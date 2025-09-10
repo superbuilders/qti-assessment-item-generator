@@ -73,6 +73,10 @@
 			"types": "./dist/structured/client.d.ts",
 			"import": "./dist/structured/client.js"
 		},
+		"./structured/differentiator": {
+			"types": "./dist/structured/differentiator.d.ts",
+			"import": "./dist/structured/differentiator.js"
+		},
 		"./widgets/registry": {
 			"types": "./dist/widgets/registry.d.ts",
 			"import": "./dist/widgets/registry.js"
