@@ -325,7 +325,7 @@ export function calculateYAxisLayoutAxisAware(
 		leftMargin = Math.ceil((spaceLeftOfAnchor - f * (svgWidth - pads.right)) / denom)
 	}
 
-	if (!isFinite(leftMargin) || leftMargin < 0) {
+	if (!Number.isFinite(leftMargin) || leftMargin < 0) {
 		leftMargin = Math.ceil(spaceLeftOfAnchor)
 	}
 

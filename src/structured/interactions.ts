@@ -202,8 +202,8 @@ SCAN ALL text content (prompts, choices, feedback) for "$" or "%" - these MUST b
   ✅ CORRECT: [{ "type": "math", "mathml": "<mo>(</mo><mo>-</mo><mo>$</mo><mn>5</mn><mo>)</mo>" }, { "type": "text", "content": " refund" }]
 
 **Pattern checklist:**
-- /\$(?=\s*\d)/ - dollar before number
-- /\d\s*%/ - number before percent
+- /$(?=s*d)/ - dollar before number
+- /ds*%/ - number before percent
 - NEVER use HTML spans for currency
 
 6. **NO ANSWER LEAKAGE IN INTERACTIONS** - CRITICAL: Interactions MUST NEVER reveal the correct answer:

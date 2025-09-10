@@ -76,12 +76,23 @@ export const generateAreaModelMultiplication: WidgetGenerator<typeof AreaModelMu
 
 	// Runtime validation to ensure 2D arrays have matching dimensions.
 	if (cellContents.length !== rowFactors.length || cellColors.length !== rowFactors.length) {
-		throw new Error("The 'cellContents' and 'cellColors' arrays must have the same number of rows as 'rowFactors'.")
+		logger.error("dimension mismatch in area model", {
+			cellContentsRows: cellContents.length,
+			cellColorsRows: cellColors.length,
+			rowFactorsLength: rowFactors.length
+		})
+		throw errors.new("cell arrays must have same number of rows as row factors")
 	}
 
 	for (let i = 0; i < cellContents.length; i++) {
 		if (cellContents[i]?.length !== columnFactors.length || cellColors[i]?.length !== columnFactors.length) {
-			throw new Error(`Row ${i} in 'cellContents' and 'cellColors' must have the same length as 'columnFactors'.`)
+			logger.error("column dimension mismatch in area model", {
+				row: i,
+				cellContentsColumns: cellContents[i]?.length,
+				cellColorsColumns: cellColors[i]?.length,
+				columnFactorsLength: columnFactors.length
+			})
+			throw errors.new(`row ${i} arrays must have same length as column factors`)
 		}
 	}
 
@@ -172,8 +183,9 @@ export const generateAreaModelMultiplication: WidgetGenerator<typeof AreaModelMu
 	// Draw column factor labels above the grid
 	let currentX = gridStartX
 	for (let j = 0; j < columnFactors.length; j++) {
-		const colFactor = columnFactors[j]!
-		const colWidth = scaledColWidths[j]!
+		const colFactor = columnFactors[j]
+		const colWidth = scaledColWidths[j]
+		if (colFactor === undefined || colWidth === undefined) continue
 		const cellCenterX = currentX + colWidth / 2
 
 		// Draw column factor label above this column (or unknown box)
@@ -203,8 +215,9 @@ export const generateAreaModelMultiplication: WidgetGenerator<typeof AreaModelMu
 	// Draw the grid of cells
 	let currentY = gridStartY
 	for (let i = 0; i < rowFactors.length; i++) {
-		const rowFactor = rowFactors[i]!
-		const rowHeight = scaledRowHeights[i]!
+		const rowFactor = rowFactors[i]
+		const rowHeight = scaledRowHeights[i]
+		if (rowFactor === undefined || rowHeight === undefined) continue
 		const rowCenterY = currentY + rowHeight / 2
 
 		// Draw row factor label to the left of this row (or unknown box)
@@ -232,9 +245,10 @@ export const generateAreaModelMultiplication: WidgetGenerator<typeof AreaModelMu
 		// Draw cells in this row
 		currentX = gridStartX
 		for (let j = 0; j < columnFactors.length; j++) {
-			const colWidth = scaledColWidths[j]!
-			const content = cellContents[i]?.[j]!
-			const color = cellColors[i]?.[j]!
+			const colWidth = scaledColWidths[j]
+			const content = cellContents[i]?.[j]
+			const color = cellColors[i]?.[j]
+			if (colWidth === undefined || content === undefined || color === undefined) continue
 
 			// Draw cell background
 			canvas.drawRect(currentX, currentY, colWidth, rowHeight, {

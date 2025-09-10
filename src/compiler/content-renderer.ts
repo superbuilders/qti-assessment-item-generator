@@ -35,6 +35,9 @@ export function renderInlineContent(inlineItems: InlineContent | null | undefine
 					}
 					return content // Render directly, no wrapper
 				}
+				default:
+					logger.error("unsupported inline content type", { item })
+					throw errors.new("unsupported inline content type")
 			}
 		})
 		.join("")
@@ -58,6 +61,9 @@ export function renderBlockContent(blockItems: BlockContent | null | undefined, 
 					}
 					return `<div>${content}</div>` // ALWAYS wrap block slots in a div
 				}
+				default:
+					logger.error("unsupported block content type", { item })
+					throw errors.new("unsupported block content type")
 			}
 		})
 		.join("\n        ")

@@ -1,5 +1,4 @@
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import {
 	createAxisOptionsSchema,
@@ -11,6 +10,7 @@ import {
 import { PADDING } from "../../utils/constants"
 import { setupCoordinatePlaneV2 } from "../../utils/coordinate-plane-v2"
 import { theme } from "../../utils/theme"
+import type { WidgetGenerator } from "../types"
 
 export const LineEquationGraphPropsSchema = z
 	.object({

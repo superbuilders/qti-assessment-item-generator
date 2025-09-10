@@ -116,7 +116,7 @@ async function mapSlotsToWidgets(
 		throw errors.wrap(response.error, "ai widget mapping")
 	}
 
-	const choice = (response.data as any).choices[0]
+	const choice = response.data.choices[0]
 	if (!choice?.message?.parsed) {
 		logger.error("CRITICAL: OpenAI widget mapping returned no parsed content")
 		throw errors.new("empty ai response: no parsed content for widget mapping")
@@ -206,7 +206,7 @@ async function generateAssessmentShell(
 		throw errors.wrap(response.error, "ai shell generation")
 	}
 
-	const choice = (response.data as any).choices[0]
+	const choice = response.data.choices[0]
 	if (!choice) {
 		logger.error("CRITICAL: OpenAI response contained no choices")
 		throw errors.new("openai returned no choices")
@@ -279,7 +279,7 @@ async function generateInteractionContent(
 		throw errors.wrap(response.error, "ai interaction generation")
 	}
 
-	const choice = (response.data as any).choices[0]
+	const choice = response.data.choices[0]
 	if (!choice?.message?.parsed) {
 		logger.error("CRITICAL: OpenAI interaction generation returned no parsed content")
 		throw errors.new("empty ai response: no parsed content for interaction generation")
@@ -350,7 +350,7 @@ async function generateWidgetContent(
 		throw errors.wrap(response.error, "ai widget generation")
 	}
 
-	const choice = (response.data as any).choices[0]
+	const choice = response.data.choices[0]
 	if (!choice?.message?.parsed) {
 		logger.error("CRITICAL: OpenAI widget generation returned no parsed content")
 		throw errors.new("empty ai response: no parsed content for widget generation")

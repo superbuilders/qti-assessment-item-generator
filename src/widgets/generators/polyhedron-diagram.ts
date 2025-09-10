@@ -358,7 +358,11 @@ export const generatePolyhedronDiagram: WidgetGenerator<typeof PolyhedronDiagram
 		faces: Record<string, { points: Array<{ x: number; y: number } | undefined> }>
 	) {
 		// Back-compat: map legacy diagonals to segments if any were provided
-		const allSegments: Array<{ from: any; to: any; label: string | null }> = []
+		const allSegments: Array<{
+			from: { type: string; index: number }
+			to: { type: string; index: number }
+			label: string | null
+		}> = []
 		for (const d of diagonals) {
 			allSegments.push({
 				from: { type: "vertex", index: d.fromVertexIndex },

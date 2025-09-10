@@ -174,7 +174,7 @@ SCAN ALL text content in widgets (labels, captions, content) for '$' - these MUS
   ✅ CORRECT: [{ 'type': 'text', 'content': 'Cost: ' }, { 'type': 'math', 'mathml': '<mo>-</mo><mo>$</mo><mn>5</mn>' }]
 
 **Pattern checklist:**
-- /\$(?=\s*\d)/ - dollar before number
+- /$(?=s*d)/ - dollar before number
 - NEVER use HTML spans for currency
 
   **DEDICATED RULE: ANSWER LEAKAGE IS STRICTLY PROHIBITED**

@@ -1,3 +1,5 @@
+import * as errors from "@superbuilders/errors"
+import * as logger from "@superbuilders/slog"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
@@ -63,9 +65,12 @@ export const generateFractionModelDiagram: WidgetGenerator<typeof FractionModelD
 
 	// --- Runtime Validation ---
 	if (operators && operators.length !== shapes.length - 1) {
-		throw new Error(
-			`The number of operators (${operators.length}) must be exactly one less than the number of shapes (${shapes.length}).`
-		)
+		logger.error("operator count mismatch in fractional model diagram", {
+			operatorCount: operators.length,
+			shapeCount: shapes.length,
+			expectedOperatorCount: shapes.length - 1
+		})
+		throw errors.new("operator count must be exactly one less than shape count")
 	}
 
 	const canvas = new CanvasImpl({
@@ -111,8 +116,9 @@ export const generateFractionModelDiagram: WidgetGenerator<typeof FractionModelD
 		}
 
 		for (let i = 0; i < numSides; i++) {
-			const p1 = vertices[i]!
-			const p2 = vertices[(i + 1) % numSides]!
+			const p1 = vertices[i]
+			const p2 = vertices[(i + 1) % numSides]
+			if (!p1 || !p2) continue
 			const path = new Path2D().moveTo(cx, cy).lineTo(p1.x, p1.y).lineTo(p2.x, p2.y).closePath()
 			const isShaded = i < numerator
 			canvas.drawPath(path, {
@@ -223,19 +229,21 @@ export const generateFractionModelDiagram: WidgetGenerator<typeof FractionModelD
 		currentX += shapeDiameter
 
 		if (operators && index < operators.length) {
-			const operator = operators[index]!
-			const operatorCenterX = currentX + operatorWidth / 2
-			canvas.drawText({
-				x: operatorCenterX,
-				y: verticalCenter,
-				text: operator,
-				anchor: "middle",
-				dominantBaseline: "middle",
-				fontPx: 48,
-				fontWeight: theme.font.weight.bold,
-				fill: theme.colors.textSecondary
-			})
-			currentX += operatorWidth
+			const operator = operators[index]
+			if (operator) {
+				const operatorCenterX = currentX + operatorWidth / 2
+				canvas.drawText({
+					x: operatorCenterX,
+					y: verticalCenter,
+					text: operator,
+					anchor: "middle",
+					dominantBaseline: "middle",
+					fontPx: 48,
+					fontWeight: theme.font.weight.bold,
+					fill: theme.colors.textSecondary
+				})
+				currentX += operatorWidth
+			}
 		}
 	})
 

@@ -1,3 +1,5 @@
+import * as errors from "@superbuilders/errors"
+import * as logger from "@superbuilders/slog"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
@@ -176,13 +178,11 @@ export const generateAngleDiagram: WidgetGenerator<typeof AngleDiagramPropsSchem
 	const isolatedPoints = points.filter((point) => !connectedPointIds.has(point.id))
 	if (isolatedPoints.length > 0) {
 		const isolatedIds = isolatedPoints.map((p) => p.id).join(", ")
-		throw new Error(
-			`Angle diagram validation failed: Points [${isolatedIds}] are not connected to any rays. ` +
-				`Every point must be referenced by at least one ray (either as 'from' or 'to'). ` +
-				"This likely indicates incomplete line definitions - ensure all geometric lines are fully specified. " +
-				"For parallel lines with transversal, you need complete line segments (e.g., A→B for line AB), " +
-				"not just partial segments from vertices to endpoints."
-		)
+		logger.error("angle diagram validation failed: isolated points found", {
+			isolatedPointIds: isolatedIds,
+			isolatedPointCount: isolatedPoints.length
+		})
+		throw errors.new("points not connected to any rays - incomplete line definitions")
 	}
 
 	const canvas = new CanvasImpl({

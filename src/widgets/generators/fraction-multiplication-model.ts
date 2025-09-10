@@ -75,8 +75,9 @@ function findRayPolygonIntersection(
 	polygonVertices: { x: number; y: number }[]
 ): { point: { x: number; y: number }; edgeIndex: number } | null {
 	for (let i = 0; i < polygonVertices.length; i++) {
-		const p3 = polygonVertices[i]!
-		const p4 = polygonVertices[(i + 1) % polygonVertices.length]!
+		const p3 = polygonVertices[i]
+		const p4 = polygonVertices[(i + 1) % polygonVertices.length]
+		if (!p3 || !p4) continue
 
 		const den = (p1.x - p2.x) * (p3.y - p4.y) - (p1.y - p2.y) * (p3.x - p4.x)
 		if (den === 0) continue
@@ -197,7 +198,8 @@ function drawSingleModel(canvas: CanvasImpl, modelProps: FractionModel, cx: numb
 				// Walk along the polygon perimeter from the edge after startEdge up to endEdge
 				let edge = (startEdge + 1) % sides
 				while (edge !== (endEdge + 1) % sides) {
-					const v = vertices[edge]!
+					const v = vertices[edge]
+					if (!v) break
 					path.lineTo(v.x, v.y)
 					edge = (edge + 1) % sides
 				}
@@ -259,7 +261,14 @@ function drawModelWithOverflow(canvas: CanvasImpl, modelProps: FractionModel, cx
 
 	for (let i = 0; i < repeatCount; i++) {
 		const tileCx = startX + i * (tileSize + gap)
-		const tileShaded = i < fullTiles ? modelProps.totalParts : i === fullTiles ? remainder : 0
+		let tileShaded: number
+		if (i < fullTiles) {
+			tileShaded = modelProps.totalParts
+		} else if (i === fullTiles) {
+			tileShaded = remainder
+		} else {
+			tileShaded = 0
+		}
 		const tileProps: FractionModel = {
 			...modelProps,
 			shadedParts: tileShaded

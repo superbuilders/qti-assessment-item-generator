@@ -1,100 +1,101 @@
 {
-  "name": "@superbuilders/qti-assessment-item-generator",
-  "version": "1.0.0",
-  "description": "QTI 3.0 assessment item generator (compiler + AI pipeline)",
-  "type": "module",
-  "files": [
-    "dist",
-    "README.md",
-    "LICENSE"
-  ],
-  "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "typecheck": "tsc --noEmit",
-    "prepublishOnly": "bun run build"
-  },
-  "keywords": [
-    "logging",
-    "structured-logging",
-    "performance",
-    "slog",
-    "high-performance"
-  ],
-  "author": "Bjorn Pagen",
-  "license": "0BSD",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/superbuilders/qti-assessment-item-generator"
-  },
-  "devDependencies": {
-    "@types/bun": "1.2.21",
-    "@types/node": "^24.3.1"
-  },
-  "peerDependencies": {
-    "typescript": "^5.9.2"
-  },
-  "engines": {
-    "node": ">=18"
-  },
-  "publishConfig": {
-    "access": "public"
-  },
-  "dependencies": {
-    "@biomejs/biome": "^2.0.0-beta.6",
-    "@superbuilders/errors": "2.0.1",
-    "@superbuilders/slog": "4.0.0",
-    "@types/he": "1.2.3",
-    "fast-xml-parser": "5.2.5",
-    "he": "1.2.0",
-    "openai": "^5.20.1",
-    "z3-solver": "4.15.3",
-    "zod": "^3"
-  },
-  "exports": {
-    "./package.json": "./package.json",
-    "./compiler": {
-      "types": "./dist/compiler/compiler.d.ts",
-      "import": "./dist/compiler/compiler.js"
-    },
-    "./compiler/schemas": {
-      "types": "./dist/compiler/schemas.d.ts",
-      "import": "./dist/compiler/schemas.js"
-    },
-    "./compiler/response-processor": {
-      "types": "./dist/compiler/response-processor.d.ts",
-      "import": "./dist/compiler/response-processor.js"
-    },
-    "./compiler/qti-constants": {
-      "types": "./dist/compiler/qti-constants.d.ts",
-      "import": "./dist/compiler/qti-constants.js"
-    },
-    "./structured": {
-      "types": "./dist/structured/client.d.ts",
-      "import": "./dist/structured/client.js"
-    },
-    "./widgets/registry": {
-      "types": "./dist/widgets/registry.d.ts",
-      "import": "./dist/widgets/registry.js"
-    },
-    "./widgets/collections": {
-      "types": "./dist/widgets/collections/index.d.ts",
-      "import": "./dist/widgets/collections/index.js"
-    },
-    "./widgets/types": {
-      "types": "./dist/widgets/types.d.ts",
-      "import": "./dist/widgets/types.js"
-    },
-    "./widgets/widget-generator": {
-      "types": "./dist/widgets/widget-generator.d.ts",
-      "import": "./dist/widgets/widget-generator.js"
-    },
-    "./examples": {
-      "types": "./dist/examples.d.ts",
-      "import": "./dist/examples.js"
-    },
-    "./qti-validation/utils": {
-      "types": "./dist/qti-validation/utils.d.ts",
-      "import": "./dist/qti-validation/utils.js"
-    }
-  }
+	"name": "@superbuilders/qti-assessment-item-generator",
+	"version": "1.0.0",
+	"description": "QTI 3.0 assessment item generator (compiler + AI pipeline)",
+	"type": "module",
+	"files": [
+		"dist",
+		"README.md",
+		"LICENSE"
+	],
+	"scripts": {
+		"build": "tsc -p tsconfig.json",
+		"typecheck": "tsc --noEmit",
+		"biome": "biome check --write",
+		"prepublishOnly": "bun run build"
+	},
+	"keywords": [
+		"logging",
+		"structured-logging",
+		"performance",
+		"slog",
+		"high-performance"
+	],
+	"author": "Bjorn Pagen",
+	"license": "0BSD",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/superbuilders/qti-assessment-item-generator"
+	},
+	"devDependencies": {
+		"@types/bun": "1.2.21",
+		"@types/node": "^24.3.1"
+	},
+	"peerDependencies": {
+		"typescript": "^5.9.2"
+	},
+	"engines": {
+		"node": ">=18"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"dependencies": {
+		"@biomejs/biome": "^2.0.0-beta.6",
+		"@superbuilders/errors": "2.0.1",
+		"@superbuilders/slog": "4.0.0",
+		"@types/he": "1.2.3",
+		"fast-xml-parser": "5.2.5",
+		"he": "1.2.0",
+		"openai": "^5.20.1",
+		"z3-solver": "4.15.3",
+		"zod": "^3"
+	},
+	"exports": {
+		"./package.json": "./package.json",
+		"./compiler": {
+			"types": "./dist/compiler/compiler.d.ts",
+			"import": "./dist/compiler/compiler.js"
+		},
+		"./compiler/schemas": {
+			"types": "./dist/compiler/schemas.d.ts",
+			"import": "./dist/compiler/schemas.js"
+		},
+		"./compiler/response-processor": {
+			"types": "./dist/compiler/response-processor.d.ts",
+			"import": "./dist/compiler/response-processor.js"
+		},
+		"./compiler/qti-constants": {
+			"types": "./dist/compiler/qti-constants.d.ts",
+			"import": "./dist/compiler/qti-constants.js"
+		},
+		"./structured": {
+			"types": "./dist/structured/client.d.ts",
+			"import": "./dist/structured/client.js"
+		},
+		"./widgets/registry": {
+			"types": "./dist/widgets/registry.d.ts",
+			"import": "./dist/widgets/registry.js"
+		},
+		"./widgets/collections": {
+			"types": "./dist/widgets/collections/index.d.ts",
+			"import": "./dist/widgets/collections/index.js"
+		},
+		"./widgets/types": {
+			"types": "./dist/widgets/types.d.ts",
+			"import": "./dist/widgets/types.js"
+		},
+		"./widgets/widget-generator": {
+			"types": "./dist/widgets/widget-generator.d.ts",
+			"import": "./dist/widgets/widget-generator.js"
+		},
+		"./examples": {
+			"types": "./dist/examples.d.ts",
+			"import": "./dist/examples.js"
+		},
+		"./qti-validation/utils": {
+			"types": "./dist/qti-validation/utils.d.ts",
+			"import": "./dist/qti-validation/utils.js"
+		}
+	}
 }

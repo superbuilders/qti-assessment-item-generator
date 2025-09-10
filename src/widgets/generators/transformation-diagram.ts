@@ -23,7 +23,7 @@ function createShapeSchema() {
 					val === null || val.trim() === "" || val.trim().toLowerCase() === "null" ? null : val.trim()
 				)
 				.describe(
-					"Shape identifier (e.g., 'ABCD', 'Figure 1', 'P', 'P'\'', null). Null means no label. Positioned near shape's center."
+					"Shape identifier (e.g., 'ABCD', 'Figure 1', 'P', 'P''', null). Null means no label. Positioned near shape's center."
 				),
 			fillColor: z
 				.string()
@@ -487,7 +487,12 @@ export const generateTransformationDiagram: WidgetGenerator<typeof Transformatio
 		const endScreen = ((-angle2 % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI)
 		const cwDiff = (endScreen - startScreen + 2 * Math.PI) % (2 * Math.PI)
 		const clockwiseIsSmall = cwDiff <= Math.PI
-		const sweepFlag: 0 | 1 = largeArcFlag === 0 ? (clockwiseIsSmall ? 1 : 0) : clockwiseIsSmall ? 0 : 1
+		let sweepFlag: 0 | 1
+		if (largeArcFlag === 0) {
+			sweepFlag = clockwiseIsSmall ? 1 : 0
+		} else {
+			sweepFlag = clockwiseIsSmall ? 0 : 1
+		}
 
 		const markPath = new Path2D()
 			.moveTo(startX, startY)
@@ -606,8 +611,12 @@ export const generateTransformationDiagram: WidgetGenerator<typeof Transformatio
 	drawPolygon(preImage, false)
 	drawPolygon(image, true)
 
-	preImage.angleMarks.forEach((mark) => drawAngleMark(preImage.vertices, mark, preImage.strokeColor))
-	image.angleMarks.forEach((mark) => drawAngleMark(image.vertices, mark, image.strokeColor))
+	for (const mark of preImage.angleMarks) {
+		drawAngleMark(preImage.vertices, mark, preImage.strokeColor)
+	}
+	for (const mark of image.angleMarks) {
+		drawAngleMark(image.vertices, mark, image.strokeColor)
+	}
 
 	// When dilation scale is very close to 1, pre-image and image labels can overlap.
 	// Nudge the image labels outward with a small additional offset to avoid overlap.

@@ -93,7 +93,11 @@ export function computeAndRenderYAxis(
 	yAxisLabelX: number
 ): AxisResult {
 	const tickLength = spec.showTicks === false ? 0 : TICK_LENGTH_PX
-	const isCategorical = !!(spec.categories && spec.categories.length > 0)
+	// Type guard function for categorical spec
+	function isCategoricalSpec(spec: AxisSpec): spec is AxisSpec & { categories: string[] } {
+		return !!(spec.categories && spec.categories.length > 0)
+	}
+	const isCategorical = isCategoricalSpec(spec)
 	if (!isCategorical) {
 		if (spec.domain.min >= spec.domain.max) {
 			logger.error("invalid y-axis domain", { domain: spec.domain })
@@ -125,8 +129,8 @@ export function computeAndRenderYAxis(
 	let bandWidth: number | undefined
 	let toSvgYCategorical: ((idx: number) => number) | undefined
 	if (isCategorical) {
-		bandWidth = chartArea.height / (spec.categories as string[]).length
-		toSvgYCategorical = (idx: number) => chartArea.top + (idx + 0.5) * (bandWidth as number)
+		bandWidth = chartArea.height / spec.categories.length
+		toSvgYCategorical = (idx: number) => chartArea.top + (idx + 0.5) * bandWidth
 	}
 
 	// MODIFIED: Replace all markup generation with canvas calls.
@@ -136,7 +140,7 @@ export function computeAndRenderYAxis(
 	})
 
 	if (isCategorical) {
-		const cats = spec.categories as string[]
+		const cats = spec.categories
 		for (let i = 0; i < cats.length; i++) {
 			const y = toSvgYCategorical?.(i)
 			if (y === undefined) continue
@@ -145,7 +149,7 @@ export function computeAndRenderYAxis(
 				strokeWidth: AXIS_STROKE_WIDTH_PX
 			})
 			if (spec.showTickLabels) {
-				const label = cats[i] as string
+				const label = cats[i]
 				canvas.drawText({
 					x: axisX - TICK_LABEL_PADDING_PX,
 					y: y + 4,
@@ -178,15 +182,17 @@ export function computeAndRenderYAxis(
 			})
 
 			if (spec.showTickLabels && selected.has(i)) {
-				const label = spec.labelFormatter ? spec.labelFormatter(t) : labels[i]!
-				canvas.drawText({
-					x: axisX - TICK_LABEL_PADDING_PX,
-					y: y + 4,
-					text: label,
-					anchor: "end",
-					fontPx: TICK_LABEL_FONT_PX,
-					fill: theme.colors.axisLabel
-				})
+				const label = spec.labelFormatter ? spec.labelFormatter(t) : labels[i]
+				if (label !== undefined) {
+					canvas.drawText({
+						x: axisX - TICK_LABEL_PADDING_PX,
+						y: y + 4,
+						text: label,
+						anchor: "end",
+						fontPx: TICK_LABEL_FONT_PX,
+						fill: theme.colors.axisLabel
+					})
+				}
 			}
 
 			// Always render horizontal gridlines for all ticks when enabled, including at y = 0
@@ -216,7 +222,7 @@ export function computeAndRenderYAxis(
 
 	// REMOVED: `registerExtents` function is no longer needed.
 	return {
-		toSvg: isCategorical ? toSvgYCategorical! : toSvgYNumeric,
+		toSvg: isCategorical ? (toSvgYCategorical ?? (() => 0)) : toSvgYNumeric,
 		bandWidth
 	}
 }
@@ -284,7 +290,7 @@ export function computeAndRenderXAxis(
 		case "categoryBand": {
 			const N = spec.categories.length
 			bandWidth = chartArea.width / N
-			toSvgX = (i: number) => chartArea.left + (i + 0.5) * bandWidth!
+			toSvgX = (i: number) => chartArea.left + (i + 0.5) * (bandWidth ?? 0)
 			break
 		}
 		case "categoryPoint": {
@@ -332,16 +338,21 @@ export function computeAndRenderXAxis(
 	})
 
 	for (let i = 0; i < tickPositions.length; i++) {
-		const x = tickPositions[i]!
+		const x = tickPositions[i]
+		if (x === undefined) continue
 		canvas.drawLine(x, axisY, x, axisY + tickLength, {
 			stroke: theme.colors.axis,
 			strokeWidth: AXIS_STROKE_WIDTH_PX
 		})
 		if (spec.showTickLabels && selected.has(i)) {
+			const labelValue = tickValues?.[i]
+			const labelText = tickLabels?.[i]
+			if (labelValue === undefined && labelText === undefined) continue
+
 			const label =
-				spec.xScaleType === "numeric" && spec.labelFormatter && tickValues
-					? spec.labelFormatter(tickValues[i]!)
-					: tickLabels[i]!
+				spec.xScaleType === "numeric" && spec.labelFormatter && labelValue !== undefined
+					? spec.labelFormatter(labelValue)
+					: labelText
 			canvas.drawText({
 				x: x,
 				y: axisY + tickLength + TICK_LABEL_PADDING_PX,

@@ -4,7 +4,7 @@ import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
 import { abbreviateMonth } from "../../utils/labels"
-import { theme } from "../../utils/theme"
+import { type Theme, theme } from "../../utils/theme"
 import type { WidgetGenerator } from "../types"
 
 export const ErrMismatchedTickCounts = errors.new("top and bottom lines must have the same number of ticks")
@@ -78,7 +78,7 @@ function drawClippedDottedLine(
 	x2: number,
 	y2: number,
 	labelBounds: Array<{ x: number; y: number; width: number; height: number }>,
-	theme: any
+	theme: Theme
 ) {
 	// Check if the line intersects with any label bounds
 	const lineIntersections: Array<{ start: number; end: number }> = []

@@ -99,25 +99,25 @@ export function setupCoordinatePlaneV2(
 	// Grid lines
 	if (xAxis.showGridLines) {
 		const { values } = buildTicks(xAxis.min, xAxis.max, xAxis.tickInterval)
-		values.forEach((t) => {
-			if (Math.abs(t) < 1e-9) return // Skip origin
+		for (const t of values) {
+			if (Math.abs(t) < 1e-9) continue // Skip origin
 			const x = toSvgX(t)
 			canvas.drawLine(x, margin.top, x, height - margin.bottom, {
 				stroke: theme.colors.gridMajor,
 				strokeWidth: 1
 			})
-		})
+		}
 	}
 	if (yAxis.showGridLines) {
 		const { values } = buildTicks(yAxis.min, yAxis.max, yAxis.tickInterval)
-		values.forEach((t) => {
-			if (Math.abs(t) < 1e-9) return // Skip origin
+		for (const t of values) {
+			if (Math.abs(t) < 1e-9) continue // Skip origin
 			const y = toSvgY(t)
 			canvas.drawLine(margin.left, y, width - margin.right, y, {
 				stroke: theme.colors.gridMajor,
 				strokeWidth: 1
 			})
-		})
+		}
 	}
 
 	// Axes lines
@@ -150,15 +150,17 @@ export function setupCoordinatePlaneV2(
 			strokeWidth: 1
 		})
 		if (selectedXTicks.has(i)) {
-			const label = xLabels[i]!
-			canvas.drawText({
-				x: x,
-				y: zeroY + 15,
-				text: label,
-				fill: theme.colors.axisLabel,
-				anchor: "middle",
-				fontPx: TICK_LABEL_FONT_PX
-			})
+			const label = xLabels[i]
+			if (label !== undefined) {
+				canvas.drawText({
+					x: x,
+					y: zeroY + 15,
+					text: label,
+					fill: theme.colors.axisLabel,
+					anchor: "middle",
+					fontPx: TICK_LABEL_FONT_PX
+				})
+			}
 		}
 	})
 
@@ -182,15 +184,17 @@ export function setupCoordinatePlaneV2(
 			strokeWidth: 1
 		})
 		if (selectedYTicks.has(i)) {
-			const label = yLabels[i]!
-			canvas.drawText({
-				x: zeroX - 8,
-				y: y + 4,
-				text: label,
-				fill: theme.colors.axisLabel,
-				anchor: "end",
-				fontPx: TICK_LABEL_FONT_PX
-			})
+			const label = yLabels[i]
+			if (label !== undefined) {
+				canvas.drawText({
+					x: zeroX - 8,
+					y: y + 4,
+					text: label,
+					fill: theme.colors.axisLabel,
+					anchor: "end",
+					fontPx: TICK_LABEL_FONT_PX
+				})
+			}
 		}
 	})
 

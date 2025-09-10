@@ -159,8 +159,9 @@ export const generateConceptualGraph: WidgetGenerator<typeof ConceptualGraphProp
 	// Precompute cumulative lengths and provide a safe pointAtT
 	const cumulativeLengths: number[] = [0]
 	for (let i = 1; i < curvePoints.length; i++) {
-		const prev = curvePoints[i - 1]!
-		const curr = curvePoints[i]!
+		const prev = curvePoints[i - 1]
+		const curr = curvePoints[i]
+		if (!prev || !curr) continue
 		const dx = curr.x - prev.x
 		const dy = curr.y - prev.y
 		const segLen = Math.hypot(dx, dy)
@@ -169,9 +170,9 @@ export const generateConceptualGraph: WidgetGenerator<typeof ConceptualGraphProp
 	const totalLength = cumulativeLengths[cumulativeLengths.length - 1] ?? 0
 	function pointAtT(t: number): { x: number; y: number } {
 		if (curvePoints.length === 0) return { x: 0, y: 0 }
-		if (curvePoints.length === 1 || totalLength === 0) return curvePoints[0]!
-		if (t <= 0) return curvePoints[0]!
-		if (t >= 1) return curvePoints[curvePoints.length - 1]!
+		if (curvePoints.length === 1 || totalLength === 0) return curvePoints[0] ?? { x: 0, y: 0 }
+		if (t <= 0) return curvePoints[0] ?? { x: 0, y: 0 }
+		if (t >= 1) return curvePoints[curvePoints.length - 1] ?? { x: 0, y: 0 }
 		const target = t * totalLength
 		let idx = 0
 		for (let i = 0; i < cumulativeLengths.length - 1; i++) {
@@ -183,15 +184,16 @@ export const generateConceptualGraph: WidgetGenerator<typeof ConceptualGraphProp
 			}
 		}
 		if (idx < 0) idx = 0
-		if (idx >= curvePoints.length - 1) return curvePoints[curvePoints.length - 1]!
+		if (idx >= curvePoints.length - 1) return curvePoints[curvePoints.length - 1] ?? { x: 0, y: 0 }
 		const cStartVal = cumulativeLengths[idx] ?? 0
 		const cEndVal = cumulativeLengths[idx + 1] ?? cStartVal
 		const cStart = cStartVal
 		const cEnd = cEndVal
 		const segmentLength = cEnd - cStart
 		const localT = segmentLength === 0 ? 0 : (target - cStart) / segmentLength
-		const p0 = curvePoints[idx]!
-		const p1 = curvePoints[idx + 1]!
+		const p0 = curvePoints[idx]
+		const p1 = curvePoints[idx + 1]
+		if (!p0 || !p1) return { x: 0, y: 0 }
 		return {
 			x: p0.x + (p1.x - p0.x) * localT,
 			y: p0.y + (p1.y - p0.y) * localT

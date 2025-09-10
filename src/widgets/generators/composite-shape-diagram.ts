@@ -394,17 +394,19 @@ export const generateCompositeShapeDiagram: WidgetGenerator<typeof CompositeShap
 				transformedPerimeter.push(first)
 			}
 			for (let i = 1; i < pathPoints.length; i++) {
-				if (pathPoints[i]) {
-					const pt = project(pathPoints[i]!)
+				const point = pathPoints[i]
+				if (point) {
+					const pt = project(point)
 					outerBoundaryPath.lineTo(pt.x, pt.y)
 					transformedPerimeter.push(pt)
 				}
 			}
 
 			for (let i = 0; i < edge.segments.length; i++) {
-				const from = pathPoints[i]!
-				const to = pathPoints[i + 1]!
-				const segment = edge.segments[i]!
+				const from = pathPoints[i]
+				const to = pathPoints[i + 1]
+				const segment = edge.segments[i]
+				if (!from || !to || !segment) continue
 
 				const p1 = project(from)
 				const p2 = project(to)
@@ -508,8 +510,9 @@ export const generateCompositeShapeDiagram: WidgetGenerator<typeof CompositeShap
 		if (edge.type !== "partitioned") continue
 		const pathPoints = edge.path.map((id) => vertexMap.get(id)).filter((p): p is Point => !!p)
 		for (let i = 0; i < edge.segments.length; i++) {
-			const from = pathPoints[i]!
-			const to = pathPoints[i + 1]!
+			const from = pathPoints[i]
+			const to = pathPoints[i + 1]
+			if (!from || !to) continue
 			const labelText = formatLabel(edge.segments[i]?.label)
 			if (!labelText) continue
 			const sFrom = project(from)

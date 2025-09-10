@@ -413,11 +413,11 @@ async function solveWithZ3(props: z.infer<typeof ConstraintGeometryDiagramPropsS
 	const solver = new Z.Solver()
 
 	const allVertices = new Map<string, VertexDef>(props.vertices.map((v) => [v.id, v]))
-	props.constraints.forEach((c) => {
+	for (const c of props.constraints) {
 		if (c.type === "intersect" || c.type === "midpoint") {
 			allVertices.set(c.id, { id: c.id, label: c.label ?? null })
 		}
-	})
+	}
 
 	const vars = new Map(
 		Array.from(allVertices.keys()).map((id) => {
@@ -476,7 +476,11 @@ async function solveWithZ3(props: z.infer<typeof ConstraintGeometryDiagramPropsS
 					logger.error("solver equalLength no lines")
 					throw errors.new("solver: invalid equalLength")
 				}
-				const base = lineDefs[0]!
+				const base = lineDefs[0]
+				if (!base) {
+					logger.error("solver: no base line for equalLength")
+					throw errors.new("solver: no base line")
+				}
 				const rest = lineDefs.slice(1)
 				const v1 = vars.get(base.from)
 				const v2 = vars.get(base.to)
@@ -489,8 +493,8 @@ async function solveWithZ3(props: z.infer<typeof ConstraintGeometryDiagramPropsS
 					.mul(v1.x.sub(v2.x))
 					.add(v1.y.sub(v2.y).mul(v1.y.sub(v2.y)))
 				for (const l2 of rest) {
-					const v3 = vars.get(l2.from),
-						v4 = vars.get(l2.to)
+					const v3 = vars.get(l2.from)
+					const v4 = vars.get(l2.to)
 					if (!v3 || !v4) {
 						logger.error("solver equalLength compare vertices missing")
 						throw errors.new("solver: vertex missing")
@@ -515,10 +519,10 @@ async function solveWithZ3(props: z.infer<typeof ConstraintGeometryDiagramPropsS
 					})
 					throw errors.new("solver: line missing")
 				}
-				const v1 = vars.get(l1.from),
-					v2 = vars.get(l1.to)
-				const v3 = vars.get(l2.from),
-					v4 = vars.get(l2.to)
+				const v1 = vars.get(l1.from)
+				const v2 = vars.get(l1.to)
+				const v3 = vars.get(l2.from)
+				const v4 = vars.get(l2.to)
 				if (!v1 || !v2 || !v3 || !v4) {
 					logger.error("solver perpendicular vertex missing")
 					throw errors.new("solver: vertex missing")
@@ -537,10 +541,10 @@ async function solveWithZ3(props: z.infer<typeof ConstraintGeometryDiagramPropsS
 					logger.error("solver parallel lines not found", { lines: c.lines })
 					throw errors.new("solver: line missing")
 				}
-				const v1 = vars.get(l1.from),
-					v2 = vars.get(l1.to)
-				const v3 = vars.get(l2.from),
-					v4 = vars.get(l2.to)
+				const v1 = vars.get(l1.from)
+				const v2 = vars.get(l1.to)
+				const v3 = vars.get(l2.from)
+				const v4 = vars.get(l2.to)
 				if (!v1 || !v2 || !v3 || !v4) {
 					logger.error("solver parallel vertex missing")
 					throw errors.new("solver: vertex missing")
@@ -559,8 +563,8 @@ async function solveWithZ3(props: z.infer<typeof ConstraintGeometryDiagramPropsS
 					throw errors.new("solver: line missing")
 				}
 				const vM = vars.get(c.id)
-				const v1 = vars.get(line.from),
-					v2 = vars.get(line.to)
+				const v1 = vars.get(line.from)
+				const v2 = vars.get(line.to)
 				if (!vM || !v1 || !v2) {
 					logger.error("solver midpoint vertex missing")
 					throw errors.new("solver: vertex missing")
@@ -570,8 +574,8 @@ async function solveWithZ3(props: z.infer<typeof ConstraintGeometryDiagramPropsS
 				break
 			}
 			case "angle": {
-				const line1 = props.lines.find((l) => l.id === c.line1),
-					line2 = props.lines.find((l) => l.id === c.line2)
+				const line1 = props.lines.find((l) => l.id === c.line1)
+				const line2 = props.lines.find((l) => l.id === c.line2)
 				if (!line1 || !line2) {
 					logger.error("solver angle lines not found", {
 						line1: c.line1,
@@ -641,15 +645,15 @@ async function solveWithZ3(props: z.infer<typeof ConstraintGeometryDiagramPropsS
 				}
 				const [refId, ...restAngleIds] = angleIds
 				// Establish a reference angle
-				const ref = anglesById.get(refId as string)
+				const ref = anglesById.get(String(refId))
 				if (!ref) {
 					logger.error("solver equalAngle reference not found", {
 						angleId: refId
 					})
 					throw errors.new("solver: angle missing")
 				}
-				const refLine1 = props.lines.find((l) => l.id === ref.line1) as LineDef | undefined
-				const refLine2 = props.lines.find((l) => l.id === ref.line2) as LineDef | undefined
+				const refLine1 = props.lines.find((l) => l.id === ref.line1)
+				const refLine2 = props.lines.find((l) => l.id === ref.line2)
 				if (!refLine1 || !refLine2) {
 					logger.error("solver equalAngle reference lines missing")
 					throw errors.new("solver: line missing")
@@ -661,24 +665,24 @@ async function solveWithZ3(props: z.infer<typeof ConstraintGeometryDiagramPropsS
 					logger.error("solver equalAngle reference vertices missing")
 					throw errors.new("solver: vertex missing")
 				}
-				const refABx = vB.x.sub(vA.x),
-					refABy = vB.y.sub(vA.y)
-				const refACx = vC.x.sub(vA.x),
-					refACy = vC.y.sub(vA.y)
+				const refABx = vB.x.sub(vA.x)
+				const refABy = vB.y.sub(vA.y)
+				const refACx = vC.x.sub(vA.x)
+				const refACy = vC.y.sub(vA.y)
 				const refDot = refABx.mul(refACx).add(refABy.mul(refACy))
 				const refLenSqAB = refABx.mul(refABx).add(refABy.mul(refABy))
 				const refLenSqAC = refACx.mul(refACx).add(refACy.mul(refACy))
 
 				for (let i = 0; i < restAngleIds.length; i++) {
-					const ai = anglesById.get(restAngleIds[i] as string)
+					const ai = anglesById.get(String(restAngleIds[i]))
 					if (!ai) {
 						logger.error("solver equalAngle angle missing", {
 							angleId: restAngleIds[i]
 						})
 						throw errors.new("solver: angle missing")
 					}
-					const l1 = props.lines.find((l) => l.id === ai.line1) as LineDef | undefined
-					const l2 = props.lines.find((l) => l.id === ai.line2) as LineDef | undefined
+					const l1 = props.lines.find((l) => l.id === ai.line1)
+					const l2 = props.lines.find((l) => l.id === ai.line2)
 					if (!l1 || !l2) {
 						logger.error("solver equalAngle lines missing")
 						throw errors.new("solver: line missing")
@@ -690,10 +694,10 @@ async function solveWithZ3(props: z.infer<typeof ConstraintGeometryDiagramPropsS
 						logger.error("solver equalAngle vertices missing")
 						throw errors.new("solver: vertex missing")
 					}
-					const abx = vB2.x.sub(vA2.x),
-						aby = vB2.y.sub(vA2.y)
-					const acx = vC2.x.sub(vA2.x),
-						acy = vC2.y.sub(vA2.y)
+					const abx = vB2.x.sub(vA2.x)
+					const aby = vB2.y.sub(vA2.y)
+					const acx = vC2.x.sub(vA2.x)
+					const acy = vC2.y.sub(vA2.y)
 					const dot = abx.mul(acx).add(aby.mul(acy))
 					const lenSqAB = abx.mul(abx).add(aby.mul(aby))
 					const lenSqAC = acx.mul(acx).add(acy.mul(acy))
@@ -796,16 +800,22 @@ async function solveWithZ3(props: z.infer<typeof ConstraintGeometryDiagramPropsS
 						if (axisVec && axisPoint) applyVertexPairAcrossAxis(e1, e2, axisVec, axisPoint)
 						else {
 							if (c.axisType === "horizontal") {
-								const p = vars.get(e1),
-									q = vars.get(e2)
-								if (!p || !q) throw errors.new("solver: vertex missing")
+								const p = vars.get(e1)
+								const q = vars.get(e2)
+								if (!p || !q) {
+									logger.error("solver: vertex missing")
+									throw errors.new("solver: vertex missing")
+								}
 								const centerY = Z.Real.val(props.height / 2)
 								solver.add(p.y.add(q.y).div(2).eq(centerY))
 								solver.add(q.x.eq(p.x))
 							} else if (c.axisType === "vertical") {
-								const p = vars.get(e1),
-									q = vars.get(e2)
-								if (!p || !q) throw errors.new("solver: vertex missing")
+								const p = vars.get(e1)
+								const q = vars.get(e2)
+								if (!p || !q) {
+									logger.error("solver: vertex missing")
+									throw errors.new("solver: vertex missing")
+								}
 								const centerX = Z.Real.val(props.width / 2)
 								solver.add(p.x.add(q.x).div(2).eq(centerX))
 								solver.add(q.y.eq(p.y))
@@ -826,22 +836,28 @@ async function solveWithZ3(props: z.infer<typeof ConstraintGeometryDiagramPropsS
 							applyVertexPairAcrossAxis(l1.to, l2.to, axisVec, axisPoint)
 						} else {
 							if (c.axisType === "horizontal") {
-								const pf = vars.get(l1.from),
-									qf = vars.get(l2.from)
-								const pt = vars.get(l1.to),
-									qt = vars.get(l2.to)
-								if (!pf || !qf || !pt || !qt) throw errors.new("solver: vertex missing")
+								const pf = vars.get(l1.from)
+								const qf = vars.get(l2.from)
+								const pt = vars.get(l1.to)
+								const qt = vars.get(l2.to)
+								if (!pf || !qf || !pt || !qt) {
+									logger.error("solver: vertices missing")
+									throw errors.new("solver: vertex missing")
+								}
 								const centerY = Z.Real.val(props.height / 2)
 								solver.add(pf.y.add(qf.y).div(2).eq(centerY))
 								solver.add(qf.x.eq(pf.x))
 								solver.add(pt.y.add(qt.y).div(2).eq(centerY))
 								solver.add(qt.x.eq(pt.x))
 							} else if (c.axisType === "vertical") {
-								const pf = vars.get(l1.from),
-									qf = vars.get(l2.from)
-								const pt = vars.get(l1.to),
-									qt = vars.get(l2.to)
-								if (!pf || !qf || !pt || !qt) throw errors.new("solver: vertex missing")
+								const pf = vars.get(l1.from)
+								const qf = vars.get(l2.from)
+								const pt = vars.get(l1.to)
+								const qt = vars.get(l2.to)
+								if (!pf || !qf || !pt || !qt) {
+									logger.error("solver: vertices missing")
+									throw errors.new("solver: vertex missing")
+								}
 								const centerX = Z.Real.val(props.width / 2)
 								solver.add(pf.x.add(qf.x).div(2).eq(centerX))
 								solver.add(qf.y.eq(pf.y))
@@ -938,11 +954,11 @@ export const generateConstraintGeometryDiagram = async (
 	const solvedPositions = await solveWithZ3(props)
 
 	const allVertices = new Map<string, VertexDef>(props.vertices.map((v) => [v.id, v]))
-	props.constraints.forEach((c) => {
+	for (const c of props.constraints) {
 		if (c.type === "intersect" || c.type === "midpoint") {
 			allVertices.set(c.id, { id: c.id, label: c.label ?? null })
 		}
-	})
+	}
 
 	// --- Geometry helpers for collision avoidance ---
 	const segmentIntersectsRect = (
@@ -951,28 +967,30 @@ export const generateConstraintGeometryDiagram = async (
 		rect: { x: number; y: number; width: number; height: number; pad?: number }
 	): boolean => {
 		const pad = rect.pad ?? 0
-		const rx = rect.x - pad,
-			ry = rect.y - pad,
-			rw = rect.width + 2 * pad,
-			rh = rect.height + 2 * pad
-		const minX = Math.min(A.x, B.x),
-			maxX = Math.max(A.x, B.x)
-		const minY = Math.min(A.y, B.y),
-			maxY = Math.max(A.y, B.y)
+		const rx = rect.x - pad
+		const ry = rect.y - pad
+		const rw = rect.width + 2 * pad
+		const rh = rect.height + 2 * pad
+		const minX = Math.min(A.x, B.x)
+		const maxX = Math.max(A.x, B.x)
+		const minY = Math.min(A.y, B.y)
+		const maxY = Math.max(A.y, B.y)
 		if (maxX < rx || minX > rx + rw || maxY < ry || minY > ry + rh) return false
-		const r1 = { x: rx, y: ry },
-			r2 = { x: rx + rw, y: ry }
-		const r3 = { x: rx + rw, y: ry + rh },
-			r4 = { x: rx, y: ry + rh }
+		const r1 = { x: rx, y: ry }
+		const r2 = { x: rx + rw, y: ry }
+		const r3 = { x: rx + rw, y: ry + rh }
+		const r4 = { x: rx, y: ry + rh }
 		const segmentsIntersect = (p1: Point, p2: Point, p3: Point, p4: Point): boolean => {
 			const o = (a: Point, b: Point, c: Point) => {
 				const val = (b.y - a.y) * (c.x - b.x) - (b.x - a.x) * (c.y - b.y)
-				return val > 1e-9 ? 1 : val < -1e-9 ? -1 : 0
+				if (val > 1e-9) return 1
+				if (val < -1e-9) return -1
+				return 0
 			}
-			const o1 = o(p1, p2, p3),
-				o2 = o(p1, p2, p4),
-				o3 = o(p3, p4, p1),
-				o4 = o(p3, p4, p2)
+			const o1 = o(p1, p2, p3)
+			const o2 = o(p1, p2, p4)
+			const o3 = o(p3, p4, p1)
+			const o4 = o(p3, p4, p2)
 			return o1 !== o2 && o3 !== o4
 		}
 		return (
@@ -985,18 +1003,18 @@ export const generateConstraintGeometryDiagram = async (
 
 	// --- Drawing Phase ---
 	if (props.shadedRegions) {
-		props.shadedRegions.forEach((region) => {
+		for (const region of props.shadedRegions) {
 			const points = region.vertices.map((vid) => solvedPositions.get(vid)).filter((p): p is Point => !!p)
 			if (points.length >= 3)
 				canvas.drawPolygon(points, {
 					fill: region.fillColor,
 					fillOpacity: region.opacity
 				})
-		})
+		}
 	}
 
 	const screenLines: ScreenLine[] = []
-	lines.forEach((line) => {
+	for (const line of lines) {
 		const from = solvedPositions.get(line.from)
 		const to = solvedPositions.get(line.to)
 		if (!from || !to) {
@@ -1032,114 +1050,113 @@ export const generateConstraintGeometryDiagram = async (
 			})
 			screenLines.push({ a: from, b: to, id: line.id })
 		}
-	})
+	}
 
-	constraints
-		.filter((c): c is Extract<ConstraintDef, { type: "angle" }> => c.type === "angle")
-		.forEach((angle) => {
-			const viz = angle.visualization
-			if (viz.type === "none") return
-			const vertexPos = solvedPositions.get(angle.vertex)
-			const line1 = lines.find((l) => l.id === angle.line1)
-			const line2 = lines.find((l) => l.id === angle.line2)
-			if (!vertexPos || !line1 || !line2) return
-			const p1Id = line1.from === angle.vertex ? line1.to : line1.from
-			const p2Id = line2.from === angle.vertex ? line2.to : line2.from
-			const p1 = solvedPositions.get(p1Id)
-			const p2 = solvedPositions.get(p2Id)
-			if (!p1 || !p2) return
+	const angleConstraints = constraints.filter((c): c is Extract<ConstraintDef, { type: "angle" }> => c.type === "angle")
+	for (const angle of angleConstraints) {
+		const viz = angle.visualization
+		if (viz.type === "none") return
+		const vertexPos = solvedPositions.get(angle.vertex)
+		const line1 = lines.find((l) => l.id === angle.line1)
+		const line2 = lines.find((l) => l.id === angle.line2)
+		if (!vertexPos || !line1 || !line2) return
+		const p1Id = line1.from === angle.vertex ? line1.to : line1.from
+		const p2Id = line2.from === angle.vertex ? line2.to : line2.from
+		const p1 = solvedPositions.get(p1Id)
+		const p2 = solvedPositions.get(p2Id)
+		if (!p1 || !p2) return
 
+		if (viz.type === "right") {
+			const v1x = p1.x - vertexPos.x
+			const v1y = p1.y - vertexPos.y
+			const m1 = Math.hypot(v1x, v1y)
+			const u1x = v1x / m1
+			const u1y = v1y / m1
+			const v2x = p2.x - vertexPos.x
+			const v2y = p2.y - vertexPos.y
+			const m2 = Math.hypot(v2x, v2y)
+			const u2x = v2x / m2
+			const u2y = v2y / m2
+			const size = 15
+			const m1x = vertexPos.x + u1x * size
+			const m1y = vertexPos.y + u1y * size
+			const m2x = vertexPos.x + u2x * size
+			const m2y = vertexPos.y + u2y * size
+			const m3x = vertexPos.x + (u1x + u2x) * size
+			const m3y = vertexPos.y + (u1y + u2y) * size
+			const path = new Path2D().moveTo(m1x, m1y).lineTo(m3x, m3y).lineTo(m2x, m2y)
+			canvas.drawPath(path, {
+				fill: "none",
+				stroke: viz.color,
+				strokeWidth: theme.stroke.width.thick
+			})
+		}
+
+		if (viz.type === "arc") {
+			const startAngle = Math.atan2(p1.y - vertexPos.y, p1.x - vertexPos.x)
+			const endAngle = Math.atan2(p2.y - vertexPos.y, p2.x - vertexPos.x)
+			const radius = viz.radius ?? 25
+			const arcStartX = vertexPos.x + radius * Math.cos(startAngle)
+			const arcStartY = vertexPos.y + radius * Math.sin(startAngle)
+			const arcEndX = vertexPos.x + radius * Math.cos(endAngle)
+			const arcEndY = vertexPos.y + radius * Math.sin(endAngle)
+			const path = new Path2D()
+				.moveTo(arcStartX, arcStartY)
+				.arcTo(radius, radius, 0, viz.largeArcFlag, viz.sweepFlag, arcEndX, arcEndY)
+			canvas.drawPath(path, {
+				fill: "none",
+				stroke: viz.color,
+				strokeWidth: theme.stroke.width.xthick
+			})
+		}
+
+		if (viz.label !== null && viz.label !== undefined) {
+			const startAngle = Math.atan2(p1.y - vertexPos.y, p1.x - vertexPos.x)
+			const endAngle = Math.atan2(p2.y - vertexPos.y, p2.x - vertexPos.x)
+			let angleDiff = endAngle - startAngle
+			while (angleDiff > Math.PI) angleDiff -= 2 * Math.PI
+			while (angleDiff < -Math.PI) angleDiff += 2 * Math.PI
+			if (Math.abs(angleDiff) > Math.PI) angleDiff = angleDiff > 0 ? angleDiff - 2 * Math.PI : angleDiff + 2 * Math.PI
+			const angleSize = Math.abs(angleDiff)
+			const midAngle = startAngle + angleDiff / 2
+			let labelRadius: number
 			if (viz.type === "right") {
-				const v1x = p1.x - vertexPos.x
-				const v1y = p1.y - vertexPos.y
-				const m1 = Math.hypot(v1x, v1y)
-				const u1x = v1x / m1
-				const u1y = v1y / m1
-				const v2x = p2.x - vertexPos.x
-				const v2y = p2.y - vertexPos.y
-				const m2 = Math.hypot(v2x, v2y)
-				const u2x = v2x / m2
-				const u2y = v2y / m2
-				const size = 15
-				const m1x = vertexPos.x + u1x * size
-				const m1y = vertexPos.y + u1y * size
-				const m2x = vertexPos.x + u2x * size
-				const m2y = vertexPos.y + u2y * size
-				const m3x = vertexPos.x + (u1x + u2x) * size
-				const m3y = vertexPos.y + (u1y + u2y) * size
-				const path = new Path2D().moveTo(m1x, m1y).lineTo(m3x, m3y).lineTo(m2x, m2y)
-				canvas.drawPath(path, {
-					fill: "none",
-					stroke: viz.color,
-					strokeWidth: theme.stroke.width.thick
-				})
-			}
-
-			if (viz.type === "arc") {
-				const startAngle = Math.atan2(p1.y - vertexPos.y, p1.x - vertexPos.x)
-				const endAngle = Math.atan2(p2.y - vertexPos.y, p2.x - vertexPos.x)
-				const radius = viz.radius ?? 25
-				const arcStartX = vertexPos.x + radius * Math.cos(startAngle)
-				const arcStartY = vertexPos.y + radius * Math.sin(startAngle)
-				const arcEndX = vertexPos.x + radius * Math.cos(endAngle)
-				const arcEndY = vertexPos.y + radius * Math.sin(endAngle)
-				const path = new Path2D()
-					.moveTo(arcStartX, arcStartY)
-					.arcTo(radius, radius, 0, viz.largeArcFlag, viz.sweepFlag, arcEndX, arcEndY)
-				canvas.drawPath(path, {
-					fill: "none",
-					stroke: viz.color,
-					strokeWidth: theme.stroke.width.xthick
-				})
-			}
-
-			if (viz.label !== null && viz.label !== undefined) {
-				const startAngle = Math.atan2(p1.y - vertexPos.y, p1.x - vertexPos.x)
-				const endAngle = Math.atan2(p2.y - vertexPos.y, p2.x - vertexPos.x)
-				let angleDiff = endAngle - startAngle
-				while (angleDiff > Math.PI) angleDiff -= 2 * Math.PI
-				while (angleDiff < -Math.PI) angleDiff += 2 * Math.PI
-				if (Math.abs(angleDiff) > Math.PI) angleDiff = angleDiff > 0 ? angleDiff - 2 * Math.PI : angleDiff + 2 * Math.PI
-				const angleSize = Math.abs(angleDiff)
-				const midAngle = startAngle + angleDiff / 2
-				let labelRadius: number
-				if (viz.type === "right") {
-					labelRadius = 25
+				labelRadius = 25
+			} else {
+				const ARC_OFFSET = 6
+				const FONT_SIZE_ESTIMATE = 14
+				const MIN_LABEL_CLEARANCE = FONT_SIZE_ESTIMATE * 1.5
+				const baseLabelRadius = (viz.radius ?? 25) + ARC_OFFSET + MIN_LABEL_CLEARANCE
+				const CLEARANCE_PX = FONT_SIZE_ESTIMATE * 0.7
+				if (Math.sin(angleSize / 2) > 0.01) {
+					const minRadiusForClearance = CLEARANCE_PX / Math.sin(angleSize / 2)
+					labelRadius = Math.max(baseLabelRadius, minRadiusForClearance)
 				} else {
-					const ARC_OFFSET = 6
-					const FONT_SIZE_ESTIMATE = 14
-					const MIN_LABEL_CLEARANCE = FONT_SIZE_ESTIMATE * 1.5
-					const baseLabelRadius = (viz.radius ?? 25) + ARC_OFFSET + MIN_LABEL_CLEARANCE
-					const CLEARANCE_PX = FONT_SIZE_ESTIMATE * 0.7
-					if (Math.sin(angleSize / 2) > 0.01) {
-						const minRadiusForClearance = CLEARANCE_PX / Math.sin(angleSize / 2)
-						labelRadius = Math.max(baseLabelRadius, minRadiusForClearance)
-					} else {
-						labelRadius = baseLabelRadius
-					}
-					const isLongLabel = viz.label ? viz.label.length > 3 : false
-					if (isLongLabel) {
-						const extraSpacing = viz.label && viz.label.length > 4 ? (viz.label.length - 4) * 4 : 0
-						labelRadius += 18 + extraSpacing
-					}
+					labelRadius = baseLabelRadius
 				}
-				const labelX = vertexPos.x + labelRadius * Math.cos(midAngle)
-				const labelY = vertexPos.y + labelRadius * Math.sin(midAngle)
-				canvas.drawText({
-					x: labelX,
-					y: labelY,
-					text: viz.label ?? "",
-					fill: theme.colors.text,
-					stroke: theme.colors.white,
-					strokeWidth: 0.3,
-					paintOrder: "stroke fill",
-					anchor: "middle",
-					dominantBaseline: "middle",
-					fontPx: theme.font.size.medium,
-					fontWeight: "500"
-				})
+				const isLongLabel = viz.label ? viz.label.length > 3 : false
+				if (isLongLabel) {
+					const extraSpacing = viz.label && viz.label.length > 4 ? (viz.label.length - 4) * 4 : 0
+					labelRadius += 18 + extraSpacing
+				}
 			}
-		})
+			const labelX = vertexPos.x + labelRadius * Math.cos(midAngle)
+			const labelY = vertexPos.y + labelRadius * Math.sin(midAngle)
+			canvas.drawText({
+				x: labelX,
+				y: labelY,
+				text: viz.label ?? "",
+				fill: theme.colors.text,
+				stroke: theme.colors.white,
+				strokeWidth: 0.3,
+				paintOrder: "stroke fill",
+				anchor: "middle",
+				dominantBaseline: "middle",
+				fontPx: theme.font.size.medium,
+				fontWeight: "500"
+			})
+		}
+	}
 
 	for (const [id, pos] of solvedPositions.entries()) {
 		const vertexDef = allVertices.get(id)
@@ -1160,11 +1177,13 @@ export const generateConstraintGeometryDiagram = async (
 			if (angles.length > 0) {
 				let maxGap = 0
 				for (let i = 0; i < angles.length; i++) {
-					const a1 = angles[i]!
-					const a2 = angles[(i + 1) % angles.length]!
+					const a1 = angles[i]
+					const a2 = angles[(i + 1) % angles.length]
+					const firstAngle = angles[0]
+					if (a1 === undefined || a2 === undefined || firstAngle === undefined) continue
 					let gap = a2 - a1
 					if (gap < 0) gap += 2 * Math.PI
-					if (i === angles.length - 1) gap = angles[0]! + 2 * Math.PI - a1
+					if (i === angles.length - 1) gap = firstAngle + 2 * Math.PI - a1
 					if (gap > maxGap) {
 						maxGap = gap
 						bestAngle = a1 + gap / 2
@@ -1227,7 +1246,7 @@ export const generateConstraintGeometryDiagram = async (
 				paintOrder: "stroke fill"
 			})
 		}
-		props.regionLabels.forEach((label) => {
+		for (const label of props.regionLabels) {
 			if (label.placement.type === "centroid") {
 				const points = label.placement.vertices.map((vid) => solvedPositions.get(vid)).filter((p): p is Point => !!p)
 				if (points.length > 0) {
@@ -1248,7 +1267,7 @@ export const generateConstraintGeometryDiagram = async (
 				const pos = { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t }
 				placeLabel(label.text, pos)
 			}
-		})
+		}
 	}
 
 	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)

@@ -51,7 +51,10 @@ function toGridInt(n: number, D: bigint): bigint {
  * Formats a rational number (numerator/denominator) into a decimal string with limited precision.
  */
 function formatRational(p: bigint, D: bigint, maxDigits = 12): string {
-	if (D === 0n) throw errors.new("denominator cannot be zero")
+	if (D === 0n) {
+		logger.error("invalid denominator", { denominator: D })
+		throw errors.new("denominator cannot be zero")
+	}
 	if (p === 0n) return "0"
 
 	const sign = p < 0n ? "-" : ""
@@ -143,7 +146,7 @@ export function buildTicks(min: number, max: number, interval: number): { values
 
 	if (k3 !== null || k6 !== null) {
 		const baseDenominator = k6 !== null ? 6 : 3
-		const k = k6 !== null ? k6 : k3!
+		const k = k6 !== null ? k6 : (k3 ?? 0)
 
 		const decimalScaleForMinMax =
 			10 ** Math.max((String(min).split(".")[1] || "").length, (String(max).split(".")[1] || "").length)

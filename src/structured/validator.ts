@@ -1,5 +1,5 @@
 import * as errors from "@superbuilders/errors"
-import * as logger from "@superbuilders/slog"
+import type * as logger from "@superbuilders/slog"
 import type { AssessmentItemInput, BlockContent, InlineContent } from "../compiler/schemas"
 import {
 	checkNoLatex,

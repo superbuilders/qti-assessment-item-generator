@@ -121,25 +121,25 @@ function setupTrigCoordinatePlane(
 	// Grid lines
 	if (xAxis.showGridLines) {
 		const { values } = buildTicks(xAxis.min, xAxis.max, xAxis.tickInterval)
-		values.forEach((t) => {
-			if (Math.abs(t) < 1e-9) return // Skip origin
+		for (const t of values) {
+			if (Math.abs(t) < 1e-9) continue // Skip origin
 			const x = toSvgX(t)
 			canvas.drawLine(x, margin.top, x, height - margin.bottom, {
 				stroke: theme.colors.gridMajor,
 				strokeWidth: 1
 			})
-		})
+		}
 	}
 	if (yAxis.showGridLines) {
 		const { values } = buildTicks(yAxis.min, yAxis.max, yAxis.tickInterval)
-		values.forEach((t) => {
-			if (Math.abs(t) < 1e-9) return // Skip origin
+		for (const t of values) {
+			if (Math.abs(t) < 1e-9) continue // Skip origin
 			const y = toSvgY(t)
 			canvas.drawLine(margin.left, y, width - margin.right, y, {
 				stroke: theme.colors.gridMajor,
 				strokeWidth: 1
 			})
-		})
+		}
 	}
 
 	// Axes lines
@@ -177,7 +177,7 @@ function setupTrigCoordinatePlane(
 			canvas.drawText({
 				x: x,
 				y: zeroY + 15,
-				text: xPiLabels[i]!,
+				text: xPiLabels[i] ?? "",
 				fill: theme.colors.axisLabel,
 				anchor: "middle",
 				fontPx: TICK_LABEL_FONT_PX
@@ -209,7 +209,7 @@ function setupTrigCoordinatePlane(
 			canvas.drawText({
 				x: zeroX - 10,
 				y: y + 4,
-				text: yLabels[i]!,
+				text: yLabels[i] ?? "",
 				fill: theme.colors.axisLabel,
 				anchor: "end",
 				fontPx: TICK_LABEL_FONT_PX

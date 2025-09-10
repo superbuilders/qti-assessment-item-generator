@@ -190,7 +190,7 @@ export const generateNumberLine: WidgetGenerator<typeof NumberLinePropsSchema> =
 				canvas.drawText({
 					x,
 					y: yPos + 20,
-					text: majorLabels[i]!,
+					text: majorLabels[i] ?? "",
 					fill: theme.colors.axis,
 					anchor: "middle",
 					fontPx: theme.font.size.small
@@ -275,7 +275,7 @@ export const generateNumberLine: WidgetGenerator<typeof NumberLinePropsSchema> =
 				canvas.drawText({
 					x: xPos - 10,
 					y: y + 4,
-					text: majorLabels[i]!,
+					text: majorLabels[i] ?? "",
 					fill: theme.colors.axis,
 					anchor: "end",
 					fontPx: theme.font.size.small

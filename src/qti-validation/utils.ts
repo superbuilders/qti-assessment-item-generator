@@ -1,5 +1,5 @@
 import * as errors from "@superbuilders/errors"
-import * as logger from "@superbuilders/slog"
+import type * as logger from "@superbuilders/slog"
 import he from "he"
 
 const LATEX_LIKE_REGEX = /\\(?:[a-zA-Z]+|[(){}[\]])/

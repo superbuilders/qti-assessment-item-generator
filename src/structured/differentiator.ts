@@ -1,5 +1,5 @@
 import * as errors from "@superbuilders/errors"
-import * as logger from "@superbuilders/slog"
+import type * as logger from "@superbuilders/slog"
 import type OpenAI from "openai"
 import { zodResponseFormat } from "openai/helpers/zod"
 import { z } from "zod"
@@ -41,7 +41,6 @@ function transformArraysToObjects(data: unknown): unknown {
 	}
 	if (typeof data === "object" && data !== null) {
 		const newObj: Record<string, unknown> = {}
-		// @ts-ignore - Safe: we've already checked that data is an object
 		// biome-ignore lint: Type assertion needed for recursive transformation
 		const dataObj = data as any
 		for (const key in dataObj) {
@@ -58,7 +57,6 @@ function transformArraysToObjects(data: unknown): unknown {
  */
 function transformObjectsToArrays(data: unknown): unknown {
 	if (typeof data === "object" && data !== null) {
-		// @ts-ignore - Safe: we've already checked that data is an object
 		// biome-ignore lint: Type assertion needed for object key iteration
 		const obj = data as any
 		const keys = Object.keys(obj)
@@ -255,7 +253,7 @@ export async function differentiateAssessmentItem(
 		throw errors.wrap(response.error, "ai item differentiation")
 	}
 
-	const choice = (response.data as any).choices[0]
+	const choice = response.data.choices[0]
 	if (!choice?.message?.parsed) {
 		logger.error("CRITICAL: OpenAI differentiation returned no parsed content")
 		throw errors.new("empty ai response: no parsed content for differentiation")
@@ -270,7 +268,6 @@ export async function differentiateAssessmentItem(
 	const result = choice.message.parsed.differentiated_items
 
 	// Step 6: Transform the AI's object-based output back into the array-based structure.
-	// @ts-ignore - Safe: The transformation ensures the output matches AssessmentItemInput structure
 	// biome-ignore lint: Type assertion needed after transformation from AI response
 	const finalItems: AssessmentItemInput[] = result.map((item: unknown) => transformObjectsToArrays(item) as any)
 

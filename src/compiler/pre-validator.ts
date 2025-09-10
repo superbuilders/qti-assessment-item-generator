@@ -1,5 +1,5 @@
 import * as errors from "@superbuilders/errors"
-import * as logger from "@superbuilders/slog"
+import type * as logger from "@superbuilders/slog"
 import { XMLParser, XMLValidator } from "fast-xml-parser"
 import {
 	checkNoCDataSections,

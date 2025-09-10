@@ -1,3 +1,5 @@
+import * as errors from "@superbuilders/errors"
+import * as logger from "@superbuilders/slog"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
@@ -83,23 +85,36 @@ export const generateNumberLineWithFractionGroups: WidgetGenerator<
 	if (minValue >= maxValue) return `<svg width="${width}" height="${height}"></svg>`
 
 	if (boxes.lowerBound >= boxes.upperBound) {
-		throw new Error(
-			`boxes.lowerBound (${boxes.lowerBound}) must be strictly less than boxes.upperBound (${boxes.upperBound})`
-		)
+		logger.error("invalid box bounds", {
+			lowerBound: boxes.lowerBound,
+			upperBound: boxes.upperBound
+		})
+		throw errors.new("box lower bound must be less than upper bound")
 	}
 
 	if (boxes.lowerBound < axis.lowerBound) {
-		throw new Error(`boxes.lowerBound (${boxes.lowerBound}) must be >= axis.lowerBound (${axis.lowerBound})`)
+		logger.error("box lower bound below axis range", {
+			boxLowerBound: boxes.lowerBound,
+			axisLowerBound: axis.lowerBound
+		})
+		throw errors.new("box lower bound must be within axis range")
 	}
 
 	if (boxes.upperBound > axis.upperBound) {
-		throw new Error(`boxes.upperBound (${boxes.upperBound}) must be <= axis.upperBound (${axis.upperBound})`)
+		logger.error("box upper bound above axis range", {
+			boxUpperBound: boxes.upperBound,
+			axisUpperBound: axis.upperBound
+		})
+		throw errors.new("box upper bound must be within axis range")
 	}
 
 	if (boxes.fillTo < boxes.lowerBound || boxes.fillTo > boxes.upperBound) {
-		throw new Error(
-			`boxes.fillTo (${boxes.fillTo}) must be between boxes.lowerBound (${boxes.lowerBound}) and boxes.upperBound (${boxes.upperBound})`
-		)
+		logger.error("fillTo value outside box bounds", {
+			fillTo: boxes.fillTo,
+			lowerBound: boxes.lowerBound,
+			upperBound: boxes.upperBound
+		})
+		throw errors.new("fillTo must be within box bounds")
 	}
 
 	const scale = chartWidth / (maxValue - minValue)

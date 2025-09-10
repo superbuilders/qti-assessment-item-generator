@@ -123,7 +123,7 @@ export const generateNumberLineForOpposites: WidgetGenerator<typeof NumberLineFo
 			canvas.drawText({
 				x: x,
 				y: yPos + 20,
-				text: tickLabels[i]!,
+				text: tickLabels[i] ?? "",
 				fill: theme.colors.axisLabel,
 				anchor: "middle",
 				fontPx: theme.font.size.small

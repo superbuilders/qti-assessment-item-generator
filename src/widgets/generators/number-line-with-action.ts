@@ -1,9 +1,10 @@
 import * as errors from "@superbuilders/errors"
+import * as logger from "@superbuilders/slog"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
 import { selectAxisLabels } from "../../utils/layout"
-import { theme } from "../../utils/theme"
+import { type Theme, theme } from "../../utils/theme"
 import type { WidgetGenerator } from "../types"
 
 export const NumberLineWithActionPropsSchema = z
@@ -211,7 +212,7 @@ function drawClippedDottedLine(
 	x2: number,
 	y2: number,
 	labelBounds: Array<{ x: number; y: number; width: number; height: number }>,
-	theme: any
+	theme: Theme
 ) {
 	// Check if the line intersects with any label bounds
 	const lineIntersections: Array<{ start: number; end: number }> = []
@@ -344,7 +345,12 @@ export const generateNumberLineWithAction: WidgetGenerator<typeof NumberLineWith
 
 	// Validate that start value and all action points stay within bounds
 	if (startValue < min || startValue > max) {
-		throw errors.new(`start value ${startValue} is outside bounds [${min}, ${max}]`)
+		logger.error("start value outside bounds", {
+			startValue,
+			min,
+			max
+		})
+		throw errors.new("start value outside bounds")
 	}
 
 	let currentValue = startValue
@@ -355,9 +361,14 @@ export const generateNumberLineWithAction: WidgetGenerator<typeof NumberLineWith
 		const numericDelta = toNumericDelta(action.delta)
 		currentValue += numericDelta
 		if (currentValue < min || currentValue > max) {
-			throw errors.new(
-				`action ${i + 1} (delta: ${numericDelta}) results in value ${currentValue} outside bounds [${min}, ${max}]`
-			)
+			logger.error("action results in value outside bounds", {
+				actionIndex: i + 1,
+				delta: numericDelta,
+				resultValue: currentValue,
+				min,
+				max
+			})
+			throw errors.new("action results in value outside bounds")
 		}
 	}
 
@@ -482,7 +493,7 @@ export const generateNumberLineWithAction: WidgetGenerator<typeof NumberLineWith
 				canvas.drawText({
 					x: x,
 					y: yPos + 20,
-					text: labels[i]!,
+					text: labels[i] ?? "",
 					fill: theme.colors.axis,
 					anchor: "middle",
 					fontPx: theme.font.size.small
@@ -491,7 +502,7 @@ export const generateNumberLineWithAction: WidgetGenerator<typeof NumberLineWith
 		})
 
 		// Draw secondary ticks with half length and no labels, BUT promote to primary if it's the start value
-		secondaryTickValues.forEach((t) => {
+		for (const t of secondaryTickValues) {
 			// Skip secondary ticks that overlap with major ticks
 			const isOverlapping = tickValues.some((majorTick) => Math.abs(majorTick - t) < 1e-10)
 			if (!isOverlapping) {
@@ -521,7 +532,7 @@ export const generateNumberLineWithAction: WidgetGenerator<typeof NumberLineWith
 					})
 				}
 			}
-		})
+		}
 
 		// Start value marker (no separate label - uses tick label instead)
 		const startX = toSvgX(startValue)
@@ -667,7 +678,7 @@ export const generateNumberLineWithAction: WidgetGenerator<typeof NumberLineWith
 				canvas.drawText({
 					x: labelX,
 					y: y + 4,
-					text: labels[i]!,
+					text: labels[i] ?? "",
 					fill: theme.colors.axis,
 					anchor: "end",
 					fontPx: theme.font.size.small
@@ -676,7 +687,7 @@ export const generateNumberLineWithAction: WidgetGenerator<typeof NumberLineWith
 		})
 
 		// Draw secondary ticks with half length and no labels, BUT promote to primary if it's the start value
-		secondaryTickValues.forEach((t) => {
+		for (const t of secondaryTickValues) {
 			// Skip secondary ticks that overlap with major ticks
 			const isOverlapping = tickValues.some((majorTick) => Math.abs(majorTick - t) < 1e-10)
 			if (!isOverlapping) {
@@ -707,7 +718,7 @@ export const generateNumberLineWithAction: WidgetGenerator<typeof NumberLineWith
 					})
 				}
 			}
-		})
+		}
 
 		// Start value marker (no separate label - uses tick label instead)
 		const startY = toSvgY(startValue)

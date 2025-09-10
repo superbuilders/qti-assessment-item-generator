@@ -1,5 +1,5 @@
+import type * as logger from "@superbuilders/slog"
 import he from "he"
-import * as logger from "@superbuilders/slog"
 
 /**
  * Converts problematic HTML entities to their numeric equivalents or actual characters.

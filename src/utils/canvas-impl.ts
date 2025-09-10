@@ -1,4 +1,5 @@
 import * as errors from "@superbuilders/errors"
+import * as logger from "@superbuilders/slog"
 import type { Canvas, CanvasOptions, Extents2D, FinalizedSvg } from "../utils/layout"
 import { estimateWrappedTextDimensions } from "../utils/text"
 import type { Path2D } from "./path-builder"
@@ -81,34 +82,42 @@ class ClippedCanvas implements Canvas {
 	}
 
 	drawInClippedRegion(): void {
+		logger.error("attempted to nest drawInClippedRegion calls")
 		throw errors.new("cannot nest drawInClippedRegion calls")
 	}
 
 	addDef(): void {
+		logger.error("attempted to add def to clipped canvas")
 		throw errors.new("defs must be added to the main canvas")
 	}
 
 	addStyle(): void {
+		logger.error("attempted to add style to clipped canvas")
 		throw errors.new("styles must be added to the main canvas")
 	}
 
 	withTransform(): void {
+		logger.error("attempted to apply transform to clipped canvas")
 		throw errors.new("transforms must be applied on the main canvas")
 	}
 
 	addHatchPattern(): void {
+		logger.error("attempted to add hatch pattern to clipped canvas")
 		throw errors.new("patterns must be added to the main canvas")
 	}
 
 	addLinearGradient(): void {
+		logger.error("attempted to add linear gradient to clipped canvas")
 		throw errors.new("gradients must be added to the main canvas")
 	}
 
 	addRadialGradient(): void {
+		logger.error("attempted to add radial gradient to clipped canvas")
 		throw errors.new("gradients must be added to the main canvas")
 	}
 
 	finalize(): FinalizedSvg {
+		logger.error("attempted to finalize clipped canvas")
 		throw errors.new("cannot finalize a clipped canvas")
 	}
 }
@@ -130,10 +139,12 @@ export class CanvasImpl implements Canvas {
 
 	constructor(options: CanvasOptions) {
 		// Validate parameters according to PRD constraints
-		if (!isFinite(options.fontPxDefault) || options.fontPxDefault <= 0) {
+		if (!Number.isFinite(options.fontPxDefault) || options.fontPxDefault <= 0) {
+			logger.error("invalid fontPxDefault", { fontPxDefault: options.fontPxDefault })
 			throw errors.new("fontPxDefault must be finite and > 0")
 		}
-		if (!isFinite(options.lineHeightDefault) || options.lineHeightDefault <= 0) {
+		if (!Number.isFinite(options.lineHeightDefault) || options.lineHeightDefault <= 0) {
+			logger.error("invalid lineHeightDefault", { lineHeightDefault: options.lineHeightDefault })
 			throw errors.new("lineHeightDefault must be finite and > 0")
 		}
 
@@ -198,31 +209,43 @@ export class CanvasImpl implements Canvas {
 		lineHeight?: number // NEW: Line height multiplier (default 1.2)
 	}): void {
 		// Validate parameters
-		if (opts.fontPx !== undefined && (!isFinite(opts.fontPx) || opts.fontPx <= 0)) {
+		if (opts.fontPx !== undefined && (!Number.isFinite(opts.fontPx) || opts.fontPx <= 0)) {
+			logger.error("invalid fontPx", { fontPx: opts.fontPx })
 			throw errors.new("fontPx must be finite and > 0")
 		}
-		if (opts.strokeWidth !== undefined && (!isFinite(opts.strokeWidth) || opts.strokeWidth < 0)) {
+		if (opts.strokeWidth !== undefined && (!Number.isFinite(opts.strokeWidth) || opts.strokeWidth < 0)) {
+			logger.error("invalid strokeWidth", { strokeWidth: opts?.strokeWidth || style?.strokeWidth })
 			throw errors.new("strokeWidth must be finite and >= 0")
 		}
 		if (opts.opacity !== undefined && (opts.opacity < 0 || opts.opacity > 1)) {
+			logger.error("invalid opacity", { opacity: opts?.opacity || style?.opacity })
 			throw errors.new("opacity must be within [0, 1]")
 		}
 		if (opts.strokeOpacity !== undefined && (opts.strokeOpacity < 0 || opts.strokeOpacity > 1)) {
+			logger.error("invalid strokeOpacity", { strokeOpacity: opts?.strokeOpacity || style?.strokeOpacity })
 			throw errors.new("strokeOpacity must be within [0, 1]")
 		}
 		if (opts.fillOpacity !== undefined && (opts.fillOpacity < 0 || opts.fillOpacity > 1)) {
+			logger.error("invalid fillOpacity", { fillOpacity: opts.fillOpacity })
 			throw errors.new("fillOpacity must be within [0, 1]")
 		}
-		if (opts.maxWidth !== undefined && (!isFinite(opts.maxWidth) || opts.maxWidth <= 0)) {
+		if (opts.maxWidth !== undefined && (!Number.isFinite(opts.maxWidth) || opts.maxWidth <= 0)) {
+			logger.error("invalid maxWidth", { maxWidth: opts.maxWidth })
 			throw errors.new("maxWidth must be finite and > 0")
 		}
-		if (opts.lineHeight !== undefined && (!isFinite(opts.lineHeight) || opts.lineHeight <= 0)) {
+		if (opts.lineHeight !== undefined && (!Number.isFinite(opts.lineHeight) || opts.lineHeight <= 0)) {
+			logger.error("invalid lineHeight", { lineHeight: opts.lineHeight })
 			throw errors.new("lineHeight must be finite and > 0")
 		}
-		if (opts.rotate && (!isFinite(opts.rotate.angle) || !isFinite(opts.rotate.cx) || !isFinite(opts.rotate.cy))) {
+		if (
+			opts.rotate &&
+			(!Number.isFinite(opts.rotate.angle) || !Number.isFinite(opts.rotate.cx) || !Number.isFinite(opts.rotate.cy))
+		) {
+			logger.error("invalid rotate parameters", { rotate: opts.rotate })
 			throw errors.new("rotate.angle, rotate.cx, rotate.cy must be finite numbers")
 		}
 		if (opts.paintOrder && opts.paintOrder !== "stroke fill") {
+			logger.error("invalid paintOrder", { paintOrder: opts.paintOrder })
 			throw errors.new("paintOrder, when provided, must be exactly 'stroke fill'")
 		}
 
@@ -374,10 +397,12 @@ export class CanvasImpl implements Canvas {
 		dominantBaseline?: "auto" | "alphabetic" | "hanging" | "ideographic" | "mathematical" | "middle"
 	}): void {
 		// Validate parameters
-		if (opts.fontPx !== undefined && (!isFinite(opts.fontPx) || opts.fontPx <= 0)) {
+		if (opts.fontPx !== undefined && (!Number.isFinite(opts.fontPx) || opts.fontPx <= 0)) {
+			logger.error("invalid fontPx", { fontPx: opts.fontPx })
 			throw errors.new("fontPx must be finite and > 0")
 		}
-		if (opts.lineHeight !== undefined && (!isFinite(opts.lineHeight) || opts.lineHeight <= 0)) {
+		if (opts.lineHeight !== undefined && (!Number.isFinite(opts.lineHeight) || opts.lineHeight <= 0)) {
+			logger.error("invalid lineHeight", { lineHeight: opts.lineHeight })
 			throw errors.new("lineHeight must be finite and > 0")
 		}
 
@@ -493,13 +518,16 @@ export class CanvasImpl implements Canvas {
 		}
 	): void {
 		// Validate parameters
-		if (!isFinite(style.strokeWidth) || style.strokeWidth < 0) {
+		if (!Number.isFinite(style.strokeWidth) || style.strokeWidth < 0) {
+			logger.error("invalid strokeWidth", { strokeWidth: opts?.strokeWidth || style?.strokeWidth })
 			throw errors.new("strokeWidth must be finite and >= 0")
 		}
 		if (style.opacity !== undefined && (style.opacity < 0 || style.opacity > 1)) {
+			logger.error("invalid opacity", { opacity: opts?.opacity || style?.opacity })
 			throw errors.new("opacity must be within [0, 1]")
 		}
 		if (style.strokeOpacity !== undefined && (style.strokeOpacity < 0 || style.strokeOpacity > 1)) {
+			logger.error("invalid strokeOpacity", { strokeOpacity: opts?.strokeOpacity || style?.strokeOpacity })
 			throw errors.new("strokeOpacity must be within [0, 1]")
 		}
 
@@ -559,7 +587,8 @@ export class CanvasImpl implements Canvas {
 		}
 	): void {
 		// Validate parameters
-		if (style.strokeWidth !== undefined && (!isFinite(style.strokeWidth) || style.strokeWidth < 0)) {
+		if (style.strokeWidth !== undefined && (!Number.isFinite(style.strokeWidth) || style.strokeWidth < 0)) {
+			logger.error("invalid strokeWidth", { strokeWidth: opts?.strokeWidth || style?.strokeWidth })
 			throw errors.new("strokeWidth must be finite and >= 0")
 		}
 
@@ -601,7 +630,8 @@ export class CanvasImpl implements Canvas {
 		}
 	): void {
 		// Validate parameters
-		if (style.strokeWidth !== undefined && (!isFinite(style.strokeWidth) || style.strokeWidth < 0)) {
+		if (style.strokeWidth !== undefined && (!Number.isFinite(style.strokeWidth) || style.strokeWidth < 0)) {
+			logger.error("invalid strokeWidth", { strokeWidth: opts?.strokeWidth || style?.strokeWidth })
 			throw errors.new("strokeWidth must be finite and >= 0")
 		}
 
@@ -643,7 +673,8 @@ export class CanvasImpl implements Canvas {
 		}
 	): void {
 		// Validate parameters
-		if (style.strokeWidth !== undefined && (!isFinite(style.strokeWidth) || style.strokeWidth < 0)) {
+		if (style.strokeWidth !== undefined && (!Number.isFinite(style.strokeWidth) || style.strokeWidth < 0)) {
+			logger.error("invalid strokeWidth", { strokeWidth: opts?.strokeWidth || style?.strokeWidth })
 			throw errors.new("strokeWidth must be finite and >= 0")
 		}
 
@@ -824,6 +855,7 @@ export class CanvasImpl implements Canvas {
 	drawForeignObject(opts: { x: number; y: number; width: number; height: number; content: string }): void {
 		// Validate content has proper XHTML wrapper
 		if (!opts.content.includes('xmlns="http://www.w3.org/1999/xhtml"')) {
+			logger.error("invalid XHTML content", { content: opts.content.substring(0, 100) })
 			throw errors.new(
 				'drawForeignObject.content must be wrapped in a single root XHTML element with xmlns="http://www.w3.org/1999/xhtml"'
 			)

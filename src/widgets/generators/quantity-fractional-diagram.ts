@@ -1,3 +1,5 @@
+import * as errors from "@superbuilders/errors"
+import * as logger from "@superbuilders/slog"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
@@ -66,8 +68,9 @@ function findRayPolygonIntersection(
 	polygonVertices: { x: number; y: number }[]
 ): { point: { x: number; y: number }; edgeIndex: number } | null {
 	for (let i = 0; i < polygonVertices.length; i++) {
-		const p3 = polygonVertices[i]!
-		const p4 = polygonVertices[(i + 1) % polygonVertices.length]!
+		const p3 = polygonVertices[i]
+		const p4 = polygonVertices[(i + 1) % polygonVertices.length]
+		if (!p3 || !p4) continue
 		const den = (p1.x - p2.x) * (p3.y - p4.y) - (p1.y - p2.y) * (p3.x - p4.x)
 		if (den === 0) continue
 		const t = ((p1.x - p3.x) * (p3.y - p4.y) - (p1.y - p3.y) * (p3.x - p4.x)) / den
@@ -99,7 +102,15 @@ function drawSingleModel(
 	switch (shape.type) {
 		case "rectangle": {
 			const { rows, columns } = shape
-			if (rows * columns !== totalParts) throw new Error("Rectangle rows * columns must equal totalParts.")
+			if (rows * columns !== totalParts) {
+				logger.error("rectangle dimension mismatch", {
+					rows,
+					columns,
+					totalParts,
+					calculatedParts: rows * columns
+				})
+				throw errors.new("rectangle rows * columns must equal totalParts")
+			}
 			const rectX = cx - size / 2
 			const rectY = cy - size / 2
 			const cellWidth = size / columns
@@ -190,7 +201,8 @@ function drawSingleModel(
 				// Walk along the polygon perimeter from the edge after startEdge up to endEdge
 				let edge = (startEdge + 1) % sides
 				while (edge !== (endEdge + 1) % sides) {
-					const v = vertices[edge]!
+					const v = vertices[edge]
+					if (!v) break
 					path.lineTo(v.x, v.y)
 					edge = (edge + 1) % sides
 				}

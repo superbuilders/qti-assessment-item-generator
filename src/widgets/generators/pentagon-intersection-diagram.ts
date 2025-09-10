@@ -182,11 +182,9 @@ export const generatePentagonIntersectionDiagram: WidgetGenerator<
 		if (arc.label) {
 			// const arcCenterX = arc.startX + arc.endDeltaX / 2 // Unused variable
 			// const arcCenterY = arc.startY + arc.endDeltaY / 2 // Unused variable
-
 			// const perpX = -arc.endDeltaY / Math.sqrt(arc.endDeltaX * arc.endDeltaX + arc.endDeltaY * arc.endDeltaY) // Unused variable
 			// const labelOffset = arc.rx + 8 // Unused variable
 			// const labelX = arcCenterX + perpX * labelOffset // Unused variable
-
 			// Canvas automatically tracks text extents
 		}
 	}
@@ -234,7 +232,7 @@ export const generatePentagonIntersectionDiagram: WidgetGenerator<
 		const endY = arc.startY + arc.endDeltaY
 		const arcPath = new Path2D()
 			.moveTo(arc.startX, arc.startY)
-			.arcTo(arc.rx, arc.ry, arc.xAxisRotation, arc.largeArcFlag as 0 | 1, arc.sweepFlag as 0 | 1, endX, endY)
+			.arcTo(arc.rx, arc.ry, arc.xAxisRotation, arc.largeArcFlag ? 1 : 0, arc.sweepFlag ? 1 : 0, endX, endY)
 		canvas.drawPath(arcPath, {
 			fill: "none",
 			stroke: arc.color,

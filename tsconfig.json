@@ -14,23 +14,11 @@
 		"esModuleInterop": true,
 		"experimentalDecorators": true,
 		"emitDecoratorMetadata": true,
-		"lib": [
-			"ESNext",
-			"DOM"
-		],
-		"types": [
-			"bun-types"
-		],
+		"lib": ["ESNext", "DOM"],
+		"types": ["bun-types"],
 		"noUnusedLocals": true,
 		"noUnusedParameters": true
 	},
-	"include": [
-		"src/**/*"
-	],
-	"exclude": [
-		"node_modules",
-		"dist",
-		"**/*.test.ts",
-		"**/*.spec.ts"
-	]
+	"include": ["src/**/*"],
+	"exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts"]
 }

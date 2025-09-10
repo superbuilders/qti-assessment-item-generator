@@ -1,3 +1,5 @@
+import * as errors from "@superbuilders/errors"
+import * as logger from "@superbuilders/slog"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
@@ -59,13 +61,19 @@ export const generateRadiallyConstrainedAngleDiagram: WidgetGenerator<
 
 	// Validate ray labels count
 	if (rayLabels.length !== angles.length + 1) {
-		throw new Error("There must be exactly one more ray label than the number of angles.")
+		logger.error("ray labels count mismatch", {
+			rayLabelsCount: rayLabels.length,
+			anglesCount: angles.length,
+			expectedRayLabels: angles.length + 1
+		})
+		throw errors.new("ray labels count must be one more than angles count")
 	}
 
 	// Validate total angle constraint
 	const totalAngle = angles.reduce((sum, angle) => sum + angle.value, 0)
 	if (totalAngle < 1 || totalAngle > 360) {
-		throw new Error("The sum of angles must be between 1 and 360 degrees.")
+		logger.error("invalid total angle", { totalAngle })
+		throw errors.new("sum of angles must be between 1 and 360 degrees")
 	}
 
 	const canvas = new CanvasImpl({
@@ -151,7 +159,7 @@ export const generateRadiallyConstrainedAngleDiagram: WidgetGenerator<
 		})
 
 		// Draw the label for the ray's point
-		const rayLabel = rayLabels[i]!
+		const rayLabel = rayLabels[i] ?? ""
 		const labelDistFromPoint = 22
 		const rayLabelX = cx + (pointOnRayDist + labelDistFromPoint) * Math.cos(rayAngleRad)
 		const rayLabelY = cy + (pointOnRayDist + labelDistFromPoint) * Math.sin(rayAngleRad)

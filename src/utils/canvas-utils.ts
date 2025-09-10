@@ -229,10 +229,10 @@ export function renderLines(
 	if (!lines) return
 
 	for (const l of lines) {
-		let y1: number,
-			y2: number,
-			isVertical = false,
-			verticalX: number | null = null
+		let y1: number
+		let y2: number
+		let isVertical = false
+		let verticalX: number | null = null
 
 		if (l.equation.type === "slopeIntercept") {
 			const { slope, yIntercept } = l.equation

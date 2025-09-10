@@ -7,7 +7,6 @@
 		"./gritql/no-new-error.grit",
 		"./gritql/no-try.grit",
 		"./gritql/no-implicit-select-all.grit",
-		"./gritql/no-relative-imports.grit",
 		"./gritql/no-manual-memoization.grit",
 		"./gritql/no-iife.grit",
 		"./gritql/require-logger-before-throw.grit"
@@ -70,9 +69,7 @@
 				"noUnusedVariables": "error",
 				"noUnusedFunctionParameters": "error"
 			},
-			"nursery": {
-				"useUniqueElementIds": "off"
-			},
+			"nursery": {},
 			"style": {
 				"noNonNullAssertion": {
 					"level": "error",

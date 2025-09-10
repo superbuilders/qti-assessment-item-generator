@@ -318,7 +318,7 @@ export const generatePolyhedronNetDiagram: WidgetGenerator<typeof PolyhedronNetD
 				const [x, y] = p.split(",").map(Number)
 				return { x: x || 0, y: y || 0 }
 			})
-			.filter((p) => !isNaN(p.x) && !isNaN(p.y) && isFinite(p.x) && isFinite(p.y))
+			.filter((p) => !Number.isNaN(p.x) && !Number.isNaN(p.y) && Number.isFinite(p.x) && Number.isFinite(p.y))
 		polys.push(polygonPoints)
 	}
 
