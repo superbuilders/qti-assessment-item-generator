@@ -1,8 +1,8 @@
-import { describe, expect, test, mock } from "bun:test"
+import { describe, expect, mock, test } from "bun:test"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import { differentiateAssessmentItem } from "../src/structured/differentiator"
-import type { AssessmentItemInput } from "../src/compiler/schemas"
+import type { AssessmentItemInput } from "../../src/compiler/schemas"
+import { differentiateAssessmentItem } from "../../src/structured/differentiator"
 
 // Mock the OpenAI client
 mock.module("openai", () => {

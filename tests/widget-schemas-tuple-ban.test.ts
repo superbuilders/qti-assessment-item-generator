@@ -48,12 +48,7 @@ function containsTuple(schema: z.ZodType): boolean {
 		if (containsTuple(def.schema)) return true
 	}
 
-	if (
-		hasKey(def, "left") &&
-		hasKey(def, "right") &&
-		isZodSchema(def.left) &&
-		isZodSchema(def.right)
-	) {
+	if (hasKey(def, "left") && hasKey(def, "right") && isZodSchema(def.left) && isZodSchema(def.right)) {
 		if (containsTuple(def.left) || containsTuple(def.right)) return true
 	}
 
@@ -68,13 +63,11 @@ describe("Zod Schema Tuple Ban", () => {
 				logger.error("widget schema contains tuple types which are not compatible with openai api", { widgetType })
 				throw errors.new(
 					`widget schema '${widgetType}' contains tuple types which are not compatible with openai api. ` +
-					"replace tuples with arrays and add runtime validation. " +
-					"example: change z.tuple([z.string(), z.string()]) to z.array(z.string()) with a runtime length check."
+						"replace tuples with arrays and add runtime validation. " +
+						"example: change z.tuple([z.string(), z.string()]) to z.array(z.string()) with a runtime length check."
 				)
 			}
 			expect(hasTuples).toBe(false)
 		})
 	}
 })
-
-

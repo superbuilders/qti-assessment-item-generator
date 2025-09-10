@@ -78,5 +78,3 @@ describe("Zod Schema Default Ban", () => {
 		})
 	}
 })
-
-

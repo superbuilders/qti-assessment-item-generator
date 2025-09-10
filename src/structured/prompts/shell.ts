@@ -1,11 +1,11 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import type { AssessmentItemInput } from "../compiler/schemas"
-import { AssessmentItemShellSchema } from "../compiler/schemas"
-import { allExamples } from "../examples"
-import type { ImageContext } from "./ai-context-builder"
+import type { AssessmentItemInput } from "../../compiler/schemas"
+import { AssessmentItemShellSchema } from "../../compiler/schemas"
+import { allExamples } from "../../examples"
+import type { ImageContext } from "../ai-context-builder"
+import type { AiContextEnvelope } from "../types"
 import { caretBanPromptSection } from "./caret"
-import type { AiContextEnvelope } from "./types"
 
 // Helper to convert a full AssessmentItemInput into a shell for prompt examples
 function createShellFromExample(item: AssessmentItemInput) {
@@ -575,7 +575,7 @@ ${JSON.stringify(exampleShells, null, 2)}
 \`\`\`
 
 ## Raw Source Input
-${envelope.context.map((content, index) => `\n\n## Source Context Block ${index + 1}\n\`\`\`\n${content}\n\`\`\``).join('')}
+${envelope.context.map((content, index) => `\n\n## Source Context Block ${index + 1}\n\`\`\`\n${content}\n\`\`\``).join("")}
 
   ## CRITICAL Instructions:
 - **Analyze Images**: Use the raster images provided to your vision to understand the visual components of the question. Any SVG content is provided directly in the 'Raw Source Input' blocks.

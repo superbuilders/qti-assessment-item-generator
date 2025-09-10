@@ -2318,7 +2318,10 @@ export const reactantAmountsTemperatureTableWithDropdowns: AssessmentItemInput =
 			]
 		},
 		{ type: "blockSlot", slotId: "react_temp_table" },
-		{ type: "paragraph", content: [{ type: "text", content: "Select the reactant and amount for rows C, D, and E directly in the table." }] }
+		{
+			type: "paragraph",
+			content: [{ type: "text", content: "Select the reactant and amount for rows C, D, and E directly in the table." }]
+		}
 	],
 	interactions: {},
 	feedback: {
@@ -2955,9 +2958,7 @@ export const timeOnNumberLine: AssessmentItemInput = {
 			tickInterval: { type: "whole", interval: 15 },
 			secondaryTickInterval: { type: "whole", interval: 1 },
 			showTickLabels: true,
-			highlightedPoints: [
-				{ value: 55, label: "A", color: "#A0522D", style: "arrowAndDot" }
-			]
+			highlightedPoints: [{ value: 55, label: "A", color: "#A0522D", style: "arrowAndDot" }]
 		}
 	},
 	body: [
@@ -4409,4 +4410,3 @@ export const allExamples: AssessmentItemInput[] = [
 	kineticEnergyMassSpeedRelationships,
 	reactantAmountsTempChangeTablePerseus
 ]
-

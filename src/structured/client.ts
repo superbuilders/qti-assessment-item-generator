@@ -15,11 +15,11 @@ import {
 import type { WidgetCollectionName } from "../widgets/collections"
 import { allWidgetSchemas, type WidgetInput } from "../widgets/registry"
 import { buildImageContextFromRasterUrls, type ImageContext } from "./ai-context-builder"
-import { createInteractionContentPrompt } from "./interactions"
-import { createAssessmentShellPrompt } from "./shell"
+import { createInteractionContentPrompt } from "./prompts/interactions"
+import { createAssessmentShellPrompt } from "./prompts/shell"
+import { createWidgetMappingPrompt } from "./prompts/widget-mapping"
+import { createWidgetContentPrompt } from "./prompts/widgets"
 import type { AiContextEnvelope } from "./types"
-import { createWidgetMappingPrompt } from "./widget-mapping"
-import { createWidgetContentPrompt } from "./widgets"
 
 const OPENAI_MODEL = "gpt-5"
 
@@ -372,7 +372,7 @@ export async function generateFromEnvelope(
 		logger.error("envelope validation failed", { reason: "context array is empty" })
 		throw errors.new("envelope context cannot be empty")
 	}
-	
+
 	logger.info("starting structured qti generation from envelope", {
 		widgetCollection: widgetCollectionName,
 		contextBlockCount: envelope.context.length,
@@ -383,7 +383,7 @@ export async function generateFromEnvelope(
 
 	// --- AI Pipeline Shots ---
 	// All subsequent "shot" functions MUST be updated to accept the `envelope` object.
-	
+
 	// Shot 1: Generate Shell
 	const shellResult = await errors.try(generateAssessmentShell(openai, logger, envelope, imageContext))
 	if (shellResult.error) {
@@ -495,9 +495,11 @@ export async function generateFromEnvelope(
 		throw errors.wrap(widgetMappingResult.error, "map slots to widgets")
 	}
 	let widgetMapping = widgetMappingResult.data
-	
+
 	// Shot 3: Generate Interactions
-	const interactionContentResult = await errors.try(generateInteractionContent(openai, logger, envelope, assessmentShell, imageContext, widgetMapping))
+	const interactionContentResult = await errors.try(
+		generateInteractionContent(openai, logger, envelope, assessmentShell, imageContext, widgetMapping)
+	)
 	if (interactionContentResult.error) {
 		logger.error("generate interaction content", { error: interactionContentResult.error })
 		throw errors.wrap(interactionContentResult.error, "generate interaction content")
@@ -561,7 +563,18 @@ export async function generateFromEnvelope(
 	)
 
 	// Shot 4: Generate Widgets
-	const widgetContentResult = await errors.try(generateWidgetContent(openai, logger, envelope, assessmentShell, widgetMapping, generatedInteractions, widgetCollectionName, imageContext))
+	const widgetContentResult = await errors.try(
+		generateWidgetContent(
+			openai,
+			logger,
+			envelope,
+			assessmentShell,
+			widgetMapping,
+			generatedInteractions,
+			widgetCollectionName,
+			imageContext
+		)
+	)
 	if (widgetContentResult.error) {
 		logger.error("generate widget content", { error: widgetContentResult.error })
 		throw errors.wrap(widgetContentResult.error, "generate widget content")

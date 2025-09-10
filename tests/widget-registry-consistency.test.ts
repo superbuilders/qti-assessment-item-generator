@@ -55,5 +55,3 @@ describe("Widget type consistency", () => {
 		expect(schemaKeys.length).toBe(EXPECTED_WIDGET_COUNT)
 	})
 })
-
-

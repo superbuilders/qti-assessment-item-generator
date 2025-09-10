@@ -12,6 +12,7 @@ import { generateBoxPlot } from "./generators/box-plot"
 import { generateCircleDiagram } from "./generators/circle-diagram"
 import { generateCompositeShapeDiagram } from "./generators/composite-shape-diagram"
 import { generateConceptualGraph } from "./generators/conceptual-graph"
+import { generateConstraintGeometryDiagram } from "./generators/constraint-geometry-diagram"
 import { generateCoordinatePlaneComprehensive } from "./generators/coordinate-plane-comprehensive"
 import { generateDataTable } from "./generators/data-table"
 import { generateDiscreteObjectRatioDiagram } from "./generators/discrete-object-ratio-diagram"
@@ -57,7 +58,6 @@ import { generatePolyhedronDiagram } from "./generators/polyhedron-diagram"
 import { generatePolyhedronNetDiagram } from "./generators/polyhedron-net-diagram"
 import { generatePopulationBarChart } from "./generators/population-bar-chart"
 import { generatePopulationChangeEventGraph } from "./generators/population-change-event-graph"
-import { generateConstraintGeometryDiagram } from "./generators/constraint-geometry-diagram"
 import { generateProbabilitySpinner } from "./generators/probability-spinner"
 import { generateProtractorAngleDiagram } from "./generators/protractor-angle-diagram"
 import { generatePythagoreanProofDiagram } from "./generators/pythagorean-proof-diagram"
@@ -85,8 +85,8 @@ import type { Widget } from "./registry"
 
 export async function generateWidget(widget: Widget): Promise<string> {
 	switch (widget.type) {
-        case "constraintGeometryDiagram":
-            return await generateConstraintGeometryDiagram(widget)
+		case "constraintGeometryDiagram":
+			return await generateConstraintGeometryDiagram(widget)
 		case "areaGraph":
 			return await generateAreaGraph(widget)
 		case "areaModelMultiplication":

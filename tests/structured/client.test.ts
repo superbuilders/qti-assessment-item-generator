@@ -1,9 +1,9 @@
-import { describe, expect, test, mock } from "bun:test"
+import { describe, expect, mock, test } from "bun:test"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import { generateFromEnvelope } from "../src/structured/client"
-import { buildPerseusEnvelope } from "../src/structured/ai-context-builder"
-import type { AssessmentItemShell } from "../src/compiler/schemas"
+import type { AssessmentItemShell } from "../../src/compiler/schemas"
+import { buildPerseusEnvelope } from "../../src/structured/ai-context-builder"
+import { generateFromEnvelope } from "../../src/structured/client"
 
 // Mock the OpenAI client
 mock.module("openai", () => {
@@ -188,5 +188,61 @@ describe("Structured AI Pipeline", () => {
 		// The function should either fail at compile time or throw at runtime
 		// Since TypeScript should catch this, the test mainly documents the expected behavior
 		expect(result.error || true).toBeTruthy()
+	})
+
+	test("should throw a slot mismatch error if shell is inconsistent", async () => {
+		const OpenAI = (await import("openai")).default
+
+		// Create a separate mock for this specific test case
+		const MockOpenAIInconsistent = class {
+			chat = {
+				completions: {
+					parse: async (options: any) => {
+						const functionName = options?.response_format?.json_schema?.name
+						if (functionName === "assessment_shell_generator") {
+							return {
+								choices: [
+									{
+										message: {
+											parsed: {
+												identifier: "mock-item-invalid",
+												title: "Mock Item Invalid",
+												responseDeclarations: [],
+												body: [{ type: "blockSlot", slotId: "image_widget" }],
+												widgets: [], // <-- INTENTIONALLY EMPTY
+												interactions: [],
+												feedback: { correct: [], incorrect: [] }
+											} as AssessmentItemShell,
+											refusal: null
+										}
+									}
+								]
+							}
+						}
+						// For other function calls, just return empty responses
+						return {
+							choices: [
+								{
+									message: {
+										parsed: {},
+										refusal: null
+									}
+								}
+							]
+						}
+					}
+				}
+			}
+		}
+
+		const mockOpenAI = new MockOpenAIInconsistent() as any
+
+		const envelope = { context: ["test content"], imageUrls: [] }
+
+		const result = await errors.try(generateFromEnvelope(mockOpenAI, logger, envelope, "math-core"))
+
+		expect(result.error).toBeTruthy()
+		expect(result.error?.message).toInclude("Slot declaration mismatch")
+		expect(result.error?.message).toInclude("Slots used in content but not declared")
 	})
 })

@@ -1,9 +1,9 @@
-import type { AnyInteraction } from "../compiler/schemas"
-import { type WidgetCollectionName, widgetCollections } from "../widgets/collections"
-import { allWidgetSchemas } from "../widgets/registry"
-import type { ImageContext } from "./ai-context-builder"
+import type { AnyInteraction } from "../../compiler/schemas"
+import { type WidgetCollectionName, widgetCollections } from "../../widgets/collections"
+import { allWidgetSchemas } from "../../widgets/registry"
+import type { ImageContext } from "../ai-context-builder"
+import type { AiContextEnvelope } from "../types"
 import { caretBanPromptSection } from "./caret"
-import type { AiContextEnvelope } from "./types"
 
 export function createWidgetContentPrompt(
 	envelope: AiContextEnvelope,
@@ -203,7 +203,7 @@ ${JSON.stringify(imageContext.rasterImageUrls, null, 2)}
 \`\`\`
 
 ## Raw Source Input
-${envelope.context.map((content, index) => `\n\n## Source Context Block ${index + 1}\n\`\`\`\n${content}\n\`\`\``).join('')}
+${envelope.context.map((content, index) => `\n\n## Source Context Block ${index + 1}\n\`\`\`\n${content}\n\`\`\``).join("")}
 
 ## Assessment Shell (for context):
 \`\`\`json

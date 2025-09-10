@@ -190,5 +190,3 @@ describe("QTI Compiler Schema OpenAI Compatibility", () => {
 		assertNoInvalidRefSiblings(jsonSchema)
 	})
 })
-
-

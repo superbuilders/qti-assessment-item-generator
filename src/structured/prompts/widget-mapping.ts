@@ -1,7 +1,7 @@
 import { z } from "zod"
-import { type WidgetCollectionName, widgetCollections } from "../widgets/collections"
-import { allWidgetSchemas } from "../widgets/registry"
-import type { AiContextEnvelope } from "./types"
+import { type WidgetCollectionName, widgetCollections } from "../../widgets/collections"
+import { allWidgetSchemas } from "../../widgets/registry"
+import type { AiContextEnvelope } from "../types"
 
 function createWidgetMappingSchema(slotNames: string[], allowedWidgetKeys: readonly string[]) {
 	const shape: Record<string, z.ZodType<string>> = {}
@@ -148,7 +148,7 @@ ${[...collection.widgetTypeKeys].sort().join("\n")}`
 	const userContent = `Based on the Perseus JSON and assessment body below, create a JSON object that maps each widget slot name to the most appropriate widget type.
 
 ## Raw Source Input
-${envelope.context.map((content, index) => `\n\n## Source Context Block ${index + 1}\n\`\`\`\n${content}\n\`\`\``).join('')}
+${envelope.context.map((content, index) => `\n\n## Source Context Block ${index + 1}\n\`\`\`\n${content}\n\`\`\``).join("")}
 
 Assessment Item Body (as structured JSON):
 \`\`\`json

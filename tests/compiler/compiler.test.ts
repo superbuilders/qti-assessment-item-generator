@@ -2,8 +2,8 @@ import { describe, expect, test } from "bun:test"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { XMLValidator } from "fast-xml-parser"
-import { compile } from "../src/compiler/compiler"
-import { allExamples } from "../src/examples"
+import { compile } from "../../src/compiler/compiler"
+import { allExamples } from "../../src/examples"
 
 describe("QTI Compiler End-to-End Tests", () => {
 	for (const example of allExamples) {

@@ -1,13 +1,13 @@
 // tests/perseus-e2e.test.ts
 import { describe, expect, test } from "bun:test"
 import * as errors from "@superbuilders/errors"
-import { buildPerseusEnvelope } from "../src/structured/ai-context-builder"
+import { buildPerseusEnvelope } from "../../src/structured/ai-context-builder"
 import {
-	soupVolumeEstimation,
-	rectangularPrismVolume,
+	interactiveGraphPlotting,
 	numberLineMatcher,
-	interactiveGraphPlotting
-} from "./fixtures/perseus-regression-items"
+	rectangularPrismVolume,
+	soupVolumeEstimation
+} from "../fixtures/perseus-regression-items"
 
 describe("Perseus E2E Regression Suite", () => {
 	// Test Case 1: Direct HTTPS URL for an SVG

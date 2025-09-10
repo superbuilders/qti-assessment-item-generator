@@ -8,9 +8,7 @@ describe("Zod Schema to OpenAI JSON Schema Conversion", () => {
 			const responseFormat = zodResponseFormat(zodSchema, `zod_schema_for_${widgetType}`)
 			const jsonSchema = responseFormat.json_schema?.schema
 			const schemaString = JSON.stringify(jsonSchema, null, 2)
-			expect(schemaString).not.toInclude("\"$ref\"")
+			expect(schemaString).not.toInclude('"$ref"')
 		})
 	}
 })
-
-
