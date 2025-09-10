@@ -1,0 +1,15 @@
+ignore_patterns:
+  - "yek.yaml"
+  - "biome.json"
+  - "tsconfig.json"
+  - "prd.md"
+  - "README.md"
+  - "patches/*"
+  - "bun.lock"
+  - "package.json"
+  - "**/__snapshots__/**"
+priority_rules:
+  - score: 99
+    pattern: "^rules/"
+  - score: 100
+    pattern: "^prompt/"
