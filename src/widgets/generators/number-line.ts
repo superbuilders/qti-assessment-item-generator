@@ -169,7 +169,7 @@ export const generateNumberLine: WidgetGenerator<typeof NumberLinePropsSchema> =
 		})
 
 		// Draw minor ticks first
-		minorValues.forEach((t) => {
+		for (const t of minorValues) {
 			if (!majorValues.some((mt) => Math.abs(mt - t) < 1e-9)) {
 				// Avoid drawing over major ticks
 				canvas.drawLine(toSvgX(t), yPos - 3, toSvgX(t), yPos + 3, {
@@ -177,7 +177,7 @@ export const generateNumberLine: WidgetGenerator<typeof NumberLinePropsSchema> =
 					strokeWidth: theme.stroke.width.base
 				})
 			}
-		})
+		}
 
 		// Draw major ticks and labels
 		majorValues.forEach((t, i) => {
@@ -199,44 +199,47 @@ export const generateNumberLine: WidgetGenerator<typeof NumberLinePropsSchema> =
 		})
 
 		// Draw highlighted points
-		;(highlightedPoints || []).forEach((p) => {
-			const px = toSvgX(p.value)
-			canvas.drawCircle(px, yPos, 5, {
-				fill: p.color,
-				stroke: p.color,
-				strokeWidth: theme.stroke.width.thin
-			})
 
-			if (p.style === "arrowAndDot") {
-				const arrowStartY = yPos - 25
-				const arrowEndY = yPos - 8
-				canvas.drawLine(px, arrowStartY, px, arrowEndY, {
+		if (highlightedPoints) {
+			for (const p of highlightedPoints) {
+				const px = toSvgX(p.value)
+				canvas.drawCircle(px, yPos, 5, {
+					fill: p.color,
 					stroke: p.color,
-					strokeWidth: theme.stroke.width.thick,
-					markerEnd: "url(#action-arrow)"
+					strokeWidth: theme.stroke.width.thin
 				})
-				if (p.label)
+
+				if (p.style === "arrowAndDot") {
+					const arrowStartY = yPos - 25
+					const arrowEndY = yPos - 8
+					canvas.drawLine(px, arrowStartY, px, arrowEndY, {
+						stroke: p.color,
+						strokeWidth: theme.stroke.width.thick,
+						markerEnd: "url(#action-arrow)"
+					})
+					if (p.label)
+						canvas.drawText({
+							x: px,
+							y: arrowStartY - 5,
+							text: p.label,
+							fill: p.color,
+							anchor: "middle",
+							dominantBaseline: "baseline",
+							fontWeight: "700"
+						})
+				} else if (p.label) {
 					canvas.drawText({
 						x: px,
-						y: arrowStartY - 5,
+						y: yPos - 15,
 						text: p.label,
 						fill: p.color,
 						anchor: "middle",
 						dominantBaseline: "baseline",
 						fontWeight: "700"
 					})
-			} else if (p.label) {
-				canvas.drawText({
-					x: px,
-					y: yPos - 15,
-					text: p.label,
-					fill: p.color,
-					anchor: "middle",
-					dominantBaseline: "baseline",
-					fontWeight: "700"
-				})
+				}
 			}
-		})
+		}
 	} else {
 		// Vertical
 		const xPos = width / 2
@@ -256,14 +259,14 @@ export const generateNumberLine: WidgetGenerator<typeof NumberLinePropsSchema> =
 			minGapPx: 12
 		})
 
-		minorValues.forEach((t) => {
+		for (const t of minorValues) {
 			if (!majorValues.some((mt) => Math.abs(mt - t) < 1e-9)) {
 				canvas.drawLine(xPos - 3, toSvgY(t), xPos + 3, toSvgY(t), {
 					stroke: theme.colors.axis,
 					strokeWidth: theme.stroke.width.base
 				})
 			}
-		})
+		}
 
 		majorValues.forEach((t, i) => {
 			const y = toSvgY(t)
@@ -283,44 +286,46 @@ export const generateNumberLine: WidgetGenerator<typeof NumberLinePropsSchema> =
 			}
 		})
 
-		;(highlightedPoints || []).forEach((p) => {
-			const py = toSvgY(p.value)
-			canvas.drawCircle(xPos, py, 5, {
-				fill: p.color,
-				stroke: p.color,
-				strokeWidth: theme.stroke.width.thin
-			})
-
-			if (p.style === "arrowAndDot") {
-				const arrowStartX = xPos - 25
-				const arrowEndX = xPos - 8
-				canvas.drawLine(arrowStartX, py, arrowEndX, py, {
+		if (highlightedPoints) {
+			for (const p of highlightedPoints) {
+				const py = toSvgY(p.value)
+				canvas.drawCircle(xPos, py, 5, {
+					fill: p.color,
 					stroke: p.color,
-					strokeWidth: theme.stroke.width.thick,
-					markerEnd: "url(#action-arrow)"
+					strokeWidth: theme.stroke.width.thin
 				})
-				if (p.label)
+
+				if (p.style === "arrowAndDot") {
+					const arrowStartX = xPos - 25
+					const arrowEndX = xPos - 8
+					canvas.drawLine(arrowStartX, py, arrowEndX, py, {
+						stroke: p.color,
+						strokeWidth: theme.stroke.width.thick,
+						markerEnd: "url(#action-arrow)"
+					})
+					if (p.label)
+						canvas.drawText({
+							x: arrowStartX - 5,
+							y: py,
+							text: p.label,
+							fill: p.color,
+							anchor: "end",
+							dominantBaseline: "middle",
+							fontWeight: "700"
+						})
+				} else if (p.label) {
 					canvas.drawText({
-						x: arrowStartX - 5,
+						x: xPos + 15,
 						y: py,
 						text: p.label,
 						fill: p.color,
-						anchor: "end",
+						anchor: "start",
 						dominantBaseline: "middle",
 						fontWeight: "700"
 					})
-			} else if (p.label) {
-				canvas.drawText({
-					x: xPos + 15,
-					y: py,
-					text: p.label,
-					fill: p.color,
-					anchor: "start",
-					dominantBaseline: "middle",
-					fontWeight: "700"
-				})
+				}
 			}
-		})
+		}
 	}
 
 	canvas.addDef(
