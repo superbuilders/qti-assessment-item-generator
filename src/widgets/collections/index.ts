@@ -1,4 +1,3 @@
-import { z } from "zod" // NEW: Import z for Zod schema definition
 import { fourthGradeMathCollection } from "./fourth-grade-math"
 import { mathCoreCollection } from "./math-core"
 import { scienceCollection } from "./science"
@@ -12,7 +11,3 @@ export const widgetCollections = {
 } as const
 
 export type WidgetCollectionName = keyof typeof widgetCollections
-
-// NEW: Define and export Zod enum schema for widget collection names.
-// Using literal values to avoid type assertion issues
-export const WidgetCollectionNameSchema = z.enum(["math-core", "simple-visual", "science", "fourth-grade-math"])

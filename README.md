@@ -23,30 +23,49 @@ At a glance
 Usage: Structured AI Pipeline
 ----------------------------
 
-Generates a structured `AssessmentItemInput` from Perseus-like data via a 4-shot AI orchestration, then you can compile it to QTI XML.
+Generates a structured `AssessmentItemInput` from source data via a 4-shot AI orchestration, then you can compile it to QTI XML.
 
 ```ts
 import OpenAI from "openai"
 import * as logger from "@superbuilders/slog"
-import { generateStructuredQtiItem } from "@superbuilders/qti-assessment-item-generator/structured"
+import { generateFromEnvelope } from "@superbuilders/qti-assessment-item-generator/structured"
 import { compile } from "@superbuilders/qti-assessment-item-generator/compiler"
+import { buildPerseusEnvelope, buildHtmlEnvelope } from "@superbuilders/qti-assessment-item-generator/structured/ai-context-builder"
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! })
 
-const perseusData = {
-	question: {
-		content: "What is the answer? [[☃ text_entry 1]]"
-	}
-}
+// Example A: Perseus-like JSON source
+const perseusData = { /* ... unknown input ... */ }
+const envelopeA = await buildPerseusEnvelope(perseusData)
+const itemA = await generateFromEnvelope(openai, logger, envelopeA, "math-core")
+const xmlA = await compile(itemA)
 
-// Optional: constrain widget types by collection name
-// Valid: "math-core" | "simple-visual" | "science" | "fourth-grade-math"
+// Example B: Raw HTML + optional screenshot
+const html = "<div>...</div>"
+const screenshotUrl = "https://example.com/screenshot.png"
+const envelopeB = buildHtmlEnvelope(html, screenshotUrl)
+const itemB = await generateFromEnvelope(openai, logger, envelopeB, "simple-visual")
+const xmlB = await compile(itemB)
+```
+
+### Migration: Perseus compatibility
+
+- Before (removed):
+```ts
+import { generateStructuredQtiItem } from "@superbuilders/qti-assessment-item-generator/structured"
+
 const item = await generateStructuredQtiItem(openai, logger, perseusData, {
 	widgetCollectionName: "math-core"
 })
+```
 
-// Compile structured item to QTI 3.0 XML
-const xml = await compile(item)
+- After (required):
+```ts
+import { generateFromEnvelope } from "@superbuilders/qti-assessment-item-generator/structured"
+import { buildPerseusEnvelope } from "@superbuilders/qti-assessment-item-generator/structured/ai-context-builder"
+
+const envelope = await buildPerseusEnvelope(perseusData)
+const item = await generateFromEnvelope(openai, logger, envelope, "math-core")
 ```
 
 What the pipeline does
@@ -61,7 +80,7 @@ What the pipeline does
 Inputs and outputs
 ------------------
 
-- Input: Perseus-like JSON (unknown), plus OpenAI client and logger
+- Input: `AiContextEnvelope` (with context blocks and image URLs), widget collection name (required), plus OpenAI client and logger
 - Output: `AssessmentItemInput` (typed, schema-constrained)
 
 Error handling
@@ -69,6 +88,7 @@ Error handling
 
 - Uses `@superbuilders/errors` with `errors.try` + structured logging.
 - No silent fallbacks. Missing or invalid data throws.
+- API performs boundary validation and throws on invalid envelopes or invalid `widgetCollectionName`. No defaults, no fallbacks.
 
 Usage: AI Differentiation
 -------------------------
@@ -97,8 +117,13 @@ API Reference
 
 ### structured
 
-- `generateStructuredQtiItem(openai, logger, perseusData, { widgetCollectionName? }) => Promise<AssessmentItemInput>`
-  - `widgetCollectionName` defaults to `"math-core"`. Use to constrain widget mapping/generation.
+- `generateFromEnvelope(openai, logger, envelope, widgetCollectionName) => Promise<AssessmentItemInput>`
+  - `widgetCollectionName` is REQUIRED; there is no default.
+
+### Helper builders
+
+- `buildPerseusEnvelope(perseusJson: unknown) => Promise<AiContextEnvelope>`
+- `buildHtmlEnvelope(html: string, screenshotUrl?: string) => AiContextEnvelope`
 
 ### compiler
 
@@ -132,6 +157,7 @@ Troubleshooting
 - Slot mismatch error: your content references slots not declared in the shell; fix source content.
 - Interaction choice count error: ensure at least 2 choices for choice/order interactions.
 - MathML issues: the sanitizer enforces valid operators and bans deprecated tags.
+- Empty envelope context error: the API requires non-empty context array; no defaults provided.
 
 License
 -------

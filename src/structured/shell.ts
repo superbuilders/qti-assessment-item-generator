@@ -3,8 +3,9 @@ import * as logger from "@superbuilders/slog"
 import type { AssessmentItemInput } from "../compiler/schemas"
 import { AssessmentItemShellSchema } from "../compiler/schemas"
 import { allExamples } from "../examples"
+import type { ImageContext } from "./ai-context-builder"
 import { caretBanPromptSection } from "./caret"
-import type { ImageContext } from "./perseus-image-resolver"
+import type { AiContextEnvelope } from "./types"
 
 // Helper to convert a full AssessmentItemInput into a shell for prompt examples
 function createShellFromExample(item: AssessmentItemInput) {
@@ -27,8 +28,9 @@ function createShellFromExample(item: AssessmentItemInput) {
 	}
 	return result.data
 }
+
 export function createAssessmentShellPrompt(
-	perseusJson: string,
+	envelope: AiContextEnvelope,
 	imageContext: ImageContext
 ): {
 	systemInstruction: string
@@ -559,10 +561,10 @@ Any discrepancy will cause your output to be rejected. Review your work carefull
 
 ## Image Context (for your analysis only)
 
-### Raw SVG Content
-If any images are SVGs, their content is provided here for you to analyze.
+### Raster Image URLs
+If any images are raster formats (PNG, JPG), their URLs are provided here for your vision to analyze.
 \`\`\`json
-${imageContext.svgContentMap.size === 0 ? "{}" : JSON.stringify(Object.fromEntries(imageContext.svgContentMap), null, 2)}
+${JSON.stringify(imageContext.rasterImageUrls, null, 2)}
 \`\`\`
 
 ## Target Shell Examples
@@ -572,13 +574,11 @@ Below are examples of the exact 'shell' structure you must generate. Study them 
 ${JSON.stringify(exampleShells, null, 2)}
 \`\`\`
 
-## Perseus JSON to Convert
-\`\`\`json
-${perseusJson}
-\`\`\`
+## Raw Source Input
+${envelope.context.map((content, index) => `\n\n## Source Context Block ${index + 1}\n\`\`\`\n${content}\n\`\`\``).join('')}
 
   ## CRITICAL Instructions:
-- **Analyze Images**: Use the raster images provided to your vision and the raw SVG content above to understand the visual components of the question.
+- **Analyze Images**: Use the raster images provided to your vision to understand the visual components of the question. Any SVG content is provided directly in the 'Raw Source Input' blocks.
 - **\`body\` Field**: Create a 'body' field containing the main content as a structured JSON array (not an HTML string).
   - **ONLY REFERENCED WIDGETS (WITH CHOICE-LEVEL EXCEPTION)**: CRITICAL RULE - Only include widgets/interactions that are explicitly referenced in the Perseus content string via \`[[☃ widget_name]]\` placeholders. Perseus JSON may contain many widget definitions, but you MUST ignore any that aren't actually used in the content.
     - **Exception 1 - Visuals inside interaction choices**: When the original Perseus JSON encodes visuals (e.g., Graphie images, number lines, diagrams) inside interaction choice content, you MUST predeclare widget slots for those visuals even if there is no corresponding \`[[☃ ...]]\` placeholder in the top-level body.

@@ -8,6 +8,7 @@ ignore_patterns:
   - "bun.lock"
   - "package.json"
   - "**/__snapshots__/**"
+  - "src/widgets/**"
 priority_rules:
   - score: 99
     pattern: "^rules/"

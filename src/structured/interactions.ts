@@ -1,9 +1,10 @@
 import type { allWidgetSchemas } from "../widgets/registry"
+import type { ImageContext } from "./ai-context-builder"
 import { caretBanPromptSection } from "./caret"
-import type { ImageContext } from "./perseus-image-resolver"
+import type { AiContextEnvelope } from "./types"
 
 export function createInteractionContentPrompt(
-	perseusJson: string,
+	envelope: AiContextEnvelope,
 	assessmentShell: unknown,
 	imageContext: ImageContext,
 	widgetMapping?: Record<string, keyof typeof allWidgetSchemas>
@@ -216,22 +217,14 @@ SCAN ALL text content (prompts, choices, feedback) for "$" or "%" - these MUST b
 
 ## Image Context (for your analysis only)
 
-### Image URL Mappings
-Mapping of original image URLs to resolved URLs (includes both SVG and raster images).
+### Raster Image URLs
+If any images are raster formats (PNG, JPG), their URLs are provided here for your vision to analyze.
 \`\`\`json
-${imageContext.resolvedUrlMap.size === 0 ? "{}" : JSON.stringify(Object.fromEntries(imageContext.resolvedUrlMap), null, 2)}
+${JSON.stringify(imageContext.rasterImageUrls, null, 2)}
 \`\`\`
 
-### Raw SVG Content
-If any images are SVGs, their content is provided here for you to analyze.
-\`\`\`json
-${imageContext.svgContentMap.size === 0 ? "{}" : JSON.stringify(Object.fromEntries(imageContext.svgContentMap), null, 2)}
-\`\`\`
-
-## Original Perseus JSON:
-\`\`\`json
-${perseusJson}
-\`\`\`
+## Raw Source Input
+${envelope.context.map((content, index) => `\n\n## Source Context Block ${index + 1}\n\`\`\`\n${content}\n\`\`\``).join('')}
 
 ## Assessment Shell (for context):
 \`\`\`json

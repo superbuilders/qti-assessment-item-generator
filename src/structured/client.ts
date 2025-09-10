@@ -14,9 +14,10 @@ import {
 } from "../compiler/schemas"
 import type { WidgetCollectionName } from "../widgets/collections"
 import { allWidgetSchemas, type WidgetInput } from "../widgets/registry"
+import { buildImageContextFromRasterUrls, type ImageContext } from "./ai-context-builder"
 import { createInteractionContentPrompt } from "./interactions"
-import { buildImageContext, type ImageContext } from "./perseus-image-resolver"
 import { createAssessmentShellPrompt } from "./shell"
+import type { AiContextEnvelope } from "./types"
 import { createWidgetMappingPrompt } from "./widget-mapping"
 import { createWidgetContentPrompt } from "./widgets"
 
@@ -77,14 +78,14 @@ function createInteractionCollectionSchema(interactionSlotNames: string[]) {
 async function mapSlotsToWidgets(
 	openai: OpenAI,
 	logger: logger.Logger,
-	perseusJson: string,
+	envelope: AiContextEnvelope,
 	assessmentBody: string,
 	slotNames: string[], // ✅ Takes the parsed slot names to generate the prompt.
 	widgetCollectionName: WidgetCollectionName
 ): Promise<Record<string, keyof typeof allWidgetSchemas>> {
 	// ✅ The prompt and the schema are now generated together dynamically.
 	const { systemInstruction, userContent, WidgetMappingSchema } = createWidgetMappingPrompt(
-		perseusJson,
+		envelope,
 		assessmentBody,
 		slotNames,
 		widgetCollectionName
@@ -170,11 +171,11 @@ async function mapSlotsToWidgets(
 async function generateAssessmentShell(
 	openai: OpenAI,
 	logger: logger.Logger,
-	perseusJson: string,
+	envelope: AiContextEnvelope,
 	imageContext: ImageContext
 ): Promise<AssessmentItemShell> {
 	// Assumes a new prompt function is created for this shot.
-	const { systemInstruction, userContent } = createAssessmentShellPrompt(perseusJson, imageContext)
+	const { systemInstruction, userContent } = createAssessmentShellPrompt(envelope, imageContext)
 
 	const responseFormat = zodResponseFormat(AssessmentItemShellSchema, "assessment_shell_generator")
 	logger.debug("generated json schema for openai", {
@@ -227,7 +228,7 @@ async function generateAssessmentShell(
 async function generateInteractionContent(
 	openai: OpenAI,
 	logger: logger.Logger,
-	perseusJson: string,
+	envelope: AiContextEnvelope,
 	assessmentShell: AssessmentItemShell,
 	imageContext: ImageContext,
 	widgetMapping?: Record<string, keyof typeof allWidgetSchemas>
@@ -240,7 +241,7 @@ async function generateInteractionContent(
 
 	// This new prompt function instructs the AI to generate the interaction objects.
 	const { systemInstruction, userContent } = createInteractionContentPrompt(
-		perseusJson,
+		envelope,
 		assessmentShell,
 		imageContext,
 		widgetMapping
@@ -294,12 +295,12 @@ async function generateInteractionContent(
 async function generateWidgetContent(
 	openai: OpenAI,
 	logger: logger.Logger,
-	perseusJson: string,
+	envelope: AiContextEnvelope,
 	assessmentShell: AssessmentItemShell,
 	widgetMapping: Record<string, keyof typeof allWidgetSchemas>,
 	generatedInteractions: Record<string, AnyInteraction>,
-	imageContext: ImageContext,
-	widgetCollectionName: WidgetCollectionName
+	widgetCollectionName: WidgetCollectionName,
+	imageContext: ImageContext
 ): Promise<Record<string, WidgetInput>> {
 	const widgetSlotNames = Object.keys(widgetMapping)
 	if (widgetSlotNames.length === 0) {
@@ -309,7 +310,7 @@ async function generateWidgetContent(
 
 	// This new prompt function instructs the AI to generate the widget objects.
 	const { systemInstruction, userContent } = createWidgetContentPrompt(
-		perseusJson,
+		envelope,
 		assessmentShell,
 		widgetMapping,
 		generatedInteractions,
@@ -359,33 +360,35 @@ async function generateWidgetContent(
 	return choice.message.parsed
 }
 
-/**
- * Main entry point for the structured pipeline: generateStructuredQtiItem.
- * This orchestrates the 4-shot process and merges the results.
- */
-export async function generateStructuredQtiItem(
+// ADD the new single public entry point that accepts a normalized envelope.
+export async function generateFromEnvelope(
 	openai: OpenAI,
 	logger: logger.Logger,
-	perseusData: unknown,
-	options: { widgetCollectionName?: WidgetCollectionName } = {}
+	envelope: AiContextEnvelope,
+	widgetCollectionName: WidgetCollectionName
 ): Promise<AssessmentItemInput> {
-	// Default to "math-core" to ensure backward compatibility and no disruption.
-	const { widgetCollectionName = "math-core" } = options
-	const perseusJsonString = JSON.stringify(perseusData, null, 2)
-	logger.info("starting structured qti generation process", {
-		widgetCollection: widgetCollectionName
+	// Validate envelope at the boundary. No defaults or fallbacks.
+	if (!envelope.context || envelope.context.length === 0) {
+		logger.error("envelope validation failed", { reason: "context array is empty" })
+		throw errors.new("envelope context cannot be empty")
+	}
+	
+	logger.info("starting structured qti generation from envelope", {
+		widgetCollection: widgetCollectionName,
+		contextBlockCount: envelope.context.length,
+		imageUrlCount: envelope.imageUrls.length
 	})
+	// MODIFIED: Use the new, simplified raster-only image context builder.
+	const imageContext = await buildImageContextFromRasterUrls(envelope.imageUrls)
 
-	const imageContext = await buildImageContext(perseusData)
-
-	// Shot 1: Generate the content shell and plan.
-	logger.debug("shot 1: generating assessment shell")
-	const shellResult = await errors.try(generateAssessmentShell(openai, logger, perseusJsonString, imageContext))
+	// --- AI Pipeline Shots ---
+	// All subsequent "shot" functions MUST be updated to accept the `envelope` object.
+	
+	// Shot 1: Generate Shell
+	const shellResult = await errors.try(generateAssessmentShell(openai, logger, envelope, imageContext))
 	if (shellResult.error) {
-		logger.error("shot 1 failed: shell generation pass failed", {
-			error: shellResult.error
-		})
-		throw shellResult.error
+		logger.error("generate assessment shell", { error: shellResult.error })
+		throw errors.wrap(shellResult.error, "generate assessment shell")
 	}
 	const assessmentShell = shellResult.data
 	logger.debug("shot 1 complete", {
@@ -476,7 +479,7 @@ export async function generateStructuredQtiItem(
 		// Convert structured body to string representation for widget mapping prompt
 		const bodyString = assessmentShell.body ? JSON.stringify(assessmentShell.body) : ""
 		const mappingResult = await errors.try(
-			mapSlotsToWidgets(openai, logger, perseusJsonString, bodyString, widgetSlotNames, widgetCollectionName)
+			mapSlotsToWidgets(openai, logger, envelope, bodyString, widgetSlotNames, widgetCollectionName)
 		)
 		if (mappingResult.error) {
 			const emptyMapping: Record<string, keyof typeof allWidgetSchemas> = {}
@@ -488,24 +491,16 @@ export async function generateStructuredQtiItem(
 	const widgetMappingResult = await performWidgetMapping()
 
 	if (widgetMappingResult.error) {
-		logger.error("shot 2 failed: widget mapping pass failed", {
-			error: widgetMappingResult.error
-		})
-		throw widgetMappingResult.error
+		logger.error("map slots to widgets", { error: widgetMappingResult.error })
+		throw errors.wrap(widgetMappingResult.error, "map slots to widgets")
 	}
 	let widgetMapping = widgetMappingResult.data
-	logger.debug("shot 2 complete", { mapping: widgetMapping })
-
-	// ✅ NEW - Shot 3: Generate the full interaction objects.
-	logger.debug("shot 3: generating interaction content")
-	const interactionContentResult = await errors.try(
-		generateInteractionContent(openai, logger, perseusJsonString, assessmentShell, imageContext, widgetMapping)
-	)
+	
+	// Shot 3: Generate Interactions
+	const interactionContentResult = await errors.try(generateInteractionContent(openai, logger, envelope, assessmentShell, imageContext, widgetMapping))
 	if (interactionContentResult.error) {
-		logger.error("shot 3 failed: interaction content generation failed", {
-			error: interactionContentResult.error
-		})
-		throw interactionContentResult.error
+		logger.error("generate interaction content", { error: interactionContentResult.error })
+		throw errors.wrap(interactionContentResult.error, "generate interaction content")
 	}
 	const generatedInteractions = interactionContentResult.data
 	logger.debug("shot 3 complete", {
@@ -565,41 +560,28 @@ export async function generateStructuredQtiItem(
 		Object.entries(widgetMapping).filter(([slot]) => originalWidgetSlots.has(slot) && usedAfterShot3.has(slot))
 	)
 
-	// Shot 4: Generate ONLY the widget content based on the mapping.
-	logger.debug("shot 4: generating widget content")
-	const widgetContentResult = await errors.try(
-		generateWidgetContent(
-			openai,
-			logger,
-			perseusJsonString,
-			assessmentShell,
-			widgetMapping,
-			generatedInteractions,
-			imageContext,
-			widgetCollectionName
-		)
-	)
+	// Shot 4: Generate Widgets
+	const widgetContentResult = await errors.try(generateWidgetContent(openai, logger, envelope, assessmentShell, widgetMapping, generatedInteractions, widgetCollectionName, imageContext))
 	if (widgetContentResult.error) {
-		logger.error("shot 4 failed: widget content generation failed", {
-			error: widgetContentResult.error
-		})
-		throw widgetContentResult.error
+		logger.error("generate widget content", { error: widgetContentResult.error })
+		throw errors.wrap(widgetContentResult.error, "generate widget content")
 	}
 	const generatedWidgets = widgetContentResult.data
 	logger.debug("shot 4 complete", {
 		generatedWidgetKeys: Object.keys(generatedWidgets)
 	})
 
-	// Final Step: Deterministically merge the shell, interactions, and widgets.
+	// Final Assembly
 	const finalAssessmentItem: AssessmentItemInput = {
 		...assessmentShell,
-		// Replace the string arrays from the shell with the generated objects.
 		interactions: generatedInteractions,
 		widgets: generatedWidgets
 	}
-
-	logger.info("structured qti generation process successful", {
-		identifier: finalAssessmentItem.identifier
-	})
 	return finalAssessmentItem
 }
+
+// All internal "shot" functions MUST be updated to accept the `envelope`.
+// async function generateAssessmentShell(openai: OpenAI, logger: logger.Logger, envelope: AiContextEnvelope, imageContext: ImageContext): Promise<AssessmentItemShell> { /* ... */ }
+// async function mapSlotsToWidgets(openai: OpenAI, logger: logger.Logger, envelope: AiContextEnvelope, assessmentBody: string, slotNames: string[], widgetCollectionName: WidgetCollectionName): Promise<Record<string, keyof typeof allWidgetSchemas>> { /* ... */ }
+// async function generateInteractionContent(openai: OpenAI, logger: logger.Logger, envelope: AiContextEnvelope, assessmentShell: AssessmentItemShell, imageContext: ImageContext, widgetMapping?: Record<string, keyof typeof allWidgetSchemas>): Promise<Record<string, AnyInteraction>> { /* ... */ }
+// async function generateWidgetContent(openai: OpenAI, logger: logger.Logger, envelope: AiContextEnvelope, assessmentShell: AssessmentItemShell, widgetMapping: Record<string, keyof typeof allWidgetSchemas>, generatedInteractions: Record<string, AnyInteraction>, widgetCollectionName: WidgetCollectionName, imageContext: ImageContext): Promise<Record<string, WidgetInput>> { /* ... */ }
