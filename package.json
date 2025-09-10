@@ -1,6 +1,6 @@
 {
   "name": "@superbuilders/qti-assessment-item-generator",
-  "version": "4.0.0",
+  "version": "1.0.0",
   "description": "QTI 3.0 assessment item generator (compiler + AI pipeline)",
   "type": "module",
   "files": [
@@ -35,6 +35,9 @@
   },
   "engines": {
     "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "dependencies": {
     "@biomejs/biome": "^2.0.0-beta.6",
