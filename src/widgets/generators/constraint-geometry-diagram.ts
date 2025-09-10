@@ -1055,16 +1055,16 @@ export const generateConstraintGeometryDiagram = async (
 	const angleConstraints = constraints.filter((c): c is Extract<ConstraintDef, { type: "angle" }> => c.type === "angle")
 	for (const angle of angleConstraints) {
 		const viz = angle.visualization
-		if (viz.type === "none") return
+		if (viz.type === "none") continue
 		const vertexPos = solvedPositions.get(angle.vertex)
 		const line1 = lines.find((l) => l.id === angle.line1)
 		const line2 = lines.find((l) => l.id === angle.line2)
-		if (!vertexPos || !line1 || !line2) return
+		if (!vertexPos || !line1 || !line2) continue
 		const p1Id = line1.from === angle.vertex ? line1.to : line1.from
 		const p2Id = line2.from === angle.vertex ? line2.to : line2.from
 		const p1 = solvedPositions.get(p1Id)
 		const p2 = solvedPositions.get(p2Id)
-		if (!p1 || !p2) return
+		if (!p1 || !p2) continue
 
 		if (viz.type === "right") {
 			const v1x = p1.x - vertexPos.x
@@ -1259,10 +1259,10 @@ export const generateConstraintGeometryDiagram = async (
 			} else if (label.placement.type === "alongLine") {
 				const lineId: string = label.placement.line
 				const line = lines.find((l) => l.id === lineId)
-				if (!line) return
+				if (!line) continue
 				const a = solvedPositions.get(line.from)
 				const b = solvedPositions.get(line.to)
-				if (!a || !b) return
+				if (!a || !b) continue
 				const t = label.placement.offset
 				const pos = { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t }
 				placeLabel(label.text, pos)

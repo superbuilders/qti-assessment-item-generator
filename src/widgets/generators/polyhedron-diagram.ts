@@ -359,8 +359,16 @@ export const generatePolyhedronDiagram: WidgetGenerator<typeof PolyhedronDiagram
 	) {
 		// Back-compat: map legacy diagonals to segments if any were provided
 		const allSegments: Array<{
-			from: { type: string; index: number }
-			to: { type: string; index: number }
+			from:
+				| { type: "vertex"; index: number }
+				| { type: "edgeMidpoint"; a: number; b: number }
+				| { type: "edgePoint"; a: number; b: number; t: number }
+				| { type: "faceCentroid"; face: z.infer<typeof FaceName> }
+			to:
+				| { type: "vertex"; index: number }
+				| { type: "edgeMidpoint"; a: number; b: number }
+				| { type: "edgePoint"; a: number; b: number; t: number }
+				| { type: "faceCentroid"; face: z.infer<typeof FaceName> }
 			label: string | null
 		}> = []
 		for (const d of diagonals) {

@@ -129,8 +129,9 @@ export function computeAndRenderYAxis(
 	let bandWidth: number | undefined
 	let toSvgYCategorical: ((idx: number) => number) | undefined
 	if (isCategorical) {
-		bandWidth = chartArea.height / spec.categories.length
-		toSvgYCategorical = (idx: number) => chartArea.top + (idx + 0.5) * bandWidth
+		const bw = chartArea.height / spec.categories.length
+		bandWidth = bw
+		toSvgYCategorical = (idx: number) => chartArea.top + (idx + 0.5) * bw
 	}
 
 	// MODIFIED: Replace all markup generation with canvas calls.

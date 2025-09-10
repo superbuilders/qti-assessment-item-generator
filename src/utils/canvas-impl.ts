@@ -214,15 +214,15 @@ export class CanvasImpl implements Canvas {
 			throw errors.new("fontPx must be finite and > 0")
 		}
 		if (opts.strokeWidth !== undefined && (!Number.isFinite(opts.strokeWidth) || opts.strokeWidth < 0)) {
-			logger.error("invalid strokeWidth", { strokeWidth: opts?.strokeWidth || style?.strokeWidth })
+			logger.error("invalid strokeWidth", { strokeWidth: opts.strokeWidth })
 			throw errors.new("strokeWidth must be finite and >= 0")
 		}
 		if (opts.opacity !== undefined && (opts.opacity < 0 || opts.opacity > 1)) {
-			logger.error("invalid opacity", { opacity: opts?.opacity || style?.opacity })
+			logger.error("invalid opacity", { opacity: opts.opacity })
 			throw errors.new("opacity must be within [0, 1]")
 		}
 		if (opts.strokeOpacity !== undefined && (opts.strokeOpacity < 0 || opts.strokeOpacity > 1)) {
-			logger.error("invalid strokeOpacity", { strokeOpacity: opts?.strokeOpacity || style?.strokeOpacity })
+			logger.error("invalid strokeOpacity", { strokeOpacity: opts.strokeOpacity })
 			throw errors.new("strokeOpacity must be within [0, 1]")
 		}
 		if (opts.fillOpacity !== undefined && (opts.fillOpacity < 0 || opts.fillOpacity > 1)) {
@@ -519,15 +519,15 @@ export class CanvasImpl implements Canvas {
 	): void {
 		// Validate parameters
 		if (!Number.isFinite(style.strokeWidth) || style.strokeWidth < 0) {
-			logger.error("invalid strokeWidth", { strokeWidth: opts?.strokeWidth || style?.strokeWidth })
+			logger.error("invalid strokeWidth", { strokeWidth: style.strokeWidth })
 			throw errors.new("strokeWidth must be finite and >= 0")
 		}
 		if (style.opacity !== undefined && (style.opacity < 0 || style.opacity > 1)) {
-			logger.error("invalid opacity", { opacity: opts?.opacity || style?.opacity })
+			logger.error("invalid opacity", { opacity: style.opacity })
 			throw errors.new("opacity must be within [0, 1]")
 		}
 		if (style.strokeOpacity !== undefined && (style.strokeOpacity < 0 || style.strokeOpacity > 1)) {
-			logger.error("invalid strokeOpacity", { strokeOpacity: opts?.strokeOpacity || style?.strokeOpacity })
+			logger.error("invalid strokeOpacity", { strokeOpacity: style.strokeOpacity })
 			throw errors.new("strokeOpacity must be within [0, 1]")
 		}
 
@@ -588,7 +588,7 @@ export class CanvasImpl implements Canvas {
 	): void {
 		// Validate parameters
 		if (style.strokeWidth !== undefined && (!Number.isFinite(style.strokeWidth) || style.strokeWidth < 0)) {
-			logger.error("invalid strokeWidth", { strokeWidth: opts?.strokeWidth || style?.strokeWidth })
+			logger.error("invalid strokeWidth", { strokeWidth: style.strokeWidth })
 			throw errors.new("strokeWidth must be finite and >= 0")
 		}
 
@@ -631,7 +631,7 @@ export class CanvasImpl implements Canvas {
 	): void {
 		// Validate parameters
 		if (style.strokeWidth !== undefined && (!Number.isFinite(style.strokeWidth) || style.strokeWidth < 0)) {
-			logger.error("invalid strokeWidth", { strokeWidth: opts?.strokeWidth || style?.strokeWidth })
+			logger.error("invalid strokeWidth", { strokeWidth: style.strokeWidth })
 			throw errors.new("strokeWidth must be finite and >= 0")
 		}
 
@@ -674,7 +674,7 @@ export class CanvasImpl implements Canvas {
 	): void {
 		// Validate parameters
 		if (style.strokeWidth !== undefined && (!Number.isFinite(style.strokeWidth) || style.strokeWidth < 0)) {
-			logger.error("invalid strokeWidth", { strokeWidth: opts?.strokeWidth || style?.strokeWidth })
+			logger.error("invalid strokeWidth", { strokeWidth: style.strokeWidth })
 			throw errors.new("strokeWidth must be finite and >= 0")
 		}
 
