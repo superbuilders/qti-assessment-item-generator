@@ -3,7 +3,6 @@ ignore_patterns:
   - "biome.json"
   - "tsconfig.json"
   - "prd.md"
-  - "README.md"
   - "patches/*"
   - "bun.lock"
   - "package.json"
