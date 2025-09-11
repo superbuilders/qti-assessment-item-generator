@@ -6,6 +6,7 @@ import { PADDING } from "../../utils/constants"
 import { CSS_COLOR_PATTERN } from "../../utils/css-color"
 import { Path2D } from "../../utils/path-builder"
 import { theme } from "../../utils/theme"
+import { estimateWrappedTextDimensions } from "../../utils/text"
 import type { WidgetGenerator } from "../types"
 
 // Schema for an angle segment in the diagram.
@@ -245,7 +246,7 @@ export const generateRadiallyConstrainedAngleDiagram: WidgetGenerator<
 	const suggestedBase = diagramRadius * 0.7
 	const baseSecondaryRadius = Math.max(innerArcMinRadius, Math.min(innerArcMaxRadius, suggestedBase))
 	const radiusStep = 18
-	const pendingSecondaryLabels: Array<{ x: number; y: number; text: string }> = []
+	const pendingSecondaryLabels: Array<{ x: number; y: number; text: string; midAngleRad: number }> = []
 
 	secondaryAngles.forEach((angle, i) => {
 		const fromRay = rayPositions.find(r => r.label === angle.fromRayLabel)!
@@ -283,16 +284,18 @@ export const generateRadiallyConstrainedAngleDiagram: WidgetGenerator<
 		const labelRadius = Math.min(innerArcMaxRadius, secondaryRadius + 16)
 		const labelX = cx + labelRadius * Math.cos(midAngleRad)
 		const labelY = cy + labelRadius * Math.sin(midAngleRad)
-		pendingSecondaryLabels.push({ x: labelX, y: labelY, text: `${angle.value}°` })
+		pendingSecondaryLabels.push({ x: labelX, y: labelY, text: `${angle.value}°`, midAngleRad })
 	})
 
 	// Draw rays and ray labels ON TOP of sectors/arcs
+	const screenSegments: Array<{ a: { x: number; y: number }; b: { x: number; y: number } }> = []
 	for (const ray of rayPositions) {
 		// Draw ray line
 		canvas.drawLine(cx, cy, ray.x, ray.y, { 
 			stroke: theme.colors.black, 
 			strokeWidth: theme.stroke.width.thick 
 		})
+		screenSegments.push({ a: { x: cx, y: cy }, b: { x: ray.x, y: ray.y } })
 		
 		// Draw point at end of ray
 		canvas.drawCircle(ray.x, ray.y, 4, { fill: theme.colors.black })
@@ -308,14 +311,108 @@ export const generateRadiallyConstrainedAngleDiagram: WidgetGenerator<
 		})
 	}
 
+	// Collision helpers (modeled after composite-shape-diagram)
+	function segmentIntersectsRect(
+		A: { x: number; y: number },
+		B: { x: number; y: number },
+		rect: { x: number; y: number; width: number; height: number; pad?: number }
+	): boolean {
+		const pad = rect.pad ?? 0
+		const rx = rect.x - pad
+		const ry = rect.y - pad
+		const rw = rect.width + 2 * pad
+		const rh = rect.height + 2 * pad
+
+		const minX = Math.min(A.x, B.x)
+		const maxX = Math.max(A.x, B.x)
+		const minY = Math.min(A.y, B.y)
+		const maxY = Math.max(A.y, B.y)
+		if (maxX < rx || minX > rx + rw || maxY < ry || minY > ry + rh) return false
+
+		const r1 = { x: rx, y: ry }
+		const r2 = { x: rx + rw, y: ry }
+		const r3 = { x: rx + rw, y: ry + rh }
+		const r4 = { x: rx, y: ry + rh }
+		const orient = (p: { x: number; y: number }, q: { x: number; y: number }, r: { x: number; y: number }) => {
+			const val = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y)
+			if (val > 1e-9) return 1
+			if (val < -1e-9) return -1
+			return 0
+		}
+		const segmentsIntersect = (
+			p1: { x: number; y: number },
+			p2: { x: number; y: number },
+			p3: { x: number; y: number },
+			p4: { x: number; y: number }
+		) => {
+			const o1 = orient(p1, p2, p3)
+			const o2 = orient(p1, p2, p4)
+			const o3 = orient(p3, p4, p1)
+			const o4 = orient(p3, p4, p2)
+			return o1 !== o2 && o3 !== o4
+		}
+		return (
+			segmentsIntersect(A, B, r1, r2) ||
+			segmentsIntersect(A, B, r2, r3) ||
+			segmentsIntersect(A, B, r3, r4) ||
+			segmentsIntersect(A, B, r4, r1)
+		)
+	}
+
+	function rectIntersectsAnySegment(rect: { x: number; y: number; width: number; height: number; pad?: number }): boolean {
+		for (const seg of screenSegments) {
+			if (segmentIntersectsRect(seg.a, seg.b, rect)) return true
+		}
+		return false
+	}
+
 	// Finally, draw angle labels ON TOP of rays
-	[...pendingPrimaryLabels, ...pendingSecondaryLabels].forEach(lbl => {
+	// Primary labels: draw as-is
+	pendingPrimaryLabels.forEach(lbl => {
 		canvas.drawText({
 			x: lbl.x, y: lbl.y, text: lbl.text,
 			fill: theme.colors.black, anchor: "middle", dominantBaseline: "middle",
 			fontPx: 18, fontWeight: theme.font.weight.bold,
 		})
 	})
+
+	// Secondary labels: adjust along mid-angle direction to avoid ray piercing
+	for (const lbl of pendingSecondaryLabels) {
+		const fontPx = 18
+		const { maxWidth: w, height: h } = estimateWrappedTextDimensions(lbl.text, Number.POSITIVE_INFINITY, fontPx, 1.2)
+		const halfW = w / 2
+		const halfH = h / 2
+		const dirX = Math.cos(lbl.midAngleRad)
+		const dirY = Math.sin(lbl.midAngleRad)
+		const baseOffsetPx = 0
+
+		function placeFor(mult: number) {
+			let px = lbl.x + mult * baseOffsetPx * dirX
+			let py = lbl.y + mult * baseOffsetPx * dirY
+			let it = 0
+			const maxIt = 60
+			const step = 2
+			while (
+				rectIntersectsAnySegment({ x: px - halfW, y: py - halfH, width: w, height: h, pad: 1 }) &&
+				it < maxIt
+			) {
+				px += mult * step * dirX
+				py += mult * step * dirY
+				it++
+			}
+			return { x: px, y: py, it }
+		}
+
+		const outward = placeFor(1)
+		const inward = placeFor(-1)
+		const chosen = inward.it < outward.it ? inward : outward
+
+		canvas.drawText({
+			x: chosen.x, y: chosen.y, text: lbl.text,
+			fill: theme.colors.black, anchor: "middle", dominantBaseline: "middle",
+			fontPx, fontWeight: theme.font.weight.bold,
+		})
+	}
 
 	// Draw the center point and its label last to be on top
 	canvas.drawCircle(cx, cy, 6, { fill: theme.colors.black })
