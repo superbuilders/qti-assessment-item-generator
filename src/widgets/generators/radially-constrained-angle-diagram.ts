@@ -21,7 +21,7 @@ const AngleSegmentSchema = z
 		color: z
 			.string()
 			.regex(CSS_COLOR_PATTERN, "Invalid CSS color format")
-			.describe("The color for the angle's visual representation."),
+			.describe("The color for the angle's visual representation. Primary angles (adjacent rays) render as filled sectors, secondary angles (spanning multiple rays) render as stroke-only arcs."),
 	})
 	.strict()
 
@@ -45,11 +45,11 @@ export const RadiallyConstrainedAngleDiagramPropsSchema = z
 		angles: z
 			.array(AngleSegmentSchema)
 			.min(1, "At least one angle is required.")
-			.describe("An array of angle segments, each explicitly defining which rays it spans."),
+			.describe("An array of angle segments, each explicitly defining which rays it spans. Supports multiple layers: primary angles (adjacent rays) create filled sectors, secondary angles (spanning multiple rays) create arc overlays. Multiple secondary angles are automatically stacked at increasing radii."),
 	})
 	.strict()
 	.describe(
-		"Creates a diagram with rays originating from a central point, showing the angles between them. Each angle explicitly defines which rays it spans, making the relationships clear and unambiguous."
+		"Creates a diagram with rays originating from a central point, showing the angles between them. Each angle explicitly defines which rays it spans, making the relationships clear and unambiguous. Supports layered visualization: primary angles (between adjacent rays) appear as filled sectors, while secondary angles (spanning multiple rays) appear as arc overlays at different radii. Multiple secondary angles are automatically stacked for clear visual separation."
 	)
 
 export type RadiallyConstrainedAngleDiagramProps = z.infer<typeof RadiallyConstrainedAngleDiagramPropsSchema>
