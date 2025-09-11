@@ -152,18 +152,19 @@ export const generateAdditionWithRegrouping: WidgetGenerator<typeof AdditionWith
 		}
 
 		// Show carried values above the columns they affect
+		// IMPORTANT: Avoid absolute positioning so the row contributes to layout height
 		for (let index = 0; index < maxLength; index++) {
 			const carryValue = carried[index] ?? 0
 
 			if (carryValue > 0) {
-				html += '<td style="padding: 0 8px; position: relative;">'
 				html +=
-					'<div style="position: absolute; top: -18px; left: 0; right: 0; text-align: center; font-size: 0.7em; color: #1E90FF; font-weight: bold;">'
-				html += String(carryValue)
-				html += "</div>"
-				html += "</td>"
+					'<td style="padding: 0 8px 6px; text-align: center; vertical-align: bottom;">' +
+					`<span style="display: inline-block; font-size: 0.7em; color: #1E90FF; font-weight: bold;">${String(
+						carryValue
+					)}</span>` +
+					"</td>"
 			} else {
-				html += '<td style="padding: 0 8px;"></td>'
+				html += '<td style="padding: 0 8px 6px;"></td>'
 			}
 		}
 		html += "</tr>"
