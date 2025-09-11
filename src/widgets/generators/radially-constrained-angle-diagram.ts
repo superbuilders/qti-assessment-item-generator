@@ -202,26 +202,27 @@ export const generateRadiallyConstrainedAngleDiagram: WidgetGenerator<
 		}
 	}
 
-	// Draw primary angles as filled sectors (inner)
+	// Draw primary angles as filled sectors (inner) UNDER rays
 	const primaryArcRadius = diagramRadius * 0.4
 	const primaryLabelRadius = primaryArcRadius + 28
+	const pendingPrimaryLabels: Array<{ x: number; y: number; text: string }> = []
 
 	for (const angle of primaryAngles) {
 		const fromRay = rayPositions.find(r => r.label === angle.fromRayLabel)!
 		const toRay = rayPositions.find(r => r.label === angle.toRayLabel)!
-
+		
 		const fromRad = fromRay.angleRad
 		const toRad = toRay.angleRad
-
+		
 		// Calculate angle span (always go clockwise from fromRay to toRay)
 		let angleDiff = toRad - fromRad
 		if (angleDiff <= 0) {
 			angleDiff += 2 * Math.PI
 		}
-
+		
 		const startPoint = { x: cx + primaryArcRadius * Math.cos(fromRad), y: cy + primaryArcRadius * Math.sin(fromRad) }
 		const endPoint = { x: cx + primaryArcRadius * Math.cos(toRad), y: cy + primaryArcRadius * Math.sin(toRad) }
-
+		
 		const largeArcFlag = angleDiff > Math.PI ? 1 : 0
 		const path = new Path2D()
 			.moveTo(cx, cy)
@@ -229,46 +230,43 @@ export const generateRadiallyConstrainedAngleDiagram: WidgetGenerator<
 			.arcTo(primaryArcRadius, primaryArcRadius, 0, largeArcFlag, 1, endPoint.x, endPoint.y)
 			.closePath()
 		canvas.drawPath(path, { fill: angle.color, stroke: "none" })
-
-		// Draw angle label at midpoint
+		
+		// Defer label drawing until after rays so labels sit above
 		const midAngleRad = fromRad + angleDiff / 2
 		const labelX = cx + primaryLabelRadius * Math.cos(midAngleRad)
 		const labelY = cy + primaryLabelRadius * Math.sin(midAngleRad)
-		canvas.drawText({
-			x: labelX, y: labelY, text: `${angle.value}°`,
-			fill: theme.colors.black, anchor: "middle", dominantBaseline: "middle",
-			fontPx: 18, fontWeight: theme.font.weight.bold,
-		})
+		pendingPrimaryLabels.push({ x: labelX, y: labelY, text: `${angle.value}°` })
 	}
 
-	// Draw secondary angles as internal arcs (between primary sectors and ray endpoints)
+	// Draw secondary angles as internal arcs UNDER rays (between primary sectors and ray endpoints)
 	// Choose a radius band strictly inside the ray length and above the primary labels
 	const innerArcMinRadius = primaryLabelRadius + 14
 	const innerArcMaxRadius = pointOnRayDist - 24
 	const suggestedBase = diagramRadius * 0.7
 	const baseSecondaryRadius = Math.max(innerArcMinRadius, Math.min(innerArcMaxRadius, suggestedBase))
 	const radiusStep = 18
+	const pendingSecondaryLabels: Array<{ x: number; y: number; text: string }> = []
 
 	secondaryAngles.forEach((angle, i) => {
 		const fromRay = rayPositions.find(r => r.label === angle.fromRayLabel)!
 		const toRay = rayPositions.find(r => r.label === angle.toRayLabel)!
-
+		
 		const fromRad = fromRay.angleRad
 		const toRad = toRay.angleRad
-
+		
 		// Calculate angle span (always go clockwise from fromRay to toRay)
 		let angleDiff = toRad - fromRad
 		if (angleDiff <= 0) {
 			angleDiff += 2 * Math.PI
 		}
-
+		
 		let secondaryRadius = baseSecondaryRadius + i * radiusStep
 		if (secondaryRadius > innerArcMaxRadius) {
 			secondaryRadius = innerArcMaxRadius
 		}
 		const startPoint = { x: cx + secondaryRadius * Math.cos(fromRad), y: cy + secondaryRadius * Math.sin(fromRad) }
 		const endPoint = { x: cx + secondaryRadius * Math.cos(toRad), y: cy + secondaryRadius * Math.sin(toRad) }
-
+		
 		const largeArcFlag = angleDiff > Math.PI ? 1 : 0
 		const arcPath = new Path2D()
 			.moveTo(startPoint.x, startPoint.y)
@@ -279,20 +277,16 @@ export const generateRadiallyConstrainedAngleDiagram: WidgetGenerator<
 			strokeWidth: theme.stroke.width.thick, 
 			fill: "none" 
 		})
-
-		// Draw angle label at midpoint of arc (keep label inside ray endpoints)
+		
+		// Defer label drawing until after rays
 		const midAngleRad = fromRad + angleDiff / 2
 		const labelRadius = Math.min(innerArcMaxRadius, secondaryRadius + 16)
 		const labelX = cx + labelRadius * Math.cos(midAngleRad)
 		const labelY = cy + labelRadius * Math.sin(midAngleRad)
-		canvas.drawText({
-			x: labelX, y: labelY, text: `${angle.value}°`,
-			fill: theme.colors.black, anchor: "middle", dominantBaseline: "middle",
-			fontPx: 18, fontWeight: theme.font.weight.bold,
-		})
+		pendingSecondaryLabels.push({ x: labelX, y: labelY, text: `${angle.value}°` })
 	})
 
-	// Draw rays and ray labels
+	// Draw rays and ray labels ON TOP of sectors/arcs
 	for (const ray of rayPositions) {
 		// Draw ray line
 		canvas.drawLine(cx, cy, ray.x, ray.y, { 
@@ -302,7 +296,7 @@ export const generateRadiallyConstrainedAngleDiagram: WidgetGenerator<
 		
 		// Draw point at end of ray
 		canvas.drawCircle(ray.x, ray.y, 4, { fill: theme.colors.black })
-
+		
 		// Draw ray label
 		const labelDistFromPoint = 22
 		const rayLabelX = cx + (pointOnRayDist + labelDistFromPoint) * Math.cos(ray.angleRad)
@@ -313,6 +307,15 @@ export const generateRadiallyConstrainedAngleDiagram: WidgetGenerator<
 			fontPx: 20, fontWeight: theme.font.weight.bold,
 		})
 	}
+
+	// Finally, draw angle labels ON TOP of rays
+	[...pendingPrimaryLabels, ...pendingSecondaryLabels].forEach(lbl => {
+		canvas.drawText({
+			x: lbl.x, y: lbl.y, text: lbl.text,
+			fill: theme.colors.black, anchor: "middle", dominantBaseline: "middle",
+			fontPx: 18, fontWeight: theme.font.weight.bold,
+		})
+	})
 
 	// Draw the center point and its label last to be on top
 	canvas.drawCircle(cx, cy, 6, { fill: theme.colors.black })

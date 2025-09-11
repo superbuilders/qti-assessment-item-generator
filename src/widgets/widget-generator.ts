@@ -74,6 +74,7 @@ import { generateStackedItemsDiagram } from "./generators/stacked-items-diagram"
 import { generateSubtractionWithRegrouping } from "./generators/subtraction-with-regrouping"
 import { generateTapeDiagram } from "./generators/tape-diagram"
 import { generateTransformationDiagram } from "./generators/transformation-diagram"
+import { generateTransversalAngleDiagram } from "./generators/transversal-angle-diagram"
 import { generateTreeDiagram } from "./generators/tree-diagram"
 import { generateTriangleDiagram } from "./generators/triangle-diagram"
 import { generateUnitBlockDiagram } from "./generators/unit-block-diagram"
@@ -201,6 +202,8 @@ export async function generateWidget(widget: Widget): Promise<string> {
 			return await generateTapeDiagram(widget)
 		case "transformationDiagram":
 			return await generateTransformationDiagram(widget)
+		case "transversalAngleDiagram":
+			return await generateTransversalAngleDiagram(widget)
 		case "treeDiagram":
 			return await generateTreeDiagram(widget)
 		case "triangleDiagram":

@@ -81,7 +81,7 @@ const screenshotUrl = "https://example.com/item-screenshot.png"; // Optional
 const envelope = buildHtmlEnvelope(html, screenshotUrl);
 
 // 2. Generate the structured AssessmentItemInput object.
-const structuredItem = await generateFromEnvelope(openai, logger, envelope, "simple-visual");
+const structuredItem = await generateFromEnvelope(openai, logger, envelope, "fourth-grade-math");
 
 // 3. Compile the structured item to QTI XML.
 const xml = await compile(structuredItem);

@@ -75,6 +75,7 @@ import { StackedItemsDiagramPropsSchema } from "./generators/stacked-items-diagr
 import { SubtractionWithRegroupingPropsSchema } from "./generators/subtraction-with-regrouping"
 import { TapeDiagramPropsSchema } from "./generators/tape-diagram"
 import { TransformationDiagramPropsSchema } from "./generators/transformation-diagram"
+import { TransversalAngleDiagramPropsSchema } from "./generators/transversal-angle-diagram"
 import { TreeDiagramPropsSchema } from "./generators/tree-diagram"
 import { TriangleDiagramPropsSchema } from "./generators/triangle-diagram"
 import { UnitBlockDiagramPropsSchema } from "./generators/unit-block-diagram"
@@ -149,6 +150,7 @@ export const allWidgetSchemas = {
 	stackedItemsDiagram: StackedItemsDiagramPropsSchema,
 	tapeDiagram: TapeDiagramPropsSchema,
 	transformationDiagram: TransformationDiagramPropsSchema,
+	transversalAngleDiagram: TransversalAngleDiagramPropsSchema,
 	treeDiagram: TreeDiagramPropsSchema,
 	triangleDiagram: TriangleDiagramPropsSchema,
 	unitBlockDiagram: UnitBlockDiagramPropsSchema,
@@ -246,6 +248,7 @@ export {
 	SubtractionWithRegroupingPropsSchema,
 	TapeDiagramPropsSchema,
 	TransformationDiagramPropsSchema,
+	TransversalAngleDiagramPropsSchema,
 	TreeDiagramPropsSchema,
 	TriangleDiagramPropsSchema,
 	UnitBlockDiagramPropsSchema,
@@ -318,6 +321,7 @@ const widgetSchemasWithoutSpecialUnions = [
 	typedSchemas.stackedItemsDiagram,
 	typedSchemas.tapeDiagram,
 	typedSchemas.transformationDiagram,
+	typedSchemas.transversalAngleDiagram,
 	typedSchemas.treeDiagram,
 	typedSchemas.triangleDiagram,
 	typedSchemas.unitBlockDiagram,
