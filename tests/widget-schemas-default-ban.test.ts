@@ -24,7 +24,7 @@ function hasZodDef(obj: unknown): obj is { _def: unknown } {
 
 function containsDefault(schema: z.ZodType): boolean {
 	if (!hasZodDef(schema)) return false
-	const defUnknown: unknown = (schema as { _def: unknown })._def
+	const defUnknown: unknown = (schema satisfies { _def: unknown })._def
 	if (isRecord(defUnknown) && hasKey(defUnknown, "typeName") && defUnknown.typeName === "ZodDefault") return true
 
 	if (isRecord(defUnknown) && hasKey(defUnknown, "shape") && isRecord(defUnknown.shape)) {

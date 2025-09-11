@@ -21,21 +21,6 @@ function isZodSchema(value: unknown): value is z.ZodType {
 	return isRecord(def) && hasKey(def, "typeName")
 }
 
-function hasZodDef(obj: unknown): obj is {
-	_def: {
-		typeName?: string
-		shape?: unknown
-		type?: unknown
-		options?: unknown[]
-		innerType?: unknown
-		schema?: unknown
-		left?: unknown
-		right?: unknown
-	}
-} {
-	return isRecord(obj) && hasKey(obj, "_def") && isRecord(obj._def)
-}
-
 function containsOptional(schema: unknown): boolean {
 	if (!isZodSchema(schema)) return false
 	const defUnknown: unknown = schema._def

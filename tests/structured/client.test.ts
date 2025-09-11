@@ -5,14 +5,41 @@ import type { AssessmentItemShell } from "../../src/compiler/schemas"
 import { buildPerseusEnvelope } from "../../src/structured/ai-context-builder"
 import { generateFromEnvelope } from "../../src/structured/client"
 
+// Define the minimal interface we need for testing
+interface MockOpenAIInterface {
+	chat: {
+		completions: {
+			parse: (options: unknown) => Promise<{
+				choices: Array<{
+					message: {
+						parsed: unknown
+						refusal: null
+					}
+				}>
+			}>
+		}
+	}
+}
+
 // Mock the OpenAI client
 mock.module("openai", () => {
-	class MockOpenAI {
+	class MockOpenAI implements MockOpenAIInterface {
 		chat = {
 			completions: {
-				parse: async (options: any) => {
+				parse: async (options: unknown) => {
 					// Simulate responses based on the function name in the schema
-					const functionName = options?.response_format?.json_schema?.name
+					const functionName =
+						typeof options === "object" &&
+						options !== null &&
+						"response_format" in options &&
+						typeof options.response_format === "object" &&
+						options.response_format !== null &&
+						"json_schema" in options.response_format &&
+						typeof options.response_format.json_schema === "object" &&
+						options.response_format.json_schema !== null &&
+						"name" in options.response_format.json_schema
+							? options.response_format.json_schema.name
+							: undefined
 					if (functionName === "assessment_shell_generator") {
 						return {
 							choices: [
@@ -45,7 +72,7 @@ mock.module("openai", () => {
 												correct: [{ type: "paragraph", content: [{ type: "text", content: "Correct" }] }],
 												incorrect: [{ type: "paragraph", content: [{ type: "text", content: "Incorrect" }] }]
 											}
-										} as AssessmentItemShell,
+										} satisfies AssessmentItemShell,
 										refusal: null
 									}
 								}
@@ -108,6 +135,7 @@ mock.module("openai", () => {
 							]
 						}
 					}
+					logger.error("unhandled mock case for function", { functionName })
 					throw errors.new(`unhandled mock case for function: ${functionName}`)
 				}
 			}
@@ -135,6 +163,7 @@ describe("Structured AI Pipeline", () => {
 
 		expect(result.error).toBeFalsy()
 		if (result.error) {
+			logger.error("test setup failed", { error: result.error })
 			throw errors.new("test setup failed")
 		}
 
@@ -183,7 +212,8 @@ describe("Structured AI Pipeline", () => {
 		}
 
 		// This should fail at TypeScript level, but let's test runtime behavior
-		const result = await errors.try(generateFromEnvelope(mockOpenAI, logger, envelope, "invalid-collection" as any))
+		// @ts-expect-error - Testing invalid collection name
+		const result = await errors.try(generateFromEnvelope(mockOpenAI, logger, envelope, "invalid-collection"))
 
 		// The function should either fail at compile time or throw at runtime
 		// Since TypeScript should catch this, the test mainly documents the expected behavior
@@ -191,14 +221,23 @@ describe("Structured AI Pipeline", () => {
 	})
 
 	test("should throw a slot mismatch error if shell is inconsistent", async () => {
-		const OpenAI = (await import("openai")).default
-
 		// Create a separate mock for this specific test case
-		const MockOpenAIInconsistent = class {
+		const MockOpenAIInconsistent = class implements MockOpenAIInterface {
 			chat = {
 				completions: {
-					parse: async (options: any) => {
-						const functionName = options?.response_format?.json_schema?.name
+					parse: async (options: unknown) => {
+						const functionName =
+							typeof options === "object" &&
+							options !== null &&
+							"response_format" in options &&
+							typeof options.response_format === "object" &&
+							options.response_format !== null &&
+							"json_schema" in options.response_format &&
+							typeof options.response_format.json_schema === "object" &&
+							options.response_format.json_schema !== null &&
+							"name" in options.response_format.json_schema
+								? options.response_format.json_schema.name
+								: undefined
 						if (functionName === "assessment_shell_generator") {
 							return {
 								choices: [
@@ -212,7 +251,7 @@ describe("Structured AI Pipeline", () => {
 												widgets: [], // <-- INTENTIONALLY EMPTY
 												interactions: [],
 												feedback: { correct: [], incorrect: [] }
-											} as AssessmentItemShell,
+											} satisfies AssessmentItemShell,
 											refusal: null
 										}
 									}
@@ -235,11 +274,12 @@ describe("Structured AI Pipeline", () => {
 			}
 		}
 
-		const mockOpenAI = new MockOpenAIInconsistent() as any
+		const mockOpenAI = new MockOpenAIInconsistent()
 
 		const envelope = { context: ["test content"], imageUrls: [] }
 
-		const result = await errors.try(generateFromEnvelope(mockOpenAI, logger, envelope, "math-core"))
+		// biome-ignore lint: Mock for testing purposes
+		const result = await errors.try(generateFromEnvelope(mockOpenAI as any, logger, envelope, "math-core"))
 
 		expect(result.error).toBeTruthy()
 		expect(result.error?.message).toInclude("Slot declaration mismatch")

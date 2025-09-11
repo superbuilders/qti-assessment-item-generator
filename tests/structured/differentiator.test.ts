@@ -112,6 +112,7 @@ describe("Differentiation Pipeline", () => {
 
 		const item = differentiated[0]
 		if (!item) {
+			logger.error("differentiated item is undefined", { differentiated })
 			throw errors.new("differentiated item is undefined")
 		}
 

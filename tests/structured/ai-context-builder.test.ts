@@ -1,6 +1,7 @@
 // tests/structured/ai-context-builder.test.ts
 import { beforeAll, describe, expect, mock, test } from "bun:test"
 import * as errors from "@superbuilders/errors"
+import * as logger from "@superbuilders/slog"
 import { buildHtmlEnvelope, buildPerseusEnvelope } from "../../src/structured/ai-context-builder"
 
 describe("AI Context Builders", () => {
@@ -34,7 +35,7 @@ describe("AI Context Builders", () => {
 		beforeAll(async () => {
 			// Mock fetch to simulate a failed URL resolution
 			mock.module("node-fetch", () => ({
-				default: async (url: string) => {
+				default: async () => {
 					// Make all requests fail
 					return {
 						ok: false,
@@ -43,7 +44,8 @@ describe("AI Context Builders", () => {
 					}
 				}
 			}))
-			global.fetch = (await import("node-fetch")).default as any
+			// @ts-expect-error - Mocking global fetch for testing
+			global.fetch = (await import("node-fetch")).default
 		})
 
 		test("should handle failing web+graphie URLs gracefully", async () => {
@@ -68,6 +70,7 @@ describe("AI Context Builders", () => {
 			// The most important thing is that it does NOT throw an error.
 			expect(result.error).toBeFalsy()
 			if (result.error) {
+				logger.error("test setup failed", { error: result.error })
 				throw errors.new("test setup failed")
 			}
 			const envelope = result.data

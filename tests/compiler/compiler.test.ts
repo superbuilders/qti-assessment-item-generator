@@ -17,6 +17,7 @@ describe("QTI Compiler End-to-End Tests", () => {
 			}
 			expect(result.error).toBeFalsy()
 			if (result.error) {
+				logger.error("test setup failed", { error: result.error })
 				throw errors.new("test setup failed")
 			}
 			const validationResult = XMLValidator.validate(result.data, {
@@ -32,6 +33,7 @@ describe("QTI Compiler End-to-End Tests", () => {
 			const result = await errors.try(compile(example))
 			expect(result.error).toBeFalsy()
 			if (result.error) {
+				logger.error("test setup failed", { error: result.error })
 				throw errors.new("test setup failed")
 			}
 
