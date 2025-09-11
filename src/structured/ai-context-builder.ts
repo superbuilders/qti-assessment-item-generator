@@ -11,7 +11,10 @@ export interface ImageContext {
 }
 
 // MODIFIED: buildPerseusEnvelope is now async and handles all Perseus-specific logic.
-export async function buildPerseusEnvelope(perseusJson: unknown): Promise<AiContextEnvelope> {
+export async function buildPerseusEnvelope(
+	perseusJson: unknown,
+	fetchFn: typeof fetch = fetch
+): Promise<AiContextEnvelope> {
 	const context: string[] = [JSON.stringify(perseusJson, null, 2)]
 	const imageUrls: string[] = []
 
@@ -37,11 +40,11 @@ export async function buildPerseusEnvelope(perseusJson: unknown): Promise<AiCont
 		const baseUrl = originalUrl.replace("web+graphie://", "https://")
 		for (const ext of SUPPORTED_EXTENSIONS) {
 			const urlWithExt = `${baseUrl}.${ext}`
-			const headResult = await errors.try(fetch(urlWithExt, { method: "HEAD", signal: AbortSignal.timeout(5000) }))
+			const headResult = await errors.try(fetchFn(urlWithExt, { method: "HEAD", signal: AbortSignal.timeout(5000) }))
 			if (headResult.error || !headResult.data.ok) continue
 
 			if (ext === "svg") {
-				const downloadResult = await errors.try(fetch(urlWithExt))
+				const downloadResult = await errors.try(fetchFn(urlWithExt))
 				if (downloadResult.error || !downloadResult.data.ok) continue
 				const textResult = await errors.try(downloadResult.data.text())
 				if (textResult.error) continue
