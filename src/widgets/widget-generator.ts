@@ -4,6 +4,7 @@ import { generateThreeDIntersectionDiagram } from "./generators/3d-intersection-
 import { generateAbsoluteValueNumberLine } from "./generators/absolute-value-number-line"
 import { generateAdditionWithRegrouping } from "./generators/addition-with-regrouping"
 import { generateAngleDiagram } from "./generators/angle-diagram"
+import { generateAngleTypeDiagram } from "./generators/angle-type-diagram"
 import { generateAreaGraph } from "./generators/area-graph"
 import { generateAreaModelMultiplication } from "./generators/area-model-multiplication"
 import { generateBarChart } from "./generators/bar-chart"
@@ -98,6 +99,8 @@ export async function generateWidget(widget: Widget): Promise<string> {
 			return await generateAbsoluteValueNumberLine(widget)
 		case "angleDiagram":
 			return await generateAngleDiagram(widget)
+		case "angleTypeDiagram":
+			return await generateAngleTypeDiagram(widget)
 		case "conceptualGraph":
 			return await generateConceptualGraph(widget)
 		case "barChart":

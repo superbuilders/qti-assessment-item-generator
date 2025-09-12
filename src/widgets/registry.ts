@@ -5,6 +5,7 @@ import { ThreeDIntersectionDiagramPropsSchema } from "./generators/3d-intersecti
 import { AbsoluteValueNumberLinePropsSchema } from "./generators/absolute-value-number-line"
 import { AdditionWithRegroupingPropsSchema } from "./generators/addition-with-regrouping"
 import { AngleDiagramPropsSchema } from "./generators/angle-diagram"
+import { AngleTypeDiagramPropsSchema } from "./generators/angle-type-diagram"
 import { AreaGraphPropsSchema } from "./generators/area-graph"
 import { AreaModelMultiplicationPropsSchema } from "./generators/area-model-multiplication"
 import { BarChartPropsSchema } from "./generators/bar-chart"
@@ -89,6 +90,7 @@ export const allWidgetSchemas = {
 	threeDIntersectionDiagram: ThreeDIntersectionDiagramPropsSchema,
 	absoluteValueNumberLine: AbsoluteValueNumberLinePropsSchema,
 	angleDiagram: AngleDiagramPropsSchema,
+	angleTypeDiagram: AngleTypeDiagramPropsSchema,
 	areaModelMultiplication: AreaModelMultiplicationPropsSchema,
 	areaGraph: AreaGraphPropsSchema,
 	barChart: BarChartPropsSchema,
@@ -178,6 +180,7 @@ export {
 	AbsoluteValueNumberLinePropsSchema,
 	AdditionWithRegroupingPropsSchema,
 	AngleDiagramPropsSchema,
+	AngleTypeDiagramPropsSchema,
 	AreaGraphPropsSchema,
 	AreaModelMultiplicationPropsSchema,
 	BarChartPropsSchema,
@@ -262,6 +265,7 @@ const widgetSchemasWithoutSpecialUnions = [
 	typedSchemas.threeDIntersectionDiagram,
 	typedSchemas.absoluteValueNumberLine,
 	typedSchemas.angleDiagram,
+	typedSchemas.angleTypeDiagram,
 	typedSchemas.areaModelMultiplication,
 	typedSchemas.areaGraph,
 	typedSchemas.barChart,
