@@ -3,6 +3,17 @@ import type { AngleTypeDiagramProps } from "../src/widgets/generators/angle-type
 // Valid examples for the Angle Type Diagram widget
 export const angleTypeDiagramExamples: AngleTypeDiagramProps[] = [
   {
+    // Full angle (360°)
+    type: "angleTypeDiagram",
+    width: 250,
+    height: 200,
+    angleType: "full",
+    rotation: 0,
+    labels: { ray1Point: "A", vertex: "B", ray2Point: "C" },
+    showAngleArc: true,
+    sectorColor: "#4aa3ff",
+  },
+  {
     // Question 4, Diagram 'b' - Obtuse Angle
     type: "angleTypeDiagram",
     width: 250,
