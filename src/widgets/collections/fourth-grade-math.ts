@@ -20,6 +20,7 @@ import {
 	SimpleArrowPropsSchema,
 	SubtractionWithRegroupingPropsSchema,
 	TapeDiagramPropsSchema,
+	TransformationDiagramPropsSchema,
 	VectorDiagramPropsSchema,
 	VerticalArithmeticSetupPropsSchema
 } from "../registry"
@@ -49,7 +50,8 @@ export const fourthGradeMathCollection = {
 		simpleArrow: SimpleArrowPropsSchema,
 		vectorDiagram: VectorDiagramPropsSchema,
 		nPolygon: NPolygonPropsSchema,
-		patternDiagram: PatternDiagramPropsSchema
+		patternDiagram: PatternDiagramPropsSchema,
+		transformationDiagram: TransformationDiagramPropsSchema
 	},
 	widgetTypeKeys: [
 		"dataTable",
@@ -74,6 +76,7 @@ export const fourthGradeMathCollection = {
 		"simpleArrow",
 		"vectorDiagram",
 		"nPolygon",
-		"patternDiagram"
+		"patternDiagram",
+		"transformationDiagram"
 	] as const
 } as const
