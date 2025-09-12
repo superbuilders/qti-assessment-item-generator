@@ -20,6 +20,7 @@ import { DataTablePropsSchema } from "./generators/data-table"
 import { DiscreteObjectRatioDiagramPropsSchema } from "./generators/discrete-object-ratio-diagram"
 import { DistanceFormulaGraphPropsSchema } from "./generators/distance-formula-graph"
 import { DivergentBarChartPropsSchema } from "./generators/divergent-bar-chart"
+import { DivisionAreaDiagramPropsSchema } from "./generators/division-area-diagram"
 import { DivisionModelDiagramPropsSchema } from "./generators/division-model-diagram"
 import { DotPlotPropsSchema } from "./generators/dot-plot"
 import { DoubleNumberLinePropsSchema } from "./generators/double-number-line"
@@ -165,6 +166,7 @@ export const allWidgetSchemas = {
 	pieChart: PieChartWidgetPropsSchema,
 	fractionFrequencyPlot: FractionFrequencyPlotPropsSchema,
 	freeBodyDiagram: FreeBodyDiagramPropsSchema,
+	divisionAreaDiagram: DivisionAreaDiagramPropsSchema,
 	divisionModelDiagram: DivisionModelDiagramPropsSchema,
 	factorizationDiagram: FactorizationDiagramPropsSchema,
 	equivalentFractionModel: EquivalentFractionModelPropsSchema,
@@ -195,6 +197,7 @@ export {
 	DiscreteObjectRatioDiagramPropsSchema,
 	DistanceFormulaGraphPropsSchema,
 	DivergentBarChartPropsSchema,
+	DivisionAreaDiagramPropsSchema,
 	DivisionModelDiagramPropsSchema,
 	DotPlotPropsSchema,
 	DoubleNumberLinePropsSchema,
@@ -338,6 +341,7 @@ const widgetSchemasWithoutSpecialUnions = [
 	typedSchemas.pieChart,
 	typedSchemas.fractionFrequencyPlot,
 	typedSchemas.freeBodyDiagram,
+	typedSchemas.divisionAreaDiagram,
 	typedSchemas.divisionModelDiagram,
 	typedSchemas.factorizationDiagram,
 	typedSchemas.equivalentFractionModel,

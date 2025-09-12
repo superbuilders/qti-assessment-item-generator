@@ -19,6 +19,7 @@ import { generateDataTable } from "./generators/data-table"
 import { generateDiscreteObjectRatioDiagram } from "./generators/discrete-object-ratio-diagram"
 import { generateDistanceFormulaGraph } from "./generators/distance-formula-graph"
 import { generateDivergentBarChart } from "./generators/divergent-bar-chart"
+import { generateDivisionAreaDiagram } from "./generators/division-area-diagram"
 import { generateDivisionModelDiagram } from "./generators/division-model-diagram"
 import { generateDotPlot } from "./generators/dot-plot"
 import { generateDoubleNumberLine } from "./generators/double-number-line"
@@ -235,6 +236,8 @@ export async function generateWidget(widget: Widget): Promise<string> {
 			return await generateSubtractionWithRegrouping(widget)
 		case "fractionFrequencyPlot":
 			return await generateFractionFrequencyPlot(widget)
+		case "divisionAreaDiagram":
+			return await generateDivisionAreaDiagram(widget)
 		case "divisionModelDiagram":
 			return await generateDivisionModelDiagram(widget)
 		case "factorizationDiagram":
