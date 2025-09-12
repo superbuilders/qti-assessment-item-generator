@@ -1,5 +1,8 @@
 import { z } from "zod"
+import * as errors from "@superbuilders/errors"
+import * as logger from "@superbuilders/slog"
 import { CanvasImpl } from "../../utils/canvas-impl"
+import { Path2D } from "../../utils/path-builder"
 import { PADDING } from "../../utils/constants"
 import { theme } from "../../utils/theme"
 import type { WidgetGenerator } from "../types"
@@ -13,13 +16,23 @@ export const ProtractorAngleDiagramPropsSchema = z
 		type: z.literal("protractorAngleDiagram"),
 		width: z.number().positive().describe("total width of the diagram in pixels"),
 		height: z.number().positive().describe("total height of the diagram in pixels"),
-		angle: z.number().min(0).max(180).describe("angle measurement in degrees (0-180)"),
+		smallerReading: z
+			.number()
+			.min(0)
+			.max(180)
+			.describe(
+				"smaller protractor reading in degrees on the inner (ccw) scale, where 0° is to the right and 180° to the left. larger reading must be greater"
+			),
+		largerReading: z
+			.number()
+			.min(0)
+			.max(180)
+			.describe("larger protractor reading in degrees on the inner (ccw) scale; must be greater than smaller reading"),
 		startPointLabel: z.string().describe("label for the starting point (e.g., 'A'). use empty string for no label."),
 		centerPointLabel: z
 			.string()
 			.describe("label for the center vertex point (e.g., 'B'). use empty string for no label."),
-		endPointLabel: z.string().describe("label for the ending point (e.g., 'C'). use empty string for no label."),
-		showAngleLabel: z.boolean().describe("whether to show the angle measurement label (e.g., '120°')")
+		endPointLabel: z.string().describe("label for the ending point (e.g., 'C'). use empty string for no label.")
 	})
 	.strict()
 	.describe("creates a protractor diagram with two lines showing a specific angle measurement")
@@ -32,7 +45,7 @@ export type ProtractorAngleDiagramProps = z.infer<typeof ProtractorAngleDiagramP
 export const generateProtractorAngleDiagram: WidgetGenerator<typeof ProtractorAngleDiagramPropsSchema> = async (
 	props
 ) => {
-	const { width, height, angle, startPointLabel, centerPointLabel, endPointLabel, showAngleLabel } = props
+	const { width, height, smallerReading, largerReading, startPointLabel, centerPointLabel, endPointLabel } = props
 
 	const canvas = new CanvasImpl({
 		chartArea: { left: 0, top: 0, width, height },
@@ -72,22 +85,71 @@ export const generateProtractorAngleDiagram: WidgetGenerator<typeof ProtractorAn
 	const centerX = protractorCenterX
 	const centerY = protractorCenterY
 
-	// left line is horizontal (180°) - goes left
-	const startX = centerX - lineLength - arrowOffset
-	const startY = centerY
+	// validate readings
+	if (!(largerReading > smallerReading)) {
+		logger.error("invalid protractor readings", { smallerReading, largerReading })
+		throw errors.new("larger reading must be greater than smaller reading")
+	}
 
-	// right line goes at specified angle (measured counterclockwise from left horizontal)
-	// left horizontal is at 180°, so the right line is at (180° - angle)
-	const rightAngleRad = ((180 - angle) * Math.PI) / 180
-	const endX = centerX + (lineLength + arrowOffset) * Math.cos(rightAngleRad)
-	const endY = centerY - (lineLength + arrowOffset) * Math.sin(rightAngleRad) // negative bc svg y increases downward
+	// convert readings to radians (inner CCW scale)
+	const degToRad = (d: number) => (d * Math.PI) / 180
+	const startAngleRad = degToRad(smallerReading)
+	const endAngleRad = degToRad(largerReading)
+	const angleRad = endAngleRad - startAngleRad
 
-	// draw lines (to the base of where arrows will be, not to arrow tips)
-	const lineEndStartX = centerX - lineLength
-	const lineEndStartY = centerY
-	const lineEndEndX = centerX + lineLength * Math.cos(rightAngleRad)
-	const lineEndEndY = centerY - lineLength * Math.sin(rightAngleRad)
+	// compute ray endpoints (to arrow tips)
+	const startX = centerX + (lineLength + arrowOffset) * Math.cos(startAngleRad)
+	const startY = centerY - (lineLength + arrowOffset) * Math.sin(startAngleRad)
+	const endX = centerX + (lineLength + arrowOffset) * Math.cos(endAngleRad)
+	const endY = centerY - (lineLength + arrowOffset) * Math.sin(endAngleRad)
 
+	// compute line bases (we will render lines after drawing the filled sector to keep them on top)
+	const lineEndStartX = centerX + lineLength * Math.cos(startAngleRad)
+	const lineEndStartY = centerY - lineLength * Math.sin(startAngleRad)
+	const lineEndEndX = centerX + lineLength * Math.cos(endAngleRad)
+	const lineEndEndY = centerY - lineLength * Math.sin(endAngleRad)
+
+	// draw angle arc from start ray to end ray
+	const arcRadius = 50
+	const arcSegments = 20
+	const totalArcAngle = angleRad
+	const angleStep = totalArcAngle / arcSegments
+
+	const arcColor = "#4A90E2"
+
+	// build filled sector with constant radius using linearized arc
+	const sectorPoints: Array<{ x: number; y: number }> = []
+	for (let i = 0; i <= arcSegments; i++) {
+		const a = startAngleRad + i * angleStep
+		const x = centerX + arcRadius * Math.cos(a)
+		const y = centerY - arcRadius * Math.sin(a)
+		sectorPoints.push({ x, y })
+	}
+	const fillPath = new Path2D().moveTo(centerX, centerY)
+		.lineTo(sectorPoints[0].x, sectorPoints[0].y)
+	for (let i = 1; i < sectorPoints.length; i++) {
+		fillPath.lineTo(sectorPoints[i].x, sectorPoints[i].y)
+	}
+	fillPath.closePath()
+	canvas.drawPath(fillPath, { fill: arcColor, stroke: "none" })
+
+	// outline the arc for visual clarity
+	for (let i = 0; i < arcSegments; i++) {
+		const currentAngle = startAngleRad + i * angleStep
+		const nextAngle = startAngleRad + (i + 1) * angleStep
+
+		const x1 = centerX + arcRadius * Math.cos(currentAngle)
+		const y1 = centerY - arcRadius * Math.sin(currentAngle)
+		const x2 = centerX + arcRadius * Math.cos(nextAngle)
+		const y2 = centerY - arcRadius * Math.sin(nextAngle)
+
+		canvas.drawLine(x1, y1, x2, y2, {
+			stroke: arcColor,
+			strokeWidth: theme.stroke.width.thick
+		})
+	}
+
+	// draw lines on top of the filled sector and arc outline
 	canvas.drawLine(centerX, centerY, lineEndStartX, lineEndStartY, {
 		stroke: theme.colors.black,
 		strokeWidth: theme.stroke.width.thick
@@ -97,59 +159,20 @@ export const generateProtractorAngleDiagram: WidgetGenerator<typeof ProtractorAn
 		strokeWidth: theme.stroke.width.thick
 	})
 
-	// draw angle arc from left horizontal to right line
-	const arcRadius = 50
-	const arcSegments = 20
-	const startAngleRad = Math.PI // left horizontal (180°)
-	const endAngleRad = rightAngleRad
-	const totalArcAngle = startAngleRad - endAngleRad // arc spans this angle
-	const angleStep = totalArcAngle / arcSegments
-
-	for (let i = 0; i < arcSegments; i++) {
-		const currentAngle = startAngleRad - i * angleStep
-		const nextAngle = startAngleRad - (i + 1) * angleStep
-
-		const x1 = centerX + arcRadius * Math.cos(currentAngle)
-		const y1 = centerY - arcRadius * Math.sin(currentAngle)
-		const x2 = centerX + arcRadius * Math.cos(nextAngle)
-		const y2 = centerY - arcRadius * Math.sin(nextAngle)
-
-		canvas.drawLine(x1, y1, x2, y2, {
-			stroke: "#4A90E2",
-			strokeWidth: theme.stroke.width.thick
-		})
-	}
-
-	// draw angle label if enabled
-	if (showAngleLabel) {
-		const midAngle = (startAngleRad + endAngleRad) / 2
-		const labelRadius = arcRadius + 20
-		const labelX = centerX + labelRadius * Math.cos(midAngle)
-		const labelY = centerY - labelRadius * Math.sin(midAngle)
-
-		canvas.drawText({
-			x: labelX,
-			y: labelY,
-			text: `${angle}°`,
-			fill: theme.colors.text,
-			fontPx: theme.font.size.medium,
-			fontWeight: "600",
-			anchor: "middle",
-			dominantBaseline: "middle"
-		})
-	}
+	// do not render a numeric angle label; sizing is derived from the readings only
 
 	// draw point markers (always present) and labels (if provided)
 	// draw arrow heads at line endpoints
 	const arrowSize = 8
 
-	// start point (left) - arrow pointing left
+	// start point arrow oriented along start ray
+	const startLineAngle = Math.atan2(startY - centerY, startX - centerX)
 	const startArrowTipX = startX
 	const startArrowTipY = startY
-	const startArrowBase1X = startX + arrowSize
-	const startArrowBase1Y = startY - arrowSize / 2
-	const startArrowBase2X = startX + arrowSize
-	const startArrowBase2Y = startY + arrowSize / 2
+	const startArrowBase1X = startX - arrowSize * Math.cos(startLineAngle) - (arrowSize / 2) * Math.sin(startLineAngle)
+	const startArrowBase1Y = startY - arrowSize * Math.sin(startLineAngle) + (arrowSize / 2) * Math.cos(startLineAngle)
+	const startArrowBase2X = startX - arrowSize * Math.cos(startLineAngle) + (arrowSize / 2) * Math.sin(startLineAngle)
+	const startArrowBase2Y = startY - arrowSize * Math.sin(startLineAngle) - (arrowSize / 2) * Math.cos(startLineAngle)
 
 	canvas.drawPolygon(
 		[
@@ -161,9 +184,13 @@ export const generateProtractorAngleDiagram: WidgetGenerator<typeof ProtractorAn
 	)
 
 	if (startPointLabel !== "") {
+		const startLabelOffset = 15
+		const startLabelAngle = startAngleRad + Math.PI / 2
+		const startLabelX = startX + startLabelOffset * Math.cos(startLabelAngle)
+		const startLabelY = startY - startLabelOffset * Math.sin(startLabelAngle)
 		canvas.drawText({
-			x: startX - 15,
-			y: startY - 10,
+			x: startLabelX,
+			y: startLabelY,
 			text: startPointLabel,
 			fill: theme.colors.text,
 			fontPx: theme.font.size.large,
@@ -187,7 +214,7 @@ export const generateProtractorAngleDiagram: WidgetGenerator<typeof ProtractorAn
 		})
 	}
 
-	// end point (right) - arrow pointing in the direction of the line
+	// end point - arrow pointing in the direction of the end line
 	const lineAngle = Math.atan2(endY - centerY, endX - centerX)
 	const endArrowTipX = endX
 	const endArrowTipY = endY
@@ -206,9 +233,13 @@ export const generateProtractorAngleDiagram: WidgetGenerator<typeof ProtractorAn
 	)
 
 	if (endPointLabel !== "") {
+		const endLabelOffset = 12
+		const endLabelAngle = endAngleRad + Math.PI / 2
+		const endLabelX = endX + endLabelOffset * Math.cos(endLabelAngle)
+		const endLabelY = endY - endLabelOffset * Math.sin(endLabelAngle)
 		canvas.drawText({
-			x: endX + 10,
-			y: endY - 10,
+			x: endLabelX,
+			y: endLabelY,
 			text: endPointLabel,
 			fill: theme.colors.text,
 			fontPx: theme.font.size.large,

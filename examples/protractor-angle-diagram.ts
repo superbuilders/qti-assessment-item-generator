@@ -5,30 +5,41 @@ export const protractorAngleDiagramExamples: ProtractorAngleDiagramProps[] = [
 		type: "protractorAngleDiagram",
 		width: 400,
 		height: 300,
-		angle: 45,
+		smallerReading: 0,
+		largerReading: 45,
 		startPointLabel: "A",
 		centerPointLabel: "B",
-		endPointLabel: "C",
-		showAngleLabel: true
+		endPointLabel: "C"
 	},
 	{
 		type: "protractorAngleDiagram",
 		width: 450,
 		height: 350,
-		angle: 120,
+		smallerReading: 0,
+		largerReading: 120,
 		startPointLabel: "D",
 		centerPointLabel: "E",
-		endPointLabel: "F",
-		showAngleLabel: true
+		endPointLabel: "F"
+	},
+	// Example showcasing a non-zero starting angle to match a rotated measurement
+	{
+		type: "protractorAngleDiagram",
+		width: 480,
+		height: 340,
+		smallerReading: 125,
+		largerReading: 160,
+		startPointLabel: "A",
+		centerPointLabel: "B",
+		endPointLabel: "C"
 	},
 	{
 		type: "protractorAngleDiagram",
 		width: 350,
 		height: 250,
-		angle: 90,
+		smallerReading: 0,
+		largerReading: 90,
 		startPointLabel: "",
 		centerPointLabel: "",
-		endPointLabel: "",
-		showAngleLabel: false
+		endPointLabel: ""
 	}
 ]
