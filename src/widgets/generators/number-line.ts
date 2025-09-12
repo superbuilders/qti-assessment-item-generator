@@ -33,24 +33,48 @@ const createTickIntervalSchema = () =>
 // Factory function to create a HighlightedPointSchema to avoid $ref issues
 const createHighlightedPointSchema = () =>
 	z
-		.object({
-			value: z.number().describe("The numerical position of the point on the number line."),
-			color: z
-				.string()
-				.regex(CSS_COLOR_PATTERN, "invalid css color")
-				.describe("CSS hex color for the point and its arrow/label."),
-			style: z
-				.enum(["dot", "arrowAndDot"])
-				.describe(
-					"Visual style of the marker. 'dot' is a simple circle, 'arrowAndDot' includes an arrow pointing to the dot."
-				),
-			label: z
-				.string()
-				.nullable()
-				.transform((val) => (val === "" ? null : val))
-				.describe("Optional text label for the point. If null, no label is shown.")
-		})
-		.strict()
+		.discriminatedUnion("type", [
+			z
+				.object({
+					type: z.literal("value"),
+					value: z.number().describe("Position on the number line."),
+					color: z
+						.string()
+						.regex(CSS_COLOR_PATTERN, "invalid css color")
+						.describe("CSS hex color for the point and its arrow/label."),
+					style: z
+						.enum(["dot", "arrowAndDot"])
+						.describe(
+							"Visual style for known points. 'dot' is a circle; 'arrowAndDot' adds an arrow."
+						),
+					label: z
+						.string()
+						.nullable()
+						.transform((val) => (val === "" ? null : val))
+						.describe("Optional text label. If null, no label is shown.")
+				})
+				.strict(),
+			z
+				.object({
+					type: z.literal("unknown"),
+					value: z.number().describe("Position on the number line."),
+					color: z
+						.string()
+						.regex(CSS_COLOR_PATTERN, "invalid css color")
+						.describe("CSS hex color for the box and its arrow/label."),
+					style: z
+						.enum(["box", "arrowAndBox"])
+						.describe(
+							"Visual style for unknown points. 'box' is an empty rectangle; 'arrowAndBox' adds an arrow."
+						),
+					label: z
+						.string()
+						.nullable()
+						.transform((val) => (val === "" ? null : val))
+						.describe("Optional text label. If null, no label is shown.")
+				})
+				.strict()
+		])
 
 export const NumberLinePropsSchema = z
 	.object({
@@ -203,40 +227,77 @@ export const generateNumberLine: WidgetGenerator<typeof NumberLinePropsSchema> =
 		if (highlightedPoints) {
 			for (const p of highlightedPoints) {
 				const px = toSvgX(p.value)
-				canvas.drawCircle(px, yPos, 5, {
-					fill: p.color,
-					stroke: p.color,
-					strokeWidth: theme.stroke.width.thin
-				})
-
-				if (p.style === "arrowAndDot") {
-					const arrowStartY = yPos - 25
-					const arrowEndY = yPos - 8
-					canvas.drawLine(px, arrowStartY, px, arrowEndY, {
+				if (p.type === "value") {
+					canvas.drawCircle(px, yPos, 5, {
+						fill: p.color,
 						stroke: p.color,
-						strokeWidth: theme.stroke.width.thick,
-						markerEnd: "url(#action-arrow)"
+						strokeWidth: theme.stroke.width.thin
 					})
-					if (p.label)
+
+					if (p.style === "arrowAndDot") {
+						const arrowStartY = yPos - 25
+						const arrowEndY = yPos - 8
+						canvas.drawLine(px, arrowStartY, px, arrowEndY, {
+							stroke: theme.colors.axis,
+							strokeWidth: theme.stroke.width.thick,
+							markerEnd: "url(#action-arrow)"
+						})
+						if (p.label)
+							canvas.drawText({
+								x: px,
+								y: arrowStartY - 5,
+								text: p.label,
+								fill: p.color,
+								anchor: "middle",
+								dominantBaseline: "baseline",
+								fontWeight: "700"
+							})
+					} else if (p.label) {
 						canvas.drawText({
 							x: px,
-							y: arrowStartY - 5,
+							y: yPos - 15,
 							text: p.label,
 							fill: p.color,
 							anchor: "middle",
 							dominantBaseline: "baseline",
 							fontWeight: "700"
 						})
-				} else if (p.label) {
-					canvas.drawText({
-						x: px,
-						y: yPos - 15,
-						text: p.label,
+					}
+				} else {
+					// unknown -> render a normal dot, and place an empty box where the label would be
+					const boxSize = 12
+					// draw the dot at the position (same as known value)
+					canvas.drawCircle(px, yPos, 5, {
 						fill: p.color,
-						anchor: "middle",
-						dominantBaseline: "baseline",
-						fontWeight: "700"
+						stroke: p.color,
+						strokeWidth: theme.stroke.width.thin
 					})
+
+					if (p.style === "arrowAndBox") {
+						// draw arrow pointing to the dot
+						const arrowStartY = yPos - 25
+						const arrowEndY = yPos - 8
+						canvas.drawLine(px, arrowStartY, px, arrowEndY, {
+							stroke: theme.colors.axis,
+							strokeWidth: theme.stroke.width.thick,
+							markerEnd: "url(#action-arrow)"
+						})
+						// place the box where the arrow label would be
+						const labelY = arrowStartY - 5
+						canvas.drawRect(px - boxSize / 2, labelY - boxSize / 2, boxSize, boxSize, {
+							fill: theme.colors.white,
+							stroke: p.color,
+							strokeWidth: theme.stroke.width.base
+						})
+					} else {
+						// no arrow: place the box where a dot label would normally go
+						const labelY = yPos - 15
+						canvas.drawRect(px - boxSize / 2, labelY - boxSize / 2, boxSize, boxSize, {
+							fill: theme.colors.white,
+							stroke: p.color,
+							strokeWidth: theme.stroke.width.base
+						})
+					}
 				}
 			}
 		}
@@ -289,40 +350,77 @@ export const generateNumberLine: WidgetGenerator<typeof NumberLinePropsSchema> =
 		if (highlightedPoints) {
 			for (const p of highlightedPoints) {
 				const py = toSvgY(p.value)
-				canvas.drawCircle(xPos, py, 5, {
-					fill: p.color,
-					stroke: p.color,
-					strokeWidth: theme.stroke.width.thin
-				})
-
-				if (p.style === "arrowAndDot") {
-					const arrowStartX = xPos - 25
-					const arrowEndX = xPos - 8
-					canvas.drawLine(arrowStartX, py, arrowEndX, py, {
+				if (p.type === "value") {
+					canvas.drawCircle(xPos, py, 5, {
+						fill: p.color,
 						stroke: p.color,
-						strokeWidth: theme.stroke.width.thick,
-						markerEnd: "url(#action-arrow)"
+						strokeWidth: theme.stroke.width.thin
 					})
-					if (p.label)
+
+					if (p.style === "arrowAndDot") {
+						const arrowStartX = xPos - 25
+						const arrowEndX = xPos - 8
+						canvas.drawLine(arrowStartX, py, arrowEndX, py, {
+							stroke: theme.colors.axis,
+							strokeWidth: theme.stroke.width.thick,
+							markerEnd: "url(#action-arrow)"
+						})
+						if (p.label)
+							canvas.drawText({
+								x: arrowStartX - 5,
+								y: py,
+								text: p.label,
+								fill: p.color,
+								anchor: "end",
+								dominantBaseline: "middle",
+								fontWeight: "700"
+							})
+					} else if (p.label) {
 						canvas.drawText({
-							x: arrowStartX - 5,
+							x: xPos + 15,
 							y: py,
 							text: p.label,
 							fill: p.color,
-							anchor: "end",
+							anchor: "start",
 							dominantBaseline: "middle",
 							fontWeight: "700"
 						})
-				} else if (p.label) {
-					canvas.drawText({
-						x: xPos + 15,
-						y: py,
-						text: p.label,
+					}
+				} else {
+					// unknown -> render a normal dot, and place an empty box where the label would be
+					const boxSize = 12
+					// draw the dot at the position (same as known value)
+					canvas.drawCircle(xPos, py, 5, {
 						fill: p.color,
-						anchor: "start",
-						dominantBaseline: "middle",
-						fontWeight: "700"
+						stroke: p.color,
+						strokeWidth: theme.stroke.width.thin
 					})
+
+					if (p.style === "arrowAndBox") {
+						// draw arrow pointing to the dot
+						const arrowStartX = xPos - 25
+						const arrowEndX = xPos - 8
+						canvas.drawLine(arrowStartX, py, arrowEndX, py, {
+							stroke: theme.colors.axis,
+							strokeWidth: theme.stroke.width.thick,
+							markerEnd: "url(#action-arrow)"
+						})
+						// place the box where the arrow label would be
+						const labelX = arrowStartX - 5
+						canvas.drawRect(labelX - boxSize / 2, py - boxSize / 2, boxSize, boxSize, {
+							fill: theme.colors.white,
+							stroke: p.color,
+							strokeWidth: theme.stroke.width.base
+						})
+					} else {
+						// no arrow: place the box where a dot label would normally go
+						const labelX = xPos + 15
+						canvas.drawRect(labelX - boxSize / 2, py - boxSize / 2, boxSize, boxSize, {
+							fill: theme.colors.white,
+							stroke: p.color,
+							strokeWidth: theme.stroke.width.base
+						})
+					}
 				}
 			}
 		}

@@ -786,8 +786,8 @@ export const verticalNumberLineComparison: AssessmentItemInput = {
 			secondaryTickInterval: null,
 			showTickLabels: true,
 			highlightedPoints: [
-				{ value: -1.4, label: "-1.4", color: "#800080", style: "arrowAndDot" },
-				{ value: -6.4, label: "-6.4", color: "#800000", style: "arrowAndDot" }
+				{ type: "value", value: -1.4, label: "-1.4", color: "#800080", style: "arrowAndDot" },
+				{ type: "value", value: -6.4, label: "-6.4", color: "#800000", style: "arrowAndDot" }
 			]
 		}
 	},
@@ -2958,7 +2958,7 @@ export const timeOnNumberLine: AssessmentItemInput = {
 			tickInterval: { type: "whole", interval: 15 },
 			secondaryTickInterval: { type: "whole", interval: 1 },
 			showTickLabels: true,
-			highlightedPoints: [{ value: 55, label: "A", color: "#A0522D", style: "arrowAndDot" }]
+			highlightedPoints: [{ type: "value", value: 55, label: "A", color: "#A0522D", style: "arrowAndDot" }]
 		}
 	},
 	body: [
