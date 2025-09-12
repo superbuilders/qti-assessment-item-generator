@@ -59,6 +59,23 @@ export const radiallyConstrainedAngleDiagramExamples: RadiallyConstrainedAngleDi
 			{ fromRayLabel: "D", toRayLabel: "E", value: 47, color: "#50E3C2" },
 			{ fromRayLabel: "A", toRayLabel: "C", value: 120, color: "#E91E63" }
 		]
+	},
+	// Diagram matching: center A, rays B C D E, primaries 60-50-50, secondaries 110 and 160
+	{
+		type: "radiallyConstrainedAngleDiagram",
+		width: 520,
+		height: 420,
+		centerLabel: "A",
+		rayLabels: ["B", "C", "D", "E"],
+		angles: [
+			// primary filled sectors
+			{ fromRayLabel: "B", toRayLabel: "C", value: 60, color: "#f1c40f" },
+			{ fromRayLabel: "C", toRayLabel: "D", value: 50, color: "#2ecc71" },
+			{ fromRayLabel: "D", toRayLabel: "E", value: 50, color: "#9b59b6" },
+			// stacked secondary arcs
+			{ fromRayLabel: "B", toRayLabel: "D", value: 110, color: "#3498db" },
+			{ fromRayLabel: "B", toRayLabel: "E", value: 160, color: "#E91E63" }
+		]
 	}
 ]
 

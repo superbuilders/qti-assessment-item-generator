@@ -102,15 +102,15 @@ export const generateRadiallyConstrainedAngleDiagram: WidgetGenerator<
 	}
 
 	// 2. Validate total angle constraint (PRIMARY angles only)
+	// Primary = strictly forward adjacent pairs (i -> i+1). No wrap-around.
 	// Secondary angles are visual helpers and must NOT be included in the total
 	// because they span multiple primary angles.
 	const tmpPrimaryCheck: typeof angles = []
 	for (const angle of angles) {
 		const fromIndex = labelToIndexMap.get(angle.fromRayLabel)!
 		const toIndex = labelToIndexMap.get(angle.toRayLabel)!
-		const rayDiff = Math.abs(toIndex - fromIndex)
-		const isAdjacent = rayDiff === 1 || rayDiff === rayLabels.length - 1
-		if (isAdjacent) tmpPrimaryCheck.push(angle)
+		const isForwardAdjacent = toIndex === fromIndex + 1
+		if (isForwardAdjacent) tmpPrimaryCheck.push(angle)
 	}
 	const totalPrimaryAngle = tmpPrimaryCheck.reduce((sum, a) => sum + a.value, 0)
 	if (totalPrimaryAngle <= 0 || totalPrimaryAngle >= 360) {
@@ -162,6 +162,36 @@ export const generateRadiallyConstrainedAngleDiagram: WidgetGenerator<
 		}
 	}
 
+	// 3. Validate that each secondary angle equals the sum of intervening primary angles
+	for (const angle of angles) {
+		const fromIndex = labelToIndexMap.get(angle.fromRayLabel)!
+		const toIndex = labelToIndexMap.get(angle.toRayLabel)!
+		const isForwardAdjacent = toIndex === fromIndex + 1
+		if (isForwardAdjacent) continue
+
+		let expected = 0
+		for (let i = fromIndex; i < toIndex; i++) {
+			const key = `${rayLabels[i]}->${rayLabels[i + 1]}`
+			const seg = primaryBetween[key]
+			if (seg === undefined) {
+				// Should be unreachable due to earlier validation, but fail loud if encountered
+				logger.error("missing primary segment for secondary validation", { key, fromIndex, toIndex })
+				throw errors.new("missing primary angle between adjacent rays")
+			}
+			expected += seg
+		}
+
+		if (expected !== angle.value) {
+			logger.error("secondary angle inconsistent with primary sum", {
+				fromRayLabel: angle.fromRayLabel,
+				toRayLabel: angle.toRayLabel,
+				expected,
+				actual: angle.value,
+			})
+			throw errors.new(`angle from '${angle.fromRayLabel}' to '${angle.toRayLabel}' must equal sum of primary angles`)
+		}
+	}
+
 	// Center the drawing around -90 degrees (top) using total of primary angles
 	const startAngleDeg = -90 - totalPrimaryAngle / 2
 	const rayAnglesDeg: number[] = new Array(rayLabels.length)
@@ -184,7 +214,7 @@ export const generateRadiallyConstrainedAngleDiagram: WidgetGenerator<
 		}
 	})
 
-	// Separate angles into primary (adjacent rays) and secondary (spanning multiple rays)
+	// Separate angles into primary (forward-adjacent rays) and secondary (spanning multiple rays)
 	const primaryAngles: typeof angles = []
 	const secondaryAngles: typeof angles = []
 
@@ -192,11 +222,10 @@ export const generateRadiallyConstrainedAngleDiagram: WidgetGenerator<
 		const fromRay = rayPositions.find(r => r.label === angle.fromRayLabel)!
 		const toRay = rayPositions.find(r => r.label === angle.toRayLabel)!
 		
-		// Primary angle: adjacent rays (difference of 1 in the rayLabels array)
-		const rayDiff = Math.abs(toRay.index - fromRay.index)
-		const isAdjacent = rayDiff === 1 || rayDiff === rayLabels.length - 1 // Handle wrap-around
+		// Primary angle: strictly forward adjacent (i -> i+1). No wrap-around.
+		const isForwardAdjacent = toRay.index === fromRay.index + 1
 		
-		if (isAdjacent) {
+		if (isForwardAdjacent) {
 			primaryAngles.push(angle)
 		} else {
 			secondaryAngles.push(angle)
@@ -243,9 +272,10 @@ export const generateRadiallyConstrainedAngleDiagram: WidgetGenerator<
 	// Choose a radius band strictly inside the ray length and above the primary labels
 	const innerArcMinRadius = primaryLabelRadius + 14
 	const innerArcMaxRadius = pointOnRayDist - 24
-	const suggestedBase = diagramRadius * 0.7
-	const baseSecondaryRadius = Math.max(innerArcMinRadius, Math.min(innerArcMaxRadius, suggestedBase))
-	const radiusStep = 18
+	// Push the first secondary arc outward a bit for additional headroom near labels
+	const baseSecondaryRadius = Math.min(innerArcMaxRadius, innerArcMinRadius + 16)
+	// Widen spacing so the outer arc sits farther out as well
+	const radiusStep = 44
 	const pendingSecondaryLabels: Array<{ x: number; y: number; text: string; midAngleRad: number }> = []
 
 	secondaryAngles.forEach((angle, i) => {
@@ -281,7 +311,11 @@ export const generateRadiallyConstrainedAngleDiagram: WidgetGenerator<
 		
 		// Defer label drawing until after rays
 		const midAngleRad = fromRad + angleDiff / 2
-		const labelRadius = Math.min(innerArcMaxRadius, secondaryRadius + 16)
+		// Give stacked secondary labels progressively more headroom
+		const extraLabelOffset = 16 + i * 12 // 16px first, 28px second, etc.
+		// Allow labels to extend a bit closer to the ray endpoints than arcs do
+		const labelMaxRadius = Math.max(innerArcMaxRadius, pointOnRayDist - 8)
+		const labelRadius = Math.min(labelMaxRadius, secondaryRadius + extraLabelOffset)
 		const labelX = cx + labelRadius * Math.cos(midAngleRad)
 		const labelY = cy + labelRadius * Math.sin(midAngleRad)
 		pendingSecondaryLabels.push({ x: labelX, y: labelY, text: `${angle.value}°`, midAngleRad })
@@ -376,7 +410,8 @@ export const generateRadiallyConstrainedAngleDiagram: WidgetGenerator<
 		})
 	})
 
-	// Secondary labels: adjust along mid-angle direction to avoid ray piercing
+	// Secondary labels: rotate tangentially along the arc to avoid ray piercing,
+	// keeping labels close to their arcs instead of pushing them radially outward
 	for (const lbl of pendingSecondaryLabels) {
 		const fontPx = 18
 		const { maxWidth: w, height: h } = estimateWrappedTextDimensions(lbl.text, Number.POSITIVE_INFINITY, fontPx, 1.2)
@@ -384,28 +419,32 @@ export const generateRadiallyConstrainedAngleDiagram: WidgetGenerator<
 		const halfH = h / 2
 		const dirX = Math.cos(lbl.midAngleRad)
 		const dirY = Math.sin(lbl.midAngleRad)
-		const baseOffsetPx = 0
+		// Tangential unit vector (perpendicular to radial direction)
+		const tanX = -dirY
+		const tanY = dirX
+		// Nudge slightly away from the arc center to prevent grazing intersections
+		const radialNudge = 2
 
-		function placeFor(mult: number) {
-			let px = lbl.x + mult * baseOffsetPx * dirX
-			let py = lbl.y + mult * baseOffsetPx * dirY
+		function placeTangential(mult: number) {
+			let px = lbl.x + radialNudge * dirX
+			let py = lbl.y + radialNudge * dirY
 			let it = 0
-			const maxIt = 60
-			const step = 2
+			const maxIt = 80
+			const step = 3
 			while (
 				rectIntersectsAnySegment({ x: px - halfW, y: py - halfH, width: w, height: h, pad: 1 }) &&
 				it < maxIt
 			) {
-				px += mult * step * dirX
-				py += mult * step * dirY
+				px += mult * step * tanX
+				py += mult * step * tanY
 				it++
 			}
 			return { x: px, y: py, it }
 		}
 
-		const outward = placeFor(1)
-		const inward = placeFor(-1)
-		const chosen = inward.it < outward.it ? inward : outward
+		const cw = placeTangential(1)
+		const ccw = placeTangential(-1)
+		const chosen = ccw.it < cw.it ? ccw : cw
 
 		canvas.drawText({
 			x: chosen.x, y: chosen.y, text: lbl.text,
