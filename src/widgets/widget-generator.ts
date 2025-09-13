@@ -11,6 +11,7 @@ import { generateBarChart } from "./generators/bar-chart"
 import { generateBoxGrid } from "./generators/box-grid"
 import { generateBoxPlot } from "./generators/box-plot"
 import { generateCircleDiagram } from "./generators/circle-diagram"
+import { generateCircleAngleDiagram } from "./generators/circle-angle-diagram"
 import { generateCompositeShapeDiagram } from "./generators/composite-shape-diagram"
 import { generateConceptualGraph } from "./generators/conceptual-graph"
 import { generateConstraintGeometryDiagram } from "./generators/constraint-geometry-diagram"
@@ -122,6 +123,8 @@ export async function generateWidget(widget: Widget): Promise<string> {
 			return await generateBoxPlot(widget)
 		case "circleDiagram":
 			return await generateCircleDiagram(widget)
+		case "circleAngleDiagram":
+			return await generateCircleAngleDiagram(widget)
 		case "fractionModelDiagram":
 			return await generateFractionModelDiagram(widget)
 		case "compositeShapeDiagram":

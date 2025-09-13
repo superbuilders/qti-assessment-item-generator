@@ -12,6 +12,7 @@ import { BarChartPropsSchema } from "./generators/bar-chart"
 import { BoxGridPropsSchema } from "./generators/box-grid"
 import { BoxPlotPropsSchema } from "./generators/box-plot"
 import { CircleDiagramPropsSchema } from "./generators/circle-diagram"
+import { CircleAngleDiagramPropsSchema } from "./generators/circle-angle-diagram"
 import { CompositeShapeDiagramPropsSchema } from "./generators/composite-shape-diagram"
 import { ConceptualGraphPropsSchema } from "./generators/conceptual-graph"
 import { ConstraintGeometryDiagramPropsSchema } from "./generators/constraint-geometry-diagram"
@@ -97,6 +98,7 @@ export const allWidgetSchemas = {
 	clockDiagram: ClockDiagramPropsSchema,
 	angleDiagram: AngleDiagramPropsSchema,
 	angleTypeDiagram: AngleTypeDiagramPropsSchema,
+	circleAngleDiagram: CircleAngleDiagramPropsSchema,
 	areaModelMultiplication: AreaModelMultiplicationPropsSchema,
 	areaGraph: AreaGraphPropsSchema,
 	barChart: BarChartPropsSchema,
@@ -197,6 +199,7 @@ export {
 	BoxGridPropsSchema,
 	BoxPlotPropsSchema,
 	CircleDiagramPropsSchema,
+	CircleAngleDiagramPropsSchema,
 	CompositeShapeDiagramPropsSchema,
 	ConceptualGraphPropsSchema,
 	ConstraintGeometryDiagramPropsSchema,
@@ -282,6 +285,7 @@ const widgetSchemasWithoutSpecialUnions = [
 	typedSchemas.clockDiagram,
 	typedSchemas.angleDiagram,
 	typedSchemas.angleTypeDiagram,
+	typedSchemas.circleAngleDiagram,
 	typedSchemas.areaModelMultiplication,
 	typedSchemas.areaGraph,
 	typedSchemas.barChart,
