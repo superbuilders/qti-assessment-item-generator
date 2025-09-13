@@ -35,6 +35,7 @@ import { generateFractionModelDiagram } from "./generators/fractional-model-diag
 import { generateFreeBodyDiagram } from "./generators/free-body-diagram"
 import { generateFunctionPlotGraph } from "./generators/function-plot-graph"
 import { generateGeometricSolidDiagram } from "./generators/geometric-solid-diagram"
+import { generateGeometricPrimitiveDiagram } from "./generators/geometric-primitive-diagram"
 import { generateHangerDiagram } from "./generators/hanger-diagram"
 import { generateHistogram } from "./generators/histogram"
 import { generateInequalityNumberLine } from "./generators/inequality-number-line"
@@ -89,6 +90,8 @@ import type { Widget } from "./registry"
 
 export async function generateWidget(widget: Widget): Promise<string> {
 	switch (widget.type) {
+		case "geometricPrimitiveDiagram":
+			return await generateGeometricPrimitiveDiagram(widget)
 		case "constraintGeometryDiagram":
 			return await generateConstraintGeometryDiagram(widget)
 		case "areaGraph":

@@ -36,6 +36,7 @@ import { FractionModelDiagramPropsSchema } from "./generators/fractional-model-d
 import { FreeBodyDiagramPropsSchema } from "./generators/free-body-diagram"
 import { FunctionPlotGraphPropsSchema } from "./generators/function-plot-graph"
 import { GeometricSolidDiagramPropsSchema } from "./generators/geometric-solid-diagram"
+import { GeometricPrimitiveDiagramPropsSchema } from "./generators/geometric-primitive-diagram"
 import { HangerDiagramPropsSchema } from "./generators/hanger-diagram"
 import { HistogramPropsSchema } from "./generators/histogram"
 import { InequalityNumberLinePropsSchema } from "./generators/inequality-number-line"
@@ -124,6 +125,7 @@ export const allWidgetSchemas = {
 	figureComparisonDiagram: FigureComparisonDiagramPropsSchema,
 	fractionNumberLine: FractionNumberLinePropsSchema,
 	fractionSumDiagram: FractionSumDiagramPropsSchema,
+	geometricPrimitiveDiagram: GeometricPrimitiveDiagramPropsSchema,
 	geometricSolidDiagram: GeometricSolidDiagramPropsSchema,
 	hangerDiagram: HangerDiagramPropsSchema,
 	histogram: HistogramPropsSchema,
@@ -214,6 +216,7 @@ export {
 	FractionModelDiagramPropsSchema,
 	FreeBodyDiagramPropsSchema,
 	FunctionPlotGraphPropsSchema,
+	GeometricPrimitiveDiagramPropsSchema,
 	GeometricSolidDiagramPropsSchema,
 	HangerDiagramPropsSchema,
 	HistogramPropsSchema,
@@ -303,6 +306,7 @@ const widgetSchemasWithoutSpecialUnions = [
 	typedSchemas.figureComparisonDiagram,
 	typedSchemas.fractionNumberLine,
 	typedSchemas.fractionSumDiagram,
+	typedSchemas.geometricPrimitiveDiagram,
 	typedSchemas.geometricSolidDiagram,
 	typedSchemas.hangerDiagram,
 	typedSchemas.histogram,

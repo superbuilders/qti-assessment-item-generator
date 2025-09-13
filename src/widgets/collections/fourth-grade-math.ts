@@ -19,6 +19,7 @@ import {
 	PatternDiagramPropsSchema,
 	ProtractorAngleDiagramPropsSchema,
 	AngleTypeDiagramPropsSchema,
+	GeometricPrimitiveDiagramPropsSchema,
 	QuantityFractionalDiagramPropsSchema,
 	SimpleArrowPropsSchema,
 	SubtractionWithRegroupingPropsSchema,
@@ -31,6 +32,7 @@ import {
 export const fourthGradeMathCollection = {
 	name: "fourth-grade-math",
 	schemas: {
+		geometricPrimitiveDiagram: GeometricPrimitiveDiagramPropsSchema,
 		angleTypeDiagram: AngleTypeDiagramPropsSchema,
 		dataTable: DataTablePropsSchema,
 		tapeDiagram: TapeDiagramPropsSchema,
@@ -60,6 +62,7 @@ export const fourthGradeMathCollection = {
 		transformationDiagram: TransformationDiagramPropsSchema
 	},
 	widgetTypeKeys: [
+		"geometricPrimitiveDiagram",
 		"angleTypeDiagram",
 		"dataTable",
 		"tapeDiagram",
