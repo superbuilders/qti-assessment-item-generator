@@ -387,3 +387,149 @@ export const divisionAreaDiagramExamples_809_div_4: DivisionAreaDiagramProps[] =
     showFinalRemainderBox: true
   }
 ]
+
+// Example set 7: 96 ÷ 6 (with bring-to-right tokens)
+export const divisionAreaDiagramExamples_96_div_6: DivisionAreaDiagramProps[] = [
+  // State 1: Plan to subtract 60 (6 × 10). Show 96 on top, minus row boxed 6 0, bring 36 to the right.
+  {
+    type: "divisionAreaDiagram",
+    divisor: 6,
+    dividend: 96,
+    quotientParts: [
+      { type: "value", value: 10, color: null },
+      { type: "placeholder" }
+    ],
+    steps: [
+      {
+        subtrahend: null,
+        difference: null,
+        differenceColor: null,
+        topTokens: [ { type: "digit", value: 9, color: null }, { type: "digit", value: 6, color: null } ],
+        subtrahendTokens: [ { type: "boxedDigit", value: 6, color: null }, { type: "boxedDigit", value: 0, color: null } ],
+        differenceTokens: [ { type: "digit", value: 3, color: "red" }, { type: "digit", value: 6, color: "red" } ],
+        rightPanel: { tokensTop: [ { type: "digit", value: 3, color: "red" }, { type: "digit", value: 6, color: "red" } ], minusTokens: null, bottomTokens: null }
+      },
+      { subtrahend: null, difference: null, differenceColor: null, topTokens: null, subtrahendTokens: null, differenceTokens: null, rightPanel: null }
+    ],
+    showFinalRemainderBox: false
+  },
+  // State 2: Commit subtraction of 60 and show remainder 36 below.
+  {
+    type: "divisionAreaDiagram",
+    divisor: 6,
+    dividend: 96,
+    quotientParts: [
+      { type: "value", value: 10, color: null },
+      { type: "placeholder" }
+    ],
+    steps: [
+      { subtrahend: 60, difference: 36, differenceColor: "red", topTokens: null, subtrahendTokens: null, differenceTokens: null, rightPanel: null },
+      { subtrahend: null, difference: null, differenceColor: null, topTokens: null, subtrahendTokens: null, differenceTokens: null, rightPanel: null }
+    ],
+    showFinalRemainderBox: false
+  },
+  // State 3: Choose +6 (blue) and subtract 36 (6 × 6) → remainder 0 boxed.
+  {
+    type: "divisionAreaDiagram",
+    divisor: 6,
+    dividend: 96,
+    quotientParts: [
+      { type: "value", value: 10, color: null },
+      { type: "value", value: 6, color: "blue" }
+    ],
+    steps: [
+      {
+        subtrahend: 60,
+        difference: 36,
+        differenceColor: "red",
+        topTokens: [ { type: "digit", value: 9, color: null }, { type: "digit", value: 6, color: null } ],
+        subtrahendTokens: [ { type: "digit", value: 6, color: null }, { type: "digit", value: 0, color: null } ],
+        differenceTokens: [ { type: "digit", value: 3, color: "red" }, { type: "digit", value: 6, color: "red" } ],
+        rightPanel: { tokensTop: [ { type: "digit", value: 3, color: "red" }, { type: "digit", value: 6, color: "red" } ], minusTokens: null, bottomTokens: null }
+      },
+      {
+        subtrahend: 36,
+        difference: 0,
+        differenceColor: null,
+        topTokens: null,
+        subtrahendTokens: [ { type: "digit", value: 3, color: null }, { type: "digit", value: 6, color: null } ],
+        differenceTokens: [ { type: "boxedDigit", value: 0, color: null } ],
+        rightPanel: null
+      }
+    ],
+    showFinalRemainderBox: true
+  }
+]
+
+// Example set 8: 54 ÷ 3 (with bring-to-right tokens)
+export const divisionAreaDiagramExamples_54_div_3: DivisionAreaDiagramProps[] = [
+  // State 1: Plan to subtract 30 (3 × 10). Show 54 on top, minus row boxed 3 0, bring 24 to the right.
+  {
+    type: "divisionAreaDiagram",
+    divisor: 3,
+    dividend: 54,
+    quotientParts: [
+      { type: "value", value: 10, color: null },
+      { type: "placeholder" }
+    ],
+    steps: [
+      {
+        subtrahend: null,
+        difference: null,
+        differenceColor: null,
+        topTokens: [ { type: "digit", value: 5, color: null }, { type: "digit", value: 4, color: null } ],
+        subtrahendTokens: [ { type: "boxedDigit", value: 3, color: null }, { type: "boxedDigit", value: 0, color: null } ],
+        differenceTokens: [ { type: "digit", value: 2, color: "red" }, { type: "digit", value: 4, color: "red" } ],
+        rightPanel: { tokensTop: [ { type: "digit", value: 2, color: "red" }, { type: "digit", value: 4, color: "red" } ], minusTokens: null, bottomTokens: null }
+      },
+      { subtrahend: null, difference: null, differenceColor: null, topTokens: null, subtrahendTokens: null, differenceTokens: null, rightPanel: null }
+    ],
+    showFinalRemainderBox: false
+  },
+  // State 2: Commit subtraction of 30 and show remainder 24 below.
+  {
+    type: "divisionAreaDiagram",
+    divisor: 3,
+    dividend: 54,
+    quotientParts: [
+      { type: "value", value: 10, color: null },
+      { type: "placeholder" }
+    ],
+    steps: [
+      { subtrahend: 30, difference: 24, differenceColor: "red", topTokens: null, subtrahendTokens: null, differenceTokens: null, rightPanel: null },
+      { subtrahend: null, difference: null, differenceColor: null, topTokens: null, subtrahendTokens: null, differenceTokens: null, rightPanel: null }
+    ],
+    showFinalRemainderBox: false
+  },
+  // State 3: Choose +8 (blue) and subtract 24 (3 × 8) → remainder 0 boxed.
+  {
+    type: "divisionAreaDiagram",
+    divisor: 3,
+    dividend: 54,
+    quotientParts: [
+      { type: "value", value: 10, color: null },
+      { type: "value", value: 8, color: "blue" }
+    ],
+    steps: [
+      {
+        subtrahend: 30,
+        difference: 24,
+        differenceColor: "red",
+        topTokens: [ { type: "digit", value: 5, color: null }, { type: "digit", value: 4, color: null } ],
+        subtrahendTokens: [ { type: "digit", value: 3, color: null }, { type: "digit", value: 0, color: null } ],
+        differenceTokens: [ { type: "digit", value: 2, color: "red" }, { type: "digit", value: 4, color: "red" } ],
+        rightPanel: { tokensTop: [ { type: "digit", value: 2, color: "red" }, { type: "digit", value: 4, color: "red" } ], minusTokens: null, bottomTokens: null }
+      },
+      {
+        subtrahend: 24,
+        difference: 0,
+        differenceColor: null,
+        topTokens: null,
+        subtrahendTokens: [ { type: "digit", value: 2, color: null }, { type: "digit", value: 4, color: null } ],
+        differenceTokens: [ { type: "boxedDigit", value: 0, color: null } ],
+        rightPanel: null
+      }
+    ],
+    showFinalRemainderBox: true
+  }
+]

@@ -30,6 +30,7 @@ import { generateFigureComparisonDiagram } from "./generators/figure-comparison-
 import { generateFractionFrequencyPlot } from "./generators/fraction-frequency-plot"
 import { generateFractionMultiplicationModel } from "./generators/fraction-multiplication-model"
 import { generateFractionNumberLine } from "./generators/fraction-number-line"
+import { generateFractionSumDiagram } from "./generators/fraction-sum-diagram"
 import { generateFractionModelDiagram } from "./generators/fractional-model-diagram"
 import { generateFreeBodyDiagram } from "./generators/free-body-diagram"
 import { generateFunctionPlotGraph } from "./generators/function-plot-graph"
@@ -226,6 +227,8 @@ export async function generateWidget(widget: Widget): Promise<string> {
 			return await generateFigureComparisonDiagram(widget)
 		case "fractionNumberLine":
 			return await generateFractionNumberLine(widget)
+		case "fractionSumDiagram":
+			return await generateFractionSumDiagram(widget)
 		case "parallelogramTrapezoidDiagram":
 			return await generateParallelogramTrapezoidDiagram(widget)
 		case "urlImage":

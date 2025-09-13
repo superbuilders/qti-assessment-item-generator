@@ -31,6 +31,7 @@ import { FigureComparisonDiagramPropsSchema } from "./generators/figure-comparis
 import { FractionFrequencyPlotPropsSchema } from "./generators/fraction-frequency-plot"
 import { FractionMultiplicationModelPropsSchema } from "./generators/fraction-multiplication-model"
 import { FractionNumberLinePropsSchema } from "./generators/fraction-number-line"
+import { FractionSumDiagramPropsSchema } from "./generators/fraction-sum-diagram"
 import { FractionModelDiagramPropsSchema } from "./generators/fractional-model-diagram"
 import { FreeBodyDiagramPropsSchema } from "./generators/free-body-diagram"
 import { FunctionPlotGraphPropsSchema } from "./generators/function-plot-graph"
@@ -122,6 +123,7 @@ export const allWidgetSchemas = {
 	emojiImage: EmojiImagePropsSchema,
 	figureComparisonDiagram: FigureComparisonDiagramPropsSchema,
 	fractionNumberLine: FractionNumberLinePropsSchema,
+	fractionSumDiagram: FractionSumDiagramPropsSchema,
 	geometricSolidDiagram: GeometricSolidDiagramPropsSchema,
 	hangerDiagram: HangerDiagramPropsSchema,
 	histogram: HistogramPropsSchema,
@@ -208,6 +210,7 @@ export {
 	FractionFrequencyPlotPropsSchema,
 	FractionMultiplicationModelPropsSchema,
 	FractionNumberLinePropsSchema,
+	FractionSumDiagramPropsSchema,
 	FractionModelDiagramPropsSchema,
 	FreeBodyDiagramPropsSchema,
 	FunctionPlotGraphPropsSchema,
@@ -299,6 +302,7 @@ const widgetSchemasWithoutSpecialUnions = [
 	typedSchemas.emojiImage,
 	typedSchemas.figureComparisonDiagram,
 	typedSchemas.fractionNumberLine,
+	typedSchemas.fractionSumDiagram,
 	typedSchemas.geometricSolidDiagram,
 	typedSchemas.hangerDiagram,
 	typedSchemas.histogram,
