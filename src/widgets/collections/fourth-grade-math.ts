@@ -28,7 +28,8 @@ import {
 	TransformationDiagramPropsSchema,
 	WheelDiagramPropsSchema,
 	VectorDiagramPropsSchema,
-	VerticalArithmeticSetupPropsSchema
+	VerticalArithmeticSetupPropsSchema,
+	LabeledRectangleDiagramPropsSchema
 } from "../registry"
 
 export const fourthGradeMathCollection = {
@@ -63,7 +64,8 @@ export const fourthGradeMathCollection = {
 		vectorDiagram: VectorDiagramPropsSchema,
 		nPolygon: NPolygonPropsSchema,
 		patternDiagram: PatternDiagramPropsSchema,
-		transformationDiagram: TransformationDiagramPropsSchema
+		transformationDiagram: TransformationDiagramPropsSchema,
+		labeledRectangleDiagram: LabeledRectangleDiagramPropsSchema
 	},
 	widgetTypeKeys: [
 		"clockDiagram",
@@ -95,6 +97,7 @@ export const fourthGradeMathCollection = {
 		"vectorDiagram",
 		"nPolygon",
 		"patternDiagram",
-		"transformationDiagram"
+		"transformationDiagram",
+		"labeledRectangleDiagram"
 	] as const
 } as const

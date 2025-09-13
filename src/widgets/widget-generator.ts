@@ -89,6 +89,7 @@ import { generateVennDiagram } from "./generators/venn-diagram"
 import { generateVerticalArithmeticSetup } from "./generators/vertical-arithmetic-setup"
 import { generateClockDiagram } from "./generators/clock-diagram"
 import { generateWheelDiagram } from "./generators/wheel-diagram"
+import { generateLabeledRectangleDiagram } from "./generators/labeled-rectangle-diagram"
 import type { Widget } from "./registry"
 
 export async function generateWidget(widget: Widget): Promise<string> {
@@ -97,6 +98,8 @@ export async function generateWidget(widget: Widget): Promise<string> {
 			return await generateClockDiagram(widget)
 		case "wheelDiagram":
 			return await generateWheelDiagram(widget)
+        case "labeledRectangleDiagram":
+            return await generateLabeledRectangleDiagram(widget)
 		case "geometricPrimitiveDiagram":
 			return await generateGeometricPrimitiveDiagram(widget)
 		case "constraintGeometryDiagram":

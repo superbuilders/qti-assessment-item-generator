@@ -90,6 +90,7 @@ import { VennDiagramPropsSchema } from "./generators/venn-diagram"
 import { VerticalArithmeticSetupPropsSchema } from "./generators/vertical-arithmetic-setup"
 import { ClockDiagramPropsSchema } from "./generators/clock-diagram"
 import { WheelDiagramPropsSchema } from "./generators/wheel-diagram"
+import { LabeledRectangleDiagramPropsSchema } from "./generators/labeled-rectangle-diagram"
 
 // Master registry of widget schemas for dynamic validation and prompting
 export const allWidgetSchemas = {
@@ -181,7 +182,8 @@ export const allWidgetSchemas = {
 	equivalentFractionModel: EquivalentFractionModelPropsSchema,
 	subtractionWithRegrouping: SubtractionWithRegroupingPropsSchema,
 	additionWithRegrouping: AdditionWithRegroupingPropsSchema,
-	wheelDiagram: WheelDiagramPropsSchema
+	wheelDiagram: WheelDiagramPropsSchema,
+	labeledRectangleDiagram: LabeledRectangleDiagramPropsSchema
 } as const
 
 export const typedSchemas = allWidgetSchemas
@@ -277,6 +279,8 @@ export {
 	VerticalArithmeticSetupPropsSchema,
 	ClockDiagramPropsSchema,
 	WheelDiagramPropsSchema
+,
+	LabeledRectangleDiagramPropsSchema
 }
 
 const widgetSchemasWithoutSpecialUnions = [
@@ -366,7 +370,8 @@ const widgetSchemasWithoutSpecialUnions = [
 	typedSchemas.equivalentFractionModel,
 	typedSchemas.subtractionWithRegrouping,
 	typedSchemas.additionWithRegrouping,
-	typedSchemas.wheelDiagram
+	typedSchemas.wheelDiagram,
+	typedSchemas.labeledRectangleDiagram
 ] as const
 
 export const WidgetSchema = z.union([
