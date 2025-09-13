@@ -13,14 +13,74 @@ import type { WidgetGenerator } from "../types"
  * (or a full circle for 360°) indicating the angle type. All three points of the angle are labeled.
  * The entire diagram can be rotated.
  */
+function createLabelValueSchema() {
+	return z
+		.string()
+		.nullable()
+		.transform((value) => {
+			if (value === null) return null
+			if (["", "null", "NULL"].includes(value)) return null
+			return value
+		})
+		.describe("Label text or null. Empty string and 'null'/'NULL' are converted to null.")
+}
 export const AngleTypeDiagramPropsSchema = z
 	.object({
 		type: z.literal("angleTypeDiagram"),
 		width: z.number().positive().describe("Total width of the SVG diagram in pixels."),
 		height: z.number().positive().describe("Total height of the SVG diagram in pixels."),
 		angleType: z
-			.enum(["acute", "right", "obtuse", "straight", "reflex", "full"])
-			.describe("The type of angle to display, which determines its measure."),
+			.discriminatedUnion("type", [
+				z
+					.object({
+						type: z.literal("acute"),
+						value: z
+							.number()
+							.gt(0)
+							.lt(90)
+							.describe("Angle measure in degrees (exclusive 0° and 90°)."),
+					})
+					.strict(),
+				z
+					.object({
+						type: z.literal("right"),
+						value: z.literal(90).describe("Angle measure fixed at 90°."),
+					})
+					.strict(),
+				z
+					.object({
+						type: z.literal("obtuse"),
+						value: z
+							.number()
+							.gt(90)
+							.lt(180)
+							.describe("Angle measure in degrees (exclusive 90° and 180°)."),
+					})
+					.strict(),
+				z
+					.object({
+						type: z.literal("straight"),
+						value: z.literal(180).describe("Angle measure fixed at 180°."),
+					})
+					.strict(),
+				z
+					.object({
+						type: z.literal("reflex"),
+						value: z
+							.number()
+							.gt(180)
+							.lt(360)
+							.describe("Angle measure in degrees (exclusive 180° and 360°)."),
+					})
+					.strict(),
+				z
+					.object({
+						type: z.literal("full"),
+						value: z.literal(360).describe("Angle measure fixed at 360°."),
+					})
+					.strict(),
+			])
+			.describe("Angle classification with an explicit degree value and category-specific constraints."),
 		rotation: z
 			.number()
 			.default(0)
@@ -29,12 +89,12 @@ export const AngleTypeDiagramPropsSchema = z
 			),
 		labels: z
 			.object({
-				ray1Point: z.string().describe("Label for the point on the first ray (e.g., 'P'). This ray is rotated from the baseline ray."),
-				vertex: z.string().describe("Label for the vertex of the angle (e.g., 'Q')."),
-				ray2Point: z.string().describe("Label for the point on the second, baseline ray (e.g., 'R').")
+				ray1Point: createLabelValueSchema().describe("Label for the point on the first ray (e.g., 'P'). This ray is rotated from the baseline ray. Can be null."),
+				vertex: createLabelValueSchema().describe("Label for the vertex of the angle (e.g., 'Q'). Can be null."),
+				ray2Point: createLabelValueSchema().describe("Label for the point on the second, baseline ray (e.g., 'R'). Can be null.")
 			})
 			.strict()
-			.describe("The labels for the three points defining the angle."),
+			.describe("The labels for the three points defining the angle. Empty string and 'null'/'NULL' normalize to null."),
 		showAngleArc: z.boolean().default(true).describe("Whether to show the arc indicating the angle."),
 		sectorColor: z
 			.string()
@@ -62,16 +122,8 @@ export const generateAngleTypeDiagram: WidgetGenerator<typeof AngleTypeDiagramPr
 	const cy = height / 2
 	const toRad = (deg: number) => (deg * Math.PI) / 180
 
-	// Map angle type to a representative degree value
-	const angleMap: Record<typeof angleType, number> = {
-		acute: 45,
-		right: 90,
-		obtuse: 135,
-		straight: 180,
-		reflex: 270,
-		full: 360
-	}
-	const angleDegrees = angleMap[angleType]
+	// Angle measure in degrees is explicitly provided by the discriminated union
+	const angleDegrees = angleType.value
 	const angleRadians = toRad(angleDegrees)
 	const rotationRadians = toRad(rotation)
 
@@ -89,7 +141,7 @@ export const generateAngleTypeDiagram: WidgetGenerator<typeof AngleTypeDiagramPr
 	let p2Adjusted = { ...p2 }
 	// For a full 360° angle, place A and C along the baseline such that |AB| = |AC|.
 	// Make A at half the baseline length, and C at the full baseline length (colinear).
-	if (angleType === "full") {
+	if (angleType.type === "full") {
 		const halfLen = rayLength * 0.5
 		p1 = { x: cx + halfLen * Math.cos(ray2AngleRad), y: cy + halfLen * Math.sin(ray2AngleRad) } // A at half length
 		p2Adjusted = { x: cx + rayLength * Math.cos(ray2AngleRad), y: cy + rayLength * Math.sin(ray2AngleRad) } // C at full length
@@ -112,7 +164,7 @@ export const generateAngleTypeDiagram: WidgetGenerator<typeof AngleTypeDiagramPr
 	)
 
 	// Draw rays
-	if (angleType !== "full") {
+	if (angleType.type !== "full") {
 		canvas.drawLine(cx, cy, p1Arrow.x, p1Arrow.y, {
 			stroke: theme.colors.black,
 			strokeWidth: theme.stroke.width.thick,
@@ -127,7 +179,7 @@ export const generateAngleTypeDiagram: WidgetGenerator<typeof AngleTypeDiagramPr
 
 	// Build collision segments for label placement
 	const screenSegments: Array<{ a: { x: number; y: number }; b: { x: number; y: number } }> = []
-	if (angleType !== "full") {
+	if (angleType.type !== "full") {
 		screenSegments.push({ a: { x: cx, y: cy }, b: { x: p1Arrow.x, y: p1Arrow.y } })
 	}
 	screenSegments.push({ a: { x: cx, y: cy }, b: { x: p2Arrow.x, y: p2Arrow.y } })
@@ -200,7 +252,7 @@ export const generateAngleTypeDiagram: WidgetGenerator<typeof AngleTypeDiagramPr
 
 	// Draw angle arc/marker
 	if (showAngleArc) {
-		if (angleType === "full") {
+		if (angleType.type === "full") {
 			// Render full 360° sector as a filled circle at the vertex
 			canvas.drawCircle(cx, cy, arcRadius, {
 				fill: sectorColor,
@@ -212,7 +264,7 @@ export const generateAngleTypeDiagram: WidgetGenerator<typeof AngleTypeDiagramPr
 				stroke: sectorColor,
 				strokeWidth: theme.stroke.width.thin
 			})
-		} else if (angleType === "right") {
+		} else if (angleType.type === "right") {
 			const markerSize = arcRadius * 0.8
 			const m1 = { x: cx + markerSize * Math.cos(ray2AngleRad), y: cy + markerSize * Math.sin(ray2AngleRad) }
 			const m2 = { x: cx + markerSize * Math.cos(ray1AngleRad), y: cy + markerSize * Math.sin(ray1AngleRad) }
@@ -271,7 +323,10 @@ export const generateAngleTypeDiagram: WidgetGenerator<typeof AngleTypeDiagramPr
 	const labelOffset = 16
 	const pointRadius = 4
 
-	function placeLabelNear(point: { x: number; y: number }, baseAngleRad: number, text: string) {
+	function placeLabelNear(point: { x: number; y: number }, baseAngleRad: number, text: string | null) {
+		if (text === null) {
+			return
+		}
 		const fontPx = 18
 		const { maxWidth: w, height: h } = estimateWrappedTextDimensions(text, Number.POSITIVE_INFINITY, fontPx, 1.2)
 		const halfW = w / 2
@@ -310,7 +365,7 @@ export const generateAngleTypeDiagram: WidgetGenerator<typeof AngleTypeDiagramPr
 
 	// Point 1 (on rotated ray or offset along baseline for full)
 	canvas.drawCircle(p1.x, p1.y, pointRadius, { fill: theme.colors.black })
-	placeLabelNear(p1, angleType === "full" ? ray2AngleRad : ray1AngleRad, labels.ray1Point)
+	placeLabelNear(p1, angleType.type === "full" ? ray2AngleRad : ray1AngleRad, labels.ray1Point)
 
 	// Point 2 (on baseline ray)
 	canvas.drawCircle(p2Adjusted.x, p2Adjusted.y, pointRadius, { fill: theme.colors.black })
@@ -320,9 +375,9 @@ export const generateAngleTypeDiagram: WidgetGenerator<typeof AngleTypeDiagramPr
 	canvas.drawCircle(cx, cy, 4, { fill: theme.colors.black })
 	// Position vertex label to not interfere with the angle
 	const midAngle = ray2AngleRad + angleRadians / 2
-	const vertexDefaultAngle = angleType === "full" ? ray2AngleRad - Math.PI / 2 : midAngle + Math.PI
+	const vertexDefaultAngle = angleType.type === "full" ? ray2AngleRad - Math.PI / 2 : midAngle + Math.PI
 	// Vertex label with simple collision-aware adjustment
-	{
+	if (labels.vertex !== null) {
 		const fontPx = 18
 		const text = labels.vertex
 		const { maxWidth: w, height: h } = estimateWrappedTextDimensions(text, Number.POSITIVE_INFINITY, fontPx, 1.2)
