@@ -19,12 +19,14 @@ import {
 	PatternDiagramPropsSchema,
 	ProtractorAngleDiagramPropsSchema,
 	AngleTypeDiagramPropsSchema,
+	ClockDiagramPropsSchema,
 	GeometricPrimitiveDiagramPropsSchema,
 	QuantityFractionalDiagramPropsSchema,
 	SimpleArrowPropsSchema,
 	SubtractionWithRegroupingPropsSchema,
 	TapeDiagramPropsSchema,
 	TransformationDiagramPropsSchema,
+	WheelDiagramPropsSchema,
 	VectorDiagramPropsSchema,
 	VerticalArithmeticSetupPropsSchema
 } from "../registry"
@@ -32,6 +34,8 @@ import {
 export const fourthGradeMathCollection = {
 	name: "fourth-grade-math",
 	schemas: {
+		clockDiagram: ClockDiagramPropsSchema,
+		wheelDiagram: WheelDiagramPropsSchema,
 		geometricPrimitiveDiagram: GeometricPrimitiveDiagramPropsSchema,
 		angleTypeDiagram: AngleTypeDiagramPropsSchema,
 		dataTable: DataTablePropsSchema,
@@ -62,6 +66,8 @@ export const fourthGradeMathCollection = {
 		transformationDiagram: TransformationDiagramPropsSchema
 	},
 	widgetTypeKeys: [
+		"clockDiagram",
+		"wheelDiagram",
 		"geometricPrimitiveDiagram",
 		"angleTypeDiagram",
 		"dataTable",

@@ -86,10 +86,16 @@ import { generateUrlImage } from "./generators/url-image"
 import { generateVectorDiagram } from "./generators/vector-diagram"
 import { generateVennDiagram } from "./generators/venn-diagram"
 import { generateVerticalArithmeticSetup } from "./generators/vertical-arithmetic-setup"
+import { generateClockDiagram } from "./generators/clock-diagram"
+import { generateWheelDiagram } from "./generators/wheel-diagram"
 import type { Widget } from "./registry"
 
 export async function generateWidget(widget: Widget): Promise<string> {
 	switch (widget.type) {
+		case "clockDiagram":
+			return await generateClockDiagram(widget)
+		case "wheelDiagram":
+			return await generateWheelDiagram(widget)
 		case "geometricPrimitiveDiagram":
 			return await generateGeometricPrimitiveDiagram(widget)
 		case "constraintGeometryDiagram":

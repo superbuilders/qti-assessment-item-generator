@@ -87,11 +87,14 @@ import { UrlImageWidgetPropsSchema } from "./generators/url-image"
 import { VectorDiagramPropsSchema } from "./generators/vector-diagram"
 import { VennDiagramPropsSchema } from "./generators/venn-diagram"
 import { VerticalArithmeticSetupPropsSchema } from "./generators/vertical-arithmetic-setup"
+import { ClockDiagramPropsSchema } from "./generators/clock-diagram"
+import { WheelDiagramPropsSchema } from "./generators/wheel-diagram"
 
 // Master registry of widget schemas for dynamic validation and prompting
 export const allWidgetSchemas = {
 	threeDIntersectionDiagram: ThreeDIntersectionDiagramPropsSchema,
 	absoluteValueNumberLine: AbsoluteValueNumberLinePropsSchema,
+	clockDiagram: ClockDiagramPropsSchema,
 	angleDiagram: AngleDiagramPropsSchema,
 	angleTypeDiagram: AngleTypeDiagramPropsSchema,
 	areaModelMultiplication: AreaModelMultiplicationPropsSchema,
@@ -175,7 +178,8 @@ export const allWidgetSchemas = {
 	factorizationDiagram: FactorizationDiagramPropsSchema,
 	equivalentFractionModel: EquivalentFractionModelPropsSchema,
 	subtractionWithRegrouping: SubtractionWithRegroupingPropsSchema,
-	additionWithRegrouping: AdditionWithRegroupingPropsSchema
+	additionWithRegrouping: AdditionWithRegroupingPropsSchema,
+	wheelDiagram: WheelDiagramPropsSchema
 } as const
 
 export const typedSchemas = allWidgetSchemas
@@ -267,12 +271,15 @@ export {
 	UrlImageWidgetPropsSchema,
 	VectorDiagramPropsSchema,
 	VennDiagramPropsSchema,
-	VerticalArithmeticSetupPropsSchema
+	VerticalArithmeticSetupPropsSchema,
+	ClockDiagramPropsSchema,
+	WheelDiagramPropsSchema
 }
 
 const widgetSchemasWithoutSpecialUnions = [
 	typedSchemas.threeDIntersectionDiagram,
 	typedSchemas.absoluteValueNumberLine,
+	typedSchemas.clockDiagram,
 	typedSchemas.angleDiagram,
 	typedSchemas.angleTypeDiagram,
 	typedSchemas.areaModelMultiplication,
@@ -354,7 +361,8 @@ const widgetSchemasWithoutSpecialUnions = [
 	typedSchemas.factorizationDiagram,
 	typedSchemas.equivalentFractionModel,
 	typedSchemas.subtractionWithRegrouping,
-	typedSchemas.additionWithRegrouping
+	typedSchemas.additionWithRegrouping,
+	typedSchemas.wheelDiagram
 ] as const
 
 export const WidgetSchema = z.union([
