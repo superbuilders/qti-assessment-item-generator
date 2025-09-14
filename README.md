@@ -1,40 +1,21 @@
 # @superbuilders/qti-assessment-item-generator
 
-A robust toolkit for generating and compiling QTI 3.0 assessment items. This library uses a powerful AI pipeline to convert source content, such as Perseus JSON or HTML, into structured, valid QTI 3.0 XML. It also includes an AI-powered differentiation engine to create multiple variations of an assessment item.
+A robust toolkit for generating and compiling QTI 3.0 assessment items from various sources using a structured AI pipeline.
 
 -   **Runtime**: Bun
 -   **Package Manager**: Bun
 
-## Features
-
--   **Structured AI Conversion**: Transform Perseus-like JSON or raw HTML into a fully-typed, structured assessment item object.
--   **AI-Powered Differentiation**: Generate multiple, structurally identical variations of an assessment item that maintain the same difficulty and pedagogical intent.
--   **Robust QTI 3.0 Compiler**: Compile the structured item object into a hardened, valid QTI 3.0 XML string.
--   **Safety-First Design**: The library is built on a principle of strict validation and explicit error handling. It avoids silent fallbacks to ensure data integrity and reliable output.
-
 ## Install
 
 ```bash
-bun install @superbuilders/qti-assessment-item-generator
+bun add @superbuilders/qti-assessment-item-generator
 ```
 
-## Core Concepts
+## Core Functionality
 
-The primary workflow of the library follows a clear, three-step process:
+### Full Pipeline: Perseus JSON to QTI XML
 
-1.  **Create an `Envelope`**: Your source content (e.g., Perseus JSON) is first wrapped in an `AiContextEnvelope`. This object contains the context the AI will use for generation. Helper functions are provided to make this easy.
-2.  **Generate a `Structured Item`**: The envelope is passed to the AI pipeline, which returns a fully-typed `AssessmentItemInput` object. This is a predictable, structured JSON representation of the assessment item.
-3.  **Compile to `XML`**: The `AssessmentItemInput` object is passed to the compiler, which produces a valid QTI 3.0 XML string.
-
-## Usage
-
-### Generating a Single Assessment Item
-
-This is the most common use case. You start with your source data, create an envelope, and then generate the structured item.
-
-#### Example A: From Perseus-like JSON
-
-Use the `buildPerseusEnvelope` helper to prepare your Perseus data. It automatically resolves `web+graphie://` URLs and embeds any fetched SVG content into the context for the AI.
+This example demonstrates the primary workflow: converting a Perseus JSON object into a QTI 3.0 XML string. The `buildPerseusEnvelope` helper automatically resolves `web+graphie://` URLs and embeds SVG content for the AI.
 
 ```ts
 import OpenAI from "openai";
@@ -61,9 +42,9 @@ const xml = await compile(structuredItem);
 console.log(xml);
 ```
 
-#### Example B: From Raw HTML
+### Full Pipeline: HTML to QTI XML
 
-Use the `buildHtmlEnvelope` helper for raw HTML content. You can also provide a URL to a screenshot for additional visual context.
+This example converts raw HTML into a QTI 3.0 XML string. The `buildHtmlEnvelope` helper strictly validates all `<img>` `src` URLs and the optional `screenshotUrl`. Only absolute `http`/`https` URLs are accepted. If any `<img>` has an invalid or unsupported `src`, the function will throw.
 
 ```ts
 import OpenAI from "openai";
@@ -74,8 +55,14 @@ import { buildHtmlEnvelope } from "@superbuilders/qti-assessment-item-generator/
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 
-const html = "<div><p>Which of these is a prime number?</p>...</div>";
-const screenshotUrl = "https://example.com/item-screenshot.png"; // Optional
+const html = `
+  <div>
+    <p>Which of these is a prime number?</p>
+    <img src="https://example.com/some-diagram.png" alt="Diagram" />
+  </div>
+`;
+// Optional: provide a full screenshot for broader context.
+const screenshotUrl = "https://example.com/item-screenshot.png";
 
 // 1. Build the AI context envelope.
 const envelope = buildHtmlEnvelope(html, screenshotUrl);
@@ -89,9 +76,9 @@ const xml = await compile(structuredItem);
 console.log(xml);
 ```
 
-### Generating Item Variations (AI Differentiation)
+### AI-Powered Item Differentiation
 
-Once you have a structured `AssessmentItemInput` object, you can use the differentiation engine to create multiple unique, but equivalent, versions of it.
+Generate unique variations of an existing assessment item while preserving its structure and difficulty.
 
 ```ts
 import OpenAI from "openai";
@@ -111,9 +98,50 @@ const items = await differentiateAssessmentItem(openai, logger, sourceItem, 3);
 console.log(`Generated ${items.length} new items.`);
 ```
 
-## API Reference
+### Standalone Widget Compilation
 
-The library's functions are organized into logical modules.
+Compile a widget configuration directly into an SVG or HTML string without using the AI pipeline. This is useful for rendering visual aids independently.
+
+```ts
+import { generateWidget } from "@superbuilders/qti-assessment-item-generator/widgets/widget-generator";
+import type { BarChartProps } from "@superbuilders/qti-assessment-item-generator/widgets/registry";
+import { BarChartPropsSchema } from "@superbuilders/qti-assessment-item-generator/widgets/registry";
+import type { Widget } from "@superbuilders/qti-assessment-item-generator/widgets/registry";
+
+// 1. Define the properties for the widget you want to compile.
+const barChartProps: BarChartProps = {
+  type: "barChart",
+  width: 480,
+  height: 340,
+  title: "Games Won Last Summer",
+  xAxisLabel: "Team",
+  yAxis: {
+    label: "Games Won",
+    min: 0,
+    max: 16,
+    tickInterval: 2
+  },
+  data: [
+    { label: "Lions", value: 14, state: "normal" },
+    { label: "Tigers", value: 2, state: "normal" },
+    { label: "Bears", value: 7, state: "normal" }
+  ],
+  barColor: "#4285F4"
+};
+
+// 2. Validate the configuration against the specific Zod schema
+const validationResult = BarChartPropsSchema.safeParse(barChartProps);
+if (!validationResult.success) {
+  throw validationResult.error;
+}
+
+// 3. Pass the validated data to the generator (Widget union type)
+const svgString = await generateWidget(validationResult.data as unknown as Widget);
+
+console.log(svgString);
+```
+
+## API Reference
 
 ### `structured`
 
@@ -124,19 +152,74 @@ The library's functions are organized into logical modules.
 ### `structured/ai-context-builder`
 
 -   `buildPerseusEnvelope(perseusJson: unknown) => Promise<AiContextEnvelope>`
-    -   Creates an envelope from Perseus JSON, resolving `web+graphie://` URLs automatically.
+    -   Creates an envelope from Perseus JSON, resolving `web+graphie://` URLs and embedding SVG content.
 -   `buildHtmlEnvelope(html: string, screenshotUrl?: string) => AiContextEnvelope`
-    -   Creates an envelope from raw HTML and an optional screenshot URL.
+    -   Creates an envelope from raw HTML. Strictly validates all `<img>` `src` URLs and optional `screenshotUrl`. Only absolute `http`/`https` URLs are accepted.
 
 ### `structured/differentiator`
 
 -   `differentiateAssessmentItem(openai, logger, item, n) => Promise<AssessmentItemInput[]>`
-    -   Generates `n` new variations of a structured `AssessmentItemInput` with identical structure and the same difficulty.
+    -   Generates `n` new variations of a structured `AssessmentItemInput`.
 
 ### `compiler`
 
 -   `compile(item: AssessmentItemInput) => Promise<string>`
-    -   Compiles a structured `AssessmentItemInput` object into a valid QTI 3.0 item XML string.
+    -   Compiles a structured `AssessmentItemInput` object into a valid QTI 3.0 XML string.
+
+### `widgets/widget-generator`
+
+-   `generateWidget(widget: Widget) => Promise<string>`
+    -   Compiles a single widget's property object into an SVG or HTML string.
+
+### Widget Schemas and Types
+
+You can import individual Zod schemas and TypeScript `input` types for each widget, as well as a unified `WidgetInput` type for any valid widget object. This is ideal for programmatically creating or validating widget configurations.
+
+```ts
+import { generateWidget } from "@superbuilders/qti-assessment-item-generator/widgets/widget-generator";
+import {
+  BarChartPropsSchema,
+  type BarChartProps,
+  type WidgetInput,
+  type Widget
+} from "@superbuilders/qti-assessment-item-generator/widgets/registry";
+
+// Example of creating a specific widget with full type-safety
+const myBarChart: BarChartProps = {
+  type: "barChart",
+  width: 480,
+  height: 340,
+  title: "Games Won Last Summer",
+  xAxisLabel: "Team",
+  yAxis: {
+    label: "Games Won",
+    min: 0,
+    max: 16,
+    tickInterval: 2
+  },
+  data: [
+    { label: "Lions", value: 14, state: "normal" },
+    { label: "Tigers", value: 2, state: "normal" },
+    { label: "Bears", value: 7, state: "normal" }
+  ],
+  barColor: "#4285F4"
+};
+
+// Validate the configuration against the specific Zod schema
+const validationResult = BarChartPropsSchema.safeParse(myBarChart);
+if (!validationResult.success) {
+  throw validationResult.error;
+}
+
+// The `generateWidget` function accepts a `Widget` (runtime-inferred union)
+const svg = await generateWidget(validationResult.data as unknown as Widget);
+```
+
+## Image URL Policy
+
+- `buildHtmlEnvelope` accepts only absolute `http`/`https` image URLs.
+- If any `<img>` in the HTML lacks a valid absolute `src` or uses an unsupported scheme, it will throw.
+- If an optional `screenshotUrl` is provided but invalid or unsupported, it will throw.
 
 ## Configuration
 

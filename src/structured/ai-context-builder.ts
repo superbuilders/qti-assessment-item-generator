@@ -79,11 +79,54 @@ export async function buildPerseusEnvelope(
 }
 
 export function buildHtmlEnvelope(html: string, screenshotUrl?: string): AiContextEnvelope {
-	// No changes needed here, but kept for context.
-	return {
-		context: [html],
-		imageUrls: screenshotUrl ? [new URL(screenshotUrl).toString()] : []
+	const imageUrls: string[] = []
+
+	// Validate optional screenshotUrl strictly: if provided but invalid → throw
+	if (screenshotUrl) {
+		const screenshotUrlResult = errors.trySync(() => new URL(screenshotUrl))
+		if (screenshotUrlResult.error) {
+			logger.error("invalid screenshot url", { screenshotUrl, error: screenshotUrlResult.error })
+			throw errors.wrap(screenshotUrlResult.error, "screenshot url parse")
+		}
+		const normalized = screenshotUrlResult.data
+		if (normalized.protocol !== "http:" && normalized.protocol !== "https:") {
+			logger.error("unsupported screenshot url scheme", { screenshotUrl, protocol: normalized.protocol })
+			throw errors.new("unsupported screenshot url scheme")
+		}
+		imageUrls.push(normalized.toString())
 	}
+
+	// Robust, case-insensitive <img> tag finder
+	const imgTagRegex = /<img\b[^>]*>/gi
+	// Within a single tag, robust, case-insensitive src extractor supporting ' or "
+	const srcAttrRegex = /\bsrc\s*=\s*(?:"([^"]*)"|'([^']*)')/i
+
+	const unique = new Set<string>()
+	let tagMatch: RegExpExecArray | null
+	while ((tagMatch = imgTagRegex.exec(html)) !== null) {
+		const tag = tagMatch[0]
+		const srcMatch = srcAttrRegex.exec(tag)
+		if (!srcMatch) {
+			logger.error("img tag missing src attribute", { tag })
+			throw errors.new("img tag missing src")
+		}
+		const raw = srcMatch[1] ?? srcMatch[2] ?? ""
+		const urlResult = errors.trySync(() => new URL(raw))
+		if (urlResult.error) {
+			logger.error("invalid image src in html", { src: raw, error: urlResult.error })
+			throw errors.wrap(urlResult.error, "html image src parse")
+		}
+		const url = urlResult.data
+		if (url.protocol !== "http:" && url.protocol !== "https:") {
+			logger.error("unsupported image url scheme", { src: raw, protocol: url.protocol })
+			throw errors.new("unsupported image url scheme")
+		}
+		unique.add(url.toString())
+	}
+
+	for (const u of unique) imageUrls.push(u)
+
+	return { context: [html], imageUrls }
 }
 
 // MODIFIED: Renamed and simplified. This function no longer probes for extensions or handles SVGs.
