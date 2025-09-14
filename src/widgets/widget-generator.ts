@@ -91,6 +91,7 @@ import { generateClockDiagram } from "./generators/clock-diagram"
 import { generateWheelDiagram } from "./generators/wheel-diagram"
 import { generateLabeledRectangleDiagram } from "./generators/labeled-rectangle-diagram"
 import { generateCustomPolygonDiagram } from "./generators/custom-polygon-diagram"
+import { generateLineDiagram } from "./generators/line-diagram"
 import type { Widget } from "./registry"
 
 export async function generateWidget(widget: Widget): Promise<string> {
@@ -103,6 +104,8 @@ export async function generateWidget(widget: Widget): Promise<string> {
             return await generateLabeledRectangleDiagram(widget)
 		case "customPolygonDiagram":
 			return await generateCustomPolygonDiagram(widget)
+		case "lineDiagram":
+			return await generateLineDiagram(widget)
 		case "geometricPrimitiveDiagram":
 			return await generateGeometricPrimitiveDiagram(widget)
 		case "constraintGeometryDiagram":

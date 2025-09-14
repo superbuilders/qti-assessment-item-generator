@@ -92,6 +92,7 @@ import { ClockDiagramPropsSchema } from "./generators/clock-diagram"
 import { WheelDiagramPropsSchema } from "./generators/wheel-diagram"
 import { LabeledRectangleDiagramPropsSchema } from "./generators/labeled-rectangle-diagram"
 import { CustomPolygonDiagramPropsSchema } from "./generators/custom-polygon-diagram"
+import { LineDiagramPropsSchema } from "./generators/line-diagram"
 
 // Master registry of widget schemas for dynamic validation and prompting
 export const allWidgetSchemas = {
@@ -185,7 +186,8 @@ export const allWidgetSchemas = {
 	additionWithRegrouping: AdditionWithRegroupingPropsSchema,
 	wheelDiagram: WheelDiagramPropsSchema,
 	labeledRectangleDiagram: LabeledRectangleDiagramPropsSchema,
-	customPolygonDiagram: CustomPolygonDiagramPropsSchema
+	customPolygonDiagram: CustomPolygonDiagramPropsSchema,
+	lineDiagram: LineDiagramPropsSchema
 } as const
 
 export const typedSchemas = allWidgetSchemas
@@ -280,10 +282,10 @@ export {
 	VennDiagramPropsSchema,
 	VerticalArithmeticSetupPropsSchema,
 	ClockDiagramPropsSchema,
-	WheelDiagramPropsSchema
-,
+	WheelDiagramPropsSchema,
 	LabeledRectangleDiagramPropsSchema,
-	CustomPolygonDiagramPropsSchema
+	CustomPolygonDiagramPropsSchema,
+	LineDiagramPropsSchema
 }
 
 const widgetSchemasWithoutSpecialUnions = [
@@ -375,7 +377,8 @@ const widgetSchemasWithoutSpecialUnions = [
 	typedSchemas.additionWithRegrouping,
 	typedSchemas.wheelDiagram,
 	typedSchemas.labeledRectangleDiagram,
-	typedSchemas.customPolygonDiagram
+	typedSchemas.customPolygonDiagram,
+	typedSchemas.lineDiagram
 ] as const
 
 export const WidgetSchema = z.union([

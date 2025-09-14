@@ -6,6 +6,7 @@ import { selectAxisLabels } from "../../utils/layout"
 import { theme } from "../../utils/theme"
 import { buildTicks } from "../../utils/ticks"
 import type { WidgetGenerator } from "../types"
+import { estimateWrappedTextDimensions } from "../../utils/text"
 
 // Factory function to create a TickIntervalSchema to avoid $ref issues
 const createTickIntervalSchema = () =>
@@ -242,25 +243,34 @@ export const generateNumberLine: WidgetGenerator<typeof NumberLinePropsSchema> =
 							strokeWidth: theme.stroke.width.thick,
 							markerEnd: "url(#action-arrow)"
 						})
-						if (p.label)
+						if (p.label) {
+							const fontPx = theme.font.size.small
+							const dims = estimateWrappedTextDimensions(p.label, Number.POSITIVE_INFINITY, fontPx, 1.2)
+							const safeY = Math.max(arrowStartY - 5, PADDING + dims.height + 2)
 							canvas.drawText({
 								x: px,
-								y: arrowStartY - 5,
+								y: safeY,
 								text: p.label,
 								fill: p.color,
 								anchor: "middle",
 								dominantBaseline: "baseline",
-								fontWeight: "700"
+								fontWeight: "700",
+								fontPx
 							})
+						}
 					} else if (p.label) {
+						const fontPx = theme.font.size.small
+						const dims = estimateWrappedTextDimensions(p.label, Number.POSITIVE_INFINITY, fontPx, 1.2)
+						const safeY = Math.max(yPos - 15, PADDING + dims.height + 2)
 						canvas.drawText({
 							x: px,
-							y: yPos - 15,
+							y: safeY,
 							text: p.label,
 							fill: p.color,
 							anchor: "middle",
 							dominantBaseline: "baseline",
-							fontWeight: "700"
+							fontWeight: "700",
+							fontPx
 						})
 					}
 				} else {
@@ -365,25 +375,34 @@ export const generateNumberLine: WidgetGenerator<typeof NumberLinePropsSchema> =
 							strokeWidth: theme.stroke.width.thick,
 							markerEnd: "url(#action-arrow)"
 						})
-						if (p.label)
+						if (p.label) {
+							const fontPx = theme.font.size.small
+							const dims = estimateWrappedTextDimensions(p.label, Number.POSITIVE_INFINITY, fontPx, 1.2)
+							const safeX = Math.max(arrowStartX - 5, PADDING + 4 + dims.maxWidth)
 							canvas.drawText({
-								x: arrowStartX - 5,
+								x: safeX,
 								y: py,
 								text: p.label,
 								fill: p.color,
 								anchor: "end",
 								dominantBaseline: "middle",
-								fontWeight: "700"
+								fontWeight: "700",
+								fontPx
 							})
+						}
 					} else if (p.label) {
+						const fontPx = theme.font.size.small
+						const dims = estimateWrappedTextDimensions(p.label, Number.POSITIVE_INFINITY, fontPx, 1.2)
+						const safeX = Math.min(xPos + 15, width - PADDING - 4 - dims.maxWidth)
 						canvas.drawText({
-							x: xPos + 15,
+							x: safeX,
 							y: py,
 							text: p.label,
 							fill: p.color,
 							anchor: "start",
 							dominantBaseline: "middle",
-							fontWeight: "700"
+							fontWeight: "700",
+							fontPx
 						})
 					}
 				} else {
