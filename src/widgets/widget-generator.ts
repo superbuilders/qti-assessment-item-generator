@@ -90,6 +90,7 @@ import { generateVerticalArithmeticSetup } from "./generators/vertical-arithmeti
 import { generateClockDiagram } from "./generators/clock-diagram"
 import { generateWheelDiagram } from "./generators/wheel-diagram"
 import { generateLabeledRectangleDiagram } from "./generators/labeled-rectangle-diagram"
+import { generateCustomPolygonDiagram } from "./generators/custom-polygon-diagram"
 import type { Widget } from "./registry"
 
 export async function generateWidget(widget: Widget): Promise<string> {
@@ -100,6 +101,8 @@ export async function generateWidget(widget: Widget): Promise<string> {
 			return await generateWheelDiagram(widget)
         case "labeledRectangleDiagram":
             return await generateLabeledRectangleDiagram(widget)
+		case "customPolygonDiagram":
+			return await generateCustomPolygonDiagram(widget)
 		case "geometricPrimitiveDiagram":
 			return await generateGeometricPrimitiveDiagram(widget)
 		case "constraintGeometryDiagram":

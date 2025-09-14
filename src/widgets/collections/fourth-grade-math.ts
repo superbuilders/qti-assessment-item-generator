@@ -30,6 +30,8 @@ import {
 	VectorDiagramPropsSchema,
 	VerticalArithmeticSetupPropsSchema,
 	LabeledRectangleDiagramPropsSchema
+,
+	CustomPolygonDiagramPropsSchema
 } from "../registry"
 
 export const fourthGradeMathCollection = {
@@ -65,7 +67,8 @@ export const fourthGradeMathCollection = {
 		nPolygon: NPolygonPropsSchema,
 		patternDiagram: PatternDiagramPropsSchema,
 		transformationDiagram: TransformationDiagramPropsSchema,
-		labeledRectangleDiagram: LabeledRectangleDiagramPropsSchema
+		labeledRectangleDiagram: LabeledRectangleDiagramPropsSchema,
+		customPolygonDiagram: CustomPolygonDiagramPropsSchema
 	},
 	widgetTypeKeys: [
 		"clockDiagram",
@@ -98,6 +101,7 @@ export const fourthGradeMathCollection = {
 		"nPolygon",
 		"patternDiagram",
 		"transformationDiagram",
-		"labeledRectangleDiagram"
+		"labeledRectangleDiagram",
+		"customPolygonDiagram"
 	] as const
 } as const

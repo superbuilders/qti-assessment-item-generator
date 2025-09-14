@@ -18,19 +18,29 @@ export const LabeledRectangleDiagramPropsSchema = z.object({
     height: z.number().positive().describe("The total height of the SVG canvas in pixels."),
     topLabel: z
         .string()
-        .regex(MATHML_INNER_PATTERN, "invalid mathml")
+        .regex(MATHML_INNER_PATTERN, "invalid mathml inner content")
         .nullable()
-        .describe("MathML string to render above the rectangle (provide a full <math>...</math> element)."),
+        .describe("MathML INNER content (no <math> wrapper) rendered above the rectangle."),
+    bottomLabel: z
+        .string()
+        .regex(MATHML_INNER_PATTERN, "invalid mathml inner content")
+        .nullable()
+        .describe("MathML INNER content (no <math> wrapper) rendered below the rectangle."),
     leftLabel: z
         .string()
-        .regex(MATHML_INNER_PATTERN, "invalid mathml")
+        .regex(MATHML_INNER_PATTERN, "invalid mathml inner content")
         .nullable()
-        .describe("MathML string to render along the left side, rotated -90° (full <math>...</math>)."),
+        .describe("MathML INNER content (no <math>) along the left side, rotated -90°."),
+    rightLabel: z
+        .string()
+        .regex(MATHML_INNER_PATTERN, "invalid mathml inner content")
+        .nullable()
+        .describe("MathML INNER content (no <math>) along the right side, rotated -90°."),
     areaLabel: z
         .string()
-        .regex(MATHML_INNER_PATTERN, "invalid mathml")
+        .regex(MATHML_INNER_PATTERN, "invalid mathml inner content")
         .nullable()
-        .describe("MathML string to render centered inside the rectangle (full <math>...</math>)."),
+        .describe("MathML INNER content (no <math>) centered inside the rectangle."),
     fillColor: z.string().regex(CSS_COLOR_PATTERN, "invalid css color").default("#FEF2E4").describe("The fill color of the rectangle."),
     borderColor: z.string().regex(CSS_COLOR_PATTERN, "invalid css color").default("#D27D2D").describe("The border color of the rectangle."),
     textColor: z.string().regex(CSS_COLOR_PATTERN, "invalid css color").default("#333333").describe("The color of the text labels.")
@@ -42,7 +52,7 @@ export type LabeledRectangleDiagramProps = z.infer<typeof LabeledRectangleDiagra
  * Generates an SVG diagram of a labeled rectangle.
  */
 export const generateLabeledRectangleDiagram: WidgetGenerator<typeof LabeledRectangleDiagramPropsSchema> = async (props) => {
-    const { width, height, topLabel, leftLabel, areaLabel, fillColor, borderColor, textColor } = props;
+    const { width, height, topLabel, bottomLabel, leftLabel, rightLabel, areaLabel, fillColor, borderColor, textColor } = props;
 
     const canvas = new CanvasImpl({
         chartArea: { left: 0, top: 0, width, height },
@@ -75,7 +85,19 @@ export const generateLabeledRectangleDiagram: WidgetGenerator<typeof LabeledRect
             y: rectY - 35, // Positioned above the rectangle
             width: rectWidth,
             height: 30,
-            content: `<div xmlns="http://www.w3.org/1999/xhtml" style="${labelStyle} font-size: ${fontPx}px;">${topLabel}</div>`
+            content: `<div xmlns="http://www.w3.org/1999/xhtml" style="${labelStyle} font-size: ${fontPx}px;"><math xmlns=\"http://www.w3.org/1998/Math/MathML\">${topLabel}</math></div>`
+        });
+    }
+
+    // Bottom Label
+    if (bottomLabel) {
+        const fontPx = 16;
+        canvas.drawForeignObject({
+            x: rectX,
+            y: rectY + rectHeight + 5, // Positioned below the rectangle
+            width: rectWidth,
+            height: 30,
+            content: `<div xmlns="http://www.w3.org/1999/xhtml" style="${labelStyle} font-size: ${fontPx}px;"><math xmlns=\"http://www.w3.org/1998/Math/MathML\">${bottomLabel}</math></div>`
         });
     }
 
@@ -94,7 +116,27 @@ export const generateLabeledRectangleDiagram: WidgetGenerator<typeof LabeledRect
                 y: transformOriginY - containerHeight / 2,
                 width: containerWidth,
                 height: containerHeight,
-                content: `<div xmlns="http://www.w3.org/1999/xhtml" style="${labelStyle} font-size: ${fontPx}px;">${leftLabel}</div>`
+                content: `<div xmlns="http://www.w3.org/1999/xhtml" style="${labelStyle} font-size: ${fontPx}px;"><math xmlns=\"http://www.w3.org/1998/Math/MathML\">${leftLabel}</math></div>`
+            });
+        });
+    }
+
+    // Right Label (rotated -90 degrees)
+    if (rightLabel) {
+        const fontPx = 16;
+        const containerWidth = rectHeight;
+        const containerHeight = 30;
+        const transformOriginX = rectX + rectWidth + 35 - containerHeight / 2;
+        const transformOriginY = rectY + rectHeight / 2;
+        const transform = `rotate(-90, ${transformOriginX}, ${transformOriginY})`;
+
+        canvas.withTransform(transform, () => {
+            canvas.drawForeignObject({
+                x: transformOriginX - containerWidth / 2,
+                y: transformOriginY - containerHeight / 2,
+                width: containerWidth,
+                height: containerHeight,
+                content: `<div xmlns="http://www.w3.org/1999/xhtml" style="${labelStyle} font-size: ${fontPx}px;"><math xmlns=\"http://www.w3.org/1998/Math/MathML\">${rightLabel}</math></div>`
             });
         });
     }
@@ -107,7 +149,7 @@ export const generateLabeledRectangleDiagram: WidgetGenerator<typeof LabeledRect
             y: rectY,
             width: rectWidth,
             height: rectHeight,
-            content: `<div xmlns="http://www.w3.org/1999/xhtml" style="${labelStyle} font-size: ${fontPx}px; font-weight: bold;">${areaLabel}</div>`
+            content: `<div xmlns="http://www.w3.org/1999/xhtml" style="${labelStyle} font-size: ${fontPx}px; font-weight: bold;"><math xmlns=\"http://www.w3.org/1998/Math/MathML\">${areaLabel}</math></div>`
         });
     }
 
