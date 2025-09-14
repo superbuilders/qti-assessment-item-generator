@@ -182,6 +182,9 @@ export const generateLineDiagram: WidgetGenerator<typeof LineDiagramPropsSchema>
 	// Draw Lines and Labels
 	const lineMap = new Map(lines.map((line) => [line.id, line]))
 
+	// Keep track of placed text labels to avoid text-to-text collisions
+	const placedLabels: Array<{ x: number; y: number; width: number; height: number; padding: number }> = []
+
 	// Draw Perpendicular Indicators UNDER the lines for better aesthetics
 	for (const indicator of perpendicularIndicators) {
 		const line1 = lineMap.get(indicator.line1Id)
@@ -286,12 +289,28 @@ export const generateLineDiagram: WidgetGenerator<typeof LineDiagramPropsSchema>
 			const halfW = dims.maxWidth / 2
 			const halfH = dims.height / 2
 
-			function rectIntersectsAnySegment(rect: { x: number; y: number; width: number; height: number; pad?: number }): boolean {
+			function rectIntersectsAnySegmentOrText(rect: { x: number; y: number; width: number; height: number; pad?: number }): boolean {
 				const pad = rect.pad ?? 0
 				const rx = rect.x - pad
 				const ry = rect.y - pad
 				const rw = rect.width + 2 * pad
 				const rh = rect.height + 2 * pad
+				
+				// Check for text-to-text collisions first
+				for (const placedLabel of placedLabels) {
+					const labelPad = placedLabel.padding
+					const lx = placedLabel.x - labelPad
+					const ly = placedLabel.y - labelPad
+					const lw = placedLabel.width + 2 * labelPad
+					const lh = placedLabel.height + 2 * labelPad
+					
+					// Check if rectangles overlap (AABB collision)
+					if (rx < lx + lw && rx + rw > lx && ry < ly + lh && ry + rh > ly) {
+						return true
+					}
+				}
+				
+				// Check for text-to-line collisions
 				const r1 = { x: rx, y: ry }
 				const r2 = { x: rx + rw, y: ry }
 				const r3 = { x: rx + rw, y: ry + rh }
@@ -334,7 +353,7 @@ export const generateLineDiagram: WidgetGenerator<typeof LineDiagramPropsSchema>
 				const maxIt = 80
 				const step = 3
 				while (
-					rectIntersectsAnySegment({ x: px - halfW, y: py - halfH, width: dims.maxWidth, height: dims.height, pad: 1 }) &&
+					rectIntersectsAnySegmentOrText({ x: px - halfW, y: py - halfH, width: dims.maxWidth, height: dims.height, pad: 5 }) &&
 					it < maxIt
 				) {
 					px += mult * step * tx
@@ -357,6 +376,17 @@ export const generateLineDiagram: WidgetGenerator<typeof LineDiagramPropsSchema>
 				fontWeight: theme.font.weight.bold,
 				anchor: "middle",
 				dominantBaseline: "middle"
+			})
+
+			// Record this label's position to prevent future text-to-text collisions
+			// Use a larger padding to ensure better separation between labels
+			const labelPadding = 8
+			placedLabels.push({
+				x: chosen.x - halfW,
+				y: chosen.y - halfH,
+				width: dims.maxWidth,
+				height: dims.height,
+				padding: labelPadding
 			})
 		}
 	}
