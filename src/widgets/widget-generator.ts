@@ -92,6 +92,8 @@ import { generateWheelDiagram } from "./generators/wheel-diagram"
 import { generateLabeledRectangleDiagram } from "./generators/labeled-rectangle-diagram"
 import { generateCustomPolygonDiagram } from "./generators/custom-polygon-diagram"
 import { generateLineDiagram } from "./generators/line-diagram"
+import { generatePESSpectrum } from "./generators/pes-spectrum"
+import { generateStickPlot } from "./generators/stick-plot"
 import type { Widget } from "./registry"
 
 export async function generateWidget(widget: Widget): Promise<string> {
@@ -280,6 +282,10 @@ export async function generateWidget(widget: Widget): Promise<string> {
 			return await generateSinCosineWidget(widget)
 		case "vectorDiagram":
 			return await generateVectorDiagram(widget)
+		case "pesSpectrum":
+			return await generatePESSpectrum(widget)
+		case "stickPlot":
+			return await generateStickPlot(widget)
 		default:
 			logger.error("unknown widget type", { widget })
 			throw errors.new(`Unknown widget type: ${JSON.stringify(widget)}`)

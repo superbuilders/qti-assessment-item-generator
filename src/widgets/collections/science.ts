@@ -4,14 +4,17 @@ import {
 	CoordinatePlaneComprehensivePropsSchema,
 	DivergentBarChartPropsSchema,
 	FreeBodyDiagramPropsSchema,
+	FunctionPlotGraphPropsSchema,
 	HistogramPropsSchema,
 	KeelingCurvePropsSchema,
 	LineGraphPropsSchema,
 	ParabolaGraphPropsSchema,
+	PESSpectrumPropsSchema,
 	PieChartWidgetPropsSchema,
 	PopulationBarChartPropsSchema,
 	PopulationChangeEventGraphPropsSchema,
-	ScatterPlotPropsSchema
+	ScatterPlotPropsSchema,
+	StickPlotPropsSchema
 } from "../registry"
 import { simpleVisualCollection } from "./simple-visual"
 
@@ -31,7 +34,10 @@ export const scienceCollection = {
 		parabolaGraph: ParabolaGraphPropsSchema,
 		scatterPlot: ScatterPlotPropsSchema,
 		freeBodyDiagram: FreeBodyDiagramPropsSchema,
-		pieChart: PieChartWidgetPropsSchema
+		pieChart: PieChartWidgetPropsSchema,
+		functionPlotGraph: FunctionPlotGraphPropsSchema,
+		pesSpectrum: PESSpectrumPropsSchema,
+		stickPlot: StickPlotPropsSchema
 	},
 	widgetTypeKeys: [
 		...simpleVisualCollection.widgetTypeKeys,
@@ -47,6 +53,9 @@ export const scienceCollection = {
 		"parabolaGraph",
 		"scatterPlot",
 		"freeBodyDiagram",
-		"pieChart"
+		"pieChart",
+		"functionPlotGraph",
+		"pesSpectrum",
+		"stickPlot"
 	] as const
 } as const

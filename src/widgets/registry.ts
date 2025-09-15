@@ -93,6 +93,8 @@ import { WheelDiagramPropsSchema } from "./generators/wheel-diagram"
 import { LabeledRectangleDiagramPropsSchema } from "./generators/labeled-rectangle-diagram"
 import { CustomPolygonDiagramPropsSchema } from "./generators/custom-polygon-diagram"
 import { LineDiagramPropsSchema } from "./generators/line-diagram"
+import { PESSpectrumPropsSchema } from "./generators/pes-spectrum"
+import { StickPlotPropsSchema } from "./generators/stick-plot"
 
 // Master registry of widget schemas for dynamic validation and prompting
 export const allWidgetSchemas = {
@@ -187,7 +189,9 @@ export const allWidgetSchemas = {
 	wheelDiagram: WheelDiagramPropsSchema,
 	labeledRectangleDiagram: LabeledRectangleDiagramPropsSchema,
 	customPolygonDiagram: CustomPolygonDiagramPropsSchema,
-	lineDiagram: LineDiagramPropsSchema
+	lineDiagram: LineDiagramPropsSchema,
+	pesSpectrum: PESSpectrumPropsSchema,
+	stickPlot: StickPlotPropsSchema
 } as const
 
 export const typedSchemas = allWidgetSchemas
@@ -285,7 +289,9 @@ export {
 	WheelDiagramPropsSchema,
 	LabeledRectangleDiagramPropsSchema,
 	CustomPolygonDiagramPropsSchema,
-	LineDiagramPropsSchema
+	LineDiagramPropsSchema,
+	PESSpectrumPropsSchema,
+	StickPlotPropsSchema
 }
 
 // NEW: Input types for each schema
@@ -381,6 +387,8 @@ export type WheelDiagramProps = z.input<typeof WheelDiagramPropsSchema>
 export type LabeledRectangleDiagramProps = z.input<typeof LabeledRectangleDiagramPropsSchema>
 export type CustomPolygonDiagramProps = z.input<typeof CustomPolygonDiagramPropsSchema>
 export type LineDiagramProps = z.input<typeof LineDiagramPropsSchema>
+export type PESSpectrumProps = z.input<typeof PESSpectrumPropsSchema>
+export type StickPlotProps = z.input<typeof StickPlotPropsSchema>
 
 const widgetSchemasWithoutSpecialUnions = [
 	typedSchemas.threeDIntersectionDiagram,
@@ -472,7 +480,9 @@ const widgetSchemasWithoutSpecialUnions = [
 	typedSchemas.wheelDiagram,
 	typedSchemas.labeledRectangleDiagram,
 	typedSchemas.customPolygonDiagram,
-	typedSchemas.lineDiagram
+	typedSchemas.lineDiagram,
+	typedSchemas.pesSpectrum,
+	typedSchemas.stickPlot
 ] as const
 
 export const WidgetSchema = z.union([
