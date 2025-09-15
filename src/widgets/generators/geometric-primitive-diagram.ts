@@ -51,9 +51,7 @@ export const GeometricPrimitiveDiagramPropsSchema = z
 							.number()
 							.positive()
 							.nullable()
-							.describe(
-								"The length of the segment in pixels. If not provided, it defaults to 60% of the canvas width."
-							)
+							.describe("The length of the segment in pixels. If not provided, it defaults to 60% of the canvas width.")
 					})
 					.strict(),
 				z
@@ -101,9 +99,7 @@ export const GeometricPrimitiveDiagramPropsSchema = z
 							.number()
 							.positive()
 							.nullable()
-							.describe(
-								"The distance in pixels between the arc's endpoints. Defaults to 60% of canvas width."
-							),
+							.describe("The distance in pixels between the arc's endpoints. Defaults to 60% of canvas width."),
 						bulge: z
 							.number()
 							.default(0.5)
@@ -201,38 +197,40 @@ const extendLineToBox = (
 		return distA - distB
 	})
 
-	return { start: intersections[0] as Point, end: intersections[intersections.length - 1] as Point }
+	const start: Point = intersections[0]
+	const end: Point = intersections[intersections.length - 1]
+	return { start, end }
 }
 
 /**
  * For rays: extend from p1 toward p2 until the box boundary, ensuring directionality matches p2.
  */
 const extendRayToBoxEnd = (
-    p1: Point,
-    p2: Point,
-    box: { x: number; y: number; width: number; height: number }
+	p1: Point,
+	p2: Point,
+	box: { x: number; y: number; width: number; height: number }
 ): Point | null => {
-    const line = extendLineToBox(p1, p2, box)
-    if (!line) return null
-    const dirX = p2.x - p1.x
-    const dirY = p2.y - p1.y
-    const toStartX = line.start.x - p1.x
-    const toStartY = line.start.y - p1.y
-    const toEndX = line.end.x - p1.x
-    const toEndY = line.end.y - p1.y
-    const dotStart = dirX * toStartX + dirY * toStartY
-    const dotEnd = dirX * toEndX + dirY * toEndY
-    // Choose the intersection that lies in the forward direction from p1 toward p2 (positive dot)
-    if (dotStart >= 0 && dotEnd >= 0) {
-        // Both forward; choose the farther one (larger projection)
-        return dotEnd >= dotStart ? line.end : line.start
-    }
-    if (dotStart >= 0) return line.start
-    if (dotEnd >= 0) return line.end
-    // If neither is forward (degenerate), fall back to the farther endpoint
-    const distStart = Math.hypot(toStartX, toStartY)
-    const distEnd = Math.hypot(toEndX, toEndY)
-    return distEnd >= distStart ? line.end : line.start
+	const line = extendLineToBox(p1, p2, box)
+	if (!line) return null
+	const dirX = p2.x - p1.x
+	const dirY = p2.y - p1.y
+	const toStartX = line.start.x - p1.x
+	const toStartY = line.start.y - p1.y
+	const toEndX = line.end.x - p1.x
+	const toEndY = line.end.y - p1.y
+	const dotStart = dirX * toStartX + dirY * toStartY
+	const dotEnd = dirX * toEndX + dirY * toEndY
+	// Choose the intersection that lies in the forward direction from p1 toward p2 (positive dot)
+	if (dotStart >= 0 && dotEnd >= 0) {
+		// Both forward; choose the farther one (larger projection)
+		return dotEnd >= dotStart ? line.end : line.start
+	}
+	if (dotStart >= 0) return line.start
+	if (dotEnd >= 0) return line.end
+	// If neither is forward (degenerate), fall back to the farther endpoint
+	const distStart = Math.hypot(toStartX, toStartY)
+	const distEnd = Math.hypot(toEndX, toEndY)
+	return distEnd >= distStart ? line.end : line.start
 }
 
 /**

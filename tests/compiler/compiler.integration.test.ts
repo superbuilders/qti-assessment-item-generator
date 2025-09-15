@@ -52,9 +52,7 @@ describe("Compiler Identifier Validation Integration Tests", () => {
 					shuffle: true
 				}
 			},
-			responseDeclarations: [
-				{ identifier: "RESPONSE_1", cardinality: "single", baseType: "identifier", correct: "A" }
-			]
+			responseDeclarations: [{ identifier: "RESPONSE_1", cardinality: "single", baseType: "identifier", correct: "A" }]
 		}
 		await expect(compile(itemWithDuplicate)).rejects.toThrow(ErrDuplicateResponseIdentifier)
 	})
@@ -98,9 +96,7 @@ describe("Compiler Identifier Validation Integration Tests", () => {
 					footer: []
 				}
 			},
-			responseDeclarations: [
-				{ identifier: "RESPONSE_1", cardinality: "single", baseType: "identifier", correct: "A" }
-			]
+			responseDeclarations: [{ identifier: "RESPONSE_1", cardinality: "single", baseType: "identifier", correct: "A" }]
 		}
 		await expect(compile(itemWithDuplicate)).rejects.toThrow(ErrDuplicateResponseIdentifier)
 	})
@@ -122,9 +118,7 @@ describe("Compiler Identifier Validation Integration Tests", () => {
 					maxChoices: 1
 				}
 			},
-			responseDeclarations: [
-				{ identifier: "RESPONSE_1", cardinality: "single", baseType: "identifier", correct: "A" }
-			]
+			responseDeclarations: [{ identifier: "RESPONSE_1", cardinality: "single", baseType: "identifier", correct: "A" }]
 		}
 		await expect(compile(itemWithDuplicate)).rejects.toThrow(ErrDuplicateChoiceIdentifier)
 	})
@@ -154,9 +148,7 @@ describe("Compiler Identifier Validation Integration Tests", () => {
 					footer: []
 				}
 			},
-			responseDeclarations: [
-				{ identifier: "RESPONSE_1", cardinality: "single", baseType: "identifier", correct: "A" }
-			]
+			responseDeclarations: [{ identifier: "RESPONSE_1", cardinality: "single", baseType: "identifier", correct: "A" }]
 		}
 		await expect(compile(itemWithDuplicate)).rejects.toThrow(ErrDuplicateChoiceIdentifier)
 	})
@@ -196,9 +188,7 @@ describe("Compiler Identifier Validation Integration Tests", () => {
 					footer: []
 				}
 			},
-			responseDeclarations: [
-				{ identifier: "RESPONSE_1", cardinality: "single", baseType: "identifier", correct: "A" }
-			]
+			responseDeclarations: [{ identifier: "RESPONSE_1", cardinality: "single", baseType: "identifier", correct: "A" }]
 		}
 		await expect(compile(itemWithInvalidKey)).rejects.toThrow(ErrInvalidRowHeaderKey)
 	})

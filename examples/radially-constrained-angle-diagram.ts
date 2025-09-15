@@ -2,11 +2,11 @@ import type { RadiallyConstrainedAngleDiagramProps } from "../src/widgets/genera
 
 /**
  * Examples for the Radially Constrained Angle Diagram widget.
- * 
+ *
  * This file contains both VALID examples and ERROR examples:
  * - radiallyConstrainedAngleDiagramExamples: Working examples that render correctly
  * - radiallyConstrainedAngleDiagramErrorExamples: Examples that demonstrate validation errors
- * 
+ *
  * The error examples will throw runtime errors when used with generateWidget().
  * They are provided for documentation and testing purposes to show what NOT to do.
  */
@@ -42,9 +42,7 @@ export const radiallyConstrainedAngleDiagramExamples: RadiallyConstrainedAngleDi
 		height: 300,
 		centerLabel: "X",
 		rayLabels: ["M", "N"],
-		angles: [
-			{ fromRayLabel: "M", toRayLabel: "N", value: 45, color: "#9b59b6" }
-		]
+		angles: [{ fromRayLabel: "M", toRayLabel: "N", value: 45, color: "#9b59b6" }]
 	},
 	{
 		type: "radiallyConstrainedAngleDiagram",
@@ -93,12 +91,12 @@ export const radiallyConstrainedAngleDiagramErrorExamples = {
 		]
 	},
 
-	// ERROR: Invalid toRayLabel - "Z" is not in rayLabels  
+	// ERROR: Invalid toRayLabel - "Z" is not in rayLabels
 	invalidToRayLabel: {
 		type: "radiallyConstrainedAngleDiagram" as const,
 		width: 400,
 		height: 400,
-		centerLabel: "O", 
+		centerLabel: "O",
 		rayLabels: ["A", "B", "C"],
 		angles: [
 			{ fromRayLabel: "A", toRayLabel: "Z", value: 60, color: "#ff6b6b" } // "Z" doesn't exist!
@@ -139,7 +137,7 @@ export const radiallyConstrainedAngleDiagramErrorExamples = {
 		rayLabels: ["A", "B", "C"],
 		angles: [
 			{ fromRayLabel: "X", toRayLabel: "Y", value: 200, color: "#ff6b6b" }, // Both ray labels invalid
-			{ fromRayLabel: "C", toRayLabel: "A", value: 200, color: "#4ecdc4" }  // Wrong order + total > 360
+			{ fromRayLabel: "C", toRayLabel: "A", value: 200, color: "#4ecdc4" } // Wrong order + total > 360
 		]
 	}
 } as const

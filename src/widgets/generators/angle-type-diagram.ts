@@ -1,10 +1,10 @@
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
-import { Path2D } from "../../utils/path-builder"
-import { theme } from "../../utils/theme"
-import { estimateWrappedTextDimensions } from "../../utils/text"
 import { CSS_COLOR_PATTERN } from "../../utils/css-color"
+import { Path2D } from "../../utils/path-builder"
+import { estimateWrappedTextDimensions } from "../../utils/text"
+import { theme } from "../../utils/theme"
 import type { WidgetGenerator } from "../types"
 
 /**
@@ -34,51 +34,39 @@ export const AngleTypeDiagramPropsSchema = z
 				z
 					.object({
 						type: z.literal("acute"),
-						value: z
-							.number()
-							.gt(0)
-							.lt(90)
-							.describe("Angle measure in degrees (exclusive 0° and 90°)."),
+						value: z.number().gt(0).lt(90).describe("Angle measure in degrees (exclusive 0° and 90°).")
 					})
 					.strict(),
 				z
 					.object({
 						type: z.literal("right"),
-						value: z.literal(90).describe("Angle measure fixed at 90°."),
+						value: z.literal(90).describe("Angle measure fixed at 90°.")
 					})
 					.strict(),
 				z
 					.object({
 						type: z.literal("obtuse"),
-						value: z
-							.number()
-							.gt(90)
-							.lt(180)
-							.describe("Angle measure in degrees (exclusive 90° and 180°)."),
+						value: z.number().gt(90).lt(180).describe("Angle measure in degrees (exclusive 90° and 180°).")
 					})
 					.strict(),
 				z
 					.object({
 						type: z.literal("straight"),
-						value: z.literal(180).describe("Angle measure fixed at 180°."),
+						value: z.literal(180).describe("Angle measure fixed at 180°.")
 					})
 					.strict(),
 				z
 					.object({
 						type: z.literal("reflex"),
-						value: z
-							.number()
-							.gt(180)
-							.lt(360)
-							.describe("Angle measure in degrees (exclusive 180° and 360°)."),
+						value: z.number().gt(180).lt(360).describe("Angle measure in degrees (exclusive 180° and 360°).")
 					})
 					.strict(),
 				z
 					.object({
 						type: z.literal("full"),
-						value: z.literal(360).describe("Angle measure fixed at 360°."),
+						value: z.literal(360).describe("Angle measure fixed at 360°.")
 					})
-					.strict(),
+					.strict()
 			])
 			.describe("Angle classification with an explicit degree value and category-specific constraints."),
 		rotation: z
@@ -89,12 +77,18 @@ export const AngleTypeDiagramPropsSchema = z
 			),
 		labels: z
 			.object({
-				ray1Point: createLabelValueSchema().describe("Label for the point on the first ray (e.g., 'P'). This ray is rotated from the baseline ray. Can be null."),
+				ray1Point: createLabelValueSchema().describe(
+					"Label for the point on the first ray (e.g., 'P'). This ray is rotated from the baseline ray. Can be null."
+				),
 				vertex: createLabelValueSchema().describe("Label for the vertex of the angle (e.g., 'Q'). Can be null."),
-				ray2Point: createLabelValueSchema().describe("Label for the point on the second, baseline ray (e.g., 'R'). Can be null.")
+				ray2Point: createLabelValueSchema().describe(
+					"Label for the point on the second, baseline ray (e.g., 'R'). Can be null."
+				)
 			})
 			.strict()
-			.describe("The labels for the three points defining the angle. Empty string and 'null'/'NULL' normalize to null."),
+			.describe(
+				"The labels for the three points defining the angle. Empty string and 'null'/'NULL' normalize to null."
+			),
 		showAngleArc: z.boolean().default(true).describe("Whether to show the arc indicating the angle."),
 		sectorColor: z
 			.string()
@@ -233,18 +227,37 @@ export const generateAngleTypeDiagram: WidgetGenerator<typeof AngleTypeDiagramPr
 
 	const placedLabelRects: Array<{ x: number; y: number; width: number; height: number; pad?: number }> = []
 
-	function rectsOverlap(a: { x: number; y: number; width: number; height: number }, b: { x: number; y: number; width: number; height: number }): boolean {
+	function rectsOverlap(
+		a: { x: number; y: number; width: number; height: number },
+		b: { x: number; y: number; width: number; height: number }
+	): boolean {
 		return !(a.x + a.width < b.x || b.x + b.width < a.x || a.y + a.height < b.y || b.y + b.height < a.y)
 	}
 
-	function rectIntersectsAnyObstacle(rect: { x: number; y: number; width: number; height: number; pad?: number }): boolean {
+	function rectIntersectsAnyObstacle(rect: {
+		x: number
+		y: number
+		width: number
+		height: number
+		pad?: number
+	}): boolean {
 		for (const seg of screenSegments) {
 			if (segmentIntersectsRect(seg.a, seg.b, rect)) return true
 		}
 		// check previously placed labels
 		for (const r of placedLabelRects) {
-			const a = { x: rect.x - (rect.pad ?? 0), y: rect.y - (rect.pad ?? 0), width: rect.width + 2 * (rect.pad ?? 0), height: rect.height + 2 * (rect.pad ?? 0) }
-			const b = { x: r.x - (r.pad ?? 0), y: r.y - (r.pad ?? 0), width: r.width + 2 * (r.pad ?? 0), height: r.height + 2 * (r.pad ?? 0) }
+			const a = {
+				x: rect.x - (rect.pad ?? 0),
+				y: rect.y - (rect.pad ?? 0),
+				width: rect.width + 2 * (rect.pad ?? 0),
+				height: rect.height + 2 * (rect.pad ?? 0)
+			}
+			const b = {
+				x: r.x - (r.pad ?? 0),
+				y: r.y - (r.pad ?? 0),
+				width: r.width + 2 * (r.pad ?? 0),
+				height: r.height + 2 * (r.pad ?? 0)
+			}
 			if (rectsOverlap(a, b)) return true
 		}
 		return false
@@ -274,7 +287,12 @@ export const generateAngleTypeDiagram: WidgetGenerator<typeof AngleTypeDiagramPr
 			}
 
 			// Filled square
-			const fillPath = new Path2D().moveTo(cx, cy).lineTo(m1.x, m1.y).lineTo(corner.x, corner.y).lineTo(m2.x, m2.y).closePath()
+			const fillPath = new Path2D()
+				.moveTo(cx, cy)
+				.lineTo(m1.x, m1.y)
+				.lineTo(corner.x, corner.y)
+				.lineTo(m2.x, m2.y)
+				.closePath()
 			canvas.drawPath(fillPath, {
 				fill: sectorColor,
 				fillOpacity: 0.2,
@@ -338,7 +356,7 @@ export const generateAngleTypeDiagram: WidgetGenerator<typeof AngleTypeDiagramPr
 			baseAngleRad - Math.PI / 2,
 			baseAngleRad + Math.PI,
 			baseAngleRad + Math.PI / 3,
-			baseAngleRad - Math.PI / 3,
+			baseAngleRad - Math.PI / 3
 		]
 		for (const dist of [labelOffset + 2, labelOffset + 8, labelOffset + 14]) {
 			for (const ang of dirs) {
@@ -349,9 +367,13 @@ export const generateAngleTypeDiagram: WidgetGenerator<typeof AngleTypeDiagramPr
 		let minCollisions = Number.POSITIVE_INFINITY
 		for (const c of candidates) {
 			const rect = { x: c.x - halfW, y: c.y - halfH, width: w, height: h, pad: rectPad }
-			const collides = rectIntersectsAnyObstacle(rect) ||
+			const collides =
+				rectIntersectsAnyObstacle(rect) ||
 				// also avoid overlapping the point itself
-				(c.x > point.x - (pointRadius + 6) && c.x < point.x + (pointRadius + 6) && c.y > point.y - (pointRadius + 6) && c.y < point.y + (pointRadius + 6))
+				(c.x > point.x - (pointRadius + 6) &&
+					c.x < point.x + (pointRadius + 6) &&
+					c.y > point.y - (pointRadius + 6) &&
+					c.y < point.y + (pointRadius + 6))
 			const collisions = collides ? 1 : 0
 			if (collisions < minCollisions) {
 				minCollisions = collisions
@@ -359,7 +381,15 @@ export const generateAngleTypeDiagram: WidgetGenerator<typeof AngleTypeDiagramPr
 			}
 			if (minCollisions === 0) break
 		}
-		canvas.drawText({ x: best.x, y: best.y, text, anchor: "middle", dominantBaseline: "middle", fontPx, fontWeight: theme.font.weight.bold })
+		canvas.drawText({
+			x: best.x,
+			y: best.y,
+			text,
+			anchor: "middle",
+			dominantBaseline: "middle",
+			fontPx,
+			fontWeight: theme.font.weight.bold
+		})
 		placedLabelRects.push({ x: best.x - halfW, y: best.y - halfH, width: w, height: h, pad: rectPad })
 	}
 
@@ -394,7 +424,15 @@ export const generateAngleTypeDiagram: WidgetGenerator<typeof AngleTypeDiagramPr
 				break
 			}
 		}
-		canvas.drawText({ x: result.x, y: result.y, text, anchor: "middle", dominantBaseline: "middle", fontPx, fontWeight: theme.font.weight.bold })
+		canvas.drawText({
+			x: result.x,
+			y: result.y,
+			text,
+			anchor: "middle",
+			dominantBaseline: "middle",
+			fontPx,
+			fontWeight: theme.font.weight.bold
+		})
 		placedLabelRects.push({ x: result.x - halfW, y: result.y - halfH, width: w, height: h, pad: 2 })
 	}
 

@@ -54,9 +54,7 @@ export type CustomPolygonDiagramProps = z.infer<typeof CustomPolygonDiagramProps
 /**
  * Generates an SVG diagram of a custom polygon with annotations.
  */
-export const generateCustomPolygonDiagram: WidgetGenerator<typeof CustomPolygonDiagramPropsSchema> = async (
-	props
-) => {
+export const generateCustomPolygonDiagram: WidgetGenerator<typeof CustomPolygonDiagramPropsSchema> = async (props) => {
 	const { width, height, points, fillColor, strokeColor } = props
 
 	const canvas = new CanvasImpl({
@@ -122,5 +120,3 @@ export const generateCustomPolygonDiagram: WidgetGenerator<typeof CustomPolygonD
 	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}">${svgBody}</svg>`
 }
-
-

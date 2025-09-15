@@ -10,12 +10,14 @@ import { generateAreaModelMultiplication } from "./generators/area-model-multipl
 import { generateBarChart } from "./generators/bar-chart"
 import { generateBoxGrid } from "./generators/box-grid"
 import { generateBoxPlot } from "./generators/box-plot"
-import { generateCircleDiagram } from "./generators/circle-diagram"
 import { generateCircleAngleDiagram } from "./generators/circle-angle-diagram"
+import { generateCircleDiagram } from "./generators/circle-diagram"
+import { generateClockDiagram } from "./generators/clock-diagram"
 import { generateCompositeShapeDiagram } from "./generators/composite-shape-diagram"
 import { generateConceptualGraph } from "./generators/conceptual-graph"
 import { generateConstraintGeometryDiagram } from "./generators/constraint-geometry-diagram"
 import { generateCoordinatePlaneComprehensive } from "./generators/coordinate-plane-comprehensive"
+import { generateCustomPolygonDiagram } from "./generators/custom-polygon-diagram"
 import { generateDataTable } from "./generators/data-table"
 import { generateDiscreteObjectRatioDiagram } from "./generators/discrete-object-ratio-diagram"
 import { generateDistanceFormulaGraph } from "./generators/distance-formula-graph"
@@ -35,12 +37,14 @@ import { generateFractionSumDiagram } from "./generators/fraction-sum-diagram"
 import { generateFractionModelDiagram } from "./generators/fractional-model-diagram"
 import { generateFreeBodyDiagram } from "./generators/free-body-diagram"
 import { generateFunctionPlotGraph } from "./generators/function-plot-graph"
-import { generateGeometricSolidDiagram } from "./generators/geometric-solid-diagram"
 import { generateGeometricPrimitiveDiagram } from "./generators/geometric-primitive-diagram"
+import { generateGeometricSolidDiagram } from "./generators/geometric-solid-diagram"
 import { generateHangerDiagram } from "./generators/hanger-diagram"
 import { generateHistogram } from "./generators/histogram"
 import { generateInequalityNumberLine } from "./generators/inequality-number-line"
 import { generateKeelingCurve } from "./generators/keeling-curve"
+import { generateLabeledRectangleDiagram } from "./generators/labeled-rectangle-diagram"
+import { generateLineDiagram } from "./generators/line-diagram"
 import { generateLineEquationGraph } from "./generators/line-equation-graph"
 import { generateLineGraph } from "./generators/line-graph"
 import { generateNPolygon } from "./generators/n-polygon"
@@ -55,6 +59,7 @@ import { generatePartitionedShape } from "./generators/partitioned-shape"
 import { generatePatternDiagram } from "./generators/pattern-diagram"
 import { generatePentagonIntersectionDiagram } from "./generators/pentagon-intersection-diagram"
 import { generatePeriodicTable } from "./generators/periodic-table"
+import { generatePESSpectrum } from "./generators/pes-spectrum"
 import { generatePieChart } from "./generators/pi-chart"
 import { generatePictograph } from "./generators/pictograph"
 import { generatePointPlotGraph } from "./generators/point-plot-graph"
@@ -76,6 +81,7 @@ import { generateShapeTransformationGraph } from "./generators/shape-transformat
 import { generateSimpleArrow } from "./generators/simple-arrow"
 import { generateSinCosineWidget } from "./generators/sin-cosine-widget"
 import { generateStackedItemsDiagram } from "./generators/stacked-items-diagram"
+import { generateStickPlot } from "./generators/stick-plot"
 import { generateSubtractionWithRegrouping } from "./generators/subtraction-with-regrouping"
 import { generateTapeDiagram } from "./generators/tape-diagram"
 import { generateTransformationDiagram } from "./generators/transformation-diagram"
@@ -87,23 +93,23 @@ import { generateUrlImage } from "./generators/url-image"
 import { generateVectorDiagram } from "./generators/vector-diagram"
 import { generateVennDiagram } from "./generators/venn-diagram"
 import { generateVerticalArithmeticSetup } from "./generators/vertical-arithmetic-setup"
-import { generateClockDiagram } from "./generators/clock-diagram"
 import { generateWheelDiagram } from "./generators/wheel-diagram"
-import { generateLabeledRectangleDiagram } from "./generators/labeled-rectangle-diagram"
-import { generateCustomPolygonDiagram } from "./generators/custom-polygon-diagram"
-import { generateLineDiagram } from "./generators/line-diagram"
-import { generatePESSpectrum } from "./generators/pes-spectrum"
-import { generateStickPlot } from "./generators/stick-plot"
-import type { Widget } from "./registry"
+import { type WidgetInput, WidgetSchema } from "./registry"
 
-export async function generateWidget(widget: Widget): Promise<string> {
+export async function generateWidget(widgetInput: WidgetInput): Promise<string> {
+	const parsed = WidgetSchema.safeParse(widgetInput)
+	if (!parsed.success) {
+		logger.error("widget validation failed", { error: parsed.error })
+		throw errors.wrap(parsed.error, "widget validation")
+	}
+	const widget = parsed.data
 	switch (widget.type) {
 		case "clockDiagram":
 			return await generateClockDiagram(widget)
 		case "wheelDiagram":
 			return await generateWheelDiagram(widget)
-        case "labeledRectangleDiagram":
-            return await generateLabeledRectangleDiagram(widget)
+		case "labeledRectangleDiagram":
+			return await generateLabeledRectangleDiagram(widget)
 		case "customPolygonDiagram":
 			return await generateCustomPolygonDiagram(widget)
 		case "lineDiagram":

@@ -3,10 +3,10 @@ import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
 import { CSS_COLOR_PATTERN } from "../../utils/css-color"
 import { selectAxisLabels } from "../../utils/layout"
+import { estimateWrappedTextDimensions } from "../../utils/text"
 import { theme } from "../../utils/theme"
 import { buildTicks } from "../../utils/ticks"
 import type { WidgetGenerator } from "../types"
-import { estimateWrappedTextDimensions } from "../../utils/text"
 
 // Factory function to create a TickIntervalSchema to avoid $ref issues
 const createTickIntervalSchema = () =>
@@ -33,49 +33,44 @@ const createTickIntervalSchema = () =>
 
 // Factory function to create a HighlightedPointSchema to avoid $ref issues
 const createHighlightedPointSchema = () =>
-	z
-		.discriminatedUnion("type", [
-			z
-				.object({
-					type: z.literal("value"),
-					value: z.number().describe("Position on the number line."),
-					color: z
-						.string()
-						.regex(CSS_COLOR_PATTERN, "invalid css color")
-						.describe("CSS hex color for the point and its arrow/label."),
-					style: z
-						.enum(["dot", "arrowAndDot"])
-						.describe(
-							"Visual style for known points. 'dot' is a circle; 'arrowAndDot' adds an arrow."
-						),
-					label: z
-						.string()
-						.nullable()
-						.transform((val) => (val === "" ? null : val))
-						.describe("Optional text label. If null, no label is shown.")
-				})
-				.strict(),
-			z
-				.object({
-					type: z.literal("unknown"),
-					value: z.number().describe("Position on the number line."),
-					color: z
-						.string()
-						.regex(CSS_COLOR_PATTERN, "invalid css color")
-						.describe("CSS hex color for the box and its arrow/label."),
-					style: z
-						.enum(["box", "arrowAndBox"])
-						.describe(
-							"Visual style for unknown points. 'box' is an empty rectangle; 'arrowAndBox' adds an arrow."
-						),
-					label: z
-						.string()
-						.nullable()
-						.transform((val) => (val === "" ? null : val))
-						.describe("Optional text label. If null, no label is shown.")
-				})
-				.strict()
-		])
+	z.discriminatedUnion("type", [
+		z
+			.object({
+				type: z.literal("value"),
+				value: z.number().describe("Position on the number line."),
+				color: z
+					.string()
+					.regex(CSS_COLOR_PATTERN, "invalid css color")
+					.describe("CSS hex color for the point and its arrow/label."),
+				style: z
+					.enum(["dot", "arrowAndDot"])
+					.describe("Visual style for known points. 'dot' is a circle; 'arrowAndDot' adds an arrow."),
+				label: z
+					.string()
+					.nullable()
+					.transform((val) => (val === "" ? null : val))
+					.describe("Optional text label. If null, no label is shown.")
+			})
+			.strict(),
+		z
+			.object({
+				type: z.literal("unknown"),
+				value: z.number().describe("Position on the number line."),
+				color: z
+					.string()
+					.regex(CSS_COLOR_PATTERN, "invalid css color")
+					.describe("CSS hex color for the box and its arrow/label."),
+				style: z
+					.enum(["box", "arrowAndBox"])
+					.describe("Visual style for unknown points. 'box' is an empty rectangle; 'arrowAndBox' adds an arrow."),
+				label: z
+					.string()
+					.nullable()
+					.transform((val) => (val === "" ? null : val))
+					.describe("Optional text label. If null, no label is shown.")
+			})
+			.strict()
+	])
 
 export const NumberLinePropsSchema = z
 	.object({

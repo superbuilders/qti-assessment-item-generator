@@ -5,14 +5,22 @@ import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
 import { CSS_COLOR_PATTERN } from "../../utils/css-color"
 import { Path2D } from "../../utils/path-builder"
-import { theme } from "../../utils/theme"
 import { estimateWrappedTextDimensions } from "../../utils/text"
+import { theme } from "../../utils/theme"
 import type { WidgetGenerator } from "../types"
 
 // Id regexes and base schemas (ids are type-safe by prefix)
 const RAY_POINT_ID = /^pt_ray_[A-Za-z0-9_]+$/
 const CYCLE_POINT_ID = /^pt_cycle_[A-Za-z0-9_]+$/
 const ENDPOINT_ID = /^(?:pt_ray_|pt_cycle_)[A-Za-z0-9_]+$/
+
+// Explicit ray mapping type to avoid recursive type references
+type Rays = {
+	mainPlus: string
+	mainMinus: string
+	transversalPlus: string
+	transversalMinus: string
+}
 
 function createPointRaySchema() {
 	return z.object({ id: z.string().regex(RAY_POINT_ID), label: z.string().nullable() }).strict()
@@ -37,7 +45,7 @@ const PointsObjectSchema = z
 
 		// The two ray endpoints for the second line.
 		line2RayA: createPointRaySchema(),
-		line2RayB: createPointRaySchema(),
+		line2RayB: createPointRaySchema()
 	})
 	.strict()
 	.describe(
@@ -51,7 +59,7 @@ const Intersection1CycleSchema = z.object({
 		.enum(["line1RayA", "line1RayB"])
 		.describe(
 			"The key of the point on the main line that comes immediately after 'transversalRayA' in clockwise order around 'intersection1'."
-		),
+		)
 })
 
 // NEW: A schema that does the same for intersection 2.
@@ -60,26 +68,17 @@ const Intersection2CycleSchema = z.object({
 		.enum(["line2RayA", "line2RayB"])
 		.describe(
 			"The key of the point on the main line that comes immediately after 'intersection1' in clockwise order around 'intersection2'."
-		),
+		)
 })
 
 function createAngleSchema() {
 	return z
 		.object({
 			label: z.string().describe("Numeric or symbolic label for the wedge (e.g., '6')."),
-			color: z
-				.string()
-				.regex(CSS_COLOR_PATTERN, "Invalid CSS color format")
-				.describe("Fill color for the sector."),
+			color: z.string().regex(CSS_COLOR_PATTERN, "Invalid CSS color format").describe("Fill color for the sector."),
 			vertex: z.string().regex(CYCLE_POINT_ID).describe("Vertex id; must be one of the two intersection centers."),
-			from: z
-				.string()
-				.regex(ENDPOINT_ID)
-				.describe("Starting endpoint id at the vertex's around set (ray or center)."),
-			to: z
-				.string()
-				.regex(ENDPOINT_ID)
-				.describe("Ending endpoint id at the vertex's around set (ray or center)."),
+			from: z.string().regex(ENDPOINT_ID).describe("Starting endpoint id at the vertex's around set (ray or center)."),
+			to: z.string().regex(ENDPOINT_ID).describe("Ending endpoint id at the vertex's around set (ray or center).")
 		})
 		.strict()
 }
@@ -105,7 +104,10 @@ function createTransversalAngleDiagramPropsSchema() {
 			intersection1Cycle: Intersection1CycleSchema,
 			intersection2Cycle: Intersection2CycleSchema,
 
-			angles: z.array(createAngleSchema()).min(1).describe("Angles defined by vertex/from/to ids with labels and colors."),
+			angles: z
+				.array(createAngleSchema())
+				.min(1)
+				.describe("Angles defined by vertex/from/to ids with labels and colors.")
 		})
 		.strict()
 }
@@ -116,11 +118,20 @@ export type TransversalAngleDiagramProps = z.infer<typeof TransversalAngleDiagra
 /**
  * Generates an SVG diagram of two lines intersected by a transversal using constraint-first inputs.
  */
-export const generateTransversalAngleDiagram: WidgetGenerator<
-	typeof TransversalAngleDiagramPropsSchema
-> = async (props) => {
-	const { width, height, line1Angle, line2Angle, transversalAngle, points, intersection1Cycle, intersection2Cycle, angles } =
-		props
+export const generateTransversalAngleDiagram: WidgetGenerator<typeof TransversalAngleDiagramPropsSchema> = async (
+	props
+) => {
+	const {
+		width,
+		height,
+		line1Angle,
+		line2Angle,
+		transversalAngle,
+		points,
+		intersection1Cycle,
+		intersection2Cycle,
+		angles
+	} = props
 
 	// --- BEGIN RUNTIME INVARIANT VALIDATION ---
 	const norm = (deg: number) => ((deg % 180) + 180) % 180
@@ -145,7 +156,7 @@ export const generateTransversalAngleDiagram: WidgetGenerator<
 		points.transversalRayA.id,
 		points.intersection1.id,
 		points.intersection2.id,
-		points.transversalRayB.id,
+		points.transversalRayB.id
 	]
 
 	// Derive the full clockwise order for intersection 1 from the single user choice.
@@ -155,7 +166,7 @@ export const generateTransversalAngleDiagram: WidgetGenerator<
 		"transversalRayA",
 		i1Choice,
 		"intersection2", // Opposite on transversal
-		i1OppositeChoice,
+		i1OppositeChoice
 	] as const
 
 	// Derive the full clockwise order for intersection 2.
@@ -165,7 +176,7 @@ export const generateTransversalAngleDiagram: WidgetGenerator<
 		"intersection1",
 		i2Choice,
 		"transversalRayB", // Opposite on transversal
-		i2OppositeChoice,
+		i2OppositeChoice
 	] as const
 
 	const degToRad = (deg: number) => (deg * Math.PI) / 180
@@ -200,20 +211,38 @@ export const generateTransversalAngleDiagram: WidgetGenerator<
 			{ key: "transversalPlus" as const, ang: normalizeRad(transAngle) },
 			{ key: "mainPlus" as const, ang: normalizeRad(mainAngle) },
 			{ key: "transversalMinus" as const, ang: normalizeRad(transAngle + Math.PI) },
-			{ key: "mainMinus" as const, ang: normalizeRad(mainAngle + Math.PI) },
+			{ key: "mainMinus" as const, ang: normalizeRad(mainAngle + Math.PI) }
 		]
 		const geometricOrder = directions.sort((a, b) => a.ang - b.ang).map((d) => d.key)
 
 		const anchorIndex = geometricOrder.indexOf(transAnchorKey)
-		if (anchorIndex === -1) throw errors.new("internal error: anchor key not found")
+		if (anchorIndex === -1) {
+			logger.error("anchor key not found", { transAnchorKey, geometricOrder })
+			throw errors.new("internal error: anchor key not found")
+		}
 
-		const map: Record<string, string> = {}
+		// Build entries first, then materialize a strictly-typed record ensuring all keys are present
+		const entries: Array<["mainPlus" | "mainMinus" | "transversalPlus" | "transversalMinus", string]> = []
 		for (let i = 0; i < 4; i++) {
 			const geoKey = geometricOrder[(anchorIndex + i) % 4]
 			const logicalId = points[logicalKeys[i]].id
-			map[geoKey] = logicalId
+			entries.push([geoKey, logicalId])
 		}
-		return map as Record<"mainPlus" | "mainMinus" | "transversalPlus" | "transversalMinus", string>
+		const m = new Map(entries)
+		const get = (k: "mainPlus" | "mainMinus" | "transversalPlus" | "transversalMinus"): string => {
+			const v = m.get(k)
+			if (v === undefined) {
+				logger.error("ray key missing", { key: k })
+				throw errors.new("ray key missing")
+			}
+			return v
+		}
+		return {
+			mainPlus: get("mainPlus"),
+			mainMinus: get("mainMinus"),
+			transversalPlus: get("transversalPlus"),
+			transversalMinus: get("transversalMinus")
+		}
 	}
 
 	// For intersection 1, `transversalRayA` is the reference, which is on the "minus" side of the transversal.
@@ -221,25 +250,46 @@ export const generateTransversalAngleDiagram: WidgetGenerator<
 	const raysLine1 = alignAndMap(clockwiseKeys1, line1Angle, transversalAngle)
 	const raysLine2 = alignAndMap(clockwiseKeys2, line2Angle, transversalAngle)
 
+	type Intersection = {
+		label: string
+		rays: Rays
+		angles: Array<{
+			span: "byEndpoints"
+			label: string
+			color: string
+			fromEndpoint: string
+			toEndpoint: string
+		}>
+	}
 
-	const intersections = {
+	const intersections: { line1: Intersection; line2: Intersection } = {
 		line1: {
 			label: points.intersection1.id,
 			rays: raysLine1,
-			angles: [] as Array<{ span: "byEndpoints"; label: string; color: string; fromEndpoint: string; toEndpoint: string }>,
+			angles: []
 		},
 		line2: {
 			label: points.intersection2.id,
 			rays: raysLine2,
-			angles: [] as Array<{ span: "byEndpoints"; label: string; color: string; fromEndpoint: string; toEndpoint: string }>,
-		},
+			angles: []
+		}
 	}
 
 	// Compile angles, validating they belong to the correct, derived intersection sets.
 	for (const a of angles) {
-		const target = a.vertex === intersections.line1.label ? intersections.line1 : a.vertex === intersections.line2.label ? intersections.line2 : null
+		let target: Intersection | null = null
+		if (a.vertex === intersections.line1.label) {
+			target = intersections.line1
+		} else if (a.vertex === intersections.line2.label) {
+			target = intersections.line2
+		} else {
+			target = null
+		}
 		if (!target) {
-			logger.error("angle vertex not at intersections", { vertex: a.vertex, centers: [intersections.line1.label, intersections.line2.label] })
+			logger.error("angle vertex not at intersections", {
+				vertex: a.vertex,
+				centers: [intersections.line1.label, intersections.line2.label]
+			})
 			throw errors.new("angle vertex must be one of the two intersections")
 		}
 		if (a.from === a.to) {
@@ -248,7 +298,12 @@ export const generateTransversalAngleDiagram: WidgetGenerator<
 		}
 		const allowed = new Set(Object.values(target.rays))
 		if (!allowed.has(a.from) || !allowed.has(a.to)) {
-			logger.error("angle endpoints not in around set", { vertex: a.vertex, from: a.from, to: a.to, allowed: Array.from(allowed) })
+			logger.error("angle endpoints not in around set", {
+				vertex: a.vertex,
+				from: a.from,
+				to: a.to,
+				allowed: Array.from(allowed)
+			})
 			throw errors.new("angle endpoints must be in the derived around set for that vertex")
 		}
 		target.angles.push({ span: "byEndpoints", label: a.label, color: a.color, fromEndpoint: a.from, toEndpoint: a.to })
@@ -258,7 +313,7 @@ export const generateTransversalAngleDiagram: WidgetGenerator<
 	const canvas = new CanvasImpl({
 		chartArea: { left: 0, top: 0, width, height },
 		fontPxDefault: 16,
-		lineHeightDefault: 1.2,
+		lineHeightDefault: 1.2
 	})
 
 	const cx = width / 2
@@ -275,15 +330,15 @@ export const generateTransversalAngleDiagram: WidgetGenerator<
 	const dy = (spacing / 2) * Math.sin(transversalRad)
 	const intersectionPos = {
 		line1: { x: cx - dx, y: cy - dy },
-		line2: { x: cx + dx, y: cy + dy },
+		line2: { x: cx + dx, y: cy + dy }
 	}
 
-	const resolveBaseAngle = (raySide: "main" | "transversal", main: "line1" | "line2"): number =>
-		raySide === "transversal" ? transversalRad : main === "line1" ? line1Rad : line2Rad
+	const resolveBaseAngle = (raySide: "main" | "transversal", main: "line1" | "line2"): number => {
+		if (raySide === "transversal") return transversalRad
+		if (main === "line1") return line1Rad
+		return line2Rad
+	}
 	const angleForRay = (dir: "+" | "-", base: number) => (dir === "+" ? base : base + Math.PI)
-
-	type Intersection = typeof intersections.line1
-	type Rays = Intersection["rays"]
 
 	function labelsToAngles(main: "line1" | "line2", rays: Rays): Map<string, number> {
 		const map = new Map<string, number>()
@@ -297,7 +352,13 @@ export const generateTransversalAngleDiagram: WidgetGenerator<
 	// Draw sectors first
 	const sectorRadius = spacing * 0.3
 	const labelRadius = sectorRadius + 14
-	const pendingAngleLabels: Array<{ x: number; y: number; text: string; midAngleRad: number; origin: { x: number; y: number } }> = []
+	const pendingAngleLabels: Array<{
+		x: number
+		y: number
+		text: string
+		midAngleRad: number
+		origin: { x: number; y: number }
+	}> = []
 
 	function drawAnglesFor(main: "line1" | "line2", at: { x: number; y: number }, inter: Intersection) {
 		const map = labelsToAngles(main, inter.rays)
@@ -309,7 +370,13 @@ export const generateTransversalAngleDiagram: WidgetGenerator<
 			const ci = allTransversal.indexOf(centerLabel)
 			const ei = allTransversal.indexOf(endpointLabel)
 			if (ci >= 0 && ei >= 0 && ci !== ei) {
-				return ei > ci ? map.get(inter.rays.transversalPlus)! : map.get(inter.rays.transversalMinus)!
+				const plus = map.get(inter.rays.transversalPlus)
+				const minus = map.get(inter.rays.transversalMinus)
+				if (plus === undefined || minus === undefined) {
+					logger.error("missing transversal ray angles", { centerLabel, endpointLabel })
+					throw errors.new("missing transversal ray angles")
+				}
+				return ei > ci ? plus : minus
 			}
 			logger.error("unresolvable endpoint label for angle", { centerLabel, endpointLabel })
 			throw errors.new("unresolvable endpoint label")
@@ -320,7 +387,7 @@ export const generateTransversalAngleDiagram: WidgetGenerator<
 			let sweep = endAngleRad - startAngleRad
 			if (sweep <= -Math.PI) sweep += 2 * Math.PI
 			if (sweep > Math.PI) sweep -= 2 * Math.PI
-			
+
 			const startX = at.x + sectorRadius * Math.cos(startAngleRad)
 			const startY = at.y + sectorRadius * Math.sin(startAngleRad)
 			const arcEndAngleRad = startAngleRad + sweep
@@ -334,9 +401,15 @@ export const generateTransversalAngleDiagram: WidgetGenerator<
 				.arcTo(sectorRadius, sectorRadius, 0, largeArcFlag, sweepFlag, endX, endY)
 				.closePath()
 			canvas.drawPath(path, { fill: a.color, stroke: "none" })
-			
+
 			const midAngleRad = startAngleRad + sweep / 2
-			pendingAngleLabels.push({ x: at.x + labelRadius * Math.cos(midAngleRad), y: at.y + labelRadius * Math.sin(midAngleRad), text: a.label, midAngleRad, origin: { x: at.x, y: at.y } })
+			pendingAngleLabels.push({
+				x: at.x + labelRadius * Math.cos(midAngleRad),
+				y: at.y + labelRadius * Math.sin(midAngleRad),
+				text: a.label,
+				midAngleRad,
+				origin: { x: at.x, y: at.y }
+			})
 		}
 	}
 
@@ -366,7 +439,7 @@ export const generateTransversalAngleDiagram: WidgetGenerator<
 	function placeEndpointsFor(main: "line1" | "line2", origin: { x: number; y: number }, rays: Rays) {
 		const map = labelsToAngles(main, rays)
 		for (const [label, ang] of map) {
-			if (!Object.values(points).some(p => p.id === label && p.id.startsWith("pt_ray_"))) continue
+			if (!Object.values(points).some((p) => p.id === label && p.id.startsWith("pt_ray_"))) continue
 			if (!pointPositions.has(label)) {
 				pointPositions.set(label, { x: origin.x + pointDist * Math.cos(ang), y: origin.y + pointDist * Math.sin(ang) })
 			}
@@ -380,7 +453,16 @@ export const generateTransversalAngleDiagram: WidgetGenerator<
 		const inter = intersections[key]
 		const pos = intersectionPos[key]
 		const labelText = pointsById.get(inter.label)?.label ?? ""
-		canvas.drawText({ x: pos.x, y: pos.y - 14, text: labelText, fill: theme.colors.black, anchor: "middle", dominantBaseline: "middle", fontPx: 18, fontWeight: theme.font.weight.bold })
+		canvas.drawText({
+			x: pos.x,
+			y: pos.y - 14,
+			text: labelText,
+			fill: theme.colors.black,
+			anchor: "middle",
+			dominantBaseline: "middle",
+			fontPx: 18,
+			fontWeight: theme.font.weight.bold
+		})
 	}
 
 	// Collision helpers and label placement (unchanged from original)
@@ -421,10 +503,21 @@ export const generateTransversalAngleDiagram: WidgetGenerator<
 			const o4 = orient(p3, p4, p2)
 			return o1 !== o2 && o3 !== o4
 		}
-		return segmentsIntersect(A, B, r1, r2) || segmentsIntersect(A, B, r2, r3) || segmentsIntersect(A, B, r3, r4) || segmentsIntersect(A, B, r4, r1)
+		return (
+			segmentsIntersect(A, B, r1, r2) ||
+			segmentsIntersect(A, B, r2, r3) ||
+			segmentsIntersect(A, B, r3, r4) ||
+			segmentsIntersect(A, B, r4, r1)
+		)
 	}
 
-	function rectIntersectsAnySegment(rect: { x: number; y: number; width: number; height: number; pad?: number }): boolean {
+	function rectIntersectsAnySegment(rect: {
+		x: number
+		y: number
+		width: number
+		height: number
+		pad?: number
+	}): boolean {
 		for (const seg of screenSegments) {
 			if (segmentIntersectsRect(seg.a, seg.b, rect)) return true
 		}
@@ -438,7 +531,7 @@ export const generateTransversalAngleDiagram: WidgetGenerator<
 		const halfH = h / 2
 		const dirX = Math.cos(item.midAngleRad)
 		const dirY = Math.sin(item.midAngleRad)
-		
+
 		let bestPos = { x: item.x, y: item.y }
 		let minCollisions = Number.POSITIVE_INFINITY
 		let bestDist = 0
@@ -450,7 +543,7 @@ export const generateTransversalAngleDiagram: WidgetGenerator<
 			const rect = { x: testX - halfW, y: testY - halfH, width: w, height: h, pad: 2 }
 			const collides = rectIntersectsAnySegment(rect)
 			const collisions = collides ? 1 : 0
-			
+
 			if (collisions < minCollisions) {
 				minCollisions = collisions
 				bestPos = { x: testX, y: testY }
@@ -461,7 +554,16 @@ export const generateTransversalAngleDiagram: WidgetGenerator<
 			}
 			if (minCollisions === 0) break
 		}
-		canvas.drawText({ x: bestPos.x, y: bestPos.y, text: item.text, fill: theme.colors.black, anchor: "middle", dominantBaseline: "middle", fontPx, fontWeight: theme.font.weight.bold })
+		canvas.drawText({
+			x: bestPos.x,
+			y: bestPos.y,
+			text: item.text,
+			fill: theme.colors.black,
+			anchor: "middle",
+			dominantBaseline: "middle",
+			fontPx,
+			fontWeight: theme.font.weight.bold
+		})
 	}
 
 	for (const [pointId, pos] of pointPositions) {
@@ -473,7 +575,7 @@ export const generateTransversalAngleDiagram: WidgetGenerator<
 		const { maxWidth: w, height: h } = estimateWrappedTextDimensions(labelText, Number.POSITIVE_INFINITY, fontPx, 1.2)
 		const halfW = w / 2
 		const halfH = h / 2
-		
+
 		let bestX = pos.x
 		let bestY = pos.y
 		let minCollisions = Number.POSITIVE_INFINITY
@@ -485,7 +587,7 @@ export const generateTransversalAngleDiagram: WidgetGenerator<
 				const testY = pos.y + dist * Math.sin(angle)
 				const rect = { x: testX - halfW, y: testY - halfH, width: w, height: h, pad: 2 }
 				const collisions = rectIntersectsAnySegment(rect) ? 1 : 0
-				
+
 				if (collisions < minCollisions) {
 					minCollisions = collisions
 					bestX = testX
@@ -495,7 +597,16 @@ export const generateTransversalAngleDiagram: WidgetGenerator<
 			}
 			if (minCollisions === 0) break
 		}
-		canvas.drawText({ x: bestX, y: bestY, text: labelText, fill: theme.colors.black, anchor: "middle", dominantBaseline: "middle", fontPx, fontWeight: theme.font.weight.bold })
+		canvas.drawText({
+			x: bestX,
+			y: bestY,
+			text: labelText,
+			fill: theme.colors.black,
+			anchor: "middle",
+			dominantBaseline: "middle",
+			fontPx,
+			fontWeight: theme.font.weight.bold
+		})
 	}
 
 	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)

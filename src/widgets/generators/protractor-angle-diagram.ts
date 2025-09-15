@@ -1,9 +1,9 @@
-import { z } from "zod"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
+import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
-import { Path2D } from "../../utils/path-builder"
 import { PADDING } from "../../utils/constants"
+import { Path2D } from "../../utils/path-builder"
 import { theme } from "../../utils/theme"
 import type { WidgetGenerator } from "../types"
 
@@ -125,8 +125,7 @@ export const generateProtractorAngleDiagram: WidgetGenerator<typeof ProtractorAn
 		const y = centerY - arcRadius * Math.sin(a)
 		sectorPoints.push({ x, y })
 	}
-	const fillPath = new Path2D().moveTo(centerX, centerY)
-		.lineTo(sectorPoints[0].x, sectorPoints[0].y)
+	const fillPath = new Path2D().moveTo(centerX, centerY).lineTo(sectorPoints[0].x, sectorPoints[0].y)
 	for (let i = 1; i < sectorPoints.length; i++) {
 		fillPath.lineTo(sectorPoints[i].x, sectorPoints[i].y)
 	}

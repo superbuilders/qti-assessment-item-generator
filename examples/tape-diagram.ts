@@ -42,9 +42,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 		},
 		bottomTape: {
 			label: "Tom's Money",
-			segments: [
-				{ label: "?", length: 2 }
-			],
+			segments: [{ label: "?", length: 2 }],
 			color: "#FFD93D"
 		},
 		showTotalBracket: false,

@@ -1,16 +1,18 @@
 import { describe, expect, test } from "bun:test"
 import * as errors from "@superbuilders/errors"
+import * as logger from "@superbuilders/slog"
 import { pesSpectrumExamples } from "../../examples/pes-spectrum"
-import type { Widget } from "../../src/widgets/registry"
+import type { WidgetInput } from "../../src/widgets/registry"
 import { generateWidget } from "../../src/widgets/widget-generator"
 
 describe("Widget: pes-spectrum", () => {
-	const examples = pesSpectrumExamples as unknown as Widget[]
+	const examples: WidgetInput[] = pesSpectrumExamples
 
 	examples.forEach((props, index) => {
 		test(`should produce consistent output for example #${index + 1}`, async () => {
 			const result = await errors.try(generateWidget(props))
 			if (result.error) {
+				logger.error("widget generation failed", { error: result.error, index })
 				throw result.error
 			}
 			expect(result.data).toMatchSnapshot()

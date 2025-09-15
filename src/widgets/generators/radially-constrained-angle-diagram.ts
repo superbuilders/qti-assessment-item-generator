@@ -5,8 +5,8 @@ import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
 import { CSS_COLOR_PATTERN } from "../../utils/css-color"
 import { Path2D } from "../../utils/path-builder"
-import { theme } from "../../utils/theme"
 import { estimateWrappedTextDimensions } from "../../utils/text"
+import { theme } from "../../utils/theme"
 import type { WidgetGenerator } from "../types"
 
 // Schema for an angle segment in the diagram.
@@ -22,7 +22,9 @@ const AngleSegmentSchema = z
 		color: z
 			.string()
 			.regex(CSS_COLOR_PATTERN, "Invalid CSS color format")
-			.describe("The color for the angle's visual representation. Primary angles (adjacent rays) render as filled sectors, secondary angles (spanning multiple rays) render as stroke-only arcs."),
+			.describe(
+				"The color for the angle's visual representation. Primary angles (adjacent rays) render as filled sectors, secondary angles (spanning multiple rays) render as stroke-only arcs."
+			)
 	})
 	.strict()
 
@@ -46,7 +48,9 @@ export const RadiallyConstrainedAngleDiagramPropsSchema = z
 		angles: z
 			.array(AngleSegmentSchema)
 			.min(1, "At least one angle is required.")
-			.describe("An array of angle segments, each explicitly defining which rays it spans. Supports multiple layers: primary angles (adjacent rays) create filled sectors, secondary angles (spanning multiple rays) create arc overlays. Multiple secondary angles are automatically stacked at increasing radii."),
+			.describe(
+				"An array of angle segments, each explicitly defining which rays it spans. Supports multiple layers: primary angles (adjacent rays) create filled sectors, secondary angles (spanning multiple rays) create arc overlays. Multiple secondary angles are automatically stacked at increasing radii."
+			)
 	})
 	.strict()
 	.describe(
@@ -75,44 +79,26 @@ export const generateRadiallyConstrainedAngleDiagram: WidgetGenerator<
 	for (const angle of angles) {
 		const fromIndex = labelToIndexMap.get(angle.fromRayLabel)
 		const toIndex = labelToIndexMap.get(angle.toRayLabel)
-
-		if (fromIndex === undefined) {
-			logger.error("invalid fromRayLabel in angle", { 
-				fromRayLabel: angle.fromRayLabel, 
-				availableLabels: rayLabels 
-			})
-			throw errors.new(`fromRayLabel '${angle.fromRayLabel}' not found in rayLabels`)
+		if (fromIndex === undefined || toIndex === undefined) {
+			logger.error("unrecognized ray label in angle", { angle })
+			throw errors.new("unrecognized ray label")
 		}
-		if (toIndex === undefined) {
-			logger.error("invalid toRayLabel in angle", { 
-				toRayLabel: angle.toRayLabel, 
-				availableLabels: rayLabels 
-			})
-			throw errors.new(`toRayLabel '${angle.toRayLabel}' not found in rayLabels`)
-		}
-		if (fromIndex >= toIndex) {
-			logger.error("invalid angle span", { 
-				fromRayLabel: angle.fromRayLabel, 
-				toRayLabel: angle.toRayLabel,
-				fromIndex,
-				toIndex
-			})
-			throw errors.new(`fromRayLabel '${angle.fromRayLabel}' must appear before toRayLabel '${angle.toRayLabel}' in rayLabels array`)
-		}
-	}
-
-	// 2. Validate total angle constraint (PRIMARY angles only)
-	// Primary = strictly forward adjacent pairs (i -> i+1). No wrap-around.
-	// Secondary angles are visual helpers and must NOT be included in the total
-	// because they span multiple primary angles.
-	const tmpPrimaryCheck: typeof angles = []
-	for (const angle of angles) {
-		const fromIndex = labelToIndexMap.get(angle.fromRayLabel)!
-		const toIndex = labelToIndexMap.get(angle.toRayLabel)!
 		const isForwardAdjacent = toIndex === fromIndex + 1
-		if (isForwardAdjacent) tmpPrimaryCheck.push(angle)
+		// Collect primary angles for total check
+		if (isForwardAdjacent) {
+			// tmpPrimaryCheck declared below for clarity
+		}
 	}
-	const totalPrimaryAngle = tmpPrimaryCheck.reduce((sum, a) => sum + a.value, 0)
+	// Recompute primary list explicitly to avoid forward references
+	const primaryForTotal: typeof angles = []
+	for (const angle of angles) {
+		const fromIndex = labelToIndexMap.get(angle.fromRayLabel)
+		const toIndex = labelToIndexMap.get(angle.toRayLabel)
+		if (fromIndex !== undefined && toIndex !== undefined && toIndex === fromIndex + 1) {
+			primaryForTotal.push(angle)
+		}
+	}
+	const totalPrimaryAngle = primaryForTotal.reduce((sum: number, a: { value: number }) => sum + a.value, 0)
 	if (totalPrimaryAngle <= 0 || totalPrimaryAngle >= 360) {
 		logger.error("invalid total primary angle", { totalPrimaryAngle })
 		throw errors.new("sum of primary angles must be less than 360 degrees")
@@ -122,7 +108,7 @@ export const generateRadiallyConstrainedAngleDiagram: WidgetGenerator<
 	const canvas = new CanvasImpl({
 		chartArea: { left: 0, top: 0, width, height },
 		fontPxDefault: 16,
-		lineHeightDefault: 1.2,
+		lineHeightDefault: 1.2
 	})
 
 	const cx = width / 2
@@ -135,8 +121,12 @@ export const generateRadiallyConstrainedAngleDiagram: WidgetGenerator<
 	// Build a lookup for primary angles between consecutive rays
 	const primaryBetween: Record<string, number> = {}
 	for (const angle of angles) {
-		const fromIndex = labelToIndexMap.get(angle.fromRayLabel)!
-		const toIndex = labelToIndexMap.get(angle.toRayLabel)!
+		const fromIndex = labelToIndexMap.get(angle.fromRayLabel)
+		const toIndex = labelToIndexMap.get(angle.toRayLabel)
+		if (fromIndex === undefined || toIndex === undefined) {
+			logger.error("unrecognized ray label in angle", { angle })
+			throw errors.new("unrecognized ray label")
+		}
 		const rayDiff = Math.abs(toIndex - fromIndex)
 		const isAdjacent = rayDiff === 1 || rayDiff === rayLabels.length - 1
 		if (!isAdjacent) continue
@@ -164,8 +154,12 @@ export const generateRadiallyConstrainedAngleDiagram: WidgetGenerator<
 
 	// 3. Validate that each secondary angle equals the sum of intervening primary angles
 	for (const angle of angles) {
-		const fromIndex = labelToIndexMap.get(angle.fromRayLabel)!
-		const toIndex = labelToIndexMap.get(angle.toRayLabel)!
+		const fromIndex = labelToIndexMap.get(angle.fromRayLabel)
+		const toIndex = labelToIndexMap.get(angle.toRayLabel)
+		if (fromIndex === undefined || toIndex === undefined) {
+			logger.error("unrecognized ray label in angle", { angle })
+			throw errors.new("unrecognized ray label")
+		}
 		const isForwardAdjacent = toIndex === fromIndex + 1
 		if (isForwardAdjacent) continue
 
@@ -186,7 +180,7 @@ export const generateRadiallyConstrainedAngleDiagram: WidgetGenerator<
 				fromRayLabel: angle.fromRayLabel,
 				toRayLabel: angle.toRayLabel,
 				expected,
-				actual: angle.value,
+				actual: angle.value
 			})
 			throw errors.new(`angle from '${angle.fromRayLabel}' to '${angle.toRayLabel}' must equal sum of primary angles`)
 		}
@@ -210,7 +204,7 @@ export const generateRadiallyConstrainedAngleDiagram: WidgetGenerator<
 			angleRad,
 			angleDeg,
 			x: cx + pointOnRayDist * Math.cos(angleRad),
-			y: cy + pointOnRayDist * Math.sin(angleRad),
+			y: cy + pointOnRayDist * Math.sin(angleRad)
 		}
 	})
 
@@ -219,12 +213,16 @@ export const generateRadiallyConstrainedAngleDiagram: WidgetGenerator<
 	const secondaryAngles: typeof angles = []
 
 	for (const angle of angles) {
-		const fromRay = rayPositions.find(r => r.label === angle.fromRayLabel)!
-		const toRay = rayPositions.find(r => r.label === angle.toRayLabel)!
-		
+		const fromRay = rayPositions.find((r) => r.label === angle.fromRayLabel)
+		const toRay = rayPositions.find((r) => r.label === angle.toRayLabel)
+		if (!fromRay || !toRay) {
+			logger.error("ray position not found for primary angle", { angle })
+			throw errors.new("ray position not found")
+		}
+
 		// Primary angle: strictly forward adjacent (i -> i+1). No wrap-around.
 		const isForwardAdjacent = toRay.index === fromRay.index + 1
-		
+
 		if (isForwardAdjacent) {
 			primaryAngles.push(angle)
 		} else {
@@ -238,21 +236,24 @@ export const generateRadiallyConstrainedAngleDiagram: WidgetGenerator<
 	const pendingPrimaryLabels: Array<{ x: number; y: number; text: string }> = []
 
 	for (const angle of primaryAngles) {
-		const fromRay = rayPositions.find(r => r.label === angle.fromRayLabel)!
-		const toRay = rayPositions.find(r => r.label === angle.toRayLabel)!
-		
+		const fromRay = rayPositions.find((r) => r.label === angle.fromRayLabel)
+		const toRay = rayPositions.find((r) => r.label === angle.toRayLabel)
+		if (!fromRay || !toRay) {
+			logger.error("ray position not found for primary angle", { angle })
+			throw errors.new("ray position not found")
+		}
 		const fromRad = fromRay.angleRad
 		const toRad = toRay.angleRad
-		
+
 		// Calculate angle span (always go clockwise from fromRay to toRay)
 		let angleDiff = toRad - fromRad
 		if (angleDiff <= 0) {
 			angleDiff += 2 * Math.PI
 		}
-		
+
 		const startPoint = { x: cx + primaryArcRadius * Math.cos(fromRad), y: cy + primaryArcRadius * Math.sin(fromRad) }
 		const endPoint = { x: cx + primaryArcRadius * Math.cos(toRad), y: cy + primaryArcRadius * Math.sin(toRad) }
-		
+
 		const largeArcFlag = angleDiff > Math.PI ? 1 : 0
 		const path = new Path2D()
 			.moveTo(cx, cy)
@@ -260,7 +261,7 @@ export const generateRadiallyConstrainedAngleDiagram: WidgetGenerator<
 			.arcTo(primaryArcRadius, primaryArcRadius, 0, largeArcFlag, 1, endPoint.x, endPoint.y)
 			.closePath()
 		canvas.drawPath(path, { fill: angle.color, stroke: "none" })
-		
+
 		// Defer label drawing until after rays so labels sit above
 		const midAngleRad = fromRad + angleDiff / 2
 		const labelX = cx + primaryLabelRadius * Math.cos(midAngleRad)
@@ -278,37 +279,36 @@ export const generateRadiallyConstrainedAngleDiagram: WidgetGenerator<
 	const radiusStep = 44
 	const pendingSecondaryLabels: Array<{ x: number; y: number; text: string; midAngleRad: number }> = []
 
-	secondaryAngles.forEach((angle, i) => {
-		const fromRay = rayPositions.find(r => r.label === angle.fromRayLabel)!
-		const toRay = rayPositions.find(r => r.label === angle.toRayLabel)!
-		
+	let i = 0
+	for (const angle of secondaryAngles) {
+		const fromRay = rayPositions.find((r) => r.label === angle.fromRayLabel)
+		const toRay = rayPositions.find((r) => r.label === angle.toRayLabel)
+		if (!fromRay || !toRay) {
+			logger.error("ray position not found for secondary angle", { angle })
+			throw errors.new("ray position not found")
+		}
 		const fromRad = fromRay.angleRad
 		const toRad = toRay.angleRad
-		
 		// Calculate angle span (always go clockwise from fromRay to toRay)
 		let angleDiff = toRad - fromRad
 		if (angleDiff <= 0) {
 			angleDiff += 2 * Math.PI
 		}
-		
 		let secondaryRadius = baseSecondaryRadius + i * radiusStep
 		if (secondaryRadius > innerArcMaxRadius) {
 			secondaryRadius = innerArcMaxRadius
 		}
 		const startPoint = { x: cx + secondaryRadius * Math.cos(fromRad), y: cy + secondaryRadius * Math.sin(fromRad) }
 		const endPoint = { x: cx + secondaryRadius * Math.cos(toRad), y: cy + secondaryRadius * Math.sin(toRad) }
-		
 		const largeArcFlag = angleDiff > Math.PI ? 1 : 0
 		const arcPath = new Path2D()
 			.moveTo(startPoint.x, startPoint.y)
 			.arcTo(secondaryRadius, secondaryRadius, 0, largeArcFlag, 1, endPoint.x, endPoint.y)
-		
-		canvas.drawPath(arcPath, { 
-			stroke: angle.color, 
-			strokeWidth: theme.stroke.width.thick, 
-			fill: "none" 
+		canvas.drawPath(arcPath, {
+			stroke: angle.color,
+			strokeWidth: theme.stroke.width.thick,
+			fill: "none"
 		})
-		
 		// Defer label drawing until after rays
 		const midAngleRad = fromRad + angleDiff / 2
 		// Give stacked secondary labels progressively more headroom
@@ -319,29 +319,35 @@ export const generateRadiallyConstrainedAngleDiagram: WidgetGenerator<
 		const labelX = cx + labelRadius * Math.cos(midAngleRad)
 		const labelY = cy + labelRadius * Math.sin(midAngleRad)
 		pendingSecondaryLabels.push({ x: labelX, y: labelY, text: `${angle.value}°`, midAngleRad })
-	})
+		i++
+	}
 
 	// Draw rays and ray labels ON TOP of sectors/arcs
 	const screenSegments: Array<{ a: { x: number; y: number }; b: { x: number; y: number } }> = []
 	for (const ray of rayPositions) {
 		// Draw ray line
-		canvas.drawLine(cx, cy, ray.x, ray.y, { 
-			stroke: theme.colors.black, 
-			strokeWidth: theme.stroke.width.thick 
+		canvas.drawLine(cx, cy, ray.x, ray.y, {
+			stroke: theme.colors.black,
+			strokeWidth: theme.stroke.width.thick
 		})
 		screenSegments.push({ a: { x: cx, y: cy }, b: { x: ray.x, y: ray.y } })
-		
+
 		// Draw point at end of ray
 		canvas.drawCircle(ray.x, ray.y, 4, { fill: theme.colors.black })
-		
+
 		// Draw ray label
 		const labelDistFromPoint = 22
 		const rayLabelX = cx + (pointOnRayDist + labelDistFromPoint) * Math.cos(ray.angleRad)
 		const rayLabelY = cy + (pointOnRayDist + labelDistFromPoint) * Math.sin(ray.angleRad)
 		canvas.drawText({
-			x: rayLabelX, y: rayLabelY, text: ray.label,
-			fill: theme.colors.black, anchor: "middle", dominantBaseline: "middle",
-			fontPx: 20, fontWeight: theme.font.weight.bold,
+			x: rayLabelX,
+			y: rayLabelY,
+			text: ray.label,
+			fill: theme.colors.black,
+			anchor: "middle",
+			dominantBaseline: "middle",
+			fontPx: 20,
+			fontWeight: theme.font.weight.bold
 		})
 	}
 
@@ -393,7 +399,13 @@ export const generateRadiallyConstrainedAngleDiagram: WidgetGenerator<
 		)
 	}
 
-	function rectIntersectsAnySegment(rect: { x: number; y: number; width: number; height: number; pad?: number }): boolean {
+	function rectIntersectsAnySegment(rect: {
+		x: number
+		y: number
+		width: number
+		height: number
+		pad?: number
+	}): boolean {
 		for (const seg of screenSegments) {
 			if (segmentIntersectsRect(seg.a, seg.b, rect)) return true
 		}
@@ -402,13 +414,18 @@ export const generateRadiallyConstrainedAngleDiagram: WidgetGenerator<
 
 	// Finally, draw angle labels ON TOP of rays
 	// Primary labels: draw as-is
-	pendingPrimaryLabels.forEach(lbl => {
+	for (const lbl of pendingPrimaryLabels) {
 		canvas.drawText({
-			x: lbl.x, y: lbl.y, text: lbl.text,
-			fill: theme.colors.black, anchor: "middle", dominantBaseline: "middle",
-			fontPx: 18, fontWeight: theme.font.weight.bold,
+			x: lbl.x,
+			y: lbl.y,
+			text: lbl.text,
+			fill: theme.colors.black,
+			anchor: "middle",
+			dominantBaseline: "middle",
+			fontPx: 18,
+			fontWeight: theme.font.weight.bold
 		})
-	})
+	}
 
 	// Secondary labels: rotate tangentially along the arc to avoid ray piercing,
 	// keeping labels close to their arcs instead of pushing them radially outward
@@ -431,10 +448,7 @@ export const generateRadiallyConstrainedAngleDiagram: WidgetGenerator<
 			let it = 0
 			const maxIt = 80
 			const step = 3
-			while (
-				rectIntersectsAnySegment({ x: px - halfW, y: py - halfH, width: w, height: h, pad: 1 }) &&
-				it < maxIt
-			) {
+			while (rectIntersectsAnySegment({ x: px - halfW, y: py - halfH, width: w, height: h, pad: 1 }) && it < maxIt) {
 				px += mult * step * tanX
 				py += mult * step * tanY
 				it++
@@ -447,9 +461,14 @@ export const generateRadiallyConstrainedAngleDiagram: WidgetGenerator<
 		const chosen = ccw.it < cw.it ? ccw : cw
 
 		canvas.drawText({
-			x: chosen.x, y: chosen.y, text: lbl.text,
-			fill: theme.colors.black, anchor: "middle", dominantBaseline: "middle",
-			fontPx, fontWeight: theme.font.weight.bold,
+			x: chosen.x,
+			y: chosen.y,
+			text: lbl.text,
+			fill: theme.colors.black,
+			anchor: "middle",
+			dominantBaseline: "middle",
+			fontPx,
+			fontWeight: theme.font.weight.bold
 		})
 	}
 
@@ -461,8 +480,14 @@ export const generateRadiallyConstrainedAngleDiagram: WidgetGenerator<
 		const labelX = cx
 		const labelY = cy + labelDistance
 		canvas.drawText({
-			x: labelX, y: labelY, text: centerLabel, fill: theme.colors.black,
-			fontPx: 20, fontWeight: theme.font.weight.bold, anchor: "middle", dominantBaseline: "middle"
+			x: labelX,
+			y: labelY,
+			text: centerLabel,
+			fill: theme.colors.black,
+			fontPx: 20,
+			fontWeight: theme.font.weight.bold,
+			anchor: "middle",
+			dominantBaseline: "middle"
 		})
 	}
 

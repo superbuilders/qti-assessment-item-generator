@@ -32,5 +32,3 @@ export const customPolygonDiagramExamples: CustomPolygonDiagramProps[] = [
 		strokeColor: "#1F6FB2"
 	}
 ]
-
-

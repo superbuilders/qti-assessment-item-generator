@@ -1,5 +1,5 @@
-import type { LineDiagramPropsSchema } from "../src/widgets/generators/line-diagram"
 import type { z } from "zod"
+import type { LineDiagramPropsSchema } from "../src/widgets/generators/line-diagram"
 
 type LineDiagramProps = z.infer<typeof LineDiagramPropsSchema>
 
@@ -56,9 +56,7 @@ export const lineDiagramExamples: LineDiagramProps[] = [
 				color: "#2E7D32"
 			}
 		],
-		perpendicularIndicators: [
-			{ line1Id: "line_m", line2Id: "line_n", size: 8, color: "#2E7D32" }
-		]
+		perpendicularIndicators: [{ line1Id: "line_m", line2Id: "line_n", size: 8, color: "#2E7D32" }]
 	},
 	{
 		type: "lineDiagram",
@@ -217,9 +215,7 @@ export const lineDiagramExamples: LineDiagramProps[] = [
 				color: "#A0C8E0"
 			}
 		],
-		perpendicularIndicators: [
-			{ line1Id: "line_s", line2Id: "line_r", size: 12, color: "#FDB813" }
-		]
+		perpendicularIndicators: [{ line1Id: "line_s", line2Id: "line_r", size: 12, color: "#FDB813" }]
 	},
 	{
 		type: "lineDiagram",
@@ -291,9 +287,7 @@ export const lineDiagramExamples: LineDiagramProps[] = [
 				color: "#4285F4"
 			}
 		],
-		perpendicularIndicators: [
-			{ line1Id: "line_h", line2Id: "line_v", size: 15, color: "#FDB813" }
-		]
+		perpendicularIndicators: [{ line1Id: "line_h", line2Id: "line_v", size: 15, color: "#FDB813" }]
 	},
 	{
 		type: "lineDiagram",
@@ -428,8 +422,6 @@ export const lineDiagramExamples: LineDiagramProps[] = [
 				color: "#4285F4"
 			}
 		],
-		perpendicularIndicators: [
-			{ line1Id: "line_h", line2Id: "line_v", size: 15, color: "#FDB813" }
-		]
+		perpendicularIndicators: [{ line1Id: "line_h", line2Id: "line_v", size: 15, color: "#FDB813" }]
 	}
 ]

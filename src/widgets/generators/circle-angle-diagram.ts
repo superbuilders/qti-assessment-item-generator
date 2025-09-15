@@ -1,10 +1,10 @@
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
-import { Path2D } from "../../utils/path-builder"
-import { theme } from "../../utils/theme"
 import { CSS_COLOR_PATTERN } from "../../utils/css-color"
+import { Path2D } from "../../utils/path-builder"
 import { estimateWrappedTextDimensions } from "../../utils/text"
+import { theme } from "../../utils/theme"
 import type { WidgetGenerator } from "../types"
 
 /**
@@ -31,8 +31,12 @@ export const CircleAngleDiagramPropsSchema = z
 		labels: z
 			.object({
 				center: z.string().describe("The label for the center point of the circle (e.g., 'O')."),
-				point1: z.string().describe("The label for the point on the circumference where the first ray ends (e.g., 'A')."),
-				point2: z.string().describe("The label for the point on the circumference where the second ray ends (e.g., 'B').")
+				point1: z
+					.string()
+					.describe("The label for the point on the circumference where the first ray ends (e.g., 'A')."),
+				point2: z
+					.string()
+					.describe("The label for the point on the circumference where the second ray ends (e.g., 'B').")
 			})
 			.strict()
 			.describe("Labels for the three points defining the angle."),
@@ -162,7 +166,13 @@ export const generateCircleAngleDiagram: WidgetGenerator<typeof CircleAngleDiagr
 		)
 	}
 
-	function rectIntersectsAnySegment(rect: { x: number; y: number; width: number; height: number; pad?: number }): boolean {
+	function rectIntersectsAnySegment(rect: {
+		x: number
+		y: number
+		width: number
+		height: number
+		pad?: number
+	}): boolean {
 		for (const seg of screenSegments) {
 			if (segmentIntersectsRect(seg.a, seg.b, rect)) return true
 		}
@@ -203,7 +213,10 @@ export const generateCircleAngleDiagram: WidgetGenerator<typeof CircleAngleDiagr
 			(3 * Math.PI) / 4,
 			(-3 * Math.PI) / 4
 		]
-		let chosen = { x: cx + labelOffset * Math.cos(candidateAngles[0]), y: cy + labelOffset * Math.sin(candidateAngles[0]) }
+		let chosen = {
+			x: cx + labelOffset * Math.cos(candidateAngles[0]),
+			y: cy + labelOffset * Math.sin(candidateAngles[0])
+		}
 		for (const ang of candidateAngles) {
 			const tx = cx + labelOffset * Math.cos(ang)
 			const ty = cy + labelOffset * Math.sin(ang)

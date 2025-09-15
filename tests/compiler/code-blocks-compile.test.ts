@@ -31,5 +31,3 @@ describe("Compiler: code blocks", () => {
 		expect(xml).toMatchSnapshot()
 	})
 })
-
-

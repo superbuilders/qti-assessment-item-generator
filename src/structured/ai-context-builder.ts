@@ -103,7 +103,8 @@ export function buildHtmlEnvelope(html: string, screenshotUrl?: string): AiConte
 
 	const unique = new Set<string>()
 	let tagMatch: RegExpExecArray | null
-	while ((tagMatch = imgTagRegex.exec(html)) !== null) {
+	tagMatch = imgTagRegex.exec(html)
+	while (tagMatch !== null) {
 		const tag = tagMatch[0]
 		const srcMatch = srcAttrRegex.exec(tag)
 		if (!srcMatch) {
@@ -122,6 +123,7 @@ export function buildHtmlEnvelope(html: string, screenshotUrl?: string): AiConte
 			throw errors.new("unsupported image url scheme")
 		}
 		unique.add(url.toString())
+		tagMatch = imgTagRegex.exec(html)
 	}
 
 	for (const u of unique) imageUrls.push(u)

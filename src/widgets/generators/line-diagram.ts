@@ -1,13 +1,13 @@
-import { z } from "zod"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
+import { z } from "zod"
 
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
 import { CSS_COLOR_PATTERN } from "../../utils/css-color"
-import { theme } from "../../utils/theme"
-import { estimateWrappedTextDimensions } from "../../utils/text"
 import { Path2D } from "../../utils/path-builder"
+import { estimateWrappedTextDimensions } from "../../utils/text"
+import { theme } from "../../utils/theme"
 import type { WidgetGenerator } from "../types"
 
 const ErrInvalidBounds = errors.new("gridBounds min must be less than max")
@@ -19,21 +19,24 @@ const lineIdRegex = /^line_[A-Za-z0-9_]+$/
 // Schema for a line in the diagram
 const LineSchema = z
 	.object({
-		id: z.string().regex(lineIdRegex).describe("A unique identifier for this line, must be prefixed with 'line_', e.g., 'line_r', 'line_q'."),
-		from: z.object({ x: z.number(), y: z.number() }).strict().describe("A point on the line in logical grid coordinates."),
-		to: z.object({ x: z.number(), y: z.number() }).strict().describe("Another point on the line in logical grid coordinates."),
-		style: z.enum(["solid", "dotted"]).describe("The style of the line. 'dotted' renders as dashed."),
-		label: z
+		id: z
 			.string()
-			.nullable()
-			.describe("Optional text label for the line, e.g., 'r', 's', 'm'."),
+			.regex(lineIdRegex)
+			.describe("A unique identifier for this line, must be prefixed with 'line_', e.g., 'line_r', 'line_q'."),
+		from: z
+			.object({ x: z.number(), y: z.number() })
+			.strict()
+			.describe("A point on the line in logical grid coordinates."),
+		to: z
+			.object({ x: z.number(), y: z.number() })
+			.strict()
+			.describe("Another point on the line in logical grid coordinates."),
+		style: z.enum(["solid", "dotted"]).describe("The style of the line. 'dotted' renders as dashed."),
+		label: z.string().nullable().describe("Optional text label for the line, e.g., 'r', 's', 'm'."),
 		labelPosition: z
 			.enum(["start", "middle", "end"])
 			.describe("Relative position of the label along the visible part of the line."),
-		color: z
-			.string()
-			.regex(CSS_COLOR_PATTERN, "invalid css color")
-			.describe("Color of the line and its label.")
+		color: z.string().regex(CSS_COLOR_PATTERN, "invalid css color").describe("Color of the line and its label.")
 	})
 	.strict()
 
@@ -42,14 +45,8 @@ const PerpendicularIndicatorSchema = z
 	.object({
 		line1Id: z.string().regex(lineIdRegex).describe("The ID of the first line forming the right angle."),
 		line2Id: z.string().regex(lineIdRegex).describe("The ID of the second line forming the right angle."),
-		size: z
-			.number()
-			.positive()
-			.describe("The size of the square indicator in pixels."),
-		color: z
-			.string()
-			.regex(CSS_COLOR_PATTERN, "invalid css color")
-			.describe("Color of the indicator square.")
+		size: z.number().positive().describe("The size of the square indicator in pixels."),
+		color: z.string().regex(CSS_COLOR_PATTERN, "invalid css color").describe("Color of the indicator square.")
 	})
 	.strict()
 
@@ -145,7 +142,7 @@ export const generateLineDiagram: WidgetGenerator<typeof LineDiagramPropsSchema>
 
 	if (gridBounds.minX >= gridBounds.maxX || gridBounds.minY >= gridBounds.maxY) {
 		logger.error("invalid grid bounds for line diagram", { gridBounds })
-		throw errors.wrap(ErrInvalidBounds, `min must be less than max for grid bounds`)
+		throw errors.wrap(ErrInvalidBounds, "min must be less than max for grid bounds")
 	}
 
 	const canvas = new CanvasImpl({
@@ -224,12 +221,7 @@ export const generateLineDiagram: WidgetGenerator<typeof LineDiagramPropsSchema>
 		const p2 = { x: p1.x + n2.x * markerSize, y: p1.y + n2.y * markerSize }
 		const p3 = { x: p0.x + n2.x * markerSize, y: p0.y + n2.y * markerSize }
 
-		const path = new Path2D()
-			.moveTo(p0.x, p0.y)
-			.lineTo(p1.x, p1.y)
-			.lineTo(p2.x, p2.y)
-			.lineTo(p3.x, p3.y)
-			.closePath()
+		const path = new Path2D().moveTo(p0.x, p0.y).lineTo(p1.x, p1.y).lineTo(p2.x, p2.y).lineTo(p3.x, p3.y).closePath()
 		canvas.drawPath(path, { fill: "none", stroke: indicator.color, strokeWidth: theme.stroke.width.thick })
 	}
 	// Keep a list of screen-space segments for collision checks when placing labels
@@ -289,13 +281,19 @@ export const generateLineDiagram: WidgetGenerator<typeof LineDiagramPropsSchema>
 			const halfW = dims.maxWidth / 2
 			const halfH = dims.height / 2
 
-			function rectIntersectsAnySegmentOrText(rect: { x: number; y: number; width: number; height: number; pad?: number }): boolean {
+			function rectIntersectsAnySegmentOrText(rect: {
+				x: number
+				y: number
+				width: number
+				height: number
+				pad?: number
+			}): boolean {
 				const pad = rect.pad ?? 0
 				const rx = rect.x - pad
 				const ry = rect.y - pad
 				const rw = rect.width + 2 * pad
 				const rh = rect.height + 2 * pad
-				
+
 				// Check for text-to-text collisions first
 				for (const placedLabel of placedLabels) {
 					const labelPad = placedLabel.padding
@@ -303,13 +301,13 @@ export const generateLineDiagram: WidgetGenerator<typeof LineDiagramPropsSchema>
 					const ly = placedLabel.y - labelPad
 					const lw = placedLabel.width + 2 * labelPad
 					const lh = placedLabel.height + 2 * labelPad
-					
+
 					// Check if rectangles overlap (AABB collision)
 					if (rx < lx + lw && rx + rw > lx && ry < ly + lh && ry + rh > ly) {
 						return true
 					}
 				}
-				
+
 				// Check for text-to-line collisions
 				const r1 = { x: rx, y: ry }
 				const r2 = { x: rx + rw, y: ry }
@@ -353,7 +351,13 @@ export const generateLineDiagram: WidgetGenerator<typeof LineDiagramPropsSchema>
 				const maxIt = 80
 				const step = 3
 				while (
-					rectIntersectsAnySegmentOrText({ x: px - halfW, y: py - halfH, width: dims.maxWidth, height: dims.height, pad: 5 }) &&
+					rectIntersectsAnySegmentOrText({
+						x: px - halfW,
+						y: py - halfH,
+						width: dims.maxWidth,
+						height: dims.height,
+						pad: 5
+					}) &&
 					it < maxIt
 				) {
 					px += mult * step * tx

@@ -1,8 +1,11 @@
 import {
 	AdditionWithRegroupingPropsSchema,
+	AngleTypeDiagramPropsSchema,
 	AreaModelMultiplicationPropsSchema,
 	BarChartPropsSchema,
 	BoxGridPropsSchema,
+	ClockDiagramPropsSchema,
+	CustomPolygonDiagramPropsSchema,
 	DataTablePropsSchema,
 	DivisionAreaDiagramPropsSchema,
 	DivisionModelDiagramPropsSchema,
@@ -10,28 +13,24 @@ import {
 	FactorizationDiagramPropsSchema,
 	FractionFrequencyPlotPropsSchema,
 	FractionModelDiagramPropsSchema,
-	FractionSumDiagramPropsSchema,
 	FractionMultiplicationModelPropsSchema,
 	FractionNumberLinePropsSchema,
+	FractionSumDiagramPropsSchema,
+	GeometricPrimitiveDiagramPropsSchema,
+	LabeledRectangleDiagramPropsSchema,
 	NPolygonPropsSchema,
 	NumberLinePropsSchema,
 	NumberLineWithActionPropsSchema,
 	PatternDiagramPropsSchema,
 	ProtractorAngleDiagramPropsSchema,
-	AngleTypeDiagramPropsSchema,
-	ClockDiagramPropsSchema,
-	GeometricPrimitiveDiagramPropsSchema,
 	QuantityFractionalDiagramPropsSchema,
 	SimpleArrowPropsSchema,
 	SubtractionWithRegroupingPropsSchema,
 	TapeDiagramPropsSchema,
 	TransformationDiagramPropsSchema,
-	WheelDiagramPropsSchema,
 	VectorDiagramPropsSchema,
 	VerticalArithmeticSetupPropsSchema,
-	LabeledRectangleDiagramPropsSchema
-,
-	CustomPolygonDiagramPropsSchema
+	WheelDiagramPropsSchema
 } from "../registry"
 
 export const fourthGradeMathCollection = {

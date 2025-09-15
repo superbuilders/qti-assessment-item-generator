@@ -250,7 +250,7 @@ CRITICAL: Never embed images or SVGs directly. The body must contain ONLY text, 
       { "type": "blockSlot", "slotId": "image_1" },
       { "type": "paragraph", "content": [{ "type": "text", "content": "Which claim is best supported by the passage above?" }] },
       { "type": "blockSlot", "slotId": "choice_interaction" },
-      { "type": "paragraph", "content": [{ "type": "text", "content": "\"Muscle Tissue Skeletal Muscle Fibers\" by Berkshire Community College Bioscience Image Library, CC0 1.0." }] }
+      { "type": "paragraph", "content": [{ "type": "text", "content": ""Muscle Tissue Skeletal Muscle Fibers" by Berkshire Community College Bioscience Image Library, CC0 1.0." }] }
     ]
   }
   \`\`\`
@@ -286,7 +286,7 @@ CRITICAL: Never embed images or SVGs directly. The body must contain ONLY text, 
     "body": [
       { "type": "paragraph", "content": [{ "type": "text", "content": "Examine the image and answer the question below." }] },
       { "type": "blockSlot", "slotId": "image_1" },
-      { "type": "paragraph", "content": [{ "type": "text", "content": "Cartoon showing Columbia stirring a bowl labeled \"Citizenship\" with a spoon labeled \"Equal Rights.\" Figures representing many nations are in the bowl; a caricature of an Irishman jumps up, yelling and waving a knife and a green flag." }] },
+      { "type": "paragraph", "content": [{ "type": "text", "content": "Cartoon showing Columbia stirring a bowl labeled "Citizenship" with a spoon labeled "Equal Rights." Figures representing many nations are in the bowl; a caricature of an Irishman jumps up, yelling and waving a knife and a green flag." }] },
       { "type": "paragraph", "content": [{ "type": "text", "content": "Which change most directly contributed to the development depicted?" }] },
       { "type": "blockSlot", "slotId": "choice_interaction" }
     ]
@@ -329,7 +329,7 @@ CRITICAL: Never embed images or SVGs directly. The body must contain ONLY text, 
         { "type": "inlineSlot", "slotId": "dropdown_1" },
         { "type": "text", "content": "." }
       ]},
-      { "type": "paragraph", "content": [{ "type": "text", "content": "Diagram credit: \"Latitude of the Earth\" by Djexplo, CC0 1.0." }] }
+      { "type": "paragraph", "content": [{ "type": "text", "content": "Diagram credit: "Latitude of the Earth" by Djexplo, CC0 1.0." }] }
     ]
   }
   \`\`\`
@@ -518,8 +518,8 @@ If found, REWRITE by splitting the text and inserting \`{ "type": "math", "mathm
   ]
 
 **Pattern checklist you MUST handle:**
-- Dollar before number: /\$(?=\s*\d)/
-- Number before percent: /\d\s*%/
+- Dollar before number: /$(?=s*d)/
+- Number before percent: /ds*%/
 - Any \`<span class="currency">\` usage (BANNED)
 - Currency/percent inside parentheses
 - Ranges with hyphen/en dash
@@ -2411,7 +2411,7 @@ Widgets MUST NEVER display, label, or visually indicate the correct answer. This
     { "type": "paragraph", "content": [{ "type": "text", "content": "- If the two lines are the same, they share all of their points (infinitely many). This corresponds to ending up with an equation of the form " }, { "type": "math", "mathml": "<mi>a</mi><mo>=</mo><mi>a</mi>" }, { "type": "text", "content": "." }] },
     { "type": "paragraph", "content": [{ "type": "text", "content": "- If the two lines are different and parallel, they share no points. This corresponds to ending up with a false equation of the form " }, { "type": "math", "mathml": "<mi>a</mi><mo>=</mo><mi>b</mi>" }, { "type": "text", "content": ", where " }, { "type": "math", "mathml": "<mi>a</mi>" }, { "type": "text", "content": " and " }, { "type": "math", "mathml": "<mi>b</mi>" }, { "type": "text", "content": " are different numbers." }] },
     { "type": "paragraph", "content": [{ "type": "text", "content": "Simplifying the equation" }] },
-    { "type": "paragraph", "content": [{ "type": "math", "mathml": "<mrow><mtable columnalign=\"left left\"><mtr><mtd><mn>3</mn><mrow><mo>(</mo><mi>x</mi><mo>+</mo><mn>5</mn><mo>)</mo></mrow><mo>=</mo><mo>-</mo><mn>4</mn><mi>x</mi><mo>+</mo><mn>8</mn></mtd><mtd></mtd></mtr><mtr><mtd><mn>3</mn><mi>x</mi><mo>+</mo><mn>15</mn><mo>=</mo><mo>-</mo><mn>4</mn><mi>x</mi><mo>+</mo><mn>8</mn></mtd><mtd><mrow><mo>(</mo><mtext>Distribute</mtext><mo>)</mo></mrow></mtd></mtr><mtr><mtd><mn>7</mn><mi>x</mi><mo>+</mo><mn>15</mn><mo>=</mo><mn>8</mn></mtd><mtd><mrow><mo>(</mo><mtext>Add </mtext><mn>4</mn><mi>x</mi><mtext> to both sides</mtext><mo>)</mo></mrow></mtd></mtr><mtr><mtd><mn>7</mn><mi>x</mi><mo>=</mo><mo>-</mo><mn>7</mn></mtd><mtd><mrow><mo>(</mo><mtext>Subtract </mtext><mn>15</mn><mtext> from both sides</mtext><mo>)</mo></mrow></mtd></mtr><mtr><mtd><mi>x</mi><mo>=</mo><mo>-</mo><mn>1</mn></mtd><mtd><mrow><mo>(</mo><mtext>Divide both sides by </mtext><mn>7</mn><mo>)</mo></mrow></mtd></mtr></mtable></mrow>" }] },
+    { "type": "paragraph", "content": [{ "type": "math", "mathml": "<mrow><mtable columnalign="left left"><mtr><mtd><mn>3</mn><mrow><mo>(</mo><mi>x</mi><mo>+</mo><mn>5</mn><mo>)</mo></mrow><mo>=</mo><mo>-</mo><mn>4</mn><mi>x</mi><mo>+</mo><mn>8</mn></mtd><mtd></mtd></mtr><mtr><mtd><mn>3</mn><mi>x</mi><mo>+</mo><mn>15</mn><mo>=</mo><mo>-</mo><mn>4</mn><mi>x</mi><mo>+</mo><mn>8</mn></mtd><mtd><mrow><mo>(</mo><mtext>Distribute</mtext><mo>)</mo></mrow></mtd></mtr><mtr><mtd><mn>7</mn><mi>x</mi><mo>+</mo><mn>15</mn><mo>=</mo><mn>8</mn></mtd><mtd><mrow><mo>(</mo><mtext>Add </mtext><mn>4</mn><mi>x</mi><mtext> to both sides</mtext><mo>)</mo></mrow></mtd></mtr><mtr><mtd><mn>7</mn><mi>x</mi><mo>=</mo><mo>-</mo><mn>7</mn></mtd><mtd><mrow><mo>(</mo><mtext>Subtract </mtext><mn>15</mn><mtext> from both sides</mtext><mo>)</mo></mrow></mtd></mtr><mtr><mtd><mi>x</mi><mo>=</mo><mo>-</mo><mn>1</mn></mtd><mtd><mrow><mo>(</mo><mtext>Divide both sides by </mtext><mn>7</mn><mo>)</mo></mrow></mtd></mtr></mtable></mrow>" }] },
     { "type": "paragraph", "content": [{ "type": "text", "content": "The answer" }] },
     { "type": "paragraph", "content": [{ "type": "text", "content": "The given equation has exactly one solution." }] }
   ],

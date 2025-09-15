@@ -29,5 +29,3 @@ export const circleAngleDiagramExamples: CircleAngleDiagramProps[] = [
 		shadeColor: "#FFD700"
 	}
 ]
-
-
