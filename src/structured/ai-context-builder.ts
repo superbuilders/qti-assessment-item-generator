@@ -4,6 +4,10 @@ import type { AiContextEnvelope } from "./types"
 
 const SUPPORTED_EXTENSIONS = ["svg", "png", "jpeg", "jpg", "gif"] as const
 
+// NEW: Regex to find standard image URLs and Markdown links
+const IMAGE_URL_REGEX = /https?:\/\/[^\s)]+\.(svg|png|jpeg|jpg|gif)/gi
+const MARKDOWN_LINK_REGEX = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g
+
 // MODIFIED: Simplify ImageContext. It no longer needs to handle SVGs or resolved URL maps,
 // as this logic is now fully encapsulated within the Perseus envelope builder.
 export interface ImageContext {
@@ -15,21 +19,47 @@ export async function buildPerseusEnvelope(
 	perseusJson: unknown,
 	fetchFn: typeof fetch = fetch
 ): Promise<AiContextEnvelope> {
-	const context: string[] = [JSON.stringify(perseusJson, null, 2)]
+	const jsonString = JSON.stringify(perseusJson, null, 2)
+	const context: string[] = [jsonString]
 	const imageUrls: string[] = []
+	const foundUrls = new Set<string>()
 
-	// --- Integrated Perseus URL Resolution Logic ---
-	const findPerseusUrls = (obj: unknown, urls: Set<string>): void => {
+	// --- Integrated and Expanded URL Resolution Logic ---
+
+	// NEW: Recursive function to find all types of URLs
+	const findAllUrlsAndLinks = (obj: unknown): void => {
 		if (typeof obj !== "object" || obj === null) return
+
 		if (Array.isArray(obj)) {
-			for (const item of obj) findPerseusUrls(item, urls)
+			for (const item of obj) findAllUrlsAndLinks(item)
 			return
 		}
-		for (const [key, value] of Object.entries(obj)) {
-			if (key === "url" && typeof value === "string" && value.startsWith("web+graphie://")) {
-				urls.add(value)
+
+		for (const value of Object.values(obj)) {
+			if (typeof value === "string") {
+				// Type 1: Find web+graphie URLs
+				if (value.startsWith("web+graphie://")) {
+					foundUrls.add(value)
+				}
+
+				// Type 2: Find direct https:// image URLs from image widgets and content
+				const imageMatches = value.matchAll(IMAGE_URL_REGEX)
+				for (const match of imageMatches) {
+					if (match[0]) foundUrls.add(match[0])
+				}
+
+				// Type 3: Find and extract Markdown links from content strings
+				const markdownMatches = value.matchAll(MARKDOWN_LINK_REGEX)
+				for (const match of markdownMatches) {
+					const [, text, url] = match
+					if (text && url) {
+						// Add as a separate, explicit context block for the AI
+						context.push(`Contextual Link Found: [${text}](${url})`)
+					}
+				}
 			} else {
-				findPerseusUrls(value, urls)
+				// Recurse into nested objects and arrays
+				findAllUrlsAndLinks(value)
 			}
 		}
 	}
@@ -37,33 +67,58 @@ export async function buildPerseusEnvelope(
 	const resolveAndFetchUrl = async (
 		originalUrl: string
 	): Promise<{ type: "raster"; url: string } | { type: "svg"; content: string } | null> => {
-		const baseUrl = originalUrl.replace("web+graphie://", "https://")
-		for (const ext of SUPPORTED_EXTENSIONS) {
-			const urlWithExt = `${baseUrl}.${ext}`
-			const headResult = await errors.try(fetchFn(urlWithExt, { method: "HEAD", signal: AbortSignal.timeout(5000) }))
-			if (headResult.error || !headResult.data.ok) continue
+		let baseUrl = originalUrl
+		let isGraphie = false
 
-			if (ext === "svg") {
-				const downloadResult = await errors.try(fetchFn(urlWithExt))
-				if (downloadResult.error || !downloadResult.data.ok) continue
-				const textResult = await errors.try(downloadResult.data.text())
-				if (textResult.error) continue
-				return { type: "svg", content: textResult.data }
+		if (originalUrl.startsWith("web+graphie://")) {
+			baseUrl = originalUrl.replace("web+graphie://", "https://")
+			isGraphie = true
+		}
+
+		// If it's a Graphie URL, we need to probe for the correct extension.
+		if (isGraphie) {
+			for (const ext of SUPPORTED_EXTENSIONS) {
+				const urlWithExt = `${baseUrl}.${ext}`
+				const headResult = await errors.try(fetchFn(urlWithExt, { method: "HEAD", signal: AbortSignal.timeout(5000) }))
+				if (headResult.error || !headResult.data.ok) continue
+
+				if (ext === "svg") {
+					const downloadResult = await errors.try(fetchFn(urlWithExt))
+					if (downloadResult.error || !downloadResult.data.ok) continue
+					const textResult = await errors.try(downloadResult.data.text())
+					if (textResult.error) continue
+					return { type: "svg", content: textResult.data }
+				}
+				return { type: "raster", url: urlWithExt }
 			}
-			return { type: "raster", url: urlWithExt }
+		} else {
+			// It's a direct https:// URL with an extension.
+			const isSvg = originalUrl.endsWith(".svg")
+			if (isSvg) {
+				const downloadResult = await errors.try(fetchFn(originalUrl))
+				if (!downloadResult.error && downloadResult.data.ok) {
+					const textResult = await errors.try(downloadResult.data.text())
+					if (!textResult.error) {
+						return { type: "svg", content: textResult.data }
+					}
+				}
+			} else {
+				// Assume it's a raster image if not SVG and has a supported extension.
+				return { type: "raster", url: originalUrl }
+			}
 		}
 		return null
 	}
 
-	const perseusUrls = new Set<string>()
-	findPerseusUrls(perseusJson, perseusUrls)
+	// --- Main Execution ---
+	findAllUrlsAndLinks(perseusJson)
 
-	if (perseusUrls.size > 0) {
-		logger.debug("resolving perseus urls", { count: perseusUrls.size })
-		const promises = Array.from(perseusUrls).map(async (url) => {
+	if (foundUrls.size > 0) {
+		logger.debug("resolving all found urls", { count: foundUrls.size })
+		const promises = Array.from(foundUrls).map(async (url) => {
 			const result = await errors.try(resolveAndFetchUrl(url))
 			if (result.error || !result.data) {
-				logger.warn("failed to resolve perseus url", { url, error: result.error })
+				logger.warn("failed to resolve url, skipping from context", { url, error: result.error })
 				return
 			}
 			if (result.data.type === "svg") {
