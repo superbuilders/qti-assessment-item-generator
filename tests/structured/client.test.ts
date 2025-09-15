@@ -193,7 +193,8 @@ describe("Structured AI Pipeline", () => {
 
 		const emptyEnvelope = {
 			context: [],
-			imageUrls: []
+			rasterImageUrls: [],
+			vectorImageUrls: []
 		}
 
 		const result = await errors.try(generateFromEnvelope(mockOpenAI, logger, emptyEnvelope, "math-core"))
@@ -208,7 +209,8 @@ describe("Structured AI Pipeline", () => {
 
 		const envelope = {
 			context: ["test content"],
-			imageUrls: []
+			rasterImageUrls: [],
+			vectorImageUrls: []
 		}
 
 		// This should fail at TypeScript level, but let's test runtime behavior
@@ -276,7 +278,7 @@ describe("Structured AI Pipeline", () => {
 
 		const mockOpenAI = new MockOpenAIInconsistent()
 
-		const envelope = { context: ["test content"], imageUrls: [] }
+		const envelope = { context: ["test content"], rasterImageUrls: [], vectorImageUrls: [] }
 
 		// biome-ignore lint: Mock for testing purposes
 		const result = await errors.try(generateFromEnvelope(mockOpenAI as any, logger, envelope, "math-core"))

@@ -14,7 +14,7 @@ import {
 } from "../compiler/schemas"
 import type { WidgetCollectionName } from "../widgets/collections"
 import { allWidgetSchemas, type WidgetInput } from "../widgets/registry"
-import { buildImageContextFromRasterUrls, type ImageContext } from "./ai-context-builder"
+import { buildImageContext, type ImageContext } from "./ai-context-builder"
 import { createInteractionContentPrompt } from "./prompts/interactions"
 import { createAssessmentShellPrompt } from "./prompts/shell"
 import { createWidgetMappingPrompt } from "./prompts/widget-mapping"
@@ -81,14 +81,16 @@ async function mapSlotsToWidgets(
 	envelope: AiContextEnvelope,
 	assessmentBody: string,
 	slotNames: string[], // ✅ Takes the parsed slot names to generate the prompt.
-	widgetCollectionName: WidgetCollectionName
+	widgetCollectionName: WidgetCollectionName,
+	imageContext: ImageContext // ADD this parameter
 ): Promise<Record<string, keyof typeof allWidgetSchemas>> {
 	// ✅ The prompt and the schema are now generated together dynamically.
 	const { systemInstruction, userContent, WidgetMappingSchema } = createWidgetMappingPrompt(
 		envelope,
 		assessmentBody,
 		slotNames,
-		widgetCollectionName
+		widgetCollectionName,
+		imageContext // PASS this parameter
 	)
 
 	const responseFormat = zodResponseFormat(WidgetMappingSchema, "widget_mapper")
@@ -98,13 +100,19 @@ async function mapSlotsToWidgets(
 		schema: JSON.stringify(responseFormat.json_schema?.schema, null, 2)
 	})
 
-	logger.debug("calling openai for slot-to-widget mapping", { slotNames })
+	// NEW: Build multimodal message content, same as other shots
+	const messageContent: OpenAI.ChatCompletionContentPart[] = [{ type: "text", text: userContent }]
+	for (const imageUrl of imageContext.rasterImageUrls) {
+		messageContent.push({ type: "image_url", image_url: { url: imageUrl } })
+	}
+
+	logger.debug("calling openai for slot-to-widget mapping with multimodal input", { slotNames })
 	const response = await errors.try(
 		openai.chat.completions.parse({
 			model: OPENAI_MODEL,
 			messages: [
 				{ role: "system", content: systemInstruction },
-				{ role: "user", content: userContent }
+				{ role: "user", content: messageContent } // MODIFIED to use multimodal content
 			],
 			// ✅ The dynamically generated, constrained schema is used here.
 			response_format: responseFormat
@@ -376,10 +384,12 @@ export async function generateFromEnvelope(
 	logger.info("starting structured qti generation from envelope", {
 		widgetCollection: widgetCollectionName,
 		contextBlockCount: envelope.context.length,
-		imageUrlCount: envelope.imageUrls.length
+		rasterUrlCount: envelope.rasterImageUrls.length, // MODIFIED log field
+		vectorUrlCount: envelope.vectorImageUrls.length // NEW log field
 	})
-	// MODIFIED: Use the new, simplified raster-only image context builder.
-	const imageContext = await buildImageContextFromRasterUrls(envelope.imageUrls)
+	
+	// MODIFIED: Use the new, unified image context builder.
+	const imageContext = buildImageContext(envelope)
 
 	// --- AI Pipeline Shots ---
 	// All subsequent "shot" functions MUST be updated to accept the `envelope` object.
@@ -478,8 +488,9 @@ export async function generateFromEnvelope(
 		// Only make the AI call if there are widgets to map
 		// Convert structured body to string representation for widget mapping prompt
 		const bodyString = assessmentShell.body ? JSON.stringify(assessmentShell.body) : ""
+		// MODIFIED: Pass the full imageContext to the mapSlotsToWidgets call
 		const mappingResult = await errors.try(
-			mapSlotsToWidgets(openai, logger, envelope, bodyString, widgetSlotNames, widgetCollectionName)
+			mapSlotsToWidgets(openai, logger, envelope, bodyString, widgetSlotNames, widgetCollectionName, imageContext)
 		)
 		if (mappingResult.error) {
 			const emptyMapping: Record<string, keyof typeof allWidgetSchemas> = {}

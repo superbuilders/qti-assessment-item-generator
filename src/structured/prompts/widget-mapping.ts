@@ -1,7 +1,9 @@
 import { z } from "zod"
 import { type WidgetCollectionName, widgetCollections } from "../../widgets/collections"
 import { allWidgetSchemas } from "../../widgets/registry"
+import type { ImageContext } from "../ai-context-builder"
 import type { AiContextEnvelope } from "../types"
+import { formatUnifiedContextSections } from "./shared"
 
 function createWidgetMappingSchema(slotNames: string[], allowedWidgetKeys: readonly string[]) {
 	const shape: Record<string, z.ZodType<string>> = {}
@@ -23,7 +25,8 @@ export function createWidgetMappingPrompt(
 	envelope: AiContextEnvelope,
 	assessmentBody: string,
 	slotNames: string[],
-	widgetCollectionName: WidgetCollectionName
+	widgetCollectionName: WidgetCollectionName,
+	imageContext: ImageContext
 ) {
 	const collection = widgetCollections[widgetCollectionName]
 
@@ -145,12 +148,11 @@ Correct mapping when graph widgets are available:
 Widget Type Options:
 ${[...collection.widgetTypeKeys].sort().join("\n")}`
 
-	const userContent = `Based on the Perseus JSON and assessment body below, create a JSON object that maps each widget slot name to the most appropriate widget type.
+	const userContent = `Based on the source material and assessment body below, create a JSON object that maps each widget slot name to the most appropriate widget type. Use the provided context, including raster images for vision and vector images as text, to understand the content fully.
 
-## Raw Source Input
-${envelope.context.map((content, index) => `\n\n## Source Context Block ${index + 1}\n\`\`\`\n${content}\n\`\`\``).join("")}
+${formatUnifiedContextSections(envelope, imageContext)}
 
-Assessment Item Body (as structured JSON):
+## Assessment Item Body (as structured JSON)
 \`\`\`json
 ${assessmentBody}
 \`\`\`

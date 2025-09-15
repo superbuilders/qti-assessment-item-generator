@@ -4,6 +4,7 @@ import { allWidgetSchemas } from "../../widgets/registry"
 import type { ImageContext } from "../ai-context-builder"
 import type { AiContextEnvelope } from "../types"
 import { caretBanPromptSection } from "./caret"
+import { formatUnifiedContextSections } from "./shared"
 
 export function createWidgetContentPrompt(
 	envelope: AiContextEnvelope,
@@ -172,7 +173,7 @@ SCAN ALL text content in widgets (labels, captions, content) for '$' - these MUS
   ✅ CORRECT: [{ 'type': 'math', 'mathml': '<mo>$</mo><mn>10</mn>' }, { 'type': 'text', 'content': '–' }, { 'type': 'math', 'mathml': '<mo>$</mo><mn>20</mn>' }]
 
 - ❌ WRONG: 'Cost: -$5'
-  ✅ CORRECT: [{ 'type': 'text', 'content': 'Cost: ' }, { 'type': 'math', 'mathml': '<mo>-</mo><mo>$</mo><mn>5</mn>' }]
+  ✅ CORRECT: [{ 'type': 'text', 'content': 'Cost: ' }, { 'type": 'math', 'mathml': '<mo>-</mo><mo>$</mo><mn>5</mn>' }]
 
 **Pattern checklist:**
 - /$(?=s*d)/ - dollar before number
@@ -192,18 +193,9 @@ SCAN ALL text content in widgets (labels, captions, content) for '$' - these MUS
    - The widget should present the problem visually WITHOUT showing the solution
    - **ABSOLUTE RULE**: Answers are ONLY allowed in feedback fields. HARD STOP. NO EXCEPTIONS.`
 
-	const userContent = `Generate widget content based on the following inputs. Use the provided image context to understand the visual components.
+	const userContent = `Generate widget content based on the following inputs. Use the provided context, including raster images for vision and vector images as text, to understand the content fully.
 
-## Image Context (for your analysis only)
-
-### Raster Image URLs
-If any images are raster formats (PNG, JPG), their URLs are provided here for your vision to analyze.
-\`\`\`json
-${JSON.stringify(imageContext.rasterImageUrls, null, 2)}
-\`\`\`
-
-## Raw Source Input
-${envelope.context.map((content, index) => `\n\n## Source Context Block ${index + 1}\n\`\`\`\n${content}\n\`\`\``).join("")}
+${formatUnifiedContextSections(envelope, imageContext)}
 
 ## Assessment Shell (for context):
 \`\`\`json

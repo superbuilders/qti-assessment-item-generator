@@ -15,7 +15,7 @@ bun add @superbuilders/qti-assessment-item-generator
 
 ### Full Pipeline: Perseus JSON to QTI XML
 
-This example demonstrates the primary workflow: converting a Perseus JSON object into a QTI 3.0 XML string. The `buildPerseusEnvelope` helper automatically resolves `web+graphie://` URLs and embeds SVG content for the AI.
+This example demonstrates the primary workflow: converting a Perseus JSON object into a QTI 3.0 XML string. The `buildPerseusEnvelope` helper automatically resolves `web+graphie://` and standard `https://` image URLs, fetches external SVG content, and embeds it for the AI.
 
 ```ts
 import OpenAI from "openai";
@@ -44,7 +44,7 @@ console.log(xml);
 
 ### Full Pipeline: HTML to QTI XML
 
-This example converts raw HTML into a QTI 3.0 XML string. The `buildHtmlEnvelope` helper strictly validates all `<img>` `src` URLs and the optional `screenshotUrl`. Only absolute `http`/`https` URLs are accepted. If any `<img>` has an invalid or unsupported `src`, the function will throw.
+This example converts raw HTML into a QTI 3.0 XML string. The `buildHtmlEnvelope` helper is now async and fetches SVG content from external image URLs. Inline `<svg>` embedded in the HTML remains as-is inside the primary HTML context and is not duplicated. `<img>` `src` URLs and the optional `screenshotUrl` are validated: only absolute `http`/`https` URLs are accepted. Invalid `<img>` `src` values are skipped; an invalid `screenshotUrl` will throw. Fetch timeout is 30 seconds.
 
 ```ts
 import OpenAI from "openai";
@@ -65,7 +65,7 @@ const html = `
 const screenshotUrl = "https://example.com/item-screenshot.png";
 
 // 1. Build the AI context envelope.
-const envelope = buildHtmlEnvelope(html, screenshotUrl);
+const envelope = await buildHtmlEnvelope(html, screenshotUrl);
 
 // 2. Generate the structured AssessmentItemInput object.
 const structuredItem = await generateFromEnvelope(openai, logger, envelope, "fourth-grade-math");
@@ -152,9 +152,9 @@ console.log(svgString);
 ### `structured/ai-context-builder`
 
 -   `buildPerseusEnvelope(perseusJson: unknown) => Promise<AiContextEnvelope>`
-    -   Creates an envelope from Perseus JSON, resolving `web+graphie://` URLs and embedding SVG content.
--   `buildHtmlEnvelope(html: string, screenshotUrl?: string) => AiContextEnvelope`
-    -   Creates an envelope from raw HTML. Strictly validates all `<img>` `src` URLs and optional `screenshotUrl`. Only absolute `http`/`https` URLs are accepted.
+    -   Creates an envelope from Perseus JSON. Resolves both `web+graphie://` and standard `https://` image URLs, fetches external SVG content, and separates raster/vector URLs for the AI.
+-   `buildHtmlEnvelope(html: string, screenshotUrl?: string) => Promise<AiContextEnvelope>`
+    -   Creates an envelope from raw HTML. **Breaking change: now async.** Fetches SVG content from external image URLs. Inline `<svg>` remains only in the primary HTML context (not extracted). Only absolute `http`/`https` URLs are accepted; invalid `<img>` `src` values are skipped, while an invalid `screenshotUrl` will throw. Fetch timeout is 30 seconds.
 
 ### `structured/differentiator`
 
@@ -217,9 +217,45 @@ const svg = await generateWidget(validationResult.data as unknown as Widget);
 
 ## Image URL Policy
 
-- `buildHtmlEnvelope` accepts only absolute `http`/`https` image URLs.
-- If any `<img>` in the HTML lacks a valid absolute `src` or uses an unsupported scheme, it will throw.
-- If an optional `screenshotUrl` is provided but invalid or unsupported, it will throw.
+-   `buildHtmlEnvelope` accepts only absolute `http`/`https` image URLs.
+-   `<img>` elements with invalid/unsupported `src` values are skipped (not thrown).
+-   If an optional `screenshotUrl` is provided but invalid or unsupported, it will throw.
+-   Inline `<svg>` content embedded in HTML is left as-is inside the primary HTML context; only external `.svg` image URLs are fetched and embedded as text.
+
+## Breaking Changes (v2.0.0)
+
+This version includes breaking changes to the AI context pipeline:
+
+-   **`AiContextEnvelope` interface**: The `imageUrls` field has been renamed to `rasterImageUrls`, and a new `vectorImageUrls` field has been added.
+-   **`buildHtmlEnvelope` function**: Now async and performs network fetches for SVG content from `<img>` sources.
+-   **Enhanced context**: Both builders now provide richer context with explicit separation of raster and vector images, improving AI accuracy especially for widget mapping.
+
+### Migration Guide
+
+1.  Update `AiContextEnvelope` usage:
+    ```ts
+    // Before
+    const envelope: AiContextEnvelope = {
+      context: [...],
+      imageUrls: [...]
+    }
+    
+    // After
+    const envelope: AiContextEnvelope = {
+      context: [...],
+      rasterImageUrls: [...],
+      vectorImageUrls: [...]
+    }
+    ```
+
+2.  Make `buildHtmlEnvelope` calls async:
+    ```ts
+    // Before
+    const envelope = buildHtmlEnvelope(html, screenshotUrl);
+    
+    // After
+    const envelope = await buildHtmlEnvelope(html, screenshotUrl);
+    ```
 
 ## Configuration
 

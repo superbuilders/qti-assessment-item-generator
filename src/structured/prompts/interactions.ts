@@ -2,6 +2,7 @@ import type { allWidgetSchemas } from "../../widgets/registry"
 import type { ImageContext } from "../ai-context-builder"
 import type { AiContextEnvelope } from "../types"
 import { caretBanPromptSection } from "./caret"
+import { formatUnifiedContextSections } from "./shared"
 
 export function createInteractionContentPrompt(
 	envelope: AiContextEnvelope,
@@ -213,18 +214,9 @@ SCAN ALL text content (prompts, choices, feedback) for "$" or "%" - these MUST b
    - NEVER include visual or textual cues that indicate the correct response
    - **ABSOLUTE RULE**: Answers are ONLY allowed in feedback fields. HARD STOP. NO EXCEPTIONS.`
 
-	const userContent = `Generate interaction content based on the following inputs. Use the provided image context to understand the visual components.
+	const userContent = `Generate interaction content based on the following inputs. Use the provided context, including raster images for vision and vector images as text, to understand the content fully.
 
-## Image Context (for your analysis only)
-
-### Raster Image URLs
-If any images are raster formats (PNG, JPG), their URLs are provided here for your vision to analyze.
-\`\`\`json
-${JSON.stringify(imageContext.rasterImageUrls, null, 2)}
-\`\`\`
-
-## Raw Source Input
-${envelope.context.map((content, index) => `\n\n## Source Context Block ${index + 1}\n\`\`\`\n${content}\n\`\`\``).join("")}
+${formatUnifiedContextSections(envelope, imageContext)}
 
 ## Assessment Shell (for context):
 \`\`\`json

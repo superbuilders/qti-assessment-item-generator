@@ -6,6 +6,7 @@ import { allExamples } from "../../examples"
 import type { ImageContext } from "../ai-context-builder"
 import type { AiContextEnvelope } from "../types"
 import { caretBanPromptSection } from "./caret"
+import { formatUnifiedContextSections } from "./shared"
 
 // Helper to convert a full AssessmentItemInput into a shell for prompt examples
 function createShellFromExample(item: AssessmentItemInput) {
@@ -176,7 +177,7 @@ Example shell for matcher conversion:
 Notes for implementation:
 - The single \`data_table\` will be generated as a \`dataTable\` widget.
 - Each right-column cell must be a dropdown rendered as an inlineChoiceInteraction (inline, not block).
-- The dropdown choices should be the full set from the matcher’s right side; correctness encoded in response declarations per row.
+- The dropdown choices should be the full set from the matcher's right side; correctness encoded in response declarations per row.
 - No per-choice visuals or per-choice tables are allowed for matcher conversions.
 
 ### Perseus matcher field mapping (implementation detail)
@@ -194,7 +195,7 @@ Example mapping for the provided sample:
 - Right header: "Name" → table column 2 header
 - Left values: \`SrS\`, \`Na2SO4\`, \`Na2S\`, \`SrSO4\`, \`SrSe\`, \`Na2Se\` (render from LaTeX to MathML inline)
 - Dropdown choices (same for each row): \`strontium sulfide\`, \`sodium sulfate\`, \`sodium sulfide\`, \`strontium sulfate\`, \`strontium selenide\`, \`sodium selenide\`
-- Correct mapping: per row, the right choice matching the left formula’s compound name
+- Correct mapping: per row, the right choice matching the left formula's compound name
 
 ABSOLUTE REQUIREMENT: SLOT CONSISTENCY.
 This is the most critical rule. Any slot you include in the 'body' MUST have its slotId listed in either the 'widgets' array or the 'interactions' array. 
@@ -557,15 +558,9 @@ Any discrepancy will cause your output to be rejected. Review your work carefull
 
 	const exampleShells = allExamples.map(createShellFromExample)
 
-	const userContent = `Convert the following Perseus JSON into an assessment shell. Use the provided image context to understand the content fully.
+	const userContent = `Convert the following source into an assessment shell. Use the provided context, including raster images for vision and vector images as text, to understand the content fully.
 
-## Image Context (for your analysis only)
-
-### Raster Image URLs
-If any images are raster formats (PNG, JPG), their URLs are provided here for your vision to analyze.
-\`\`\`json
-${JSON.stringify(imageContext.rasterImageUrls, null, 2)}
-\`\`\`
+${formatUnifiedContextSections(envelope, imageContext)}
 
 ## Target Shell Examples
 Below are examples of the exact 'shell' structure you must generate. Study them to understand the desired output format, especially how MathML is used and how widget/interaction slots are defined.
@@ -573,9 +568,6 @@ Below are examples of the exact 'shell' structure you must generate. Study them 
 \`\`\`json
 ${JSON.stringify(exampleShells, null, 2)}
 \`\`\`
-
-## Raw Source Input
-${envelope.context.map((content, index) => `\n\n## Source Context Block ${index + 1}\n\`\`\`\n${content}\n\`\`\``).join("")}
 
   ## CRITICAL Instructions:
 - **Analyze Images**: Use the raster images provided to your vision to understand the visual components of the question. Any SVG content is provided directly in the 'Raw Source Input' blocks.

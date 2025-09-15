@@ -54,7 +54,7 @@ describe("Compiler Identifier Validation Integration Tests", () => {
 			},
 			responseDeclarations: [{ identifier: "RESPONSE_1", cardinality: "single", baseType: "identifier", correct: "A" }]
 		}
-		await expect(compile(itemWithDuplicate)).rejects.toThrow(ErrDuplicateResponseIdentifier)
+		return expect(compile(itemWithDuplicate)).rejects.toThrow(ErrDuplicateResponseIdentifier)
 	})
 
 	test("should throw ErrDuplicateResponseIdentifier for duplicates between an interaction and a widget", async () => {
@@ -98,7 +98,7 @@ describe("Compiler Identifier Validation Integration Tests", () => {
 			},
 			responseDeclarations: [{ identifier: "RESPONSE_1", cardinality: "single", baseType: "identifier", correct: "A" }]
 		}
-		await expect(compile(itemWithDuplicate)).rejects.toThrow(ErrDuplicateResponseIdentifier)
+		return expect(compile(itemWithDuplicate)).rejects.toThrow(ErrDuplicateResponseIdentifier)
 	})
 
 	test("should throw ErrDuplicateChoiceIdentifier for duplicates within a choiceInteraction", async () => {
@@ -120,7 +120,7 @@ describe("Compiler Identifier Validation Integration Tests", () => {
 			},
 			responseDeclarations: [{ identifier: "RESPONSE_1", cardinality: "single", baseType: "identifier", correct: "A" }]
 		}
-		await expect(compile(itemWithDuplicate)).rejects.toThrow(ErrDuplicateChoiceIdentifier)
+		return expect(compile(itemWithDuplicate)).rejects.toThrow(ErrDuplicateChoiceIdentifier)
 	})
 
 	test("should throw ErrDuplicateChoiceIdentifier for duplicates within a dataTable dropdown", async () => {
@@ -150,7 +150,7 @@ describe("Compiler Identifier Validation Integration Tests", () => {
 			},
 			responseDeclarations: [{ identifier: "RESPONSE_1", cardinality: "single", baseType: "identifier", correct: "A" }]
 		}
-		await expect(compile(itemWithDuplicate)).rejects.toThrow(ErrDuplicateChoiceIdentifier)
+		return expect(compile(itemWithDuplicate)).rejects.toThrow(ErrDuplicateChoiceIdentifier)
 	})
 
 	test("should throw ErrInvalidRowHeaderKey for a non-existent rowHeaderKey", async () => {
@@ -190,7 +190,7 @@ describe("Compiler Identifier Validation Integration Tests", () => {
 			},
 			responseDeclarations: [{ identifier: "RESPONSE_1", cardinality: "single", baseType: "identifier", correct: "A" }]
 		}
-		await expect(compile(itemWithInvalidKey)).rejects.toThrow(ErrInvalidRowHeaderKey)
+		return expect(compile(itemWithInvalidKey)).rejects.toThrow(ErrInvalidRowHeaderKey)
 	})
 
 	test("should compile successfully with complex valid identifiers", async () => {
