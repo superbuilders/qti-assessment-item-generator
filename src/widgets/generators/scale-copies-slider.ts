@@ -124,7 +124,6 @@ export const generateScaleCopiesSlider: WidgetGenerator<typeof ScaleCopiesSlider
 	 * the "Before" shape, an arrow, and the "After" shape.
 	 */
 	const drawShapeGroup = (shape: ScaleCopiesSliderProps["shapeA"], yOffset: number): void => {
-		let _groupSvg = ""
 
 		// --- Before Shape ---
 		const beforeW = shape.before.width * scale
@@ -149,8 +148,15 @@ export const generateScaleCopiesSlider: WidgetGenerator<typeof ScaleCopiesSlider
 		const arrowXStart = padding.left + shapeWidth + 5
 		const arrowXEnd = arrowXStart + colGap - 10
 		const arrowY = yOffset + rowHeight / 2
-		_groupSvg += `<defs><marker id="arrowhead" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="${theme.colors.axis}"/></marker></defs>`
-		_groupSvg += `<line x1="${arrowXStart}" y1="${arrowY}" x2="${arrowXEnd}" y2="${arrowY}" stroke="${theme.colors.axis}" stroke-width="${theme.stroke.width.base}" marker-end="url(#arrowhead)"/>`
+		// add arrowhead marker to defs and draw a line using marker-end
+		canvas.addDef(
+			`<marker id="arrowhead" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="${theme.colors.axis}"/></marker>`
+		)
+		canvas.drawLine(arrowXStart, arrowY, arrowXEnd, arrowY, {
+			stroke: theme.colors.axis,
+			strokeWidth: theme.stroke.width.base,
+			markerEnd: "url(#arrowhead)"
+		})
 
 		// --- After Shape ---
 		const afterW = shape.after.width * scale

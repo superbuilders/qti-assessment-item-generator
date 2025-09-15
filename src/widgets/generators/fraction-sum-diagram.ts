@@ -181,11 +181,7 @@ export const generateFractionSumDiagram: WidgetGenerator<typeof FractionSumDiagr
 		canvas.drawText({ x: cx, y: y + (6 + fontPx * 0.6), text: den, fontPx, anchor: "middle" })
 	}
 
-	const _measureFractionBarWidth = (num: string, den: string, fontPx: number): number => {
-		const numMetrics = estimateWrappedTextDimensions(num, Number.POSITIVE_INFINITY, fontPx, 1.2)
-		const denMetrics = estimateWrappedTextDimensions(den, Number.POSITIVE_INFINITY, fontPx, 1.2)
-		return Math.max(numMetrics.maxWidth, denMetrics.maxWidth) + 8
-	}
+	// removed unused helper that measured fraction bar width
 
 	/** Draw a simple arch (single smooth curve) from x1 to x2. */
 	const drawArch = (x1: number, x2: number, y: number, isUpward: boolean) => {
