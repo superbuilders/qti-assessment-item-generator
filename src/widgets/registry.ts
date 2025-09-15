@@ -43,6 +43,7 @@ import { GeometricSolidDiagramPropsSchema } from "./generators/geometric-solid-d
 import { HangerDiagramPropsSchema } from "./generators/hanger-diagram"
 import { HistogramPropsSchema } from "./generators/histogram"
 import { InequalityNumberLinePropsSchema } from "./generators/inequality-number-line"
+import { IntegerChipModelPropsSchema } from "./generators/integer-chip-model"
 import { KeelingCurvePropsSchema } from "./generators/keeling-curve"
 import { LabeledRectangleDiagramPropsSchema } from "./generators/labeled-rectangle-diagram"
 import { LineDiagramPropsSchema } from "./generators/line-diagram"
@@ -153,6 +154,7 @@ export const allWidgetSchemas = {
 	partitionedShape: PartitionedShapePropsSchema,
 	pentagonIntersectionDiagram: PentagonIntersectionDiagramPropsSchema,
 	pictograph: PictographPropsSchema,
+	integerChipModel: IntegerChipModelPropsSchema,
 	polyhedronDiagram: PolyhedronDiagramPropsSchema,
 	probabilitySpinner: ProbabilitySpinnerPropsSchema,
 	polyhedronNetDiagram: PolyhedronNetDiagramPropsSchema,
@@ -255,6 +257,7 @@ export {
 	PeriodicTableWidgetPropsSchema,
 	PieChartWidgetPropsSchema,
 	PictographPropsSchema,
+	IntegerChipModelPropsSchema,
 	PointPlotGraphPropsSchema,
 	PolygonGraphPropsSchema,
 	PolyhedronDiagramPropsSchema,
@@ -420,6 +423,7 @@ const widgetSchemasWithoutSpecialUnions = [
 	typedSchemas.radiallyConstrainedAngleDiagram,
 	typedSchemas.shapeTransformationGraph,
 	typedSchemas.dataTable,
+	typedSchemas.integerChipModel,
 	typedSchemas.discreteObjectRatioDiagram,
 	typedSchemas.dotPlot,
 	typedSchemas.doubleNumberLine,

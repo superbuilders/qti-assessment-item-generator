@@ -42,6 +42,7 @@ import { generateGeometricSolidDiagram } from "./generators/geometric-solid-diag
 import { generateHangerDiagram } from "./generators/hanger-diagram"
 import { generateHistogram } from "./generators/histogram"
 import { generateInequalityNumberLine } from "./generators/inequality-number-line"
+import { generateIntegerChipModel } from "./generators/integer-chip-model"
 import { generateKeelingCurve } from "./generators/keeling-curve"
 import { generateLabeledRectangleDiagram } from "./generators/labeled-rectangle-diagram"
 import { generateLineDiagram } from "./generators/line-diagram"
@@ -208,6 +209,8 @@ export async function generateWidget(widgetInput: WidgetInput): Promise<string> 
 			return await generatePentagonIntersectionDiagram(widget)
 		case "pictograph":
 			return await generatePictograph(widget)
+		case "integerChipModel":
+			return await generateIntegerChipModel(widget)
 		case "polyhedronDiagram":
 			return await generatePolyhedronDiagram(widget)
 		case "probabilitySpinner":
