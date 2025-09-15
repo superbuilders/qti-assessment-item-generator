@@ -176,7 +176,7 @@ Example shell for matcher conversion:
 Notes for implementation:
 - The single \`data_table\` will be generated as a \`dataTable\` widget.
 - Each right-column cell must be a dropdown rendered as an inlineChoiceInteraction (inline, not block).
-- The dropdown choices should be the full set from the matcher’s right side; correctness encoded in response declarations per row.
+- The dropdown choices should be the full set from the matcher's right side; correctness encoded in response declarations per row.
 - No per-choice visuals or per-choice tables are allowed for matcher conversions.
 
 ### Perseus matcher field mapping (implementation detail)
@@ -194,7 +194,7 @@ Example mapping for the provided sample:
 - Right header: "Name" → table column 2 header
 - Left values: \`SrS\`, \`Na2SO4\`, \`Na2S\`, \`SrSO4\`, \`SrSe\`, \`Na2Se\` (render from LaTeX to MathML inline)
 - Dropdown choices (same for each row): \`strontium sulfide\`, \`sodium sulfate\`, \`sodium sulfide\`, \`strontium sulfate\`, \`strontium selenide\`, \`sodium selenide\`
-- Correct mapping: per row, the right choice matching the left formula’s compound name
+- Correct mapping: per row, the right choice matching the left formula's compound name
 
 ABSOLUTE REQUIREMENT: SLOT CONSISTENCY.
 This is the most critical rule. Any slot you include in the 'body' MUST have its slotId listed in either the 'widgets' array or the 'interactions' array. 

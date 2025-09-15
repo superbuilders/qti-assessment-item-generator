@@ -176,6 +176,73 @@ export function sanitizeMathMLOperators(htmlFragment: string): string {
 	return fixedXml
 }
 
+// Numeric/text answer format validators
+function gcd(a: number, b: number): number {
+	let x = Math.abs(a)
+	let y = Math.abs(b)
+	while (y !== 0) {
+		const t = y
+		y = x % y
+		x = t
+	}
+	return x
+}
+
+/**
+ * Validates a fraction string is in simplest form with no spaces.
+ * Accepts optional leading minus on the numerator; denominator must be positive.
+ * Examples: "3/5", "-7/8". Rejects: " 3/5 ", "6/8", "3 / 5", "3/-5".
+ */
+export function validateSimpleFractionFormat(value: string, logger: logger.Logger, context: string): void {
+	if (/\s/.test(value)) {
+		logger.error("fraction contains spaces", { context, value })
+		throw errors.new("fraction must not contain spaces")
+	}
+	const m = value.match(/^(-?)(\d+)\/(\d+)$/)
+	if (!m) {
+		logger.error("invalid fraction pattern", { context, value })
+		throw errors.new("invalid fraction format: expected a/b with optional leading minus on a")
+	}
+	const sign = m[1] === "-" ? -1 : 1
+	const num = Number.parseInt(m[2] ?? "0", 10) * sign
+	const den = Number.parseInt(m[3] ?? "0", 10)
+	if (den === 0) {
+		logger.error("zero denominator in fraction", { context, value })
+		throw errors.new("fraction denominator must be nonzero")
+	}
+	// enforce positive denominator
+	if (value.includes("/-")) {
+		logger.error("negative denominator in fraction", { context, value })
+		throw errors.new("fraction denominator must be positive; attach sign to numerator")
+	}
+	// simplest terms
+	const d = gcd(num, den)
+	if (d !== 1 && d !== -1) {
+		logger.error("fraction not in simplest form", { context, value, gcd: d })
+		throw errors.new("fraction must be in simplest terms")
+	}
+}
+
+/**
+ * Validates scientific notation in the form "X.XX x 10^YY" with:
+ * - exactly one space around lowercase 'x'
+ * - mantissa absolute value in [1, 10)
+ * - exponent is an integer (allow leading minus)
+ */
+export function validateScientificNotationFormat(value: string, logger: logger.Logger, context: string): void {
+	const pattern = /^(-?\d)\.(\d+)\s+x\s+10\^(-?\d+)$/
+	const m = value.match(pattern)
+	if (!m) {
+		logger.error("invalid scientific notation pattern", { context, value })
+		throw errors.new("invalid scientific notation: expected format X.XX x 10^YY with spaces around x")
+	}
+	const mantissa = Number.parseFloat(`${m[1]}.${m[2]}`)
+	if (!(Math.abs(mantissa) >= 1 && Math.abs(mantissa) < 10)) {
+		logger.error("mantissa out of normalized range", { context, value, mantissa })
+		throw errors.new("scientific notation mantissa must be in [1, 10)")
+	}
+}
+
 /**
  * Validates that a string contains only XML 1.0 valid characters for character data (PCDATA).
  * Disallows C0 control characters other than TAB (0x09), LF (0x0A), and CR (0x0D),

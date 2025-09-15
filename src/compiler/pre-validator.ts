@@ -6,7 +6,9 @@ import {
 	checkNoInvalidXmlChars,
 	checkNoLatex,
 	checkNoMfencedElements,
-	checkNoPerseusArtifacts
+	checkNoPerseusArtifacts,
+	validateScientificNotationFormat,
+	validateSimpleFractionFormat
 } from "../qti-validation/utils"
 import type { AssessmentItemInput, BlockContent, InlineContent } from "./schemas"
 
@@ -364,6 +366,40 @@ export function validateAssessmentItemInput(item: AssessmentItemInput, logger: l
 	// Validate each response declaration has a corresponding interaction responseIdentifier
 	// or an embedded input within a widget (e.g., dataTable input cells)
 	if (item.responseDeclarations.length > 0) {
+		// Enforce single canonical numeric/text formats where required
+		for (const decl of item.responseDeclarations) {
+			// Only validate formatting for string baseType, which we use for
+			// fraction, sig-fig, and scientific-notation enforcement
+			if (decl.baseType === "string") {
+				const values = Array.isArray(decl.correct) ? decl.correct : [decl.correct]
+				if (values.length !== 1) {
+					logger.error("string baseType must declare exactly one correct value", {
+						responseIdentifier: decl.identifier,
+						count: values.length
+					})
+					throw errors.new("string baseType requires exactly one correct value")
+				}
+				const v = values[0]
+				if (typeof v !== "string") {
+					logger.error("string baseType correct is not a string", {
+						responseIdentifier: decl.identifier,
+						typeof: typeof v
+					})
+					throw errors.new("string baseType correct must be a string")
+				}
+				const context = `responseDeclarations[${decl.identifier}]`
+				// Heuristics: apply format checks if the value pattern implies a format-sensitive answer
+				if (/^-?\d+\/\d+$/.test(v) || /\//.test(v)) {
+					// Fraction format: no spaces, simplest form, positive denominator
+					validateSimpleFractionFormat(v, logger, context)
+				}
+				if (/10\^/.test(v) && /\sx\s/.test(v)) {
+					// Scientific notation format: X.XX x 10^YY with proper spacing and normalized mantissa
+					validateScientificNotationFormat(v, logger, context)
+				}
+			}
+		}
+
 		// Guard: identifier base-type with single cardinality must have exactly one correct value
 		for (const decl of item.responseDeclarations) {
 			if (decl.baseType === "identifier" && decl.cardinality === "single") {

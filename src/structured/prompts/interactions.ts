@@ -39,6 +39,15 @@ We FULLY support the following QTI interaction types:
 - **textEntryInteraction**: Numeric/text input (maps from Perseus \`numeric-input\`, \`expression\`, \`input-number\` widgets)
 - **inlineChoiceInteraction**: Dropdown selection within text (maps from Perseus \`dropdown\` widgets)
 
+**NUMERIC INPUT — SINGLE REPRESENTATION POLICY**
+For \`textEntryInteraction\` you MUST:
+- Choose exactly ONE representation matching the problem’s instructions (fraction, integer/decimal with specified significant digits, or scientific notation).
+- Do NOT include alternate equivalent forms.
+- Insert concise instruction text adjacent to the inline input telling students the expected format (e.g., "Enter as a fraction in simplest form without spaces", "Round to 3 significant figures", "In the format X.XX x 10^XX").
+- Set \`responseDeclarations\` to that single representation and emit only one \`correct\` value.
+- Use \`baseType: "string"\` when exact formatting is required (fractions, sig figs, scientific notation). Use \`integer\`/\`float\` only when exact string formatting is not required.
+- Set \`expectedLength\` consistent with the chosen format.
+
 **CRITICAL: Perseus \`sorter\` widgets should be converted to QTI \`orderInteraction\`.** This is a fully supported interaction type where students drag items to arrange them in the correct sequence.
 
 **⚠️ CRITICAL: CHEMISTRY NOTATION MUST BE MATHML — NEVER PLAIN TEXT ⚠️**
