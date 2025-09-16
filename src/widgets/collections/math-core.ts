@@ -8,6 +8,7 @@ import {
 	CompositeShapeDiagramPropsSchema,
 	CoordinatePlaneComprehensivePropsSchema,
 	DataTablePropsSchema,
+	QuadrantDiagramPropsSchema,
 	DiscreteObjectRatioDiagramPropsSchema,
 	DistanceFormulaGraphPropsSchema,
 	DotPlotPropsSchema,
@@ -58,6 +59,7 @@ import {
 export const mathCoreCollection = {
 	name: "math-core",
 	schemas: {
+		quadrantDiagram: QuadrantDiagramPropsSchema,
 		threeDIntersectionDiagram: ThreeDIntersectionDiagramPropsSchema,
 		absoluteValueNumberLine: AbsoluteValueNumberLinePropsSchema,
 		angleDiagram: AngleDiagramPropsSchema,
@@ -115,6 +117,7 @@ export const mathCoreCollection = {
 	},
 	widgetTypeKeys: [
 		"threeDIntersectionDiagram",
+		"quadrantDiagram",
 		"absoluteValueNumberLine",
 		"angleDiagram",
 		"barChart",

@@ -8,55 +8,55 @@ export const boxGridExamples: BoxGridProps[] = [
 		data: [
 			[
 				{
-					content: { type: "text", content: "1" },
+					content: { type: "whole", value: 1, sign: "+" },
 					backgroundColor: "#FFE5B4"
 				},
 				{
-					content: { type: "text", content: "2" },
+					content: { type: "fraction", numerator: 1, denominator: 2, sign: "+" },
 					backgroundColor: null
 				},
 				{
-					content: { type: "text", content: "3" },
+					content: { type: "mixed", whole: 1, numerator: 1, denominator: 4, sign: "+" },
 					backgroundColor: "#B4E5FF"
 				},
 				{
-					content: { type: "text", content: "4" },
+					content: { type: "whole", value: 4, sign: "+" },
 					backgroundColor: null
 				}
 			],
 			[
 				{
-					content: { type: "text", content: "5" },
+					content: { type: "whole", value: 5, sign: "+" },
 					backgroundColor: null
 				},
 				{
-					content: { type: "text", content: "6" },
+					content: { type: "mixed", whole: 2, numerator: 3, denominator: 5, sign: "-" },
 					backgroundColor: "#FFB4E5"
 				},
 				{
-					content: { type: "text", content: "7" },
+					content: { type: "fraction", numerator: 3, denominator: 4, sign: "+" },
 					backgroundColor: null
 				},
 				{
-					content: { type: "text", content: "8" },
+					content: { type: "whole", value: 8, sign: "+" },
 					backgroundColor: "#B4FFE5"
 				}
 			],
 			[
 				{
-					content: { type: "text", content: "9" },
+					content: { type: "whole", value: 0, sign: "+" },
 					backgroundColor: null
 				},
 				{
-					content: { type: "text", content: "10" },
+					content: { type: "mixed", whole: 3, numerator: 0, denominator: 7, sign: "+" },
 					backgroundColor: "#E5B4FF"
 				},
 				{
-					content: { type: "text", content: "11" },
+					content: { type: "fraction", numerator: 7, denominator: 8, sign: "-" },
 					backgroundColor: null
 				},
 				{
-					content: { type: "text", content: "12" },
+					content: { type: "whole", value: 12, sign: "+" },
 					backgroundColor: "#FFE5B4"
 				}
 			]
@@ -74,11 +74,11 @@ export const boxGridExamples: BoxGridProps[] = [
 					backgroundColor: "#4285F4"
 				},
 				{
-					content: { type: "text", content: "=" },
+					content: { type: "fraction", numerator: 0, denominator: 1, sign: "+" },
 					backgroundColor: null
 				},
 				{
-					content: { type: "text", content: "5" },
+					content: { type: "whole", value: 5, sign: "+" },
 					backgroundColor: "#34A853"
 				}
 			],
@@ -88,11 +88,11 @@ export const boxGridExamples: BoxGridProps[] = [
 					backgroundColor: "#FF6B6B"
 				},
 				{
-					content: { type: "text", content: "=" },
+					content: { type: "fraction", numerator: 0, denominator: 1, sign: "+" },
 					backgroundColor: null
 				},
 				{
-					content: { type: "text", content: "24" },
+					content: { type: "whole", value: 24, sign: "+" },
 					backgroundColor: "#FFD93D"
 				}
 			]

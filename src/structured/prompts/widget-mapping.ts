@@ -40,7 +40,55 @@ export function createWidgetMappingPrompt(
 				const schemaEntry = schemaEntries.find(([key]) => key === typeName)
 				if (schemaEntry) {
 					const [, schema] = schemaEntry
-					const description = schema?._def.description ?? "No description available."
+					let description = schema?._def.description ?? "No description available."
+					
+					// Enhanced guidance for discreteObjectRatioDiagram
+					if (typeName === "discreteObjectRatioDiagram") {
+						description += `
+
+**ENHANCED SELECTION GUIDANCE FOR discreteObjectRatioDiagram:**
+
+Choose this widget when MOST of the following are true (treat "true" liberally):
+- Many small, countable items are shown (even if irregularly spaced or not in perfect rows)
+- 1-5 visually distinct item types/classes (e.g., eggs vs chicks; whales vs shark; cookies vs ice cream)
+- Items are not connected by lines/edges and there are no numeric axes or bars
+- Items may vary in pose, rotation, mirroring, or color shade but remain semantically the same class
+- Mild overlap/occlusion is present but each item is still individually countable
+- Counts are intended to be read by literally counting the items
+
+**SELECTION CHECKLIST (yes/no):**
+- countableItems: Are there multiple discrete objects that can be counted?
+- fewTypes: Are there ≤5 different types of objects?
+- noAxesNoBars: Are there no coordinate axes or bar chart elements?
+- noConnectingLines: Are objects standalone (not connected by lines/networks)?
+- variationsAreSameType: Do pose/rotation variations represent the same semantic type?
+- occlusionLow: Can individual items still be distinguished and counted?
+
+**Score = number of "yes". If Score ≥ 3, SELECT discreteObjectRatioDiagram unless a disqualifier applies.**
+
+**TIE-BREAKER (very important):**
+If both pictograph/bar-like interpretations and this widget seem plausible, PREFER discreteObjectRatioDiagram. Counting pictures is the canonical representation for ratio problems.
+
+**NORMALIZATION RULES:**
+- Treat mirrored/rotated/pose-varied instances as the same type if a human would name them the same (all "whales", "eggs", "cookies")
+- Small stylistic differences do not create new types unless they clearly communicate different categories
+
+**CONCRETE EXAMPLES:**
+
+✅ SELECT discreteObjectRatioDiagram:
+- Input: Repeated eggs and chicks scattered, no axes
+  → objects: [{emoji:"🥚",count:5},{emoji:"🐥",count:3}]
+
+- Input: Turtles and seals, mixed poses, uneven spacing  
+  → objects: [{emoji:"🐢",count:6},{emoji:"🦭",count:3}]
+
+- Input: 4 chicks and 5 penguins (from your example)
+  → objects: [{emoji:"🐥",count:4},{emoji:"🐧",count:5}]
+
+- Input: Many whales and one shark, some overlap, water spouts drawn
+  → objects: [{emoji:"🐋",count:8},{emoji:"🦈",count:1}]`
+					}
+					
 					return `- ${typeName}: ${description}`
 				}
 				return `- ${typeName}: No description available.`
@@ -146,7 +194,19 @@ Correct mapping when graph widgets are available:
 - Choice-level visual widgets declared for multiple choice interactions (e.g., names ending with \`_choice_a\`, \`_choice_b\`, \`_choice_c\`) MUST be mapped to a concrete widget type, not \`WIDGET_NOT_FOUND\`. Inspect the scenario and choose the correct type from the allowed list.
 
 Widget Type Options:
-${[...collection.widgetTypeKeys].sort().join("\n")}`
+${[...collection.widgetTypeKeys].sort().join("\n")}
+
+**⚠️ CRITICAL SELECTION ENFORCEMENT FOR discreteObjectRatioDiagram:**
+
+When you encounter images with multiple discrete, countable objects (like animals, food items, toys, etc.), you MUST apply the checklist scoring system described in the widget descriptions above. Do NOT be overly conservative. The discreteObjectRatioDiagram widget is specifically designed for these scenarios and should be selected when the checklist score ≥ 3.
+
+**MANDATORY OUTPUT CONTRACT:**
+When the checklist score ≥ 3, you MUST select discreteObjectRatioDiagram and return the objects array with best-effort counts. Small counting uncertainty is acceptable; choose the most reasonable count. Do NOT use WIDGET_NOT_FOUND for countable discrete objects that clearly fit this pattern.
+
+**COMPETING WIDGET PRIORITY:**
+- bar chart, scatter plot, area chart, and line graph are DISPREFERRED when items are individually countable discrete objects
+- pictograph widgets are LOWER PRIORITY than discreteObjectRatioDiagram for counting scenarios
+- Default to discreteObjectRatioDiagram for multiple repeated pictures/icons/objects`
 
 	const userContent = `Based on the source material and assessment body below, create a JSON object that maps each widget slot name to the most appropriate widget type. Use the provided context, including raster images for vision and vector images as text, to understand the content fully.
 

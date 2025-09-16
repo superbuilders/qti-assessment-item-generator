@@ -96,6 +96,7 @@ import { generateVectorDiagram } from "./generators/vector-diagram"
 import { generateVennDiagram } from "./generators/venn-diagram"
 import { generateVerticalArithmeticSetup } from "./generators/vertical-arithmetic-setup"
 import { generateWheelDiagram } from "./generators/wheel-diagram"
+import { generateQuadrantDiagram } from "./generators/quadrant-diagram"
 import { type WidgetInput, WidgetSchema } from "./registry"
 
 export async function generateWidget(widgetInput: WidgetInput): Promise<string> {
@@ -106,6 +107,8 @@ export async function generateWidget(widgetInput: WidgetInput): Promise<string> 
 	}
 	const widget = parsed.data
 	switch (widget.type) {
+		case "quadrantDiagram":
+			return await generateQuadrantDiagram(widget)
 		case "clockDiagram":
 			return await generateClockDiagram(widget)
 		case "wheelDiagram":

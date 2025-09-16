@@ -97,11 +97,13 @@ import { VectorDiagramPropsSchema } from "./generators/vector-diagram"
 import { VennDiagramPropsSchema } from "./generators/venn-diagram"
 import { VerticalArithmeticSetupPropsSchema } from "./generators/vertical-arithmetic-setup"
 import { WheelDiagramPropsSchema } from "./generators/wheel-diagram"
+import { QuadrantDiagramPropsSchema } from "./generators/quadrant-diagram"
 
 // Master registry of widget schemas for dynamic validation and prompting
 export const allWidgetSchemas = {
 	threeDIntersectionDiagram: ThreeDIntersectionDiagramPropsSchema,
 	absoluteValueNumberLine: AbsoluteValueNumberLinePropsSchema,
+	quadrantDiagram: QuadrantDiagramPropsSchema,
 	clockDiagram: ClockDiagramPropsSchema,
 	angleDiagram: AngleDiagramPropsSchema,
 	angleTypeDiagram: AngleTypeDiagramPropsSchema,
@@ -204,6 +206,7 @@ export const typedSchemas = allWidgetSchemas
 export {
 	ThreeDIntersectionDiagramPropsSchema,
 	AbsoluteValueNumberLinePropsSchema,
+	QuadrantDiagramPropsSchema,
 	AdditionWithRegroupingPropsSchema,
 	AngleDiagramPropsSchema,
 	AngleTypeDiagramPropsSchema,
@@ -303,6 +306,7 @@ export {
 // NEW: Input types for each schema
 export type ThreeDIntersectionDiagramProps = z.input<typeof ThreeDIntersectionDiagramPropsSchema>
 export type AbsoluteValueNumberLineProps = z.input<typeof AbsoluteValueNumberLinePropsSchema>
+export type QuadrantDiagramProps = z.input<typeof QuadrantDiagramPropsSchema>
 export type AdditionWithRegroupingProps = z.input<typeof AdditionWithRegroupingPropsSchema>
 export type AngleDiagramProps = z.input<typeof AngleDiagramPropsSchema>
 export type AngleTypeDiagramProps = z.input<typeof AngleTypeDiagramPropsSchema>
@@ -400,6 +404,7 @@ export type MarbleDiagramProps = z.input<typeof MarbleDiagramPropsSchema>
 const widgetSchemasWithoutSpecialUnions = [
 	typedSchemas.threeDIntersectionDiagram,
 	typedSchemas.absoluteValueNumberLine,
+	typedSchemas.quadrantDiagram,
 	typedSchemas.clockDiagram,
 	typedSchemas.angleDiagram,
 	typedSchemas.angleTypeDiagram,

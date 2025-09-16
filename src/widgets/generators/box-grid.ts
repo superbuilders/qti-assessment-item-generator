@@ -1,9 +1,12 @@
+import * as errors from "@superbuilders/errors"
+import * as logger from "@superbuilders/slog"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
 import { CSS_COLOR_PATTERN } from "../../utils/css-color"
 import { MATHML_INNER_PATTERN } from "../../utils/mathml"
 import { theme } from "../../utils/theme"
+import { numberContentToInnerMathML } from "../../utils/number-to-mathml"
 import type { WidgetGenerator } from "../types"
 
 // Defines the content and styling for a single cell in the grid.
@@ -11,13 +14,7 @@ const BoxGridCellSchema = z
 	.object({
 		content: z
 			.discriminatedUnion("type", [
-				z
-					.object({
-						type: z.literal("text").describe("Identifies this as plain text content"),
-						content: z.string().describe("The actual text content to display")
-					})
-					.strict()
-					.describe("Plain text content that will be rendered as-is"),
+				// text-only removed: we render numbers/math as MathML for consistent typography
 				z
 					.object({
 						type: z.literal("math").describe("Identifies this as mathematical content"),
@@ -27,9 +24,36 @@ const BoxGridCellSchema = z
 							.describe("Inner MathML markup (no outer <math> element)")
 					})
 					.strict()
-					.describe("Mathematical content represented in MathML format")
+					.describe("Mathematical content represented in MathML format"),
+				z
+					.object({
+						type: z.literal("whole").describe("Whole number content"),
+						value: z.number().int().describe("Integer magnitude (non-directional)"),
+						sign: z.enum(["+", "-"]).describe("Sign of the number")
+					})
+					.strict()
+					.describe("Whole number content with explicit sign"),
+				z
+					.object({
+						type: z.literal("fraction").describe("Fractional number content"),
+						numerator: z.number().int().min(0).describe("Numerator (non-negative)"),
+						denominator: z.number().int().positive().describe("Denominator (positive)"),
+						sign: z.enum(["+", "-"]).describe("Sign of the fraction")
+					})
+					.strict()
+					.describe("Fractional number content with explicit sign"),
+				z
+					.object({
+						type: z.literal("mixed").describe("Mixed number content like 1 1/4"),
+						whole: z.number().int().min(0).describe("Whole part (non-negative)"),
+						numerator: z.number().int().min(0).describe("Numerator of the fractional part"),
+						denominator: z.number().int().positive().describe("Denominator of the fractional part (positive)"),
+						sign: z.enum(["+", "-"]).describe("Sign of the mixed number")
+					})
+					.strict()
+					.describe("Mixed number content with explicit sign")
 			])
-			.describe("Inline content for the cell: either plain text or MathML"),
+			.describe("Inline content for the cell: math (MathML) or number (whole/fraction/mixed)"),
 		backgroundColor: z
 			.string()
 			.regex(CSS_COLOR_PATTERN, "invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)")
@@ -78,18 +102,6 @@ export const BoxGridPropsSchema = z
 export type BoxGridProps = z.infer<typeof BoxGridPropsSchema>
 
 /**
- * Helper function to get the label text from cell content
- */
-function getCellLabel(content: { type: "text"; content: string } | { type: "math"; mathml: string }): string {
-	if (content.type === "text") return content.content
-	// math content: strip markup for a plain-text fallback
-	return content.mathml
-		.replace(/<[^>]+>/g, " ")
-		.replace(/\s+/g, " ")
-		.trim()
-}
-
-/**
  * Generates an SVG diagram of a grid of cells, with each cell capable of
  * displaying data and having a custom background color for highlighting.
  */
@@ -97,9 +109,25 @@ export const generateBoxGrid: WidgetGenerator<typeof BoxGridPropsSchema> = async
 	const { width, height, data, showGridLines } = props
 
 	const numRows = data.length
-	if (numRows === 0) return `<svg width="${width}" height="${height}" />`
-	const numCols = data[0]?.length ?? 0
-	if (numCols === 0) return `<svg width="${width}" height="${height}" />`
+	if (numRows === 0) {
+		logger.error("box grid has no rows", { width, height })
+		throw errors.new("box grid: no rows")
+	}
+	const firstRow = data[0]
+	const expectedNumCols = firstRow ? firstRow.length : 0
+	if (expectedNumCols === 0) {
+		logger.error("box grid first row has no columns", { width, height })
+		throw errors.new("box grid: no columns")
+	}
+	for (let r = 0; r < numRows; r++) {
+		const row = data[r]
+		const rowCols = row ? row.length : -1
+		if (rowCols !== expectedNumCols) {
+			logger.error("box grid rows have inconsistent column counts", { rowIndex: r, expected: expectedNumCols, actual: rowCols })
+			throw errors.new("box grid: ragged rows")
+		}
+	}
+	const numCols = expectedNumCols
 
 	const cellWidth = width / numCols
 	const cellHeight = height / numRows
@@ -134,19 +162,30 @@ export const generateBoxGrid: WidgetGenerator<typeof BoxGridPropsSchema> = async
 				})
 			}
 
-			// Draw the text content (render text directly; for math, render a simple text fallback by stripping tags)
-			const textX = x + cellWidth / 2
-			const textY = y + cellHeight / 2
-			const label = getCellLabel(cell.content)
-			canvas.drawText({
-				x: textX,
-				y: textY,
-				text: label,
-				fontPx: 14,
-				anchor: "middle",
-				dominantBaseline: "middle",
-				fill: theme.colors.text
-			})
+			// Draw content: for math and numbers, render as MathML via XHTML foreignObject for typographic quality
+			if (
+				cell.content.type === "math" ||
+				cell.content.type === "whole" ||
+				cell.content.type === "fraction" ||
+				cell.content.type === "mixed"
+			) {
+				const inner =
+					cell.content.type === "math"
+						? cell.content.mathml
+						: numberContentToInnerMathML(cell.content)
+
+				const fontPx = 14
+				// Increase font size for better legibility in grid cells
+				const xhtml = `<!DOCTYPE html><div xmlns="http://www.w3.org/1999/xhtml" style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-family:${theme.font.family.sans};color:${theme.colors.text};"><math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\" style=\"font-size:${fontPx * 1.25}px;\">${inner}</math></div>`
+
+				canvas.drawForeignObject({
+					x: x,
+					y: y,
+					width: cellWidth,
+					height: cellHeight,
+					content: xhtml
+				})
+			}
 		}
 	}
 

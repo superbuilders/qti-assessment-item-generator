@@ -2112,7 +2112,6 @@ export const countApplesEmoji: AssessmentItemInput = {
 			title: null,
 			width: 250,
 			height: 120,
-			layout: "grid",
 			objects: [{ count: 3, emoji: "🍎" }]
 		},
 		choice_4_apples: {
@@ -2120,7 +2119,6 @@ export const countApplesEmoji: AssessmentItemInput = {
 			title: null,
 			width: 250,
 			height: 120,
-			layout: "grid",
 			objects: [{ count: 4, emoji: "🍎" }]
 		},
 		choice_5_apples: {
@@ -2128,7 +2126,6 @@ export const countApplesEmoji: AssessmentItemInput = {
 			title: null,
 			width: 250,
 			height: 120,
-			layout: "grid",
 			objects: [{ count: 5, emoji: "🍎" }]
 		},
 		choice_6_apples: {
@@ -2136,7 +2133,6 @@ export const countApplesEmoji: AssessmentItemInput = {
 			title: null,
 			width: 250,
 			height: 120,
-			layout: "grid",
 			objects: [{ count: 6, emoji: "🍎" }]
 		}
 	},

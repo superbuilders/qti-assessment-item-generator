@@ -1,7 +1,7 @@
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { drawChartTitle } from "../../utils/chart-layout-utils"
-import { PADDING } from "../../utils/constants"
+// PADDING intentionally unused; this widget uses tighter padding for visuals.
 import { abbreviateMonth } from "../../utils/labels"
 
 import { theme } from "../../utils/theme"
@@ -25,6 +25,7 @@ const ObjectTypeSchema = z
 	.strict()
 
 // The main Zod schema for the discreteObjectRatioDiagram function
+// Single, simple API: always renders one row per object type from top to bottom.
 export const DiscreteObjectRatioDiagramPropsSchema = z
 	.object({
 		type: z
@@ -44,13 +45,9 @@ export const DiscreteObjectRatioDiagramPropsSchema = z
 			),
 		objects: z
 			.array(ObjectTypeSchema)
+			.min(1)
 			.describe(
-				"Array of object types with their counts. Each type uses a different emoji. Order affects color assignment and grouping. Can be empty array for blank diagram."
-			),
-		layout: z
-			.enum(["grid", "cluster"])
-			.describe(
-				"Visual arrangement of objects. 'grid' spaces all objects evenly in rows. 'cluster' groups objects by type, ideal for showing distinct ratios."
+				"Array of object types with their counts. Each type uses a different emoji. One or more types required."
 			),
 		title: z
 			.string()
@@ -62,7 +59,7 @@ export const DiscreteObjectRatioDiagramPropsSchema = z
 	})
 	.strict()
 	.describe(
-		"Creates visual representations of ratios using discrete countable objects (emojis). Perfect for elementary ratio concepts, part-to-part and part-to-whole relationships. The 'cluster' layout clearly shows groupings while 'grid' emphasizes the total collection."
+		"Creates visual representations of ratios using discrete countable objects (emojis). Objects are grouped by rows, one row per object type."
 	)
 
 export type DiscreteObjectRatioDiagramProps = z.infer<typeof DiscreteObjectRatioDiagramPropsSchema>
@@ -75,10 +72,11 @@ export type DiscreteObjectRatioDiagramProps = z.infer<typeof DiscreteObjectRatio
 export const generateDiscreteObjectRatioDiagram: WidgetGenerator<typeof DiscreteObjectRatioDiagramPropsSchema> = async (
 	data
 ) => {
-	const { width, height, objects, layout, title } = data
+	const { width, height, title } = data
 
 	// Titles float above the chart content area.
-	const padding = { top: 40, right: PADDING, bottom: PADDING, left: PADDING }
+	// Tighter side/bottom padding for a cleaner look in this widget.
+	const padding = { top: 40, right: 12, bottom: 12, left: 12 }
 
 	const chartWidth = width - padding.left - padding.right
 	const chartHeight = height - padding.top - padding.bottom
@@ -90,7 +88,7 @@ export const generateDiscreteObjectRatioDiagram: WidgetGenerator<typeof Discrete
 	})
 
 	// Add a clean background container with rounded corners and subtle border
-	const containerPadding = 10
+	const containerPadding = 6
 	const containerX = padding.left - containerPadding
 	const containerY = padding.top - containerPadding
 	const containerWidth = chartWidth + 2 * containerPadding
@@ -120,8 +118,16 @@ export const generateDiscreteObjectRatioDiagram: WidgetGenerator<typeof Discrete
 		})
 	}
 
-	const iconSize = 28 // Larger for better emoji visibility
-	const iconPadding = 8 // More breathing room
+	// Dynamically size emoji so rows fill available space cleanly
+	const spacingRatio = 0.35 // horizontal space between items as a fraction of size
+	const rowCount = data.objects.length
+	const rowHeight = chartHeight / rowCount
+	const heightBased = rowHeight * 0.8
+	const widthBasedAllRows = Math.min(
+		...data.objects.map((o) => (o.count > 0 ? chartWidth / (o.count * (1 + spacingRatio)) : heightBased))
+	)
+	const iconSize = Math.max(12, Math.floor(Math.min(heightBased, widthBasedAllRows)))
+	const iconPadding = Math.floor(iconSize * spacingRatio)
 	const step = iconSize + iconPadding
 
 	// Function to draw emojis with better positioning using Canvas API
@@ -140,39 +146,24 @@ export const generateDiscreteObjectRatioDiagram: WidgetGenerator<typeof Discrete
 	let currentX = padding.left
 	let currentY = padding.top
 
-	if (layout === "grid") {
-		for (const obj of objects) {
-			for (let i = 0; i < obj.count; i++) {
-				if (currentX + iconSize > width - padding.right) {
-					currentX = padding.left
-					currentY += step
-				}
-				drawIcon(currentX, currentY, obj.emoji)
-				currentX += step
-			}
-		}
-	} else {
-		// Cluster layout: group objects by type
-		for (let groupIndex = 0; groupIndex < objects.length; groupIndex++) {
-			const obj = objects[groupIndex]
-			if (!obj) continue
-			const groupWidth = chartWidth / objects.length
-			const startX = padding.left + groupIndex * groupWidth
-			currentX = startX
-			currentY = padding.top
-			for (let i = 0; i < obj.count; i++) {
-				if (currentX + step > startX + groupWidth) {
-					currentX = startX
-					currentY += step
-				}
-				drawIcon(currentX, currentY, obj.emoji)
-				currentX += step
-			}
+	// Group by horizontal rows (one row per object type)
+	const objects = data.objects
+	for (let rowIndex = 0; rowIndex < objects.length; rowIndex++) {
+		const obj = objects[rowIndex]
+		const startY = padding.top + rowIndex * rowHeight
+		// Center row content horizontally
+		const rowContentWidth = obj.count * step
+		const extraX = Math.max(0, Math.floor((chartWidth - rowContentWidth) / 2))
+		currentX = padding.left + extraX
+		currentY = startY
+		for (let i = 0; i < obj.count; i++) {
+			drawIcon(currentX, currentY, obj.emoji)
+			currentX += step
 		}
 	}
 
-	// NEW: Finalize the canvas and construct the root SVG element
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	// NEW: Finalize the canvas and construct the root SVG element with smaller outer padding
+	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(12)
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.medium}">${svgBody}</svg>`
 }
