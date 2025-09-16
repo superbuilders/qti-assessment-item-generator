@@ -297,8 +297,9 @@ export const generateTransformationDiagram: WidgetGenerator<typeof Transformatio
 	const image: TransformationDiagramProps["preImage"] = {
 		...preImage,
 		vertices: imageVertices,
-		label: addPrimeToNullable(preImage.label),
-		vertexLabels: preImage.vertexLabels.map(addPrime),
+		label: "Figure 2", // Use "Figure 2" instead of primed label
+		vertexLabels: ["A", "B", "C", "D"], // Use different labels for the second shape
+		strokeColor: "#1fab54", // Use green for the transformed image
 		sideLengths: [] // Side lengths are not transferred as they change in dilation
 	}
 
@@ -357,6 +358,17 @@ export const generateTransformationDiagram: WidgetGenerator<typeof Transformatio
 			strokeWidth: strokeWidth,
 			dash: dash
 		})
+
+		// Draw vertex dots
+		for (const vertex of shape.vertices) {
+			const svgX = toSvgX(vertex.x)
+			const svgY = toSvgY(vertex.y)
+			canvas.drawCircle(svgX, svgY, 4, {
+				fill: shape.strokeColor,
+				stroke: shape.strokeColor,
+				strokeWidth: 2
+			})
+		}
 	}
 
 	const drawLine = (line: {
@@ -382,7 +394,7 @@ export const generateTransformationDiagram: WidgetGenerator<typeof Transformatio
 		for (let i = 0; i < shape.vertices.length; i++) {
 			const vertex = shape.vertices[i]
 			const label = shape.vertexLabels[i]
-			if (!vertex || !label) continue
+			if (!vertex || !label || label === "•") continue // Skip bullet point placeholders
 
 			const perVertexExtraOffset = Array.isArray(extraOffset) ? (extraOffset[i] ?? 0) : extraOffset
 			const labelOffset = 16 + perVertexExtraOffset
@@ -648,6 +660,46 @@ export const generateTransformationDiagram: WidgetGenerator<typeof Transformatio
 	drawVertexLabels(preImage)
 	drawVertexLabels(image, imageLabelExtraOffset)
 	drawSideLengths(preImage)
+
+	// Draw shape labels without clashing the polygon; prefer above, else place below.
+	const drawShapeLabel = (shape: TransformationDiagramProps["preImage"]) => {
+		if (!shape.label) return
+
+		// Compute screen-space bbox of the shape
+		const svgXs = shape.vertices.map((v) => toSvgX(v.x))
+		const svgYs = shape.vertices.map((v) => toSvgY(v.y))
+		const minSvgX = Math.min(...svgXs)
+		const maxSvgX = Math.max(...svgXs)
+		const minSvgY = Math.min(...svgYs)
+		const maxSvgY = Math.max(...svgYs)
+
+		// Label styling and margins
+		const fontPx = theme.font.size.medium
+		const halfTextHeight = fontPx / 2
+		const margin = 24
+
+		// Try above first; if too close to top padding, place below
+		let labelY = minSvgY - margin - halfTextHeight
+		if (labelY < PADDING) {
+			labelY = maxSvgY + margin + halfTextHeight
+		}
+
+		const labelX = (minSvgX + maxSvgX) / 2
+
+		canvas.drawText({
+			x: labelX,
+			y: labelY,
+			text: shape.label,
+			anchor: "middle",
+			dominantBaseline: "middle",
+			fontPx,
+			fontWeight: theme.font.weight.bold,
+			fill: shape.strokeColor
+		})
+	}
+
+	drawShapeLabel(preImage)
+	drawShapeLabel(image)
 
 	if (centerPoint) {
 		drawPoint(centerPointInfo ?? { ...centerPoint, label: "P", style: "dot" })
