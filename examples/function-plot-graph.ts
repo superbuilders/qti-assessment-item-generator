@@ -23,7 +23,7 @@ export const functionPlotGraphExamples: FunctionPlotGraphProps[] = [
 		showQuadrantLabels: true,
 		polylines: [
 			{
-				id: "parabola",
+				id: "polyline_parabola",
 				points: [
 					{ x: -4, y: 8 },
 					{ x: -3, y: 4.5 },
@@ -36,7 +36,8 @@ export const functionPlotGraphExamples: FunctionPlotGraphProps[] = [
 					{ x: 4, y: 8 }
 				],
 				color: "#2563eb",
-				style: "solid"
+				style: "solid",
+				label: null
 			}
 		],
 		points: [
@@ -66,7 +67,7 @@ export const functionPlotGraphExamples: FunctionPlotGraphProps[] = [
 		showQuadrantLabels: false,
 		polylines: [
 			{
-				id: "motion",
+				id: "polyline_motion",
 				points: [
 					{ x: 0, y: 0 },
 					{ x: 1, y: 2 },
@@ -81,7 +82,8 @@ export const functionPlotGraphExamples: FunctionPlotGraphProps[] = [
 					{ x: 10, y: 0 }
 				],
 				color: "#059669",
-				style: "solid"
+				style: "solid",
+				label: null
 			}
 		],
 		points: [
@@ -110,7 +112,7 @@ export const functionPlotGraphExamples: FunctionPlotGraphProps[] = [
 		showQuadrantLabels: false,
 		polylines: [
 			{
-				id: "quadratic",
+				id: "polyline_quadratic",
 				points: [
 					{ x: -3, y: 9 },
 					{ x: -2.5, y: 6.25 },
@@ -127,7 +129,8 @@ export const functionPlotGraphExamples: FunctionPlotGraphProps[] = [
 					{ x: 3, y: 9 }
 				],
 				color: "#7c3aed",
-				style: "solid"
+				style: "solid",
+				label: null
 			}
 		],
 		points: []

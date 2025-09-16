@@ -1,11 +1,18 @@
 import { z } from "zod"
+import * as errors from "@superbuilders/errors"
+import * as logger from "@superbuilders/slog"
 import { CSS_COLOR_PATTERN } from "../utils/css-color"
 import { abbreviateMonth } from "../utils/labels"
 import type { Canvas } from "../utils/layout"
+import { estimateWrappedTextDimensions } from "../utils/text"
 import { theme } from "../utils/theme"
 
 // --- START: Moved Zod Schema Definitions ---
 // These schemas were previously in coordinate-plane-base.ts and are now homed here.
+
+// ID patterns for graph primitives
+const LINE_ID = /^line_[A-Za-z0-9_]+$/
+const POLYLINE_ID = /^polyline_[A-Za-z0-9_]+$/
 
 // Factory function for axis schema to prevent $ref generation
 export const createAxisOptionsSchema = () =>
@@ -86,7 +93,10 @@ export const createLineEquationSchema = () =>
 export const createLineSchema = () =>
 	z
 		.object({
-			id: z.string().describe('A unique identifier for the line (e.g., "line-a").'),
+			id: z
+				.string()
+				.regex(LINE_ID, "invalid line id; must match ^line_[A-Za-z0-9_]+$")
+				.describe('A unique identifier for the line (e.g., "line_p").'),
 			equation: createLineEquationSchema().describe("The mathematical definition of the line."),
 			color: z
 				.string()
@@ -95,7 +105,11 @@ export const createLineSchema = () =>
 					"invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA), rgb/rgba(), hsl/hsla(), or a common named color"
 				)
 				.describe('The color of the line, as a CSS color string (e.g., "red", "#FF0000").'),
-			style: z.enum(["solid", "dashed"]).describe("The style of the line.")
+			style: z.enum(["solid", "dashed"]).describe("The style of the line."),
+			label: z
+				.string()
+				.nullable()
+				.describe("Optional text label to place near the rendered line. Use null for no label.")
 		})
 		.strict()
 
@@ -167,7 +181,10 @@ export type Distance = z.infer<typeof DistanceSchema>
 export const createPolylineSchema = () =>
 	z
 		.object({
-			id: z.string().describe("A unique identifier for this polyline."),
+			id: z
+				.string()
+				.regex(POLYLINE_ID, "invalid polyline id; must match ^polyline_[A-Za-z0-9_]+$")
+				.describe("A unique identifier for this polyline (e.g., 'polyline_motion')."),
 			points: z
 				.array(z.object({ x: z.number(), y: z.number() }))
 				.describe("An array of {x, y} points to connect in order."),
@@ -178,7 +195,11 @@ export const createPolylineSchema = () =>
 					"invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA), rgb/rgba(), hsl/hsla(), or a common named color"
 				)
 				.describe("The color of the polyline."),
-			style: z.enum(["solid", "dashed"]).describe("The style of the polyline.")
+			style: z.enum(["solid", "dashed"]).describe("The style of the polyline."),
+			label: z
+				.string()
+				.nullable()
+				.describe("Optional text label to place near the rendered polyline. Use null for no label.")
 		})
 		.strict()
 
@@ -228,6 +249,23 @@ export function renderLines(
 ): void {
 	if (!lines) return
 
+	// Compute chart bounds for label placement constraints
+	const chartLeft = Math.min(toSvgX(xAxis.min), toSvgX(xAxis.max))
+	const chartRight = Math.max(toSvgX(xAxis.min), toSvgX(xAxis.max))
+	const chartTop = Math.min(toSvgY(yAxis.min), toSvgY(yAxis.max))
+	const chartBottom = Math.max(toSvgY(yAxis.min), toSvgY(yAxis.max))
+
+	// Axes segments to avoid (if visible)
+	const avoidAxes: Array<{ a: { x: number; y: number }; b: { x: number; y: number } }> = []
+	if (yAxis.min <= 0 && 0 <= yAxis.max) {
+		const y0 = toSvgY(0)
+		avoidAxes.push({ a: { x: chartLeft, y: y0 }, b: { x: chartRight, y: y0 } })
+	}
+	if (xAxis.min <= 0 && 0 <= xAxis.max) {
+		const x0 = toSvgX(0)
+		avoidAxes.push({ a: { x: x0, y: chartTop }, b: { x: x0, y: chartBottom } })
+	}
+
 	for (const l of lines) {
 		let y1: number
 		let y2: number
@@ -258,14 +296,195 @@ export function renderLines(
 		const dash = l.style === "dashed" ? "5 3" : undefined
 		const x1Svg = isVertical && verticalX !== null ? toSvgX(verticalX) : toSvgX(xAxis.min)
 		const x2Svg = isVertical && verticalX !== null ? toSvgX(verticalX) : toSvgX(xAxis.max)
+		const y1Svg = toSvgY(y1)
+		const y2Svg = toSvgY(y2)
 
 		canvas.drawInClippedRegion((clippedCanvas) => {
-			clippedCanvas.drawLine(x1Svg, toSvgY(y1), x2Svg, toSvgY(y2), {
+			clippedCanvas.drawLine(x1Svg, y1Svg, x2Svg, y2Svg, {
 				stroke: l.color,
 				strokeWidth: theme.stroke.width.thick,
 				dash: dash
 			})
 		})
+
+		// Auto place label when provided (non-null/non-empty)
+		if (l.label !== null) {
+			const text = l.label.trim()
+			if (text.length > 0) {
+				const seg = { a: { x: x1Svg, y: y1Svg }, b: { x: x2Svg, y: y2Svg } }
+				const dx = seg.b.x - seg.a.x
+				const dy = seg.b.y - seg.a.y
+				const len = Math.hypot(dx, dy) || 1
+				const tx = dx / len
+				const ty = dy / len
+				const nx = -ty
+				const ny = tx
+
+				const midAnchor = { x: (seg.a.x + seg.b.x) / 2, y: (seg.a.y + seg.b.y) / 2 }
+				const normalOffset = 14
+
+				const fontPx = theme.font.size.medium
+				const { maxWidth: w, height: h } = estimateWrappedTextDimensions(text, Number.POSITIVE_INFINITY, fontPx, 1.2)
+				const halfW = w / 2
+				const halfH = h / 2
+
+				const avoid = [...avoidAxes, seg]
+
+				function withinBounds(rect: { x: number; y: number; width: number; height: number }) {
+					const pad = 2
+					const lft = rect.x - pad
+					const rgt = rect.x + rect.width + pad
+					const top = rect.y - pad
+					const bot = rect.y + rect.height + pad
+					return lft >= chartLeft && rgt <= chartRight && top >= chartTop && bot <= chartBottom
+				}
+				function orient(p: { x: number; y: number }, q: { x: number; y: number }, r: { x: number; y: number }) {
+					const v = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y)
+					if (v > 1e-9) return 1
+					if (v < -1e-9) return -1
+					return 0
+				}
+				function intersects(p1: { x: number; y: number }, p2: { x: number; y: number }, p3: { x: number; y: number }, p4: { x: number; y: number }) {
+					const o1 = orient(p1, p2, p3)
+					const o2 = orient(p1, p2, p4)
+					const o3 = orient(p3, p4, p1)
+					const o4 = orient(p3, p4, p2)
+					return o1 !== o2 && o3 !== o4
+				}
+				function rectIntersectsSegment(rect: { x: number; y: number; width: number; height: number }, s: { a: { x: number; y: number }; b: { x: number; y: number } }) {
+					const r = { x1: rect.x, y1: rect.y, x2: rect.x + rect.width, y2: rect.y + rect.height }
+					const edges = [
+						{ a: { x: r.x1, y: r.y1 }, b: { x: r.x2, y: r.y1 } },
+						{ a: { x: r.x2, y: r.y1 }, b: { x: r.x2, y: r.y2 } },
+						{ a: { x: r.x2, y: r.y2 }, b: { x: r.x1, y: r.y2 } },
+						{ a: { x: r.x1, y: r.y2 }, b: { x: r.x1, y: r.y1 } }
+					]
+					return edges.some((e) => intersects(e.a, e.b, s.a, s.b))
+				}
+				function placeFromBase(base: { x: number; y: number }, direction: 1 | -1) {
+					const step = 6
+					const maxIt = 80
+					for (let i = 0; i < maxIt; i++) {
+						const cx = base.x + direction * tx * i * step
+						const cy = base.y + direction * ty * i * step
+						const rect = { x: cx - halfW, y: cy - halfH, width: w, height: h }
+						if (!withinBounds(rect)) continue
+						let hit = false
+						for (const s of avoid) {
+							if (rectIntersectsSegment(rect, s)) {
+								hit = true
+								break
+							}
+						}
+						if (!hit) return { x: cx, y: cy, i }
+					}
+					return null
+				}
+
+				// Candidate anchors: near far-from-y-axis endpoint, then midpoint
+				const yAxisVisible = xAxis.min <= 0 && 0 <= xAxis.max
+				const x0 = yAxisVisible ? toSvgX(0) : 0
+				const distA = Math.abs(seg.a.x - x0)
+				const distB = Math.abs(seg.b.x - x0)
+				const far = distA >= distB ? seg.a : seg.b
+				const near = distA >= distB ? seg.b : seg.a
+				// Anchor 15% inward from the far endpoint to avoid edges
+				const fracInward = 0.15
+				const farAnchor = { x: far.x + (near.x - far.x) * fracInward, y: far.y + (near.y - far.y) * fracInward }
+				const anchors = [farAnchor, midAnchor]
+
+				let chosen: { x: number; y: number; i: number } | null = null
+				let bestDistFromYAxis = -Infinity
+				for (const a of anchors) {
+					const base = { x: a.x + nx * normalOffset, y: a.y + ny * normalOffset }
+					// Prefer direction that increases distance from y-axis
+					let preferredDir: 1 | -1 = 1
+					if (yAxisVisible) {
+						const signFromAxis = a.x - x0 >= 0 ? 1 : -1
+						const signTx = tx >= 0 ? 1 : -1
+						preferredDir = (signFromAxis * signTx) > 0 ? 1 : -1
+					}
+					const posPreferred = placeFromBase(base, preferredDir)
+					const posOther = placeFromBase(base, (preferredDir === 1 ? -1 : 1) as 1 | -1)
+					let cand = posPreferred && posOther ? (posPreferred.i <= posOther.i ? posPreferred : posOther) : posPreferred ?? posOther
+					if (!cand) continue
+
+					// Enforce minimum horizontal gap from y-axis
+					if (yAxisVisible) {
+						const minGapPx = 14
+						if (Math.abs(cand.x - x0) < halfW + minGapPx) {
+							const step = 6
+							const maxExtra = 120
+							let extra = 0
+							while (extra <= maxExtra) {
+								const cx = cand.x + preferredDir * tx * step
+								const cy = cand.y + preferredDir * ty * step
+								const rect = { x: cx - halfW, y: cy - halfH, width: w, height: h }
+								const within = withinBounds(rect)
+								let hit = false
+								for (const s of avoid) {
+									if (rectIntersectsSegment(rect, s)) { hit = true; break }
+								}
+								if (within && !hit && Math.abs(cx - x0) >= halfW + minGapPx) {
+									cand = { x: cx, y: cy, i: cand.i }
+									break
+								}
+								extra += step
+							}
+						}
+					}
+
+					const distFromYAxis = yAxisVisible ? Math.abs(cand.x - x0) : Number.POSITIVE_INFINITY
+					if (distFromYAxis > bestDistFromYAxis) {
+						bestDistFromYAxis = distFromYAxis
+						chosen = cand
+					}
+				}
+				if (!chosen) {
+					logger.error("label placement", { type: "line", id: l.id })
+					throw errors.new("label placement")
+				}
+
+				// Enforce a minimum horizontal gap from the y-axis if visible
+				if (yAxisVisible) {
+					const minGapPx = 14
+					const gapOk = Math.abs(chosen.x - x0) >= halfW + minGapPx
+					if (!gapOk) {
+						const step = 6
+						const maxExtra = 120
+						let extra = 0
+						// Choose nudge direction that increases distance from the y-axis
+						const dir: 1 | -1 = yAxisVisible ? ((chosen.x - x0 >= 0 ? 1 : -1) * (tx >= 0 ? 1 : -1) > 0 ? 1 : -1) : 1
+						while (extra <= maxExtra) {
+							const cx = chosen.x + dir * tx * step
+							const cy = chosen.y + dir * ty * step
+							const rect = { x: cx - halfW, y: cy - halfH, width: w, height: h }
+							const within = withinBounds(rect)
+							let hit = false
+							for (const s of avoid) {
+								if (rectIntersectsSegment(rect, s)) { hit = true; break }
+							}
+							if (within && !hit && Math.abs(cx - x0) >= halfW + minGapPx) {
+								chosen = { x: cx, y: cy, i: chosen.i }
+								break
+							}
+							extra += step
+						}
+					}
+				}
+
+				canvas.drawText({
+					x: chosen.x,
+					y: chosen.y,
+					text: abbreviateMonth(text),
+					fill: l.color,
+					anchor: "middle",
+					dominantBaseline: "middle",
+					fontPx,
+					fontWeight: theme.font.weight.bold
+				})
+			}
+		}
 	}
 }
 
@@ -395,6 +614,114 @@ export function renderPolylines(
 					strokeWidth: theme.stroke.width.thick,
 					dash: dash
 				})
+
+				if (polyline.label !== null) {
+					const text = polyline.label.trim()
+					if (text.length > 0 && points.length >= 2) {
+						let total = 0
+						const segLens: number[] = []
+						for (let i = 0; i < points.length - 1; i++) {
+							const dx = points[i + 1].x - points[i].x
+							const dy = points[i + 1].y - points[i].y
+							const d = Math.hypot(dx, dy)
+							segLens.push(d)
+							total += d
+						}
+						let target = total / 2
+						let segIndex = 0
+						while (segIndex < segLens.length && target > segLens[segIndex]) {
+							target -= segLens[segIndex]
+							segIndex++
+						}
+						const a = points[Math.min(segIndex, points.length - 2)]
+						const b = points[Math.min(segIndex + 1, points.length - 1)]
+						const segLen = Math.max(1, segLens[Math.min(segIndex, segLens.length - 1)] || 1)
+						const t = target / segLen
+						const anchorX = a.x + (b.x - a.x) * t
+						const anchorY = a.y + (b.y - a.y) * t
+						const dx = b.x - a.x
+						const dy = b.y - a.y
+						const len = Math.hypot(dx, dy) || 1
+						const tx = dx / len
+						const ty = dy / len
+						const nx = -ty
+						const ny = tx
+
+						const avoid = [] as Array<{ a: { x: number; y: number }; b: { x: number; y: number } }>
+						for (let i = 0; i < points.length - 1; i++) {
+							avoid.push({ a: points[i], b: points[i + 1] })
+						}
+
+						const normalOffset = 14
+						const baseX = anchorX + nx * normalOffset
+						const baseY = anchorY + ny * normalOffset
+						const fontPx = theme.font.size.medium
+						const { maxWidth: w, height: h } = estimateWrappedTextDimensions(text, Number.POSITIVE_INFINITY, fontPx, 1.2)
+						const halfW = w / 2
+						const halfH = h / 2
+
+						function orient(p: { x: number; y: number }, q: { x: number; y: number }, r: { x: number; y: number }) {
+							const v = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y)
+							if (v > 1e-9) return 1
+							if (v < -1e-9) return -1
+							return 0
+						}
+						function intersects(p1: { x: number; y: number }, p2: { x: number; y: number }, p3: { x: number; y: number }, p4: { x: number; y: number }) {
+							const o1 = orient(p1, p2, p3)
+							const o2 = orient(p1, p2, p4)
+							const o3 = orient(p3, p4, p1)
+							const o4 = orient(p3, p4, p2)
+							return o1 !== o2 && o3 !== o4
+						}
+						function rectIntersectsSegment(rect: { x: number; y: number; width: number; height: number }, s: { a: { x: number; y: number }; b: { x: number; y: number } }) {
+							const r = { x1: rect.x, y1: rect.y, x2: rect.x + rect.width, y2: rect.y + rect.height }
+							const edges = [
+								{ a: { x: r.x1, y: r.y1 }, b: { x: r.x2, y: r.y1 } },
+								{ a: { x: r.x2, y: r.y1 }, b: { x: r.x2, y: r.y2 } },
+								{ a: { x: r.x2, y: r.y2 }, b: { x: r.x1, y: r.y2 } },
+								{ a: { x: r.x1, y: r.y2 }, b: { x: r.x1, y: r.y1 } }
+							]
+							return edges.some((e) => intersects(e.a, e.b, s.a, s.b))
+						}
+						function place(direction: 1 | -1) {
+							const step = 6
+							const maxIt = 80
+							for (let i = 0; i < maxIt; i++) {
+								const cx = baseX + direction * tx * i * step
+								const cy = baseY + direction * ty * i * step
+								const rect = { x: cx - halfW, y: cy - halfH, width: w, height: h }
+								let hit = false
+								for (const s of avoid) {
+									if (rectIntersectsSegment(rect, s)) {
+										hit = true
+										break
+									}
+								}
+								if (!hit) return { x: cx, y: cy, i }
+							}
+							return null
+						}
+
+						const pos1 = place(1)
+						const pos2 = place(-1)
+						const chosen = pos1 && pos2 ? (pos1.i <= pos2.i ? pos1 : pos2) : pos1 ?? pos2
+						if (!chosen) {
+							logger.error("label placement", { type: "polyline", id: polyline.id })
+							throw errors.new("label placement")
+						}
+
+						clippedCanvas.drawText({
+							x: chosen.x,
+							y: chosen.y,
+							text: abbreviateMonth(text),
+							fill: polyline.color,
+							anchor: "middle",
+							dominantBaseline: "middle",
+							fontPx,
+							fontWeight: theme.font.weight.bold
+						})
+					}
+				}
 			}
 		}
 	})
