@@ -10,7 +10,6 @@ import { AreaGraphPropsSchema } from "./generators/area-graph"
 import { AreaModelMultiplicationPropsSchema } from "./generators/area-model-multiplication"
 import { BarChartPropsSchema } from "./generators/bar-chart"
 import { BoxGridPropsSchema } from "./generators/box-grid"
-import { StringGridPropsSchema } from "./generators/string-grid"
 import { BoxPlotPropsSchema } from "./generators/box-plot"
 import { CircleAngleDiagramPropsSchema } from "./generators/circle-angle-diagram"
 import { CircleDiagramPropsSchema } from "./generators/circle-diagram"
@@ -114,7 +113,6 @@ export const allWidgetSchemas = {
 	areaGraph: AreaGraphPropsSchema,
 	barChart: BarChartPropsSchema,
 	boxGrid: BoxGridPropsSchema,
-	stringGrid: StringGridPropsSchema,
 	boxPlot: BoxPlotPropsSchema,
 	circleDiagram: CircleDiagramPropsSchema,
 	fractionModelDiagram: FractionModelDiagramPropsSchema,
@@ -218,7 +216,6 @@ export {
 	AreaModelMultiplicationPropsSchema,
 	BarChartPropsSchema,
 	BoxGridPropsSchema,
-	StringGridPropsSchema,
 	BoxPlotPropsSchema,
 	CircleDiagramPropsSchema,
 	CircleAngleDiagramPropsSchema,
@@ -320,7 +317,6 @@ export type AreaGraphProps = z.input<typeof AreaGraphPropsSchema>
 export type AreaModelMultiplicationProps = z.input<typeof AreaModelMultiplicationPropsSchema>
 export type BarChartProps = z.input<typeof BarChartPropsSchema>
 export type BoxGridProps = z.input<typeof BoxGridPropsSchema>
-export type StringGridProps = z.input<typeof StringGridPropsSchema>
 export type BoxPlotProps = z.input<typeof BoxPlotPropsSchema>
 export type CircleDiagramProps = z.input<typeof CircleDiagramPropsSchema>
 export type CircleAngleDiagramProps = z.input<typeof CircleAngleDiagramPropsSchema>
@@ -421,7 +417,6 @@ const widgetSchemasWithoutSpecialUnions = [
 	typedSchemas.areaGraph,
 	typedSchemas.barChart,
 	typedSchemas.boxGrid,
-	typedSchemas.stringGrid,
 	typedSchemas.boxPlot,
 	typedSchemas.circleDiagram,
 	typedSchemas.fractionModelDiagram,
