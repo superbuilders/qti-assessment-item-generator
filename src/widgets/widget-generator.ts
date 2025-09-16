@@ -48,6 +48,7 @@ import { generateLabeledRectangleDiagram } from "./generators/labeled-rectangle-
 import { generateLineDiagram } from "./generators/line-diagram"
 import { generateLineEquationGraph } from "./generators/line-equation-graph"
 import { generateLineGraph } from "./generators/line-graph"
+import { generateMarbleDiagram } from "./generators/marble-diagram"
 import { generateNPolygon } from "./generators/n-polygon"
 import { generateNumberLine } from "./generators/number-line"
 import { generateNumberLineForOpposites } from "./generators/number-line-for-opposites"
@@ -295,6 +296,8 @@ export async function generateWidget(widgetInput: WidgetInput): Promise<string> 
 			return await generatePESSpectrum(widget)
 		case "stickPlot":
 			return await generateStickPlot(widget)
+		case "marbleDiagram":
+			return await generateMarbleDiagram(widget)
 		default:
 			logger.error("unknown widget type", { widget })
 			throw errors.new(`Unknown widget type: ${JSON.stringify(widget)}`)

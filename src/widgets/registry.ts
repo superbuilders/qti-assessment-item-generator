@@ -49,6 +49,7 @@ import { LabeledRectangleDiagramPropsSchema } from "./generators/labeled-rectang
 import { LineDiagramPropsSchema } from "./generators/line-diagram"
 import { LineEquationGraphPropsSchema } from "./generators/line-equation-graph"
 import { LineGraphPropsSchema } from "./generators/line-graph"
+import { MarbleDiagramPropsSchema } from "./generators/marble-diagram"
 import { NPolygonPropsSchema } from "./generators/n-polygon"
 import { NumberLinePropsSchema } from "./generators/number-line"
 import { NumberLineForOppositesPropsSchema } from "./generators/number-line-for-opposites"
@@ -193,7 +194,8 @@ export const allWidgetSchemas = {
 	customPolygonDiagram: CustomPolygonDiagramPropsSchema,
 	lineDiagram: LineDiagramPropsSchema,
 	pesSpectrum: PESSpectrumPropsSchema,
-	stickPlot: StickPlotPropsSchema
+	stickPlot: StickPlotPropsSchema,
+	marbleDiagram: MarbleDiagramPropsSchema
 } as const
 
 export const typedSchemas = allWidgetSchemas
@@ -294,7 +296,8 @@ export {
 	CustomPolygonDiagramPropsSchema,
 	LineDiagramPropsSchema,
 	PESSpectrumPropsSchema,
-	StickPlotPropsSchema
+	StickPlotPropsSchema,
+	MarbleDiagramPropsSchema
 }
 
 // NEW: Input types for each schema
@@ -392,6 +395,7 @@ export type CustomPolygonDiagramProps = z.input<typeof CustomPolygonDiagramProps
 export type LineDiagramProps = z.input<typeof LineDiagramPropsSchema>
 export type PESSpectrumProps = z.input<typeof PESSpectrumPropsSchema>
 export type StickPlotProps = z.input<typeof StickPlotPropsSchema>
+export type MarbleDiagramProps = z.input<typeof MarbleDiagramPropsSchema>
 
 const widgetSchemasWithoutSpecialUnions = [
 	typedSchemas.threeDIntersectionDiagram,
@@ -486,7 +490,8 @@ const widgetSchemasWithoutSpecialUnions = [
 	typedSchemas.customPolygonDiagram,
 	typedSchemas.lineDiagram,
 	typedSchemas.pesSpectrum,
-	typedSchemas.stickPlot
+	typedSchemas.stickPlot,
+	typedSchemas.marbleDiagram
 ] as const
 
 export const WidgetSchema = z.union([
