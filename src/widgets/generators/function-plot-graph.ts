@@ -96,14 +96,19 @@ export const generateFunctionPlotGraph: WidgetGenerator<typeof FunctionPlotGraph
 	const EPS = 0.05
 	const TOL = 1e-6
 	const extendedPolylines = polylines.map((pl) => {
-		const pts = pl.points.map((p, idx, arr) => {
-			const isEndpoint = idx === 0 || idx === arr.length - 1
-			if (isEndpoint && Math.abs(p.y - yAxis.min) <= TOL) {
-				return { x: p.x, y: yAxis.min - EPS }
-			}
-			return p
-		})
-		return { ...pl, points: pts }
+		if (pl.type === "points") {
+			const pts = pl.points.map((p, idx, arr) => {
+				const isEndpoint = idx === 0 || idx === arr.length - 1
+				if (isEndpoint && Math.abs(p.y - yAxis.min) <= TOL) {
+					return { x: p.x, y: yAxis.min - EPS }
+				}
+				return p
+			})
+			return { ...pl, points: pts }
+		} else {
+			// function-based polylines don't need endpoint extension - they're evaluated dynamically
+			return pl
+		}
 	})
 
 	renderPolylines(extendedPolylines, baseInfo.toSvgX, baseInfo.toSvgY, canvas)

@@ -172,29 +172,69 @@ export type Distance = z.infer<typeof DistanceSchema>
 
 // Factory function for polyline schema
 export const createPolylineSchema = () =>
-	z
-		.object({
-			id: z
-				.string()
-				.regex(POLYLINE_ID, "invalid polyline id; must match ^polyline_[A-Za-z0-9_]+$")
-				.describe("A unique identifier for this polyline (e.g., 'polyline_motion')."),
-			points: z
-				.array(z.object({ x: z.number(), y: z.number() }))
-				.describe("An array of {x, y} points to connect in order."),
-			color: z
-				.string()
-				.regex(
-					CSS_COLOR_PATTERN,
-					"invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA), rgb/rgba(), hsl/hsla(), or a common named color"
-				)
-				.describe("The color of the polyline."),
-			style: z.enum(["solid", "dashed"]).describe("The style of the polyline."),
-			label: z
-				.string()
-				.nullable()
-				.describe("Optional text label to place near the rendered polyline. Use null for no label.")
-		})
-		.strict()
+	z.discriminatedUnion("type", [
+		z
+			.object({
+				type: z.literal("points").describe("Indicates this polyline is defined by explicit points."),
+				id: z
+					.string()
+					.regex(POLYLINE_ID, "invalid polyline id; must match ^polyline_[A-Za-z0-9_]+$")
+					.describe("A unique identifier for this polyline (e.g., 'polyline_motion')."),
+				points: z
+					.array(z.object({ x: z.number(), y: z.number() }))
+					.describe("An array of {x, y} points to connect in order."),
+				color: z
+					.string()
+					.regex(
+						CSS_COLOR_PATTERN,
+						"invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA), rgb/rgba(), hsl/hsla(), or a common named color"
+					)
+					.describe("The color of the polyline."),
+				style: z.enum(["solid", "dashed"]).describe("The style of the polyline."),
+				label: z
+					.string()
+					.nullable()
+					.describe("Optional text label to place near the rendered polyline. Use null for no label.")
+			})
+			.strict(),
+		z
+			.object({
+				type: z.literal("function").describe("Indicates this polyline is defined by a polynomial function."),
+				id: z
+					.string()
+					.regex(POLYLINE_ID, "invalid polyline id; must match ^polyline_[A-Za-z0-9_]+$")
+					.describe("A unique identifier for this polyline (e.g., 'polyline_motion')."),
+				coefficients: z
+					.array(z.number())
+					.min(1, "must have at least one coefficient")
+					.describe("Polynomial coefficients in descending order of powers. E.g., [4, 3, 2, 1, 0] represents 4x⁴ + 3x³ + 2x² + 1x + 0."),
+				xRange: z
+					.object({
+						min: z.number().describe("Minimum x value for function evaluation."),
+						max: z.number().describe("Maximum x value for function evaluation.")
+					})
+					.describe("The x-range over which to evaluate and plot the function."),
+				resolution: z
+					.number()
+					.int()
+					.min(10, "resolution must be at least 10 points")
+					.default(100)
+					.describe("Number of points to generate when plotting the function (default: 100)."),
+				color: z
+					.string()
+					.regex(
+						CSS_COLOR_PATTERN,
+						"invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA), rgb/rgba(), hsl/hsla(), or a common named color"
+					)
+					.describe("The color of the polyline."),
+				style: z.enum(["solid", "dashed"]).describe("The style of the polyline."),
+				label: z
+					.string()
+					.nullable()
+					.describe("Optional text label to place near the rendered polyline. Use null for no label.")
+			})
+			.strict()
+	])
 
 export const PolylineSchema = createPolylineSchema()
 export type Polyline = z.infer<typeof PolylineSchema>
@@ -597,10 +637,36 @@ export function renderPolylines(
 
 	canvas.drawInClippedRegion((clippedCanvas) => {
 		for (const polyline of polylines) {
-			const points = polyline.points.map((p) => ({
-				x: toSvgX(p.x),
-				y: toSvgY(p.y)
-			}))
+			let points: { x: number; y: number }[]
+			
+			if (polyline.type === "points") {
+				points = polyline.points.map((p) => ({
+					x: toSvgX(p.x),
+					y: toSvgY(p.y)
+				}))
+			} else {
+				// function-based polyline: evaluate polynomial at resolution points
+				const { coefficients, xRange, resolution } = polyline
+				const xStep = (xRange.max - xRange.min) / (resolution - 1)
+				points = []
+				
+				for (let i = 0; i < resolution; i++) {
+					const x = xRange.min + i * xStep
+					let y = 0
+					const degree = coefficients.length - 1
+					
+					// evaluate polynomial: coefficients[0]*x^degree + coefficients[1]*x^(degree-1) + ...
+					for (let j = 0; j < coefficients.length; j++) {
+						const power = degree - j
+						y += coefficients[j] * Math.pow(x, power)
+					}
+					
+					points.push({
+						x: toSvgX(x),
+						y: toSvgY(y)
+					})
+				}
+			}
 			if (points.length > 0) {
 				const dash = polyline.style === "dashed" ? "5 3" : undefined
 				clippedCanvas.drawPolyline(points, {
