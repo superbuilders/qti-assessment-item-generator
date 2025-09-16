@@ -184,6 +184,116 @@ describe("buildPerseusEnvelope (unit)", () => {
 		expect(envelope.vectorImageUrls).toHaveLength(0)
 	})
 
+	test("builds envelope for marble probability item", async () => {
+		const perseusJson = {
+			"hints": [
+				{
+					"images": {},
+					"content": "$\\text{Probability} = \\\dfrac{\\text{Number of favorable outcomes}}{\\text{Number of possible outcomes}}$",
+					"replace": false,
+					"widgets": {}
+				},
+				{
+					"images": {},
+					"content": "There are $16$ favorable outcomes (the $8 + 8 = 16$ marbles that are either blue or red).\n\nThere are $21$ possible outcomes (the $8 + 5 + 8 = 21$ total marbles).",
+					"replace": false,
+					"widgets": {}
+				},
+				{
+					"images": {},
+					"content": "$\\qquad \\text{P(draw a blue or red marble}) = \\\dfrac{16}{21}\\approx0.76$",
+					"replace": false,
+					"widgets": {}
+				}
+			],
+			"question": {
+				"images": {},
+				"content": "You randomly draw a marble from a bag of marbles that contains $8$ blue marbles, $5$ green marbles, and $8$ red marbles.\n\n**What is $\\text{P(draw a blue or red marble})$?**  \n*If necessary, round your answer to $2$ decimal places.*  \n[[☃ input-number 1]]\n\n[[☃ image 1]]\n\n",
+				"widgets": {
+					"image 1": {
+						"type": "image",
+						"graded": true,
+						"static": false,
+						"options": {
+							"alt": "An image of 8 red marbles, 5 green marbles, and 8 blue marbles mixed up.",
+							"box": [
+								480,
+								160
+							],
+							"range": [
+								[
+									0,
+									10
+								],
+								[
+									0,
+									10
+								]
+							],
+							"title": "",
+							"labels": [],
+							"static": false,
+							"caption": "",
+							"backgroundImage": {
+								"url": "https://cdn.kastatic.org/ka-perseus-graphie/64430f539a7bd1d4c56f957779c43a4a184c09bd.png",
+								"width": 480,
+								"height": 160
+							}
+						},
+						"version": {
+							"major": 0,
+							"minor": 0
+						},
+						"alignment": "block"
+					},
+					"input-number 1": {
+						"type": "input-number",
+						"graded": true,
+						"static": false,
+						"options": {
+							"size": "normal",
+							"value": 0.7619047619047619,
+							"inexact": true,
+							"maxError": 0.005,
+							"simplify": "optional",
+							"answerType": "percent",
+							"rightAlign": false
+						},
+						"version": {
+							"major": 0,
+							"minor": 0
+						},
+						"alignment": "default"
+					}
+				}
+			},
+			"answerArea": {
+				"tTable": false,
+				"zTable": false,
+				"chi2Table": false,
+				"calculator": true,
+				"periodicTable": false
+			},
+			"itemDataVersion": {
+				"major": 0,
+				"minor": 1
+			}
+		}
+
+		const result = await errors.try(buildPerseusEnvelope(perseusJson))
+		expect(result.error).toBeFalsy()
+		if (result.error) {
+			logger.error("test failed", { error: result.error })
+			throw result.error
+		}
+		const envelope = result.data
+		expect(envelope.context).toHaveLength(1)
+		expect(envelope.vectorImageUrls).toEqual([])
+		expect(envelope.rasterImageUrls).toEqual([
+			"https://cdn.kastatic.org/ka-perseus-graphie/64430f539a7bd1d4c56f957779c43a4a184c09bd.png"
+		])
+	})
+
 	test("extracts multiple markdown links without adding to context", async () => {
 		const perseusJsonWithMultipleLinks = {
 			question: { content: "Check [source A](https://example.com/a) and [source B](https://example.com/b) for more information." }
