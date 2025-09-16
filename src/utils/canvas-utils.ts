@@ -37,13 +37,6 @@ export const createPlotPointSchema = () =>
 			x: z.number().describe("The value of the point on the horizontal (X) axis."),
 			y: z.number().describe("The value of the point on the vertical (Y) axis."),
 			label: z.string().describe('A text label to display near the point (e.g., "A", "(m, n)").'),
-			color: z
-				.string()
-				.regex(
-					CSS_COLOR_PATTERN,
-					"invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA), rgb/rgba(), hsl/hsla(), or a common named color"
-				)
-				.describe("The color of the point, as a CSS color string."),
 			style: z.enum(["open", "closed"]).describe("Visual style for the point marker.")
 		})
 		.strict()
@@ -219,11 +212,12 @@ export function renderPoints(
 	for (const p of points) {
 		const px = toSvgX(p.x)
 		const py = toSvgY(p.y)
-		const fill = p.style === "open" ? theme.colors.white : p.color
+		const pointColor = theme.colors.black
+		const fill = p.style === "open" ? theme.colors.white : pointColor
 
 		canvas.drawCircle(px, py, theme.geometry.pointRadius.base, {
 			fill,
-			stroke: p.color,
+			stroke: pointColor,
 			strokeWidth: theme.stroke.width.base
 		})
 

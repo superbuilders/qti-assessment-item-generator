@@ -290,10 +290,6 @@ export const generateTransformationDiagram: WidgetGenerator<typeof Transformatio
 		}
 	}
 
-	// FIX: Use separate functions for nullable (shape label) and non-nullable (vertex labels) to fix type error.
-	const addPrimeToNullable = (label: string | null): string | null => (label ? `${label}′` : null)
-	const addPrime = (label: string): string => `${label}′`
-
 	const image: TransformationDiagramProps["preImage"] = {
 		...preImage,
 		vertices: imageVertices,

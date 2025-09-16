@@ -41,9 +41,9 @@ export const functionPlotGraphExamples: FunctionPlotGraphProps[] = [
 			}
 		],
 		points: [
-			{ id: "origin", x: 0, y: 0, label: "O", color: "#dc2626", style: "closed" },
-			{ id: "point1", x: -2, y: 2, label: "A", color: "#dc2626", style: "closed" },
-			{ id: "point2", x: 2, y: 2, label: "B", color: "#dc2626", style: "closed" }
+			{ id: "origin", x: 0, y: 0, label: "O", style: "closed" },
+			{ id: "point1", x: -2, y: 2, label: "A", style: "closed" },
+			{ id: "point2", x: 2, y: 2, label: "B", style: "closed" }
 		]
 	},
 	{
@@ -87,8 +87,8 @@ export const functionPlotGraphExamples: FunctionPlotGraphProps[] = [
 			}
 		],
 		points: [
-			{ id: "max", x: 3, y: 3.5, label: "Max", color: "#dc2626", style: "closed" },
-			{ id: "min", x: 8, y: -3, label: "Min", color: "#dc2626", style: "closed" }
+			{ id: "max", x: 3, y: 3.5, label: "Max", style: "closed" },
+			{ id: "min", x: 8, y: -3, label: "Min", style: "closed" }
 		]
 	},
 	{
