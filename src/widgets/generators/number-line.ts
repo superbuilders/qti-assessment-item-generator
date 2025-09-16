@@ -3,9 +3,10 @@ import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
 import { CSS_COLOR_PATTERN } from "../../utils/css-color"
 import { selectAxisLabels } from "../../utils/layout"
-import { estimateWrappedTextDimensions } from "../../utils/text"
 import { theme } from "../../utils/theme"
 import { buildTicks } from "../../utils/ticks"
+import { MATHML_INNER_PATTERN } from "../../utils/mathml"
+import { numberContentToInnerMathML } from "../../utils/number-to-mathml"
 import type { WidgetGenerator } from "../types"
 
 // Factory function to create a TickIntervalSchema to avoid $ref issues
@@ -36,38 +37,70 @@ const createHighlightedPointSchema = () =>
 	z.discriminatedUnion("type", [
 		z
 			.object({
-				type: z.literal("value"),
-				value: z.number().describe("Position on the number line."),
+				type: z.literal("whole"),
+				position: z.number().describe("Position on the number line."),
 				color: z
 					.string()
 					.regex(CSS_COLOR_PATTERN, "invalid css color")
-					.describe("CSS hex color for the point and its arrow/label."),
+					.describe("CSS hex color for the point and its label."),
 				style: z
-					.enum(["dot", "arrowAndDot"])
-					.describe("Visual style for known points. 'dot' is a circle; 'arrowAndDot' adds an arrow."),
-				label: z
-					.string()
-					.nullable()
-					.transform((val) => (val === "" ? null : val))
-					.describe("Optional text label. If null, no label is shown.")
+					.literal("dot")
+					.describe("Visual style: only 'dot' is supported"),
+				value: z.number().int().describe("Integer magnitude (non-directional)"),
+				sign: z.enum(["+", "-"]).describe("Sign of the whole number")
 			})
 			.strict(),
 		z
 			.object({
-				type: z.literal("unknown"),
-				value: z.number().describe("Position on the number line."),
+				type: z.literal("fraction"),
+				position: z.number().describe("Position on the number line."),
 				color: z
 					.string()
 					.regex(CSS_COLOR_PATTERN, "invalid css color")
-					.describe("CSS hex color for the box and its arrow/label."),
+					.describe("CSS hex color for the point and its label."),
 				style: z
-					.enum(["box", "arrowAndBox"])
-					.describe("Visual style for unknown points. 'box' is an empty rectangle; 'arrowAndBox' adds an arrow."),
-				label: z
+					.literal("dot")
+					.describe("Visual style: only 'dot' is supported"),
+				numerator: z.number().int().min(0).describe("Numerator (non-negative)"),
+				denominator: z.number().int().positive().describe("Denominator (positive)"),
+				sign: z.enum(["+", "-"]).describe("Sign of the fraction")
+			})
+			.strict(),
+		z
+			.object({
+				type: z.literal("mixed"),
+				position: z.number().describe("Position on the number line."),
+				color: z
 					.string()
-					.nullable()
-					.transform((val) => (val === "" ? null : val))
-					.describe("Optional text label. If null, no label is shown.")
+					.regex(CSS_COLOR_PATTERN, "invalid css color")
+					.describe("CSS hex color for the point and its label."),
+				style: z
+					.literal("dot")
+					.describe("Visual style: only 'dot' is supported"),
+				whole: z.number().int().min(0).describe("Whole part (non-negative)"),
+				numerator: z.number().int().min(0).describe("Numerator of the fractional part"),
+				denominator: z.number().int().positive().describe("Denominator of the fractional part (positive)"),
+				sign: z.enum(["+", "-"]).describe("Sign of the mixed number")
+			})
+			.strict(),
+		z
+			.object({
+				type: z.literal("mathml"),
+				position: z.number().describe("Position on the number line."),
+				color: z
+					.string()
+					.regex(CSS_COLOR_PATTERN, "invalid css color")
+					.describe("CSS hex color for the point and its label."),
+				style: z
+					.literal("dot")
+					.describe("Visual style: only 'dot' is supported"),
+				mathml: z
+					.string()
+					.regex(
+						MATHML_INNER_PATTERN,
+						"invalid mathml snippet; must be inner MathML without outer <math> wrapper"
+					)
+					.describe("Inner MathML markup (no outer <math> element)")
 			})
 			.strict()
 	])
@@ -218,92 +251,47 @@ export const generateNumberLine: WidgetGenerator<typeof NumberLinePropsSchema> =
 			}
 		})
 
-		// Draw highlighted points
+		// Draw highlighted points (new discriminated union with explicit position and MathML labels)
 
 		if (highlightedPoints) {
 			for (const p of highlightedPoints) {
-				const px = toSvgX(p.value)
-				if (p.type === "value") {
-					canvas.drawCircle(px, yPos, 5, {
-						fill: p.color,
-						stroke: p.color,
-						strokeWidth: theme.stroke.width.thin
-					})
+				const px = toSvgX(p.position)
+				// Draw the point dot
+				canvas.drawCircle(px, yPos, 5, {
+					fill: p.color,
+					stroke: p.color,
+					strokeWidth: theme.stroke.width.thin
+				})
 
-					if (p.style === "arrowAndDot") {
-						const arrowStartY = yPos - 25
-						const arrowEndY = yPos - 8
-						canvas.drawLine(px, arrowStartY, px, arrowEndY, {
-							stroke: theme.colors.axis,
-							strokeWidth: theme.stroke.width.thick,
-							markerEnd: "url(#action-arrow)"
-						})
-						if (p.label) {
-							const fontPx = theme.font.size.small
-							const dims = estimateWrappedTextDimensions(p.label, Number.POSITIVE_INFINITY, fontPx, 1.2)
-							const safeY = Math.max(arrowStartY - 5, PADDING + dims.height + 2)
-							canvas.drawText({
-								x: px,
-								y: safeY,
-								text: p.label,
-								fill: p.color,
-								anchor: "middle",
-								dominantBaseline: "baseline",
-								fontWeight: "700",
-								fontPx
-							})
-						}
-					} else if (p.label) {
-						const fontPx = theme.font.size.small
-						const dims = estimateWrappedTextDimensions(p.label, Number.POSITIVE_INFINITY, fontPx, 1.2)
-						const safeY = Math.max(yPos - 15, PADDING + dims.height + 2)
-						canvas.drawText({
-							x: px,
-							y: safeY,
-							text: p.label,
-							fill: p.color,
-							anchor: "middle",
-							dominantBaseline: "baseline",
-							fontWeight: "700",
-							fontPx
-						})
-					}
+				// Prepare MathML content
+				let inner: string
+				if (p.type === "mathml") {
+					inner = p.mathml
+				} else if (p.type === "whole") {
+					inner = numberContentToInnerMathML({ type: "whole", value: p.value, sign: p.sign })
+				} else if (p.type === "fraction") {
+					inner = numberContentToInnerMathML({ type: "fraction", numerator: p.numerator, denominator: p.denominator, sign: p.sign })
 				} else {
-					// unknown -> render a normal dot, and place an empty box where the label would be
-					const boxSize = 12
-					// draw the dot at the position (same as known value)
-					canvas.drawCircle(px, yPos, 5, {
-						fill: p.color,
-						stroke: p.color,
-						strokeWidth: theme.stroke.width.thin
-					})
-
-					if (p.style === "arrowAndBox") {
-						// draw arrow pointing to the dot
-						const arrowStartY = yPos - 25
-						const arrowEndY = yPos - 8
-						canvas.drawLine(px, arrowStartY, px, arrowEndY, {
-							stroke: theme.colors.axis,
-							strokeWidth: theme.stroke.width.thick,
-							markerEnd: "url(#action-arrow)"
-						})
-						// place the box where the arrow label would be
-						const labelY = arrowStartY - 5
-						canvas.drawRect(px - boxSize / 2, labelY - boxSize / 2, boxSize, boxSize, {
-							fill: theme.colors.white,
-							stroke: p.color,
-							strokeWidth: theme.stroke.width.base
-						})
-					} else {
-						// no arrow: place the box where a dot label would normally go
-						const labelY = yPos - 15
-						canvas.drawRect(px - boxSize / 2, labelY - boxSize / 2, boxSize, boxSize, {
-							fill: theme.colors.white,
-							stroke: p.color,
-							strokeWidth: theme.stroke.width.base
-						})
-					}
+					inner = numberContentToInnerMathML({ type: "mixed", whole: p.whole, numerator: p.numerator, denominator: p.denominator, sign: p.sign })
 				}
+
+				// Render label near the point (larger font). Ensure consistent gap from axis
+				const fontPx = theme.font.size.large
+				const labelWidth = 120
+				const labelHeight = 32
+				const desiredGapFromAxisPx = 18
+				// Position the foreignObject so that its BOTTOM edge is a fixed gap above the axis
+				// Do not clamp to top padding; allow negative viewBox adjustments to preserve consistent gap
+				const safeY = yPos - desiredGapFromAxisPx - labelHeight
+				// Bottom-align MathML inside the foreignObject so visual gap is consistent regardless of content height
+				const xhtml = `<!DOCTYPE html><div xmlns="http://www.w3.org/1999/xhtml" style="display:flex;align-items:flex-end;justify-content:center;width:100%;height:100%;line-height:1;font-family:${theme.font.family.sans};color:${p.color};"><math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\" style=\"font-size:${fontPx * 1.2}px;\">${inner}</math></div>`
+				canvas.drawForeignObject({
+					x: px - labelWidth / 2,
+					y: safeY,
+					width: labelWidth,
+					height: labelHeight,
+					content: xhtml
+				})
 			}
 		}
 	} else {
@@ -354,95 +342,47 @@ export const generateNumberLine: WidgetGenerator<typeof NumberLinePropsSchema> =
 
 		if (highlightedPoints) {
 			for (const p of highlightedPoints) {
-				const py = toSvgY(p.value)
-				if (p.type === "value") {
-					canvas.drawCircle(xPos, py, 5, {
-						fill: p.color,
-						stroke: p.color,
-						strokeWidth: theme.stroke.width.thin
-					})
+				const py = toSvgY(p.position)
+				// Draw the point dot
+				canvas.drawCircle(xPos, py, 5, {
+					fill: p.color,
+					stroke: p.color,
+					strokeWidth: theme.stroke.width.thin
+				})
 
-					if (p.style === "arrowAndDot") {
-						const arrowStartX = xPos - 25
-						const arrowEndX = xPos - 8
-						canvas.drawLine(arrowStartX, py, arrowEndX, py, {
-							stroke: theme.colors.axis,
-							strokeWidth: theme.stroke.width.thick,
-							markerEnd: "url(#action-arrow)"
-						})
-						if (p.label) {
-							const fontPx = theme.font.size.small
-							const dims = estimateWrappedTextDimensions(p.label, Number.POSITIVE_INFINITY, fontPx, 1.2)
-							const safeX = Math.max(arrowStartX - 5, PADDING + 4 + dims.maxWidth)
-							canvas.drawText({
-								x: safeX,
-								y: py,
-								text: p.label,
-								fill: p.color,
-								anchor: "end",
-								dominantBaseline: "middle",
-								fontWeight: "700",
-								fontPx
-							})
-						}
-					} else if (p.label) {
-						const fontPx = theme.font.size.small
-						const dims = estimateWrappedTextDimensions(p.label, Number.POSITIVE_INFINITY, fontPx, 1.2)
-						const safeX = Math.min(xPos + 15, width - PADDING - 4 - dims.maxWidth)
-						canvas.drawText({
-							x: safeX,
-							y: py,
-							text: p.label,
-							fill: p.color,
-							anchor: "start",
-							dominantBaseline: "middle",
-							fontWeight: "700",
-							fontPx
-						})
-					}
+				// Prepare MathML content
+				let inner: string
+				if (p.type === "mathml") {
+					inner = p.mathml
+				} else if (p.type === "whole") {
+					inner = numberContentToInnerMathML({ type: "whole", value: p.value, sign: p.sign })
+				} else if (p.type === "fraction") {
+					inner = numberContentToInnerMathML({ type: "fraction", numerator: p.numerator, denominator: p.denominator, sign: p.sign })
 				} else {
-					// unknown -> render a normal dot, and place an empty box where the label would be
-					const boxSize = 12
-					// draw the dot at the position (same as known value)
-					canvas.drawCircle(xPos, py, 5, {
-						fill: p.color,
-						stroke: p.color,
-						strokeWidth: theme.stroke.width.thin
-					})
-
-					if (p.style === "arrowAndBox") {
-						// draw arrow pointing to the dot
-						const arrowStartX = xPos - 25
-						const arrowEndX = xPos - 8
-						canvas.drawLine(arrowStartX, py, arrowEndX, py, {
-							stroke: theme.colors.axis,
-							strokeWidth: theme.stroke.width.thick,
-							markerEnd: "url(#action-arrow)"
-						})
-						// place the box where the arrow label would be
-						const labelX = arrowStartX - 5
-						canvas.drawRect(labelX - boxSize / 2, py - boxSize / 2, boxSize, boxSize, {
-							fill: theme.colors.white,
-							stroke: p.color,
-							strokeWidth: theme.stroke.width.base
-						})
-					} else {
-						// no arrow: place the box where a dot label would normally go
-						const labelX = xPos + 15
-						canvas.drawRect(labelX - boxSize / 2, py - boxSize / 2, boxSize, boxSize, {
-							fill: theme.colors.white,
-							stroke: p.color,
-							strokeWidth: theme.stroke.width.base
-						})
-					}
+					inner = numberContentToInnerMathML({ type: "mixed", whole: p.whole, numerator: p.numerator, denominator: p.denominator, sign: p.sign })
 				}
+
+				// Render label near the point (larger font). Ensure consistent gap from vertical axis
+				const fontPx = theme.font.size.large
+				const labelWidth = 120
+				const labelHeight = 32
+				const desiredGapFromAxisPx = 15
+				// Place the foreignObject so that its LEFT edge is a fixed gap to the right of the axis
+				const safeX = Math.min(xPos + desiredGapFromAxisPx, width - PADDING - 2 - labelWidth)
+				// Left-align MathML inside the foreignObject so visual gap is consistent regardless of content width
+				const xhtml = `<!DOCTYPE html><div xmlns="http://www.w3.org/1999/xhtml" style="display:flex;align-items:center;justify-content:flex-start;width:100%;height:100%;line-height:1;font-family:${theme.font.family.sans};color:${p.color};"><math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\" style=\"font-size:${fontPx * 1.2}px;\">${inner}</math></div>`
+				canvas.drawForeignObject({
+					x: safeX,
+					y: py - labelHeight / 2,
+					width: labelWidth,
+					height: labelHeight,
+					content: xhtml
+				})
 			}
 		}
 	}
 
-	canvas.addDef(
-		`<marker id="action-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="${theme.colors.axis}"/></marker>`
-	)
+	// arrows removed: only 'dot' style is supported; no marker defs needed
 
 	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="12">${svgBody}</svg>`

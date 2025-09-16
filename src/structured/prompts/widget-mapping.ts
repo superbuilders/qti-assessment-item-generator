@@ -111,14 +111,22 @@ The goal is to produce clean, professional educational content that maintains th
 **CRITICAL RULE: WIDGET_NOT_FOUND BAIL**
 This is your most important instruction. If you determine that a widget slot **CANNOT** be reasonably mapped to any of the available widget types, you **MUST** use the exact string literal **"WIDGET_NOT_FOUND"** as its type. Do not guess or force a fit.
 
-Use "WIDGET_NOT_FOUND" if:
-1.  There is no semantically appropriate widget type in the provided list for the given Perseus content.
-2.  A slot clearly represents an interactive element that was misclassified as a widget.`
+Use "WIDGET_NOT_FOUND" **ONLY** if:
+1.  There is no semantically appropriate widget type in the provided list for the given Perseus content AND the content cannot be represented by \`emojiImage\` (for semantic objects) or \`urlImage\` (for non-semantic visuals).
+2.  A slot clearly represents an interactive element that was misclassified as a widget.
+
+**⚠️ IMPORTANT: Before using WIDGET_NOT_FOUND for any visual content, always consider:**
+- Can this be mapped to \`emojiImage\` if it shows recognizable objects/things?
+- Can this be mapped to \`urlImage\` if it's a static visual without specific semantic meaning?
+- Is there any domain-specific widget that could represent this content?`
 
 	// MODIFIED: Conditionally append the highly specific and clarified simple-visual instruction.
 	if (widgetCollectionName === "simple-visual") {
 		systemInstruction += `
-3.  **For this 'simple-visual' collection ONLY**: Your task is to map Perseus \`image\` widgets to our \`urlImage\` widget. To do this, you must look at the **original Perseus JSON** for the specific widget slot. If the corresponding Perseus \`image\` widget definition is **missing its \`url\` property** or the \`url\` is an empty string, you **MUST** output \`WIDGET_NOT_FOUND\`.
+3.  **For this 'simple-visual' collection ONLY**: Your primary task is to map Perseus \`image\` widgets to our \`urlImage\` widget. However, if the corresponding Perseus \`image\` widget definition is **missing its \`url\` property** or the \`url\` is an empty string, you should:
+    - **FIRST**: Check if the image content represents a recognizable semantic object that could be mapped to \`emojiImage\` (animals, food, objects, etc.)
+    - **SECOND**: If it's clearly a semantic object, map to \`emojiImage\` instead of bailing
+    - **ONLY THEN**: Use \`WIDGET_NOT_FOUND\` if neither \`urlImage\` nor \`emojiImage\` is appropriate
     - **NOTE**: You will be provided a context map of working URLs. **Assume all URLs in that context map are valid and functional.** Your job is not to validate them, but to recognize when a URL is completely absent from the source Perseus JSON in the first place.
 
 4.  **Reference Resources Preference (periodic table, formula sheets)**: When the assessment body or Perseus JSON clearly indicates a standard reference resource (e.g., "periodic table", "periodic table of the elements"), and this collection includes a specific widget type for it (e.g., \`periodicTable\`), you **MUST** map the corresponding slot to that specific widget type rather than a generic \`urlImage\`. This ensures consistent rendering and behavior for reference materials.`
@@ -141,6 +149,52 @@ Use "WIDGET_NOT_FOUND" if:
   - Tables: choose \`dataTable\`
   - Set comparisons: choose \`vennDiagram\`
   - Reference resources: choose specific resource widgets (e.g., \`periodicTable\`)
+  - **CRITICAL: Semantic objects/things**: AGGRESSIVELY choose \`emojiImage\` for images of recognizable objects, animals, food, items, etc.
+
+**⚠️ MANDATORY: emojiImage for Semantic Objects**
+When you encounter raster images (PNG/JPG/GIF) or vector images (SVG) that depict recognizable real-world objects, you MUST map them to \`emojiImage\` instead of \`urlImage\` or \`WIDGET_NOT_FOUND\`. This applies to ANY identifiable object, creature, item, or thing from the real world.
+
+**Categories of objects that MUST use emojiImage (these are just EXAMPLES - map ANY real-world object):**
+- Animals: ANY animal, creature, or living thing (ladybug, whale, shark, cat, dog, bird, turtle, penguin, elephant, spider, fish, etc.)
+- Food items: ANY food, drink, or edible item (pizza, cookie, hot dog, apple, banana, ice cream, bread, cheese, etc.)
+- Everyday objects: ANY common item or household object (shoe, book, flower, dollar bill, key, phone, umbrella, chair, etc.)
+- Tools/items: ANY tool, device, or manufactured item (video game controller, bone, toilet, cup, ball, hammer, scissors, etc.)
+- Transportation: ANY vehicle or mode of transport (car, bicycle, airplane, boat, train, skateboard, etc.)
+- Nature: ANY natural element or outdoor item (tree, leaf, sun, moon, star, rock, cloud, etc.)
+- Clothing: ANY garment or accessory (hat, shirt, pants, jewelry, glasses, etc.)
+- Sports/recreation: ANY sports equipment or recreational item (ball, racket, board game, toy, etc.)
+
+**CRITICAL: These categories are NOT exhaustive.** If you see an image of ANYTHING that exists in the real world and can be named with a noun, map it to emojiImage. The examples above represent maybe 0.1% of all possible real-world objects.
+
+**Selection criteria for emojiImage:**
+1. The image shows a single recognizable object or simple collection of similar objects
+2. The object has a reasonable emoji equivalent (even if not perfect)
+3. The image is primarily illustrative/decorative rather than data-driven
+4. No other specific widget type in this collection better represents the content
+
+**DO NOT use WIDGET_NOT_FOUND for semantic objects.** The emojiImage widget can represent virtually any recognizable thing with an appropriate emoji. Be creative and liberal in your emoji selection - a close approximation is infinitely better than bailing with WIDGET_NOT_FOUND.
+
+**UNIVERSAL RULE: If it's a "thing" in the real world, map it to emojiImage.** This includes objects that might seem unusual, obscure, or specific. When in doubt, choose emojiImage over WIDGET_NOT_FOUND for any recognizable object.
+
+**Sample mappings (remember, these are just tiny examples of infinite possibilities):**
+- Image of a ladybug → emojiImage with emoji: "🐞"
+- Image of pizza slice → emojiImage with emoji: "🍕"  
+- Image of a shoe → emojiImage with emoji: "👟"
+- Image of toilet → emojiImage with emoji: "🚽"
+- Image of dollar bill → emojiImage with emoji: "💵"
+- Image of video game controller → emojiImage with emoji: "🎮"
+- Image of bone → emojiImage with emoji: "🦴"
+- Image of flower → emojiImage with emoji: "🌸"
+- Image of book → emojiImage with emoji: "📚"
+- Image of hot dog → emojiImage with emoji: "🌭"
+- Image of paperclip → emojiImage with emoji: "📎"
+- Image of microscope → emojiImage with emoji: "🔬"
+- Image of treasure chest → emojiImage with emoji: "🗝️" or "💰"
+- Image of cactus → emojiImage with emoji: "🌵"
+- Image of fire extinguisher → emojiImage with emoji: "🧯"
+
+**These examples represent less than 0.01% of possible objects. Map ANY real-world thing to emojiImage, even if it seems weird or specific.**
+
   - Emoji-only assets: choose \`emojiImage\`
 
 - When \`urlImage\` MAY be acceptable (still last resort):
@@ -186,6 +240,8 @@ Correct mapping when graph widgets are available:
 	systemInstruction += `
 
 **CRITICAL RULE**: You MUST choose a widget type from the list (or "WIDGET_NOT_FOUND") for every slot. Do not refuse or omit any slot.
+
+**⚠️ SEMANTIC OBJECT ENFORCEMENT**: For any visual content showing recognizable real-world objects, creatures, items, or things, you MUST prefer \`emojiImage\` over \`WIDGET_NOT_FOUND\`. This applies to ALL physical objects that exist in reality and can be named with a noun - not just common ones. The emojiImage widget is specifically designed to replace arbitrary object images with appropriate emoji representations. WIDGET_NOT_FOUND should be reserved for truly unmappable content like abstract concepts, complex diagrams, or interactive elements - NOT for any identifiable real-world object.
 
 **STRICT NAMING-BASED MAPPING RULES (DO NOT VIOLATE):**
 - For science collection free-body-diagram conversions, any slot whose name starts with \`fbd_\` MUST be mapped to \`freeBodyDiagram\`.

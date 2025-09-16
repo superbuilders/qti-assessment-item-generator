@@ -1,4 +1,4 @@
-// Bun Snapshot v1, https://goo.gl/fbAQLP
+// Bun Snapshot v1, https://bun.sh/docs/test/snapshots
 
 exports[`Widget: integer-chip-model edge cases and special scenarios should handle single chip 1`] = `
 "<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
