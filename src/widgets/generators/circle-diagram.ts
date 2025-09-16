@@ -1,3 +1,5 @@
+import * as errors from "@superbuilders/errors"
+import * as logger from "@superbuilders/slog"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
@@ -6,13 +8,13 @@ import { Path2D } from "../../utils/path-builder"
 import { theme } from "../../utils/theme"
 import type { WidgetGenerator } from "../types"
 
-// Defines a line segment, such as a radius or a diameter.
+// Defines a line segment, such as a radius, innerRadius, or a diameter.
 const SegmentSchema = z
 	.object({
 		type: z
-			.enum(["radius", "diameter"])
+			.enum(["radius", "innerRadius", "diameter"])
 			.describe(
-				"Type of line segment. 'radius' draws from center to edge. 'diameter' draws across the full circle through center."
+				"Type of line segment. 'radius' draws from center to outer edge. 'innerRadius' draws from center to the inner circle when present. 'diameter' draws across the full circle through center."
 			),
 		label: z
 			.string()
@@ -34,7 +36,7 @@ const SegmentSchema = z
 			)
 	})
 	.strict()
-	.describe("Defines a line segment (a radius or diameter) to be drawn on the diagram.")
+	.describe("Defines a line segment (a radius, innerRadius, or diameter) to be drawn on the diagram.")
 
 // Defines a sector (a pie slice) of the circle.
 const SectorSchema = z
@@ -163,7 +165,7 @@ export const CircleDiagramPropsSchema = z
 		segments: z
 			.array(SegmentSchema)
 			.describe(
-				"Line segments (radii or diameters) to draw. Empty array means no segments. Use for showing radius/diameter measurements or dividing the circle."
+				"Line segments (radii, inner-radii, or diameters) to draw. Empty array means no segments. Use for showing radius/diameter measurements or dividing the circle."
 			),
 		sectors: z
 			.array(SectorSchema)
@@ -234,6 +236,7 @@ export const generateCircleDiagram: WidgetGenerator<typeof CircleDiagramPropsSch
 		lineHeightDefault: 1.2
 	})
 	const r = radius * scale
+	const rInnerOpt = innerRadius ? innerRadius * scale : null
 
 	// Annulus is only compatible with the full "circle" shape.
 	if (shape === "circle" && innerRadius && annulusFillColor) {
@@ -369,17 +372,23 @@ export const generateCircleDiagram: WidgetGenerator<typeof CircleDiagramPropsSch
 		}
 	}
 
-	// Segments (radii/diameters) are drawn on top of the main shape.
+	// Segments (radii/inner-radii/diameters) are drawn on top of the main shape.
 	if (segments.length > 0) {
 		for (const seg of segments) {
+			if (seg.type === "innerRadius" && rInnerOpt === null) {
+				logger.error("innerRadius segment requires innerRadius", { hasInnerRadius: Boolean(innerRadius) })
+				throw errors.new("inner radius segment without innerRadius")
+			}
+
 			const lineStart = pointOnCircle(
 				seg.type === "diameter" ? seg.angle + 180 : seg.angle,
 				seg.type === "diameter" ? r : 0
 			)
-			const lineEnd = pointOnCircle(seg.angle, r)
+			const targetRadius = seg.type === "innerRadius" && rInnerOpt !== null ? rInnerOpt : r
+			const lineEnd = pointOnCircle(seg.angle, targetRadius)
 
 			// Correction for radius start point: pointOnCircle with r=0 correctly returns the center (cx,cy)
-			if (seg.type === "radius") {
+			if (seg.type === "radius" || seg.type === "innerRadius") {
 				lineStart.x = cx
 				lineStart.y = cy
 			}
@@ -390,8 +399,16 @@ export const generateCircleDiagram: WidgetGenerator<typeof CircleDiagramPropsSch
 			})
 
 			if (seg.label) {
-				const labelStartRadius = shape === "circle" && innerRadius ? innerRadius * scale : 0
-				const labelAnchorRadius = labelStartRadius + (r - labelStartRadius) / 2
+				let labelAnchorRadius = r / 2
+				if (seg.type === "innerRadius") {
+					labelAnchorRadius = rInnerOpt !== null ? rInnerOpt / 2 : r / 2
+				} else if (seg.type === "radius") {
+					const startR = rInnerOpt !== null ? rInnerOpt : 0
+					labelAnchorRadius = startR + (r - startR) / 2
+				} else if (seg.type === "diameter") {
+					labelAnchorRadius = r / 2
+				}
+
 				const mid = pointOnCircle(seg.angle, labelAnchorRadius)
 				const angleRad = toRad(seg.angle)
 				const verticalOffsetMultiplier = seg.angle > 270 && seg.angle < 360 ? -1 : 1
