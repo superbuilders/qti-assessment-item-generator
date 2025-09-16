@@ -9,6 +9,7 @@ import { generateAreaGraph } from "./generators/area-graph"
 import { generateAreaModelMultiplication } from "./generators/area-model-multiplication"
 import { generateBarChart } from "./generators/bar-chart"
 import { generateBoxGrid } from "./generators/box-grid"
+import { generateStringGrid } from "./generators/string-grid"
 import { generateBoxPlot } from "./generators/box-plot"
 import { generateCircleAngleDiagram } from "./generators/circle-angle-diagram"
 import { generateCircleDiagram } from "./generators/circle-diagram"
@@ -142,6 +143,8 @@ export async function generateWidget(widgetInput: WidgetInput): Promise<string> 
 			return await generateBarChart(widget)
 		case "boxGrid":
 			return await generateBoxGrid(widget)
+		case "stringGrid":
+			return await generateStringGrid(widget)
 		case "boxPlot":
 			return await generateBoxPlot(widget)
 		case "circleDiagram":
