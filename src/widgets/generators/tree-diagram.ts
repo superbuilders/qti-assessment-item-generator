@@ -166,10 +166,15 @@ export const generateTreeDiagram: WidgetGenerator<typeof TreeDiagramPropsSchema>
 
 		// Draw the text label only if it exists
 		if (node.label !== null) {
-			canvas.drawText({
+			// Wrap text to fit inside the node circle. We leave a small padding so
+			// long labels like "2 heads and 1 tail" don't overflow the bubble.
+			const innerPaddingPx = 6
+			const maxTextWidthPx = Math.max(2 * nodeRadius - 2 * innerPaddingPx, 4)
+			canvas.drawWrappedText({
 				x: x,
 				y: y,
 				text: node.label,
+				maxWidthPx: maxTextWidthPx,
 				fill: node.color,
 				fontPx: nodeFontSize,
 				anchor: "middle",

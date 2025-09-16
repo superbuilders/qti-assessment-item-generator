@@ -5,750 +5,754 @@ import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
 import { CSS_COLOR_PATTERN } from "../../utils/css-color"
 import { Path2D } from "../../utils/path-builder"
+import { estimateWrappedTextDimensions } from "../../utils/text"
+import { MATHML_INNER_PATTERN } from "../../utils/mathml"
 import { theme } from "../../utils/theme"
 import type { WidgetGenerator } from "../types"
 
-const Point = z
-	.object({
-		id: z
-			.string()
-			.describe(
-				"Unique identifier for this vertex (e.g., 'A', 'B', 'C', 'P', 'M'). Used to reference in sides, angles, etc. Must be unique."
-			),
-		x: z
-			.number()
-			.describe(
-				"X-coordinate of the point in diagram space (e.g., 100, 250, 50). Can be negative. Diagram auto-centers all content."
-			),
-		y: z
-			.number()
-			.describe(
-				"Y-coordinate of the point in diagram space (e.g., 50, 200, 150). Positive y is downward. Diagram auto-centers all content."
-			),
-		label: z
-			.string()
-			.nullable()
-			.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
-			.describe(
-				"Text label displayed near the point (e.g., 'A', 'P', 'M₁', null). Null means no label. Typically single letter or letter with subscript."
-			)
-	})
-	.strict()
+// -----------------------------
+// Constraint-first schema (angles by three points)
+// -----------------------------
 
-const Side = z
-	.object({
-		vertex1: z
-			.string()
-			.describe(
-				"First point ID defining this side's endpoint (e.g., 'A' in side AB). Order matters for labeling position."
-			),
-		vertex2: z
-			.string()
-			.describe(
-				"Second point ID defining this side's endpoint (e.g., 'B' in side AB). Order matters for labeling position."
-			),
-		label: z
-			.string()
-			.nullable()
-			.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
-			.describe(
-				"Length label for this side (e.g., '5', '3.2 cm', 'a', '√2', null). Null means no label. Positioned at midpoint of side."
-			),
-		tickMarks: z
-			.number()
-			.int()
-			.min(0)
-			.describe(
-				"Number of tick marks showing congruence (0 = no marks, 1 = single mark, 2 = double marks, etc.). Same count indicates congruent sides."
-			)
-	})
-	.strict()
+// Domain-specific value factories with distinct constraints
+function createAngleValueSchema() {
+	return z
+		.discriminatedUnion("type", [
+			z.object({ type: z.literal("numeric"), value: z.number().gt(0).lt(180) }).strict(),
+			z.object({ type: z.literal("symbolic"), symbol: z.string() }).strict()
+		])
+		.describe("Angle value in degrees (0<deg<180) or symbolic variable")
+}
 
-const Angle = z
-	.object({
-		pointOnFirstRay: z
-			.string()
-			.describe(
-				"Point ID on the first ray of the angle (e.g., 'A' in angle ABC). Forms one side of the angle with the vertex."
-			),
-		vertex: z
-			.string()
-			.describe("Point ID at the vertex of the angle (e.g., 'B' in angle ABC). The angle is measured at this point."),
-		pointOnSecondRay: z
-			.string()
-			.describe(
-				"Point ID on the second ray of the angle (e.g., 'C' in angle ABC). Forms the other side of the angle with the vertex."
-			),
-		label: z
-			.string()
-			.nullable()
-			.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
-			.describe(
-				"Angle measurement or name (e.g., '45°', '90°', 'θ', '∠ABC', 'x', null). Null shows arc without label."
-			),
-		color: z
-			.string()
-			.regex(CSS_COLOR_PATTERN, "invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)")
-			.describe(
-				"CSS color for the angle arc (e.g., '#FF6B6B' for red, 'blue', 'green'). Different colors distinguish multiple angles."
-			),
-		radius: z
-			.number()
-			.describe(
-				"Radius of the angle arc in pixels (e.g., 25, 30, 20). Larger radii for outer angles when multiple angles share a vertex."
-			),
-		isRightAngle: z
-			.boolean()
-			.describe("If true, shows a square corner instead of arc to indicate 90°. Overrides arc display."),
-		showArc: z
-			.boolean()
-			.describe("Whether to display the angle arc/square. False shows only the label without visual marker.")
-	})
-	.strict()
+function createSideValueSchema() {
+	return z
+		.discriminatedUnion("type", [
+			z.object({ type: z.literal("numeric"), value: z.number().gt(0) }).strict(),
+			z.object({ type: z.literal("symbolic"), symbol: z.string() }).strict(),
+			z
+				.object({
+					type: z.literal("mathml"),
+					mathml: z
+						.string()
+						.regex(
+							MATHML_INNER_PATTERN,
+							"invalid mathml snippet; must be inner MathML without outer <math> wrapper"
+						),
+					value: z.number().gt(0)
+				})
+				.strict()
+		])
+		.describe("Side length label: numeric, symbolic, or MathML with numeric value")
+}
 
-const InternalLine = z
-	.object({
-		from: z
-			.string()
-			.describe("Starting point ID for the line segment. Must match a point.id in points array (e.g., 'A', 'M')."),
-		to: z
-			.string()
-			.describe("Ending point ID for the line segment. Must match a point.id in points array (e.g., 'D', 'P')."),
-		style: z
-			.enum(["solid", "dashed", "dotted"])
-			.describe(
-				"Visual style of the line. 'solid' for main elements, 'dashed' for auxiliary lines, 'dotted' for reference lines."
-			)
-	})
-	.strict()
+function createAngleMarkSchema() {
+	return z
+		.object({
+			vertex: z.string().regex(TRI_POINT_ID).describe("Vertex point id of the angle"),
+			from: z.string().regex(TRI_POINT_ID).describe("Ray start point id around the vertex"),
+			to: z.string().regex(TRI_POINT_ID).describe("Ray end point id around the vertex"),
+			value: createAngleValueSchema().describe("Angle value for the arc"),
+			color: z.string().regex(CSS_COLOR_PATTERN, "invalid css color").describe("Arc color for the mark.")
+		})
+		.strict()
+}
 
-const ShadedRegion = z
-	.object({
-		vertices: z
-			.array(z.string())
-			.describe(
-				"Ordered point IDs defining the region to shade. Connect in sequence to form closed polygon (e.g., ['A','B','M'] for triangle ABM). Min 3 points."
-			),
-		color: z
-			.string()
-			.regex(CSS_COLOR_PATTERN, "invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)")
-			.describe(
-				"CSS fill color with transparency (e.g., 'rgba(255,0,0,0.2)' for light red, 'rgba(0,128,255,0.3)' for light blue). Use alpha < 0.5 for transparency."
-			)
-	})
-	.strict()
+function createSidesLabelSchema() {
+	return z
+		.object({
+			AB: createSideValueSchema().nullable(),
+			BC: createSideValueSchema().nullable(),
+			CA: createSideValueSchema().nullable()
+		})
+		.strict()
+		.describe("Optional labels for each side.")
+}
+
+// Replace constants with factory functions
+const TRI_POINT_ID = /^pt_tri_[A-Za-z0-9_]+$/
+
+function createTrianglePointsSchema() {
+	return z
+		.object({
+			A: z.object({ id: z.string().regex(TRI_POINT_ID), label: z.string() }).strict().describe("point A"),
+			B: z.object({ id: z.string().regex(TRI_POINT_ID), label: z.string() }).strict().describe("point B"),
+			C: z.object({ id: z.string().regex(TRI_POINT_ID), label: z.string() }).strict().describe("point C")
+		})
+		.strict()
+}
+
+function createAuxiliaryPointsSchema() {
+	return z
+		.array(z.object({ id: z.string().regex(TRI_POINT_ID), label: z.string() }).strict())
+		.nullable()
+}
+
+function createConstructionLinesSchema() {
+	return z
+		.array(
+			z
+				.object({
+					points: z.array(z.string().regex(TRI_POINT_ID)).min(2).max(3),
+					style: z.enum(["solid", "dashed", "dotted"]) 
+				})
+				.strict()
+		)
+		.nullable()
+}
+
+function createLinesSchema() {
+	return z
+		.array(z.array(z.string().regex(TRI_POINT_ID)).min(2))
+		.nullable()
+}
+
+function createAltitudeSchema() {
+	return z
+		.object({
+			vertex: z.string().regex(TRI_POINT_ID),
+			toSide: z.enum(["AB", "BC", "CA"]),
+			value: createSideValueSchema().nullable(),
+			style: z.enum(["dashed", "dotted"]),
+			color: z.string().regex(CSS_COLOR_PATTERN, "invalid css color"),
+			withRightAngle: z.literal(true)
+		})
+		.strict()
+}
 
 export const TriangleDiagramPropsSchema = z
 	.object({
-		type: z
-			.literal("triangleDiagram")
-			.describe("Identifies this as a triangle diagram widget for geometric constructions and proofs."),
-		width: z
-			.number()
-			.positive()
-			.describe(
-				"Total width of the diagram in pixels (e.g., 400, 500, 350). Must accommodate the triangle and all labels."
-			),
-		height: z
-			.number()
-			.positive()
-			.describe(
-				"Total height of the diagram in pixels (e.g., 350, 400, 300). Should fit the triangle with comfortable padding."
-			),
-		points: z
-			.array(Point)
-			.describe(
-				"All vertices used in the diagram. Must include at least 3 points to form the main triangle. Can include additional points for constructions."
-			),
-		sides: z
-			.array(Side)
-			.describe(
-				"Side annotations with labels and congruence marks. Empty array means no side labels. Order doesn't affect display."
-			),
-		angles: z
-			.array(Angle)
-			.describe(
-				"Angle annotations with arcs, labels, and optional right-angle markers. Empty array means no angle marks."
-			),
-		internalLines: z
-			.array(InternalLine)
-			.describe(
-				"Additional line segments like altitudes, medians, or angle bisectors. Empty array means no internal lines."
-			),
-		shadedRegions: z
-			.array(ShadedRegion)
-			.describe(
-				"Regions to fill with translucent color. Empty array means no shading. Useful for highlighting areas or showing equal regions."
-			)
+		type: z.literal("triangleDiagram"),
+		width: z.number().positive(),
+		height: z.number().positive(),
+		points: createTrianglePointsSchema(),
+		extraPoints: createAuxiliaryPointsSchema(),
+		angleArcs: z.array(createAngleMarkSchema()).min(2),
+		sideLabels: createSidesLabelSchema().nullable(),
+		constructionLines: createConstructionLinesSchema(),
+		lines: createLinesSchema(),
+		altitudes: z.array(createAltitudeSchema()).nullable(),
+		rightAngleMarks: z.array(z.object({
+			vertex: z.string().regex(TRI_POINT_ID),
+			from: z.string().regex(TRI_POINT_ID),
+			to: z.string().regex(TRI_POINT_ID),
+			size: z.number().positive().nullable()
+		}).strict()).nullable()
 	})
 	.strict()
 	.describe(
-		"Creates triangle diagrams with comprehensive geometric annotations including side lengths, angles, tick marks for congruence, internal lines (altitudes, medians), and shaded regions. Perfect for geometric proofs, constructions, and teaching triangle properties. Supports multiple triangles and complex constructions through flexible point system."
+		"Constraint-first triangle diagram. Angles defined by three point ids; auxiliary points and colinear constraints enable exterior angles."
 	)
 
 export type TriangleDiagramProps = z.infer<typeof TriangleDiagramPropsSchema>
 
-/**
- * Generates a versatile diagram of a triangle and its components.
- * Ideal for a wide range of geometry problems.
- */
-export const generateTriangleDiagram: WidgetGenerator<typeof TriangleDiagramPropsSchema> = async (props) => {
-	const { width, height, points, sides, angles, internalLines, shadedRegions } = props
+type Vec = { x: number; y: number }
 
-	// Initialize extents tracking
+function toRad(deg: number): number {
+	return (deg * Math.PI) / 180
+}
+
+function toDeg(rad: number): number {
+	return (rad * 180) / Math.PI
+}
+
+function vecAdd(a: Vec, b: Vec): Vec {
+	return { x: a.x + b.x, y: a.y + b.y }
+}
+
+function vecScale(a: Vec, s: number): Vec {
+	return { x: a.x * s, y: a.y * s }
+}
+
+function dist(a: Vec, b: Vec): number {
+	return Math.hypot(a.x - b.x, a.y - b.y)
+}
+
+function lineIntersection(p: Vec, v: Vec, q: Vec, w: Vec): Vec {
+	// Solve p + t v = q + s w
+	const det = v.x * w.y - v.y * w.x
+	if (Math.abs(det) < 1e-9) {
+		logger.error("triangle lines parallel", { v, w })
+		throw errors.new("triangle geometry: parallel lines")
+	}
+	const t = ((q.x - p.x) * w.y - (q.y - p.y) * w.x) / det
+	return { x: p.x + t * v.x, y: p.y + t * v.y }
+}
+
+function angleOf(v: Vec): number {
+	return Math.atan2(v.y, v.x)
+}
+
+function drawArc(canvas: CanvasImpl, center: Vec, r: number, start: number, end: number, color: string): void {
+	// Normalize
+	let s = start
+	let e = end
+	while (e - s > Math.PI * 2) e -= Math.PI * 2
+	while (s - e > Math.PI * 2) s -= Math.PI * 2
+	const largeFlag: 0 | 1 = Math.abs(e - s) > Math.PI ? 1 : 0
+	const sweepFlag: 0 | 1 = e >= s ? 1 : 0
+	const sx = center.x + r * Math.cos(s)
+	const sy = center.y + r * Math.sin(s)
+	const ex = center.x + r * Math.cos(e)
+	const ey = center.y + r * Math.sin(e)
+	const path = new Path2D().moveTo(sx, sy).arcTo(r, r, 0, largeFlag, sweepFlag, ex, ey)
+	canvas.drawPath(path, { fill: "none", stroke: color, strokeWidth: theme.stroke.width.thick })
+}
+
+type AngleValue = z.infer<ReturnType<typeof createAngleValueSchema>>
+type SideValue = z.infer<ReturnType<typeof createSideValueSchema>>
+
+function angleValueToString(v: AngleValue): string {
+	return v.type === "numeric" ? `${v.value}\u00B0` : v.symbol
+}
+
+function sideValueToString(v: SideValue): string {
+	if (v.type === "numeric") return `${v.value}`
+	if (v.type === "symbolic") return v.symbol
+	if (v.type === "mathml") return v.value.toString()
+	return ""
+}
+
+// forward-only schema: no legacy normalization helpers
+
+export const generateTriangleDiagram: WidgetGenerator<typeof TriangleDiagramPropsSchema> = async (
+	props
+) => {
+	const { width, height, angleArcs, sideLabels, points, extraPoints, constructionLines, lines, altitudes, rightAngleMarks } = props
+
 	const canvas = new CanvasImpl({
 		chartArea: { left: 0, top: 0, width, height },
 		fontPxDefault: 12,
 		lineHeightDefault: 1.2
 	})
 
-	if (points.length < 3) {
-		logger.error("triangle diagram insufficient points", {
-			pointCount: points.length
-		})
-		throw errors.new("triangle requires at least 3 points")
-	}
+	// --- Derive interior angles at A and B from constraints ---
+	const idA = points.A.id
+	const idB = points.B.id
+	const idC = points.C.id
 
-	const padding = PADDING
-	// const minX = Math.min(...points.map((p) => p.x)) - padding // Unused variable
-	// const maxX = Math.max(...points.map((p) => p.x)) + padding // Unused variable
-	// const minY = Math.min(...points.map((p) => p.y)) - padding // Unused variable
-	// const maxY = Math.max(...points.map((p) => p.y)) + padding // Unused variable
-
-	const pointMap = new Map(points.map((p) => [p.id, p]))
-
-	// Precompute dashed-vertex membership for helper ray rendering
-	const dashedVertexIds = new Set<string>()
-	for (const line of internalLines) {
-		if (line.style === "dashed") {
-			const from = pointMap.get(line.from)
-			const to = pointMap.get(line.to)
-			if (from) dashedVertexIds.add(from.id)
-			if (to) dashedVertexIds.add(to.id)
+	const onSameLine = (...ids: string[]): boolean => {
+		if (!lines) return false
+		for (const L of lines) {
+			let ok = true
+			for (const id of ids) if (!L.includes(id)) { ok = false; break }
+			if (ok) return true
 		}
+		return false
 	}
 
-	// Compute centroid of the main triangle (first 3 points) to infer outward direction
-	// Safe to access without checks since we validated points.length >= 3 above
-	const pAforCentroid = points[0]
-	const pBforCentroid = points[1]
-	const pCforCentroid = points[2]
-	if (!pAforCentroid || !pBforCentroid || !pCforCentroid) {
-		logger.error("triangle diagram missing required points", {
-			points: points.slice(0, 3)
-		})
-		throw errors.new("triangle diagram: first 3 points are required")
-	}
-	const centroidXForAngles = (pAforCentroid.x + pBforCentroid.x + pCforCentroid.x) / 3
-	const centroidYForAngles = (pAforCentroid.y + pBforCentroid.y + pCforCentroid.y) / 3
+	type AngleMarkNormalized = { vertex: string; from: string; to: string; value: AngleValue; color: string }
+	const angleMarks: AngleMarkNormalized[] = angleArcs.map((m) => ({
+		vertex: m.vertex,
+		from: m.from,
+		to: m.to,
+		value: m.value,
+		color: m.color
+	}))
 
-	// Layer 1: Shaded Regions (drawn first to be in the background)
-	for (const region of shadedRegions) {
-		const regionPoints = region.vertices
-			.map((id) => pointMap.get(id))
-			.filter((p): p is NonNullable<typeof p> => p !== undefined)
-		if (regionPoints.length < 3) continue
+	const rightAt = new Set<string>((rightAngleMarks ?? []).map((r) => r.vertex))
 
-		canvas.drawPolygon(regionPoints, { fill: region.color, stroke: "none" })
-	}
-
-	// Layer 2: Main Triangle Outlines
-	// Iterate through points in chunks of 3 to draw all defined triangles. This
-	// fixes a bug where only the first of multiple triangles was being rendered.
-	for (let i = 0; i < points.length; i += 3) {
-		const trianglePoints = points.slice(i, i + 3)
-		// Ensure we have a complete triangle before attempting to draw.
-		if (trianglePoints.length === 3) {
-			canvas.drawPolygon(trianglePoints, {
-				fill: "none",
-				stroke: theme.colors.black,
-				strokeWidth: theme.stroke.width.thick
-			})
+	function tryInteriorDegFor(vertex: string): number | null {
+		const others = vertex === idA ? [idB, idC] : vertex === idB ? [idA, idC] : [idA, idB]
+		const arcs = angleMarks.filter((a) => a.vertex === vertex && a.value.type === "numeric")
+		let fromArcs: number | null = null
+		for (const a of arcs) {
+			const f = a.from
+			const t = a.to
+			const val = (a.value as { type: "numeric"; value: number }).value
+			if ((f === others[0] && t === others[1]) || (f === others[1] && t === others[0])) { fromArcs = val; break }
+			if (
+				(f === others[0] && onSameLine(vertex, others[1], t)) ||
+				(t === others[0] && onSameLine(vertex, others[1], f)) ||
+				(f === others[1] && onSameLine(vertex, others[0], t)) ||
+				(t === others[1] && onSameLine(vertex, others[0], f))
+			) {
+				fromArcs = 180 - val
+				break
+			}
 		}
+		if (fromArcs != null) {
+			if (rightAt.has(vertex) && Math.abs(fromArcs - 90) > 1e-6) {
+				logger.error("conflicting angle constraints at vertex", { vertex, numeric: fromArcs })
+				throw errors.new("conflicting angle constraints")
+			}
+			return fromArcs
+		}
+		if (rightAt.has(vertex)) return 90
+		return null
 	}
 
-	// Precompute triangle membership and centroids for improved side label placement.
-	// We consider triangles defined by sequential chunks of 3 points, matching the
-	// drawing logic above.
-	const triangleChunks: Array<{ ids: Set<string>; cx: number; cy: number }> = []
-	for (let i = 0; i < points.length; i += 3) {
-		const t0 = points[i]
-		const t1 = points[i + 1]
-		const t2 = points[i + 2]
-		if (!t0 || !t1 || !t2) continue
-		triangleChunks.push({
-			ids: new Set<string>([t0.id, t1.id, t2.id]),
-			cx: (t0.x + t1.x + t2.x) / 3,
-			cy: (t0.y + t1.y + t2.y) / 3
-		})
+	let Adeg = tryInteriorDegFor(idA)
+	let Bdeg = tryInteriorDegFor(idB)
+	let Cdeg = tryInteriorDegFor(idC)
+
+	const known = [Adeg, Bdeg, Cdeg].filter((v): v is number => typeof v === "number")
+	if (known.length < 2) {
+		logger.error("insufficient numeric angle constraints", { hasA: Adeg != null, hasB: Bdeg != null, hasC: Cdeg != null })
+		throw errors.new("insufficient numeric angle constraints")
+	}
+	if (Adeg == null && Bdeg != null && Cdeg != null) Adeg = 180 - (Bdeg + Cdeg)
+	if (Bdeg == null && Adeg != null && Cdeg != null) Bdeg = 180 - (Adeg + Cdeg)
+	if (Cdeg == null && Adeg != null && Bdeg != null) Cdeg = 180 - (Adeg + Bdeg)
+
+	if (!(Adeg != null && Bdeg != null && Cdeg != null && Adeg > 0 && Bdeg > 0 && Cdeg > 0)) {
+		logger.error("derived triangle angles invalid", { A: Adeg, B: Bdeg, C: Cdeg })
+		throw errors.new("invalid derived triangle angles")
 	}
 
-	// Fallback centroid across all points for degenerate cases
-	const centroidAllX = points.reduce((acc, p) => acc + p.x, 0) / points.length
-	const centroidAllY = points.reduce((acc, p) => acc + p.y, 0) / points.length
+	// From here, non-null assertion via local copies guarantees type safety
+	const AdegVal = Adeg as number
+	const BdegVal = Bdeg as number
+	const CdegVal = Cdeg as number
 
-	// Layer 3: Internal Lines
-	for (const line of internalLines) {
-		const from = pointMap.get(line.from)
-		const to = pointMap.get(line.to)
-		if (!from || !to) continue
+	// --- Data space geometry (unit base), then fit to box ---
+	const A_data: Vec = { x: 0, y: 0 }
+	const B_data: Vec = { x: 1, y: 0 }
+	const vA_data: Vec = { x: Math.cos(toRad(AdegVal)), y: -Math.sin(toRad(AdegVal)) }
+	const vB_data: Vec = { x: -Math.cos(toRad(BdegVal)), y: -Math.sin(toRad(BdegVal)) }
+	const C_data = lineIntersection(A_data, vA_data, B_data, vB_data)
 
-		let dash: string | undefined
-		if (line.style === "dashed") {
-			dash = "4 3"
-		} else if (line.style === "dotted") {
-			dash = "2 4"
+	function computeFit(pointsList: Vec[]) {
+		if (pointsList.length === 0) {
+			return { scale: 1, project: (p: Vec) => p }
 		}
-		canvas.drawLine(from.x, from.y, to.x, to.y, {
-			stroke: theme.colors.black,
-			strokeWidth: theme.stroke.width.base,
-			dash
-		})
+		const minX = Math.min(...pointsList.map((p) => p.x))
+		const maxX = Math.max(...pointsList.map((p) => p.x))
+		const minY = Math.min(...pointsList.map((p) => p.y))
+		const maxY = Math.max(...pointsList.map((p) => p.y))
+		const rawW = maxX - minX
+		const rawH = maxY - minY
+		const scale = Math.min((width - 2 * PADDING) / (rawW || 1), (height - 2 * PADDING) / (rawH || 1))
+		const offsetX = (width - scale * rawW) / 2 - scale * minX
+		const offsetY = (height - scale * rawH) / 2 - scale * minY
+		const project = (p: Vec) => ({ x: offsetX + scale * p.x, y: offsetY + scale * p.y })
+		return { scale, project }
 	}
 
-	// Layer 4: Angle Markers
-	for (const angle of angles) {
-		const p1 = pointMap.get(angle.pointOnFirstRay)
-		const vertex = pointMap.get(angle.vertex)
-		const p2 = pointMap.get(angle.pointOnSecondRay)
-		if (!p1 || !vertex || !p2) continue
+	const { project } = computeFit([A_data, B_data, C_data])
+	const A = project(A_data)
+	const B = project(B_data)
+	const C = project(C_data)
 
-		// Calculate angle magnitude for distance scaling
-		let startAngle = Math.atan2(p1.y - vertex.y, p1.x - vertex.x)
-		let endAngle = Math.atan2(p2.y - vertex.y, p2.x - vertex.x)
+	// We'll draw arcs first; lines and labels will be drawn after to sit on top
+	const vertexFont = theme.font.size.large
 
-		// Ensure angles are calculated in a consistent direction
-		if (endAngle < startAngle) {
-			endAngle += 2 * Math.PI
-		}
-		if (endAngle - startAngle > Math.PI) {
-			// This handles the case of reflex angles correctly by swapping
-			const temp = startAngle
-			startAngle = endAngle
-			endAngle = temp + 2 * Math.PI
-		}
+	// Build id map including primary vertices
+	const idToPoint = new Map<string, Vec>([
+		[idA, A],
+		[idB, B],
+		[idC, C]
+	])
 
-		const angleMagnitudeRad = Math.abs(endAngle - startAngle)
-
-		// Calculate distance scaling based on angle magnitude (smaller angles = farther distance)
-		const calculateAngleDistance = (baseDistance: number): number => {
-			if (angle.isRightAngle) {
-				return baseDistance // Keep right angles at fixed distance
+	// Place auxiliary points using colinear constraints
+	if (lines) {
+		for (const line of lines) {
+			const knownIdx: number[] = []
+			for (let i = 0; i < line.length; i++) if (idToPoint.has(line[i])) knownIdx.push(i)
+			if (knownIdx.length < 2) continue
+			const p1 = idToPoint.get(line[knownIdx[0]])!
+			const p2 = idToPoint.get(line[knownIdx[1]])!
+			const dir = { x: p2.x - p1.x, y: p2.y - p1.y }
+			const baseLen = Math.hypot(dir.x, dir.y) || 1
+			const ux = dir.x / baseLen
+			const uy = dir.y / baseLen
+			const step = baseLen * 0.3
+			const anchor = knownIdx[0]
+			for (let i = anchor + 1; i < line.length; i++) {
+				const prev = idToPoint.get(line[i - 1])
+				const curId = line[i]
+				if (!prev) break
+				if (!idToPoint.has(curId)) idToPoint.set(curId, { x: prev.x + step * ux, y: prev.y + step * uy })
+			}
+			for (let i = anchor - 1; i >= 0; i--) {
+				const next = idToPoint.get(line[i + 1])
+				const curId = line[i]
+				if (!next) break
+				if (!idToPoint.has(curId)) idToPoint.set(curId, { x: next.x - step * ux, y: next.y - step * uy })
 			}
 
-			const MIN_DISTANCE_MULTIPLIER = 1.0 // Lower bound (current distance is good baseline)
-			const MAX_DISTANCE_MULTIPLIER = 2.5 // Upper bound to prevent labels floating too far
-			const SCALING_FACTOR = 0.3 // Controls how aggressively small angles are pushed out
+			// Do not draw base lines yet; arcs will be drawn first
+		}
+	}
 
-			// Use logarithmic scaling: smaller angles get exponentially more distance
-			// angleMagnitudeRad ranges from ~0 to π, log gives us smooth inverse relationship
-			const normalizedAngle = angleMagnitudeRad / Math.PI // Normalize to 0-1
-			const logScale = Math.log(normalizedAngle + 0.1) // Add offset to avoid log(0)
-			const invertedScale = -logScale // Invert so smaller angles get higher values
+	// Build screen segments for collision detection (triangle edges + explicit base lines)
+	const screenSegments: Array<{ a: { x: number; y: number }; b: { x: number; y: number } }> = []
+	screenSegments.push({ a: A, b: B }, { a: B, b: C }, { a: C, b: A })
+	if (lines) {
+		for (const line of lines) {
+			for (let i = 1; i < line.length; i++) {
+				const p1 = idToPoint.get(line[i - 1])
+				const p2 = idToPoint.get(line[i])
+				if (p1 && p2) screenSegments.push({ a: p1, b: p2 })
+			}
+		}
+	}
 
-			// Scale and clamp the multiplier
-			const distanceMultiplier = Math.min(
-				MAX_DISTANCE_MULTIPLIER,
-				Math.max(MIN_DISTANCE_MULTIPLIER, MIN_DISTANCE_MULTIPLIER + SCALING_FACTOR * invertedScale)
-			)
+	// Optional construction lines
+	if (constructionLines) {
+		for (const line of constructionLines) {
+			const pts = line.points
+				.map((pid: string) => idToPoint.get(pid))
+				.filter((p: Vec | undefined): p is Vec => p != null)
+			if (pts.length >= 2) {
+				const dash = line.style === "dashed" ? "4 3" : line.style === "dotted" ? "2 4" : undefined
+				for (let i = 1; i < pts.length; i++) {
+					const p1 = pts[i - 1]
+					const p2 = pts[i]
+					canvas.drawLine(p1.x, p1.y, p2.x, p2.y, { stroke: theme.colors.black, strokeWidth: theme.stroke.width.base, dash })
+					screenSegments.push({ a: p1, b: p2 })
+				}
+			}
+		}
+	}
 
-			return baseDistance * distanceMultiplier
+	// Draw angle arcs by three points (uniform radius, minor arc only)
+	// Track preferred label directions: opposite the arc's mid-angle
+	const preferredOppositeByVertex = new Map<string, number>()
+	for (const mark of angleArcs) {
+		const center = idToPoint.get(mark.vertex)
+		const pf = idToPoint.get(mark.from)
+		const pt = idToPoint.get(mark.to)
+		if (!center || !pf || !pt) {
+			logger.error("missing points for angle arc", { mark })
+			throw errors.new("missing points for angle arc")
 		}
 
-		// Calculate scaled arc radius
-		const scaledArcRadius = calculateAngleDistance(angle.radius)
+		const v1: Vec = { x: pf.x - center.x, y: pf.y - center.y }
+		const v2: Vec = { x: pt.x - center.x, y: pt.y - center.y }
 
-		// Only draw the arc/marker if showArc is true
-		if (angle.showArc) {
-			if (angle.isRightAngle) {
-				const v1x = p1.x - vertex.x
-				const v1y = p1.y - vertex.y
-				const mag1 = Math.sqrt(v1x * v1x + v1y * v1y)
-				const u1x = v1x / mag1
-				const u1y = v1y / mag1
-				const v2x = p2.x - vertex.x
-				const v2y = p2.y - vertex.y
-				const mag2 = Math.sqrt(v2x * v2x + v2y * v2y)
-				const u2x = v2x / mag2
-				const u2y = v2y / mag2
+		let a1 = angleOf(v1)
+		let a2 = angleOf(v2)
+		let d = a2 - a1
+		while (d <= -Math.PI) d += 2 * Math.PI
+		while (d > Math.PI) d -= 2 * Math.PI
+		const sweep = Math.abs(d)
+		let start = d >= 0 ? a1 : a2
+		let end = start + sweep
 
-				const markerSize = calculateAngleDistance(15)
-				const m1x = vertex.x + u1x * markerSize
-				const m1y = vertex.y + u1y * markerSize
-				const m2x = vertex.x + u2x * markerSize
-				const m2y = vertex.y + u2y * markerSize
-				const m3x = vertex.x + (u1x + u2x) * markerSize
-				const m3y = vertex.y + (u1y + u2y) * markerSize
+		// Dynamic, screen-space arc radius: doubled base, scaled by angle size (smaller angle -> slightly larger radius)
+		const baseArcRadius = 36
+		const sweepRatio = Math.min(Math.max(sweep / Math.PI, 0), 1) // 0..1 for 0..180°
+		const sizeScale = 0.85 + (1 - sweepRatio) * 0.35 // 0.85..1.2
+		const arcRadius = baseArcRadius * sizeScale
+		drawArc(canvas, center, arcRadius, start, end, mark.color)
 
-				// Canvas automatically tracks extents
-
-				const markerPath = new Path2D().moveTo(m1x, m1y).lineTo(m3x, m3y).lineTo(m2x, m2y)
-				canvas.drawPath(markerPath, {
-					fill: "none",
-					stroke: theme.colors.black,
-					strokeWidth: theme.stroke.width.thick
-				})
-
-				// Helper dashed rays from the right-angle square along both rays
-				// Draw when a dashed internal line meets this vertex (altitude/height context).
-				if (dashedVertexIds.has(vertex.id)) {
-					const helperLen = markerSize
-					// Determine if there is an existing dashed line colinear with each ray from this vertex.
-					const colinearSignFor = (dirX: number, dirY: number): -1 | 0 | 1 => {
-						for (const line of internalLines) {
-							if (line.style !== "dashed") continue
-							let other: { x: number; y: number } | null = null
-							if (line.from === vertex.id) {
-								const to = pointMap.get(line.to)
-								if (to) other = { x: to.x - vertex.x, y: to.y - vertex.y }
-							} else if (line.to === vertex.id) {
-								const fromP = pointMap.get(line.from)
-								if (fromP) other = { x: fromP.x - vertex.x, y: fromP.y - vertex.y }
-							}
-							if (!other) continue
-							const ovLen = Math.hypot(other.x, other.y)
-							if (ovLen === 0) continue
-							const ovx = other.x / ovLen
-							const ovy = other.y / ovLen
-							const dot = ovx * dirX + ovy * dirY
-							if (Math.abs(dot) > 0.98) {
-								return dot >= 0 ? 1 : -1
-							}
-						}
+		// Label with collision-aware placement using estimated text size
+		const mid = (start + end) / 2
+		// Save opposite direction for vertex label placement later
+		preferredOppositeByVertex.set(mark.vertex, (mid + Math.PI) % (2 * Math.PI))
+		const baseR = arcRadius + 18
+		const segments = [
+			{ p1: A, p2: B },
+			{ p1: B, p2: C },
+			{ p1: C, p2: A }
+		]
+		const orient = (a: Vec, b: Vec, c: Vec) => {
+			const val = (b.y - a.y) * (c.x - b.x) - (b.x - a.x) * (c.y - b.y)
+			if (val > 1e-9) return 1
+			if (val < -1e-9) return -1
 						return 0
 					}
-
-					// For each ray, draw dashed segments in both directions from the square corner,
-					// unless a real dashed line already occupies one direction; in that case, draw the opposite.
-					const drawRayHelpers = (
-						cornerX: number,
-						cornerY: number,
-						dirX: number,
-						dirY: number,
-						sign: -1 | 0 | 1
-					): void => {
-						const posX1 = cornerX
-						const posY1 = cornerY
-						const posX2 = cornerX + dirX * helperLen
-						const posY2 = cornerY + dirY * helperLen
-						const negX1 = cornerX - dirX * helperLen
-						const negY1 = cornerY - dirY * helperLen
-						// Draw toward +dir only if no true dashed internal line occupies +dir
-						if (sign <= 0) {
-							canvas.drawLine(posX1, posY1, posX2, posY2, {
-								stroke: theme.colors.black,
-								strokeWidth: theme.stroke.width.base,
-								dash: "4 3"
-							})
-						}
-						// Draw toward -dir only if no true dashed internal line occupies -dir
-						if (sign >= 0) {
-							canvas.drawLine(negX1, negY1, posX1, posY1, {
-								stroke: theme.colors.black,
-								strokeWidth: theme.stroke.width.base,
-								dash: "4 3"
-							})
-						}
-					}
-
-					const sign1 = colinearSignFor(u1x, u1y)
-					const sign2 = colinearSignFor(u2x, u2y)
-					drawRayHelpers(m1x, m1y, u1x, u1y, sign1)
-					drawRayHelpers(m2x, m2y, u2x, u2y, sign2)
-				}
-
-				// Auto-draw full dashed height when a right-angle marker exists at a non-core vertex
-				// but no explicit dashed internal line is provided. This addresses cases where the
-				// height dropdown is implied in the problem but omitted from inputs.
-				const isCoreTriangleVertex = triangleChunks.some((tri) => tri.ids.has(vertex.id))
-				if (!isCoreTriangleVertex) {
-					// Choose the farther of the two rays' endpoints as the target (typically the apex
-					// when the right angle is at the foot on the base).
-					const dToP1 = Math.hypot(p1.x - vertex.x, p1.y - vertex.y)
-					const dToP2 = Math.hypot(p2.x - vertex.x, p2.y - vertex.y)
-					const target = dToP1 >= dToP2 ? p1 : p2
-					const existsDashedHeight = internalLines.some(
-						(line) =>
-							line.style === "dashed" &&
-							((line.from === vertex.id && line.to === target.id) || (line.to === vertex.id && line.from === target.id))
-					)
-					if (!existsDashedHeight) {
-						canvas.drawLine(vertex.x, vertex.y, target.x, target.y, {
-							stroke: theme.colors.black,
-							strokeWidth: theme.stroke.width.base,
-							dash: "4 3"
-						})
-					}
-				}
-			} else {
-				const arcStartX = vertex.x + scaledArcRadius * Math.cos(startAngle)
-				const arcStartY = vertex.y + scaledArcRadius * Math.sin(startAngle)
-				const arcEndX = vertex.x + scaledArcRadius * Math.cos(endAngle)
-				const arcEndY = vertex.y + scaledArcRadius * Math.sin(endAngle)
-
-				// Track angle arc endpoints
-				// Canvas automatically tracks extents
-
-				let angleDiff = endAngle - startAngle
-				if (angleDiff > Math.PI) angleDiff -= 2 * Math.PI
-				if (angleDiff < -Math.PI) angleDiff += 2 * Math.PI
-				const sweepFlag: 0 | 1 = angleDiff > 0 ? 1 : 0
-				const arcPath = new Path2D()
-					.moveTo(arcStartX, arcStartY)
-					.arcTo(scaledArcRadius, scaledArcRadius, 0, 0, sweepFlag, arcEndX, arcEndY)
-				canvas.drawPath(arcPath, {
-					fill: "none",
-					stroke: angle.color,
-					strokeWidth: theme.stroke.width.thick
-				})
-			}
+		const intersects = (a: Vec, b: Vec, c: Vec, d2: Vec) => {
+			const o1 = orient(a, b, c)
+			const o2 = orient(a, b, d2)
+			const o3 = orient(c, d2, a)
+			const o4 = orient(c, d2, b)
+			return o1 !== o2 && o3 !== o4
 		}
-
-		if (angle.label) {
-			const midAngle = (startAngle + endAngle) / 2
-
-			let labelRadius: number
-
-			// Use a fixed radius for right angles, otherwise calculate dynamically with scaling
-			if (angle.isRightAngle) {
-				labelRadius = 28
-			} else {
-				const baseLabelRadius = scaledArcRadius * 1.6
-				const FONT_SIZE_ESTIMATE = 14 // Based on the SVG font-size
-				const CLEARANCE_PX = FONT_SIZE_ESTIMATE * 0.7 // Clearance needed for text
-
-				// For very small angles, sin() approaches 0, which can cause radius to be infinite.
-				// We only apply this logic if the angle is wide enough to avoid division by zero.
-				if (Math.sin(angleMagnitudeRad / 2) > 0.01) {
-					// Calculate the minimum radius needed to avoid the label touching the angle's lines
-					const minRadiusForClearance = CLEARANCE_PX / Math.sin(angleMagnitudeRad / 2)
-					// The label radius is the larger of the aesthetic default or the calculated minimum
-					labelRadius = Math.max(baseLabelRadius, minRadiusForClearance)
-				} else {
-					// Fallback for extremely small angles
-					labelRadius = baseLabelRadius
+		const rectHitsAnySegment = (rect: { x: number; y: number; width: number; height: number; pad?: number }): boolean => {
+			const pad = rect.pad ?? 0
+			const rx = rect.x - pad
+			const ry = rect.y - pad
+			const rw = rect.width + 2 * pad
+			const rh = rect.height + 2 * pad
+			const corners = [
+				{ x: rx, y: ry },
+				{ x: rx + rw, y: ry },
+				{ x: rx + rw, y: ry + rh },
+				{ x: rx, y: ry + rh }
+			]
+			for (const s of segments) {
+				if (
+					intersects(s.p1, s.p2, corners[0], corners[1]) ||
+					intersects(s.p1, s.p2, corners[1], corners[2]) ||
+					intersects(s.p1, s.p2, corners[2], corners[3]) ||
+					intersects(s.p1, s.p2, corners[3], corners[0])
+				) {
+					return true
 				}
 			}
-			// --- NEW LOGIC END ---
-			// For right angles, flip label direction outward from the triangle so it does not
-			// overlap the vertex label or the right-angle marker inside the corner.
-			let labelAngle = midAngle
-			if (angle.isRightAngle) {
-				const inX = vertex.x + labelRadius * Math.cos(midAngle)
-				const inY = vertex.y + labelRadius * Math.sin(midAngle)
-				const outAngle = midAngle + Math.PI
-				const outX = vertex.x + labelRadius * Math.cos(outAngle)
-				const outY = vertex.y + labelRadius * Math.sin(outAngle)
-				const distIn = Math.hypot(inX - centroidXForAngles, inY - centroidYForAngles)
-				const distOut = Math.hypot(outX - centroidXForAngles, outY - centroidYForAngles)
-				labelAngle = distOut > distIn ? outAngle : midAngle
+			return false
+		}
+		const text = angleValueToString(mark.value)
+		const fontPx = theme.font.size.medium
+		const { maxWidth, height: textH } = estimateWrappedTextDimensions(text, Number.POSITIVE_INFINITY, fontPx, 1.2)
+		const halfW = maxWidth / 2
+		const halfH = textH / 2
+		let best = { x: center.x + baseR * Math.cos(mid), y: center.y + baseR * Math.sin(mid) }
+		let minHits = Number.POSITIVE_INFINITY
+		// Prefer placing labels opposite the triangle interior
+		const tri = [A, B, C]
+		function pointInTriangle(p: Vec): boolean {
+			const [p0, p1, p2] = tri
+			const area = (a: Vec, b: Vec, c: Vec) => (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x)
+			const s1 = area(p0, p1, p)
+			const s2 = area(p1, p2, p)
+			const s3 = area(p2, p0, p)
+			const hasNeg = (s1 < 0) || (s2 < 0) || (s3 < 0)
+			const hasPos = (s1 > 0) || (s2 > 0) || (s3 > 0)
+			return !(hasNeg && hasPos)
+		}
+		// Try interior first unless the angle is very acute; if collisions persist, flip outside
+		const acuteDeg = (sweep * 180) / Math.PI
+		const tryOrders: number[] = []
+		if (acuteDeg < 25) {
+			tryOrders.push(-1, 1) // prefer outside for very acute angles
+		} else {
+			tryOrders.push(1, -1) // otherwise prefer inside
+		}
+		for (const dirSign of tryOrders) {
+			for (const dr of [0, 8, -8, 16, -16, 24]) {
+				for (const dt of [0, Math.PI / 18, -Math.PI / 18]) {
+					const r = baseR + dr
+					const ang = mid + dt
+					const x = center.x + dirSign * r * Math.cos(ang)
+					const y = center.y + dirSign * r * Math.sin(ang)
+					const rect = { x: x - halfW, y: y - halfH, width: maxWidth, height: textH, pad: 2 }
+					const hits = rectIntersectsAnySegment(rect) ? 1 : 0
+					if (hits < minHits) {
+						minHits = hits
+						best = { x, y }
+					}
+					if (minHits === 0) break
+				}
+				if (minHits === 0) break
 			}
+			if (minHits === 0) break
+		}
+		canvas.drawText({ x: best.x, y: best.y, text, fill: theme.colors.black, anchor: "middle", dominantBaseline: "middle", fontPx, fontWeight: theme.font.weight.bold })
+	}
 
-			const labelX = vertex.x + labelRadius * Math.cos(labelAngle)
-			const labelY = vertex.y + labelRadius * Math.sin(labelAngle)
-
-			// Canvas automatically tracks extents
-
-			canvas.drawText({
-				x: labelX,
-				y: labelY,
-				text: angle.label,
-				fill: theme.colors.black,
-				anchor: "middle",
-				dominantBaseline: "middle"
-			})
+	// After arcs: draw triangle lines and any explicit base lines so lines sit on top
+	canvas.drawPolygon([A, B, C], { fill: "none", stroke: theme.colors.black, strokeWidth: theme.stroke.width.thick })
+	if (lines) {
+		for (const line of lines) {
+			for (let i = 1; i < line.length; i++) {
+				const a = idToPoint.get(line[i - 1])
+				const b = idToPoint.get(line[i])
+				if (a && b) canvas.drawLine(a.x, a.y, b.x, b.y, { stroke: theme.colors.black, strokeWidth: theme.stroke.width.thick })
+			}
 		}
 	}
 
-	// Layer 5: Sides (Labels and Ticks)
-	// Compute centroid of the main triangle (first 3 points) to determine outward direction
-	// Safe to access without checks since we validated points.length >= 3 above
-	const pA = points[0]
-	const pB = points[1]
-	const pC = points[2]
-	if (!pA || !pB || !pC) {
-		logger.error("triangle diagram missing required points for sides", {
-			points: points.slice(0, 3)
-		})
-		throw errors.new("triangle diagram: first 3 points are required for sides")
-	}
-	const centroidX = (pA.x + pB.x + pC.x) / 3
-	const centroidY = (pA.y + pB.y + pC.y) / 3
-
-	for (const side of sides) {
-		const p1 = pointMap.get(side.vertex1)
-		const p2 = pointMap.get(side.vertex2)
-		if (!p1 || !p2) continue
-
-		const midX = (p1.x + p2.x) / 2
-		const midY = (p1.y + p2.y) / 2
-		const dx = p2.x - p1.x
-		const dy = p2.y - p1.y
-		const len = Math.sqrt(dx * dx + dy * dy)
-		const nx = -dy / len // Perpendicular vector
-		const ny = dx / len
-		// Dynamic label offset scaled by side length, within reasonable bounds
-		const labelOffset = Math.max(15, Math.min(32, len * 0.06 + (side.label ? side.label.length * 3 : 0)))
-
-		if (side.label) {
-			// Determine an appropriate centroid for this side: prefer the centroid
-			// of the triangle chunk that contains both endpoints; otherwise fallback.
-			let useCx = centroidX
-			let useCy = centroidY
-			for (const tri of triangleChunks) {
-				if (tri.ids.has(p1.id) && tri.ids.has(p2.id)) {
-					useCx = tri.cx
-					useCy = tri.cy
-					break
-				}
-			}
-
-			// Flip perpendicular to point away from the chosen centroid so labels are placed outside
-			let perpX = nx
-			let perpY = ny
-			const testX = midX + perpX * 10
-			const testY = midY + perpY * 10
-			const distTest = Math.hypot(testX - useCx, testY - useCy)
-			const distMid = Math.hypot(midX - useCx, midY - useCy)
-			if (distTest < distMid) {
-				perpX = -perpX
-				perpY = -perpY
-			}
-
-			const labelX = midX + perpX * labelOffset
-			const labelY = midY + perpY * labelOffset
-
-			// Canvas automatically tracks extents
-
-			canvas.drawText({
-				x: labelX,
-				y: labelY,
-				text: side.label,
-				fill: theme.colors.black,
-				anchor: "middle",
-				dominantBaseline: "middle"
-			})
+	// Altitudes (dropped heights)
+	if (altitudes) {
+		const sideMap: Record<"AB" | "BC" | "CA", { p1: Vec; p2: Vec }> = {
+			AB: { p1: A, p2: B },
+			BC: { p1: B, p2: C },
+			CA: { p1: C, p2: A }
 		}
-		if (side.tickMarks > 0) {
-			const tickSize = 6
-			const tickSpacing = 4
-			const totalTickWidth = side.tickMarks * tickSize + (side.tickMarks - 1) * tickSpacing
-			const startOffset = -totalTickWidth / 2
-			for (let i = 0; i < side.tickMarks; i++) {
-				const tickOffset = startOffset + i * (tickSize + tickSpacing)
-				const t1x = midX + (dx / len) * tickOffset - nx * (tickSize / 2)
-				const t1y = midY + (dy / len) * tickOffset - ny * (tickSize / 2)
-				const t2x = midX + (dx / len) * tickOffset + nx * (tickSize / 2)
-				const t2y = midY + (dy / len) * tickOffset + ny * (tickSize / 2)
-
-				// Canvas automatically tracks extents
-
-				canvas.drawLine(t1x, t1y, t2x, t2y, {
-					stroke: theme.colors.black,
-					strokeWidth: theme.stroke.width.thick
+		const vertexMap: Record<string, Vec> = { [points.A.id]: A, [points.B.id]: B, [points.C.id]: C }
+		for (const alt of altitudes) {
+			const v = vertexMap[alt.vertex]
+			const base = sideMap[alt.toSide]
+			if (!v || !base) {
+				logger.error("altitude references unknown points", { alt })
+				throw errors.new("invalid altitude references")
+			}
+			const bx = base.p2.x - base.p1.x
+			const by = base.p2.y - base.p1.y
+			const len2 = bx * bx + by * by
+			if (len2 === 0) {
+				logger.error("altitude base degenerate", { alt })
+				throw errors.new("invalid altitude base")
+			}
+			const t = ((v.x - base.p1.x) * bx + (v.y - base.p1.y) * by) / len2
+			if (t < 0 || t > 1) {
+				logger.error("altitude foot outside segment", { alt, t })
+				throw errors.new("altitude foot outside segment")
+			}
+			const foot: Vec = { x: base.p1.x + t * bx, y: base.p1.y + t * by }
+			const dash = alt.style === "dashed" ? "4 3" : "2 4"
+			canvas.drawLine(v.x, v.y, foot.x, foot.y, { stroke: alt.color, strokeWidth: theme.stroke.width.base, dash })
+			// add to collision segments
+			screenSegments.push({ a: v, b: foot })
+			if (alt.withRightAngle) {
+				// Draw right angle square at foot using base direction and altitude direction
+				const bl = Math.hypot(bx, by) || 1
+				const nbx = bx / bl
+				const nby = by / bl
+				const ax = v.x - foot.x
+				const ay = v.y - foot.y
+				const al = Math.hypot(ax, ay) || 1
+				const nax = ax / al
+				const nay = ay / al
+				const s = 14
+				const p1 = { x: foot.x + nbx * s, y: foot.y + nby * s }
+				const p2 = { x: foot.x + nax * s, y: foot.y + nay * s }
+				const corner = { x: p1.x + nax * s, y: p1.y + nay * s }
+				canvas.drawLine(p1.x, p1.y, corner.x, corner.y, { stroke: theme.colors.black, strokeWidth: theme.stroke.width.thick })
+				canvas.drawLine(p2.x, p2.y, corner.x, corner.y, { stroke: theme.colors.black, strokeWidth: theme.stroke.width.thick })
+			}
+			if (alt.value) {
+				const mid = { x: (v.x + foot.x) / 2, y: (v.y + foot.y) / 2 }
+				// place slightly to one side of the segment
+				const dx = foot.x - v.x
+				const dy = foot.y - v.y
+				const L = Math.hypot(dx, dy) || 1
+				const nx = -dy / L
+				const ny = dx / L
+				const off = 14
+				canvas.drawText({
+					x: mid.x + nx * off,
+					y: mid.y + ny * off,
+					text: sideValueToString(alt.value),
+					fill: theme.colors.black,
+					anchor: "middle",
+					dominantBaseline: "middle"
 				})
 			}
 		}
 	}
 
-	// Layer 6: Points and their labels (drawn last to be on top)
-	for (const point of points) {
-		// Canvas automatically tracks extents
+	// Collision helpers inspired by radially-constrained-angle-diagram
+	function segmentIntersectsRect(
+		Apt: { x: number; y: number },
+		Bpt: { x: number; y: number },
+		rect: { x: number; y: number; width: number; height: number; pad?: number }
+	): boolean {
+		const pad = rect.pad ?? 0
+		const rx = rect.x - pad
+		const ry = rect.y - pad
+		const rw = rect.width + 2 * pad
+		const rh = rect.height + 2 * pad
+		const minX = Math.min(Apt.x, Bpt.x)
+		const maxX = Math.max(Apt.x, Bpt.x)
+		const minY = Math.min(Apt.y, Bpt.y)
+		const maxY = Math.max(Apt.y, Bpt.y)
+		if (maxX < rx || minX > rx + rw || maxY < ry || minY > ry + rh) return false
+		const r1 = { x: rx, y: ry }
+		const r2 = { x: rx + rw, y: ry }
+		const r3 = { x: rx + rw, y: ry + rh }
+		const r4 = { x: rx, y: ry + rh }
+		const orient = (p: { x: number; y: number }, q: { x: number; y: number }, r: { x: number; y: number }) => {
+			const val = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y)
+			if (val > 1e-9) return 1
+			if (val < -1e-9) return -1
+			return 0
+		}
+		const segmentsIntersect = (
+			p1: { x: number; y: number },
+			p2: { x: number; y: number },
+			p3: { x: number; y: number },
+			p4: { x: number; y: number }
+		) => {
+			const o1 = orient(p1, p2, p3)
+			const o2 = orient(p1, p2, p4)
+			const o3 = orient(p3, p4, p1)
+			const o4 = orient(p3, p4, p2)
+			return o1 !== o2 && o3 !== o4
+		}
+		return (
+			segmentsIntersect(Apt, Bpt, r1, r2) ||
+			segmentsIntersect(Apt, Bpt, r2, r3) ||
+			segmentsIntersect(Apt, Bpt, r3, r4) ||
+			segmentsIntersect(Apt, Bpt, r4, r1)
+		)
+	}
 
-		canvas.drawCircle(point.x, point.y, 4, {
-			fill: theme.colors.black
-		})
-		if (point.label) {
-			// Place vertex labels along the external angle bisector so they sit outside
-			// the triangle and are equidistant from both incident sides.
-			let useCx = centroidAllX
-			let useCy = centroidAllY
-			let bisX = 0
-			let bisY = 0
-			let haveBisector = false
-			for (const tri of triangleChunks) {
-				if (tri.ids.has(point.id)) {
-					useCx = tri.cx
-					useCy = tri.cy
-					const neighborIds: string[] = []
-					for (const id of tri.ids) {
-						if (id !== point.id) neighborIds.push(id)
-					}
-					if (neighborIds.length === 2) {
-						const id1 = neighborIds[0]
-						const id2 = neighborIds[1]
-						if (id1 !== undefined && id2 !== undefined) {
-							const n1 = pointMap.get(id1)
-							const n2 = pointMap.get(id2)
-							if (n1 && n2) {
-								const v1x = n1.x - point.x
-								const v1y = n1.y - point.y
-								const v2x = n2.x - point.x
-								const v2y = n2.y - point.y
-								const m1 = Math.hypot(v1x, v1y)
-								const m2 = Math.hypot(v2x, v2y)
-								if (m1 > 0 && m2 > 0) {
-									const u1x = v1x / m1
-									const u1y = v1y / m1
-									const u2x = v2x / m2
-									const u2y = v2y / m2
-									let bx = u1x + u2x
-									let by = u1y + u2y
-									const bm = Math.hypot(bx, by)
-									if (bm > 0) {
-										bx /= bm
-										by /= bm
-										// Flip to point away from triangle interior (outward)
-										const toCentX = useCx - point.x
-										const toCentY = useCy - point.y
-										if (bx * toCentX + by * toCentY > 0) {
-											bx = -bx
-											by = -by
-										}
-										bisX = bx
-										bisY = by
-										haveBisector = true
-									}
-								}
-							}
-						}
-					}
-					break
+	function rectIntersectsAnySegment(rect: { x: number; y: number; width: number; height: number; pad?: number }): boolean {
+		for (const seg of screenSegments) {
+			if (segmentIntersectsRect(seg.a, seg.b, rect)) return true
+		}
+		return false
+	}
+
+	// Vertex labels A, B, C and point markers
+	canvas.drawCircle(A.x, A.y, 5, { fill: theme.colors.black })
+	canvas.drawCircle(B.x, B.y, 5, { fill: theme.colors.black })
+	canvas.drawCircle(C.x, C.y, 5, { fill: theme.colors.black })
+
+	function placePointLabel(pos: Vec, text: string, preferredAngleRad?: number) {
+		const fontPx = vertexFont
+		const { maxWidth: w, height: h } = estimateWrappedTextDimensions(text, Number.POSITIVE_INFINITY, fontPx, 1.2)
+		const halfW = w / 2
+		const halfH = h / 2
+		let best = { x: pos.x, y: pos.y }
+		let minCollisions = Number.POSITIVE_INFINITY
+		// Build candidate angles prioritizing the preferred direction, then spread
+		const angleCandidates: number[] = []
+		if (typeof preferredAngleRad === "number") {
+			angleCandidates.push(preferredAngleRad)
+			angleCandidates.push(preferredAngleRad + Math.PI / 6, preferredAngleRad - Math.PI / 6)
+			angleCandidates.push(preferredAngleRad + Math.PI / 3, preferredAngleRad - Math.PI / 3)
+		}
+		for (let i = 0; i < 8; i++) angleCandidates.push((i * Math.PI) / 4)
+		for (const ang of angleCandidates) {
+			for (const dist of [24, 34, 14, 44]) {
+				const tx = pos.x + dist * Math.cos(ang)
+				const ty = pos.y + dist * Math.sin(ang)
+				const rect = { x: tx - halfW, y: ty - halfH, width: w, height: h, pad: 2 }
+				const hits = rectIntersectsAnySegment(rect) ? 1 : 0
+				if (hits < minCollisions) {
+					minCollisions = hits
+					best = { x: tx, y: ty }
 				}
+				if (minCollisions === 0) break
 			}
-			const OFFSET = 16
-			let textX = point.x + 8
-			let textY = point.y - 8
-			if (haveBisector) {
-				textX = point.x + bisX * OFFSET
-				textY = point.y + bisY * OFFSET
-			} else {
-				// Fallback: push away from centroid if bisector unavailable
-				const dirX = point.x - useCx
-				const dirY = point.y - useCy
-				const dirLen = Math.hypot(dirX, dirY)
-				if (dirLen > 0) {
-					textX = point.x + (dirX / dirLen) * OFFSET
-					textY = point.y + (dirY / dirLen) * OFFSET
-				}
-			}
+			if (minCollisions === 0) break
+		}
+		canvas.drawText({ x: best.x, y: best.y, text, fill: theme.colors.black, anchor: "middle", dominantBaseline: "middle", fontPx, fontWeight: theme.font.weight.bold })
+	}
 
-			// Canvas automatically tracks extents
+	placePointLabel(A, points.A.label, preferredOppositeByVertex.get(points.A.id))
+	placePointLabel(B, points.B.label, preferredOppositeByVertex.get(points.B.id))
+	placePointLabel(C, points.C.label, preferredOppositeByVertex.get(points.C.id))
 
-			canvas.drawText({
-				x: textX,
-				y: textY,
-				text: point.label,
-				fill: theme.colors.black,
-				fontPx: theme.font.size.large,
-				fontWeight: theme.font.weight.bold,
-				anchor: "middle",
-				dominantBaseline: "middle"
-			})
+	// Draw markers and labels for extra points positioned via lines
+	if (extraPoints) {
+		for (const p of extraPoints) {
+			const pos = idToPoint.get(p.id)
+			if (!pos) continue
+			canvas.drawCircle(pos.x, pos.y, 5, { fill: theme.colors.black })
+			placePointLabel(pos, p.label)
 		}
 	}
 
-	// Finalize the canvas and construct the root SVG element
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(padding)
+	// Optional side labels (screen space)
+	if (sideLabels) {
+		const placeSideLabel = (
+			p1: Vec,
+			p2: Vec,
+			lbl: z.infer<ReturnType<typeof createSideValueSchema>> | null
+		) => {
+			if (!lbl) return
+			const mid = vecScale(vecAdd(p1, p2), 0.5)
+			const dx = p2.x - p1.x
+			const dy = p2.y - p1.y
+			const len = Math.hypot(dx, dy)
+			if (len === 0) return
+			const nx = -dy / len
+			const ny = dx / len
+			const off = 20
+			const lx = mid.x + nx * off
+			const ly = mid.y + ny * off
+			if (lbl.type === "mathml") {
+				// Render MathML via foreignObject similar to number-line
+				const fontPx = theme.font.size.large
+				const labelWidth = 120
+				const labelHeight = 32
+				const xhtml = `<!DOCTYPE html><div xmlns="http://www.w3.org/1999/xhtml" style="display:flex;align-items:flex-end;justify-content:center;width:100%;height:100%;line-height:1;font-family:${theme.font.family.sans};color:${theme.colors.black};"><math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\" style=\"font-size:${fontPx * 1.1}px;\">${lbl.mathml}</math></div>`
+				canvas.drawForeignObject({ x: lx - labelWidth / 2, y: ly - labelHeight / 2, width: labelWidth, height: labelHeight, content: xhtml })
+				return
+			}
+			canvas.drawText({ x: lx, y: ly, text: sideValueToString(lbl), fill: theme.colors.black, anchor: "middle", dominantBaseline: "middle" })
+		}
+		placeSideLabel(A, B, sideLabels.AB)
+		placeSideLabel(B, C, sideLabels.BC)
+		placeSideLabel(C, A, sideLabels.CA)
+	}
+
+	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.medium}">${svgBody}</svg>`
 }
+
