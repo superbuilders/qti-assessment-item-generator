@@ -7,6 +7,190 @@ import { Path2D } from "../../utils/path-builder"
 import { theme } from "../../utils/theme"
 import type { WidgetGenerator } from "../types"
 
+type Point = { x: number; y: number }
+
+function distance(a: Point, b: Point): number {
+	const dx = b.x - a.x
+	const dy = b.y - a.y
+	return Math.hypot(dx, dy)
+}
+
+function segmentIntersectionParamT(p: Point, r: Point, q: Point, s: Point): number | null {
+	// Returns t in [0,1] along PR where PR intersects QS, or null if no proper intersection.
+	// PR = p + t*(r - p), QS = q + u*(s - q)
+	const rx = r.x - p.x
+	const ry = r.y - p.y
+	const sx = s.x - q.x
+	const sy = s.y - q.y
+
+	const denom = rx * sy - ry * sx
+	if (denom === 0) {
+		return null
+	}
+
+	const qpx = q.x - p.x
+	const qpy = q.y - p.y
+	const t = (qpx * sy - qpy * sx) / denom
+	const u = (qpx * ry - qpy * rx) / denom
+
+	if (t < 0 || t > 1) {
+		return null
+	}
+	if (u < 0 || u > 1) {
+		return null
+	}
+	return t
+}
+
+function computeSafeBasePointForRadius(
+	center: Point,
+	end: Point,
+	shapes: ReadonlyArray<
+		| { type: "polygon"; id: string; vertexIds: string[] }
+		| { type: "circle"; id: string; centerId: string; radius: number }
+	>,
+	getVertex: (id: string) => Point | undefined,
+	perpendicularOffsetPx: number
+): Point {
+	// Project along the radius from center -> end and avoid zones where the label base would clash
+	const totalLen = distance(center, end)
+	if (!(totalLen > 0)) {
+		return { x: (center.x + end.x) / 2, y: (center.y + end.y) / 2 }
+	}
+
+	// Buffers in pixels converted to normalized t along the radius
+	const bufferNearCenterPx = 20
+	const bufferNearCirclePx = perpendicularOffsetPx + 12
+	const intersectionBufferPx = 15
+
+	const tMinRaw = bufferNearCenterPx / totalLen
+	const tMaxRaw = 1 - bufferNearCirclePx / totalLen
+	let tMin = tMinRaw
+	let tMax = tMaxRaw
+	if (tMin < 0) {
+		tMin = 0
+	}
+	if (tMax > 1) {
+		tMax = 1
+	}
+	if (tMin >= tMax) {
+		// Degenerate; fall back to midpoint along the segment
+		return { x: (center.x + end.x) / 2, y: (center.y + end.y) / 2 }
+	}
+
+	const intersectionTs: number[] = []
+	for (const shape of shapes) {
+		if (shape.type === "polygon") {
+			const ids = shape.vertexIds
+			if (ids && ids.length > 1) {
+				const pts: Point[] = []
+				for (const id of ids) {
+					const v = getVertex(id)
+					if (v) {
+						pts.push(v)
+					}
+				}
+				for (let i = 0; i < pts.length; i++) {
+					const a = pts[i]
+					const b = pts[(i + 1) % pts.length]
+					const t = segmentIntersectionParamT(center, end, a, b)
+					if (t !== null) {
+						// Only consider intersections away from center a bit
+						if (t > 0 && t < 1) {
+							intersectionTs.push(t)
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// Build forbidden intervals
+	const forbiddens: Array<{ start: number; end: number }> = []
+	forbiddens.push({ start: tMin, end: tMin }) // placeholder to ease merging when empty
+	const bufferT = intersectionBufferPx / totalLen
+	for (const t of intersectionTs) {
+		const start = t - bufferT
+		const end = t + bufferT
+		forbiddens.push({ start, end })
+	}
+
+	// Normalize and merge forbidden intervals
+	const merged: Array<{ start: number; end: number }> = []
+	const sorted = forbiddens
+		.map((iv) => ({ start: Math.max(iv.start, 0), end: Math.min(iv.end, 1) }))
+		.filter((iv) => iv.end > iv.start)
+		.sort((i1, i2) => {
+			if (i1.start < i2.start) {
+				return -1
+			}
+			if (i1.start > i2.start) {
+				return 1
+			}
+			return 0
+		})
+	for (const iv of sorted) {
+		if (merged.length === 0) {
+			merged.push({ start: iv.start, end: iv.end })
+		} else {
+			const last = merged[merged.length - 1]
+			if (iv.start <= last.end) {
+				if (iv.end > last.end) {
+					last.end = iv.end
+				}
+			} else {
+				merged.push({ start: iv.start, end: iv.end })
+			}
+		}
+	}
+
+	// Start with base allowed interval [tMin, tMax]
+	let allowed: Array<{ start: number; end: number }> = []
+	let cursor = tMin
+	for (const f of merged) {
+		if (f.end < tMin) {
+			continue
+		}
+		if (f.start > tMax) {
+			break
+		}
+		const segStart = cursor
+		const segEnd = Math.min(f.start, tMax)
+		if (segEnd > segStart) {
+			allowed.push({ start: segStart, end: segEnd })
+		}
+		if (f.end > cursor) {
+			cursor = Math.max(f.end, cursor)
+		}
+		if (cursor >= tMax) {
+			break
+		}
+	}
+	if (cursor < tMax) {
+		allowed.push({ start: cursor, end: tMax })
+	}
+
+	if (allowed.length === 0) {
+		// No safe interval; return midpoint
+		return { x: (center.x + end.x) / 2, y: (center.y + end.y) / 2 }
+	}
+
+	// Choose the largest allowed interval and place in its center
+	let best = allowed[0]
+	let bestSpan = best.end - best.start
+	for (let i = 1; i < allowed.length; i++) {
+		const span = allowed[i].end - allowed[i].start
+		if (span > bestSpan) {
+			best = allowed[i]
+			bestSpan = span
+		}
+	}
+	const tChosen = (best.start + best.end) / 2
+	const baseX = center.x + (end.x - center.x) * tChosen
+	const baseY = center.y + (end.y - center.y) * tChosen
+	return { x: baseX, y: baseY }
+}
+
 const CompositeShapePolygonSchema = z
 	.object({
 		id: z.string(),
@@ -303,16 +487,28 @@ export const generateNestedShapeDiagram: WidgetGenerator<typeof NestedShapeDiagr
 				labelX = midX + offset * Math.sin(angle)
 				labelY = midY - offset * Math.cos(angle)
 			}
-			// Check if this segment is a radius (for label coloring)
+			// Check if this segment is a radius (for label coloring and smarter placement)
 			let isRadiusLabel = false
+			let baseX = midX
+			let baseY = midY
 			for (const shape of shapes) {
 				if (shape.type === "circle") {
 					const center = vertexMap.get(shape.centerId)
 					if (center && ((a.x === center.x && a.y === center.y) || (b.x === center.x && b.y === center.y))) {
 						isRadiusLabel = true
+						const rCenter = center
+						const rEnd = rCenter.x === a.x && rCenter.y === a.y ? b : a
+						const safeBase = computeSafeBasePointForRadius(rCenter, rEnd, shapes, (id) => vertexMap.get(id), offset)
+						baseX = safeBase.x
+						baseY = safeBase.y
 						break
 					}
 				}
+			}
+
+			if (isRadiusLabel) {
+				labelX = baseX + offset * Math.sin(angle)
+				labelY = baseY - offset * Math.cos(angle)
 			}
 
 			canvas.drawText({
