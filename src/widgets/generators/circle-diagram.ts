@@ -6,6 +6,7 @@ import { PADDING } from "../../utils/constants"
 import { CSS_COLOR_PATTERN } from "../../utils/css-color"
 import { Path2D } from "../../utils/path-builder"
 import { theme } from "../../utils/theme"
+import { estimateWrappedTextDimensions } from "../../utils/text"
 import type { WidgetGenerator } from "../types"
 
 // Defines a line segment, such as a radius, innerRadius, or a diameter.
@@ -238,6 +239,128 @@ export const generateCircleDiagram: WidgetGenerator<typeof CircleDiagramPropsSch
 	const r = radius * scale
 	const rInnerOpt = innerRadius ? innerRadius * scale : null
 
+	// Collision detection utilities
+	const avoidSegments: Array<{ a: { x: number; y: number }; b: { x: number; y: number } }> = []
+	const placedLabels: Array<{ x: number; y: number; width: number; height: number }> = []
+
+	function orient(p: { x: number; y: number }, q: { x: number; y: number }, r: { x: number; y: number }) {
+		const v = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y)
+		if (v > 1e-9) return 1
+		if (v < -1e-9) return -1
+		return 0
+	}
+
+	function intersects(p1: { x: number; y: number }, p2: { x: number; y: number }, p3: { x: number; y: number }, p4: { x: number; y: number }) {
+		const o1 = orient(p1, p2, p3)
+		const o2 = orient(p1, p2, p4)
+		const o3 = orient(p3, p4, p1)
+		const o4 = orient(p3, p4, p2)
+		return o1 !== o2 && o3 !== o4
+	}
+
+	function rectIntersectsSegment(rect: { x: number; y: number; width: number; height: number }, s: { a: { x: number; y: number }; b: { x: number; y: number } }) {
+		const r = { x1: rect.x, y1: rect.y, x2: rect.x + rect.width, y2: rect.y + rect.height }
+		const edges = [
+			{ a: { x: r.x1, y: r.y1 }, b: { x: r.x2, y: r.y1 } },
+			{ a: { x: r.x2, y: r.y1 }, b: { x: r.x2, y: r.y2 } },
+			{ a: { x: r.x2, y: r.y2 }, b: { x: r.x1, y: r.y2 } },
+			{ a: { x: r.x1, y: r.y2 }, b: { x: r.x1, y: r.y1 } }
+		]
+		return edges.some((e) => intersects(e.a, e.b, s.a, s.b))
+	}
+
+	function rectIntersectsRect(rect1: { x: number; y: number; width: number; height: number }, rect2: { x: number; y: number; width: number; height: number }) {
+		return !(rect1.x + rect1.width < rect2.x || rect2.x + rect2.width < rect1.x || rect1.y + rect1.height < rect2.y || rect2.y + rect2.height < rect1.y)
+	}
+
+	function withinBounds(rect: { x: number; y: number; width: number; height: number }) {
+		const pad = 2
+		const lft = rect.x - pad
+		const rgt = rect.x + rect.width + pad
+		const top = rect.y - pad
+		const bot = rect.y + rect.height + pad
+		return lft >= PADDING && rgt <= width - PADDING && top >= PADDING && bot <= height - PADDING
+	}
+
+	function findSafeLabelPosition(
+		idealX: number,
+		idealY: number,
+		labelWidth: number,
+		labelHeight: number,
+		searchRadius = 30
+	): { x: number; y: number } | null {
+		const halfW = labelWidth / 2
+		const halfH = labelHeight / 2
+
+		// Try the ideal position first
+		const idealRect = { x: idealX - halfW, y: idealY - halfH, width: labelWidth, height: labelHeight }
+		if (withinBounds(idealRect)) {
+			let hasCollision = false
+			
+			// Check against segments
+			for (const seg of avoidSegments) {
+				if (rectIntersectsSegment(idealRect, seg)) {
+					hasCollision = true
+					break
+				}
+			}
+			
+			// Check against other labels
+			if (!hasCollision) {
+				for (const label of placedLabels) {
+					if (rectIntersectsRect(idealRect, label)) {
+						hasCollision = true
+						break
+					}
+				}
+			}
+
+			if (!hasCollision) {
+				return { x: idealX, y: idealY }
+			}
+		}
+
+		// Search in expanding circles around the ideal position
+		const step = 6
+		
+		for (let radius = step; radius <= searchRadius; radius += step) {
+			const angleStep = Math.PI / 8 // 8 positions per circle
+			for (let angle = 0; angle < 2 * Math.PI; angle += angleStep) {
+				const testX = idealX + Math.cos(angle) * radius
+				const testY = idealY + Math.sin(angle) * radius
+				const testRect = { x: testX - halfW, y: testY - halfH, width: labelWidth, height: labelHeight }
+
+				if (!withinBounds(testRect)) continue
+
+				let hasCollision = false
+				
+				// Check against segments
+				for (const seg of avoidSegments) {
+					if (rectIntersectsSegment(testRect, seg)) {
+						hasCollision = true
+						break
+					}
+				}
+				
+				// Check against other labels
+				if (!hasCollision) {
+					for (const label of placedLabels) {
+						if (rectIntersectsRect(testRect, label)) {
+							hasCollision = true
+							break
+						}
+					}
+				}
+
+				if (!hasCollision) {
+					return { x: testX, y: testY }
+				}
+			}
+		}
+
+		return null
+	}
+
 	// Annulus is only compatible with the full "circle" shape.
 	if (shape === "circle" && innerRadius && annulusFillColor) {
 		const r1 = radius * scale
@@ -353,21 +476,76 @@ export const generateCircleDiagram: WidgetGenerator<typeof CircleDiagramPropsSch
 				stroke: arc.strokeColor,
 				strokeWidth: theme.stroke.width.xxthick
 			})
+
+			// Add arc segments to avoid list for collision detection
+			// Approximate arc with multiple line segments for collision detection
+			const arcAngleSpan = Math.abs(arc.endAngle - arc.startAngle)
+			const numSegments = Math.max(3, Math.ceil(arcAngleSpan / 30)) // One segment per 30 degrees
+			for (let i = 0; i < numSegments; i++) {
+				const angle1 = arc.startAngle + (i * arcAngleSpan) / numSegments
+				const angle2 = arc.startAngle + ((i + 1) * arcAngleSpan) / numSegments
+				const p1 = pointOnCircle(angle1, r)
+				const p2 = pointOnCircle(angle2, r)
+				avoidSegments.push({ a: p1, b: p2 })
+			}
+
 			if (arc.label !== null) {
 				const midAngle = (arc.startAngle + arc.endAngle) / 2
 				const labelPos = pointOnCircle(midAngle, r + PADDING)
-				const finalX = clamp(labelPos.x, PADDING, width - PADDING)
-				const finalY = clamp(labelPos.y, PADDING, height - PADDING)
-				canvas.drawText({
-					x: finalX,
-					y: finalY,
-					text: arc.label,
-					fontPx: theme.font.size.medium,
-					fontWeight: theme.font.weight.bold,
-					fill: theme.colors.text,
-					anchor: "middle",
-					dominantBaseline: "middle"
-				})
+				
+				// Estimate label dimensions
+				const { maxWidth: labelWidth, height: labelHeight } = estimateWrappedTextDimensions(
+					arc.label,
+					Number.POSITIVE_INFINITY,
+					theme.font.size.medium,
+					1.2
+				)
+
+				// Find safe position using collision detection
+				const safePos = findSafeLabelPosition(labelPos.x, labelPos.y, labelWidth, labelHeight)
+				if (safePos) {
+					// Track this label's position to avoid future collisions
+					placedLabels.push({
+						x: safePos.x - labelWidth / 2,
+						y: safePos.y - labelHeight / 2,
+						width: labelWidth,
+						height: labelHeight
+					})
+
+					canvas.drawText({
+						x: safePos.x,
+						y: safePos.y,
+						text: arc.label,
+						fontPx: theme.font.size.medium,
+						fontWeight: theme.font.weight.bold,
+						fill: theme.colors.text,
+						anchor: "middle",
+						dominantBaseline: "middle"
+					})
+				} else {
+					// Fallback to clamped position if no safe position found
+					logger.warn("arc label placement failed, using fallback", { startAngle: arc.startAngle, endAngle: arc.endAngle })
+					const fallbackX = clamp(labelPos.x, PADDING, width - PADDING)
+					const fallbackY = clamp(labelPos.y, PADDING, height - PADDING)
+					
+					placedLabels.push({
+						x: fallbackX - labelWidth / 2,
+						y: fallbackY - labelHeight / 2,
+						width: labelWidth,
+						height: labelHeight
+					})
+
+					canvas.drawText({
+						x: fallbackX,
+						y: fallbackY,
+						text: arc.label,
+						fontPx: theme.font.size.medium,
+						fontWeight: theme.font.weight.bold,
+						fill: theme.colors.text,
+						anchor: "middle",
+						dominantBaseline: "middle"
+					})
+				}
 			}
 		}
 	}
@@ -393,6 +571,9 @@ export const generateCircleDiagram: WidgetGenerator<typeof CircleDiagramPropsSch
 				lineStart.y = cy
 			}
 
+			// Add segment to avoid list for label collision detection
+			avoidSegments.push({ a: lineStart, b: lineEnd })
+
 			canvas.drawLine(lineStart.x, lineStart.y, lineEnd.x, lineEnd.y, {
 				stroke: seg.color,
 				strokeWidth: theme.stroke.width.thick
@@ -414,17 +595,60 @@ export const generateCircleDiagram: WidgetGenerator<typeof CircleDiagramPropsSch
 				const verticalOffsetMultiplier = seg.angle > 270 && seg.angle < 360 ? -1 : 1
 				const offsetX = -Math.sin(angleRad) * 10
 				const offsetY = Math.cos(angleRad) * 10 * verticalOffsetMultiplier
-				const finalX = clamp(mid.x + offsetX, PADDING, width - PADDING)
-				const finalY = clamp(mid.y + offsetY, PADDING, height - PADDING)
-				canvas.drawText({
-					x: finalX,
-					y: finalY,
-					text: seg.label,
-					fontPx: theme.font.size.base,
-					fill: theme.colors.text,
-					anchor: "middle",
-					dominantBaseline: "middle"
-				})
+				const idealX = mid.x + offsetX
+				const idealY = mid.y + offsetY
+
+				// Estimate label dimensions
+				const { maxWidth: labelWidth, height: labelHeight } = estimateWrappedTextDimensions(
+					seg.label,
+					Number.POSITIVE_INFINITY,
+					theme.font.size.base,
+					1.2
+				)
+
+				// Find safe position using collision detection
+				const safePos = findSafeLabelPosition(idealX, idealY, labelWidth, labelHeight)
+				if (safePos) {
+					// Track this label's position to avoid future collisions
+					placedLabels.push({
+						x: safePos.x - labelWidth / 2,
+						y: safePos.y - labelHeight / 2,
+						width: labelWidth,
+						height: labelHeight
+					})
+
+					canvas.drawText({
+						x: safePos.x,
+						y: safePos.y,
+						text: seg.label,
+						fontPx: theme.font.size.base,
+						fill: theme.colors.text,
+						anchor: "middle",
+						dominantBaseline: "middle"
+					})
+				} else {
+					// Fallback to clamped position if no safe position found
+					logger.warn("segment label placement failed, using fallback", { segmentType: seg.type, angle: seg.angle })
+					const fallbackX = clamp(idealX, PADDING, width - PADDING)
+					const fallbackY = clamp(idealY, PADDING, height - PADDING)
+					
+					placedLabels.push({
+						x: fallbackX - labelWidth / 2,
+						y: fallbackY - labelHeight / 2,
+						width: labelWidth,
+						height: labelHeight
+					})
+
+					canvas.drawText({
+						x: fallbackX,
+						y: fallbackY,
+						text: seg.label,
+						fontPx: theme.font.size.base,
+						fill: theme.colors.text,
+						anchor: "middle",
+						dominantBaseline: "middle"
+					})
+				}
 			}
 		}
 	}
@@ -437,16 +661,60 @@ export const generateCircleDiagram: WidgetGenerator<typeof CircleDiagramPropsSch
 
 	if (areaLabel !== null) {
 		const yOffset = -10
-		canvas.drawText({
-			x: cx,
-			y: cy + yOffset,
-			text: areaLabel,
-			fontPx: theme.font.size.large,
-			fontWeight: theme.font.weight.bold,
-			fill: theme.colors.text,
-			anchor: "middle",
-			dominantBaseline: "middle"
-		})
+		const idealX = cx
+		const idealY = cy + yOffset
+		
+		// Estimate label dimensions
+		const { maxWidth: labelWidth, height: labelHeight } = estimateWrappedTextDimensions(
+			areaLabel,
+			Number.POSITIVE_INFINITY,
+			theme.font.size.large,
+			1.2
+		)
+
+		// Find safe position using collision detection
+		const safePos = findSafeLabelPosition(idealX, idealY, labelWidth, labelHeight, 50) // Larger search radius for area label
+		if (safePos) {
+			// Track this label's position to avoid future collisions
+			placedLabels.push({
+				x: safePos.x - labelWidth / 2,
+				y: safePos.y - labelHeight / 2,
+				width: labelWidth,
+				height: labelHeight
+			})
+
+			canvas.drawText({
+				x: safePos.x,
+				y: safePos.y,
+				text: areaLabel,
+				fontPx: theme.font.size.large,
+				fontWeight: theme.font.weight.bold,
+				fill: theme.colors.text,
+				anchor: "middle",
+				dominantBaseline: "middle"
+			})
+		} else {
+			// Fallback to original position if no safe position found
+			logger.warn("area label placement failed, using fallback position")
+			
+			placedLabels.push({
+				x: idealX - labelWidth / 2,
+				y: idealY - labelHeight / 2,
+				width: labelWidth,
+				height: labelHeight
+			})
+
+			canvas.drawText({
+				x: idealX,
+				y: idealY,
+				text: areaLabel,
+				fontPx: theme.font.size.large,
+				fontWeight: theme.font.weight.bold,
+				fill: theme.colors.text,
+				anchor: "middle",
+				dominantBaseline: "middle"
+			})
+		}
 	}
 
 	// NEW: Finalize the canvas and construct the root SVG element
