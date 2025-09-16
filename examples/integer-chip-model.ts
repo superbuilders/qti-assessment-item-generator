@@ -1,44 +1,92 @@
 import type { IntegerChipModelProps } from "../src/widgets/generators/integer-chip-model"
 
 export const integerChipModelExamples: IntegerChipModelProps[] = [
+	// Basic positive chips
 	{
 		type: "integerChipModel",
 		width: 300,
 		height: 150,
-		chipGroups: [{ count: 5, sign: "plus" }]
+		showLegend: false,
+		chips: [
+			{ sign: "plus", crossedOut: false },
+			{ sign: "plus", crossedOut: false },
+			{ sign: "plus", crossedOut: false },
+			{ sign: "plus", crossedOut: false },
+			{ sign: "plus", crossedOut: false }
+		]
 	},
+	// Mixed layout with legend
 	{
 		type: "integerChipModel",
 		width: 320,
 		height: 180,
-		chipGroups: [
-			{ count: 3, sign: "minus" },
-			{ count: 3, sign: "plus" }
+		showLegend: true,
+		chips: [
+			{ sign: "minus", crossedOut: false },
+			{ sign: "minus", crossedOut: false },
+			{ sign: "minus", crossedOut: false },
+			{ sign: "plus", crossedOut: false },
+			{ sign: "plus", crossedOut: false },
+			{ sign: "plus", crossedOut: false }
 		]
 	},
+	// Crossed-out chips demonstrating zero pairs
 	{
 		type: "integerChipModel",
 		width: 280,
 		height: 160,
-		chipGroups: [
-			{ count: 8, sign: "plus" },
-			{ count: 2, sign: "minus" }
+		showLegend: false,
+		chips: [
+			{ sign: "plus", crossedOut: false },
+			{ sign: "plus", crossedOut: false },
+			{ sign: "plus", crossedOut: false },
+			{ sign: "plus", crossedOut: false },
+			{ sign: "plus", crossedOut: false },
+			{ sign: "minus", crossedOut: true },
+			{ sign: "plus", crossedOut: true },
+			{ sign: "minus", crossedOut: false }
 		]
 	},
+	// All negative chips
 	{
 		type: "integerChipModel",
 		width: 220,
 		height: 220,
-		chipGroups: [{ count: 10, sign: "minus" }]
+		showLegend: false,
+		chips: [
+			{ sign: "minus", crossedOut: false },
+			{ sign: "minus", crossedOut: false },
+			{ sign: "minus", crossedOut: false },
+			{ sign: "minus", crossedOut: false },
+			{ sign: "minus", crossedOut: false },
+			{ sign: "minus", crossedOut: false },
+			{ sign: "minus", crossedOut: false },
+			{ sign: "minus", crossedOut: false },
+			{ sign: "minus", crossedOut: false },
+			{ sign: "minus", crossedOut: false }
+		]
 	},
+	// Complex mixed layout with crossed-out pairs and legend
 	{
 		type: "integerChipModel",
 		width: 360,
 		height: 200,
-		chipGroups: [
-			{ count: 7, sign: "plus" },
-			{ count: 7, sign: "minus" },
-			{ count: 4, sign: "plus" }
+		showLegend: true,
+		chips: [
+			{ sign: "plus", crossedOut: false },
+			{ sign: "plus", crossedOut: false },
+			{ sign: "plus", crossedOut: false },
+			{ sign: "minus", crossedOut: true },
+			{ sign: "plus", crossedOut: true },
+			{ sign: "minus", crossedOut: false },
+			{ sign: "minus", crossedOut: false },
+			{ sign: "minus", crossedOut: false },
+			{ sign: "minus", crossedOut: false },
+			{ sign: "minus", crossedOut: true },
+			{ sign: "plus", crossedOut: true },
+			{ sign: "plus", crossedOut: false },
+			{ sign: "plus", crossedOut: false },
+			{ sign: "plus", crossedOut: false }
 		]
 	}
 ]
