@@ -74,6 +74,7 @@ import { PopulationChangeEventGraphPropsSchema } from "./generators/population-c
 import { ProbabilitySpinnerPropsSchema } from "./generators/probability-spinner"
 import { ProtractorAngleDiagramPropsSchema } from "./generators/protractor-angle-diagram"
 import { PythagoreanProofDiagramPropsSchema } from "./generators/pythagorean-proof-diagram"
+import { QuadrantDiagramPropsSchema } from "./generators/quadrant-diagram"
 import { QuantityFractionalDiagramPropsSchema } from "./generators/quantity-fractional-diagram"
 import { RadiallyConstrainedAngleDiagramPropsSchema } from "./generators/radially-constrained-angle-diagram"
 import { RatioBoxDiagramPropsSchema } from "./generators/ratio-box-diagram"
@@ -88,6 +89,7 @@ import { StickPlotPropsSchema } from "./generators/stick-plot"
 import { SubtractionWithRegroupingPropsSchema } from "./generators/subtraction-with-regrouping"
 import { TapeDiagramPropsSchema } from "./generators/tape-diagram"
 import { TransformationDiagramPropsSchema } from "./generators/transformation-diagram"
+import { TransformationOnAGridPropsSchema } from "./generators/transformation-on-a-grid"
 import { TransversalAngleDiagramPropsSchema } from "./generators/transversal-angle-diagram"
 import { TreeDiagramPropsSchema } from "./generators/tree-diagram"
 import { TriangleDiagramPropsSchema } from "./generators/triangle-diagram"
@@ -97,7 +99,6 @@ import { VectorDiagramPropsSchema } from "./generators/vector-diagram"
 import { VennDiagramPropsSchema } from "./generators/venn-diagram"
 import { VerticalArithmeticSetupPropsSchema } from "./generators/vertical-arithmetic-setup"
 import { WheelDiagramPropsSchema } from "./generators/wheel-diagram"
-import { QuadrantDiagramPropsSchema } from "./generators/quadrant-diagram"
 
 // Master registry of widget schemas for dynamic validation and prompting
 export const allWidgetSchemas = {
@@ -172,6 +173,7 @@ export const allWidgetSchemas = {
 	stackedItemsDiagram: StackedItemsDiagramPropsSchema,
 	tapeDiagram: TapeDiagramPropsSchema,
 	transformationDiagram: TransformationDiagramPropsSchema,
+	transformationOnAGrid: TransformationOnAGridPropsSchema,
 	transversalAngleDiagram: TransversalAngleDiagramPropsSchema,
 	treeDiagram: TreeDiagramPropsSchema,
 	triangleDiagram: TriangleDiagramPropsSchema,
@@ -285,6 +287,7 @@ export {
 	SubtractionWithRegroupingPropsSchema,
 	TapeDiagramPropsSchema,
 	TransformationDiagramPropsSchema,
+	TransformationOnAGridPropsSchema,
 	TransversalAngleDiagramPropsSchema,
 	TreeDiagramPropsSchema,
 	TriangleDiagramPropsSchema,
@@ -384,6 +387,7 @@ export type StackedItemsDiagramProps = z.input<typeof StackedItemsDiagramPropsSc
 export type SubtractionWithRegroupingProps = z.input<typeof SubtractionWithRegroupingPropsSchema>
 export type TapeDiagramProps = z.input<typeof TapeDiagramPropsSchema>
 export type TransformationDiagramProps = z.input<typeof TransformationDiagramPropsSchema>
+export type TransformationOnAGridProps = z.input<typeof TransformationOnAGridPropsSchema>
 export type TransversalAngleDiagramProps = z.input<typeof TransversalAngleDiagramPropsSchema>
 export type TreeDiagramProps = z.input<typeof TreeDiagramPropsSchema>
 export type TriangleDiagramProps = z.input<typeof TriangleDiagramPropsSchema>
@@ -471,6 +475,7 @@ const widgetSchemasWithoutSpecialUnions = [
 	typedSchemas.stackedItemsDiagram,
 	typedSchemas.tapeDiagram,
 	typedSchemas.transformationDiagram,
+	typedSchemas.transformationOnAGrid,
 	typedSchemas.transversalAngleDiagram,
 	typedSchemas.treeDiagram,
 	typedSchemas.triangleDiagram,

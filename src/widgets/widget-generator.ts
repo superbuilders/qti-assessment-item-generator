@@ -73,6 +73,7 @@ import { generatePopulationChangeEventGraph } from "./generators/population-chan
 import { generateProbabilitySpinner } from "./generators/probability-spinner"
 import { generateProtractorAngleDiagram } from "./generators/protractor-angle-diagram"
 import { generatePythagoreanProofDiagram } from "./generators/pythagorean-proof-diagram"
+import { generateQuadrantDiagram } from "./generators/quadrant-diagram"
 import { generateQuantityFractionalDiagram } from "./generators/quantity-fractional-diagram"
 import { generateRadiallyConstrainedAngleDiagram } from "./generators/radially-constrained-angle-diagram"
 import { generateRatioBoxDiagram } from "./generators/ratio-box-diagram"
@@ -87,6 +88,7 @@ import { generateStickPlot } from "./generators/stick-plot"
 import { generateSubtractionWithRegrouping } from "./generators/subtraction-with-regrouping"
 import { generateTapeDiagram } from "./generators/tape-diagram"
 import { generateTransformationDiagram } from "./generators/transformation-diagram"
+import { generateTransformationOnAGrid } from "./generators/transformation-on-a-grid"
 import { generateTransversalAngleDiagram } from "./generators/transversal-angle-diagram"
 import { generateTreeDiagram } from "./generators/tree-diagram"
 import { generateTriangleDiagram } from "./generators/triangle-diagram"
@@ -96,7 +98,6 @@ import { generateVectorDiagram } from "./generators/vector-diagram"
 import { generateVennDiagram } from "./generators/venn-diagram"
 import { generateVerticalArithmeticSetup } from "./generators/vertical-arithmetic-setup"
 import { generateWheelDiagram } from "./generators/wheel-diagram"
-import { generateQuadrantDiagram } from "./generators/quadrant-diagram"
 import { type WidgetInput, WidgetSchema } from "./registry"
 
 export async function generateWidget(widgetInput: WidgetInput): Promise<string> {
@@ -243,6 +244,8 @@ export async function generateWidget(widgetInput: WidgetInput): Promise<string> 
 			return await generateTapeDiagram(widget)
 		case "transformationDiagram":
 			return await generateTransformationDiagram(widget)
+		case "transformationOnAGrid":
+			return await generateTransformationOnAGrid(widget)
 		case "transversalAngleDiagram":
 			return await generateTransversalAngleDiagram(widget)
 		case "treeDiagram":
