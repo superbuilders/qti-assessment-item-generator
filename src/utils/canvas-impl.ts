@@ -24,11 +24,48 @@ class ClippedCanvas implements Canvas {
 	}
 
 	// Implement all draw methods by delegating and capturing output
-	drawText(opts: Parameters<Canvas["drawText"]>[0]): void {
+	drawText(opts: {
+		x: number
+		y: number
+		text: string
+		anchor?: "start" | "middle" | "end"
+		dominantBaseline?: "hanging" | "middle" | "baseline"
+		fontPx?: number
+		fontWeight?: "100" | "200" | "300" | "400" | "500" | "600" | "700" | "800" | "900"
+		paintOrder?: "stroke fill"
+		stroke?: string
+		strokeWidth?: number | string
+		fill?: string
+		opacity?: number
+		strokeOpacity?: number
+		fillOpacity?: number
+		transform?: string
+		rotate?: { angle: number; cx: number; cy: number }
+	}): void {
 		this.drawAndCapture(() => this.mainCanvas.drawText(opts))
 	}
 
-	drawWrappedText(opts: Parameters<Canvas["drawWrappedText"]>[0]): void {
+	drawWrappedText(opts: {
+		x: number
+		y: number
+		text: string
+		className?: string
+		maxWidthPx: number
+		anchor?: "start" | "middle" | "end"
+		fontPx?: number
+		lineHeight?: number
+		fontWeight?: "100" | "200" | "300" | "400" | "500" | "600" | "700" | "800" | "900"
+		paintOrder?: "stroke fill"
+		stroke?: string
+		strokeWidth?: number | string
+		fill?: string
+		opacity?: number
+		strokeOpacity?: number
+		fillOpacity?: number
+		transform?: string
+		rotate?: { angle: number; cx: number; cy: number }
+		dominantBaseline?: "auto" | "alphabetic" | "hanging" | "ideographic" | "mathematical" | "middle"
+	}): void {
 		this.drawAndCapture(() => this.mainCanvas.drawWrappedText(opts))
 	}
 
@@ -198,7 +235,7 @@ export class CanvasImpl implements Canvas {
 		fontWeight?: "100" | "200" | "300" | "400" | "500" | "600" | "700" | "800" | "900"
 		paintOrder?: "stroke fill"
 		stroke?: string
-		strokeWidth?: number
+		strokeWidth?: number | string
 		fill?: string
 		opacity?: number
 		strokeOpacity?: number
@@ -213,9 +250,19 @@ export class CanvasImpl implements Canvas {
 			logger.error("invalid fontPx", { fontPx: opts.fontPx })
 			throw errors.new("fontPx must be finite and > 0")
 		}
-		if (opts.strokeWidth !== undefined && (!Number.isFinite(opts.strokeWidth) || opts.strokeWidth < 0)) {
-			logger.error("invalid strokeWidth", { strokeWidth: opts.strokeWidth })
-			throw errors.new("strokeWidth must be finite and >= 0")
+		if (opts.strokeWidth !== undefined) {
+			if (typeof opts.strokeWidth === "number") {
+				if (!Number.isFinite(opts.strokeWidth) || opts.strokeWidth < 0) {
+					logger.error("invalid strokeWidth", { strokeWidth: opts.strokeWidth })
+					throw errors.new("strokeWidth must be finite and >= 0")
+				}
+			} else if (typeof opts.strokeWidth === "string") {
+				// Allow CSS units like em; basic sanity check to disallow empty strings
+				if (opts.strokeWidth.trim() === "") {
+					logger.error("invalid strokeWidth string", { strokeWidth: opts.strokeWidth })
+					throw errors.new("strokeWidth string must be non-empty")
+				}
+			}
 		}
 		if (opts.opacity !== undefined && (opts.opacity < 0 || opts.opacity > 1)) {
 			logger.error("invalid opacity", { opacity: opts.opacity })
@@ -311,7 +358,7 @@ export class CanvasImpl implements Canvas {
 			const finalMaxY = Math.max(...rotatedCorners.map((p) => p.y))
 
 			// Expand extents by stroke if present
-			const strokeExpansion = opts.strokeWidth || 0
+			const strokeExpansion = typeof opts.strokeWidth === "number" ? opts.strokeWidth : 0
 			this.updateExtents(
 				finalMinX - strokeExpansion,
 				finalMaxX + strokeExpansion,
@@ -320,7 +367,7 @@ export class CanvasImpl implements Canvas {
 			)
 		} else {
 			// Expand extents by stroke if present
-			const strokeExpansion = opts.strokeWidth || 0
+			const strokeExpansion = typeof opts.strokeWidth === "number" ? opts.strokeWidth : 0
 			this.updateExtents(
 				minX - strokeExpansion,
 				minX + textWidth + strokeExpansion,
@@ -336,7 +383,7 @@ export class CanvasImpl implements Canvas {
 		if (opts.fontWeight) attrs += ` font-weight="${opts.fontWeight}"`
 		if (opts.fill) attrs += ` fill="${opts.fill}"`
 		if (opts.stroke) attrs += ` stroke="${opts.stroke}"`
-		if (opts.strokeWidth) attrs += ` stroke-width="${opts.strokeWidth}"`
+		if (opts.strokeWidth !== undefined) attrs += ` stroke-width="${opts.strokeWidth}"`
 		if (opts.paintOrder) attrs += ` paint-order="${opts.paintOrder}"`
 		if (opts.opacity !== undefined) attrs += ` opacity="${opts.opacity}"`
 		if (opts.strokeOpacity !== undefined) attrs += ` stroke-opacity="${opts.strokeOpacity}"`
@@ -387,7 +434,7 @@ export class CanvasImpl implements Canvas {
 		fontWeight?: "100" | "200" | "300" | "400" | "500" | "600" | "700" | "800" | "900"
 		paintOrder?: "stroke fill"
 		stroke?: string
-		strokeWidth?: number
+		strokeWidth?: number | string
 		fill?: string
 		opacity?: number
 		strokeOpacity?: number
@@ -404,6 +451,19 @@ export class CanvasImpl implements Canvas {
 		if (opts.lineHeight !== undefined && (!Number.isFinite(opts.lineHeight) || opts.lineHeight <= 0)) {
 			logger.error("invalid lineHeight", { lineHeight: opts.lineHeight })
 			throw errors.new("lineHeight must be finite and > 0")
+		}
+		if (opts.strokeWidth !== undefined) {
+			if (typeof opts.strokeWidth === "number") {
+				if (!Number.isFinite(opts.strokeWidth) || opts.strokeWidth < 0) {
+					logger.error("invalid strokeWidth", { strokeWidth: opts.strokeWidth })
+					throw errors.new("strokeWidth must be finite and >= 0")
+				}
+			} else if (typeof opts.strokeWidth === "string") {
+				if (opts.strokeWidth.trim() === "") {
+					logger.error("invalid strokeWidth string", { strokeWidth: opts.strokeWidth })
+					throw errors.new("strokeWidth string must be non-empty")
+				}
+			}
 		}
 
 		const fontPx = opts.fontPx || this.options.fontPxDefault
@@ -465,11 +525,14 @@ export class CanvasImpl implements Canvas {
 			textMinY = opts.y - fontPx * 0.15
 		}
 
+		// Only expand extents for numeric strokeWidth (not em units)
+		const strokeExpansion = typeof opts.strokeWidth === "number" ? opts.strokeWidth / 2 : 0
+
 		const corners = [
-			{ x: textMinX, y: textMinY },
-			{ x: textMinX + maxLineWidth, y: textMinY },
-			{ x: textMinX + maxLineWidth, y: textMinY + totalHeight },
-			{ x: textMinX, y: textMinY + totalHeight }
+			{ x: textMinX - strokeExpansion, y: textMinY - strokeExpansion },
+			{ x: textMinX + maxLineWidth + strokeExpansion, y: textMinY - strokeExpansion },
+			{ x: textMinX + maxLineWidth + strokeExpansion, y: textMinY + totalHeight + strokeExpansion },
+			{ x: textMinX - strokeExpansion, y: textMinY + totalHeight + strokeExpansion }
 		]
 
 		if (opts.rotate) {
@@ -493,7 +556,12 @@ export class CanvasImpl implements Canvas {
 				Math.max(...rotatedCorners.map((p) => p.y))
 			)
 		} else {
-			this.updateExtents(textMinX, textMinX + maxLineWidth, textMinY, textMinY + totalHeight)
+			this.updateExtents(
+				textMinX - strokeExpansion,
+				textMinX + maxLineWidth + strokeExpansion,
+				textMinY - strokeExpansion,
+				textMinY + totalHeight + strokeExpansion
+			)
 		}
 	}
 

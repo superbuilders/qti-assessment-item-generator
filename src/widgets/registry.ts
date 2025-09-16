@@ -51,6 +51,7 @@ import { LineEquationGraphPropsSchema } from "./generators/line-equation-graph"
 import { LineGraphPropsSchema } from "./generators/line-graph"
 import { MarbleDiagramPropsSchema } from "./generators/marble-diagram"
 import { NPolygonPropsSchema } from "./generators/n-polygon"
+import { NestedShapeDiagramPropsSchema } from "./generators/nested-shape-diagram"
 import { NumberLinePropsSchema } from "./generators/number-line"
 import { NumberLineForOppositesPropsSchema } from "./generators/number-line-for-opposites"
 import { NumberLineWithActionPropsSchema } from "./generators/number-line-with-action"
@@ -86,6 +87,7 @@ import { SimpleArrowPropsSchema } from "./generators/simple-arrow"
 import { SinCosineWidgetPropsSchema } from "./generators/sin-cosine-widget"
 import { StackedItemsDiagramPropsSchema } from "./generators/stacked-items-diagram"
 import { StickPlotPropsSchema } from "./generators/stick-plot"
+import { StringGridPropsSchema } from "./generators/string-grid"
 import { SubtractionWithRegroupingPropsSchema } from "./generators/subtraction-with-regrouping"
 import { TapeDiagramPropsSchema } from "./generators/tape-diagram"
 import { TransformationDiagramPropsSchema } from "./generators/transformation-diagram"
@@ -118,6 +120,7 @@ export const allWidgetSchemas = {
 	fractionModelDiagram: FractionModelDiagramPropsSchema,
 	fractionMultiplicationModel: FractionMultiplicationModelPropsSchema,
 	compositeShapeDiagram: CompositeShapeDiagramPropsSchema,
+	nestedShapeDiagram: NestedShapeDiagramPropsSchema,
 	conceptualGraph: ConceptualGraphPropsSchema,
 	constraintGeometryDiagram: ConstraintGeometryDiagramPropsSchema,
 	coordinatePlane: CoordinatePlaneComprehensivePropsSchema,
@@ -220,6 +223,7 @@ export {
 	CircleDiagramPropsSchema,
 	CircleAngleDiagramPropsSchema,
 	CompositeShapeDiagramPropsSchema,
+	NestedShapeDiagramPropsSchema,
 	ConceptualGraphPropsSchema,
 	ConstraintGeometryDiagramPropsSchema,
 	CoordinatePlaneComprehensivePropsSchema,
@@ -321,6 +325,7 @@ export type BoxPlotProps = z.input<typeof BoxPlotPropsSchema>
 export type CircleDiagramProps = z.input<typeof CircleDiagramPropsSchema>
 export type CircleAngleDiagramProps = z.input<typeof CircleAngleDiagramPropsSchema>
 export type CompositeShapeDiagramProps = z.input<typeof CompositeShapeDiagramPropsSchema>
+export type NestedShapeDiagramProps = z.input<typeof NestedShapeDiagramPropsSchema>
 export type ConceptualGraphProps = z.input<typeof ConceptualGraphPropsSchema>
 export type ConstraintGeometryDiagramProps = z.input<typeof ConstraintGeometryDiagramPropsSchema>
 export type CoordinatePlaneComprehensiveProps = z.input<typeof CoordinatePlaneComprehensivePropsSchema>
@@ -422,6 +427,7 @@ const widgetSchemasWithoutSpecialUnions = [
 	typedSchemas.fractionModelDiagram,
 	typedSchemas.fractionMultiplicationModel,
 	typedSchemas.compositeShapeDiagram,
+	typedSchemas.nestedShapeDiagram,
 	typedSchemas.conceptualGraph,
 	typedSchemas.constraintGeometryDiagram,
 	typedSchemas.coordinatePlane,

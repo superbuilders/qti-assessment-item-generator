@@ -50,6 +50,7 @@ import { generateLineEquationGraph } from "./generators/line-equation-graph"
 import { generateLineGraph } from "./generators/line-graph"
 import { generateMarbleDiagram } from "./generators/marble-diagram"
 import { generateNPolygon } from "./generators/n-polygon"
+import { generateNestedShapeDiagram } from "./generators/nested-shape-diagram"
 import { generateNumberLine } from "./generators/number-line"
 import { generateNumberLineForOpposites } from "./generators/number-line-for-opposites"
 import { generateNumberLineWithAction } from "./generators/number-line-with-action"
@@ -85,6 +86,7 @@ import { generateSimpleArrow } from "./generators/simple-arrow"
 import { generateSinCosineWidget } from "./generators/sin-cosine-widget"
 import { generateStackedItemsDiagram } from "./generators/stacked-items-diagram"
 import { generateStickPlot } from "./generators/stick-plot"
+import { generateStringGrid } from "./generators/string-grid"
 import { generateSubtractionWithRegrouping } from "./generators/subtraction-with-regrouping"
 import { generateTapeDiagram } from "./generators/tape-diagram"
 import { generateTransformationDiagram } from "./generators/transformation-diagram"
@@ -152,6 +154,8 @@ export async function generateWidget(widgetInput: WidgetInput): Promise<string> 
 			return await generateFractionModelDiagram(widget)
 		case "compositeShapeDiagram":
 			return await generateCompositeShapeDiagram(widget)
+		case "nestedShapeDiagram":
+			return await generateNestedShapeDiagram(widget)
 		case "coordinatePlane":
 			return await generateCoordinatePlaneComprehensive(widget)
 		case "divergentBarChart":

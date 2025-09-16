@@ -50,7 +50,7 @@ export interface Canvas {
 		fontWeight?: "100" | "200" | "300" | "400" | "500" | "600" | "700" | "800" | "900"
 		paintOrder?: "stroke fill"
 		stroke?: string
-		strokeWidth?: number
+		strokeWidth?: number | string
 		fill?: string
 		opacity?: number
 		strokeOpacity?: number
@@ -71,7 +71,7 @@ export interface Canvas {
 		fontWeight?: "100" | "200" | "300" | "400" | "500" | "600" | "700" | "800" | "900"
 		paintOrder?: "stroke fill"
 		stroke?: string
-		strokeWidth?: number
+		strokeWidth?: number | string
 		fill?: string
 		opacity?: number
 		strokeOpacity?: number
