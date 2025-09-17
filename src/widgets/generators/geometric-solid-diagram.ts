@@ -2,6 +2,7 @@ import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
 import { Path2D } from "../../utils/path-builder"
+import { estimateWrappedTextDimensions } from "../../utils/text"
 import { theme } from "../../utils/theme"
 import type { WidgetGenerator } from "../types"
 
@@ -121,10 +122,26 @@ export const generateGeometricSolidDiagram: WidgetGenerator<typeof GeometricSoli
 	const availableHeight = height - 2 * PADDING - labelSpace
 
 	if (shape.type === "cylinder") {
-		const scale = Math.min(availableWidth / (shape.radius * 2), availableHeight / shape.height)
-		const r = shape.radius * scale
-		const h = shape.height * scale
-		const ry = r * 0.25 // Ellipse perspective ratio
+		let scale = Math.min(availableWidth / (shape.radius * 2), availableHeight / shape.height)
+		let r = shape.radius * scale
+		let h = shape.height * scale
+		let ry = r * 0.25 // Ellipse perspective ratio
+
+		// Auto-scale boost if rendered content is too small relative to available area
+		{
+			const contentWidth = 2 * r
+			const contentHeight = h + ry
+			const availableMin = Math.max(1, Math.min(availableWidth, availableHeight))
+			const occupancy = Math.min(contentWidth, contentHeight) / availableMin
+			const targetOccupancy = 0.7
+			if (occupancy > 0 && occupancy < targetOccupancy) {
+				const boost = targetOccupancy / occupancy
+				scale *= boost
+				r = shape.radius * scale
+				h = shape.height * scale
+				ry = r * 0.25
+			}
+		}
 
 		const cx = width / 2
 		const topY = (height - h) / 2
@@ -199,10 +216,26 @@ export const generateGeometricSolidDiagram: WidgetGenerator<typeof GeometricSoli
 			}
 		}
 	} else if (shape.type === "cone") {
-		const scale = Math.min(availableWidth / (shape.radius * 2), availableHeight / shape.height)
-		const r = shape.radius * scale
-		const h = shape.height * scale
-		const ry = r * 0.25 // Ellipse perspective ratio
+		let scale = Math.min(availableWidth / (shape.radius * 2), availableHeight / shape.height)
+		let r = shape.radius * scale
+		let h = shape.height * scale
+		let ry = r * 0.25 // Ellipse perspective ratio
+
+		// Auto-scale boost if rendered content is too small relative to available area
+		{
+			const contentWidth = 2 * r
+			const contentHeight = h + ry
+			const availableMin = Math.max(1, Math.min(availableWidth, availableHeight))
+			const occupancy = Math.min(contentWidth, contentHeight) / availableMin
+			const targetOccupancy = 0.7
+			if (occupancy > 0 && occupancy < targetOccupancy) {
+				const boost = targetOccupancy / occupancy
+				scale *= boost
+				r = shape.radius * scale
+				h = shape.height * scale
+				ry = r * 0.25
+			}
+		}
 
 		const cx = width / 2
 		const apexY = (height - h) / 2
@@ -278,9 +311,24 @@ export const generateGeometricSolidDiagram: WidgetGenerator<typeof GeometricSoli
 			}
 		}
 	} else if (shape.type === "sphere") {
-		const scale = Math.min(availableWidth / (shape.radius * 2), availableHeight / (shape.radius * 2))
-		const r = shape.radius * scale
-		const ry = r * 0.3 // Ellipse perspective ratio for equator
+		let scale = Math.min(availableWidth / (shape.radius * 2), availableHeight / (shape.radius * 2))
+		let r = shape.radius * scale
+		let ry = r * 0.3 // Ellipse perspective ratio for equator
+
+		// Auto-scale boost if rendered content is too small relative to available area
+		{
+			const contentWidth = 2 * r
+			const contentHeight = 2 * r
+			const availableMin = Math.max(1, Math.min(availableWidth, availableHeight))
+			const occupancy = Math.min(contentWidth, contentHeight) / availableMin
+			const targetOccupancy = 0.7
+			if (occupancy > 0 && occupancy < targetOccupancy) {
+				const boost = targetOccupancy / occupancy
+				scale *= boost
+				r = shape.radius * scale
+				ry = r * 0.3
+			}
+		}
 
 		const cx = width / 2
 		const cy = height / 2
@@ -315,12 +363,21 @@ export const generateGeometricSolidDiagram: WidgetGenerator<typeof GeometricSoli
 					strokeWidth: theme.stroke.width.base,
 					dash: theme.stroke.dasharray.backEdge
 				})
+
+				// Place label centered above the dashed radius with a minimal non-overlapping gap
+				const fontPx = 7
+				const dims = estimateWrappedTextDimensions(l.text, Number.POSITIVE_INFINITY, fontPx, 1.2)
+				const minGap = theme.stroke.width.base + 2
+				const labelX = cx + r / 2
+				const labelY = cy - (dims.height / 2 + minGap)
+
 				canvas.drawText({
-					x: cx + r / 2,
-					y: cy - 10,
+					x: labelX,
+					y: labelY,
 					text: l.text,
 					anchor: "middle",
-					fontPx: 7
+					dominantBaseline: "middle",
+					fontPx
 				})
 			}
 		}
