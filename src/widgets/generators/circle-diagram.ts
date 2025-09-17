@@ -264,15 +264,27 @@ export const generateCircleDiagram: WidgetGenerator<typeof CircleDiagramPropsSch
 	}
 
 	function rectIntersectsSegment(
-		rect: { x: number; y: number; width: number; height: number },
+		rect: { x: number; y: number; width: number; height: number; pad?: number },
 		s: { a: { x: number; y: number }; b: { x: number; y: number } }
 	) {
-		const r = { x1: rect.x, y1: rect.y, x2: rect.x + rect.width, y2: rect.y + rect.height }
+		const pad = rect.pad ?? 0
+		const rx = rect.x - pad
+		const ry = rect.y - pad
+		const rw = rect.width + 2 * pad
+		const rh = rect.height + 2 * pad
+
+		// Quick bounding box check first
+		const minX = Math.min(s.a.x, s.b.x)
+		const maxX = Math.max(s.a.x, s.b.x)
+		const minY = Math.min(s.a.y, s.b.y)
+		const maxY = Math.max(s.a.y, s.b.y)
+		if (maxX < rx || minX > rx + rw || maxY < ry || minY > ry + rh) return false
+
 		const edges = [
-			{ a: { x: r.x1, y: r.y1 }, b: { x: r.x2, y: r.y1 } },
-			{ a: { x: r.x2, y: r.y1 }, b: { x: r.x2, y: r.y2 } },
-			{ a: { x: r.x2, y: r.y2 }, b: { x: r.x1, y: r.y2 } },
-			{ a: { x: r.x1, y: r.y2 }, b: { x: r.x1, y: r.y1 } }
+			{ a: { x: rx, y: ry }, b: { x: rx + rw, y: ry } },
+			{ a: { x: rx + rw, y: ry }, b: { x: rx + rw, y: ry + rh } },
+			{ a: { x: rx + rw, y: ry + rh }, b: { x: rx, y: ry + rh } },
+			{ a: { x: rx, y: ry + rh }, b: { x: rx, y: ry } }
 		]
 		return edges.some((e) => intersects(e.a, e.b, s.a, s.b))
 	}
@@ -298,6 +310,19 @@ export const generateCircleDiagram: WidgetGenerator<typeof CircleDiagramPropsSch
 		return lft >= PADDING && rgt <= width - PADDING && top >= PADDING && bot <= height - PADDING
 	}
 
+	function rectIntersectsAnySegment(rect: {
+		x: number
+		y: number
+		width: number
+		height: number
+		pad?: number
+	}): boolean {
+		for (const seg of avoidSegments) {
+			if (rectIntersectsSegment(rect, seg)) return true
+		}
+		return false
+	}
+
 	function findSafeLabelPosition(
 		idealX: number,
 		idealY: number,
@@ -309,71 +334,176 @@ export const generateCircleDiagram: WidgetGenerator<typeof CircleDiagramPropsSch
 		const halfH = labelHeight / 2
 
 		// Try the ideal position first
-		const idealRect = { x: idealX - halfW, y: idealY - halfH, width: labelWidth, height: labelHeight }
+		const idealRect = { x: idealX - halfW, y: idealY - halfH, width: labelWidth, height: labelHeight, pad: 1 }
 		if (withinBounds(idealRect)) {
-			let hasCollision = false
-
-			// Check against segments
-			for (const seg of avoidSegments) {
-				if (rectIntersectsSegment(idealRect, seg)) {
-					hasCollision = true
-					break
-				}
-			}
+			const hasSegmentCollision = rectIntersectsAnySegment(idealRect)
+			let hasLabelCollision = false
 
 			// Check against other labels
-			if (!hasCollision) {
+			if (!hasSegmentCollision) {
 				for (const label of placedLabels) {
 					if (rectIntersectsRect(idealRect, label)) {
-						hasCollision = true
+						hasLabelCollision = true
 						break
 					}
 				}
 			}
 
-			if (!hasCollision) {
+			if (!hasSegmentCollision && !hasLabelCollision) {
 				return { x: idealX, y: idealY }
 			}
 		}
 
 		// Search in expanding circles around the ideal position
-		const step = 6
+		const step = 4 // Smaller steps for more precision
 
 		for (let radius = step; radius <= searchRadius; radius += step) {
-			const angleStep = Math.PI / 8 // 8 positions per circle
+			const angleStep = Math.PI / 12 // More positions per circle for better coverage
 			for (let angle = 0; angle < 2 * Math.PI; angle += angleStep) {
 				const testX = idealX + Math.cos(angle) * radius
 				const testY = idealY + Math.sin(angle) * radius
-				const testRect = { x: testX - halfW, y: testY - halfH, width: labelWidth, height: labelHeight }
+				const testRect = { x: testX - halfW, y: testY - halfH, width: labelWidth, height: labelHeight, pad: 1 }
 
 				if (!withinBounds(testRect)) continue
 
-				let hasCollision = false
-
-				// Check against segments
-				for (const seg of avoidSegments) {
-					if (rectIntersectsSegment(testRect, seg)) {
-						hasCollision = true
-						break
-					}
-				}
+				const hasSegmentCollision = rectIntersectsAnySegment(testRect)
+				let hasLabelCollision = false
 
 				// Check against other labels
-				if (!hasCollision) {
+				if (!hasSegmentCollision) {
 					for (const label of placedLabels) {
 						if (rectIntersectsRect(testRect, label)) {
-							hasCollision = true
+							hasLabelCollision = true
 							break
 						}
 					}
 				}
 
-				if (!hasCollision) {
+				if (!hasSegmentCollision && !hasLabelCollision) {
 					return { x: testX, y: testY }
 				}
 			}
 		}
 
+		return null
+	}
+
+	function findNormalBasedLabelPosition(
+		centerX: number,
+		centerY: number,
+		angleRad: number,
+		radius: number,
+		labelWidth: number,
+		labelHeight: number,
+		minPadding = 20
+	): { x: number; y: number } | null {
+		const halfW = labelWidth / 2
+		const halfH = labelHeight / 2
+		
+		// Normal direction (outward from arc center)
+		const normalX = Math.cos(angleRad)
+		const normalY = Math.sin(angleRad)
+		
+		// For certain shapes, we might want to try inward positioning first
+		// (e.g., for semicircles where the arc is on the curved part)
+		const directions = [1, -0.7] // Try outward first, then inward with less distance
+		
+		for (const dirMultiplier of directions) {
+			let currentDistance = minPadding
+			const maxDistance = Math.min(width, height) / 2 - PADDING
+			const step = 8
+			
+			while (currentDistance <= maxDistance) {
+				// Position along the normal at current distance
+				const testX = centerX + (radius + currentDistance * dirMultiplier) * normalX
+				const testY = centerY + (radius + currentDistance * dirMultiplier) * normalY
+				
+				const testRect = { 
+					x: testX - halfW, 
+					y: testY - halfH, 
+					width: labelWidth, 
+					height: labelHeight, 
+					pad: 4 // Extra padding to ensure clearance
+				}
+				
+				// Check if position is valid
+				if (withinBounds(testRect) && 
+					!rectIntersectsAnySegment(testRect) && 
+					!placedLabels.some(label => rectIntersectsRect(testRect, label))) {
+					return { x: testX, y: testY }
+				}
+				
+				currentDistance += step
+			}
+		}
+		
+		return null
+	}
+
+	function findTangentialLabelPosition(
+		centerX: number,
+		centerY: number,
+		angleRad: number,
+		radius: number,
+		labelWidth: number,
+		labelHeight: number
+	): { x: number; y: number } | null {
+		const halfW = labelWidth / 2
+		const halfH = labelHeight / 2
+		
+		// Radial direction (from center outward)
+		const dirX = Math.cos(angleRad)
+		const dirY = Math.sin(angleRad)
+		
+		// Tangential direction (perpendicular to radial)
+		const tanX = -dirY
+		const tanY = dirX
+		
+		// Start at the ideal position along the arc
+		const baseX = centerX + radius * dirX
+		const baseY = centerY + radius * dirY
+		
+		// Nudge slightly away from the arc to prevent grazing intersections
+		const radialNudge = 4
+		const startX = baseX + radialNudge * dirX
+		const startY = baseY + radialNudge * dirY
+		
+		// Try both tangential directions
+		function tryTangential(multiplier: number): { x: number; y: number; iterations: number } {
+			let px = startX
+			let py = startY
+			let iterations = 0
+			const maxIterations = 60
+			const step = 3
+			
+			while (iterations < maxIterations) {
+				const testRect = { x: px - halfW, y: py - halfH, width: labelWidth, height: labelHeight, pad: 1 }
+				
+				if (withinBounds(testRect) && 
+					!rectIntersectsAnySegment(testRect) && 
+					!placedLabels.some(label => rectIntersectsRect(testRect, label))) {
+					return { x: px, y: py, iterations }
+				}
+				
+				px += multiplier * step * tanX
+				py += multiplier * step * tanY
+				iterations++
+			}
+			
+			return { x: px, y: py, iterations: maxIterations }
+		}
+		
+		const clockwise = tryTangential(1)
+		const counterclockwise = tryTangential(-1)
+		
+		// Choose the direction that required fewer iterations (found a good spot faster)
+		const chosen = counterclockwise.iterations < clockwise.iterations ? counterclockwise : clockwise
+		
+		// Only return if we found a valid position (not at max iterations)
+		if (chosen.iterations < 60) {
+			return { x: chosen.x, y: chosen.y }
+		}
+		
 		return null
 	}
 
@@ -440,6 +570,19 @@ export const generateCircleDiagram: WidgetGenerator<typeof CircleDiagramPropsSch
 				stroke: strokeColor,
 				strokeWidth: theme.stroke.width.thick
 			})
+			
+			// Add semicircle arc segments to avoid list for collision detection
+			const arcAngleSpan = 180
+			const numSegments = Math.max(6, Math.ceil(arcAngleSpan / 30))
+			for (let i = 0; i < numSegments; i++) {
+				const angle1 = startAngle + (i * arcAngleSpan) / numSegments
+				const angle2 = startAngle + ((i + 1) * arcAngleSpan) / numSegments
+				const p1 = pointOnCircle(angle1, r)
+				const p2 = pointOnCircle(angle2, r)
+				avoidSegments.push({ a: p1, b: p2 })
+			}
+			// Add the diameter line
+			avoidSegments.push({ a: start, b: end })
 			break
 		}
 		case "quarter-circle": {
@@ -458,6 +601,20 @@ export const generateCircleDiagram: WidgetGenerator<typeof CircleDiagramPropsSch
 				stroke: strokeColor,
 				strokeWidth: theme.stroke.width.thick
 			})
+			
+			// Add quarter-circle segments to avoid list for collision detection
+			const arcAngleSpan = 90
+			const numSegments = Math.max(3, Math.ceil(arcAngleSpan / 30))
+			for (let i = 0; i < numSegments; i++) {
+				const angle1 = startAngle + (i * arcAngleSpan) / numSegments
+				const angle2 = startAngle + ((i + 1) * arcAngleSpan) / numSegments
+				const p1 = pointOnCircle(angle1, r)
+				const p2 = pointOnCircle(angle2, r)
+				avoidSegments.push({ a: p1, b: p2 })
+			}
+			// Add the radial lines
+			avoidSegments.push({ a: { x: cx, y: cy }, b: start })
+			avoidSegments.push({ a: { x: cx, y: cy }, b: end })
 			break
 		}
 		default: {
@@ -466,6 +623,16 @@ export const generateCircleDiagram: WidgetGenerator<typeof CircleDiagramPropsSch
 				stroke: strokeColor,
 				strokeWidth: theme.stroke.width.thick
 			})
+			
+			// Add full circle segments to avoid list for collision detection
+			const numSegments = 24 // Full circle needs more segments
+			for (let i = 0; i < numSegments; i++) {
+				const angle1 = (i * 360) / numSegments
+				const angle2 = ((i + 1) * 360) / numSegments
+				const p1 = pointOnCircle(angle1, r)
+				const p2 = pointOnCircle(angle2, r)
+				avoidSegments.push({ a: p1, b: p2 })
+			}
 			break
 		}
 	}
@@ -478,6 +645,16 @@ export const generateCircleDiagram: WidgetGenerator<typeof CircleDiagramPropsSch
 			stroke: theme.colors.black,
 			strokeWidth: theme.stroke.width.thick
 		})
+		
+		// Add inner circle segments to avoid list for collision detection
+		const numSegments = 20
+		for (let i = 0; i < numSegments; i++) {
+			const angle1 = (i * 360) / numSegments
+			const angle2 = ((i + 1) * 360) / numSegments
+			const p1 = pointOnCircle(angle1, rInner)
+			const p2 = pointOnCircle(angle2, rInner)
+			avoidSegments.push({ a: p1, b: p2 })
+		}
 	}
 
 	// Arcs are drawn on top of the main shape.
@@ -507,7 +684,7 @@ export const generateCircleDiagram: WidgetGenerator<typeof CircleDiagramPropsSch
 
 			if (arc.label !== null) {
 				const midAngle = (arc.startAngle + arc.endAngle) / 2
-				const labelPos = pointOnCircle(midAngle, r + PADDING)
+				const midAngleRad = (midAngle * Math.PI) / 180
 
 				// Estimate label dimensions
 				const { maxWidth: labelWidth, height: labelHeight } = estimateWrappedTextDimensions(
@@ -517,20 +694,34 @@ export const generateCircleDiagram: WidgetGenerator<typeof CircleDiagramPropsSch
 					1.2
 				)
 
-				// Find safe position using collision detection
-				const safePos = findSafeLabelPosition(labelPos.x, labelPos.y, labelWidth, labelHeight)
-				if (safePos) {
+				// Try normal-based positioning first (best for avoiding line intersections)
+				const normalPos = findNormalBasedLabelPosition(cx, cy, midAngleRad, r, labelWidth, labelHeight)
+				
+				let finalPos: { x: number; y: number } | null = normalPos
+				
+				// If normal positioning failed, try tangential positioning
+				if (!finalPos) {
+					finalPos = findTangentialLabelPosition(cx, cy, midAngleRad, r + PADDING, labelWidth, labelHeight)
+				}
+				
+				// If both failed, try radial positioning as last resort
+				if (!finalPos) {
+					const labelPos = pointOnCircle(midAngle, r + PADDING)
+					finalPos = findSafeLabelPosition(labelPos.x, labelPos.y, labelWidth, labelHeight)
+				}
+
+				if (finalPos) {
 					// Track this label's position to avoid future collisions
 					placedLabels.push({
-						x: safePos.x - labelWidth / 2,
-						y: safePos.y - labelHeight / 2,
+						x: finalPos.x - labelWidth / 2,
+						y: finalPos.y - labelHeight / 2,
 						width: labelWidth,
 						height: labelHeight
 					})
 
 					canvas.drawText({
-						x: safePos.x,
-						y: safePos.y,
+						x: finalPos.x,
+						y: finalPos.y,
 						text: arc.label,
 						fontPx: theme.font.size.medium,
 						fontWeight: theme.font.weight.bold,
@@ -544,6 +735,7 @@ export const generateCircleDiagram: WidgetGenerator<typeof CircleDiagramPropsSch
 						startAngle: arc.startAngle,
 						endAngle: arc.endAngle
 					})
+					const labelPos = pointOnCircle(midAngle, r + PADDING)
 					const fallbackX = clamp(labelPos.x, PADDING, width - PADDING)
 					const fallbackY = clamp(labelPos.y, PADDING, height - PADDING)
 
