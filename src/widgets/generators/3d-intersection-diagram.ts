@@ -189,50 +189,8 @@ type Point3D = { x: number; y: number; z: number }
 type Point2D = { x: number; y: number }
 // type Face = { vertices: number[]; normal: Point3D } // TODO: will need this for plane intersections
 
-// Helper function to make any color transparent with enhanced saturation
+// Helper function to make any color transparent (simplified version)
 const makeColorTransparent = (color: string, opacity: number): string => {
-	// Helper to enhance saturation of RGB values
-	const enhanceSaturation = (r: number, g: number, b: number): [number, number, number] => {
-		// Convert RGB to HSL for saturation enhancement
-		const rNorm = r / 255
-		const gNorm = g / 255
-		const bNorm = b / 255
-		
-		const max = Math.max(rNorm, gNorm, bNorm)
-		const min = Math.min(rNorm, gNorm, bNorm)
-		const diff = max - min
-		
-		// Calculate lightness
-		const lightness = (max + min) / 2
-		
-		if (diff === 0) {
-			// Grayscale - no saturation to enhance
-			return [r, g, b]
-		}
-		
-		// Calculate current saturation
-		const saturation = lightness > 0.5 ? diff / (2 - max - min) : diff / (max + min)
-		
-		// Enhance saturation by 20% (capped at 1.0)
-		const enhancedSat = Math.min(saturation * 1.2, 1.0)
-		
-		// Convert back to RGB with enhanced saturation
-		const c = (1 - Math.abs(2 * lightness - 1)) * enhancedSat
-		const x = c * (1 - Math.abs(((max === rNorm ? (gNorm - bNorm) / diff : max === gNorm ? (bNorm - rNorm) / diff + 2 : (rNorm - gNorm) / diff + 4) % 6) - 1))
-		const m = lightness - c / 2
-		
-		let rNew, gNew, bNew
-		if (max === rNorm) {
-			[rNew, gNew, bNew] = [c + m, x + m, m]
-		} else if (max === gNorm) {
-			[rNew, gNew, bNew] = [x + m, c + m, m]
-		} else {
-			[rNew, gNew, bNew] = [m, x + m, c + m]
-		}
-		
-		return [Math.round(rNew * 255), Math.round(gNew * 255), Math.round(bNew * 255)]
-	}
-	
 	// Handle hex colors
 	if (color.startsWith('#')) {
 		const hex = color.slice(1)
@@ -258,19 +216,14 @@ const makeColorTransparent = (color: string, opacity: number): string => {
 			return color
 		}
 		
-		const [rEnhanced, gEnhanced, bEnhanced] = enhanceSaturation(r, g, b)
-		return `rgba(${rEnhanced}, ${gEnhanced}, ${bEnhanced}, ${opacity})`
+		return `rgba(${r}, ${g}, ${b}, ${opacity})`
 	}
 	
-	// Handle rgba/rgb colors - extract RGB values and apply enhancement
+	// Handle rgba/rgb colors - extract RGB values and apply new opacity
 	const rgbaMatch = color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*[\d.]+)?\)/)
 	if (rgbaMatch) {
-		const [, rStr, gStr, bStr] = rgbaMatch
-		const r = parseInt(rStr, 10)
-		const g = parseInt(gStr, 10)
-		const b = parseInt(bStr, 10)
-		const [rEnhanced, gEnhanced, bEnhanced] = enhanceSaturation(r, g, b)
-		return `rgba(${rEnhanced}, ${gEnhanced}, ${bEnhanced}, ${opacity})`
+		const [, r, g, b] = rgbaMatch
+		return `rgba(${r}, ${g}, ${b}, ${opacity})`
 	}
 	
 	// For named colors or other formats, return as-is (CSS will handle it)
@@ -378,8 +331,10 @@ export const generateThreeDIntersectionDiagram: WidgetGenerator<typeof ThreeDInt
 			const h = solid.height / 2
 			
 			// Octagon vertices (bottom then top)
+			// Rotate by π/8 (22.5°) so that a flat face is parallel to the Z-axis
+			const rotationOffset = Math.PI / 8
 			for (let i = 0; i < 8; i++) {
-				const angle = (i * 2 * Math.PI) / 8
+				const angle = (i * 2 * Math.PI) / 8 + rotationOffset
 				const x = radius * Math.cos(angle)
 				const z = radius * Math.sin(angle)
 				
