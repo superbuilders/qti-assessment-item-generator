@@ -44,7 +44,9 @@ exports[`Widget: marble-diagram should produce consistent output for example #4 
 
 exports[`Widget: marble-diagram should produce consistent output for example #5 1`] = `
 "<svg width="236" height="236" viewBox="0 0 236 236" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
-	<circle cx="189.20679587684572" cy="137.56632605567575" r="24" fill="#D0021B" stroke="#000000" stroke-width="2" />
-  <circle cx="148.53724310733378" cy="82.24265419691801" r="24" fill="#5B8DEF" stroke="#000000" stroke-width="2" />
+	<circle cx="148.53724310733378" cy="82.24265419691801" r="24" fill="#00AA00" stroke="#000000" stroke-width="2" />
+  <circle cx="201.63654438965023" cy="60.70960197970271" r="24" fill="#D0021B" stroke="#000000" stroke-width="2" />
+  <circle cx="193.894684093073" cy="148.69944179058075" r="24" fill="#00AA00" stroke="#000000" stroke-width="2" />
+  <circle cx="90.00588585995138" cy="70.82045500352979" r="24" fill="#5B8DEF" stroke="#000000" stroke-width="2" />
 </svg>"
 `;

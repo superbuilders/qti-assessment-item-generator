@@ -1,32 +1,52 @@
 import { z } from "zod"
+import { CSS_COLOR_PATTERN } from "../../utils/css-color"
 import { theme } from "../../utils/theme"
 import type { WidgetGenerator } from "../types"
 
+// Schema for a color group of marbles
+const MarbleColorGroupSchema = z
+    .object({
+        color: z
+            .string()
+            .regex(CSS_COLOR_PATTERN, "invalid css color")
+            .describe("CSS color for the marbles in this group (e.g., '#5B8DEF', 'red', 'rgba(208,2,27,1)')"),
+        count: z
+            .number()
+            .int()
+            .positive()
+            .describe("Number of marbles in this color group (positive integer).")
+    })
+    .strict()
+
 export const MarbleDiagramPropsSchema = z
-	.object({
-		type: z.literal("marbleDiagram"),
-		blueMarbles: z.number().int().min(0).describe("number of blue marbles"),
-		redMarbles: z.number().int().min(0).describe("number of red marbles")
-	})
-	.strict()
-	.describe("Displays blue and red marbles with fixed layout and styling.")
+    .object({
+        type: z.literal("marbleDiagram"),
+        groups: z
+            .array(MarbleColorGroupSchema)
+            .min(1)
+            .describe(
+                "Array of color groups. Each group defines a CSS color and a positive count. Supports two or more groups."
+            )
+    })
+    .strict()
+    .describe(
+        "Displays a bag/jar of marbles packed randomly, grouped by color. Supports multiple color groups with positive counts."
+    )
 
 export type MarbleDiagramProps = z.infer<typeof MarbleDiagramPropsSchema>
 
 export const generateMarbleDiagram: WidgetGenerator<typeof MarbleDiagramPropsSchema> = async (props) => {
-	const { blueMarbles, redMarbles } = props
-	const total = blueMarbles + redMarbles
-	if (total === 0) {
-		return `<svg width="100" height="50" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" />`
-	}
+    const { groups } = props
+    const total = groups.reduce((sum, g) => sum + g.count, 0)
+    if (total === 0) {
+        return `<svg width="100" height="50" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" />`
+    }
 
 	// Fixed visual parameters for consistency
 	const radius = 24
 	const diameter = radius * 2
 	const stroke = "#000000"
 	const strokeWidth = 2
-	const colorBlue = "#5B8DEF"
-	const colorRed = "#D0021B"
 	const padding = 10
 	const clearance = 6 // extra spacing so circles do not visually touch
 	const minDist = diameter + clearance
@@ -41,10 +61,13 @@ export const generateMarbleDiagram: WidgetGenerator<typeof MarbleDiagramPropsSch
 	const innerTop = padding + radius
 	let innerBottom = height - padding - radius
 
-	// Build color list and shuffle deterministically via Math.random
-	const colors: string[] = []
-	for (let i = 0; i < blueMarbles; i++) colors.push(colorBlue)
-	for (let i = 0; i < redMarbles; i++) colors.push(colorRed)
+    // Build color list from groups and shuffle deterministically via Math.random
+    const colors: string[] = []
+    for (const g of groups) {
+        for (let i = 0; i < g.count; i++) {
+            colors.push(g.color)
+        }
+    }
 	for (let i = colors.length - 1; i > 0; i--) {
 		const j = Math.floor(Math.random() * (i + 1))
 		const t = colors[i]

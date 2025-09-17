@@ -89,6 +89,32 @@ If both pictograph/bar-like interpretations and this widget seem plausible, PREF
   → objects: [{emoji:"🐋",count:8},{emoji:"🦈",count:1}]`
 					}
 					
+					// Enhanced guidance for marbleDiagram
+					if (typeName === "marbleDiagram") {
+						description += `
+
+**ENHANCED SELECTION GUIDANCE FOR marbleDiagram:**
+
+Choose this widget whenever the problem context involves counting marbles by color (e.g., "bag of marbles", "jar of marbles", draws of red vs blue marbles). This widget is the preferred representation for marble problems and SHOULD be selected over more generic options.
+
+**PRIORITY RULES (when marbleDiagram is available):**
+- ALWAYS prefer marbleDiagram for marble-counting scenarios
+- Tie-breaker: Prefer marbleDiagram over discreteObjectRatioDiagram, bar/pictograph, or generic image widgets when the items are marbles
+
+**Detection cues (non-exhaustive):**
+- Problem mentions "marble", "marbles", "bag/jar/urn of marbles"
+- Colors associated with marbles (e.g., red, blue, green, etc.)
+- Actions like drawing, replacing/not replacing marbles
+
+**Scope note:**
+- Supports two or more distinct marble colors; not limited to red/blue.
+
+**Examples:**
+- "A bag has 6 blue marbles and 4 red marbles" → marbleDiagram
+- "Draw a marble at random; the bag has red and blue marbles" → marbleDiagram
+- "A jar contains 2 red, 3 blue, and 5 green marbles" → marbleDiagram`
+					}
+					
 					return `- ${typeName}: ${description}`
 				}
 				return `- ${typeName}: No description available.`
@@ -263,6 +289,17 @@ When the checklist score ≥ 3, you MUST select discreteObjectRatioDiagram and r
 - bar chart, scatter plot, area chart, and line graph are DISPREFERRED when items are individually countable discrete objects
 - pictograph widgets are LOWER PRIORITY than discreteObjectRatioDiagram for counting scenarios
 - Default to discreteObjectRatioDiagram for multiple repeated pictures/icons/objects`
+
+		// Marble-specific hard selection priority
+		systemInstruction += `
+
+**CRITICAL SELECTION ENFORCEMENT FOR marbleDiagram (marble problems):**
+
+- When the assessment body or Perseus JSON clearly involves marbles being counted/sorted by color (e.g., "bag/jar/urn of marbles", draws of red vs blue marbles), and 'marbleDiagram' is listed in the available widget types for this collection, you MUST select 'marbleDiagram'.
+- Tie-breaker: Prefer 'marbleDiagram' over 'discreteObjectRatioDiagram', pictographs, charts, or generic images for any marble-related scenario.
+- Typical cues: mentions of marbles by color (red, blue, green, etc.), drawing with/without replacement, probability questions centered on marbles.
+- marbleDiagram supports multiple color groups via an array of { color, count } objects; use it for multi-color bags as well.
+- If a scenario demands visualization beyond colored marbles (e.g., shapes or labels on marbles), then a different widget may be considered.`
 
 	const userContent = `Based on the source material and assessment body below, create a JSON object that maps each widget slot name to the most appropriate widget type. Use the provided context, including raster images for vision and vector images as text, to understand the content fully.
 
