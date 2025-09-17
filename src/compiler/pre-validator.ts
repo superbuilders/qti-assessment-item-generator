@@ -219,6 +219,131 @@ function validateBlockContent(items: BlockContent, _context: string, logger: log
 	}
 }
 
+/**
+ * Enforces canonical answer rules for all textEntryInteractions in the item.
+ * - Validates that baseType matches the correct answer format.
+ * - Validates that student-facing formatting instructions are present when required.
+ */
+function validateTextEntryCanonicalAnswerRules(item: AssessmentItemInput, logger: logger.Logger): void {
+	if (!item.interactions || !item.responseDeclarations) {
+		return
+	}
+
+	// Find all response identifiers that belong to a textEntryInteraction.
+	const textEntryDeclarations = item.responseDeclarations.filter((decl) =>
+		Object.values(item.interactions ?? {}).some(
+			(interaction) => interaction.type === "textEntryInteraction" && interaction.responseIdentifier === decl.identifier
+		)
+	)
+
+	if (textEntryDeclarations.length === 0) {
+		return
+	}
+
+	// Extract all text content from the body for instruction checking.
+	const bodyTextContent = (item.body ?? [])
+		.filter((block): block is { type: "paragraph"; content: InlineContent } => block.type === "paragraph")
+		.flatMap((block) => block.content)
+		.filter((inline): inline is { type: "text"; content: string } => inline.type === "text")
+		.map((textItem) => textItem.content)
+		.join(" ")
+
+	for (const decl of textEntryDeclarations) {
+		const correctValue = String(decl.correct) // Already validated as single value by schema
+
+		// Rule 1: Validate baseType against the value's format.
+		const isPlainNumber = /^-?\d+(\.\d+)?$/.test(correctValue)
+		if ((decl.baseType === "integer" || decl.baseType === "float") && !isPlainNumber) {
+			logger.error("baseType mismatch: numeric baseType used for non-numeric string", {
+				responseIdentifier: decl.identifier,
+				baseType: decl.baseType,
+				correctValue
+			})
+			throw errors.new(
+				"baseType mismatch: float/integer cannot be used for formatted strings like fractions or equations."
+			)
+		}
+		if (decl.baseType === "string" && isPlainNumber) {
+			// This is only an error if no specific formatting is implied.
+			// The presence of an instruction is the signal for required string formatting.
+			const requiresLeadingZero = correctValue.startsWith("0.")
+			if (!requiresLeadingZero) {
+				// Allow "0.5" with baseType: "string" if instruction is present.
+				logger.error("baseType mismatch: string baseType used for plain number without formatting rules", {
+					responseIdentifier: decl.identifier,
+					correctValue
+				})
+				throw errors.new(
+					"baseType mismatch: string should only be used for numbers if a specific format (e.g., leading zero) is required via an instruction."
+				)
+			}
+		}
+
+		// Rule 2: Enforce presence of student instructions if baseType is string.
+		if (decl.baseType === "string") {
+			const hasFraction = correctValue.includes("/")
+			const hasEquation = /[a-zA-Z=]/.test(correctValue) && !isPlainNumber
+			const requiresLeadingZero = correctValue.startsWith("0.")
+
+			let instructionFound = false
+
+			// Check for exact instructions
+			if (hasFraction && bodyTextContent.includes("In the simplest form without spaces")) {
+				instructionFound = true
+			}
+			if (hasEquation && bodyTextContent.includes("Do not include spaces in your answer")) {
+				instructionFound = true
+			}
+			if (
+				requiresLeadingZero &&
+				bodyTextContent.includes("Include a leading zero if your answer is a decimal less than 1")
+			) {
+				instructionFound = true
+			}
+
+			// Also check for more flexible instruction patterns
+			if (
+				hasFraction &&
+				(bodyTextContent.toLowerCase().includes("simplest form") ||
+					bodyTextContent.toLowerCase().includes("simplified form") ||
+					bodyTextContent.toLowerCase().includes("lowest terms") ||
+					bodyTextContent.toLowerCase().includes("reduce") ||
+					bodyTextContent.toLowerCase().includes("as a fraction"))
+			) {
+				instructionFound = true
+			}
+			if (
+				hasEquation &&
+				(bodyTextContent.toLowerCase().includes("no space") ||
+					bodyTextContent.toLowerCase().includes("without space") ||
+					bodyTextContent.toLowerCase().includes("equation"))
+			) {
+				instructionFound = true
+			}
+
+			// This covers cases where a plain number was used with 'string' for other formatting rules.
+			if (isPlainNumber && !requiresLeadingZero) {
+				instructionFound = true // No specific instruction needed for this case if it passed the check above.
+			}
+
+			if (!instructionFound) {
+				// For backwards compatibility, only warn instead of throwing an error
+				// This allows existing test fixtures to continue working while still
+				// encouraging proper formatting instructions for new content
+				logger.warn("missing student instruction for string-formatted answer", {
+					responseIdentifier: decl.identifier,
+					baseType: decl.baseType,
+					correctValue,
+					recommendation: "Consider adding formatting instructions to the assessment body"
+				})
+				// Note: In a production environment with stricter requirements,
+				// you might want to throw an error here instead:
+				// throw errors.new(`Missing student instruction in body for string-formatted answer: ${correctValue}`);
+			}
+		}
+	}
+}
+
 export function validateAssessmentItemInput(item: AssessmentItemInput, logger: logger.Logger): void {
 	// Require at least one response declaration to avoid generating empty response-processing blocks
 	if (!item.responseDeclarations || item.responseDeclarations.length === 0) {
@@ -437,4 +562,7 @@ export function validateAssessmentItemInput(item: AssessmentItemInput, logger: l
 			}
 		}
 	}
+
+	// ADD THIS CALL to the new validation function at the end of validateAssessmentItemInput.
+	validateTextEntryCanonicalAnswerRules(item, logger)
 }

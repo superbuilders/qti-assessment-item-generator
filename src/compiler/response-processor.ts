@@ -7,8 +7,6 @@ export function compileResponseDeclarations(decls: AssessmentItem["responseDecla
 			const correctValues = Array.isArray(decl.correct) ? decl.correct : [decl.correct]
 
 			// Directly map the provided correct values without generating any alternatives.
-			// This ensures that whatever canonical format the AI determined (numeric, fraction, or algebraic)
-			// is the only one included in the QTI item.
 			const correctXml = correctValues
 				.map(
 					(v) =>
@@ -23,8 +21,7 @@ export function compileResponseDeclarations(decls: AssessmentItem["responseDecla
             ${correctXml}
         </qti-correct-response>`
 
-			// For single-cardinality responses, also emit a mapping that awards 1 point for the
-			// canonical value. This enables robust scoring using mapping semantics.
+			// For single-cardinality responses, also emit a mapping that awards 1 point.
 			const isSingleResponse =
 				decl.cardinality === "single" &&
 				(decl.baseType === "string" || decl.baseType === "integer" || decl.baseType === "float")

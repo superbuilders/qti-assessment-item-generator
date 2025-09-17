@@ -242,24 +242,39 @@ export function createDynamicAssessmentItemSchema(widgetMapping: Record<string, 
 		])
 		.describe("A discriminated union representing any possible QTI interaction type supported by the system.")
 
+	// Base schema with common fields
+	const BaseResponseDeclarationSchema = z.object({
+		identifier: z
+			.string()
+			.regex(SAFE_IDENTIFIER_REGEX, "invalid response identifier")
+			.describe("Unique ID linking an interaction to this response declaration."),
+		cardinality: z
+			.enum(["single", "multiple", "ordered"])
+			.describe("Defines response structure: single value, multiple values, or ordered sequence.")
+	})
+
+	// Schema for text/numeric responses (like textEntryInteraction)
+	const TextualResponseDeclarationSchema = BaseResponseDeclarationSchema.extend({
+		baseType: z.enum(["string", "integer", "float"]),
+		// CRITICAL: 'correct' CANNOT be an array here. This enforces the single-answer rule.
+		correct: z.union([z.string(), z.number()]).describe("The single correct answer for a text or numeric entry.")
+	}).strict()
+
+	// Schema for identifier-based responses (like choiceInteraction, orderInteraction)
+	const IdentifierResponseDeclarationSchema = BaseResponseDeclarationSchema.extend({
+		baseType: z.literal("identifier"),
+		// 'correct' CAN be an array here to support multiple correct choices.
+		correct: z
+			.union([z.string(), z.array(z.string())])
+			.describe("The correct identifier(s). For multiple correct answers, provide an array of identifiers.")
+	}).strict()
+
+	// The new ResponseDeclarationSchema is a discriminated union based on 'baseType'
 	const ResponseDeclarationSchema = z
-		.object({
-			identifier: z
-				.string()
-				.regex(SAFE_IDENTIFIER_REGEX, "invalid response identifier")
-				.describe("Unique ID linking an interaction to this response declaration."),
-			cardinality: z
-				.enum(["single", "multiple", "ordered"])
-				.describe("Defines response structure: single value, multiple values, or ordered sequence."),
-			baseType: z
-				.enum(["identifier", "string", "integer", "float"])
-				.describe("Data type of the response values for validation and scoring."),
-			correct: z
-				.union([z.string(), z.number(), z.array(z.string()), z.array(z.number())])
-				.describe("The correct answer(s). For multiple correct answers, provide an array of values.")
-		})
-		.strict()
-		.describe("Defines the correct answer(s) for an interaction.")
+		.discriminatedUnion("baseType", [TextualResponseDeclarationSchema, IdentifierResponseDeclarationSchema])
+		.describe(
+			"Defines the correct answer for an interaction, with a structure that varies based on the response's baseType."
+		)
 
 	const FeedbackSchema = z
 		.object({
