@@ -1,6 +1,6 @@
-import { z } from "zod"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
+import { z } from "zod"
 import { CSS_COLOR_PATTERN } from "../utils/css-color"
 import { abbreviateMonth } from "../utils/labels"
 import type { Canvas } from "../utils/layout"
@@ -16,19 +16,19 @@ const POLYLINE_ID = /^polyline_[A-Za-z0-9_]+$/
 
 // Factory function for axis schema to prevent $ref generation
 export const createAxisOptionsSchema = () =>
-    z
-        .object({
-            label: z
-                .string()
-                .nullable()
-                .transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
-                .describe('The text title for the axis (e.g., "Number of Days"). Null hides the label.'),
-            min: z.number().describe("The minimum value displayed on the axis."),
-            max: z.number().describe("The maximum value displayed on the axis."),
-            tickInterval: z.number().describe("The numeric interval between labeled tick marks on the axis."),
-            showGridLines: z.boolean().describe("If true, display grid lines for this axis.")
-        })
-        .strict()
+	z
+		.object({
+			label: z
+				.string()
+				.nullable()
+				.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
+				.describe('The text title for the axis (e.g., "Number of Days"). Null hides the label.'),
+			min: z.number().describe("The minimum value displayed on the axis."),
+			max: z.number().describe("The maximum value displayed on the axis."),
+			tickInterval: z.number().describe("The numeric interval between labeled tick marks on the axis."),
+			showGridLines: z.boolean().describe("If true, display grid lines for this axis.")
+		})
+		.strict()
 
 export const AxisOptionsSchema = createAxisOptionsSchema()
 export type AxisOptions = z.infer<typeof AxisOptionsSchema>
@@ -136,7 +136,7 @@ export const createPolygonSchema = () =>
 					"invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA), rgb/rgba(), hsl/hsla(), or a common named color"
 				)
 				.describe(
-					"The fill color of the polygon, as a CSS color string (e.g., with alpha for transparency). Only applies if isClosed is true."
+					"The fill color of the polygon. MUST include transparency/opacity (e.g., #11accd26, rgba(17,172,205,0.15)). Use 8-digit hex (#RRGGBBAA) or rgba() with alpha < 1. Solid colors without transparency will obscure grid lines. Only applies if isClosed is true."
 				),
 			strokeColor: z
 				.string()
@@ -213,7 +213,9 @@ export const createPolylineSchema = () =>
 				coefficients: z
 					.array(z.number())
 					.min(1, "must have at least one coefficient")
-					.describe("Polynomial coefficients in descending order of powers. E.g., [4, 3, 2, 1, 0] represents 4x⁴ + 3x³ + 2x² + 1x + 0."),
+					.describe(
+						"Polynomial coefficients in descending order of powers. E.g., [4, 3, 2, 1, 0] represents 4x⁴ + 3x³ + 2x² + 1x + 0."
+					),
 				xRange: z
 					.object({
 						min: z.number().describe("Minimum x value for function evaluation."),
@@ -385,14 +387,22 @@ export function renderLines(
 					if (v < -1e-9) return -1
 					return 0
 				}
-				function intersects(p1: { x: number; y: number }, p2: { x: number; y: number }, p3: { x: number; y: number }, p4: { x: number; y: number }) {
+				function intersects(
+					p1: { x: number; y: number },
+					p2: { x: number; y: number },
+					p3: { x: number; y: number },
+					p4: { x: number; y: number }
+				) {
 					const o1 = orient(p1, p2, p3)
 					const o2 = orient(p1, p2, p4)
 					const o3 = orient(p3, p4, p1)
 					const o4 = orient(p3, p4, p2)
 					return o1 !== o2 && o3 !== o4
 				}
-				function rectIntersectsSegment(rect: { x: number; y: number; width: number; height: number }, s: { a: { x: number; y: number }; b: { x: number; y: number } }) {
+				function rectIntersectsSegment(
+					rect: { x: number; y: number; width: number; height: number },
+					s: { a: { x: number; y: number }; b: { x: number; y: number } }
+				) {
 					const r = { x1: rect.x, y1: rect.y, x2: rect.x + rect.width, y2: rect.y + rect.height }
 					const edges = [
 						{ a: { x: r.x1, y: r.y1 }, b: { x: r.x2, y: r.y1 } },
@@ -435,7 +445,7 @@ export function renderLines(
 				const anchors = [farAnchor, midAnchor]
 
 				let chosen: { x: number; y: number; i: number } | null = null
-				let bestDistFromYAxis = -Infinity
+				let bestDistFromYAxis = Number.NEGATIVE_INFINITY
 				for (const a of anchors) {
 					const base = { x: a.x + nx * normalOffset, y: a.y + ny * normalOffset }
 					// Prefer direction that increases distance from y-axis
@@ -443,11 +453,17 @@ export function renderLines(
 					if (yAxisVisible) {
 						const signFromAxis = a.x - x0 >= 0 ? 1 : -1
 						const signTx = tx >= 0 ? 1 : -1
-						preferredDir = (signFromAxis * signTx) > 0 ? 1 : -1
+						preferredDir = signFromAxis * signTx > 0 ? 1 : -1
 					}
 					const posPreferred = placeFromBase(base, preferredDir)
-					const posOther = placeFromBase(base, (preferredDir === 1 ? -1 : 1) as 1 | -1)
-					let cand = posPreferred && posOther ? (posPreferred.i <= posOther.i ? posPreferred : posOther) : posPreferred ?? posOther
+					const otherDir: 1 | -1 = preferredDir === 1 ? -1 : 1
+					const posOther = placeFromBase(base, otherDir)
+					let cand: { x: number; y: number; i: number } | null
+					if (posPreferred && posOther) {
+						cand = posPreferred.i <= posOther.i ? posPreferred : posOther
+					} else {
+						cand = posPreferred ?? posOther
+					}
 					if (!cand) continue
 
 					// Enforce minimum horizontal gap from y-axis
@@ -464,7 +480,10 @@ export function renderLines(
 								const within = withinBounds(rect)
 								let hit = false
 								for (const s of avoid) {
-									if (rectIntersectsSegment(rect, s)) { hit = true; break }
+									if (rectIntersectsSegment(rect, s)) {
+										hit = true
+										break
+									}
 								}
 								if (within && !hit && Math.abs(cx - x0) >= halfW + minGapPx) {
 									cand = { x: cx, y: cy, i: cand.i }
@@ -503,7 +522,10 @@ export function renderLines(
 							const within = withinBounds(rect)
 							let hit = false
 							for (const s of avoid) {
-								if (rectIntersectsSegment(rect, s)) { hit = true; break }
+								if (rectIntersectsSegment(rect, s)) {
+									hit = true
+									break
+								}
 							}
 							if (within && !hit && Math.abs(cx - x0) >= halfW + minGapPx) {
 								chosen = { x: cx, y: cy, i: chosen.i }
@@ -530,6 +552,51 @@ export function renderLines(
 }
 
 /**
+ * Helper function to ensure a fill color has proper opacity.
+ * If the color is opaque (no alpha channel), adds a default semi-transparent alpha.
+ */
+function ensureFillOpacity(color: string): string {
+	// Check if it's an 8-digit hex with alpha
+	if (/^#[0-9a-fA-F]{8}$/.test(color)) {
+		return color
+	}
+
+	// Check if it's a 6-digit hex (opaque) - add alpha
+	if (/^#[0-9a-fA-F]{6}$/.test(color)) {
+		return `${color}26` // Add ~15% opacity
+	}
+
+	// Check if it's a 3-digit hex (opaque) - expand and add alpha
+	if (/^#[0-9a-fA-F]{3}$/.test(color)) {
+		const expanded = color.replace(/^#([0-9a-fA-F])([0-9a-fA-F])([0-9a-fA-F])$/, "#$1$1$2$2$3$3")
+		return `${expanded}26` // Add ~15% opacity
+	}
+
+	// Check if it's rgba with alpha
+	if (/rgba?\s*\([^)]+\)/.test(color)) {
+		// If it's rgb without alpha, convert to rgba
+		if (/^rgb\s*\(/.test(color)) {
+			return color.replace(/^rgb/, "rgba").replace(/\)$/, ", 0.15)")
+		}
+		// It's already rgba, return as is
+		return color
+	}
+
+	// For hsla or other formats with alpha, return as is
+	if (/hsla?\s*\([^)]+\)/.test(color)) {
+		// If it's hsl without alpha, convert to hsla
+		if (/^hsl\s*\(/.test(color)) {
+			return color.replace(/^hsl/, "hsla").replace(/\)$/, ", 0.15)")
+		}
+		return color
+	}
+
+	// Default: return with rgba wrapper for safety
+	logger.warn("unexpected fill color format, adding default opacity", { color })
+	return "rgba(128, 128, 128, 0.15)"
+}
+
+/**
  * Utility to render polygons that reference points by ID using Canvas API.
  */
 export function renderPolygons(
@@ -553,7 +620,7 @@ export function renderPolygons(
 			if (polyPoints.length > 0) {
 				if (poly.isClosed) {
 					clippedCanvas.drawPolygon(polyPoints, {
-						fill: poly.fillColor,
+						fill: ensureFillOpacity(poly.fillColor),
 						stroke: poly.strokeColor,
 						strokeWidth: theme.stroke.width.thick
 					})
@@ -645,7 +712,7 @@ export function renderPolylines(
 	canvas.drawInClippedRegion((clippedCanvas) => {
 		for (const polyline of polylines) {
 			let points: { x: number; y: number }[]
-			
+
 			if (polyline.type === "points") {
 				points = polyline.points.map((p) => ({
 					x: toSvgX(p.x),
@@ -656,18 +723,18 @@ export function renderPolylines(
 				const { coefficients, xRange, resolution } = polyline
 				const xStep = (xRange.max - xRange.min) / (resolution - 1)
 				points = []
-				
+
 				for (let i = 0; i < resolution; i++) {
 					const x = xRange.min + i * xStep
 					let y = 0
 					const degree = coefficients.length - 1
-					
+
 					// evaluate polynomial: coefficients[0]*x^degree + coefficients[1]*x^(degree-1) + ...
 					for (let j = 0; j < coefficients.length; j++) {
 						const power = degree - j
-						y += coefficients[j] * Math.pow(x, power)
+						y += coefficients[j] * x ** power
 					}
-					
+
 					points.push({
 						x: toSvgX(x),
 						y: toSvgY(y)
@@ -714,7 +781,7 @@ export function renderPolylines(
 						const nx = -ty
 						const ny = tx
 
-						const avoid = [] as Array<{ a: { x: number; y: number }; b: { x: number; y: number } }>
+						const avoid: Array<{ a: { x: number; y: number }; b: { x: number; y: number } }> = []
 						for (let i = 0; i < points.length - 1; i++) {
 							avoid.push({ a: points[i], b: points[i + 1] })
 						}
@@ -723,7 +790,12 @@ export function renderPolylines(
 						const baseX = anchorX + nx * normalOffset
 						const baseY = anchorY + ny * normalOffset
 						const fontPx = theme.font.size.medium
-						const { maxWidth: w, height: h } = estimateWrappedTextDimensions(text, Number.POSITIVE_INFINITY, fontPx, 1.2)
+						const { maxWidth: w, height: h } = estimateWrappedTextDimensions(
+							text,
+							Number.POSITIVE_INFINITY,
+							fontPx,
+							1.2
+						)
 						const halfW = w / 2
 						const halfH = h / 2
 
@@ -733,14 +805,22 @@ export function renderPolylines(
 							if (v < -1e-9) return -1
 							return 0
 						}
-						function intersects(p1: { x: number; y: number }, p2: { x: number; y: number }, p3: { x: number; y: number }, p4: { x: number; y: number }) {
+						function intersects(
+							p1: { x: number; y: number },
+							p2: { x: number; y: number },
+							p3: { x: number; y: number },
+							p4: { x: number; y: number }
+						) {
 							const o1 = orient(p1, p2, p3)
 							const o2 = orient(p1, p2, p4)
 							const o3 = orient(p3, p4, p1)
 							const o4 = orient(p3, p4, p2)
 							return o1 !== o2 && o3 !== o4
 						}
-						function rectIntersectsSegment(rect: { x: number; y: number; width: number; height: number }, s: { a: { x: number; y: number }; b: { x: number; y: number } }) {
+						function rectIntersectsSegment(
+							rect: { x: number; y: number; width: number; height: number },
+							s: { a: { x: number; y: number }; b: { x: number; y: number } }
+						) {
 							const r = { x1: rect.x, y1: rect.y, x2: rect.x + rect.width, y2: rect.y + rect.height }
 							const edges = [
 								{ a: { x: r.x1, y: r.y1 }, b: { x: r.x2, y: r.y1 } },
@@ -771,7 +851,12 @@ export function renderPolylines(
 
 						const pos1 = place(1)
 						const pos2 = place(-1)
-						const chosen = pos1 && pos2 ? (pos1.i <= pos2.i ? pos1 : pos2) : pos1 ?? pos2
+						let chosen: { x: number; y: number; i: number } | null
+						if (pos1 && pos2) {
+							chosen = pos1.i <= pos2.i ? pos1 : pos2
+						} else {
+							chosen = pos1 ?? pos2
+						}
 						if (!chosen) {
 							logger.error("label placement", { type: "polyline", id: polyline.id })
 							throw errors.new("label placement")

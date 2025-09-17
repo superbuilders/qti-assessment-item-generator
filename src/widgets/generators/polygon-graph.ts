@@ -48,7 +48,7 @@ export const PolygonGraphPropsSchema = z
 		polygons: z
 			.array(createPolygonSchema())
 			.describe(
-				"Polygons defined by referencing point IDs. Can be closed shapes or open polylines. Each can have different colors and styles. Empty array shows just points."
+				"Polygons defined by referencing point IDs. Can be closed shapes or open polylines. Fill colors MUST include transparency (e.g., #11accd26, rgba(17,172,205,0.15)) to avoid obscuring grid lines. Empty array shows just points."
 			)
 	})
 	.strict()
@@ -72,15 +72,15 @@ export const generatePolygonGraph: WidgetGenerator<typeof PolygonGraphPropsSchem
 		{
 			width,
 			height,
-            xAxis: {
-                label: xAxis.label,
+			xAxis: {
+				label: xAxis.label,
 				min: xAxis.min,
 				max: xAxis.max,
 				tickInterval: xAxis.tickInterval,
 				showGridLines: xAxis.showGridLines
 			},
-            yAxis: {
-                label: yAxis.label,
+			yAxis: {
+				label: yAxis.label,
 				min: yAxis.min,
 				max: yAxis.max,
 				tickInterval: yAxis.tickInterval,
