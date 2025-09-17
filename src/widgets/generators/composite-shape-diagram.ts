@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
@@ -305,18 +306,8 @@ export const CompositeShapeDiagramPropsSchema = z
 		type: z
 			.literal("compositeShapeDiagram")
 			.describe("Widget type identifier for composite shape diagrams with complex polygons and annotations."),
-		width: z
-			.number()
-			.positive()
-			.describe(
-				"SVG canvas width in pixels. The diagram automatically centers and scales to fit within this width while maintaining aspect ratio. Recommended: 400-800px."
-			),
-		height: z
-			.number()
-			.positive()
-			.describe(
-				"SVG canvas height in pixels. The diagram automatically centers and scales to fit within this height while maintaining aspect ratio. Recommended: 300-600px."
-			),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		vertices: z
 			.array(createVertexSchema())
 			.describe(
@@ -1437,3 +1428,4 @@ function pointInPolygon(point: { x: number; y: number }, polygon: Array<{ x: num
 	}
 	return inside
 }
+

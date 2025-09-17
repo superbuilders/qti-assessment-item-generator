@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
@@ -38,18 +39,8 @@ export const ProbabilitySpinnerPropsSchema = z
 		type: z
 			.literal("probabilitySpinner")
 			.describe("Identifies this as a probability spinner widget for demonstrating random events and likelihood."),
-		width: z
-			.number()
-			.positive()
-			.describe(
-				"Total width of the spinner diagram in pixels (e.g., 400, 500, 350). Must accommodate the circle and pointer with padding."
-			),
-		height: z
-			.number()
-			.positive()
-			.describe(
-				"Total height of the spinner diagram in pixels (e.g., 400, 500, 350). Should include space for title if present. Often equal to width."
-			),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		groups: z
 			.array(ProbabilitySpinnerSectorGroupSchema)
 			.describe(
@@ -196,3 +187,4 @@ export const generateProbabilitySpinner: WidgetGenerator<typeof ProbabilitySpinn
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}">${svgBody}</svg>`
 }
+

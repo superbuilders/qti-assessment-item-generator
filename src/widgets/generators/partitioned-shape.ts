@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
@@ -133,14 +134,8 @@ export const PartitionedShapePropsSchema = z
 		z
 			.object({
 				type: z.literal("partitionedShape").describe("Widget type identifier."),
-				width: z
-					.number()
-					.positive()
-					.describe("Total width in pixels (e.g., 400, 500, 300). Must fit all shapes with spacing."),
-				height: z
-					.number()
-					.positive()
-					.describe("Total height in pixels (e.g., 300, 400, 300). Must fit all shapes with spacing."),
+				width: createWidthSchema(),
+				height: createHeightSchema(),
 				mode: z.literal("partition").describe("Partition mode: shows shapes divided into equal parts for fractions."),
 				shapes: z
 					.array(createPartitionShapeSchema())
@@ -162,14 +157,8 @@ export const PartitionedShapePropsSchema = z
 		z
 			.object({
 				type: z.literal("partitionedShape").describe("Widget type identifier."),
-				width: z
-					.number()
-					.positive()
-					.describe("Total width in pixels (e.g., 500, 600, 400). Must accommodate the grid."),
-				height: z
-					.number()
-					.positive()
-					.describe("Total height in pixels (e.g., 400, 500, 350). Must accommodate the grid."),
+				width: createWidthSchema(),
+				height: createHeightSchema(),
 				mode: z.literal("geometry").describe("Geometry mode: shows a coordinate grid with polygons and lines."),
 				grid: z
 					.object({
@@ -460,3 +449,4 @@ export const generatePartitionedShape: WidgetGenerator<typeof PartitionedShapePr
 			return generateGeometryView(props)
 	}
 }
+

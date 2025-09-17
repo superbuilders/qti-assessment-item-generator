@@ -2,6 +2,7 @@ import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
 import { Path2D } from "../../utils/path-builder"
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { estimateWrappedTextDimensions } from "../../utils/text"
 import { theme } from "../../utils/theme"
 import type { WidgetGenerator } from "../types"
@@ -69,20 +70,8 @@ export const GeometricSolidDiagramPropsSchema = z
 		type: z
 			.literal("geometricSolidDiagram")
 			.describe("Identifies this as a geometric solid diagram showing 3D shapes with dimension labels."),
-		width: z
-			.number()
-			.min(300)
-			.max(1200)
-			.describe(
-				"Total width of the diagram in pixels (e.g., 300, 400, 350). Must be between 300 and 1200 and accommodate the 3D projection and labels."
-			),
-		height: z
-			.number()
-			.min(300)
-			.max(1200)
-			.describe(
-				"Total height of the diagram in pixels (e.g., 300, 400, 350). Must be between 300 and 1200 and fit the shape with comfortable padding."
-			),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		shape: z
 			.discriminatedUnion("type", [Cylinder, Cone, Sphere])
 			.describe("The 3D geometric solid to display. Each type has specific dimension requirements."),

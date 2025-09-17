@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
@@ -34,8 +35,8 @@ export const RadiallyConstrainedAngleDiagramPropsSchema = z
 		type: z
 			.literal("radiallyConstrainedAngleDiagram")
 			.describe("Identifies this as a radially constrained angle diagram."),
-		width: z.number().positive().describe("The total width of the SVG diagram in pixels."),
-		height: z.number().positive().describe("The total height of the SVG diagram in pixels."),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		centerLabel: z
 			.string()
 			.nullable()
@@ -495,3 +496,4 @@ export const generateRadiallyConstrainedAngleDiagram: WidgetGenerator<
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}">${svgBody}</svg>`
 }
+

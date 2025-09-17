@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
@@ -36,8 +37,8 @@ const ReferenceLineSchema = z
 export const StickPlotPropsSchema = z
 	.object({
 		type: z.literal("stickPlot"),
-		width: z.number().positive().describe("Total width of the SVG in pixels."),
-		height: z.number().positive().describe("Total height of the SVG in pixels."),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		title: z.string().describe("Main title displayed above the plot."),
 		xAxis: z
 			.object({
@@ -174,3 +175,4 @@ export const generateStickPlot: WidgetGenerator<typeof StickPlotPropsSchema> = a
 	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.base}">${svgBody}</svg>`
 }
+

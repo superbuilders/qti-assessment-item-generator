@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import {
@@ -17,18 +18,8 @@ export const PolygonGraphPropsSchema = z
 		type: z
 			.literal("polygonGraph")
 			.describe("Identifies this as a polygon graph for drawing shapes on a coordinate plane."),
-		width: z
-			.number()
-			.positive()
-			.describe(
-				"Total width of the coordinate plane in pixels (e.g., 500, 600, 400). Should accommodate all vertices and labels."
-			),
-		height: z
-			.number()
-			.positive()
-			.describe(
-				"Total height of the coordinate plane in pixels (e.g., 500, 600, 400). Often equal to width for square aspect ratio."
-			),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		xAxis: createAxisOptionsSchema().describe(
 			"Configuration for the horizontal x-axis including range, tick marks, labels, and optional grid lines."
 		),
@@ -103,3 +94,4 @@ export const generatePolygonGraph: WidgetGenerator<typeof PolygonGraphPropsSchem
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.base}">${svgBody}</svg>`
 }
+

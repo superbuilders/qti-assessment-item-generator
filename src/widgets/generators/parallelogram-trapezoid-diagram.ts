@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
@@ -26,12 +27,7 @@ const Parallelogram = z
 			.number()
 			.positive()
 			.describe("Length of the base (bottom side) in arbitrary units (e.g., 8, 10, 6.5). Parallel to the top side."),
-		height: z
-			.number()
-			.positive()
-			.describe(
-				"Perpendicular distance between parallel sides in arbitrary units (e.g., 5, 7, 4). Not the slanted side length."
-			),
+		height: createHeightSchema(),
 		sideLength: z
 			.number()
 			.positive()
@@ -66,12 +62,7 @@ const RightTrapezoid = z
 			.number()
 			.positive()
 			.describe("Length of the bottom parallel side in arbitrary units (e.g., 10, 12, 8). Usually longer than top."),
-		height: z
-			.number()
-			.positive()
-			.describe(
-				"Perpendicular distance between parallel sides in arbitrary units (e.g., 5, 6, 4). Also the length of the left perpendicular side."
-			),
+		height: createHeightSchema(),
 		labels: z
 			.object({
 				topBase: createLabelValueSchema().describe(
@@ -106,12 +97,7 @@ const GeneralTrapezoid = z
 			.number()
 			.positive()
 			.describe("Length of the bottom parallel side in arbitrary units (e.g., 9, 12, 8). Usually longer than top."),
-		height: z
-			.number()
-			.positive()
-			.describe(
-				"Perpendicular distance between parallel sides in arbitrary units (e.g., 4, 6, 5). Measured vertically."
-			),
+		height: createHeightSchema(),
 		leftSideLength: z
 			.number()
 			.positive()
@@ -144,14 +130,8 @@ export const ParallelogramTrapezoidDiagramPropsSchema = z
 		type: z
 			.literal("parallelogramTrapezoidDiagram")
 			.describe("Identifies this as a parallelogram or trapezoid diagram widget."),
-		width: z
-			.number()
-			.positive()
-			.describe("Total width of the diagram in pixels (e.g., 400, 500, 350). Must accommodate the shape and labels."),
-		height: z
-			.number()
-			.positive()
-			.describe("Total height of the diagram in pixels (e.g., 300, 400, 250). Must accommodate the shape and labels."),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		shape: z
 			.discriminatedUnion("type", [Parallelogram, RightTrapezoid, GeneralTrapezoid])
 			.describe("The specific quadrilateral to draw with its dimensions and labels.")
@@ -630,3 +610,4 @@ export const generateParallelogramTrapezoidDiagram: WidgetGenerator<
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}">${svgBody}</svg>`
 }
+

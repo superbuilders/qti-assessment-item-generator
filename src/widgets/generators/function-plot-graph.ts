@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { createAxisOptionsSchema, createPlotPointSchema, createPolylineSchema, renderPoints, renderPolylines } from "../../utils/canvas-utils"
@@ -13,18 +14,8 @@ export const FunctionPlotGraphPropsSchema = z
 		type: z
 			.literal("functionPlotGraph")
 			.describe("Identifies this as a function plot graph widget for displaying mathematical functions and curves."),
-		width: z
-			.number()
-			.positive()
-			.describe(
-				"Total width of the coordinate plane in pixels (e.g., 500, 600, 400). Should accommodate axis labels and provide adequate plotting space."
-			),
-		height: z
-			.number()
-			.positive()
-			.describe(
-				"Total height of the coordinate plane in pixels (e.g., 500, 600, 400). Often equal to width for square aspect ratio."
-			),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		xAxis: createAxisOptionsSchema().describe(
 			"Configuration for the horizontal x-axis including domain range, tick marks, labels, and optional grid lines."
 		),
@@ -117,3 +108,4 @@ export const generateFunctionPlotGraph: WidgetGenerator<typeof FunctionPlotGraph
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.base}">${svgBody}</svg>`
 }
+

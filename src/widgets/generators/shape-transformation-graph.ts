@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
@@ -130,18 +131,8 @@ export const ShapeTransformationGraphPropsSchema = z
 			.describe(
 				"Identifies this as a shape transformation graph showing geometric transformations on a coordinate plane."
 			),
-		width: z
-			.number()
-			.positive()
-			.describe(
-				"Total width of the coordinate plane in pixels (e.g., 500, 600, 400). Should accommodate both shapes and labels."
-			),
-		height: z
-			.number()
-			.positive()
-			.describe(
-				"Total height of the coordinate plane in pixels (e.g., 500, 600, 400). Often equal to width for square grid."
-			),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		xAxis: createAxisOptionsSchema().describe(
 			"Configuration for the horizontal axis including range, ticks, and grid. Should encompass both pre-image and image."
 		),
@@ -313,3 +304,4 @@ export const generateShapeTransformationGraph: WidgetGenerator<typeof ShapeTrans
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.base}">${svgBody}</svg>`
 }
+

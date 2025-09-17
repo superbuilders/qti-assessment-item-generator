@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
@@ -35,8 +36,8 @@ function createPartitionedShapeSchema() {
 export const FractionModelDiagramPropsSchema = z
 	.object({
 		type: z.literal("fractionModelDiagram").describe("Identifies this as a fraction model diagram widget."),
-		width: z.number().positive().describe("Total width of the SVG in pixels."),
-		height: z.number().positive().describe("Total height of the SVG in pixels."),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		shapeType: ShapeTypeEnum,
 		shapes: z
 			.array(createPartitionedShapeSchema())
@@ -250,3 +251,4 @@ export const generateFractionModelDiagram: WidgetGenerator<typeof FractionModelD
 	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}">${svgBody}</svg>`
 }
+

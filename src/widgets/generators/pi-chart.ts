@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { drawChartTitle } from "../../utils/chart-layout-utils"
@@ -49,14 +50,8 @@ export const PieChartWidgetPropsSchema = z
 		type: z
 			.literal("pieChart")
 			.describe("Identifies this as a pie chart widget for showing part-to-whole relationships."),
-		width: z
-			.number()
-			.positive()
-			.describe("Total nominal width of the chart area in pixels. The SVG may expand horizontally to fit labels."),
-		height: z
-			.number()
-			.positive()
-			.describe("Total height of the SVG container in pixels. This height will be divided among the stacked charts."),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		charts: z
 			.array(PieChartDataSchema)
 			.min(1)
@@ -266,3 +261,4 @@ export const generatePieChart: WidgetGenerator<typeof PieChartWidgetPropsSchema>
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.medium}">${styleTag}${svgBody}</svg>`
 }
+

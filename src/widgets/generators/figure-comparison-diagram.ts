@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
@@ -96,18 +97,8 @@ export const FigureComparisonDiagramPropsSchema = z
 		type: z
 			.literal("figureComparisonDiagram")
 			.describe("Identifies this as a figure comparison diagram for displaying multiple polygons side by side."),
-		width: z
-			.number()
-			.positive()
-			.describe(
-				"Total width of the diagram in pixels (e.g., 600, 800, 500). Must accommodate all figures with spacing and labels."
-			),
-		height: z
-			.number()
-			.positive()
-			.describe(
-				"Total height of the diagram in pixels (e.g., 400, 300, 500). Must accommodate all figures with spacing and labels."
-			),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		figures: z
 			.array(Figure)
 			.describe(
@@ -775,3 +766,4 @@ function pointInPolygon(point: { x: number; y: number }, polygon: Array<{ x: num
 	}
 	return inside
 }
+

@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
@@ -156,8 +157,8 @@ function createAltitudeSchema() {
 export const TriangleDiagramPropsSchema = z
 	.object({
 		type: z.literal("triangleDiagram").describe("Identifies this widget as a triangle diagram. Always use the exact value 'triangleDiagram'."),
-		width: z.number().min(300).max(1200).describe("The total width of the SVG diagram in pixels. The triangle and all constructions will be scaled to fit within this width while maintaining aspect ratio. Must be between 100 and 1200 pixels."),
-		height: z.number().min(300).max(1200).describe("The total height of the SVG diagram in pixels. The triangle and all constructions will be scaled to fit within this height while maintaining aspect ratio. Must be between 100 and 1200 pixels."),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		points: createTrianglePointsSchema().describe("The three vertices that define the triangle. The triangle's shape is fully determined by the angle constraints specified in angleArcs."),
 		extraPoints: createAuxiliaryPointsSchema().describe("Additional points beyond the three triangle vertices. Used for constructions like angle bisectors, medians, or exterior angle demonstrations."),
 		angleArcs: z.array(createAngleMarkSchema()).min(3).max(3).describe("Array of exactly three angle markings to display (one per triangle angle, interior or exterior construction). At least 2 numeric angle values are required to determine the triangle's shape. The third angle is automatically calculated to sum to 180°. If all three provided angles are numeric, their interior measures MUST sum exactly to 180°. If any angle is symbolic/variable, the sum requirement is not enforced at validation time. Supports both interior angles (between triangle sides) and exterior angles (using auxiliary points and collinear constraints). Multiple angles at the same vertex are automatically given different arc radii for clarity."),
@@ -895,4 +896,5 @@ export const generateTriangleDiagram: WidgetGenerator<typeof TriangleDiagramProp
 	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.medium}">${svgBody}</svg>`
 }
+
 

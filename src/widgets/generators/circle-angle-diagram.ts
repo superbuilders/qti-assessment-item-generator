@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
@@ -15,8 +16,8 @@ import type { WidgetGenerator } from "../types"
 export const CircleAngleDiagramPropsSchema = z
 	.object({
 		type: z.literal("circleAngleDiagram"),
-		width: z.number().positive().describe("The total width of the SVG canvas in pixels."),
-		height: z.number().positive().describe("The total height of the SVG canvas in pixels."),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		angle: z
 			.number()
 			.min(0)
@@ -245,3 +246,4 @@ export const generateCircleAngleDiagram: WidgetGenerator<typeof CircleAngleDiagr
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}">${svgBody}</svg>`
 }
+

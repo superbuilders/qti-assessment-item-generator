@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
@@ -71,18 +72,8 @@ export const BoxGridPropsSchema = z
 		type: z
 			.literal("boxGrid")
 			.describe("Identifies this as a box grid widget for displaying tabular data with optional cell highlighting."),
-		width: z
-			.number()
-			.positive()
-			.describe(
-				"Total width of the grid in pixels including borders (e.g., 400, 500, 600). Must accommodate all columns with their content."
-			),
-		height: z
-			.number()
-			.positive()
-			.describe(
-				"Total height of the grid in pixels including borders (e.g., 300, 400, 200). Must accommodate all rows."
-			),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		data: z
 			.array(z.array(BoxGridCellSchema))
 			.describe(
@@ -209,3 +200,4 @@ export const generateBoxGrid: WidgetGenerator<typeof BoxGridPropsSchema> = async
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}">${svgBody}</svg>`
 }
+

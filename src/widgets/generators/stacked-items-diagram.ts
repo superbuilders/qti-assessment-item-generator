@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { z } from "zod"
 import type { WidgetGenerator } from "../types"
 
@@ -32,18 +33,8 @@ export const StackedItemsDiagramPropsSchema = z
 		type: z
 			.literal("stackedItemsDiagram")
 			.describe("Identifies this as a stacked items diagram for visualizing repeated objects in a stack."),
-		width: z
-			.number()
-			.positive()
-			.describe(
-				"Total width of the diagram container in pixels (e.g., 300, 400, 250). Must accommodate the full stack width."
-			),
-		height: z
-			.number()
-			.positive()
-			.describe(
-				"Total height of the diagram container in pixels (e.g., 400, 500, 300). Must accommodate the full stack height."
-			),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		altText: z
 			.string()
 			.describe(
@@ -115,3 +106,4 @@ export const generateStackedItemsDiagram: WidgetGenerator<typeof StackedItemsDia
 	html += "</div>"
 	return html
 }
+

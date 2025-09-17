@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
@@ -32,8 +33,8 @@ function createPointSchema() {
 export const CustomPolygonDiagramPropsSchema = z
 	.object({
 		type: z.literal("customPolygonDiagram"),
-		width: z.number().positive().describe("The total width of the SVG canvas in pixels."),
-		height: z.number().positive().describe("The total height of the SVG canvas in pixels."),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		points: z
 			.array(createPointSchema())
 			.min(3, "A polygon must have at least 3 vertices.")
@@ -120,3 +121,4 @@ export const generateCustomPolygonDiagram: WidgetGenerator<typeof CustomPolygonD
 	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}">${svgBody}</svg>`
 }
+

@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
@@ -15,8 +16,8 @@ import type { WidgetGenerator } from "../types"
 export const LabeledRectangleDiagramPropsSchema = z
 	.object({
 		type: z.literal("labeledRectangleDiagram"),
-		width: z.number().positive().describe("The total width of the SVG canvas in pixels."),
-		height: z.number().positive().describe("The total height of the SVG canvas in pixels."),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		topLabel: z
 			.string()
 			.regex(MATHML_INNER_PATTERN, "invalid mathml inner content")
@@ -174,3 +175,4 @@ export const generateLabeledRectangleDiagram: WidgetGenerator<typeof LabeledRect
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg">${svgBody}</svg>`
 }
+

@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { theme } from "../../utils/theme"
@@ -7,8 +8,8 @@ const PADDING = 20
 
 export const SimpleArrowPropsSchema = z.object({
 	type: z.literal("simpleArrow"),
-	width: z.number().positive(),
-	height: z.number().positive(),
+	width: createWidthSchema(),
+	height: createHeightSchema(),
 	orientation: z.enum(["vertical", "horizontal"]).default("vertical"),
 	direction: z.enum(["forward", "backward", "bidirectional"]).default("forward"),
 	color: z.string().default("#333333"),
@@ -116,3 +117,4 @@ export const generateSimpleArrow: WidgetGenerator<typeof SimpleArrowPropsSchema>
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}">${svgBody}</svg>`
 }
+

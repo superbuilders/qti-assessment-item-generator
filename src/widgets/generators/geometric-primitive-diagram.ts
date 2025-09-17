@@ -2,6 +2,7 @@ import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
 import { Path2D } from "../../utils/path-builder"
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { theme } from "../../utils/theme"
 import type { WidgetGenerator } from "../types"
 
@@ -28,16 +29,8 @@ type Point = { x: number; y: number; label: string | null }
 export const GeometricPrimitiveDiagramPropsSchema = z
 	.object({
 		type: z.literal("geometricPrimitiveDiagram"),
-			width: z
-				.number()
-				.min(300)
-				.max(1200)
-				.describe("The total width of the SVG canvas in pixels. Must be between 300 and 1200."),
-			height: z
-				.number()
-				.min(300)
-				.max(1200)
-				.describe("The total height of the SVG canvas in pixels. Must be between 300 and 1200."),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		primitive: z
 			.discriminatedUnion("type", [
 				z

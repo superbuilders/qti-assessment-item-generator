@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import * as errors from "@superbuilders/errors"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
@@ -26,18 +27,8 @@ export const CoordinatePlaneComprehensivePropsSchema = z
 		type: z
 			.literal("coordinatePlane")
 			.describe("Identifies this as a comprehensive coordinate plane widget with full geometric features."),
-		width: z
-			.number()
-			.positive()
-			.describe(
-				"Total width of the coordinate plane in pixels including axes and labels (e.g., 500, 600, 400). Larger values provide more plotting space."
-			),
-		height: z
-			.number()
-			.positive()
-			.describe(
-				"Total height of the coordinate plane in pixels including axes and labels (e.g., 500, 600, 400). Usually equal to width for square aspect ratio."
-			),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		xAxis: createAxisOptionsSchema().describe(
 			"Configuration for the horizontal x-axis including range, tick marks, and grid lines. Defines the visible domain of the plane."
 		),
@@ -162,3 +153,4 @@ export const generateCoordinatePlaneComprehensive: WidgetGenerator<
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.base}">${svgBody}</svg>`
 }
+

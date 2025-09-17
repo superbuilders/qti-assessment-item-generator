@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
@@ -253,18 +254,8 @@ export const NumberLinePropsSchema = z
 			.describe(
 				"Widget type identifier for general-purpose number lines supporting integers, fractions, and mixed numbers."
 			),
-		width: z
-			.number()
-			.positive()
-			.describe(
-				"SVG width in pixels. For horizontal number lines, this is the main dimension. For vertical lines, this is the narrower dimension. Recommended: 400-600px for horizontal, 200-300px for vertical."
-			),
-		height: z
-			.number()
-			.positive()
-			.describe(
-				"SVG height in pixels. For horizontal number lines, this is the narrower dimension. For vertical lines, this is the main dimension. Recommended: 150-250px for horizontal, 400-600px for vertical."
-			),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		orientation: z
 			.enum(["horizontal", "vertical"])
 			.describe(
@@ -687,3 +678,4 @@ export const generateNumberLine: WidgetGenerator<typeof NumberLinePropsSchema> =
 	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="12">${svgBody}</svg>`
 }
+

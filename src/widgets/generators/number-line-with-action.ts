@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
@@ -12,18 +13,8 @@ export const NumberLineWithActionPropsSchema = z
 		type: z
 			.literal("numberLineWithAction")
 			.describe("Identifies this as a number line with action arrows showing addition/subtraction operations."),
-		width: z
-			.number()
-			.positive()
-			.describe(
-				"Total width in pixels for horizontal orientation (e.g., 600, 700, 500). For vertical, this is the narrower dimension."
-			),
-		height: z
-			.number()
-			.positive()
-			.describe(
-				"Total height in pixels for horizontal orientation (e.g., 150, 200, 180). For vertical, this is the longer dimension."
-			),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		orientation: z
 			.enum(["horizontal", "vertical"])
 			.describe(
@@ -832,3 +823,4 @@ export const generateNumberLineWithAction: WidgetGenerator<typeof NumberLineWith
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.base}">${svgBody}</svg>`
 }
+

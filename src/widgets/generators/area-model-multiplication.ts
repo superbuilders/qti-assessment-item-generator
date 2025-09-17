@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
@@ -40,8 +41,8 @@ const CellContentSchema = z
 export const AreaModelMultiplicationPropsSchema = z
 	.object({
 		type: z.literal("areaModelMultiplication").describe("Identifies this as an area model for multiplication."),
-		width: z.number().positive().describe("Total width of the diagram in pixels."),
-		height: z.number().positive().describe("Total height of the diagram in pixels."),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		rowFactors: z
 			.array(createValueOrUnknownSchema())
 			.min(1)
@@ -296,3 +297,4 @@ export const generateAreaModelMultiplication: WidgetGenerator<typeof AreaModelMu
 	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}">${svgBody}</svg>`
 }
+

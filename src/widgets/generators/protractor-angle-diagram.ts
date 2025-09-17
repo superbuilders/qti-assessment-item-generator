@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
@@ -14,8 +15,8 @@ const PROTRACTOR_BASE64 =
 export const ProtractorAngleDiagramPropsSchema = z
 	.object({
 		type: z.literal("protractorAngleDiagram"),
-		width: z.number().positive().describe("total width of the diagram in pixels"),
-		height: z.number().positive().describe("total height of the diagram in pixels"),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		smallerReading: z
 			.number()
 			.min(0)
@@ -254,3 +255,4 @@ export const generateProtractorAngleDiagram: WidgetGenerator<typeof ProtractorAn
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd">${combinedContent}</svg>`
 }
+

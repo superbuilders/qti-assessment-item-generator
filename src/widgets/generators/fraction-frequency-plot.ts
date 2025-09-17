@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
@@ -47,8 +48,8 @@ const TickSchema = z
 export const FractionFrequencyPlotPropsSchema = z
 	.object({
 		type: z.literal("fractionFrequencyPlot").describe("Identifies this as a fraction frequency plot widget."),
-		width: z.number().positive().describe("Total width of the plot in pixels."),
-		height: z.number().positive().describe("Total height of the plot in pixels."),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		title: z
 			.string()
 			.nullable()
@@ -239,3 +240,4 @@ export const generateFractionFrequencyPlot: WidgetGenerator<typeof FractionFrequ
 	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.base}">${svgBody}</svg>`
 }
+

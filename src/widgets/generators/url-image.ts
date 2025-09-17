@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
@@ -21,8 +22,8 @@ export const UrlImageWidgetPropsSchema = z
 			.describe(
 				"Required alternative text describing the image for accessibility. Plaintext only; no markdown or HTML."
 			),
-		width: z.number().positive().nullable().describe("Optional width for the image in pixels."),
-		height: z.number().positive().nullable().describe("Optional height for the image in pixels."),
+		width: createWidthSchema().nullable(),
+		height: createHeightSchema().nullable(),
 		caption: z
 			.string()
 			.nullable()
@@ -106,3 +107,4 @@ export const generateUrlImage: WidgetGenerator<typeof UrlImageWidgetPropsSchema>
 
 	return `<div style="${containerStyles}">${imgTag}${captionTag}</div>`
 }
+

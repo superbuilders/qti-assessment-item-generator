@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
@@ -38,18 +39,8 @@ export const VennDiagramPropsSchema = z
 		type: z
 			.literal("vennDiagram")
 			.describe("Identifies this as a Venn diagram widget for visualizing set relationships and overlaps."),
-		width: z
-			.number()
-			.positive()
-			.describe(
-				"Total width of the diagram in pixels (e.g., 400, 500, 350). Must accommodate both circles, labels, and outside region."
-			),
-		height: z
-			.number()
-			.positive()
-			.describe(
-				"Total height of the diagram in pixels (e.g., 300, 400, 250). Should provide balanced proportions with width."
-			),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		circleA: createCircleSchema().describe(
 			"Left circle representing the first category or set. The count is for items ONLY in A (not in B)."
 		),
@@ -223,3 +214,4 @@ export const generateVennDiagram: WidgetGenerator<typeof VennDiagramPropsSchema>
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}">${svgBody}</svg>`
 }
+

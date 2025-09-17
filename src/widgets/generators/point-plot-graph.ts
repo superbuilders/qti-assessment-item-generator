@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { createAxisOptionsSchema, createPlotPointSchema, renderPoints } from "../../utils/canvas-utils"
@@ -11,18 +12,8 @@ export const PointPlotGraphPropsSchema = z
 		type: z
 			.literal("pointPlotGraph")
 			.describe("Identifies this as a point plot graph for displaying individual coordinate points."),
-		width: z
-			.number()
-			.positive()
-			.describe(
-				"Total width of the coordinate plane in pixels (e.g., 500, 600, 400). Should provide adequate plotting space."
-			),
-		height: z
-			.number()
-			.positive()
-			.describe(
-				"Total height of the coordinate plane in pixels (e.g., 500, 600, 400). Often equal to width for square grid."
-			),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		xAxis: createAxisOptionsSchema().describe(
 			"Configuration for the horizontal x-axis including range, tick marks, labels, and optional grid lines."
 		),
@@ -88,3 +79,4 @@ export const generatePointPlotGraph: WidgetGenerator<typeof PointPlotGraphPropsS
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.base}">${svgBody}</svg>`
 }
+

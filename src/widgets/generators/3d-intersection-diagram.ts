@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
@@ -9,8 +10,8 @@ import type { WidgetGenerator } from "../types"
 const RectangularPrismDataSchema = z
 	.object({
 		type: z.literal("rectangularPrism"),
-		width: z.number().positive().describe("The width (x-axis) of the prism."),
-		height: z.number().positive().describe("The height (y-axis) of the prism."),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		depth: z.number().positive().describe("The depth (z-axis) of the prism.")
 	})
 	.strict()
@@ -20,7 +21,7 @@ const PentagonalPrismDataSchema = z
 	.object({
 		type: z.literal("pentagonalPrism"),
 		side: z.number().positive().describe("The side length of the pentagonal bases."),
-		height: z.number().positive().describe("The height of the prism.")
+		height: createHeightSchema()
 	})
 	.strict()
 
@@ -29,7 +30,7 @@ const OctagonalPrismDataSchema = z
 	.object({
 		type: z.literal("octagonalPrism"),
 		side: z.number().positive().describe("The side length of the octagonal bases."),
-		height: z.number().positive().describe("The height of the prism.")
+		height: createHeightSchema()
 	})
 	.strict()
 
@@ -38,7 +39,7 @@ const SquarePyramidDataSchema = z
 	.object({
 		type: z.literal("squarePyramid"),
 		baseSide: z.number().positive().describe("The side length of the square base."),
-		height: z.number().positive().describe("The perpendicular height from the base to the apex.")
+		height: createHeightSchema()
 	})
 	.strict()
 
@@ -47,7 +48,7 @@ const CylinderDataSchema = z
 	.object({
 		type: z.literal("cylinder"),
 		radius: z.number().positive().describe("The radius of the circular bases."),
-		height: z.number().positive().describe("The height of the cylinder.")
+		height: createHeightSchema()
 	})
 	.strict()
 
@@ -56,7 +57,7 @@ const ConeDataSchema = z
 	.object({
 		type: z.literal("cone"),
 		radius: z.number().positive().describe("The radius of the circular base."),
-		height: z.number().positive().describe("The perpendicular height from the base to the apex.")
+		height: createHeightSchema()
 	})
 	.strict()
 
@@ -127,18 +128,8 @@ const PlaneSchema = z.discriminatedUnion("orientation", [
 export const ThreeDIntersectionDiagramPropsSchema = z
 	.object({
 		type: z.literal("threeDIntersectionDiagram"),
-		width: z
-			.number()
-			.positive()
-			.describe(
-				"The total width of the output SVG in pixels. Must accommodate the 3D projection (e.g., 400, 600, 500)."
-			),
-		height: z
-			.number()
-			.positive()
-			.describe(
-				"The total height of the output SVG in pixels. Should be proportional to the solid's dimensions (e.g., 300, 400, 350)."
-			),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		solid: z
 			.discriminatedUnion("type", [
 				RectangularPrismDataSchema,
@@ -661,3 +652,4 @@ export const generateThreeDIntersectionDiagram: WidgetGenerator<typeof ThreeDInt
 	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}">${svgBody}</svg>`
 }
+

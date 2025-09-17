@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
@@ -159,16 +160,8 @@ const Angle = z
 export const AngleDiagramPropsSchema = z
 	.object({
 		type: z.literal("angleDiagram"),
-		width: z
-			.number()
-			.positive()
-			.describe("SVG canvas width in pixels. Recommended range: 300-600px for clear visibility of geometric elements."),
-		height: z
-			.number()
-			.positive()
-			.describe(
-				"SVG canvas height in pixels. Recommended range: 200-500px for clear visibility of geometric elements."
-			),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		points: z
 			.array(Point)
 			.min(1)
@@ -574,3 +567,4 @@ export const generateAngleDiagram: WidgetGenerator<typeof AngleDiagramPropsSchem
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.base}">${svgBody}</svg>`
 }
+

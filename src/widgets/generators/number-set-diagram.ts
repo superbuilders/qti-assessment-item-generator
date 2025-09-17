@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
@@ -29,18 +30,8 @@ function createStyleSchema() {
 export const NumberSetDiagramPropsSchema = z
 	.object({
 		type: z.literal("numberSetDiagram"),
-		width: z
-			.number()
-			.positive()
-			.describe(
-				"Total width of the diagram in pixels (e.g., 500, 600, 450). Must accommodate all nested sets and labels."
-			),
-		height: z
-			.number()
-			.positive()
-			.describe(
-				"Total height of the diagram in pixels (e.g., 400, 350, 450). Should provide good proportions for the nested ovals."
-			),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		sets: z
 			.object({
 				whole: createStyleSchema().describe(
@@ -172,3 +163,4 @@ export const generateNumberSetDiagram: WidgetGenerator<typeof NumberSetDiagramPr
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}">${svgBody}</svg>`
 }
+

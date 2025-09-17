@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
@@ -162,8 +163,8 @@ function createTapeSchema() {
 export const TapeDiagramPropsSchema = z
     .object({
         type: z.literal("tapeDiagram").describe("Identifies this as a tape diagram widget. Always use exactly 'tapeDiagram'."),
-        width: z.number().positive().describe("Total width of the SVG diagram in pixels. Must be large enough to accommodate tape labels, the tapes themselves, and any brackets. Typically 400-800 pixels."),
-        height: z.number().positive().describe("Total height of the SVG diagram in pixels. Must accommodate one or two tapes, their labels, brackets above/below, and padding. Typically 150-300 pixels."),
+        width: createWidthSchema(),
+        height: createHeightSchema(),
         referenceUnitsTotal: z
             .number()
             .int()
@@ -429,3 +430,4 @@ export const generateTapeDiagram: WidgetGenerator<typeof TapeDiagramPropsSchema>
     const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
     return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.base}">${svgBody}</svg>`
 }
+

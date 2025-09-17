@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
@@ -76,18 +77,8 @@ export const TreeDiagramPropsSchema = z
 		type: z
 			.literal("treeDiagram")
 			.describe("Identifies this as a tree diagram widget for hierarchical structures and decision trees."),
-		width: z
-			.number()
-			.positive()
-			.describe(
-				"Total width of the diagram in pixels (e.g., 400, 600, 500). Must accommodate all node positions and labels."
-			),
-		height: z
-			.number()
-			.positive()
-			.describe(
-				"Total height of the diagram in pixels (e.g., 300, 400, 500). Trees typically need more height than width."
-			),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		nodes: z
 			.array(Node)
 			.describe(
@@ -188,3 +179,4 @@ export const generateTreeDiagram: WidgetGenerator<typeof TreeDiagramPropsSchema>
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}">${svgBody}</svg>`
 }
+

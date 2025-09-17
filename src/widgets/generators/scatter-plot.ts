@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
@@ -111,18 +112,8 @@ export const ScatterPlotPropsSchema = z
 		type: z
 			.literal("scatterPlot")
 			.describe("Identifies this as a scatter plot widget for displaying bivariate data relationships."),
-		width: z
-			.number()
-			.positive()
-			.describe(
-				"Total width of the plot in pixels including margins and labels (e.g., 600, 700, 500). Larger values show more detail."
-			),
-		height: z
-			.number()
-			.positive()
-			.describe(
-				"Total height of the plot in pixels including margins and labels (e.g., 400, 500, 350). Often 2/3 of width for good proportions."
-			),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		title: z
 			.string()
 			.describe(
@@ -582,3 +573,4 @@ export const generateScatterPlot: WidgetGenerator<typeof ScatterPlotPropsSchema>
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.base}">${svgBody}</svg>`
 }
+

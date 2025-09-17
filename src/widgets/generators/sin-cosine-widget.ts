@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { createAxisOptionsSchema, createPlotPointSchema, renderPoints } from "../../utils/canvas-utils"
@@ -26,8 +27,8 @@ const createPlotConfigSchema = () =>
 export const SinCosineWidgetPropsSchema = z
 	.object({
 		type: z.literal("sinCosineWidget").describe("Identifies this as a sine/cosine wave plotting widget."),
-		width: z.number().positive().describe("Total width of the SVG canvas in pixels."),
-		height: z.number().positive().describe("Total height of the SVG canvas in pixels."),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		xAxis: createAxisOptionsSchema().describe(
 			"Configuration for the horizontal x-axis (usually representing angles in radians)."
 		),
@@ -294,3 +295,4 @@ export const generateSinCosineWidget: WidgetGenerator<typeof SinCosineWidgetProp
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}">${svgBody}</svg>`
 }
+

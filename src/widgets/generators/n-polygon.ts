@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
@@ -7,8 +8,8 @@ import type { WidgetGenerator } from "../types"
 export const NPolygonPropsSchema = z
 	.object({
 		type: z.literal("nPolygon").describe("Identifies this as an n-sided regular polygon widget."),
-		width: z.number().positive().describe("Total width of the SVG in pixels."),
-		height: z.number().positive().describe("Total height of the SVG in pixels."),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		shape: z
 			.enum(["triangle", "square", "rectangle", "pentagon", "hexagon", "heptagon", "octagon"])
 			.describe("The specific type of regular polygon to render."),
@@ -99,3 +100,4 @@ export const generateNPolygon: WidgetGenerator<typeof NPolygonPropsSchema> = asy
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg">${svgBody}</svg>`
 }
+

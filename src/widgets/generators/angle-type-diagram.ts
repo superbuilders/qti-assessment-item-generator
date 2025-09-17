@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
@@ -27,8 +28,8 @@ function createLabelValueSchema() {
 export const AngleTypeDiagramPropsSchema = z
 	.object({
 		type: z.literal("angleTypeDiagram"),
-		width: z.number().positive().describe("Total width of the SVG diagram in pixels."),
-		height: z.number().positive().describe("Total height of the SVG diagram in pixels."),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		angleType: z
 			.discriminatedUnion("type", [
 				z
@@ -440,3 +441,4 @@ export const generateAngleTypeDiagram: WidgetGenerator<typeof AngleTypeDiagramPr
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}">${svgBody}</svg>`
 }
+

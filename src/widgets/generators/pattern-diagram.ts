@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { CSS_COLOR_PATTERN } from "../../utils/css-color"
@@ -40,8 +41,8 @@ export const PatternDiagramPropsSchema = z
 		type: z
 			.literal("patternDiagram")
 			.describe("Identifies this as a widget for displaying a sequence of shapes to form a pattern."),
-		width: z.number().positive().describe("Total width of the container for the pattern sequence in pixels."),
-		height: z.number().positive().describe("Total height of the container for the pattern sequence in pixels."),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		items: z
 			.array(z.discriminatedUnion("type", [createShapeItemSchema(), createPlaceholderItemSchema()]))
 			.describe("An array of items representing the pattern sequence. Each item can be a shape or a placeholder."),
@@ -187,3 +188,4 @@ export const generatePatternDiagram: WidgetGenerator<typeof PatternDiagramPropsS
 	html += "</div>"
 	return html
 }
+

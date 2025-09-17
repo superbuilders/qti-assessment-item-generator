@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
@@ -58,18 +59,8 @@ export const RectangularFrameDiagramPropsSchema = z
 		type: z
 			.literal("rectangularFrameDiagram")
 			.describe("Identifies this as a 3D rectangular frame (hollow box) diagram."),
-		width: z
-			.number()
-			.positive()
-			.describe(
-				"Total width of the diagram in pixels (e.g., 500, 600, 400). Must accommodate the 3D projection and labels."
-			),
-		height: z
-			.number()
-			.positive()
-			.describe(
-				"Total height of the diagram in pixels (e.g., 400, 500, 350). Should fit the isometric view comfortably."
-			),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		outerLength: z
 			.number()
 			.describe(
@@ -455,3 +446,4 @@ export const generateRectangularFrameDiagram: WidgetGenerator<typeof Rectangular
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.base}">${svgBody}</svg>`
 }
+

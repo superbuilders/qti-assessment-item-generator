@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
@@ -39,18 +40,8 @@ const FractionGroupSchema = z
 export const FractionSumDiagramPropsSchema = z
 	.object({
 		type: z.literal("fractionSumDiagram"),
-		width: z
-			.number()
-			.positive()
-			.describe(
-				"SVG canvas width in pixels. Recommended range: 400-800px to accommodate tape segments and fraction expressions."
-			),
-		height: z
-			.number()
-			.positive()
-			.describe(
-				"SVG canvas height in pixels. Recommended range: 200-400px to fit tape, brackets, and mathematical expressions above and below."
-			),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		denominator: z
 			.number()
 			.int()
@@ -320,3 +311,4 @@ export const generateFractionSumDiagram: WidgetGenerator<typeof FractionSumDiagr
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}">${svgBody}</svg>`
 }
+

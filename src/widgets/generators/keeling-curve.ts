@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { AXIS_VIEWBOX_PADDING } from "../../utils/constants"
@@ -13,8 +14,8 @@ const AnnotationSchema = z.object({
 export const KeelingCurvePropsSchema = z
 	.object({
 		type: z.literal("keelingCurve"),
-		width: z.number().positive().describe("Total width of the SVG in pixels."),
-		height: z.number().positive().describe("Total height of the SVG in pixels."),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		xAxisLabel: z.string().describe("Label for the horizontal axis."),
 		yAxisLabel: z.string().describe("Label for the vertical axis, including units."),
 		annotations: z
@@ -228,3 +229,4 @@ export const generateKeelingCurve: WidgetGenerator<typeof KeelingCurvePropsSchem
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.medium}">${svgBody}</svg>`
 }
+

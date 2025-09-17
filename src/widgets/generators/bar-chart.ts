@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
@@ -67,18 +68,8 @@ export const BarChartPropsSchema = z
 		type: z
 			.literal("barChart")
 			.describe("Widget type identifier for vertical bar charts used to compare categorical data."),
-		width: z
-			.number()
-			.positive()
-			.describe(
-				"Total SVG width in pixels, including all margins, labels, and chart area. Recommended range: 400-800px for readability."
-			),
-		height: z
-			.number()
-			.positive()
-			.describe(
-				"Total SVG height in pixels, including title, chart area, and axis labels. Recommended range: 300-600px for clear visualization."
-			),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		title: z
 			.string()
 			.nullable()
@@ -202,3 +193,4 @@ export const generateBarChart: WidgetGenerator<typeof BarChartPropsSchema> = asy
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.base}">${svgBody}</svg>`
 }
+

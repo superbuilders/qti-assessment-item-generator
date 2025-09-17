@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { drawChartTitle } from "../../utils/chart-layout-utils"
@@ -31,18 +32,8 @@ export const DiscreteObjectRatioDiagramPropsSchema = z
 		type: z
 			.literal("discreteObjectRatioDiagram")
 			.describe("Identifies this as a discrete object ratio diagram for visualizing ratios with countable objects."),
-		width: z
-			.number()
-			.positive()
-			.describe(
-				"Total width of the diagram in pixels (e.g., 400, 500, 600). Must accommodate all objects with reasonable spacing."
-			),
-		height: z
-			.number()
-			.positive()
-			.describe(
-				"Total height of the diagram in pixels (e.g., 300, 400, 250). Adjust based on total object count and layout."
-			),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		objects: z
 			.array(ObjectTypeSchema)
 			.min(1)
@@ -167,3 +158,4 @@ export const generateDiscreteObjectRatioDiagram: WidgetGenerator<typeof Discrete
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.medium}">${svgBody}</svg>`
 }
+

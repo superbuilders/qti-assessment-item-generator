@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
@@ -71,18 +72,8 @@ export const RatioBoxDiagramPropsSchema = z
 		type: z
 			.literal("ratioBoxDiagram")
 			.describe("Identifies this as a ratio box diagram for visualizing part-to-part and part-to-whole relationships."),
-		width: z
-			.number()
-			.positive()
-			.describe(
-				"Total width of the diagram in pixels (e.g., 500, 600, 400). Must accommodate the grid of items with reasonable spacing."
-			),
-		height: z
-			.number()
-			.positive()
-			.describe(
-				"Total height of the diagram in pixels (e.g., 400, 300, 500). Adjusts based on total items and rows needed."
-			),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		items: z
 			.array(Item)
 			.describe(
@@ -327,3 +318,4 @@ export const generateRatioBoxDiagram: WidgetGenerator<typeof RatioBoxDiagramProp
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg">${svgBody}</svg>`
 }
+

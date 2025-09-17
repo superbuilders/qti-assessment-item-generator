@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
@@ -150,8 +151,8 @@ const RectangularPrismDataSchema = z
 	.object({
 		type: z.literal("rectangularPrism"),
 		length: z.number().positive().describe("The length of the prism (depth)."),
-		width: z.number().positive().describe("The width of the prism (front-facing dimension)."),
-		height: z.number().positive().describe("The height of the prism.")
+		width: createWidthSchema(),
+		height: createHeightSchema()
 	})
 	.strict()
 
@@ -181,7 +182,7 @@ const RectangularPyramidDataSchema = z
 		type: z.literal("rectangularPyramid"),
 		baseLength: z.number().positive().describe("The length of the rectangular base."),
 		baseWidth: z.number().positive().describe("The width of the rectangular base."),
-		height: z.number().positive().describe("The perpendicular height from the base to the apex.")
+		height: createHeightSchema()
 	})
 	.strict()
 
@@ -190,7 +191,7 @@ const TriangularPyramidDataSchema = z
 	.object({
 		type: z.literal("triangularPyramid"),
 		base: createTriangularBaseSchema().describe("The dimensions of the triangular base."),
-		height: z.number().positive().describe("The perpendicular height from the base to the apex.")
+		height: createHeightSchema()
 	})
 	.strict()
 
@@ -219,18 +220,8 @@ const Diagonal = z
 export const PolyhedronDiagramPropsSchema = z
 	.object({
 		type: z.literal("polyhedronDiagram").describe("Identifies this as a 3D polyhedron diagram widget."),
-		width: z
-			.number()
-			.positive()
-			.describe(
-				"Total width of the diagram in pixels (e.g., 400, 500, 350). Must accommodate the 3D projection and labels."
-			),
-		height: z
-			.number()
-			.positive()
-			.describe(
-				"Total height of the diagram in pixels (e.g., 350, 400, 300). Should fit the isometric view comfortably."
-			),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		shape: z
 			.discriminatedUnion("type", [
 				RectangularPrismDataSchema.describe("A box-shaped prism with rectangular faces."),
@@ -971,3 +962,4 @@ export const generatePolyhedronDiagram: WidgetGenerator<typeof PolyhedronDiagram
 	const viewBox = `${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}`
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${viewBox}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.base}">${svgBody}</svg>`
 }
+

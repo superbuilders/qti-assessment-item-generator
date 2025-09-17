@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
@@ -83,18 +84,8 @@ export const PentagonIntersectionDiagramPropsSchema = z
 		type: z
 			.literal("pentagonIntersectionDiagram")
 			.describe("Identifies this as a pentagon intersection diagram showing internal angle relationships."),
-		width: z
-			.number()
-			.positive()
-			.describe(
-				"Total width of the diagram in pixels (e.g., 400, 500, 350). Must accommodate the pentagon and labels."
-			),
-		height: z
-			.number()
-			.positive()
-			.describe(
-				"Total height of the diagram in pixels (e.g., 400, 500, 350). Pentagon is centered within these bounds."
-			),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		pentagonPoints: z
 			.array(Point)
 			.describe(
@@ -277,3 +268,4 @@ export const generatePentagonIntersectionDiagram: WidgetGenerator<
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}">${svgBody}</svg>`
 }
+

@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { AXIS_VIEWBOX_PADDING } from "../../utils/constants"
@@ -25,8 +26,8 @@ function createSegmentSchema() {
 export const PopulationChangeEventGraphPropsSchema = z
 	.object({
 		type: z.literal("populationChangeEventGraph"),
-		width: z.number().positive().describe("Total width of the SVG in pixels (e.g., 400, 500)."),
-		height: z.number().positive().describe("Total height of the SVG in pixels (e.g., 400, 350)."),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		xAxisLabel: z.string().describe("The label for the horizontal axis (e.g., 'Time')."),
 		yAxisLabel: z.string().describe("The label for the vertical axis (e.g., 'Deer population size')."),
 		xAxisMin: z.number().describe("The minimum value for the x-axis. This should typically be 0 for time-based data."),
@@ -193,3 +194,4 @@ export const generatePopulationChangeEventGraph: WidgetGenerator<typeof Populati
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.large}">${svgBody}</svg>`
 }
+

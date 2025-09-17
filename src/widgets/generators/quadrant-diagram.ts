@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
@@ -7,8 +8,8 @@ import type { WidgetGenerator } from "../types"
 export const QuadrantDiagramPropsSchema = z
 	.object({
 		type: z.literal("quadrantDiagram"),
-		width: z.number().positive().describe("The total width of the SVG canvas in pixels."),
-		height: z.number().positive().describe("The total height of the SVG canvas in pixels.")
+		width: createWidthSchema(),
+		height: createHeightSchema()
 	})
 	.strict()
 	.describe(

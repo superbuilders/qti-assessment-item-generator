@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
@@ -58,8 +59,8 @@ const PerpendicularIndicatorSchema = z
 export const LineDiagramPropsSchema = z
 	.object({
 		type: z.literal("lineDiagram").describe("Widget type identifier for line geometry diagrams with infinite lines and perpendicular relationships."),
-		width: z.number().positive().describe("SVG canvas width in pixels. Recommended range: 400-600px for clear line visualization and label placement."),
-		height: z.number().positive().describe("SVG canvas height in pixels. Recommended range: 400-600px. Usually equal to width for square diagrams."),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		gridBounds: z
 			.object({
 				minX: z.number(),
@@ -410,3 +411,4 @@ export const generateLineDiagram: WidgetGenerator<typeof LineDiagramPropsSchema>
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}">${svgBody}</svg>`
 }
+

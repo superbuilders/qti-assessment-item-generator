@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
@@ -54,8 +55,8 @@ export const FractionMultiplicationModelPropsSchema = z
 		type: z
 			.literal("fractionMultiplicationModel")
 			.describe("Identifies this as a widget for showing a fraction multiplication equation using visual models."),
-		width: z.number().positive().describe("Total width of the SVG in pixels."),
-		height: z.number().positive().describe("Total height of the SVG in pixels."),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		leftOperand: createBaseFractionModelSchema().describe("The fraction model on the left side of the equation."),
 		middleTerm: createMiddleTermSchema().describe("The multiplier, which can be a number or a placeholder."),
 		rightOperand: createBaseFractionModelSchema().describe(
@@ -368,3 +369,4 @@ export const generateFractionMultiplicationModel: WidgetGenerator<
 	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}">${svgBody}</svg>`
 }
+

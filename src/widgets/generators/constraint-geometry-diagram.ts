@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { init as initZ3 } from "z3-solver"
@@ -359,8 +360,8 @@ export const ConstraintGeometryDiagramPropsSchema = z
 		type: z
 			.literal("constraintGeometryDiagram")
 			.describe("Identifies this widget as a pure constraint-based geometric diagram."),
-		width: z.number().positive().describe("The total width of the SVG canvas in pixels."),
-		height: z.number().positive().describe("The total height of the SVG canvas in pixels."),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		vertices: z
 			.array(VertexSchema)
 			.min(1)
@@ -1281,3 +1282,4 @@ export const generateConstraintGeometryDiagram = async (
 	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.base}">${svgBody}</svg>`
 }
+

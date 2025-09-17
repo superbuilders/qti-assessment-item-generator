@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
@@ -11,11 +12,8 @@ export const EquivalentFractionModelPropsSchema = z
 		type: z
 			.literal("equivalentFractionModel")
 			.describe("Identifies this as a widget for comparing equivalent fractions (tenths and hundredths)."),
-		width: z
-			.number()
-			.positive()
-			.describe("Total width of the SVG in pixels. Should accommodate two squares and spacing."),
-		height: z.number().positive().describe("Total height of the SVG in pixels."),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		numerator: z
 			.number()
 			.int()
@@ -136,3 +134,4 @@ export const generateEquivalentFractionModel: WidgetGenerator<typeof EquivalentF
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg">${svgBody}</svg>`
 }
+

@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
@@ -24,18 +25,8 @@ export const HistogramPropsSchema = z
 		type: z
 			.literal("histogram")
 			.describe("Identifies this as a histogram widget for displaying frequency distributions."),
-		width: z
-			.number()
-			.positive()
-			.describe(
-				"Total width of the histogram in pixels including margins (e.g., 500, 600, 400). Wider charts prevent label overlap."
-			),
-		height: z
-			.number()
-			.positive()
-			.describe(
-				"Total height of the histogram in pixels including title and labels (e.g., 400, 350, 500). Taller charts show frequencies more clearly."
-			),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		title: z.string().describe("Title displayed above the histogram (e.g., 'Test Score Distribution', 'Age Groups')."),
 		xAxis: z
 			.object({
@@ -215,3 +206,4 @@ export const generateHistogram: WidgetGenerator<typeof HistogramPropsSchema> = a
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.base}">${svgBody}</svg>`
 }
+

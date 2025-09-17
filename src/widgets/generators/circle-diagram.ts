@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
@@ -120,18 +121,8 @@ export const CircleDiagramPropsSchema = z
 			.describe(
 				"Rotation angle in degrees for the entire shape. 0° means no rotation. For semicircle: 0° = flat edge at bottom, 90° = flat edge at left. Positive values rotate counter-clockwise."
 			),
-		width: z
-			.number()
-			.positive()
-			.describe(
-				"SVG canvas width in pixels. Must accommodate the circle geometry plus labels and annotations. Recommended: 300-600px. For non-circular shapes, includes the complete bounding box."
-			),
-		height: z
-			.number()
-			.positive()
-			.describe(
-				"SVG canvas height in pixels. For full circles, should typically equal width to maintain proper aspect ratio. Recommended: 300-600px."
-			),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		radius: z
 			.number()
 			.positive()
@@ -933,3 +924,4 @@ export const generateCircleDiagram: WidgetGenerator<typeof CircleDiagramPropsSch
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.base}">${svgBody}</svg>`
 }
+

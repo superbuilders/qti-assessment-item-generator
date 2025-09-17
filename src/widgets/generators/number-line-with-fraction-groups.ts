@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
@@ -12,18 +13,8 @@ export const NumberLineWithFractionGroupsPropsSchema = z
 		type: z
 			.literal("numberLineWithFractionGroups")
 			.describe("Identifies this as a number line with fraction groups showing repeated segments."),
-		width: z
-			.number()
-			.positive()
-			.describe(
-				"Total width of the number line in pixels (e.g., 700, 800, 600). Must accommodate all segments and labels."
-			),
-		height: z
-			.number()
-			.positive()
-			.describe(
-				"Total height of the widget in pixels (e.g., 150, 200, 180). Includes number line and stacked segment bars."
-			),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		axis: z
 			.object({
 				lowerBound: z.number().int().describe("Lower bound numerator (e.g., 0 for 0/4, -2 for -2/4)"),
@@ -227,3 +218,4 @@ export const generateNumberLineWithFractionGroups: WidgetGenerator<
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.base}">${svgBody}</svg>`
 }
+

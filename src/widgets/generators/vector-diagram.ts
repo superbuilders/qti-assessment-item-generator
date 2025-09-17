@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
@@ -57,8 +58,8 @@ function createMarkerSchema() {
 export const VectorDiagramPropsSchema = z
 	.object({
 		type: z.literal("vectorDiagram").describe("Identifies this as a vector diagram widget"),
-		width: z.number().positive().describe("Total width of the diagram in pixels"),
-		height: z.number().positive().describe("Total height of the diagram in pixels"),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		gridSpacing: z.number().positive().default(20).describe("Spacing between grid lines in pixels"),
 		showGrid: z.boolean().default(true).describe("Whether to show the background grid"),
 		gridColor: z
@@ -160,3 +161,4 @@ export const generateVectorDiagram: WidgetGenerator<typeof VectorDiagramPropsSch
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}">${svgBody}</svg>`
 }
+

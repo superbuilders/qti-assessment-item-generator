@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
@@ -40,14 +41,8 @@ export const PopulationBarChartPropsSchema = z
 		type: z
 			.literal("populationBarChart")
 			.describe("Identifies this as a bar chart styled like the elk population example."),
-		width: z
-			.number()
-			.positive()
-			.describe("Total width of the chart in pixels including margins and labels (e.g., 600)."),
-		height: z
-			.number()
-			.positive()
-			.describe("Total height of the chart in pixels including title and axis labels (e.g., 400)."),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		xAxisLabel: z.string().describe("The label for the horizontal axis (e.g., 'Year')."),
 		yAxis: YAxisOptionsSchema.describe("Configuration for the vertical axis including scale and labels."),
 		xAxisVisibleLabels: z
@@ -159,3 +154,4 @@ export const generatePopulationBarChart: WidgetGenerator<typeof PopulationBarCha
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}">${svgBody}</svg>`
 }
+

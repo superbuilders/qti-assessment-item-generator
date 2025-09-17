@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
@@ -44,8 +45,8 @@ export const PESSpectrumPropsSchema = z
 			.describe(
 				"Optional chart title to display above the plot. If the graph does not have a title, do not include this field or pass an empty string."
 			),
-		width: z.number().positive().describe("Total SVG width in pixels (e.g., 318.333)."),
-		height: z.number().positive().describe("Total SVG height in pixels (e.g., 208.357)."),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		yAxisLabel: z.string().describe("The label for the vertical axis."),
 		// Peaks to render, left-to-right positioning derived from their energy values.
 		peaks: z
@@ -240,3 +241,4 @@ export const generatePESSpectrum: WidgetGenerator<typeof PESSpectrumPropsSchema>
 	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.base}">${svgBody}</svg>`
 }
+
