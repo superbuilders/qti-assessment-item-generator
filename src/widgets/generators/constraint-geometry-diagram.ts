@@ -231,7 +231,11 @@ const ConstraintSchema = z
 					),
 				line1: z.string().regex(lineIdRegex).describe("The ID of the first intersecting line."),
 				line2: z.string().regex(lineIdRegex).describe("The ID of the second intersecting line."),
-				label: z.string().nullable().describe("An optional display label for the new intersection vertex.")
+                label: z
+                    .string()
+                    .nullable()
+                    .transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
+                    .describe("An optional display label for the new intersection vertex.")
 			})
 			.strict()
 			.describe(
@@ -247,7 +251,11 @@ const ConstraintSchema = z
 						"A new, unique ID for the virtual vertex that will be created at the midpoint, prefixed with 'vertex_'."
 					),
 				line: z.string().regex(lineIdRegex).describe("The ID of the line on which to create the midpoint."),
-				label: z.string().nullable().describe("An optional display label for the new midpoint vertex.")
+                label: z
+                    .string()
+                    .nullable()
+                    .transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
+                    .describe("An optional display label for the new midpoint vertex.")
 			})
 			.strict()
 			.describe("Creates a 'virtual' vertex at the midpoint of a specified line."),

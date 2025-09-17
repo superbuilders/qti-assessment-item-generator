@@ -16,15 +16,19 @@ const POLYLINE_ID = /^polyline_[A-Za-z0-9_]+$/
 
 // Factory function for axis schema to prevent $ref generation
 export const createAxisOptionsSchema = () =>
-	z
-		.object({
-			label: z.string().describe('The text title for the axis (e.g., "Number of Days").'),
-			min: z.number().describe("The minimum value displayed on the axis."),
-			max: z.number().describe("The maximum value displayed on the axis."),
-			tickInterval: z.number().describe("The numeric interval between labeled tick marks on the axis."),
-			showGridLines: z.boolean().describe("If true, display grid lines for this axis.")
-		})
-		.strict()
+    z
+        .object({
+            label: z
+                .string()
+                .nullable()
+                .transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
+                .describe('The text title for the axis (e.g., "Number of Days"). Null hides the label.'),
+            min: z.number().describe("The minimum value displayed on the axis."),
+            max: z.number().describe("The maximum value displayed on the axis."),
+            tickInterval: z.number().describe("The numeric interval between labeled tick marks on the axis."),
+            showGridLines: z.boolean().describe("If true, display grid lines for this axis.")
+        })
+        .strict()
 
 export const AxisOptionsSchema = createAxisOptionsSchema()
 export type AxisOptions = z.infer<typeof AxisOptionsSchema>
@@ -102,6 +106,7 @@ export const createLineSchema = () =>
 			label: z
 				.string()
 				.nullable()
+				.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
 				.describe("Optional text label to place near the rendered line. Use null for no label.")
 		})
 		.strict()
@@ -194,6 +199,7 @@ export const createPolylineSchema = () =>
 				label: z
 					.string()
 					.nullable()
+					.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
 					.describe("Optional text label to place near the rendered polyline. Use null for no label.")
 			})
 			.strict(),
@@ -231,6 +237,7 @@ export const createPolylineSchema = () =>
 				label: z
 					.string()
 					.nullable()
+					.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
 					.describe("Optional text label to place near the rendered polyline. Use null for no label.")
 			})
 			.strict()

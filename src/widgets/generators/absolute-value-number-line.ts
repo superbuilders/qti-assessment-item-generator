@@ -26,6 +26,13 @@ export const AbsoluteValueNumberLinePropsSchema = z
 		max: z.number().describe("The maximum value displayed on the line."),
 		tickInterval: z.number().describe("The numeric interval between labeled tick marks."),
 		value: z.number().describe("The number whose absolute value is being illustrated."),
+		pointLabel: z
+			.string()
+			.nullable()
+			.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
+			.describe(
+				"Optional label shown near the plotted point. Set to null (or 'null'/'NULL'/empty string) to hide."
+			),
 		highlightColor: z
 			.string()
 			.regex(CSS_COLOR_PATTERN, "invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)")
@@ -46,7 +53,7 @@ export type AbsoluteValueNumberLineProps = z.infer<typeof AbsoluteValueNumberLin
 export const generateAbsoluteValueNumberLine: WidgetGenerator<typeof AbsoluteValueNumberLinePropsSchema> = async (
 	data
 ) => {
-	const { width, min, max, tickInterval, value, highlightColor, showDistanceLabel } = data
+	const { width, min, max, tickInterval, value, pointLabel, highlightColor, showDistanceLabel } = data
 	const absValue = Math.abs(value)
 	const canvas = new CanvasImpl({
 		chartArea: { left: 0, top: 0, width, height: 0 },
@@ -129,6 +136,17 @@ export const generateAbsoluteValueNumberLine: WidgetGenerator<typeof AbsoluteVal
 		stroke: theme.colors.black,
 		strokeWidth: theme.stroke.width.thin
 	})
+
+	// Optional label for the plotted point
+	if (pointLabel) {
+		canvas.drawText({
+			x: toSvgX(value),
+			y: yPos - 25,
+			text: pointLabel,
+			fill: theme.colors.text,
+			anchor: "middle"
+		})
+	}
 
 	// NEW: Finalize the canvas and construct the root SVG element
 	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)

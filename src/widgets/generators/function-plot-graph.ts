@@ -1,16 +1,12 @@
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
-import {
-	createAxisOptionsSchema,
-	createPlotPointSchema,
-	createPolylineSchema,
-	renderPoints,
-	renderPolylines
-} from "../../utils/canvas-utils"
+import { createAxisOptionsSchema, createPlotPointSchema, createPolylineSchema, renderPoints, renderPolylines } from "../../utils/canvas-utils"
 import { PADDING } from "../../utils/constants"
 import { setupCoordinatePlaneV2 } from "../../utils/coordinate-plane-v2"
 import { theme } from "../../utils/theme"
 import type { WidgetGenerator } from "../types"
+
+// Use shared axis schema from utils
 
 export const FunctionPlotGraphPropsSchema = z
 	.object({
@@ -73,14 +69,14 @@ export const generateFunctionPlotGraph: WidgetGenerator<typeof FunctionPlotGraph
 			width,
 			height,
 			xAxis: {
-				label: xAxis.label,
+                label: xAxis.label,
 				min: xAxis.min,
 				max: xAxis.max,
 				tickInterval: xAxis.tickInterval,
 				showGridLines: xAxis.showGridLines
 			},
 			yAxis: {
-				label: yAxis.label,
+                label: yAxis.label,
 				min: yAxis.min,
 				max: yAxis.max,
 				tickInterval: yAxis.tickInterval,

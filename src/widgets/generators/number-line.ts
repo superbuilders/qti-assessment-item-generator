@@ -9,6 +9,64 @@ import { theme } from "../../utils/theme"
 import { buildTicks } from "../../utils/ticks"
 import type { WidgetGenerator } from "../types"
 
+// Additional overlays to subsume fraction-number-line without adding new tick modes
+const Segment = z
+    .object({
+        start: z
+            .number()
+            .describe(
+                "Starting value of the highlighted segment along the axis. Must lie within [min, max]."
+            ),
+        end: z
+            .number()
+            .describe(
+                "Ending value of the highlighted segment along the axis. Must lie within [min, max] and >= start."
+            ),
+        color: z
+            .string()
+            .regex(CSS_COLOR_PATTERN, "invalid css color")
+            .describe(
+                "CSS color for the segment stroke (e.g., '#11accd', 'rgba(255,0,0,0.5)')"
+            )
+    })
+    .strict()
+
+const ModelCellGroup = z
+    .object({
+        count: z
+            .number()
+            .int()
+            .positive()
+            .describe(
+                "Number of consecutive cells in this group. Sum across groups equals totalCells."
+            ),
+        color: z
+            .string()
+            .regex(CSS_COLOR_PATTERN, "invalid css color")
+            .describe("CSS fill color for cells in this group.")
+    })
+    .strict()
+
+const Model = z
+    .object({
+        totalCells: z
+            .number()
+            .int()
+            .positive()
+            .describe("Total number of cells in the model bar (e.g., 8 for eighths)."),
+        cellGroups: z
+            .array(ModelCellGroup)
+            .describe(
+                "Groups of colored cells shown left-to-right. Sum of counts equals totalCells."
+            ),
+        bracketLabel: z
+            .string()
+            .describe(
+                "Label for a bracket spanning the entire model bar (e.g., '1 whole'). Empty string to omit."
+            )
+    })
+    .strict()
+
 // Factory function to create a TickIntervalSchema to avoid $ref issues
 const createTickIntervalSchema = () =>
 	z
@@ -241,6 +299,19 @@ export const NumberLinePropsSchema = z
 			.describe(
 				"Array of special points to highlight with colored dots and labels. Each point can be a whole number, fraction, mixed number, or complex MathML expression. Set to null for no highlighted points."
 			)
+        ,
+        segments: z
+            .array(Segment)
+            .nullable()
+            .describe(
+                "Colored segments drawn along the axis to highlight ranges. Null for none."
+            )
+        ,
+        model: Model
+            .nullable()
+            .describe(
+                "Optional cell-based model bar shown above the axis (horizontal only). Null to omit."
+            )
 	})
 	.strict()
 	.describe(
@@ -291,7 +362,9 @@ export const generateNumberLine: WidgetGenerator<typeof NumberLinePropsSchema> =
 		tickInterval,
 		secondaryTickInterval,
 		showTickLabels,
-		highlightedPoints
+        highlightedPoints,
+        segments,
+        model
 	} = data
 
 	if (min >= max) {
@@ -367,6 +440,81 @@ export const generateNumberLine: WidgetGenerator<typeof NumberLinePropsSchema> =
 
 		// Draw highlighted points (new discriminated union with explicit position and MathML labels)
 
+        // 3a. Draw on-axis segments (horizontal)
+        if (segments) {
+            for (const s of segments) {
+                const startVal = Math.max(min, Math.min(max, s.start))
+                const endVal = Math.max(min, Math.min(max, s.end))
+                if (endVal <= startVal) continue
+                const startX = toSvgX(startVal)
+                const endX = toSvgX(endVal)
+                canvas.drawLine(startX, yPos, endX, yPos, {
+                    stroke: s.color,
+                    strokeWidth: 5
+                })
+            }
+        }
+
+        // 3b. Draw fraction model bar (horizontal only)
+        if (model) {
+            const chartWidth = width - 2 * PADDING
+            const modelY = PADDING
+            const modelHeight = 36
+            const cellWidth = chartWidth / model.totalCells
+
+            // Render cell fills based on groups
+            let cellCounter = 0
+            for (const group of model.cellGroups) {
+                for (let i = 0; i < group.count; i++) {
+                    const cellX = PADDING + cellCounter * cellWidth
+                    canvas.drawRect(cellX, modelY, cellWidth, modelHeight, {
+                        fill: group.color,
+                        fillOpacity: theme.opacity.overlayLow
+                    })
+                    cellCounter++
+                }
+            }
+
+            // Render cell borders on top
+            let currentX = PADDING
+            for (let i = 0; i < model.totalCells; i++) {
+                canvas.drawRect(currentX, modelY, cellWidth, modelHeight, {
+                    fill: "none",
+                    stroke: theme.colors.black,
+                    strokeWidth: theme.stroke.width.thick
+                })
+                currentX += cellWidth
+            }
+
+            // Bracket and label spanning the model
+            if (model.bracketLabel !== "") {
+                const bracketY = modelY - 15
+                const bracketStartX = PADDING
+                const bracketEndX = PADDING + chartWidth
+                canvas.drawLine(bracketStartX, bracketY + 5, bracketStartX, bracketY - 5, {
+                    stroke: theme.colors.black,
+                    strokeWidth: theme.stroke.width.base
+                })
+                canvas.drawLine(bracketStartX, bracketY, bracketEndX, bracketY, {
+                    stroke: theme.colors.black,
+                    strokeWidth: theme.stroke.width.base
+                })
+                canvas.drawLine(bracketEndX, bracketY + 5, bracketEndX, bracketY - 5, {
+                    stroke: theme.colors.black,
+                    strokeWidth: theme.stroke.width.base
+                })
+                canvas.drawText({
+                    x: width / 2,
+                    y: bracketY - 8,
+                    text: model.bracketLabel,
+                    anchor: "middle",
+                    fontPx: 13,
+                    fontWeight: theme.font.weight.bold
+                })
+            }
+        }
+
+        // 3c. Highlighted points on top
 		if (highlightedPoints) {
 			for (const p of highlightedPoints) {
 				const px = toSvgX(p.position)
@@ -516,6 +664,21 @@ export const generateNumberLine: WidgetGenerator<typeof NumberLinePropsSchema> =
 				})
 			}
 		}
+
+        // 3a (vertical). Draw on-axis segments along the vertical axis
+        if (segments) {
+            for (const s of segments) {
+                const startVal = Math.max(min, Math.min(max, s.start))
+                const endVal = Math.max(min, Math.min(max, s.end))
+                if (endVal <= startVal) continue
+                const startY = toSvgY(startVal)
+                const endY = toSvgY(endVal)
+                canvas.drawLine(xPos, startY, xPos, endY, {
+                    stroke: s.color,
+                    strokeWidth: 5
+                })
+            }
+        }
 	}
 
 	// arrows removed: only 'dot' style is supported; no marker defs needed

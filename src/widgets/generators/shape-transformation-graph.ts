@@ -202,15 +202,15 @@ export const generateShapeTransformationGraph: WidgetGenerator<typeof ShapeTrans
 		{
 			width,
 			height,
-			xAxis: {
-				label: xAxis.label,
+            xAxis: {
+                label: xAxis.label,
 				min: xAxis.min,
 				max: xAxis.max,
 				tickInterval: xAxis.tickInterval,
 				showGridLines: xAxis.showGridLines
 			},
-			yAxis: {
-				label: yAxis.label,
+            yAxis: {
+                label: yAxis.label,
 				min: yAxis.min,
 				max: yAxis.max,
 				tickInterval: yAxis.tickInterval,

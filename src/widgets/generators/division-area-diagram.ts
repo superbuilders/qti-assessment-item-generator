@@ -7,8 +7,22 @@ import type { WidgetGenerator } from "../types"
 // Per-digit tokens to support digit-level highlighting and boxes
 const createDigitTokenSchema = () =>
 	z.discriminatedUnion("type", [
-		z.object({ type: z.literal("digit"), value: z.number(), color: z.string().nullable() }),
-		z.object({ type: z.literal("boxedDigit"), value: z.number(), color: z.string().nullable() }),
+		z.object({
+			type: z.literal("digit"),
+			value: z.number(),
+			color: z
+				.string()
+				.nullable()
+				.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
+		}),
+		z.object({
+			type: z.literal("boxedDigit"),
+			value: z.number(),
+			color: z
+				.string()
+				.nullable()
+				.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
+		}),
 		z.object({ type: z.literal("emptyBox") }),
 		z.object({ type: z.literal("spacer") })
 	])
@@ -30,7 +44,11 @@ const createValueOrPlaceholderSchema = () =>
 			z.object({
 				type: z.literal("value").describe("A known numeric value."),
 				value: z.number().describe("The numeric value to display (e.g., 10, 7)."),
-				color: z.string().nullable().describe("Optional CSS color for this quotient part.")
+				color: z
+					.string()
+					.nullable()
+					.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
+					.describe("Optional CSS color for this quotient part.")
 			}),
 			z.object({
 				type: z.literal("placeholder").describe("An unknown value represented by an empty box.")

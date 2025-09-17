@@ -342,5 +342,92 @@ export const geometricSolidDiagramExamples: GeometricSolidDiagramProps[] = [
 			{ text: "10 inches", target: "radius" },
 			{ text: "20 inches", target: "height" }
 		]
+	},
+
+	// Additional extracted-like coverage: unlabeled identification and varied sizes
+	// Spheres (unlabeled and varied canvas sizes)
+	{
+		type: "geometricSolidDiagram",
+		shape: { type: "sphere", radius: 8 },
+		width: 180,
+		height: 180,
+		labels: [{ text: "8 units", target: "radius" }]
+	},
+	{
+		type: "geometricSolidDiagram",
+		shape: { type: "sphere", radius: 15 },
+		width: 180,
+		height: 180,
+		labels: [{ text: "15 cm", target: "radius" }]
+	},
+	{
+		type: "geometricSolidDiagram",
+		shape: { type: "sphere", radius: 5 },
+		width: 120,
+		height: 120,
+		labels: []
+	},
+	{
+		type: "geometricSolidDiagram",
+		shape: { type: "sphere", radius: 5 },
+		width: 200,
+		height: 180,
+		labels: []
+	},
+	{
+		type: "geometricSolidDiagram",
+		shape: { type: "sphere", radius: 45.455 },
+		width: 100,
+		height: 100,
+		labels: []
+	},
+
+	// Cones (unlabeled identification)
+	{
+		type: "geometricSolidDiagram",
+		shape: { type: "cone", height: 15, radius: 6 },
+		width: 134,
+		height: 180,
+		labels: []
+	},
+	{
+		type: "geometricSolidDiagram",
+		shape: { type: "cone", height: 5, radius: 8 },
+		width: 180,
+		height: 68,
+		labels: []
+	},
+
+	// Cylinders (unlabeled identification and special sizes)
+	{
+		type: "geometricSolidDiagram",
+		shape: { type: "cylinder", height: 12, radius: 4 },
+		width: 128,
+		height: 150,
+		labels: []
+	},
+	{
+		type: "geometricSolidDiagram",
+		shape: { type: "cylinder", height: 24, radius: 8 },
+		width: 56,
+		height: 180,
+		labels: []
+	},
+	{
+		type: "geometricSolidDiagram",
+		shape: { type: "cylinder", height: 3, radius: 6 },
+		width: 180,
+		height: 74,
+		labels: []
+	},
+	{
+		type: "geometricSolidDiagram",
+		shape: { type: "cylinder", height: 2, radius: 4 },
+		width: 180,
+		height: 59,
+		labels: [
+			{ text: "4 feet", target: "radius" },
+			{ text: "2 feet", target: "height" }
+		]
 	}
-]
+	]

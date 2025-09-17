@@ -32,33 +32,34 @@ const BarDataSchema = z
 	})
 	.strict()
 
-// Define Y-axis schema separately
-const YAxisSchema = z
-	.object({
-		label: z
-			.string()
-			.nullable()
-			.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
-			.describe(
-				"Title for the vertical y-axis. Examples: 'Sales ($)', 'Population (thousands)', 'Test Scores', 'Temperature (°C)'. Set to null for no axis label."
-			),
-		min: z
-			.number()
-			.describe(
-				"Minimum value on the y-axis scale. Must be less than max. For data starting at 0, use 0. For negative data, use appropriate negative minimum."
-			),
-		max: z
-			.number()
-			.describe(
-				"Maximum value on the y-axis scale. Must be greater than min. Should accommodate the highest data value with some headroom for clarity."
-			),
-		tickInterval: z
-			.number()
-			.describe(
-				"Spacing between tick marks and grid lines on the y-axis. Should evenly divide the range (max - min). Examples: 10, 25, 100, 0.5."
-			)
-	})
-	.strict()
+// Define Y-axis schema via factory to avoid $ref in OpenAI JSON Schema
+const createYAxisSchema = () =>
+	z
+		.object({
+			label: z
+				.string()
+				.nullable()
+				.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
+				.describe(
+					"Title for the vertical y-axis. Examples: 'Sales ($)', 'Population (thousands)', 'Test Scores', 'Temperature (°C)'. Set to null for no axis label."
+				),
+			min: z
+				.number()
+				.describe(
+					"Minimum value on the y-axis scale. Must be less than max. For data starting at 0, use 0. For negative data, use appropriate negative minimum."
+				),
+			max: z
+				.number()
+				.describe(
+					"Maximum value on the y-axis scale. Must be greater than min. Should accommodate the highest data value with some headroom for clarity."
+				),
+			tickInterval: z
+				.number()
+				.describe(
+					"Spacing between tick marks and grid lines on the y-axis. Should evenly divide the range (max - min). Examples: 10, 25, 100, 0.5."
+				)
+		})
+		.strict()
 
 // The main Zod schema for the barChart function
 export const BarChartPropsSchema = z
@@ -92,7 +93,7 @@ export const BarChartPropsSchema = z
 			.describe(
 				"Label for the horizontal axis describing the categories. Examples: 'Months', 'Product Types', 'School Districts'. Set to null when category labels are self-explanatory."
 			),
-		yAxis: YAxisSchema.describe(
+		yAxis: createYAxisSchema().describe(
 			"Vertical axis configuration defining the scale, range, tick intervals, and axis label for the numerical values."
 		),
 		data: z

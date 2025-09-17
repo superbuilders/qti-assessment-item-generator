@@ -32,7 +32,6 @@ import { generateFactorizationDiagram } from "./generators/factorization-diagram
 import { generateFigureComparisonDiagram } from "./generators/figure-comparison-diagram"
 import { generateFractionFrequencyPlot } from "./generators/fraction-frequency-plot"
 import { generateFractionMultiplicationModel } from "./generators/fraction-multiplication-model"
-import { generateFractionNumberLine } from "./generators/fraction-number-line"
 import { generateFractionSumDiagram } from "./generators/fraction-sum-diagram"
 import { generateFractionModelDiagram } from "./generators/fractional-model-diagram"
 import { generateFreeBodyDiagram } from "./generators/free-body-diagram"
@@ -270,8 +269,6 @@ export async function generateWidget(widgetInput: WidgetInput): Promise<string> 
 			return await generateEmojiImage(widget)
 		case "figureComparisonDiagram":
 			return await generateFigureComparisonDiagram(widget)
-		case "fractionNumberLine":
-			return await generateFractionNumberLine(widget)
 		case "fractionSumDiagram":
 			return await generateFractionSumDiagram(widget)
 		case "parallelogramTrapezoidDiagram":

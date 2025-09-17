@@ -10,6 +10,7 @@ const PointSchema = z
 		x: z.number().describe("Horizontal coordinate in grid units. Can be integers or decimals. Examples: 0, 1.5, -2, 4.25. Grid origin (0,0) is at bottom-left corner."),
 		y: z.number().describe("Vertical coordinate in grid units. Can be integers or decimals. Examples: 0, 2.5, -1, 3.75. Positive y values go upward from the origin."),
 		label: z.string().nullable().describe("Optional text label for this vertex. Examples: 'A', 'B', 'C', 'P₁', 'vertex'. Set to null for unlabeled vertices. Labels are positioned outside the polygon for clarity.")
+			.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
 	})
 	.strict()
 
@@ -23,7 +24,11 @@ const PolygonSchema = z
 			.nullable()
 			.describe("CSS fill color for the polygon interior. Examples: '#FFE5CC' (light orange), 'rgba(255,0,0,0.3)' (semi-transparent red), 'transparent' (no fill). Set to null for transparent fill."),
 		strokeColor: z.string().regex(CSS_COLOR_PATTERN).describe("CSS color for the polygon outline. Examples: '#FF0000' (red), '#0066CC' (blue), '#000000' (black). Should contrast with fill color and background."),
-		label: z.string().nullable().describe("Optional label for the entire polygon. Examples: 'Figure 1', 'Original', 'Image', 'Triangle ABC'. Set to null for unlabeled polygons. Label appears below the polygon.")
+		label: z
+			.string()
+			.nullable()
+			.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
+			.describe("Optional label for the entire polygon. Examples: 'Figure 1', 'Original', 'Image', 'Triangle ABC'. Set to null for unlabeled polygons. Label appears below the polygon.")
 	})
 	.strict()
 

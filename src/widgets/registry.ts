@@ -33,7 +33,6 @@ import { FactorizationDiagramPropsSchema } from "./generators/factorization-diag
 import { FigureComparisonDiagramPropsSchema } from "./generators/figure-comparison-diagram"
 import { FractionFrequencyPlotPropsSchema } from "./generators/fraction-frequency-plot"
 import { FractionMultiplicationModelPropsSchema } from "./generators/fraction-multiplication-model"
-import { FractionNumberLinePropsSchema } from "./generators/fraction-number-line"
 import { FractionSumDiagramPropsSchema } from "./generators/fraction-sum-diagram"
 import { FractionModelDiagramPropsSchema } from "./generators/fractional-model-diagram"
 import { FreeBodyDiagramPropsSchema } from "./generators/free-body-diagram"
@@ -141,7 +140,6 @@ export const allWidgetSchemas = {
 	populationBarChart: PopulationBarChartPropsSchema,
 	emojiImage: EmojiImagePropsSchema,
 	figureComparisonDiagram: FigureComparisonDiagramPropsSchema,
-	fractionNumberLine: FractionNumberLinePropsSchema,
 	fractionSumDiagram: FractionSumDiagramPropsSchema,
 	geometricPrimitiveDiagram: GeometricPrimitiveDiagramPropsSchema,
 	geometricSolidDiagram: GeometricSolidDiagramPropsSchema,
@@ -242,7 +240,6 @@ export {
 	FigureComparisonDiagramPropsSchema,
 	FractionFrequencyPlotPropsSchema,
 	FractionMultiplicationModelPropsSchema,
-	FractionNumberLinePropsSchema,
 	FractionSumDiagramPropsSchema,
 	FractionModelDiagramPropsSchema,
 	FreeBodyDiagramPropsSchema,
@@ -345,7 +342,6 @@ export type FactorizationDiagramProps = z.input<typeof FactorizationDiagramProps
 export type FigureComparisonDiagramProps = z.input<typeof FigureComparisonDiagramPropsSchema>
 export type FractionFrequencyPlotProps = z.input<typeof FractionFrequencyPlotPropsSchema>
 export type FractionMultiplicationModelProps = z.input<typeof FractionMultiplicationModelPropsSchema>
-export type FractionNumberLineProps = z.input<typeof FractionNumberLinePropsSchema>
 export type FractionSumDiagramProps = z.input<typeof FractionSumDiagramPropsSchema>
 export type FractionModelDiagramProps = z.input<typeof FractionModelDiagramPropsSchema>
 export type FreeBodyDiagramProps = z.input<typeof FreeBodyDiagramPropsSchema>
@@ -454,7 +450,6 @@ const widgetSchemasWithoutSpecialUnions = [
 	typedSchemas.populationBarChart,
 	typedSchemas.emojiImage,
 	typedSchemas.figureComparisonDiagram,
-	typedSchemas.fractionNumberLine,
 	typedSchemas.fractionSumDiagram,
 	typedSchemas.geometricPrimitiveDiagram,
 	typedSchemas.geometricSolidDiagram,

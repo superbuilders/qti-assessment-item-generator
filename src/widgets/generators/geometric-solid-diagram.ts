@@ -188,13 +188,13 @@ export const generateGeometricSolidDiagram: WidgetGenerator<typeof GeometricSoli
 					strokeWidth: theme.stroke.width.base,
 					dash: theme.stroke.dasharray.backEdge
 				})
-				const textY = Math.min(bottomY + 18, height - 10) // Ensure text stays within bounds
+                const textY = Math.min(bottomY + 18, height - 10) // Ensure text stays within bounds
 				canvas.drawText({
 					x: cx + r / 2,
 					y: textY,
 					text: l.text,
 					anchor: "middle",
-					fontPx: 7
+                    fontPx: theme.font.size.base
 				})
 			}
 			if (l.target === "height") {
@@ -211,7 +211,7 @@ export const generateGeometricSolidDiagram: WidgetGenerator<typeof GeometricSoli
 					y: height / 2,
 					text: l.text,
 					anchor: "start",
-					fontPx: 7
+                    fontPx: theme.font.size.base
 				})
 			}
 		}
@@ -275,13 +275,13 @@ export const generateGeometricSolidDiagram: WidgetGenerator<typeof GeometricSoli
 					strokeWidth: theme.stroke.width.base,
 					dash: theme.stroke.dasharray.backEdge
 				})
-				const textY = Math.min(baseY + 18, height - 10) // Ensure text stays within bounds
+                const textY = Math.min(baseY + 18, height - 10) // Ensure text stays within bounds
 				canvas.drawText({
 					x: cx + r / 2,
 					y: textY,
 					text: l.text,
 					anchor: "middle",
-					fontPx: 7
+                    fontPx: theme.font.size.base
 				})
 			}
 			if (l.target === "height") {
@@ -306,7 +306,7 @@ export const generateGeometricSolidDiagram: WidgetGenerator<typeof GeometricSoli
 					y: height / 2,
 					text: l.text,
 					anchor: "end",
-					fontPx: 7
+                    fontPx: theme.font.size.base
 				})
 			}
 		}
@@ -365,7 +365,7 @@ export const generateGeometricSolidDiagram: WidgetGenerator<typeof GeometricSoli
 				})
 
 				// Place label centered above the dashed radius with a minimal non-overlapping gap
-				const fontPx = 7
+                const fontPx = theme.font.size.base
 				const dims = estimateWrappedTextDimensions(l.text, Number.POSITIVE_INFINITY, fontPx, 1.2)
 				const minGap = theme.stroke.width.base + 2
 				const labelX = cx + r / 2

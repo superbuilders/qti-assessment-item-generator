@@ -32,7 +32,11 @@ const LineSchema = z
 			.strict()
 			.describe("Second point defining the infinite line in grid coordinates. Combined with 'from' point, determines the line's direction and slope."),
 		style: z.enum(["solid", "dotted"]).describe("Visual style of the line. 'solid' for standard lines, 'dotted' for auxiliary or construction lines that appear dashed."),
-		label: z.string().nullable().describe("Optional text label for the line. Examples: 'r', 's', 'm', 'AB', 'perpendicular'. Set to null for unlabeled lines."),
+		label: z
+			.string()
+			.nullable()
+			.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
+			.describe("Optional text label for the line. Examples: 'r', 's', 'm', 'AB', 'perpendicular'. Set to null for unlabeled lines."),
 		labelPosition: z
 			.enum(["start", "middle", "end"])
 			.describe("Position of the label along the visible portion of the line. 'start' places near beginning, 'middle' at center, 'end' near the end of the visible line segment."),

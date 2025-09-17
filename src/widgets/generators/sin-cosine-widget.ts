@@ -250,12 +250,12 @@ export const generateSinCosineWidget: WidgetGenerator<typeof SinCosineWidgetProp
 	})
 
 	// Setup the coordinate plane with π formatting
-	const { toSvgX, toSvgY } = setupTrigCoordinatePlane(
+    const { toSvgX, toSvgY } = setupTrigCoordinatePlane(
 		{
 			width,
 			height,
-			xAxis,
-			yAxis
+            xAxis,
+            yAxis
 		},
 		canvas
 	)

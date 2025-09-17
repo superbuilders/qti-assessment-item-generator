@@ -15,7 +15,7 @@ import { buildTicks } from "./ticks"
 
 // Re-export types that are needed for the render functions
 export type AxisOptions = {
-	label: string
+    label: string | null
 	min: number
 	max: number
 	tickInterval: number
@@ -47,7 +47,7 @@ export function setupCoordinatePlaneV2(
 	// ADD dynamic margin calculation logic
 	const yAxisTickInfo = buildTicks(yAxis.min, yAxis.max, yAxis.tickInterval)
 	const maxTickLabelWidth = Math.max(...yAxisTickInfo.labels.map((l) => l.length * LABEL_AVG_CHAR_WIDTH_PX))
-	const { height: wrappedTitleHeight } = estimateWrappedTextDimensions(yAxis.label, height, 14)
+    const { height: wrappedTitleHeight } = estimateWrappedTextDimensions(yAxis.label ?? "", height, 14)
 	// Note: For v2 (4-quadrant), use similar logic but adjust if needed for centered axes.
 
 	const TICK_LENGTH = 4
@@ -199,10 +199,10 @@ export function setupCoordinatePlaneV2(
 	})
 
 	// Axis labels
-	canvas.drawText({
+    canvas.drawText({
 		x: margin.left + chartWidth / 2,
 		y: height - 5,
-		text: abbreviateMonth(xAxis.label),
+        text: abbreviateMonth(xAxis.label ?? ""),
 		anchor: "middle",
 		fill: theme.colors.axisLabel,
 		fontPx: 14
@@ -212,10 +212,10 @@ export function setupCoordinatePlaneV2(
 	const yAxisTitleX =
 		margin.left - (AXIS_TITLE_PADDING + maxTickLabelWidth + TICK_LABEL_PADDING + TICK_LENGTH + wrappedTitleHeight / 2)
 	const yAxisTitleY = margin.top + chartHeight / 2
-	canvas.drawWrappedText({
+    canvas.drawWrappedText({
 		x: yAxisTitleX,
 		y: yAxisTitleY,
-		text: abbreviateMonth(yAxis.label),
+        text: abbreviateMonth(yAxis.label ?? ""),
 		maxWidthPx: chartHeight,
 		anchor: "middle",
 		fill: theme.colors.axisLabel,

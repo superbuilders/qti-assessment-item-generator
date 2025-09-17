@@ -23,11 +23,27 @@ type Rays = {
 }
 
 function createPointRaySchema() {
-	return z.object({ id: z.string().regex(RAY_POINT_ID), label: z.string().nullable() }).strict()
+	return z
+		.object({
+			id: z.string().regex(RAY_POINT_ID),
+			label: z
+				.string()
+				.nullable()
+				.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
+		})
+		.strict()
 }
 
 function createPointCycleSchema() {
-	return z.object({ id: z.string().regex(CYCLE_POINT_ID), label: z.string().nullable() }).strict()
+	return z
+		.object({
+			id: z.string().regex(CYCLE_POINT_ID),
+			label: z
+				.string()
+				.nullable()
+				.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
+		})
+		.strict()
 }
 
 // NEW: Points schema with semantic keys defining the role of each of the 8 points.
