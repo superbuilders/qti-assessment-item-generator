@@ -254,6 +254,11 @@ export const generateAngleDiagram: WidgetGenerator<typeof AngleDiagramPropsSchem
         const rw = rect.width + 2 * pad
         const rh = rect.height + 2 * pad
 
+        // Fast reject: if either segment endpoint lies inside the rectangle, we have a collision
+        const pointInsideRect = (p: { x: number; y: number }) =>
+            p.x >= rx && p.x <= rx + rw && p.y >= ry && p.y <= ry + rh
+        if (pointInsideRect(A) || pointInsideRect(B)) return true
+
         const minX = Math.min(A.x, B.x)
         const maxX = Math.max(A.x, B.x)
         const minY = Math.min(A.y, B.y)
@@ -483,32 +488,37 @@ export const generateAngleDiagram: WidgetGenerator<typeof AngleDiagramPropsSchem
 			})
 		}
         if (point.label !== null) {
-            const raysFromPoint = rays.filter((ray) => ray.from === point.id)
+            // Consider ALL rays that touch this point, whether the point is the source or target
+            const connectedAngles: number[] = []
+            for (const ray of rays) {
+                if (ray.from === point.id) {
+                    const toPoint = pointMap.get(ray.to)
+                    if (toPoint) connectedAngles.push(Math.atan2(toPoint.y - point.y, toPoint.x - point.x))
+                } else if (ray.to === point.id) {
+                    const fromPoint = pointMap.get(ray.from)
+                    if (fromPoint) connectedAngles.push(Math.atan2(fromPoint.y - point.y, fromPoint.x - point.x))
+                }
+            }
 
-            // Determine preferred direction using largest angular gap
+            // Determine preferred direction using largest angular gap among all connected rays
             let bestAngle = Math.PI / 2
-            if (raysFromPoint.length > 0) {
-                const rayAngles = raysFromPoint
-                    .map((ray) => {
-                        const toPoint = pointMap.get(ray.to)
-                        if (!toPoint) return 0
-                        return Math.atan2(toPoint.y - point.y, toPoint.x - point.x)
-                    })
-                    .sort((a, b) => a - b)
-
-                let maxGap = 0
+            if (connectedAngles.length === 1) {
+                // Place roughly perpendicular to the lone ray
+                bestAngle = connectedAngles[0] + Math.PI / 2
+            } else if (connectedAngles.length >= 2) {
+                const rayAngles = connectedAngles.sort((a, b) => a - b)
+                let maxGap = -1
                 for (let i = 0; i < rayAngles.length; i++) {
-                    const a1 = rayAngles[i] || 0
-                    const a2 = rayAngles[(i + 1) % rayAngles.length] || 0
+                    const a1 = rayAngles[i]
+                    const a2 = rayAngles[(i + 1) % rayAngles.length]
                     let gap = a2 - a1
                     if (gap < 0) gap += 2 * Math.PI
-                    if (i === rayAngles.length - 1) gap = (rayAngles[0] || 0) + 2 * Math.PI - a1
+                    if (i === rayAngles.length - 1) gap = (rayAngles[0] + 2 * Math.PI) - a1
                     if (gap > maxGap) {
                         maxGap = gap
                         bestAngle = a1 + gap / 2
                     }
                 }
-                if (raysFromPoint.length >= 2 || maxGap < Math.PI / 6) bestAngle = Math.PI / 2
             }
 
             const baseDist = 18 // more breathing room than before
