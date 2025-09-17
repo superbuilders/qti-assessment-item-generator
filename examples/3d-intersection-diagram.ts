@@ -102,5 +102,25 @@ export const threeDIntersectionDiagramExamples: ThreeDIntersectionDiagramProps[]
       "showHiddenEdges": true,
       "intersectionColor": "#11accd"
     }
+  },
+  {
+    "type": "threeDIntersectionDiagram",
+    "plane": {
+      "position": 0.6,
+      "orientation": "vertical"
+    },
+    "solid": {
+      "type": "octagonalPrism",
+      "side": 3,
+      "height": 8
+    },
+    "width": 400,
+    "height": 350,
+    "viewOptions": {
+      "showLabels": false,
+      "projectionAngle": 30,
+      "showHiddenEdges": false,
+      "intersectionColor": "#9b59b6"
+    }
   }
 ]

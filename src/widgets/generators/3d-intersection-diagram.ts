@@ -24,6 +24,15 @@ const PentagonalPrismDataSchema = z
 	})
 	.strict()
 
+// Defines the properties for an octagonal prism solid
+const OctagonalPrismDataSchema = z
+	.object({
+		type: z.literal("octagonalPrism"),
+		side: z.number().positive().describe("The side length of the octagonal bases."),
+		height: z.number().positive().describe("The height of the prism.")
+	})
+	.strict()
+
 // Defines the properties for a square pyramid solid
 const SquarePyramidDataSchema = z
 	.object({
@@ -134,6 +143,7 @@ export const ThreeDIntersectionDiagramPropsSchema = z
 			.discriminatedUnion("type", [
 				RectangularPrismDataSchema,
 				PentagonalPrismDataSchema,
+				OctagonalPrismDataSchema,
 				SquarePyramidDataSchema,
 				CylinderDataSchema,
 				ConeDataSchema,
@@ -357,6 +367,32 @@ export const generateThreeDIntersectionDiagram: WidgetGenerator<typeof ThreeDInt
 				// Bottom pentagon
 				edges.push({start: i * 2, end: next * 2})
 				// Top pentagon  
+				edges.push({start: i * 2 + 1, end: next * 2 + 1})
+				// Vertical edges
+				edges.push({start: i * 2, end: i * 2 + 1})
+			}
+			break
+		}
+		case "octagonalPrism": {
+			const radius = solid.side / (2 * Math.sin(Math.PI / 8)) // circumradius of octagon
+			const h = solid.height / 2
+			
+			// Octagon vertices (bottom then top)
+			for (let i = 0; i < 8; i++) {
+				const angle = (i * 2 * Math.PI) / 8
+				const x = radius * Math.cos(angle)
+				const z = radius * Math.sin(angle)
+				
+				vertices.push({ x, y: -h, z }) // bottom vertex
+				vertices.push({ x, y:  h, z }) // top vertex
+			}
+			
+			// Octagon edges
+			for (let i = 0; i < 8; i++) {
+				const next = (i + 1) % 8
+				// Bottom octagon
+				edges.push({start: i * 2, end: next * 2})
+				// Top octagon  
 				edges.push({start: i * 2 + 1, end: next * 2 + 1})
 				// Vertical edges
 				edges.push({start: i * 2, end: i * 2 + 1})
