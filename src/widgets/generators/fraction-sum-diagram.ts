@@ -21,11 +21,15 @@ const FractionGroupSchema = z
 			.number()
 			.int()
 			.positive()
-			.describe("The number of segments in this group, representing the numerator of the fraction."),
+			.describe(
+				"Number of tape segments for this fraction addend. Represents the numerator value. Must be positive and cannot exceed the denominator when summed with other groups."
+			),
 		color: z
 			.string()
 			.regex(CSS_COLOR_PATTERN, "invalid css color")
-			.describe("The fill color for this group's segments.")
+			.describe(
+				"CSS fill color for this group's tape segments. Examples: '#FF6B6B' (coral), '#4ECDC4' (turquoise), '#45B7D1' (blue). Use distinct colors for each addend."
+			)
 	})
 	.strict()
 
@@ -35,23 +39,35 @@ const FractionGroupSchema = z
 export const FractionSumDiagramPropsSchema = z
 	.object({
 		type: z.literal("fractionSumDiagram"),
-		width: z.number().positive().describe("Total width of the diagram in pixels."),
-		height: z.number().positive().describe("Total height of the diagram in pixels."),
+		width: z
+			.number()
+			.positive()
+			.describe(
+				"SVG canvas width in pixels. Recommended range: 400-800px to accommodate tape segments and fraction expressions."
+			),
+		height: z
+			.number()
+			.positive()
+			.describe(
+				"SVG canvas height in pixels. Recommended range: 200-400px to fit tape, brackets, and mathematical expressions above and below."
+			),
 		denominator: z
 			.number()
 			.int()
 			.positive()
-			.describe("The common denominator, which also defines the total number of segments in the tape."),
+			.describe(
+				"Common denominator for all fractions in the sum. Determines the total number of equal segments in the tape diagram. Examples: 4, 6, 8, 12."
+			),
 		groups: z
 			.array(FractionGroupSchema)
 			.min(1)
 			.describe(
-				"An array of colored segment groups, each representing an addend in the sum. The sum of the numerators must not exceed the denominator."
+				"Array of fraction addends, each with its own color and numerator value. Each group represents one term in the addition expression. The sum of all numerators must not exceed the denominator."
 			)
 	})
 	.strict()
 	.describe(
-		"Creates a tape diagram to visually represent the sum of fractions with a common denominator. It shows colored segments for each addend, with mathematical expressions for the sum above and below the tape."
+		"Creates visual tape diagrams for adding fractions with common denominators. Shows colored segments for each addend with mathematical expressions above and below. Perfect for teaching fraction addition concepts and visual fraction arithmetic."
 	)
 
 export type FractionSumDiagramProps = z.infer<typeof FractionSumDiagramPropsSchema>

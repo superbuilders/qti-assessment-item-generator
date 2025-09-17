@@ -23,12 +23,14 @@ function createLabelSchema() {
 		.object({
 			value: z
 				.union([z.number(), z.string()])
-				.describe("The numerical value or variable for the label (e.g., 10, 7.5, 'x')."),
+				.describe(
+					"Numerical value or algebraic variable for the dimension label. Examples: 10, 7.5, 'x', '2y+3'. Use strings for variables or expressions."
+				),
 			unit: z
 				.string()
 				.nullable()
 				.describe(
-					"The unit for the value (e.g., 'cm', 'in', 'm'). If the unit is unknown or not applicable, this MUST be null."
+					"Measurement unit for the value. Common units: 'cm', 'in', 'm', 'ft', 'mm'. Set to null when no unit applies (pure numbers, ratios, or when unit is contextually understood)."
 				)
 		})
 		.strict()
@@ -48,14 +50,18 @@ function createVertexSchema() {
 				.string()
 				.regex(identifierRegex)
 				.describe(
-					"A unique identifier for this vertex (e.g., 'A', 'B', 'midpoint1'). This ID is used to reference this point in all other parts of the schema."
+					"Unique identifier for this vertex point. Use descriptive names like 'A', 'B', 'topLeft', 'center', 'midpoint1'. This ID is referenced throughout the schema to define edges, regions, and markers."
 				),
 			x: z
 				.number()
 				.describe(
-					"The horizontal coordinate in the diagram's logical space. The shape is auto-centered, so coordinates can be relative to a logical origin (0,0)."
+					"Horizontal position in the diagram's coordinate system. Use any convenient scale - the diagram auto-centers and scales to fit the canvas. Positive values go rightward from the origin."
 				),
-			y: z.number().describe("The vertical coordinate in the diagram's logical space. Positive y is downward.")
+			y: z
+				.number()
+				.describe(
+					"Vertical position in the diagram's coordinate system. Positive values go downward from the origin, following standard screen/SVG conventions."
+				)
 		})
 		.strict()
 }
@@ -70,12 +76,12 @@ function createPartitionedSegmentSchema() {
 	return z
 		.object({
 			label: createLabelSchema().describe(
-				"Structured label for this specific segment of an edge. Use null for no label."
+				"Dimension label for this segment portion. Set to null for unlabeled segments. Each segment in a partitioned edge can have its own measurement or variable."
 			),
 			style: z
 				.enum(["solid", "dashed"])
 				.describe(
-					"The visual style of this segment's line. 'solid' is standard, 'dashed' can indicate an unmeasured or auxiliary part."
+					"Line style for this segment. Use 'solid' for measured/known dimensions and 'dashed' for construction lines, unknown measurements, or auxiliary segments."
 				)
 		})
 		.strict()
@@ -92,33 +98,33 @@ function createBoundaryEdgeSchema() {
 	return z.discriminatedUnion("type", [
 		z
 			.object({
-				type: z.literal("simple").describe("A single, continuous edge between two vertices."),
+				type: z.literal("simple").describe("Single straight line edge connecting two vertices directly."),
 				from: z
 					.string()
 					.regex(identifierRegex)
-					.describe("The ID of the vertex where this edge starts. Must match an ID in the `vertices` array."),
+					.describe("Starting vertex ID for this edge. Must reference a valid vertex ID from the vertices array."),
 				to: z
 					.string()
 					.regex(identifierRegex)
-					.describe("The ID of the vertex where this edge ends. Must match an ID in the `vertices` array."),
+					.describe("Ending vertex ID for this edge. Must reference a valid vertex ID from the vertices array."),
 				label: createLabelSchema().describe(
-					"A single structured label for the entire length of this edge. Use null for no label."
+					"Measurement label for the entire edge length. Set to null for unlabeled edges."
 				)
 			})
 			.strict(),
 		z
 			.object({
-				type: z.literal("partitioned").describe("An edge composed of multiple segments connected in a path."),
+				type: z.literal("partitioned").describe("Multi-segment edge path with individual labels for each segment."),
 				path: z
 					.array(z.string().regex(identifierRegex))
 					.min(3)
 					.describe(
-						"An ordered list of vertex IDs defining the path of the edge (e.g., ['A', 'M', 'B']). Must contain at least 3 IDs to define at least two segments."
+						"Ordered sequence of vertex IDs forming the edge path. Example: ['A', 'midpoint', 'B'] creates two segments. Minimum 3 vertices required."
 					),
 				segments: z
 					.array(createPartitionedSegmentSchema())
 					.describe(
-						"The definitions for each segment along the path. CRITICAL: The number of segments in this array must be exactly one less than the number of vertex IDs in the `path` array."
+						"Segment definitions for each path section. Array length must equal path.length - 1. Each segment can have its own label and style."
 					)
 			})
 			.strict()
@@ -136,15 +142,19 @@ function createInternalSegmentSchema() {
 			fromVertexId: z
 				.string()
 				.regex(identifierRegex)
-				.describe("ID of the starting vertex. Must be a valid ID from the `vertices` array."),
+				.describe("Starting vertex ID for the internal line segment. Must reference a vertex from the vertices array."),
 			toVertexId: z
 				.string()
 				.regex(identifierRegex)
-				.describe("ID of the ending vertex. Must be a valid ID from the `vertices` array."),
+				.describe("Ending vertex ID for the internal line segment. Must reference a vertex from the vertices array."),
 			style: z
 				.enum(["solid", "dashed"])
-				.describe("Visual style of the line. 'dashed' is common for heights or decomposition lines."),
-			label: createLabelSchema().describe("Structured label for the segment's length or name. Use null for no label.")
+				.describe(
+					"Line appearance. Use 'solid' for structural divisions and 'dashed' for construction lines, heights, or auxiliary measurements."
+				),
+			label: createLabelSchema().describe(
+				"Measurement or name label for this internal segment. Set to null for construction lines without labels."
+			)
 		})
 		.strict()
 }
@@ -160,12 +170,14 @@ function createShadedRegionSchema() {
 			vertexIds: z
 				.array(z.string().regex(identifierRegex))
 				.min(3)
-				.describe("An ordered array of vertex IDs defining the boundary of the region to shade."),
+				.describe(
+					"Ordered list of vertex IDs forming the polygon boundary for shading. Vertices should be listed in clockwise or counter-clockwise order. Minimum 3 vertices required."
+				),
 			fillColor: z
 				.string()
 				.regex(CSS_COLOR_PATTERN)
 				.describe(
-					"CSS fill color for this region (e.g., '#FFE5CC', 'rgba(0,128,255,0.3)'). Use alpha for transparency."
+					"CSS color value for the shaded region. Examples: '#FFE5CC' (hex), 'rgba(255,229,204,0.5)' (with transparency), 'lightblue' (named color). Use rgba with alpha < 1.0 for semi-transparent overlays."
 				)
 		})
 		.strict()
@@ -179,11 +191,23 @@ function createShadedRegionSchema() {
 function createRegionLabelSchema() {
 	return z
 		.object({
-			text: z.string().describe("The label text to display (e.g., 'Region A', '45 cm²')."),
+			text: z
+				.string()
+				.describe(
+					"Text content for the region label. Examples: 'Region A', '45 cm²', 'Area = 12x', 'Triangle ABC'. Use for area calculations, region names, or mathematical expressions."
+				),
 			position: z
 				.object({
-					x: z.number().describe("Horizontal position for the label in the same coordinate system as vertices."),
-					y: z.number().describe("Vertical position for the label in the same coordinate system as vertices.")
+					x: z
+						.number()
+						.describe(
+							"Horizontal coordinate for label placement, using the same coordinate system as vertices. Position should be inside the intended region."
+						),
+					y: z
+						.number()
+						.describe(
+							"Vertical coordinate for label placement, using the same coordinate system as vertices. Positive y goes downward."
+						)
 				})
 				.strict()
 		})
@@ -201,15 +225,21 @@ function createRightAngleMarkerSchema() {
 			cornerVertexId: z
 				.string()
 				.regex(identifierRegex)
-				.describe("The ID of the vertex where the right angle's corner is located."),
+				.describe(
+					"Vertex ID where the 90° angle is located. This is the corner vertex where the right angle marker will be drawn."
+				),
 			adjacentVertex1Id: z
 				.string()
 				.regex(identifierRegex)
-				.describe("The ID of the first adjacent vertex, forming one leg of the angle."),
+				.describe(
+					"ID of the first vertex connected to the corner, forming one side of the right angle. Must be connected to cornerVertexId by an edge."
+				),
 			adjacentVertex2Id: z
 				.string()
 				.regex(identifierRegex)
-				.describe("The ID of the second adjacent vertex, forming the other leg of the angle.")
+				.describe(
+					"ID of the second vertex connected to the corner, forming the other side of the right angle. Must be connected to cornerVertexId by an edge."
+				)
 		})
 		.strict()
 }
@@ -221,52 +251,60 @@ function createRightAngleMarkerSchema() {
  */
 export const CompositeShapeDiagramPropsSchema = z
 	.object({
-		type: z.literal("compositeShapeDiagram").describe("Identifies this as a composite shape diagram widget."),
+		type: z
+			.literal("compositeShapeDiagram")
+			.describe("Widget type identifier for composite shape diagrams with complex polygons and annotations."),
 		width: z
 			.number()
 			.positive()
 			.describe(
-				"Total width of the SVG canvas in pixels. The diagram will be auto-centered and scaled to fit within this dimension."
+				"SVG canvas width in pixels. The diagram automatically centers and scales to fit within this width while maintaining aspect ratio. Recommended: 400-800px."
 			),
 		height: z
 			.number()
 			.positive()
 			.describe(
-				"Total height of the SVG canvas in pixels. The diagram will be auto-centered and scaled to fit within this dimension."
+				"SVG canvas height in pixels. The diagram automatically centers and scales to fit within this height while maintaining aspect ratio. Recommended: 300-600px."
 			),
 		vertices: z
 			.array(createVertexSchema())
 			.describe(
-				"An array of all vertex points that define the shape. Each vertex must have a unique ID, which is used to construct edges and regions."
+				"Complete list of all vertex points defining the shape geometry. Each vertex needs a unique ID for referencing in edges, regions, and markers. Define vertices in logical coordinates - scaling is automatic."
 			),
 
 		boundaryEdges: z
 			.array(createBoundaryEdgeSchema())
 			.describe(
-				"An ordered array of edge definitions that trace the outer perimeter of the shape. This is the primary mechanism for defining the shape's boundary and its labels."
+				"Ordered sequence of edges forming the shape's outer perimeter. Each edge connects vertices and can have measurement labels. Use simple edges for single measurements or partitioned edges for multi-segment boundaries."
 			),
 
 		internalSegments: z
 			.array(createInternalSegmentSchema())
 			.nullable()
 			.describe(
-				"Line segments *inside* the shape, used for area decomposition (e.g., showing the height). This should NOT be used to define the outer boundary."
+				"Optional internal line segments for shape decomposition and analysis. Common uses: heights, medians, diagonals, construction lines. These appear inside the boundary and can show measurements or structural divisions."
 			),
 
 		shadedRegions: z
 			.array(createShadedRegionSchema())
 			.nullable()
-			.describe("Polygonal regions to fill with color, defined by a list of vertex IDs."),
+			.describe(
+				"Optional colored regions within the shape. Define polygonal areas by listing vertex IDs in order. Useful for highlighting specific areas, showing different materials, or visual emphasis."
+			),
 
 		regionLabels: z
 			.array(createRegionLabelSchema())
 			.nullable()
-			.describe("Text labels positioned freely inside the shape's regions."),
+			.describe(
+				"Optional text labels placed at specific coordinates within regions. Use for area calculations, region names, formulas, or annotations that need precise positioning."
+			),
 
 		rightAngleMarkers: z
 			.array(createRightAngleMarkerSchema())
 			.nullable()
-			.describe("Square markers indicating 90° angles at specified vertices.")
+			.describe(
+				"Optional 90° angle indicators drawn as small squares at vertices. Specify the corner vertex and its two adjacent vertices to show perpendicular relationships."
+			)
 	})
 	.strict()
 

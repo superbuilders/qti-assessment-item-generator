@@ -17,13 +17,17 @@ const BarDataSchema = z
 		label: z
 			.string()
 			.describe(
-				"The category name displayed below this bar on the x-axis (e.g., 'January', 'Apples'). Use empty string \"\" to hide label."
+				"Category name displayed on the x-axis below this bar. Examples: 'January', 'Apples', 'Grade 3', 'Q1 2023'. Use empty string to hide the label for this bar."
 			),
-		value: z.number().describe("The numerical value determining the bar's height. Can be positive or negative."),
+		value: z
+			.number()
+			.describe(
+				"Numerical value that determines the bar's height. Supports positive and negative values. Zero creates a bar at the baseline."
+			),
 		state: z
 			.enum(["normal", "unknown"])
 			.describe(
-				"Visual state of the bar. 'normal' shows a solid bar with the actual value. 'unknown' shows a patterned bar."
+				"Visual rendering style for the bar. 'normal' creates a solid filled bar, 'unknown' creates a dashed outline bar for missing data problems."
 			)
 	})
 	.strict()
@@ -35,10 +39,24 @@ const YAxisSchema = z
 			.string()
 			.nullable()
 			.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
-			.describe("The title for the vertical axis (e.g., 'Sales ($)', 'Count', null). Null shows no label."),
-		min: z.number().describe("The minimum value shown on the y-axis. Must be less than max."),
-		max: z.number().describe("The maximum value shown on the y-axis. Must be greater than min."),
-		tickInterval: z.number().describe("The spacing between tick marks on the y-axis. Should evenly divide (max - min).")
+			.describe(
+				"Title for the vertical y-axis. Examples: 'Sales ($)', 'Population (thousands)', 'Test Scores', 'Temperature (°C)'. Set to null for no axis label."
+			),
+		min: z
+			.number()
+			.describe(
+				"Minimum value on the y-axis scale. Must be less than max. For data starting at 0, use 0. For negative data, use appropriate negative minimum."
+			),
+		max: z
+			.number()
+			.describe(
+				"Maximum value on the y-axis scale. Must be greater than min. Should accommodate the highest data value with some headroom for clarity."
+			),
+		tickInterval: z
+			.number()
+			.describe(
+				"Spacing between tick marks and grid lines on the y-axis. Should evenly divide the range (max - min). Examples: 10, 25, 100, 0.5."
+			)
 	})
 	.strict()
 
@@ -47,43 +65,51 @@ export const BarChartPropsSchema = z
 	.object({
 		type: z
 			.literal("barChart")
-			.describe("Identifies this as a bar chart widget for comparing categorical data with vertical bars."),
+			.describe("Widget type identifier for vertical bar charts used to compare categorical data."),
 		width: z
 			.number()
 			.positive()
-			.describe("Total width of the chart in pixels including margins and labels (e.g., 500)."),
+			.describe(
+				"Total SVG width in pixels, including all margins, labels, and chart area. Recommended range: 400-800px for readability."
+			),
 		height: z
 			.number()
 			.positive()
-			.describe("Total height of the chart in pixels including title and axis labels (e.g., 350)."),
+			.describe(
+				"Total SVG height in pixels, including title, chart area, and axis labels. Recommended range: 300-600px for clear visualization."
+			),
 		title: z
 			.string()
 			.nullable()
 			.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
 			.describe(
-				"The main title displayed above the chart (e.g., 'Monthly Sales', 'Student Scores', null). Null means no title."
+				"Chart title displayed at the top. Examples: 'Monthly Sales Report', 'Student Test Scores by Grade', 'Quarterly Revenue'. Set to null for no title."
 			),
 		xAxisLabel: z
 			.string()
 			.nullable()
 			.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
 			.describe(
-				"The label for the horizontal axis (e.g., 'Months', 'Products', null). Null if categories are self-explanatory."
+				"Label for the horizontal axis describing the categories. Examples: 'Months', 'Product Types', 'School Districts'. Set to null when category labels are self-explanatory."
 			),
-		yAxis: YAxisSchema.describe("Configuration for the vertical axis including scale, labels, and tick marks."),
+		yAxis: YAxisSchema.describe(
+			"Vertical axis configuration defining the scale, range, tick intervals, and axis label for the numerical values."
+		),
 		data: z
 			.array(BarDataSchema)
 			.describe(
-				"Array of bars to display. Each bar represents one category. Order determines left-to-right positioning."
+				"Array of data points, each representing one bar. Order determines left-to-right positioning. Each entry defines the category label, numerical value, and visual state."
 			),
 		barColor: z
 			.string()
 			.regex(CSS_COLOR_PATTERN, "invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)")
-			.describe("Hex-only color for normal bars (e.g., '#4472C4', '#1E90FF', '#00000080' for 50% alpha).")
+			.describe(
+				"CSS color for normal bars. Examples: '#4472C4' (blue), '#E74C3C' (red), '#2ECC71' (green). Use hex format with optional alpha channel for transparency."
+			)
 	})
 	.strict()
 	.describe(
-		"Creates a vertical bar chart for comparing values across categories. Supports both known values and 'unknown' placeholders."
+		"Creates vertical bar charts for comparing numerical values across discrete categories. Supports solid bars for known values and dashed outline bars for unknown/missing data scenarios."
 	)
 
 export type BarChartProps = z.infer<typeof BarChartPropsSchema>

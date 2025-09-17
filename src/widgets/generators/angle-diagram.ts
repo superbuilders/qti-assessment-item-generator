@@ -48,115 +48,155 @@ const Point = z
 		id: z
 			.string()
 			.describe(
-				"unique identifier for this vertex point, used to reference it in rays and angles (e.g., 'A', 'B', 'C', 'vertex1'). must be unique within the diagram. CRITICAL: every point must be connected to at least one ray - isolated points are not allowed."
+				"Unique identifier for this vertex point. Use descriptive names like 'A', 'B', 'C', 'vertex1', 'origin'. Must be unique within the diagram and referenced in at least one ray - isolated points are not allowed."
 			),
 		x: z
 			.number()
 			.describe(
-				"the horizontal coordinate of the point in the svg coordinate system. origin (0,0) is top-left. positive x moves right."
+				"Horizontal pixel coordinate in the SVG coordinate system. Origin (0,0) is at top-left corner. Positive x values move rightward."
 			),
 		y: z
 			.number()
 			.describe(
-				"the vertical coordinate of the point in the svg coordinate system. origin (0,0) is top-left. positive y moves down."
+				"Vertical pixel coordinate in the SVG coordinate system. Origin (0,0) is at top-left corner. Positive y values move downward."
 			),
 		label: z
 			.string()
 			.nullable()
 			.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
 			.describe(
-				"the text label to display next to this point (e.g., 'A', 'B', 'C', 'O' for origin, null). null means no label."
+				"Text label displayed near this point. Examples: 'A', 'B', 'C', 'O' (for origin), 'P₁'. Set to null for unlabeled points. Use single letters or short identifiers for clarity."
 			),
-		shape: z.enum(["circle", "ellipse"]).describe("the shape of the point marker. 'circle' or 'ellipse'.")
+		shape: z
+			.enum(["circle", "ellipse"])
+			.describe(
+				"Visual marker style for the point. Use 'circle' for standard geometric points or 'ellipse' for special emphasis."
+			)
 	})
 	.strict()
 
 const AngleArc = z
 	.object({
-		type: z.literal("arc").describe("arc angle visualization"),
+		type: z.literal("arc").describe("Angle visualization using a curved arc between the two rays."),
 		pointOnFirstRay: z
 			.string()
 			.describe(
-				"point id on the first ray of the angle (e.g., 'A' in angle ABC). forms one side of the angle with the vertex."
+				"Point ID on the first ray of the angle. For angle ABC, this would be 'A'. Must reference a valid point ID that forms one side of the angle with the vertex."
 			),
 		vertex: z
 			.string()
-			.describe("point id at the vertex of the angle (e.g., 'B' in angle ABC). the angle is measured at this point."),
+			.describe(
+				"Point ID at the angle's vertex where the two rays meet. For angle ABC, this would be 'B'. The angle measurement is taken at this point."
+			),
 		pointOnSecondRay: z
 			.string()
 			.describe(
-				"point id on the second ray of the angle (e.g., 'C' in angle ABC). forms the other side of the angle with the vertex."
+				"Point ID on the second ray of the angle. For angle ABC, this would be 'C'. Must reference a valid point ID that forms the other side of the angle with the vertex."
 			),
 		label: z
 			.string()
 			.nullable()
 			.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
 			.describe(
-				"angle label text (e.g., '45°', 'θ', null). null shows arc without label. Plaintext only; no markdown or HTML."
+				"Text label for the angle measurement. Examples: '45°', '90°', 'θ', 'α', '∠ABC'. Set to null for unlabeled arcs. Use plain text only - no HTML or markdown."
 			),
 		color: z
 			.string()
 			.regex(CSS_COLOR_PATTERN, "invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)")
-			.describe("css color for the angle arc and label"),
-		radius: z.number().positive().describe("arc radius in pixels from the vertex")
+			.describe(
+				"CSS color value for the arc and its label. Examples: '#FF0000' (red), '#0066CC' (blue), '#00AA00' (green). Use contrasting colors for multiple angles."
+			),
+		radius: z
+			.number()
+			.positive()
+			.describe(
+				"Arc radius in pixels from the vertex point. Typical range: 20-60px. Larger radii work better for acute angles, smaller for obtuse angles."
+			)
 	})
 	.strict()
 
 const AngleRight = z
 	.object({
-		type: z.literal("right").describe("right angle visualization with square"),
+		type: z.literal("right").describe("Right angle (90°) visualization using a small square marker at the vertex."),
 		pointOnFirstRay: z
 			.string()
 			.describe(
-				"point id on the first ray of the angle (e.g., 'A' in angle ABC). forms one side of the angle with the vertex."
+				"Point ID on the first ray forming the right angle. For angle ABC, this would be 'A'. Must reference a valid point that forms a 90° angle with the vertex and second ray."
 			),
 		vertex: z
 			.string()
-			.describe("point id at the vertex of the angle (e.g., 'B' in angle ABC). the angle is measured at this point."),
+			.describe(
+				"Point ID where the right angle is located. For angle ABC, this would be 'B'. The 90° square marker is drawn at this vertex."
+			),
 		pointOnSecondRay: z
 			.string()
 			.describe(
-				"point id on the second ray of the angle (e.g., 'C' in angle ABC). forms the other side of the angle with the vertex."
+				"Point ID on the second ray forming the right angle. For angle ABC, this would be 'C'. Must reference a valid point that forms a 90° angle with the vertex and first ray."
 			),
 		label: z
 			.string()
 			.nullable()
 			.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
 			.describe(
-				"label for the right angle (e.g., '90°', null). null shows square without label. Plaintext only; no markdown or HTML."
+				"Text label for the right angle. Examples: '90°', '⊥', 'right angle'. Set to null to show only the square marker without text. Use plain text only."
 			),
 		color: z
 			.string()
 			.regex(CSS_COLOR_PATTERN, "invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)")
-			.describe("css color for the right-angle square and label")
+			.describe(
+				"CSS color value for the right angle square marker and its label. Examples: '#000000' (black), '#0066CC' (blue). Should contrast well with the background."
+			)
 	})
 	.strict()
 
-const Angle = z.discriminatedUnion("type", [AngleArc, AngleRight]).describe("angle definition")
+const Angle = z
+	.discriminatedUnion("type", [AngleArc, AngleRight])
+	.describe(
+		"Angle visualization definition. Choose 'arc' for general angles or 'right' for 90° angles with square markers."
+	)
 
 export const AngleDiagramPropsSchema = z
 	.object({
 		type: z.literal("angleDiagram"),
-		width: z.number().positive().describe("total width of the svg in pixels"),
-		height: z.number().positive().describe("total height of the svg in pixels"),
-		points: z.array(Point).min(1).describe("all points used in the diagram"),
+		width: z
+			.number()
+			.positive()
+			.describe("SVG canvas width in pixels. Recommended range: 300-600px for clear visibility of geometric elements."),
+		height: z
+			.number()
+			.positive()
+			.describe(
+				"SVG canvas height in pixels. Recommended range: 200-500px for clear visibility of geometric elements."
+			),
+		points: z
+			.array(Point)
+			.min(1)
+			.describe(
+				"All vertex points used in the diagram. Each point must have a unique ID and be connected to at least one ray. Minimum 1 point required."
+			),
 		rays: z
 			.array(
 				z
 					.object({
-						from: z.string().describe("id of the starting point - must reference a point in the points array"),
-						to: z.string().describe("id of the ending point - must reference a point in the points array")
+						from: z
+							.string()
+							.describe("Starting point ID for this ray. Must reference a valid point from the points array."),
+						to: z.string().describe("Ending point ID for this ray. Must reference a valid point from the points array.")
 					})
 					.strict()
 			)
 			.describe(
-				"rays that connect points and form the geometric structure; every point in the points array must be referenced by at least one ray (either as 'from' or 'to'); for complete lines, ensure both directions are covered (e.g., A→B and B→A for line AB)."
+				"Line segments connecting points to form the geometric structure. Every point must be referenced in at least one ray. For complete lines through points, include both directions (e.g., A→B and B→A)."
 			),
-		angles: z.array(Angle).describe("angles to highlight")
+		angles: z
+			.array(Angle)
+			.describe(
+				"Angle annotations to display in the diagram. Can include both arc-style angles and right-angle square markers."
+			)
 	})
 	.strict()
 	.describe(
-		"creates geometric diagrams showing angles formed by rays meeting at vertices. supports both general angles (with arcs) and right angles (with squares)."
+		"Creates geometric diagrams showing angles formed by intersecting rays. Supports general angles with arc annotations and right angles with square markers. Ideal for geometry problems involving angle measurement and relationships."
 	)
 
 export type AngleDiagramProps = z.infer<typeof AngleDiagramPropsSchema>

@@ -3,10 +3,10 @@ import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
 import { CSS_COLOR_PATTERN } from "../../utils/css-color"
 import { selectAxisLabels } from "../../utils/layout"
-import { theme } from "../../utils/theme"
-import { buildTicks } from "../../utils/ticks"
 import { MATHML_INNER_PATTERN } from "../../utils/mathml"
 import { numberContentToInnerMathML } from "../../utils/number-to-mathml"
+import { theme } from "../../utils/theme"
+import { buildTicks } from "../../utils/ticks"
 import type { WidgetGenerator } from "../types"
 
 // Factory function to create a TickIntervalSchema to avoid $ref issues
@@ -16,7 +16,12 @@ const createTickIntervalSchema = () =>
 			z
 				.object({
 					type: z.literal("whole"),
-					interval: z.number().positive().describe("Whole number interval between ticks (e.g., 1, 2, 5, 10).")
+					interval: z
+						.number()
+						.positive()
+						.describe(
+							"Spacing between tick marks using whole numbers. Examples: 1 (every integer), 2 (every even number), 5 (multiples of 5), 10 (multiples of 10). Determines tick density."
+						)
 				})
 				.strict(),
 			z
@@ -26,112 +31,221 @@ const createTickIntervalSchema = () =>
 						.number()
 						.int()
 						.positive()
-						.describe("Denominator for unit fractions (e.g., 5 for fifths, 8 for eighths).")
+						.describe(
+							"Denominator for fractional intervals. Examples: 2 (halves), 3 (thirds), 4 (quarters), 5 (fifths), 8 (eighths). Creates tick marks at unit fractions like 1/4, 2/4, 3/4, etc."
+						)
 				})
 				.strict()
 		])
-		.describe("Specification for tick mark intervals.")
+		.describe(
+			"Defines the spacing between tick marks on the number line. Use 'whole' for integer intervals or 'fraction' for fractional divisions."
+		)
 
 // Factory function to create a HighlightedPointSchema to avoid $ref issues
 const createHighlightedPointSchema = () =>
-	z.discriminatedUnion("type", [
-		z
-			.object({
-				type: z.literal("whole"),
-				position: z.number().describe("Position on the number line."),
-				color: z
-					.string()
-					.regex(CSS_COLOR_PATTERN, "invalid css color")
-					.describe("CSS hex color for the point and its label."),
-				style: z
-					.literal("dot")
-					.describe("Visual style: only 'dot' is supported"),
-				value: z.number().int().describe("Integer magnitude (non-directional)"),
-				sign: z.enum(["+", "-"]).describe("Sign of the whole number")
-			})
-			.strict(),
-		z
-			.object({
-				type: z.literal("fraction"),
-				position: z.number().describe("Position on the number line."),
-				color: z
-					.string()
-					.regex(CSS_COLOR_PATTERN, "invalid css color")
-					.describe("CSS hex color for the point and its label."),
-				style: z
-					.literal("dot")
-					.describe("Visual style: only 'dot' is supported"),
-				numerator: z.number().int().min(0).describe("Numerator (non-negative)"),
-				denominator: z.number().int().positive().describe("Denominator (positive)"),
-				sign: z.enum(["+", "-"]).describe("Sign of the fraction")
-			})
-			.strict(),
-		z
-			.object({
-				type: z.literal("mixed"),
-				position: z.number().describe("Position on the number line."),
-				color: z
-					.string()
-					.regex(CSS_COLOR_PATTERN, "invalid css color")
-					.describe("CSS hex color for the point and its label."),
-				style: z
-					.literal("dot")
-					.describe("Visual style: only 'dot' is supported"),
-				whole: z.number().int().min(0).describe("Whole part (non-negative)"),
-				numerator: z.number().int().min(0).describe("Numerator of the fractional part"),
-				denominator: z.number().int().positive().describe("Denominator of the fractional part (positive)"),
-				sign: z.enum(["+", "-"]).describe("Sign of the mixed number")
-			})
-			.strict(),
-		z
-			.object({
-				type: z.literal("mathml"),
-				position: z.number().describe("Position on the number line."),
-				color: z
-					.string()
-					.regex(CSS_COLOR_PATTERN, "invalid css color")
-					.describe("CSS hex color for the point and its label."),
-				style: z
-					.literal("dot")
-					.describe("Visual style: only 'dot' is supported"),
-				mathml: z
-					.string()
-					.regex(
-						MATHML_INNER_PATTERN,
-						"invalid mathml snippet; must be inner MathML without outer <math> wrapper"
-					)
-					.describe("Inner MathML markup (no outer <math> element)")
-			})
-			.strict()
-	])
+	z
+		.discriminatedUnion("type", [
+			z
+				.object({
+					type: z.literal("whole"),
+					position: z
+						.number()
+						.describe(
+							"Exact position on the number line where the point should be placed. Must correspond to the actual value being represented."
+						),
+					color: z
+						.string()
+						.regex(CSS_COLOR_PATTERN, "invalid css color")
+						.describe(
+							"CSS color for both the point dot and its label. Examples: '#FF0000' (red), '#0066CC' (blue), '#00AA00' (green). Use distinct colors for multiple points."
+						),
+					style: z
+						.literal("dot")
+						.describe("Visual representation style. Currently only 'dot' (circular marker) is supported."),
+					value: z
+						.number()
+						.int()
+						.describe(
+							"Absolute value of the whole number (non-negative integer). Examples: 5, 12, 100. Combined with sign to form the complete number."
+						),
+					sign: z
+						.enum(["+", "-"])
+						.describe(
+							"Sign of the whole number. '+' for positive numbers, '-' for negative numbers. Affects both positioning and label display."
+						)
+				})
+				.strict(),
+			z
+				.object({
+					type: z.literal("fraction"),
+					position: z
+						.number()
+						.describe(
+							"Exact position on the number line where the fraction should be placed. Must correspond to the actual fractional value."
+						),
+					color: z
+						.string()
+						.regex(CSS_COLOR_PATTERN, "invalid css color")
+						.describe(
+							"CSS color for both the point dot and its fraction label. Examples: '#FF6B6B' (coral), '#4ECDC4' (turquoise). Use distinct colors for multiple fractions."
+						),
+					style: z
+						.literal("dot")
+						.describe("Visual representation style. Currently only 'dot' (circular marker) is supported."),
+					numerator: z
+						.number()
+						.int()
+						.min(0)
+						.describe(
+							"Numerator of the fraction (non-negative integer). Examples: 3 in 3/4, 7 in 7/8. Zero creates a fraction equal to 0."
+						),
+					denominator: z
+						.number()
+						.int()
+						.positive()
+						.describe(
+							"Denominator of the fraction (positive integer). Examples: 4 in 3/4, 8 in 7/8. Must be greater than 0."
+						),
+					sign: z
+						.enum(["+", "-"])
+						.describe(
+							"Sign of the fraction. '+' for positive fractions (right of zero), '-' for negative fractions (left of zero)."
+						)
+				})
+				.strict(),
+			z
+				.object({
+					type: z.literal("mixed"),
+					position: z
+						.number()
+						.describe(
+							"Exact position on the number line where the mixed number should be placed. Must correspond to the actual mixed number value."
+						),
+					color: z
+						.string()
+						.regex(CSS_COLOR_PATTERN, "invalid css color")
+						.describe(
+							"CSS color for both the point dot and its mixed number label. Examples: '#9B59B6' (purple), '#E67E22' (orange). Use distinct colors for multiple mixed numbers."
+						),
+					style: z
+						.literal("dot")
+						.describe("Visual representation style. Currently only 'dot' (circular marker) is supported."),
+					whole: z
+						.number()
+						.int()
+						.min(0)
+						.describe(
+							"Whole number part of the mixed number (non-negative integer). Examples: 2 in 2¾, 5 in 5⅓. Zero creates an improper fraction."
+						),
+					numerator: z
+						.number()
+						.int()
+						.min(0)
+						.describe(
+							"Numerator of the fractional part (non-negative integer). Examples: 3 in 2¾, 1 in 5⅓. Should be less than denominator for proper mixed numbers."
+						),
+					denominator: z
+						.number()
+						.int()
+						.positive()
+						.describe(
+							"Denominator of the fractional part (positive integer). Examples: 4 in 2¾, 3 in 5⅓. Must be greater than 0."
+						),
+					sign: z
+						.enum(["+", "-"])
+						.describe(
+							"Sign of the entire mixed number. '+' for positive mixed numbers (right of zero), '-' for negative mixed numbers (left of zero)."
+						)
+				})
+				.strict(),
+			z
+				.object({
+					type: z.literal("mathml"),
+					position: z
+						.number()
+						.describe(
+							"Exact position on the number line where the mathematical expression should be placed. Must correspond to the actual value of the MathML expression."
+						),
+					color: z
+						.string()
+						.regex(CSS_COLOR_PATTERN, "invalid css color")
+						.describe(
+							"CSS color for both the point dot and its MathML label. Examples: '#8E44AD' (violet), '#2ECC71' (emerald). Use distinct colors for multiple expressions."
+						),
+					style: z
+						.literal("dot")
+						.describe("Visual representation style. Currently only 'dot' (circular marker) is supported."),
+					mathml: z
+						.string()
+						.regex(MATHML_INNER_PATTERN, "invalid mathml snippet; must be inner MathML without outer <math> wrapper")
+						.describe(
+							"Inner MathML markup for complex mathematical expressions. Examples: '<msqrt><mn>2</mn></msqrt>' for √2, '<mfrac><mn>22</mn><mn>7</mn></mfrac>' for 22/7. Do not include outer <math> wrapper tags."
+						)
+				})
+				.strict()
+		])
+		.describe(
+			"Defines a special point to highlight on the number line. Supports whole numbers, fractions, mixed numbers, and complex MathML expressions. Each point appears as a colored dot with an appropriately formatted label."
+		)
 
 export const NumberLinePropsSchema = z
 	.object({
-		type: z.literal("numberLine").describe("Identifies this as a general-purpose number line widget."),
+		type: z
+			.literal("numberLine")
+			.describe(
+				"Widget type identifier for general-purpose number lines supporting integers, fractions, and mixed numbers."
+			),
 		width: z
 			.number()
 			.positive()
-			.describe("Total width in pixels for horizontal orientation, or the narrower dimension for vertical."),
+			.describe(
+				"SVG width in pixels. For horizontal number lines, this is the main dimension. For vertical lines, this is the narrower dimension. Recommended: 400-600px for horizontal, 200-300px for vertical."
+			),
 		height: z
 			.number()
 			.positive()
-			.describe("Total height in pixels for horizontal orientation, or the longer dimension for vertical."),
-		orientation: z.enum(["horizontal", "vertical"]).describe("Direction of the number line."),
-		min: z.number().describe("Minimum value shown on the number line."),
-		max: z.number().describe("Maximum value shown on the number line."),
+			.describe(
+				"SVG height in pixels. For horizontal number lines, this is the narrower dimension. For vertical lines, this is the main dimension. Recommended: 150-250px for horizontal, 400-600px for vertical."
+			),
+		orientation: z
+			.enum(["horizontal", "vertical"])
+			.describe(
+				"Direction of the number line. 'horizontal' runs left-to-right with values increasing rightward. 'vertical' runs bottom-to-top with values increasing upward."
+			),
+		min: z
+			.number()
+			.describe(
+				"Minimum value displayed on the number line. Can be negative, zero, or positive. Defines the left boundary (horizontal) or bottom boundary (vertical)."
+			),
+		max: z
+			.number()
+			.describe(
+				"Maximum value displayed on the number line. Must be greater than min. Defines the right boundary (horizontal) or top boundary (vertical)."
+			),
 		tickInterval: createTickIntervalSchema().describe(
-			"Major tick interval specification with full-length ticks and labels."
+			"Primary tick mark configuration. Creates full-height tick marks with labels. Use whole number intervals for integer number lines or fractional intervals for fraction work."
 		),
 		secondaryTickInterval: createTickIntervalSchema()
 			.nullable()
-			.describe("Optional minor tick interval with half-length ticks and no labels."),
-		showTickLabels: z.boolean().describe("If true, automatically places non-overlapping labels at major tick marks."),
+			.describe(
+				"Optional secondary tick marks for finer divisions. Creates half-height tick marks without labels. Useful for showing subdivisions like halves between integers. Set to null for no secondary ticks."
+			),
+		showTickLabels: z
+			.boolean()
+			.describe(
+				"Whether to display numeric labels at major tick marks. Labels are automatically spaced to prevent overlap. Set to false for unlabeled number lines where students fill in values."
+			),
 		highlightedPoints: z
 			.array(createHighlightedPointSchema())
 			.nullable()
-			.describe("An array of special points to mark on the line.")
+			.describe(
+				"Array of special points to highlight with colored dots and labels. Each point can be a whole number, fraction, mixed number, or complex MathML expression. Set to null for no highlighted points."
+			)
 	})
 	.strict()
+	.describe(
+		"Creates versatile number lines for teaching integers, fractions, decimals, and mixed numbers. Supports both horizontal and vertical orientations with customizable tick intervals, highlighted points, and MathML labels. Perfect for number sense, fraction concepts, and coordinate system introduction."
+	)
 
 export type NumberLineProps = z.infer<typeof NumberLinePropsSchema>
 
@@ -270,9 +384,20 @@ export const generateNumberLine: WidgetGenerator<typeof NumberLinePropsSchema> =
 				} else if (p.type === "whole") {
 					inner = numberContentToInnerMathML({ type: "whole", value: p.value, sign: p.sign })
 				} else if (p.type === "fraction") {
-					inner = numberContentToInnerMathML({ type: "fraction", numerator: p.numerator, denominator: p.denominator, sign: p.sign })
+					inner = numberContentToInnerMathML({
+						type: "fraction",
+						numerator: p.numerator,
+						denominator: p.denominator,
+						sign: p.sign
+					})
 				} else {
-					inner = numberContentToInnerMathML({ type: "mixed", whole: p.whole, numerator: p.numerator, denominator: p.denominator, sign: p.sign })
+					inner = numberContentToInnerMathML({
+						type: "mixed",
+						whole: p.whole,
+						numerator: p.numerator,
+						denominator: p.denominator,
+						sign: p.sign
+					})
 				}
 
 				// Render label near the point (larger font). Ensure consistent gap from axis
@@ -357,9 +482,20 @@ export const generateNumberLine: WidgetGenerator<typeof NumberLinePropsSchema> =
 				} else if (p.type === "whole") {
 					inner = numberContentToInnerMathML({ type: "whole", value: p.value, sign: p.sign })
 				} else if (p.type === "fraction") {
-					inner = numberContentToInnerMathML({ type: "fraction", numerator: p.numerator, denominator: p.denominator, sign: p.sign })
+					inner = numberContentToInnerMathML({
+						type: "fraction",
+						numerator: p.numerator,
+						denominator: p.denominator,
+						sign: p.sign
+					})
 				} else {
-					inner = numberContentToInnerMathML({ type: "mixed", whole: p.whole, numerator: p.numerator, denominator: p.denominator, sign: p.sign })
+					inner = numberContentToInnerMathML({
+						type: "mixed",
+						whole: p.whole,
+						numerator: p.numerator,
+						denominator: p.denominator,
+						sign: p.sign
+					})
 				}
 
 				// Render label near the point (larger font). Ensure consistent gap from vertical axis

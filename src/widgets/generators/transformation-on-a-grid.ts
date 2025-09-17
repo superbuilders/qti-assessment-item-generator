@@ -7,42 +7,45 @@ import type { WidgetGenerator } from "../types"
 
 const PointSchema = z
 	.object({
-		x: z.number().describe("The x-coordinate of the point in grid units."),
-		y: z.number().describe("The y-coordinate of the point in grid units."),
-		label: z.string().nullable().describe("An optional label for the vertex (e.g., 'A', 'B').")
+		x: z.number().describe("Horizontal coordinate in grid units. Can be integers or decimals. Examples: 0, 1.5, -2, 4.25. Grid origin (0,0) is at bottom-left corner."),
+		y: z.number().describe("Vertical coordinate in grid units. Can be integers or decimals. Examples: 0, 2.5, -1, 3.75. Positive y values go upward from the origin."),
+		label: z.string().nullable().describe("Optional text label for this vertex. Examples: 'A', 'B', 'C', 'P₁', 'vertex'. Set to null for unlabeled vertices. Labels are positioned outside the polygon for clarity.")
 	})
 	.strict()
 
 const PolygonSchema = z
 	.object({
-		id: z.string().describe("A unique identifier for the polygon."),
-		points: z.array(PointSchema).min(3).describe("An array of vertices that define the polygon."),
+		id: z.string().describe("Unique identifier for this polygon. Examples: 'original', 'transformed', 'triangle_ABC', 'figure_1'. Used for referencing and distinguishing multiple polygons."),
+		points: z.array(PointSchema).min(3).describe("Array of vertices defining the polygon boundary. Minimum 3 points required. Points should be ordered (clockwise or counter-clockwise) to form a proper polygon. Examples: triangle (3 points), rectangle (4 points), pentagon (5 points)."),
 		fillColor: z
 			.string()
 			.regex(CSS_COLOR_PATTERN)
 			.nullable()
-			.describe("The fill color of the polygon. Use a transparent color for no fill."),
-		strokeColor: z.string().regex(CSS_COLOR_PATTERN).describe("The stroke (outline) color of the polygon."),
-		label: z.string().nullable().describe("An optional label for the entire figure (e.g., 'Figure 1').")
+			.describe("CSS fill color for the polygon interior. Examples: '#FFE5CC' (light orange), 'rgba(255,0,0,0.3)' (semi-transparent red), 'transparent' (no fill). Set to null for transparent fill."),
+		strokeColor: z.string().regex(CSS_COLOR_PATTERN).describe("CSS color for the polygon outline. Examples: '#FF0000' (red), '#0066CC' (blue), '#000000' (black). Should contrast with fill color and background."),
+		label: z.string().nullable().describe("Optional label for the entire polygon. Examples: 'Figure 1', 'Original', 'Image', 'Triangle ABC'. Set to null for unlabeled polygons. Label appears below the polygon.")
 	})
 	.strict()
 
 export const TransformationOnAGridPropsSchema = z
 	.object({
 		type: z.literal("transformationOnAGrid"),
-		width: z.number().int().min(1).describe("The total width of the SVG canvas in pixels."),
-		height: z.number().int().min(1).describe("The total height of the SVG canvas in pixels."),
+		width: z.number().int().min(1).describe("SVG canvas width in pixels. Recommended range: 400-800px for clear visualization of transformations and adequate space for labels."),
+		height: z.number().int().min(1).describe("SVG canvas height in pixels. Recommended range: 400-800px. Usually equal to width for square grids, but can be adjusted for rectangular grids."),
 		grid: z
 			.object({
-				rows: z.number().int().min(1).describe("The number of rows in the grid."),
-				columns: z.number().int().min(1).describe("The number of columns in the grid."),
-				tickStep: z.number().min(0.1).default(1).describe("The distance between grid lines in grid units.")
+				rows: z.number().int().min(1).describe("Number of horizontal grid rows. Determines the vertical extent of the coordinate system. Examples: 10 for a 10-unit tall grid, 20 for more detailed work."),
+				columns: z.number().int().min(1).describe("Number of vertical grid columns. Determines the horizontal extent of the coordinate system. Examples: 10 for a 10-unit wide grid, 15 for rectangular grids."),
+				tickStep: z.number().min(0.1).default(1).describe("Spacing between grid lines in grid units. Examples: 1 (unit grid), 0.5 (half-unit subdivisions), 2 (every other unit). Smaller values create denser grids.")
 			})
 			.strict()
-			.describe("Configuration for the grid background with explicit dimensions."),
-		polygons: z.array(PolygonSchema).min(1).describe("An array of polygons to render on the grid.")
+			.describe("Grid configuration defining the coordinate system background. Creates a rectangular grid with specified dimensions and line spacing."),
+		polygons: z.array(PolygonSchema).min(1).describe("Array of polygons to display on the grid. Typically includes original figures and their transformations (rotations, reflections, translations, dilations). Each polygon can have different colors and labels for comparison.")
 	})
 	.strict()
+	.describe(
+		"Creates geometric transformation diagrams on coordinate grids. Perfect for showing reflections, rotations, translations, and dilations of polygons. Features automatic vertex labeling, smart label positioning, and support for multiple overlaid figures with different colors. Essential for transformation geometry lessons."
+	)
 
 export type TransformationOnAGridProps = z.infer<typeof TransformationOnAGridPropsSchema>
 
