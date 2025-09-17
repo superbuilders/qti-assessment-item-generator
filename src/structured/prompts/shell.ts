@@ -484,6 +484,8 @@ This is a mandatory step for all questions involving a \`textEntryInteraction\`.
         *   **Strict Formatting Rules**: When the prompt or feedback implies a specific format, such as requiring a leading zero (\`"0.5"\`), a fixed number of decimal places (\`"1.20"\`), or a specific scientific notation format (\`"3.14 x 10^2"\`).
         *   **Any non-numeric characters**: If the answer includes units or symbols that are part of the required input.
 
+    - **Note**: It is acceptable to use \`baseType="string"\` for plain numbers when strict formatting is explicitly required (fixed decimal places, significant figures, or scientific notation). Otherwise, prefer \`baseType="float"\`/\`"integer"\`.
+
 3.  **Set the Correct Response**: In the \`responseDeclarations\`, the \`correct\` field **MUST** contain only the single canonical value. For \`baseType="float"\`, this will be a number. For \`baseType="string"\`, this will be a string.
 
 4.  **Add User Instructions (Only When Necessary)**: If and only if you set \`baseType="string"\` because of a strict formatting requirement, you **MUST** add a clear, concise instruction for the student within the assessment \`body\`. This instruction should be in a new paragraph or appended in parentheses to the question prompt.
@@ -593,6 +595,23 @@ This is a mandatory step for all questions involving a \`textEntryInteraction\`.
   ]
 }
 \`\`\`
+
+**MANDATORY: Student Instruction Checklist (when baseType=\"string\")**
+
+When you choose \`baseType=\"string\"\` to enforce a specific format, you MUST add a clear instruction for the student in the assessment \`body\` (as a new paragraph or appended in parentheses to the prompt). Use one or more of the following, as applicable:
+
+- Fractions: "(In the simplest form without spaces)"
+- Algebraic expressions/equations: "(Do not include spaces in your answer)"
+- Decimals < 1: "(Include a leading zero if your answer is a decimal less than 1)"
+- Rounding to fixed places: "(Your answer should be rounded to two decimal places)" or "(Round your answer to the nearest tenth)"
+- Exact decimal places: "(Write your answer with exactly N decimal places)"
+- Scientific notation: "(Format your answer as X.XX x 10^YY)"
+- Significant figures: "(Report your answer to N significant figures)"
+- Units: Default to "(Do not include units in your answer)". Only require typing units if the original prompt explicitly instructs to include units (e.g., "Include units in your answer").
+
+Also:
+- Provide only the single canonical value in \`responseDeclarations.correct\`. Do not include alternates.
+- Never generate additional acceptable variants (fractions↔decimals, spacing changes, flipped equations, etc.).
 
 **CRITICAL: NO CURRENCY SLOTS - STRICT MATHML ENFORCEMENT.**
 Currency symbols and amounts MUST NOT be represented as slots (widget or interaction). Do not generate any slotId that indicates currency (for example, names containing "currency" or ending with "_feedback"). 
