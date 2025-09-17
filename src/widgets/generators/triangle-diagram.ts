@@ -18,54 +18,68 @@ import type { WidgetGenerator } from "../types"
 function createAngleValueSchema() {
 	return z
 		.discriminatedUnion("type", [
-			z.object({ type: z.literal("numeric"), value: z.number().gt(0).lt(180) }).strict(),
-			z.object({ type: z.literal("symbolic"), symbol: z.string() }).strict()
+			z.object({ 
+				type: z.literal("numeric").describe("Indicates this is a numeric angle value."), 
+				value: z.number().gt(0).lt(180).describe("The angle measure in degrees. Must be between 0 and 180 degrees (exclusive) to ensure valid triangle geometry.")
+			}).strict(),
+			z.object({ 
+				type: z.literal("symbolic").describe("Indicates this is a symbolic angle representation."), 
+				symbol: z.string().describe("A symbolic representation of the angle (e.g., 'x', 'α', '2y + 30'). Used when the exact numeric value is unknown or when representing algebraic relationships.")
+			}).strict()
 		])
-		.describe("Angle value in degrees (0<deg<180) or symbolic variable")
+		.describe("Represents an angle value in a triangle. Can be either a concrete numeric value in degrees or a symbolic expression. Numeric values must be strictly between 0° and 180° to maintain valid triangle geometry. Symbolic values allow representation of unknown angles or algebraic relationships between angles.")
 }
 
 function createSideValueSchema() {
 	return z
 		.discriminatedUnion("type", [
-			z.object({ type: z.literal("numeric"), value: z.number().gt(0) }).strict(),
-			z.object({ type: z.literal("symbolic"), symbol: z.string() }).strict(),
+			z.object({ 
+				type: z.literal("numeric").describe("Indicates this is a numeric side length."), 
+				value: z.number().gt(0).describe("The side length as a positive number. Can represent any unit of measurement (pixels, cm, units, etc.). Must be greater than 0 to ensure valid geometry.")
+			}).strict(),
+			z.object({ 
+				type: z.literal("symbolic").describe("Indicates this is a symbolic side length representation."), 
+				symbol: z.string().describe("A symbolic representation of the side length (e.g., 'a', 'x + 3', '2y'). Used for algebraic expressions, unknown values, or when showing relationships between sides.")
+			}).strict(),
 			z
 				.object({
-					type: z.literal("mathml"),
+					type: z.literal("mathml").describe("Indicates this is a MathML-formatted side length with an associated numeric value."),
 					mathml: z
 						.string()
 						.regex(
 							MATHML_INNER_PATTERN,
 							"invalid mathml snippet; must be inner MathML without outer <math> wrapper"
-						),
-					value: z.number().gt(0)
+						)
+						.describe("Inner MathML content for rendering complex mathematical expressions (e.g., square roots, fractions). Do not include the outer <math> wrapper tags. Example for √2: '<msqrt><mn>2</mn></msqrt>'"),
+					value: z.number().gt(0).describe("The numeric value that this MathML expression evaluates to. Used for geometric calculations while the MathML provides the visual representation.")
 				})
 				.strict()
 		])
-		.describe("Side length label: numeric, symbolic, or MathML with numeric value")
+		.describe("Represents a side length value in a triangle. Supports three formats: numeric (simple positive numbers), symbolic (algebraic expressions or variables), or MathML (for complex mathematical notation like radicals or fractions). MathML format requires both the visual representation and its numeric value for proper rendering and calculation.")
 }
 
 function createAngleMarkSchema() {
 	return z
 		.object({
-			vertex: z.string().regex(TRI_POINT_ID).describe("Vertex point id of the angle"),
-			from: z.string().regex(TRI_POINT_ID).describe("Ray start point id around the vertex"),
-			to: z.string().regex(TRI_POINT_ID).describe("Ray end point id around the vertex"),
-			value: createAngleValueSchema().describe("Angle value for the arc"),
-			color: z.string().regex(CSS_COLOR_PATTERN, "invalid css color").describe("Arc color for the mark.")
+			vertex: z.string().regex(TRI_POINT_ID).describe("The point ID where the angle is centered. This is the vertex of the angle being marked. Must match the ID of a defined point (either a triangle vertex or auxiliary point)."),
+			from: z.string().regex(TRI_POINT_ID).describe("The point ID defining the starting ray of the angle. Combined with the vertex, this creates the first ray from vertex to 'from' point. The angle arc will begin from this ray."),
+			to: z.string().regex(TRI_POINT_ID).describe("The point ID defining the ending ray of the angle. Combined with the vertex, this creates the second ray from vertex to 'to' point. The angle is measured from the 'from' ray to the 'to' ray in the minor arc direction."),
+			value: createAngleValueSchema().describe("The angle measurement or symbol to display. For numeric values, this will be shown with a degree symbol. For symbolic values, the raw symbol text is displayed. This value should match the geometric constraint of the angle."),
+			color: z.string().regex(CSS_COLOR_PATTERN, "invalid css color").describe("CSS color for the angle arc. Use distinct colors to differentiate multiple angles or highlight specific angles. Common choices: 'red' for important angles, 'blue' for given angles, 'green' for calculated angles.")
 		})
 		.strict()
+		.describe("Defines an angle marking in the triangle diagram. Angles are specified by three points: a vertex (center) and two points that define the rays. The angle is always drawn as the minor arc (less than 180°) from the 'from' ray to the 'to' ray. Multiple angle marks can overlap at the same vertex with different arc radii automatically adjusted for clarity.")
 }
 
 function createSidesLabelSchema() {
 	return z
 		.object({
-			AB: createSideValueSchema().nullable(),
-			BC: createSideValueSchema().nullable(),
-			CA: createSideValueSchema().nullable()
+			AB: createSideValueSchema().nullable().describe("Label for the side connecting vertices A and B. The label is positioned automatically on the exterior of the triangle, perpendicular to the side. Set to null to omit the label for this side."),
+			BC: createSideValueSchema().nullable().describe("Label for the side connecting vertices B and C. The label is positioned automatically on the exterior of the triangle, perpendicular to the side. Set to null to omit the label for this side."),
+			CA: createSideValueSchema().nullable().describe("Label for the side connecting vertices C and A. The label is positioned automatically on the exterior of the triangle, perpendicular to the side. Set to null to omit the label for this side.")
 		})
 		.strict()
-		.describe("Optional labels for each side.")
+		.describe("Defines optional labels for the three sides of the triangle. Each side can display a numeric value, symbolic expression, or MathML notation. Labels are automatically positioned outside the triangle for clarity. Use null for any side you don't want labeled. Side labels are commonly used to show lengths, algebraic expressions, or measurements like '5 cm', 'x + 2', or '√3'.")
 }
 
 // Replace constants with factory functions
@@ -74,17 +88,31 @@ const TRI_POINT_ID = /^pt_tri_[A-Za-z0-9_]+$/
 function createTrianglePointsSchema() {
 	return z
 		.object({
-			A: z.object({ id: z.string().regex(TRI_POINT_ID), label: z.string() }).strict().describe("point A"),
-			B: z.object({ id: z.string().regex(TRI_POINT_ID), label: z.string() }).strict().describe("point B"),
-			C: z.object({ id: z.string().regex(TRI_POINT_ID), label: z.string() }).strict().describe("point C")
+			A: z.object({ 
+				id: z.string().regex(TRI_POINT_ID).describe("Unique identifier for vertex A. Must follow the pattern 'pt_tri_[alphanumeric]'. This ID is used to reference this vertex in angle marks, lines, and other constructions."), 
+				label: z.string().describe("Display label for vertex A. Typically a single letter like 'A', but can be any string (e.g., 'P', 'A₁'). This is what appears visually next to the vertex point.")
+			}).strict().describe("First vertex of the triangle. By convention, vertices are labeled counterclockwise. The position is automatically calculated based on the angle constraints."),
+			B: z.object({ 
+				id: z.string().regex(TRI_POINT_ID).describe("Unique identifier for vertex B. Must follow the pattern 'pt_tri_[alphanumeric]'. This ID is used to reference this vertex in angle marks, lines, and other constructions."), 
+				label: z.string().describe("Display label for vertex B. Typically a single letter like 'B', but can be any string (e.g., 'Q', 'B₁'). This is what appears visually next to the vertex point.")
+			}).strict().describe("Second vertex of the triangle. By convention, vertices are labeled counterclockwise. The position is automatically calculated based on the angle constraints."),
+			C: z.object({ 
+				id: z.string().regex(TRI_POINT_ID).describe("Unique identifier for vertex C. Must follow the pattern 'pt_tri_[alphanumeric]'. This ID is used to reference this vertex in angle marks, lines, and other constructions."), 
+				label: z.string().describe("Display label for vertex C. Typically a single letter like 'C', but can be any string (e.g., 'R', 'C₁'). This is what appears visually next to the vertex point.")
+			}).strict().describe("Third vertex of the triangle. By convention, vertices are labeled counterclockwise. The position is automatically calculated based on the angle constraints.")
 		})
 		.strict()
+		.describe("Defines the three vertices of the triangle. Each vertex has a unique ID (for internal references) and a display label (what the user sees). The triangle's shape is determined by the angle constraints provided in angleArcs. Vertices are automatically positioned to satisfy all geometric constraints.")
 }
 
 function createAuxiliaryPointsSchema() {
 	return z
-		.array(z.object({ id: z.string().regex(TRI_POINT_ID), label: z.string() }).strict())
+		.array(z.object({ 
+			id: z.string().regex(TRI_POINT_ID).describe("Unique identifier for the auxiliary point. Must follow the pattern 'pt_tri_[alphanumeric]'. Used to reference this point in angle marks, lines, and other constructions."), 
+			label: z.string().describe("Display label for the auxiliary point. Can be any string (e.g., 'D', 'E', 'M' for midpoint, 'H' for orthocenter). This is what appears visually next to the point.")
+		}).strict().describe("An auxiliary point added to the diagram beyond the three triangle vertices. Its position must be defined through the 'lines' constraint."))
 		.nullable()
+		.describe("Optional array of auxiliary points to add to the diagram. These points extend beyond the basic triangle vertices and are useful for showing constructions like angle bisectors, medians, altitudes, or exterior angles. Each auxiliary point must be positioned using the 'lines' property to specify collinear constraints with existing points. Set to null if no auxiliary points are needed.")
 }
 
 function createConstructionLinesSchema() {
@@ -92,55 +120,59 @@ function createConstructionLinesSchema() {
 		.array(
 			z
 				.object({
-					points: z.array(z.string().regex(TRI_POINT_ID)).min(2).max(3),
-					style: z.enum(["solid", "dashed", "dotted"]) 
+					points: z.array(z.string().regex(TRI_POINT_ID)).min(2).max(3).describe("Array of point IDs that this construction line passes through. Specify 2 points for a line segment, or 3 points for a polyline. Points must be existing vertices or auxiliary points. The line is drawn in the order specified."),
+					style: z.enum(["solid", "dashed", "dotted"]).describe("Visual style of the construction line. Use 'dashed' for auxiliary constructions like angle bisectors or medians. Use 'dotted' for temporary or reference lines. Use 'solid' for emphasized constructions.") 
 				})
 				.strict()
+				.describe("A construction line drawn through specified points. Unlike the main triangle edges, these lines can be styled differently to indicate their purpose (e.g., dashed for constructions, dotted for helpers).")
 		)
 		.nullable()
+		.describe("Optional array of construction lines to add to the diagram. These are additional line segments or polylines beyond the triangle edges, useful for showing geometric constructions like angle bisectors, medians, perpendicular bisectors, or extended sides. Each line can have a different visual style (solid, dashed, or dotted) to distinguish its purpose. Set to null if no construction lines are needed.")
 }
 
 function createLinesSchema() {
 	return z
-		.array(z.array(z.string().regex(TRI_POINT_ID)).min(2))
+		.array(z.array(z.string().regex(TRI_POINT_ID)).min(2).describe("Array of point IDs that lie on the same line. The order defines collinearity constraints and positioning for auxiliary points. If an auxiliary point appears between two known points, it will be positioned along that line segment."))
 		.nullable()
+		.describe("Optional array defining collinear point constraints and auxiliary point positioning. Each inner array specifies points that must lie on the same straight line. This is the primary mechanism for positioning auxiliary points - they are placed along lines defined by existing points. For example, [['pt_tri_A', 'pt_tri_D', 'pt_tri_B']] places auxiliary point D on line AB between A and B. Multiple lines can intersect to precisely position points. Also enables exterior angle constructions by extending lines beyond the triangle. Set to null if no collinear constraints are needed.")
 }
 
 function createAltitudeSchema() {
 	return z
 		.object({
-			vertex: z.string().regex(TRI_POINT_ID),
-			toSide: z.enum(["AB", "BC", "CA"]),
-			value: createSideValueSchema().nullable(),
-			style: z.enum(["dashed", "dotted"]),
-			color: z.string().regex(CSS_COLOR_PATTERN, "invalid css color"),
-			withRightAngle: z.literal(true)
+			vertex: z.string().regex(TRI_POINT_ID).describe("The point ID from which the altitude is drawn. This is typically a triangle vertex, but can be any defined point. The altitude will be drawn perpendicular from this point to the specified side."),
+			toSide: z.enum(["AB", "BC", "CA"]).describe("The side of the triangle to which the altitude is perpendicular. 'AB' draws altitude to side between vertices A and B, 'BC' to side between B and C, 'CA' to side between C and A."),
+			value: createSideValueSchema().nullable().describe("Optional label for the altitude length. Can be numeric (e.g., 4), symbolic (e.g., 'h'), or MathML. The label is positioned at the midpoint of the altitude line. Set to null to omit the label."),
+			style: z.enum(["dashed", "dotted"]).describe("Visual style for the altitude line. Typically 'dashed' is used for altitudes as a standard geometric construction notation. 'dotted' can be used for less emphasis."),
+			color: z.string().regex(CSS_COLOR_PATTERN, "invalid css color").describe("CSS color for the altitude line. Common choices: 'blue' or 'green' for standard altitudes, 'red' to emphasize a specific altitude in a problem."),
+			withRightAngle: z.literal(true).describe("Always true for altitudes. Draws a small square at the foot of the altitude to indicate the 90-degree angle where the altitude meets the base.")
 		})
 		.strict()
+		.describe("Defines an altitude (height) of the triangle. An altitude is a perpendicular line segment from a vertex to the opposite side (or the line containing that side). The altitude creates a 90-degree angle with the base, which is marked with a small square. Altitudes are fundamental in calculating triangle area and in many geometric proofs.")
 }
 
 export const TriangleDiagramPropsSchema = z
 	.object({
-		type: z.literal("triangleDiagram"),
-		width: z.number().positive(),
-		height: z.number().positive(),
-		points: createTrianglePointsSchema(),
-		extraPoints: createAuxiliaryPointsSchema(),
-		angleArcs: z.array(createAngleMarkSchema()).min(2),
-		sideLabels: createSidesLabelSchema().nullable(),
-		constructionLines: createConstructionLinesSchema(),
-		lines: createLinesSchema(),
-		altitudes: z.array(createAltitudeSchema()).nullable(),
+		type: z.literal("triangleDiagram").describe("Identifies this widget as a triangle diagram. Always use the exact value 'triangleDiagram'."),
+		width: z.number().positive().describe("The total width of the SVG diagram in pixels. The triangle and all constructions will be scaled to fit within this width while maintaining aspect ratio."),
+		height: z.number().positive().describe("The total height of the SVG diagram in pixels. The triangle and all constructions will be scaled to fit within this height while maintaining aspect ratio."),
+		points: createTrianglePointsSchema().describe("The three vertices that define the triangle. The triangle's shape is fully determined by the angle constraints specified in angleArcs."),
+		extraPoints: createAuxiliaryPointsSchema().describe("Additional points beyond the three triangle vertices. Used for constructions like angle bisectors, medians, or exterior angle demonstrations."),
+		angleArcs: z.array(createAngleMarkSchema()).min(2).describe("Array of angle markings to display. At least 2 numeric angle values are required to determine the triangle's shape. The third angle is automatically calculated to sum to 180°. Supports both interior angles (between triangle sides) and exterior angles (using auxiliary points and collinear constraints). Multiple angles at the same vertex are automatically given different arc radii for clarity."),
+		sideLabels: createSidesLabelSchema().nullable().describe("Optional labels for the three sides of the triangle. Labels can show measurements, variables, or mathematical expressions."),
+		constructionLines: createConstructionLinesSchema().describe("Additional line segments for geometric constructions. These appear on top of the base triangle and can be styled (solid, dashed, dotted) to indicate their purpose."),
+		lines: createLinesSchema().describe("Collinearity constraints that position auxiliary points and enable extended constructions. Critical for creating exterior angles and precise geometric relationships."),
+		altitudes: z.array(createAltitudeSchema()).nullable().describe("Array of altitudes (perpendicular heights) to draw from vertices to opposite sides. Each altitude includes a right angle marker at its foot and optional length label."),
 		rightAngleMarks: z.array(z.object({
-			vertex: z.string().regex(TRI_POINT_ID),
-			from: z.string().regex(TRI_POINT_ID),
-			to: z.string().regex(TRI_POINT_ID),
-			size: z.number().positive().nullable()
-		}).strict()).nullable()
+			vertex: z.string().regex(TRI_POINT_ID).describe("The point ID where the right angle is located. This is the vertex of the 90-degree angle."),
+			from: z.string().regex(TRI_POINT_ID).describe("Point ID defining the first ray of the right angle, extending from the vertex."),
+			to: z.string().regex(TRI_POINT_ID).describe("Point ID defining the second ray of the right angle, extending from the vertex. The angle from 'from' to 'to' must be 90 degrees."),
+			size: z.number().positive().nullable().describe("Optional custom size for the right angle square marker in pixels. If null, uses default size of 14 pixels.")
+		}).strict().describe("Defines a right angle (90-degree) marker shown as a small square at the vertex between two rays.")).nullable().describe("Optional array of right angle markers to explicitly show 90-degree angles in the diagram. These appear as small squares at the specified vertices. Useful for right triangles or when showing perpendicular constructions. Note: altitudes automatically include right angle markers, so this is only needed for other 90-degree angles.")
 	})
 	.strict()
 	.describe(
-		"Constraint-first triangle diagram. Angles defined by three point ids; auxiliary points and colinear constraints enable exterior angles."
+		"Creates a constraint-based triangle diagram with rich geometric constructions. The triangle shape is determined by angle constraints (at least 2 numeric angles required). Supports interior and exterior angles, auxiliary points for constructions, altitudes with automatic right-angle markers, and customizable visual elements. Angles are specified using three points (vertex + two ray endpoints) allowing precise control over which angle is marked. The diagram automatically positions all elements to satisfy geometric constraints while maintaining visual clarity through smart label placement and arc radius adjustments."
 	)
 
 export type TriangleDiagramProps = z.infer<typeof TriangleDiagramPropsSchema>
