@@ -79,14 +79,14 @@ function setupTrigCoordinatePlane(
 		width: number
 		height: number
 		xAxis: {
-			label: string
+			label: string | null
 			min: number
 			max: number
 			tickInterval: number
 			showGridLines: boolean
 		}
 		yAxis: {
-			label: string
+			label: string | null
 			min: number
 			max: number
 			tickInterval: number
@@ -217,25 +217,29 @@ function setupTrigCoordinatePlane(
 		}
 	})
 
-	// Axis labels
-	canvas.drawText({
-		x: width / 2,
-		y: height - 20,
-		text: xAxis.label,
-		fill: theme.colors.axisLabel,
-		anchor: "middle",
-		fontPx: 14
-	})
+	// Axis labels (only render if not null)
+	if (xAxis.label) {
+		canvas.drawText({
+			x: width / 2,
+			y: height - 20,
+			text: xAxis.label,
+			fill: theme.colors.axisLabel,
+			anchor: "middle",
+			fontPx: 14
+		})
+	}
 
-	canvas.drawText({
-		x: 20,
-		y: height / 2,
-		text: yAxis.label,
-		fill: theme.colors.axisLabel,
-		anchor: "middle",
-		fontPx: 14,
-		transform: `rotate(-90, 20, ${height / 2})`
-	})
+	if (yAxis.label) {
+		canvas.drawText({
+			x: 20,
+			y: height / 2,
+			text: yAxis.label,
+			fill: theme.colors.axisLabel,
+			anchor: "middle",
+			fontPx: 14,
+			transform: `rotate(-90, 20, ${height / 2})`
+		})
+	}
 
 	return { toSvgX, toSvgY }
 }

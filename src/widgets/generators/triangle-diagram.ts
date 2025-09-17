@@ -708,10 +708,27 @@ export const generateTriangleDiagram: WidgetGenerator<typeof TriangleDiagramProp
 				const dx = foot.x - v.x
 				const dy = foot.y - v.y
 				const L = Math.hypot(dx, dy) || 1
+				
+				// Calculate rotation angle to make altitude label parallel to the altitude line
+				let rotationAngle = Math.atan2(dy, dx) * (180 / Math.PI)
+				
+				// Ensure text is readable (not upside down) by flipping if needed
+				if (rotationAngle > 90 || rotationAngle < -90) {
+					rotationAngle += 180
+				}
+				
 				const nx = -dy / L
 				const ny = dx / L
 				const off = 14
-				canvas.drawText({ x: mid.x + nx * off, y: mid.y + ny * off, text: sideValueToString(alt.value), fill: theme.colors.black, anchor: "middle", dominantBaseline: "middle" })
+				canvas.drawText({ 
+					x: mid.x + nx * off, 
+					y: mid.y + ny * off, 
+					text: sideValueToString(alt.value), 
+					fill: theme.colors.black, 
+					anchor: "middle", 
+					dominantBaseline: "middle",
+					rotate: { angle: rotationAngle, cx: mid.x + nx * off, cy: mid.y + ny * off }
+				})
 			}
 		}
 	}
@@ -833,21 +850,42 @@ export const generateTriangleDiagram: WidgetGenerator<typeof TriangleDiagramProp
 			const dy = p2.y - p1.y
 			const len = Math.hypot(dx, dy)
 			if (len === 0) return
+			
+			// Calculate rotation angle to make text parallel to the line
+			let rotationAngle = Math.atan2(dy, dx) * (180 / Math.PI)
+			
+			// Ensure text is readable (not upside down) by flipping if needed
+			if (rotationAngle > 90 || rotationAngle < -90) {
+				rotationAngle += 180
+			}
+			
 			const nx = -dy / len
 			const ny = dx / len
 			const off = 20
 			const lx = mid.x + nx * off
 			const ly = mid.y + ny * off
+			
 			if (lbl.type === "mathml") {
-				// Render MathML via foreignObject similar to number-line
+				// For MathML, we'll use transform on the foreignObject to rotate it
 				const fontPx = theme.font.size.large
 				const labelWidth = 120
 				const labelHeight = 32
+				const transform = `rotate(${rotationAngle} ${lx} ${ly})`
 				const xhtml = `<!DOCTYPE html><div xmlns="http://www.w3.org/1999/xhtml" style="display:flex;align-items:flex-end;justify-content:center;width:100%;height:100%;line-height:1;font-family:${theme.font.family.sans};color:${theme.colors.black};"><math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\" style=\"font-size:${fontPx * 1.1}px;\">${lbl.mathml}</math></div>`
-				canvas.drawForeignObject({ x: lx - labelWidth / 2, y: ly - labelHeight / 2, width: labelWidth, height: labelHeight, content: xhtml })
+				canvas.drawForeignObject({ x: lx - labelWidth / 2, y: ly - labelHeight / 2, width: labelWidth, height: labelHeight, content: xhtml, transform })
 				return
 			}
-			canvas.drawText({ x: lx, y: ly, text: sideValueToString(lbl), fill: theme.colors.black, anchor: "middle", dominantBaseline: "middle" })
+			
+			// For regular text, use the rotate parameter
+			canvas.drawText({ 
+				x: lx, 
+				y: ly, 
+				text: sideValueToString(lbl), 
+				fill: theme.colors.black, 
+				anchor: "middle", 
+				dominantBaseline: "middle",
+				rotate: { angle: rotationAngle, cx: lx, cy: ly }
+			})
 		}
 		placeSideLabel(A, B, sideLabels.AB)
 		placeSideLabel(B, C, sideLabels.BC)

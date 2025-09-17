@@ -927,7 +927,7 @@ export class CanvasImpl implements Canvas {
 		this.svgBody += `<polyline ${attrs} fill="none"/>`
 	}
 
-	drawForeignObject(opts: { x: number; y: number; width: number; height: number; content: string }): void {
+	drawForeignObject(opts: { x: number; y: number; width: number; height: number; content: string; transform?: string }): void {
 		// Validate content has proper XHTML wrapper
 		if (!opts.content.includes('xmlns="http://www.w3.org/1999/xhtml"')) {
 			logger.error("invalid XHTML content", { content: opts.content.substring(0, 100) })
@@ -939,7 +939,8 @@ export class CanvasImpl implements Canvas {
 		// Update extents for the foreign object bounds
 		this.updateExtents(opts.x, opts.x + opts.width, opts.y, opts.y + opts.height)
 
-		this.svgBody += `<foreignObject x="${opts.x}" y="${opts.y}" width="${opts.width}" height="${opts.height}">${opts.content}</foreignObject>`
+		const transformAttr = opts.transform ? ` transform="${opts.transform}"` : ""
+		this.svgBody += `<foreignObject x="${opts.x}" y="${opts.y}" width="${opts.width}" height="${opts.height}"${transformAttr}>${opts.content}</foreignObject>`
 	}
 
 	drawImage(opts: {

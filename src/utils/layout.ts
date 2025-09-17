@@ -212,7 +212,7 @@ export interface Canvas {
 	): void
 
 	// Complex content
-	drawForeignObject(opts: { x: number; y: number; width: number; height: number; content: string }): void
+	drawForeignObject(opts: { x: number; y: number; width: number; height: number; content: string; transform?: string }): void
 
 	// Images
 	drawImage(opts: {
