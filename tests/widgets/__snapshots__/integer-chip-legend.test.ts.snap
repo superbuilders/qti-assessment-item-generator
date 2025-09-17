@@ -1,0 +1,17 @@
+// Bun Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Widget: integer-chip-legend should produce consistent output for example #1 1`] = `
+"<svg width="90.4" height="86" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
+  <rect x="0" y="0" width="90.4" height="86" rx="6" ry="6" fill="#FFFFFF" stroke="#212121" stroke-width="2" />
+  <circle cx="20" cy="20" r="14" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="20" y="20" font-size="18px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text><text x="46" y="20" font-size="16px" fill="#212121" dominant-baseline="central">= +1</text>
+  <circle cx="20" cy="60" r="14" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="20" y="60" font-size="18px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text><text x="46" y="60" font-size="16px" fill="#212121" dominant-baseline="central">= -1</text>
+</svg>"
+`;
+
+exports[`Widget: integer-chip-legend should produce consistent output for example #2 1`] = `
+"<svg width="148" height="86" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
+  <rect x="0" y="0" width="148" height="86" rx="6" ry="6" fill="#FFFFFF" stroke="#212121" stroke-width="2" />
+  <circle cx="20" cy="20" r="14" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="20" y="20" font-size="18px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text><text x="46" y="20" font-size="16px" fill="#212121" dominant-baseline="central">= Positive</text>
+  <circle cx="20" cy="60" r="14" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="20" y="60" font-size="18px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text><text x="46" y="60" font-size="16px" fill="#212121" dominant-baseline="central">= Negative</text>
+</svg>"
+`;

@@ -6,7 +6,6 @@ export const integerChipModelExamples: IntegerChipModelProps[] = [
 		type: "integerChipModel",
 		width: 300,
 		height: 150,
-		showLegend: false,
 		chips: [
 			{ sign: "plus", crossedOut: false },
 			{ sign: "plus", crossedOut: false },
@@ -20,7 +19,6 @@ export const integerChipModelExamples: IntegerChipModelProps[] = [
 		type: "integerChipModel",
 		width: 320,
 		height: 180,
-		showLegend: true,
 		chips: [
 			{ sign: "minus", crossedOut: false },
 			{ sign: "minus", crossedOut: false },
@@ -35,7 +33,6 @@ export const integerChipModelExamples: IntegerChipModelProps[] = [
 		type: "integerChipModel",
 		width: 280,
 		height: 160,
-		showLegend: false,
 		chips: [
 			{ sign: "plus", crossedOut: false },
 			{ sign: "plus", crossedOut: false },
@@ -52,7 +49,6 @@ export const integerChipModelExamples: IntegerChipModelProps[] = [
 		type: "integerChipModel",
 		width: 220,
 		height: 220,
-		showLegend: false,
 		chips: [
 			{ sign: "minus", crossedOut: false },
 			{ sign: "minus", crossedOut: false },
@@ -71,7 +67,6 @@ export const integerChipModelExamples: IntegerChipModelProps[] = [
 		type: "integerChipModel",
 		width: 360,
 		height: 200,
-		showLegend: true,
 		chips: [
 			{ sign: "plus", crossedOut: false },
 			{ sign: "plus", crossedOut: false },
@@ -95,7 +90,6 @@ export const integerChipModelExamples: IntegerChipModelProps[] = [
 		type: "integerChipModel",
 		width: 100,
 		height: 91,
-		showLegend: true,
 		chips: []
 	},
 	// Single positive chip with legend
@@ -103,7 +97,6 @@ export const integerChipModelExamples: IntegerChipModelProps[] = [
 		type: "integerChipModel",
 		width: 100,
 		height: 91,
-		showLegend: true,
 		chips: [
 			{ sign: "plus", crossedOut: false },
 			{ sign: "minus", crossedOut: false }
@@ -114,7 +107,6 @@ export const integerChipModelExamples: IntegerChipModelProps[] = [
 		type: "integerChipModel",
 		width: 320,
 		height: 91,
-		showLegend: false,
 		chips: [
 			{ sign: "plus", crossedOut: false },
 			{ sign: "plus", crossedOut: false },
@@ -134,7 +126,6 @@ export const integerChipModelExamples: IntegerChipModelProps[] = [
 		type: "integerChipModel",
 		width: 250,
 		height: 63,
-		showLegend: false,
 		chips: [
 			{ sign: "minus", crossedOut: false },
 			{ sign: "minus", crossedOut: false },
@@ -151,7 +142,6 @@ export const integerChipModelExamples: IntegerChipModelProps[] = [
 		type: "integerChipModel",
 		width: 320,
 		height: 80,
-		showLegend: false,
 		chips: [
 			{ sign: "plus", crossedOut: false },
 			{ sign: "plus", crossedOut: false },
@@ -167,7 +157,6 @@ export const integerChipModelExamples: IntegerChipModelProps[] = [
 		type: "integerChipModel",
 		width: 320,
 		height: 80,
-		showLegend: false,
 		chips: [
 			{ sign: "plus", crossedOut: true },
 			{ sign: "plus", crossedOut: true },
@@ -182,7 +171,6 @@ export const integerChipModelExamples: IntegerChipModelProps[] = [
 		type: "integerChipModel",
 		width: 320,
 		height: 80,
-		showLegend: false,
 		chips: [
 			{ sign: "minus", crossedOut: true },
 			{ sign: "minus", crossedOut: true },
@@ -196,7 +184,6 @@ export const integerChipModelExamples: IntegerChipModelProps[] = [
 		type: "integerChipModel",
 		width: 320,
 		height: 80,
-		showLegend: false,
 		chips: [
 			{ sign: "minus", crossedOut: false },
 			{ sign: "minus", crossedOut: false },
@@ -213,7 +200,6 @@ export const integerChipModelExamples: IntegerChipModelProps[] = [
 		type: "integerChipModel",
 		width: 320,
 		height: 80,
-		showLegend: false,
 		chips: [
 			{ sign: "minus", crossedOut: true },
 			{ sign: "minus", crossedOut: true },
@@ -230,7 +216,6 @@ export const integerChipModelExamples: IntegerChipModelProps[] = [
 		type: "integerChipModel",
 		width: 320,
 		height: 91,
-		showLegend: true,
 		chips: [
 			{ sign: "plus", crossedOut: false },
 			{ sign: "minus", crossedOut: false },
@@ -246,7 +231,6 @@ export const integerChipModelExamples: IntegerChipModelProps[] = [
 		type: "integerChipModel",
 		width: 320,
 		height: 71,
-		showLegend: false,
 		chips: [
 			{ sign: "minus", crossedOut: false },
 			{ sign: "minus", crossedOut: false },
@@ -273,7 +257,6 @@ export const integerChipModelExamples: IntegerChipModelProps[] = [
 		type: "integerChipModel",
 		width: 320,
 		height: 80,
-		showLegend: false,
 		chips: [
 			{ sign: "plus", crossedOut: false },
 			{ sign: "plus", crossedOut: false },

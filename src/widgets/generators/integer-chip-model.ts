@@ -21,8 +21,7 @@ export const IntegerChipModelPropsSchema = z
 					})
 					.strict()
 			)
-			.describe("Sequence of chips in render order; 'crossedOut' draws an X overlay."),
-		showLegend: z.boolean().describe("Render legend showing + = 1 and − = −1")
+			.describe("Sequence of chips in render order; 'crossedOut' draws an X overlay.")
 	})
 	.strict()
 	.describe("Displays positive (yellow) and negative (red) integer chips to visualize integer arithmetic.")
@@ -30,7 +29,7 @@ export const IntegerChipModelPropsSchema = z
 export type IntegerChipModelProps = z.infer<typeof IntegerChipModelPropsSchema>
 
 export const generateIntegerChipModel: WidgetGenerator<typeof IntegerChipModelPropsSchema> = async (props) => {
-	const { width, height, chips, showLegend } = props
+	const { width, height, chips } = props
 
 	const chipRadius = 24
 	const chipDiameter = chipRadius * 2
@@ -47,35 +46,8 @@ export const generateIntegerChipModel: WidgetGenerator<typeof IntegerChipModelPr
 
 	const svgElements: string[] = []
 
-	// Optional legend block
-	let legendHeight = 0
-	const legendPadding = 6
-	const legendCircleRadius = 14
-	const legendRowHeight = legendCircleRadius * 2 + legendPadding
-	const legendWidth = 110
-	if (showLegend) {
-		legendHeight = legendRowHeight * 2 + legendPadding * 3
-		const legendX = padding
-		const legendY = padding
-		const box = `<rect x="${legendX}" y="${legendY}" width="${legendWidth}" height="${legendHeight}" rx="6" ry="6" fill="#FFFFFF" stroke="${BORDER_COLOR}" stroke-width="2" />`
-		const items: string[] = []
-		function legendRow(row: number, sign: "plus" | "minus", label: string): void {
-			const cy = legendY + legendPadding + legendCircleRadius + row * (legendRowHeight + legendPadding)
-			const cx = legendX + legendPadding + legendCircleRadius
-			const fillColor = sign === "plus" ? PLUS_CHIP_COLOR : MINUS_CHIP_COLOR
-			const symbol = sign === "plus" ? "+" : "−"
-			const circle = `<circle cx="${cx}" cy="${cy}" r="${legendCircleRadius}" fill="${fillColor}" stroke="${BORDER_COLOR}" stroke-width="2" />`
-			const textSymbol = `<text x="${cx}" y="${cy}" font-size="18px" font-weight="600" fill="${SYMBOL_COLOR}" text-anchor="middle" dominant-baseline="central">${symbol}</text>`
-			const textLabel = `<text x="${cx + legendCircleRadius + 12}" y="${cy}" font-size="16px" fill="${SYMBOL_COLOR}" dominant-baseline="central">${label}</text>`
-			items.push(circle + textSymbol + textLabel)
-		}
-		legendRow(0, "plus", "= 1")
-		legendRow(1, "minus", "= −1")
-		svgElements.push(box + items.join("\n  "))
-	}
-
 	let currentX = padding + chipRadius
-	let currentY = padding + chipRadius + (legendHeight > 0 ? legendHeight + padding : 0)
+	let currentY = padding + chipRadius
 	let chipsInCurrentRow = 0
 
 	function placeChip(sign: "plus" | "minus", crossedOut: boolean): void {

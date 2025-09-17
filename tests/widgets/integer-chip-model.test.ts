@@ -27,7 +27,6 @@ describe("Widget: integer-chip-model", () => {
 				type: "integerChipModel",
 				width: 100,
 				height: 100,
-				showLegend: false,
 				chips: [{ sign: "plus", crossedOut: false }]
 			}
 			const result = await errors.try(generateWidget(props))
@@ -43,7 +42,6 @@ describe("Widget: integer-chip-model", () => {
 				type: "integerChipModel",
 				width: 200,
 				height: 120,
-				showLegend: false,
 				chips: [
 					{ sign: "plus", crossedOut: true },
 					{ sign: "minus", crossedOut: true },
@@ -58,28 +56,11 @@ describe("Widget: integer-chip-model", () => {
 			expect(result.data).toMatchSnapshot()
 		})
 
-		test("should handle legend without chips", async () => {
-			const props: IntegerChipModelProps = {
-				type: "integerChipModel",
-				width: 150,
-				height: 120,
-				showLegend: true,
-				chips: [{ sign: "minus", crossedOut: false }]
-			}
-			const result = await errors.try(generateWidget(props))
-			if (result.error) {
-				logger.error("widget generation failed", { error: result.error })
-				throw result.error
-			}
-			expect(result.data).toMatchSnapshot()
-		})
-
 		test("should handle narrow width forcing vertical layout", async () => {
 			const props: IntegerChipModelProps = {
 				type: "integerChipModel",
 				width: 80,
 				height: 300,
-				showLegend: false,
 				chips: [
 					{ sign: "plus", crossedOut: false },
 					{ sign: "minus", crossedOut: false },
@@ -96,37 +77,11 @@ describe("Widget: integer-chip-model", () => {
 			expect(result.data).toMatchSnapshot()
 		})
 
-		test("should handle zero-pair cancellation pattern", async () => {
-			const props: IntegerChipModelProps = {
-				type: "integerChipModel",
-				width: 300,
-				height: 150,
-				showLegend: true,
-				chips: [
-					{ sign: "plus", crossedOut: false },
-					{ sign: "minus", crossedOut: true },
-					{ sign: "plus", crossedOut: true },
-					{ sign: "minus", crossedOut: false },
-					{ sign: "plus", crossedOut: false },
-					{ sign: "minus", crossedOut: true },
-					{ sign: "plus", crossedOut: true },
-					{ sign: "minus", crossedOut: false }
-				]
-			}
-			const result = await errors.try(generateWidget(props))
-			if (result.error) {
-				logger.error("widget generation failed", { error: result.error })
-				throw result.error
-			}
-			expect(result.data).toMatchSnapshot()
-		})
-
 		test("should handle alternating pattern", async () => {
 			const props: IntegerChipModelProps = {
 				type: "integerChipModel",
 				width: 400,
 				height: 120,
-				showLegend: false,
 				chips: [
 					{ sign: "plus", crossedOut: false },
 					{ sign: "minus", crossedOut: false },
@@ -137,29 +92,6 @@ describe("Widget: integer-chip-model", () => {
 					{ sign: "plus", crossedOut: false },
 					{ sign: "minus", crossedOut: false }
 				]
-			}
-			const result = await errors.try(generateWidget(props))
-			if (result.error) {
-				logger.error("widget generation failed", { error: result.error })
-				throw result.error
-			}
-			expect(result.data).toMatchSnapshot()
-		})
-
-		test("should handle large number of chips with mixed crossed-out", async () => {
-			const chips: Array<{ sign: "plus" | "minus"; crossedOut: boolean }> = []
-			for (let i = 0; i < 15; i++) {
-				chips.push({
-					sign: i % 2 === 0 ? "plus" : "minus",
-					crossedOut: i % 5 === 0
-				})
-			}
-			const props: IntegerChipModelProps = {
-				type: "integerChipModel",
-				width: 350,
-				height: 200,
-				showLegend: true,
-				chips
 			}
 			const result = await errors.try(generateWidget(props))
 			if (result.error) {
@@ -174,7 +106,6 @@ describe("Widget: integer-chip-model", () => {
 				type: "integerChipModel",
 				width: 50, // Very narrow
 				height: 200,
-				showLegend: false,
 				chips: [
 					{ sign: "plus", crossedOut: false },
 					{ sign: "minus", crossedOut: false }
@@ -191,28 +122,11 @@ describe("Widget: integer-chip-model", () => {
 
 	// Database-extracted test cases for comprehensive coverage
 	describe("database-extracted test scenarios", () => {
-		test("should handle empty chips with legend", async () => {
-			const props: IntegerChipModelProps = {
-				type: "integerChipModel",
-				width: 100,
-				height: 91,
-				showLegend: true,
-				chips: []
-			}
-			const result = await errors.try(generateWidget(props))
-			if (result.error) {
-				logger.error("widget generation failed", { error: result.error })
-				throw result.error
-			}
-			expect(result.data).toMatchSnapshot()
-		})
-
 		test("should handle large collection with mixed signs", async () => {
 			const props: IntegerChipModelProps = {
 				type: "integerChipModel",
 				width: 320,
 				height: 91,
-				showLegend: false,
 				chips: [
 					{ sign: "plus", crossedOut: false },
 					{ sign: "plus", crossedOut: false },
@@ -240,7 +154,6 @@ describe("Widget: integer-chip-model", () => {
 				type: "integerChipModel",
 				width: 250,
 				height: 63,
-				showLegend: false,
 				chips: [
 					{ sign: "minus", crossedOut: false },
 					{ sign: "minus", crossedOut: false },
@@ -265,7 +178,6 @@ describe("Widget: integer-chip-model", () => {
 				type: "integerChipModel",
 				width: 320,
 				height: 80,
-				showLegend: false,
 				chips: [
 					{ sign: "plus", crossedOut: false },
 					{ sign: "plus", crossedOut: false },
@@ -289,7 +201,6 @@ describe("Widget: integer-chip-model", () => {
 				type: "integerChipModel",
 				width: 320,
 				height: 80,
-				showLegend: false,
 				chips: [
 					{ sign: "plus", crossedOut: true },
 					{ sign: "plus", crossedOut: true },
@@ -312,7 +223,6 @@ describe("Widget: integer-chip-model", () => {
 				type: "integerChipModel",
 				width: 320,
 				height: 80,
-				showLegend: false,
 				chips: [
 					{ sign: "minus", crossedOut: true },
 					{ sign: "minus", crossedOut: true },
@@ -334,7 +244,6 @@ describe("Widget: integer-chip-model", () => {
 				type: "integerChipModel",
 				width: 320,
 				height: 80,
-				showLegend: false,
 				chips: [
 					{ sign: "minus", crossedOut: false },
 					{ sign: "minus", crossedOut: false },
@@ -359,7 +268,6 @@ describe("Widget: integer-chip-model", () => {
 				type: "integerChipModel",
 				width: 320,
 				height: 80,
-				showLegend: false,
 				chips: [
 					{ sign: "minus", crossedOut: true },
 					{ sign: "minus", crossedOut: true },
@@ -367,30 +275,6 @@ describe("Widget: integer-chip-model", () => {
 					{ sign: "minus", crossedOut: true },
 					{ sign: "minus", crossedOut: true },
 					{ sign: "minus", crossedOut: true },
-					{ sign: "minus", crossedOut: false },
-					{ sign: "minus", crossedOut: false }
-				]
-			}
-			const result = await errors.try(generateWidget(props))
-			if (result.error) {
-				logger.error("widget generation failed", { error: result.error })
-				throw result.error
-			}
-			expect(result.data).toMatchSnapshot()
-		})
-
-		test("should handle evaluation pattern with legend", async () => {
-			const props: IntegerChipModelProps = {
-				type: "integerChipModel",
-				width: 320,
-				height: 91,
-				showLegend: true,
-				chips: [
-					{ sign: "plus", crossedOut: false },
-					{ sign: "minus", crossedOut: false },
-					{ sign: "minus", crossedOut: false },
-					{ sign: "minus", crossedOut: false },
-					{ sign: "minus", crossedOut: false },
 					{ sign: "minus", crossedOut: false },
 					{ sign: "minus", crossedOut: false }
 				]
@@ -408,7 +292,6 @@ describe("Widget: integer-chip-model", () => {
 				type: "integerChipModel",
 				width: 320,
 				height: 71,
-				showLegend: false,
 				chips: [
 					{ sign: "minus", crossedOut: false },
 					{ sign: "minus", crossedOut: false },
@@ -443,7 +326,6 @@ describe("Widget: integer-chip-model", () => {
 				type: "integerChipModel",
 				width: 320,
 				height: 80,
-				showLegend: false,
 				chips: [
 					{ sign: "plus", crossedOut: false },
 					{ sign: "plus", crossedOut: false },
@@ -472,7 +354,6 @@ describe("Widget: integer-chip-model", () => {
 				type: "integerChipModel",
 				width: 320,
 				height: 91,
-				showLegend: false,
 				chips: [
 					{ sign: "minus", crossedOut: false },
 					{ sign: "minus", crossedOut: false },
@@ -497,7 +378,6 @@ describe("Widget: integer-chip-model", () => {
 				type: "integerChipModel",
 				width: 320,
 				height: 91,
-				showLegend: false,
 				chips: [
 					{ sign: "plus", crossedOut: false },
 					{ sign: "plus", crossedOut: false },
@@ -522,7 +402,6 @@ describe("Widget: integer-chip-model", () => {
 				type: "integerChipModel",
 				width: 320,
 				height: 64,
-				showLegend: false,
 				chips: [
 					{ sign: "plus", crossedOut: false },
 					{ sign: "plus", crossedOut: false },
@@ -553,7 +432,6 @@ describe("Widget: integer-chip-model", () => {
 				type: "integerChipModel",
 				width: 320,
 				height: 80,
-				showLegend: false,
 				chips: [
 					{ sign: "minus", crossedOut: true },
 					{ sign: "minus", crossedOut: false },
@@ -573,7 +451,6 @@ describe("Widget: integer-chip-model", () => {
 				type: "integerChipModel",
 				width: 320,
 				height: 80,
-				showLegend: false,
 				chips: [
 					{ sign: "minus", crossedOut: true },
 					{ sign: "minus", crossedOut: true },
@@ -599,7 +476,6 @@ describe("Widget: integer-chip-model", () => {
 				type: "integerChipModel",
 				width: 320,
 				height: 80,
-				showLegend: false,
 				chips: [
 					{ sign: "minus", crossedOut: true },
 					{ sign: "minus", crossedOut: true },
@@ -621,7 +497,6 @@ describe("Widget: integer-chip-model", () => {
 				type: "integerChipModel",
 				width: 320,
 				height: 80,
-				showLegend: false,
 				chips: [
 					{ sign: "minus", crossedOut: false },
 					{ sign: "minus", crossedOut: false },

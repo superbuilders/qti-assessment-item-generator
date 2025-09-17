@@ -43,6 +43,7 @@ import { GeometricSolidDiagramPropsSchema } from "./generators/geometric-solid-d
 import { HangerDiagramPropsSchema } from "./generators/hanger-diagram"
 import { HistogramPropsSchema } from "./generators/histogram"
 import { InequalityNumberLinePropsSchema } from "./generators/inequality-number-line"
+import { IntegerChipLegendPropsSchema } from "./generators/integer-chip-legend"
 import { IntegerChipModelPropsSchema } from "./generators/integer-chip-model"
 import { KeelingCurvePropsSchema } from "./generators/keeling-curve"
 import { LabeledRectangleDiagramPropsSchema } from "./generators/labeled-rectangle-diagram"
@@ -161,6 +162,7 @@ export const allWidgetSchemas = {
 	pentagonIntersectionDiagram: PentagonIntersectionDiagramPropsSchema,
 	pictograph: PictographPropsSchema,
 	integerChipModel: IntegerChipModelPropsSchema,
+	integerChipLegend: IntegerChipLegendPropsSchema,
 	polyhedronDiagram: PolyhedronDiagramPropsSchema,
 	probabilitySpinner: ProbabilitySpinnerPropsSchema,
 	polyhedronNetDiagram: PolyhedronNetDiagramPropsSchema,
@@ -268,6 +270,7 @@ export {
 	PieChartWidgetPropsSchema,
 	PictographPropsSchema,
 	IntegerChipModelPropsSchema,
+	IntegerChipLegendPropsSchema,
 	PointPlotGraphPropsSchema,
 	PolygonGraphPropsSchema,
 	PolyhedronDiagramPropsSchema,
@@ -352,6 +355,8 @@ export type GeometricSolidDiagramProps = z.input<typeof GeometricSolidDiagramPro
 export type HangerDiagramProps = z.input<typeof HangerDiagramPropsSchema>
 export type HistogramProps = z.input<typeof HistogramPropsSchema>
 export type InequalityNumberLineProps = z.input<typeof InequalityNumberLinePropsSchema>
+export type IntegerChipModelProps = z.input<typeof IntegerChipModelPropsSchema>
+export type IntegerChipLegendProps = z.input<typeof IntegerChipLegendPropsSchema>
 export type KeelingCurveProps = z.input<typeof KeelingCurvePropsSchema>
 export type LineEquationGraphProps = z.input<typeof LineEquationGraphPropsSchema>
 export type LineGraphProps = z.input<typeof LineGraphPropsSchema>
@@ -442,6 +447,7 @@ const widgetSchemasWithoutSpecialUnions = [
 	typedSchemas.shapeTransformationGraph,
 	typedSchemas.dataTable,
 	typedSchemas.integerChipModel,
+	typedSchemas.integerChipLegend,
 	typedSchemas.discreteObjectRatioDiagram,
 	typedSchemas.dotPlot,
 	typedSchemas.doubleNumberLine,
