@@ -151,9 +151,9 @@ function toRad(deg: number): number {
 	return (deg * Math.PI) / 180
 }
 
-function toDeg(rad: number): number {
-	return (rad * 180) / Math.PI
-}
+// function toDeg(rad: number): number {
+// 	return (rad * 180) / Math.PI
+// }
 
 function vecAdd(a: Vec, b: Vec): Vec {
 	return { x: a.x + b.x, y: a.y + b.y }
@@ -163,9 +163,9 @@ function vecScale(a: Vec, s: number): Vec {
 	return { x: a.x * s, y: a.y * s }
 }
 
-function dist(a: Vec, b: Vec): number {
-	return Math.hypot(a.x - b.x, a.y - b.y)
-}
+// function dist(a: Vec, b: Vec): number {
+// 	return Math.hypot(a.x - b.x, a.y - b.y)
+// }
 
 function lineIntersection(p: Vec, v: Vec, q: Vec, w: Vec): Vec {
 	// Solve p + t v = q + s w
@@ -302,7 +302,7 @@ export const generateTriangleDiagram: WidgetGenerator<typeof TriangleDiagramProp
 	// From here, non-null assertion via local copies guarantees type safety
 	const AdegVal = Adeg as number
 	const BdegVal = Bdeg as number
-	const CdegVal = Cdeg as number
+	// const CdegVal = Cdeg as number
 
 	// --- Data space geometry (unit base), then fit to box ---
 	const A_data: Vec = { x: 0, y: 0 }
@@ -441,48 +441,48 @@ export const generateTriangleDiagram: WidgetGenerator<typeof TriangleDiagramProp
 		// Save opposite direction for vertex label placement later
 		preferredOppositeByVertex.set(mark.vertex, (mid + Math.PI) % (2 * Math.PI))
 		const baseR = arcRadius + 18
-		const segments = [
-			{ p1: A, p2: B },
-			{ p1: B, p2: C },
-			{ p1: C, p2: A }
-		]
-		const orient = (a: Vec, b: Vec, c: Vec) => {
-			const val = (b.y - a.y) * (c.x - b.x) - (b.x - a.x) * (c.y - b.y)
-			if (val > 1e-9) return 1
-			if (val < -1e-9) return -1
-						return 0
-					}
-		const intersects = (a: Vec, b: Vec, c: Vec, d2: Vec) => {
-			const o1 = orient(a, b, c)
-			const o2 = orient(a, b, d2)
-			const o3 = orient(c, d2, a)
-			const o4 = orient(c, d2, b)
-			return o1 !== o2 && o3 !== o4
-		}
-		const rectHitsAnySegment = (rect: { x: number; y: number; width: number; height: number; pad?: number }): boolean => {
-			const pad = rect.pad ?? 0
-			const rx = rect.x - pad
-			const ry = rect.y - pad
-			const rw = rect.width + 2 * pad
-			const rh = rect.height + 2 * pad
-			const corners = [
-				{ x: rx, y: ry },
-				{ x: rx + rw, y: ry },
-				{ x: rx + rw, y: ry + rh },
-				{ x: rx, y: ry + rh }
-			]
-			for (const s of segments) {
-				if (
-					intersects(s.p1, s.p2, corners[0], corners[1]) ||
-					intersects(s.p1, s.p2, corners[1], corners[2]) ||
-					intersects(s.p1, s.p2, corners[2], corners[3]) ||
-					intersects(s.p1, s.p2, corners[3], corners[0])
-				) {
-					return true
-				}
-			}
-			return false
-		}
+	// const segments = [
+	// 	{ p1: A, p2: B },
+	// 	{ p1: B, p2: C },
+	// 	{ p1: C, p2: A }
+	// ]
+	// const orient = (a: Vec, b: Vec, c: Vec) => {
+	// 	const val = (b.y - a.y) * (c.x - b.x) - (b.x - a.x) * (c.y - b.y)
+	// 	if (val > 1e-9) return 1
+	// 	if (val < -1e-9) return -1
+	// 				return 0
+	// 			}
+	// const intersects = (a: Vec, b: Vec, c: Vec, d2: Vec) => {
+	// 	const o1 = orient(a, b, c)
+	// 	const o2 = orient(a, b, d2)
+	// 	const o3 = orient(c, d2, a)
+	// 	const o4 = orient(c, d2, b)
+	// 	return o1 !== o2 && o3 !== o4
+	// }
+		// const rectHitsAnySegment = (rect: { x: number; y: number; width: number; height: number; pad?: number }): boolean => {
+		// const pad = rect.pad ?? 0
+		// const rx = rect.x - pad
+		// const ry = rect.y - pad
+		// const rw = rect.width + 2 * pad
+		// const rh = rect.height + 2 * pad
+		// const corners = [
+		// 	{ x: rx, y: ry },
+		// 	{ x: rx + rw, y: ry },
+		// 	{ x: rx + rw, y: ry + rh },
+		// 	{ x: rx, y: ry + rh }
+		// ]
+		// for (const s of segments) {
+		// 	if (
+		// 		intersects(s.p1, s.p2, corners[0], corners[1]) ||
+		// 		intersects(s.p1, s.p2, corners[1], corners[2]) ||
+		// 		intersects(s.p1, s.p2, corners[2], corners[3]) ||
+		// 		intersects(s.p1, s.p2, corners[3], corners[0])
+		// 	) {
+		// 		return true
+		// 	}
+		// }
+		// return false
+	// }
 		const text = angleValueToString(mark.value)
 		const fontPx = theme.font.size.medium
 		const { maxWidth, height: textH } = estimateWrappedTextDimensions(text, Number.POSITIVE_INFINITY, fontPx, 1.2)
@@ -491,17 +491,17 @@ export const generateTriangleDiagram: WidgetGenerator<typeof TriangleDiagramProp
 		let best = { x: center.x + baseR * Math.cos(mid), y: center.y + baseR * Math.sin(mid) }
 		let minHits = Number.POSITIVE_INFINITY
 		// Prefer placing labels opposite the triangle interior
-		const tri = [A, B, C]
-		function pointInTriangle(p: Vec): boolean {
-			const [p0, p1, p2] = tri
-			const area = (a: Vec, b: Vec, c: Vec) => (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x)
-			const s1 = area(p0, p1, p)
-			const s2 = area(p1, p2, p)
-			const s3 = area(p2, p0, p)
-			const hasNeg = (s1 < 0) || (s2 < 0) || (s3 < 0)
-			const hasPos = (s1 > 0) || (s2 > 0) || (s3 > 0)
-			return !(hasNeg && hasPos)
-		}
+		// const tri = [A, B, C]
+		// function pointInTriangle(p: Vec): boolean {
+		// const [p0, p1, p2] = tri
+		// const area = (a: Vec, b: Vec, c: Vec) => (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x)
+		// const s1 = area(p0, p1, p)
+		// const s2 = area(p1, p2, p)
+		// const s3 = area(p2, p0, p)
+		// const hasNeg = (s1 < 0) || (s2 < 0) || (s3 < 0)
+		// const hasPos = (s1 > 0) || (s2 > 0) || (s3 > 0)
+		// return !(hasNeg && hasPos)
+	// }
 		// Try interior first unless the angle is very acute; if collisions persist, flip outside
 		const acuteDeg = (sweep * 180) / Math.PI
 		const tryOrders: number[] = []
