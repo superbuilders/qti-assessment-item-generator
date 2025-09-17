@@ -3,26 +3,29 @@ import { CSS_COLOR_PATTERN } from "../../utils/css-color"
 import { theme } from "../../utils/theme"
 import type { WidgetGenerator } from "../types"
 
-// Schema for a color group of marbles
-const MarbleColorGroupSchema = z
-    .object({
-        color: z
-            .string()
-            .regex(CSS_COLOR_PATTERN, "invalid css color")
-            .describe("CSS color for the marbles in this group (e.g., '#5B8DEF', 'red', 'rgba(208,2,27,1)')"),
-        count: z
-            .number()
-            .int()
-            .positive()
-            .describe("Number of marbles in this color group (positive integer).")
-    })
-    .strict()
+// Factory for a color group of marbles schema (avoids pointer reuse/$ref)
+const createMarbleColorGroupSchema = () =>
+    z
+        .object({
+            color: z
+                .string()
+                .regex(CSS_COLOR_PATTERN, "invalid css color")
+                .describe(
+                    "CSS color for the marbles in this group (e.g., '#5B8DEF', 'red', 'rgba(208,2,27,1)')"
+                ),
+            count: z
+                .number()
+                .int()
+                .positive()
+                .describe("Number of marbles in this color group (positive integer).")
+        })
+        .strict()
 
 export const MarbleDiagramPropsSchema = z
     .object({
         type: z.literal("marbleDiagram"),
         groups: z
-            .array(MarbleColorGroupSchema)
+            .array(createMarbleColorGroupSchema())
             .min(1)
             .describe(
                 "Array of color groups. Each group defines a CSS color and a positive count. Supports two or more groups."
