@@ -188,4 +188,456 @@ describe("Widget: integer-chip-model", () => {
 			expect(result.data).toMatchSnapshot()
 		})
 	})
+
+	// Database-extracted test cases for comprehensive coverage
+	describe("database-extracted test scenarios", () => {
+		test("should handle empty chips with legend", async () => {
+			const props: IntegerChipModelProps = {
+				type: "integerChipModel",
+				width: 100,
+				height: 91,
+				showLegend: true,
+				chips: []
+			}
+			const result = await errors.try(generateWidget(props))
+			if (result.error) {
+				logger.error("widget generation failed", { error: result.error })
+				throw result.error
+			}
+			expect(result.data).toMatchSnapshot()
+		})
+
+		test("should handle large collection with mixed signs", async () => {
+			const props: IntegerChipModelProps = {
+				type: "integerChipModel",
+				width: 320,
+				height: 91,
+				showLegend: false,
+				chips: [
+					{ sign: "plus", crossedOut: false },
+					{ sign: "plus", crossedOut: false },
+					{ sign: "plus", crossedOut: false },
+					{ sign: "plus", crossedOut: false },
+					{ sign: "plus", crossedOut: false },
+					{ sign: "plus", crossedOut: false },
+					{ sign: "plus", crossedOut: false },
+					{ sign: "minus", crossedOut: false },
+					{ sign: "minus", crossedOut: false },
+					{ sign: "minus", crossedOut: false },
+					{ sign: "minus", crossedOut: false }
+				]
+			}
+			const result = await errors.try(generateWidget(props))
+			if (result.error) {
+				logger.error("widget generation failed", { error: result.error })
+				throw result.error
+			}
+			expect(result.data).toMatchSnapshot()
+		})
+
+		test("should handle wide layout with many chips", async () => {
+			const props: IntegerChipModelProps = {
+				type: "integerChipModel",
+				width: 250,
+				height: 63,
+				showLegend: false,
+				chips: [
+					{ sign: "minus", crossedOut: false },
+					{ sign: "minus", crossedOut: false },
+					{ sign: "plus", crossedOut: false },
+					{ sign: "plus", crossedOut: false },
+					{ sign: "plus", crossedOut: false },
+					{ sign: "plus", crossedOut: false },
+					{ sign: "plus", crossedOut: false },
+					{ sign: "plus", crossedOut: false }
+				]
+			}
+			const result = await errors.try(generateWidget(props))
+			if (result.error) {
+				logger.error("widget generation failed", { error: result.error })
+				throw result.error
+			}
+			expect(result.data).toMatchSnapshot()
+		})
+
+		test("should handle subtraction with single crossed out chip", async () => {
+			const props: IntegerChipModelProps = {
+				type: "integerChipModel",
+				width: 320,
+				height: 80,
+				showLegend: false,
+				chips: [
+					{ sign: "plus", crossedOut: false },
+					{ sign: "plus", crossedOut: false },
+					{ sign: "plus", crossedOut: false },
+					{ sign: "plus", crossedOut: false },
+					{ sign: "plus", crossedOut: false },
+					{ sign: "plus", crossedOut: false },
+					{ sign: "minus", crossedOut: true }
+				]
+			}
+			const result = await errors.try(generateWidget(props))
+			if (result.error) {
+				logger.error("widget generation failed", { error: result.error })
+				throw result.error
+			}
+			expect(result.data).toMatchSnapshot()
+		})
+
+		test("should handle multiple positive chips crossed out", async () => {
+			const props: IntegerChipModelProps = {
+				type: "integerChipModel",
+				width: 320,
+				height: 80,
+				showLegend: false,
+				chips: [
+					{ sign: "plus", crossedOut: true },
+					{ sign: "plus", crossedOut: true },
+					{ sign: "plus", crossedOut: true },
+					{ sign: "plus", crossedOut: true },
+					{ sign: "plus", crossedOut: true },
+					{ sign: "minus", crossedOut: false }
+				]
+			}
+			const result = await errors.try(generateWidget(props))
+			if (result.error) {
+				logger.error("widget generation failed", { error: result.error })
+				throw result.error
+			}
+			expect(result.data).toMatchSnapshot()
+		})
+
+		test("should handle mixed crossed out negative chips", async () => {
+			const props: IntegerChipModelProps = {
+				type: "integerChipModel",
+				width: 320,
+				height: 80,
+				showLegend: false,
+				chips: [
+					{ sign: "minus", crossedOut: true },
+					{ sign: "minus", crossedOut: true },
+					{ sign: "minus", crossedOut: true },
+					{ sign: "plus", crossedOut: false },
+					{ sign: "plus", crossedOut: false }
+				]
+			}
+			const result = await errors.try(generateWidget(props))
+			if (result.error) {
+				logger.error("widget generation failed", { error: result.error })
+				throw result.error
+			}
+			expect(result.data).toMatchSnapshot()
+		})
+
+		test("should handle complex subtraction pattern", async () => {
+			const props: IntegerChipModelProps = {
+				type: "integerChipModel",
+				width: 320,
+				height: 80,
+				showLegend: false,
+				chips: [
+					{ sign: "minus", crossedOut: false },
+					{ sign: "minus", crossedOut: false },
+					{ sign: "minus", crossedOut: false },
+					{ sign: "minus", crossedOut: false },
+					{ sign: "minus", crossedOut: false },
+					{ sign: "minus", crossedOut: false },
+					{ sign: "plus", crossedOut: true },
+					{ sign: "plus", crossedOut: true }
+				]
+			}
+			const result = await errors.try(generateWidget(props))
+			if (result.error) {
+				logger.error("widget generation failed", { error: result.error })
+				throw result.error
+			}
+			expect(result.data).toMatchSnapshot()
+		})
+
+		test("should handle mostly crossed out negative chips", async () => {
+			const props: IntegerChipModelProps = {
+				type: "integerChipModel",
+				width: 320,
+				height: 80,
+				showLegend: false,
+				chips: [
+					{ sign: "minus", crossedOut: true },
+					{ sign: "minus", crossedOut: true },
+					{ sign: "minus", crossedOut: true },
+					{ sign: "minus", crossedOut: true },
+					{ sign: "minus", crossedOut: true },
+					{ sign: "minus", crossedOut: true },
+					{ sign: "minus", crossedOut: false },
+					{ sign: "minus", crossedOut: false }
+				]
+			}
+			const result = await errors.try(generateWidget(props))
+			if (result.error) {
+				logger.error("widget generation failed", { error: result.error })
+				throw result.error
+			}
+			expect(result.data).toMatchSnapshot()
+		})
+
+		test("should handle evaluation pattern with legend", async () => {
+			const props: IntegerChipModelProps = {
+				type: "integerChipModel",
+				width: 320,
+				height: 91,
+				showLegend: true,
+				chips: [
+					{ sign: "plus", crossedOut: false },
+					{ sign: "minus", crossedOut: false },
+					{ sign: "minus", crossedOut: false },
+					{ sign: "minus", crossedOut: false },
+					{ sign: "minus", crossedOut: false },
+					{ sign: "minus", crossedOut: false },
+					{ sign: "minus", crossedOut: false }
+				]
+			}
+			const result = await errors.try(generateWidget(props))
+			if (result.error) {
+				logger.error("widget generation failed", { error: result.error })
+				throw result.error
+			}
+			expect(result.data).toMatchSnapshot()
+		})
+
+		test("should handle large collection with different height", async () => {
+			const props: IntegerChipModelProps = {
+				type: "integerChipModel",
+				width: 320,
+				height: 71,
+				showLegend: false,
+				chips: [
+					{ sign: "minus", crossedOut: false },
+					{ sign: "minus", crossedOut: false },
+					{ sign: "minus", crossedOut: false },
+					{ sign: "minus", crossedOut: false },
+					{ sign: "minus", crossedOut: false },
+					{ sign: "minus", crossedOut: false },
+					{ sign: "minus", crossedOut: false },
+					{ sign: "minus", crossedOut: false },
+					{ sign: "minus", crossedOut: false },
+					{ sign: "plus", crossedOut: false },
+					{ sign: "plus", crossedOut: false },
+					{ sign: "plus", crossedOut: false },
+					{ sign: "plus", crossedOut: false },
+					{ sign: "plus", crossedOut: false },
+					{ sign: "plus", crossedOut: false },
+					{ sign: "plus", crossedOut: false },
+					{ sign: "plus", crossedOut: false },
+					{ sign: "plus", crossedOut: false }
+				]
+			}
+			const result = await errors.try(generateWidget(props))
+			if (result.error) {
+				logger.error("widget generation failed", { error: result.error })
+				throw result.error
+			}
+			expect(result.data).toMatchSnapshot()
+		})
+
+		test("should handle complex subtraction with multiple crossed out", async () => {
+			const props: IntegerChipModelProps = {
+				type: "integerChipModel",
+				width: 320,
+				height: 80,
+				showLegend: false,
+				chips: [
+					{ sign: "plus", crossedOut: false },
+					{ sign: "plus", crossedOut: false },
+					{ sign: "plus", crossedOut: false },
+					{ sign: "plus", crossedOut: false },
+					{ sign: "plus", crossedOut: false },
+					{ sign: "plus", crossedOut: false },
+					{ sign: "plus", crossedOut: false },
+					{ sign: "minus", crossedOut: true },
+					{ sign: "minus", crossedOut: true },
+					{ sign: "minus", crossedOut: true },
+					{ sign: "minus", crossedOut: true },
+					{ sign: "minus", crossedOut: true }
+				]
+			}
+			const result = await errors.try(generateWidget(props))
+			if (result.error) {
+				logger.error("widget generation failed", { error: result.error })
+				throw result.error
+			}
+			expect(result.data).toMatchSnapshot()
+		})
+
+		test("should handle all negative chips only", async () => {
+			const props: IntegerChipModelProps = {
+				type: "integerChipModel",
+				width: 320,
+				height: 91,
+				showLegend: false,
+				chips: [
+					{ sign: "minus", crossedOut: false },
+					{ sign: "minus", crossedOut: false },
+					{ sign: "minus", crossedOut: false },
+					{ sign: "minus", crossedOut: false },
+					{ sign: "minus", crossedOut: false },
+					{ sign: "minus", crossedOut: false },
+					{ sign: "minus", crossedOut: false },
+					{ sign: "minus", crossedOut: false }
+				]
+			}
+			const result = await errors.try(generateWidget(props))
+			if (result.error) {
+				logger.error("widget generation failed", { error: result.error })
+				throw result.error
+			}
+			expect(result.data).toMatchSnapshot()
+		})
+
+		test("should handle mixed evaluation scenario", async () => {
+			const props: IntegerChipModelProps = {
+				type: "integerChipModel",
+				width: 320,
+				height: 91,
+				showLegend: false,
+				chips: [
+					{ sign: "plus", crossedOut: false },
+					{ sign: "plus", crossedOut: false },
+					{ sign: "minus", crossedOut: false },
+					{ sign: "minus", crossedOut: false },
+					{ sign: "minus", crossedOut: false },
+					{ sign: "minus", crossedOut: false },
+					{ sign: "minus", crossedOut: false },
+					{ sign: "minus", crossedOut: false }
+				]
+			}
+			const result = await errors.try(generateWidget(props))
+			if (result.error) {
+				logger.error("widget generation failed", { error: result.error })
+				throw result.error
+			}
+			expect(result.data).toMatchSnapshot()
+		})
+
+		test("should handle small collection with different dimensions", async () => {
+			const props: IntegerChipModelProps = {
+				type: "integerChipModel",
+				width: 320,
+				height: 64,
+				showLegend: false,
+				chips: [
+					{ sign: "plus", crossedOut: false },
+					{ sign: "plus", crossedOut: false },
+					{ sign: "plus", crossedOut: false },
+					{ sign: "plus", crossedOut: false },
+					{ sign: "plus", crossedOut: false },
+					{ sign: "plus", crossedOut: false },
+					{ sign: "plus", crossedOut: false },
+					{ sign: "plus", crossedOut: false },
+					{ sign: "plus", crossedOut: false },
+					{ sign: "plus", crossedOut: false },
+					{ sign: "minus", crossedOut: false },
+					{ sign: "minus", crossedOut: false },
+					{ sign: "minus", crossedOut: false },
+					{ sign: "minus", crossedOut: false }
+				]
+			}
+			const result = await errors.try(generateWidget(props))
+			if (result.error) {
+				logger.error("widget generation failed", { error: result.error })
+				throw result.error
+			}
+			expect(result.data).toMatchSnapshot()
+		})
+
+		test("should handle single crossed out negative chip", async () => {
+			const props: IntegerChipModelProps = {
+				type: "integerChipModel",
+				width: 320,
+				height: 80,
+				showLegend: false,
+				chips: [
+					{ sign: "minus", crossedOut: true },
+					{ sign: "minus", crossedOut: false },
+					{ sign: "minus", crossedOut: false }
+				]
+			}
+			const result = await errors.try(generateWidget(props))
+			if (result.error) {
+				logger.error("widget generation failed", { error: result.error })
+				throw result.error
+			}
+			expect(result.data).toMatchSnapshot()
+		})
+
+		test("should handle mixed crossed out positive chips", async () => {
+			const props: IntegerChipModelProps = {
+				type: "integerChipModel",
+				width: 320,
+				height: 80,
+				showLegend: false,
+				chips: [
+					{ sign: "minus", crossedOut: true },
+					{ sign: "minus", crossedOut: true },
+					{ sign: "minus", crossedOut: true },
+					{ sign: "minus", crossedOut: true },
+					{ sign: "minus", crossedOut: true },
+					{ sign: "plus", crossedOut: false },
+					{ sign: "plus", crossedOut: false },
+					{ sign: "plus", crossedOut: false },
+					{ sign: "plus", crossedOut: false }
+				]
+			}
+			const result = await errors.try(generateWidget(props))
+			if (result.error) {
+				logger.error("widget generation failed", { error: result.error })
+				throw result.error
+			}
+			expect(result.data).toMatchSnapshot()
+		})
+
+		test("should handle partial subtraction pattern", async () => {
+			const props: IntegerChipModelProps = {
+				type: "integerChipModel",
+				width: 320,
+				height: 80,
+				showLegend: false,
+				chips: [
+					{ sign: "minus", crossedOut: true },
+					{ sign: "minus", crossedOut: true },
+					{ sign: "minus", crossedOut: false },
+					{ sign: "minus", crossedOut: false },
+					{ sign: "minus", crossedOut: false }
+				]
+			}
+			const result = await errors.try(generateWidget(props))
+			if (result.error) {
+				logger.error("widget generation failed", { error: result.error })
+				throw result.error
+			}
+			expect(result.data).toMatchSnapshot()
+		})
+
+		test("should handle subtraction with crossed out negative chips", async () => {
+			const props: IntegerChipModelProps = {
+				type: "integerChipModel",
+				width: 320,
+				height: 80,
+				showLegend: false,
+				chips: [
+					{ sign: "minus", crossedOut: false },
+					{ sign: "minus", crossedOut: false },
+					{ sign: "minus", crossedOut: true },
+					{ sign: "minus", crossedOut: true },
+					{ sign: "minus", crossedOut: false },
+					{ sign: "minus", crossedOut: false },
+					{ sign: "minus", crossedOut: false }
+				]
+			}
+			const result = await errors.try(generateWidget(props))
+			if (result.error) {
+				logger.error("widget generation failed", { error: result.error })
+				throw result.error
+			}
+			expect(result.data).toMatchSnapshot()
+		})
+	})
 })

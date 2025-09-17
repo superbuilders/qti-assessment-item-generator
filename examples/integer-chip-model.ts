@@ -88,5 +88,205 @@ export const integerChipModelExamples: IntegerChipModelProps[] = [
 			{ sign: "plus", crossedOut: false },
 			{ sign: "plus", crossedOut: false }
 		]
+	},
+	// Additional test cases extracted from database
+	// Empty chips with legend
+	{
+		type: "integerChipModel",
+		width: 100,
+		height: 91,
+		showLegend: true,
+		chips: []
+	},
+	// Single positive chip with legend
+	{
+		type: "integerChipModel",
+		width: 100,
+		height: 91,
+		showLegend: true,
+		chips: [
+			{ sign: "plus", crossedOut: false },
+			{ sign: "minus", crossedOut: false }
+		]
+	},
+	// Large collection with mixed signs
+	{
+		type: "integerChipModel",
+		width: 320,
+		height: 91,
+		showLegend: false,
+		chips: [
+			{ sign: "plus", crossedOut: false },
+			{ sign: "plus", crossedOut: false },
+			{ sign: "plus", crossedOut: false },
+			{ sign: "plus", crossedOut: false },
+			{ sign: "plus", crossedOut: false },
+			{ sign: "plus", crossedOut: false },
+			{ sign: "plus", crossedOut: false },
+			{ sign: "minus", crossedOut: false },
+			{ sign: "minus", crossedOut: false },
+			{ sign: "minus", crossedOut: false },
+			{ sign: "minus", crossedOut: false }
+		]
+	},
+	// Wide layout with many chips
+	{
+		type: "integerChipModel",
+		width: 250,
+		height: 63,
+		showLegend: false,
+		chips: [
+			{ sign: "minus", crossedOut: false },
+			{ sign: "minus", crossedOut: false },
+			{ sign: "plus", crossedOut: false },
+			{ sign: "plus", crossedOut: false },
+			{ sign: "plus", crossedOut: false },
+			{ sign: "plus", crossedOut: false },
+			{ sign: "plus", crossedOut: false },
+			{ sign: "plus", crossedOut: false }
+		]
+	},
+	// Crossed out chips demonstration
+	{
+		type: "integerChipModel",
+		width: 320,
+		height: 80,
+		showLegend: false,
+		chips: [
+			{ sign: "plus", crossedOut: false },
+			{ sign: "plus", crossedOut: false },
+			{ sign: "plus", crossedOut: false },
+			{ sign: "plus", crossedOut: false },
+			{ sign: "plus", crossedOut: false },
+			{ sign: "plus", crossedOut: false },
+			{ sign: "minus", crossedOut: true }
+		]
+	},
+	// Subtraction with crossed out chips
+	{
+		type: "integerChipModel",
+		width: 320,
+		height: 80,
+		showLegend: false,
+		chips: [
+			{ sign: "plus", crossedOut: true },
+			{ sign: "plus", crossedOut: true },
+			{ sign: "plus", crossedOut: true },
+			{ sign: "plus", crossedOut: true },
+			{ sign: "plus", crossedOut: true },
+			{ sign: "minus", crossedOut: false }
+		]
+	},
+	// Mixed crossed out pattern
+	{
+		type: "integerChipModel",
+		width: 320,
+		height: 80,
+		showLegend: false,
+		chips: [
+			{ sign: "minus", crossedOut: true },
+			{ sign: "minus", crossedOut: true },
+			{ sign: "minus", crossedOut: true },
+			{ sign: "plus", crossedOut: false },
+			{ sign: "plus", crossedOut: false }
+		]
+	},
+	// Complex subtraction pattern
+	{
+		type: "integerChipModel",
+		width: 320,
+		height: 80,
+		showLegend: false,
+		chips: [
+			{ sign: "minus", crossedOut: false },
+			{ sign: "minus", crossedOut: false },
+			{ sign: "minus", crossedOut: false },
+			{ sign: "minus", crossedOut: false },
+			{ sign: "minus", crossedOut: false },
+			{ sign: "minus", crossedOut: false },
+			{ sign: "plus", crossedOut: true },
+			{ sign: "plus", crossedOut: true }
+		]
+	},
+	// All crossed out negative chips
+	{
+		type: "integerChipModel",
+		width: 320,
+		height: 80,
+		showLegend: false,
+		chips: [
+			{ sign: "minus", crossedOut: true },
+			{ sign: "minus", crossedOut: true },
+			{ sign: "minus", crossedOut: true },
+			{ sign: "minus", crossedOut: true },
+			{ sign: "minus", crossedOut: true },
+			{ sign: "minus", crossedOut: true },
+			{ sign: "minus", crossedOut: false },
+			{ sign: "minus", crossedOut: false }
+		]
+	},
+	// Evaluation pattern with legend
+	{
+		type: "integerChipModel",
+		width: 320,
+		height: 91,
+		showLegend: true,
+		chips: [
+			{ sign: "plus", crossedOut: false },
+			{ sign: "minus", crossedOut: false },
+			{ sign: "minus", crossedOut: false },
+			{ sign: "minus", crossedOut: false },
+			{ sign: "minus", crossedOut: false },
+			{ sign: "minus", crossedOut: false },
+			{ sign: "minus", crossedOut: false }
+		]
+	},
+	// Large positive collection
+	{
+		type: "integerChipModel",
+		width: 320,
+		height: 71,
+		showLegend: false,
+		chips: [
+			{ sign: "minus", crossedOut: false },
+			{ sign: "minus", crossedOut: false },
+			{ sign: "minus", crossedOut: false },
+			{ sign: "minus", crossedOut: false },
+			{ sign: "minus", crossedOut: false },
+			{ sign: "minus", crossedOut: false },
+			{ sign: "minus", crossedOut: false },
+			{ sign: "minus", crossedOut: false },
+			{ sign: "minus", crossedOut: false },
+			{ sign: "plus", crossedOut: false },
+			{ sign: "plus", crossedOut: false },
+			{ sign: "plus", crossedOut: false },
+			{ sign: "plus", crossedOut: false },
+			{ sign: "plus", crossedOut: false },
+			{ sign: "plus", crossedOut: false },
+			{ sign: "plus", crossedOut: false },
+			{ sign: "plus", crossedOut: false },
+			{ sign: "plus", crossedOut: false }
+		]
+	},
+	// Complex subtraction with multiple crossed out
+	{
+		type: "integerChipModel",
+		width: 320,
+		height: 80,
+		showLegend: false,
+		chips: [
+			{ sign: "plus", crossedOut: false },
+			{ sign: "plus", crossedOut: false },
+			{ sign: "plus", crossedOut: false },
+			{ sign: "plus", crossedOut: false },
+			{ sign: "plus", crossedOut: false },
+			{ sign: "plus", crossedOut: false },
+			{ sign: "plus", crossedOut: false },
+			{ sign: "minus", crossedOut: true },
+			{ sign: "minus", crossedOut: true },
+			{ sign: "minus", crossedOut: true },
+			{ sign: "minus", crossedOut: true },
+			{ sign: "minus", crossedOut: true }
+		]
 	}
 ]
