@@ -511,6 +511,89 @@ This is a mandatory step for all questions involving a \`textEntryInteraction\`.
     - **\`responseDeclarations\`:** \`baseType\` is \`"float"\`, \`correct\` is \`11.24\`.
     - **\`body\`:** No formatting instruction is added.
 
+**Negative example (DO NOT OUTPUT) - Incorrect format and missing instructions:**
+\`\`\`json
+{
+  "body": [
+    { "type": "paragraph", "content": [{ "type": "text", "content": "Evaluate." }] },
+    {
+      "type": "paragraph",
+      "content": [
+        { "type": "math", "mathml": "<mrow><msup><mrow><mo>(</mo><mrow><mo>-</mo><mn>3</mn><mfrac><mn>1</mn><mn>3</mn></mfrac></mrow><mo>)</mo></mrow><mn>2</mn></msup><mo>=</mo></mrow>" },
+        { "type": "text", "content": " " },
+        { "type": "inlineSlot", "slotId": "text_entry" }
+      ]
+    }
+    // ❌ WRONG: Missing a paragraph with user instructions on how to format the answer.
+  ],
+  "title": "Square a negative mixed number",
+  "feedback": {
+    "correct": [
+      {
+        "type": "paragraph",
+        "content": [
+          { "type": "text", "content": "Correct! The value is " },
+          { "type": "math", "mathml": "<mfrac><mn>100</mn><mn>9</mn></mfrac>" }, // The feedback clearly shows the canonical format.
+          { "type": "text", "content": "." }
+        ]
+      }
+    ]
+  },
+  "responseDeclarations": [
+    {
+      // ❌ WRONG: The 'correct' value is a float, but the feedback specifies a fraction.
+      "correct": 11.1111111,
+      // ❌ WRONG: The 'baseType' should be "string" to enforce the fractional format.
+      "baseType": "float",
+      "identifier": "RESPONSE",
+      "cardinality": "single"
+    }
+  ]
+}
+\`\`\`
+
+**Positive example — CORRECT format derived from feedback and instructions added:**
+\`\`\`json
+{
+  "body": [
+    { "type": "paragraph", "content": [{ "type": "text", "content": "Evaluate." }] },
+    // ✅ CORRECT: A new paragraph with user instructions has been added.
+    { "type": "paragraph", "content": [{ "type": "text", "content": "(In the simplest form without spaces)" }] },
+    {
+      "type": "paragraph",
+      "content": [
+        { "type": "math", "mathml": "<mrow><msup><mrow><mo>(</mo><mrow><mo>-</mo><mn>3</mn><mfrac><mn>1</mn><mn>3</mn></mfrac></mrow><mo>)</mo></mrow><mn>2</mn></msup><mo>=</mo></mrow>" },
+        { "type": "text", "content": " " },
+        { "type": "inlineSlot", "slotId": "text_entry" }
+      ]
+    }
+  ],
+  "title": "Square a negative mixed number",
+  "feedback": {
+    "correct": [
+      {
+        "type": "paragraph",
+        "content": [
+          { "type": "text", "content": "Correct! The value is " },
+          { "type": "math", "mathml": "<mfrac><mn>100</mn><mn>9</mn></mfrac>" },
+          { "type": "text", "content": "." }
+        ]
+      }
+    ]
+  },
+  "responseDeclarations": [
+    {
+      // ✅ CORRECT: The 'correct' value is a string that matches the feedback's canonical format.
+      "correct": "100/9",
+      // ✅ CORRECT: The 'baseType' is "string" because the required format is a fraction.
+      "baseType": "string",
+      "identifier": "RESPONSE",
+      "cardinality": "single"
+    }
+  ]
+}
+\`\`\`
+
 **CRITICAL: NO CURRENCY SLOTS - STRICT MATHML ENFORCEMENT.**
 Currency symbols and amounts MUST NOT be represented as slots (widget or interaction). Do not generate any slotId that indicates currency (for example, names containing "currency" or ending with "_feedback"). 
 
