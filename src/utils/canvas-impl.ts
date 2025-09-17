@@ -473,9 +473,16 @@ export class CanvasImpl implements Canvas {
 		const lines = this.wrapText(opts.text, opts.maxWidthPx, fontPx)
 
 		// Create a single text element with tspans for each line
+		// When dominant-baseline is "middle", vertically center the entire block
+		// by offsetting the first line upward by half the block height in em units.
+		const totalLines = lines.length
+		const firstLineDyEm =
+			opts.dominantBaseline === "middle" && totalLines > 1
+				? -((totalLines - 1) * lineHeight) / 2
+				: 0
 		const tspans = lines
 			.map((line, i) => {
-				const dy = i === 0 ? "0" : `${lineHeight}em`
+				const dy = i === 0 ? `${firstLineDyEm}em` : `${lineHeight}em`
 				return `<tspan x="${opts.x}" dy="${dy}">${this.escapeHtml(line)}</tspan>`
 			})
 			.join("")

@@ -64,6 +64,72 @@ export const treeDiagramExamples: TreeDiagramProps[] = [
     height: 144,
     nodeRadius: 40,
     nodeFontSize: 12
+  },
+  // Extracted from question: x150b1c6c6e15ce1f
+  // Question: Select the tree diagram for three coin flips
+  // Widget key: image_1
+  {
+    type: "treeDiagram",
+    edges: [
+      { to: "nA", from: "rootB", style: "solid" },
+      { to: "nB", from: "rootB", style: "solid" },
+      { to: "nC", from: "rootB", style: "solid" },
+      { to: "nD", from: "rootB", style: "solid" }
+    ],
+    nodes: [
+      { id: "rootB", color: "#000000", label: null, style: "circled", position: { x: 220, y: 24 } },
+      { id: "nA", color: "#000000", label: "3 heads", style: "circled", position: { x: 70, y: 94 } },
+      { id: "nB", color: "#000000", label: "2 heads and 1 tail", style: "circled", position: { x: 170, y: 94 } },
+      { id: "nC", color: "#000000", label: "1 head and 2 tails", style: "circled", position: { x: 270, y: 94 } },
+      { id: "nD", color: "#000000", label: "3 tails", style: "circled", position: { x: 370, y: 94 } }
+    ],
+    width: 440,
+    height: 144,
+    nodeRadius: 36,
+    nodeFontSize: 14
+  },
+  // Extracted from question: x150b1c6c6e15ce1f
+  // Question: Select the tree diagram for three coin flips
+  // Widget key: image_2
+  {
+    type: "treeDiagram",
+    edges: [
+      { to: "n1H", from: "rootA", style: "solid" },
+      { to: "n1T", from: "rootA", style: "solid" },
+      { to: "n2HH", from: "n1H", style: "solid" },
+      { to: "n2HT", from: "n1H", style: "solid" },
+      { to: "n2TH", from: "n1T", style: "solid" },
+      { to: "n2TT", from: "n1T", style: "solid" },
+      { to: "n3HHH", from: "n2HH", style: "solid" },
+      { to: "n3HHT", from: "n2HH", style: "solid" },
+      { to: "n3HTH", from: "n2HT", style: "solid" },
+      { to: "n3HTT", from: "n2HT", style: "solid" },
+      { to: "n3THH", from: "n2TH", style: "solid" },
+      { to: "n3THT", from: "n2TH", style: "solid" },
+      { to: "n3TTH", from: "n2TT", style: "solid" },
+      { to: "n3TTT", from: "n2TT", style: "solid" }
+    ],
+    nodes: [
+      { id: "rootA", color: "#000000", label: null, style: "circled", position: { x: 220, y: 24 } },
+      { id: "n1H", color: "#000000", label: "H", style: "circled", position: { x: 120, y: 74 } },
+      { id: "n1T", color: "#000000", label: "T", style: "circled", position: { x: 320, y: 74 } },
+      { id: "n2HH", color: "#000000", label: "H", style: "circled", position: { x: 70, y: 174 } },
+      { id: "n2HT", color: "#000000", label: "T", style: "circled", position: { x: 170, y: 174 } },
+      { id: "n2TH", color: "#000000", label: "H", style: "circled", position: { x: 270, y: 174 } },
+      { id: "n2TT", color: "#000000", label: "T", style: "circled", position: { x: 370, y: 174 } },
+      { id: "n3HHH", color: "#000000", label: "H", style: "circled", position: { x: 45, y: 274 } },
+      { id: "n3HHT", color: "#000000", label: "T", style: "circled", position: { x: 95, y: 274 } },
+      { id: "n3HTH", color: "#000000", label: "H", style: "circled", position: { x: 145, y: 274 } },
+      { id: "n3HTT", color: "#000000", label: "T", style: "circled", position: { x: 195, y: 274 } },
+      { id: "n3THH", color: "#000000", label: "H", style: "circled", position: { x: 245, y: 274 } },
+      { id: "n3THT", color: "#000000", label: "T", style: "circled", position: { x: 295, y: 274 } },
+      { id: "n3TTH", color: "#000000", label: "H", style: "circled", position: { x: 345, y: 274 } },
+      { id: "n3TTT", color: "#000000", label: "T", style: "circled", position: { x: 395, y: 274 } }
+    ],
+    width: 440,
+    height: 304,
+    nodeRadius: 20,
+    nodeFontSize: 14
   }
 ]
 

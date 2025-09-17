@@ -6,6 +6,7 @@ import { PADDING } from "../../utils/constants"
 import { CSS_COLOR_PATTERN } from "../../utils/css-color"
 import { Path2D } from "../../utils/path-builder"
 import { theme } from "../../utils/theme"
+import { estimateWrappedTextDimensions } from "../../utils/text"
 import type { WidgetGenerator } from "../types"
 
 function createShapeSchema() {
@@ -182,12 +183,16 @@ export const TransformationDiagramPropsSchema = z
 			),
 		width: z
 			.number()
+			.min(200)
+			.max(500)
 			.positive()
 			.describe(
 				"Total width of the diagram in pixels (e.g., 600, 700, 500). Must accommodate both shapes, labels, and transformation elements."
 			),
 		height: z
 			.number()
+			.min(200)
+			.max(500)
 			.positive()
 			.describe(
 				"Total height of the diagram in pixels (e.g., 500, 600, 400). Should fit pre-image, image, and any transformation aids."
@@ -340,6 +345,114 @@ export const generateTransformationDiagram: WidgetGenerator<typeof Transformatio
 	const toSvgX = (x: number) => svgCenterX + (x - dataCenterX) * scale
 	const toSvgY = (y: number) => svgCenterY - (y - dataCenterY) * scale
 
+	// --- Begin screen geometry for collision detection ---
+	const screenSegments: Array<{ a: { x: number; y: number }; b: { x: number; y: number } }> = []
+
+	function addShapeSegments(shape: TransformationDiagramProps["preImage"]) {
+		const pts = shape.vertices.map((p) => ({ x: toSvgX(p.x), y: toSvgY(p.y) }))
+		for (let i = 0; i < pts.length; i++) {
+			const a = pts[i]
+			const b = pts[(i + 1) % pts.length]
+			screenSegments.push({ a, b })
+		}
+	}
+
+	function addSegment(from: { x: number; y: number }, to: { x: number; y: number }) {
+		screenSegments.push({ a: { x: toSvgX(from.x), y: toSvgY(from.y) }, b: { x: toSvgX(to.x), y: toSvgY(to.y) } })
+	}
+
+	// Add polygon edges for both shapes
+	addShapeSegments(preImage)
+	addShapeSegments(image)
+
+	// Add reflection aid segments when applicable
+	if (transformation.type === "reflection") {
+		addSegment(transformation.lineOfReflection.from, transformation.lineOfReflection.to)
+		// Also add dotted correspondence lines (pre vertex -> image vertex)
+		for (let i = 0; i < preImage.vertices.length; i++) {
+			const p = preImage.vertices[i]
+			const q = image.vertices[i]
+			if (p && q) addSegment(p, q)
+		}
+	}
+
+	function segmentIntersectsRect(
+		A: { x: number; y: number },
+		B: { x: number; y: number },
+		rect: { x: number; y: number; width: number; height: number; pad?: number }
+	): boolean {
+		const pad = rect.pad ?? 0
+		const rx = rect.x - pad
+		const ry = rect.y - pad
+		const rw = rect.width + 2 * pad
+		const rh = rect.height + 2 * pad
+
+		const minX = Math.min(A.x, B.x)
+		const maxX = Math.max(A.x, B.x)
+		const minY = Math.min(A.y, B.y)
+		const maxY = Math.max(A.y, B.y)
+		if (maxX < rx || minX > rx + rw || maxY < ry || minY > ry + rh) return false
+
+		const r1 = { x: rx, y: ry }
+		const r2 = { x: rx + rw, y: ry }
+		const r3 = { x: rx + rw, y: ry + rh }
+		const r4 = { x: rx, y: ry + rh }
+		const orient = (p: { x: number; y: number }, q: { x: number; y: number }, r: { x: number; y: number }) => {
+			const val = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y)
+			if (val > 1e-9) return 1
+			if (val < -1e-9) return -1
+			return 0
+		}
+		const segmentsIntersect = (
+			p1: { x: number; y: number },
+			p2: { x: number; y: number },
+			p3: { x: number; y: number },
+			p4: { x: number; y: number }
+		) => {
+			const o1 = orient(p1, p2, p3)
+			const o2 = orient(p1, p2, p4)
+			const o3 = orient(p3, p4, p1)
+			const o4 = orient(p3, p4, p2)
+			return o1 !== o2 && o3 !== o4
+		}
+		return (
+			segmentsIntersect(A, B, r1, r2) ||
+			segmentsIntersect(A, B, r2, r3) ||
+			segmentsIntersect(A, B, r3, r4) ||
+			segmentsIntersect(A, B, r4, r1)
+		)
+	}
+
+	function rectIntersectsAnySegment(rect: { x: number; y: number; width: number; height: number; pad?: number }): boolean {
+		for (const seg of screenSegments) {
+			if (segmentIntersectsRect(seg.a, seg.b, rect)) return true
+		}
+		return false
+	}
+
+	function rectsOverlap(a: { x: number; y: number; width: number; height: number }, b: {
+		x: number
+		y: number
+		width: number
+		height: number
+	}): boolean {
+		return !(a.x + a.width < b.x || b.x + b.width < a.x || a.y + a.height < b.y || b.y + b.height < a.y)
+	}
+
+	function rectsOverlapInflated(
+		a: { x: number; y: number; width: number; height: number },
+		b: { x: number; y: number; width: number; height: number },
+		grow: number
+	): boolean {
+		return !(
+			a.x + a.width < b.x - grow ||
+			b.x + b.width + grow < a.x ||
+			a.y + a.height < b.y - grow ||
+			b.y + b.height + grow < a.y
+		)
+	}
+	// --- End screen geometry for collision detection ---
+
 	const drawPolygon = (shape: TransformationDiagramProps["preImage"], isImage: boolean) => {
 		const polygonPoints = shape.vertices.map((p) => ({
 			x: toSvgX(p.x),
@@ -385,6 +498,8 @@ export const generateTransformationDiagram: WidgetGenerator<typeof Transformatio
 	}
 
 	// Removed unused function drawRotationArc
+
+	const placedLabelRects: Array<{ x: number; y: number; width: number; height: number }> = []
 
 	const drawVertexLabels = (shape: TransformationDiagramProps["preImage"], extraOffset: number | Array<number> = 0) => {
 		for (let i = 0; i < shape.vertices.length; i++) {
@@ -433,19 +548,58 @@ export const generateTransformationDiagram: WidgetGenerator<typeof Transformatio
 				bisectorY = -bisectorY
 			}
 
-			const labelX = toSvgX(vertex.x) + bisectorX * labelOffset
-			const labelY = toSvgY(vertex.y) - bisectorY * labelOffset
+			// Base screen-space direction away from vertex (accounting for flipped Y)
+			const screenRadX = bisectorX
+			const screenRadY = -bisectorY
+			const baseX = toSvgX(vertex.x) + screenRadX * labelOffset
+			const baseY = toSvgY(vertex.y) + screenRadY * labelOffset
+
+			const fontPx = theme.font.size.medium
+			const { maxWidth: w, height: h } = estimateWrappedTextDimensions(label, Number.POSITIVE_INFINITY, fontPx, 1.2)
+			const halfW = w / 2
+			const halfH = h / 2
+
+			// Tangential unit vector (perpendicular to radial)
+			const radLen = Math.hypot(screenRadX, screenRadY) || 1
+			const rx = screenRadX / radLen
+			const ry = screenRadY / radLen
+			const tx = -ry
+			const ty = rx
+
+			function placeTangential(mult: number) {
+				let px = baseX
+				let py = baseY
+				let it = 0
+				const maxIt = 80
+				const step = 3
+				while (
+					(rectIntersectsAnySegment({ x: px - halfW, y: py - halfH, width: w, height: h, pad: 1 }) ||
+						placedLabelRects.some((r) => rectsOverlap({ x: px - halfW, y: py - halfH, width: w, height: h }, r))) &&
+					it < maxIt
+				) {
+					px += mult * step * tx
+					py += mult * step * ty
+					it++
+				}
+				return { x: px, y: py, it }
+			}
+
+			const cw = placeTangential(1)
+			const ccw = placeTangential(-1)
+			const chosen = ccw.it < cw.it ? ccw : cw
 
 			canvas.drawText({
-				x: labelX,
-				y: labelY,
+				x: chosen.x,
+				y: chosen.y,
 				text: label,
 				anchor: "middle",
 				dominantBaseline: "middle",
-				fontPx: theme.font.size.medium,
+				fontPx,
 				fontWeight: theme.font.weight.bold,
 				fill: theme.colors.text
 			})
+
+			placedLabelRects.push({ x: chosen.x - halfW, y: chosen.y - halfH, width: w, height: h })
 		}
 	}
 
@@ -657,8 +811,19 @@ export const generateTransformationDiagram: WidgetGenerator<typeof Transformatio
 	drawVertexLabels(image, imageLabelExtraOffset)
 	drawSideLengths(preImage)
 
-	// Draw shape labels without clashing the polygon; prefer above, else place below.
-	const drawShapeLabel = (shape: TransformationDiagramProps["preImage"]) => {
+	// Reserve center point label 'P' rectangle to avoid shape-label overlap.
+	if (centerPoint) {
+		const svgX = toSvgX(centerPoint.x)
+		const svgY = toSvgY(centerPoint.y)
+		const fontPx = theme.font.size.medium
+		const { maxWidth: w, height: h } = estimateWrappedTextDimensions("P", Number.POSITIVE_INFINITY, fontPx, 1.2)
+		const textX = svgX
+		const textY = svgY - 12 // baseline offset in drawPoint
+		placedLabelRects.push({ x: textX - w / 2, y: textY - h, width: w, height: h })
+	}
+
+	// Draw shape labels with collision avoidance against edges and other labels
+	const drawShapeLabel = (shape: TransformationDiagramProps["preImage"], preferBelow: boolean = false) => {
 		if (!shape.label) return
 
 		// Compute screen-space bbox of the shape
@@ -671,20 +836,60 @@ export const generateTransformationDiagram: WidgetGenerator<typeof Transformatio
 
 		// Label styling and margins
 		const fontPx = theme.font.size.medium
-		const halfTextHeight = fontPx / 2
-		const margin = 24
+		const margin = preferBelow ? 28 : 24
+		const { maxWidth: w, height: h } = estimateWrappedTextDimensions(shape.label, Number.POSITIVE_INFINITY, fontPx, 1.2)
+		const halfW = w / 2
+		const halfH = h / 2
 
-		// Try above first; if too close to top padding, place below
-		let labelY = minSvgY - margin - halfTextHeight
-		if (labelY < PADDING) {
-			labelY = maxSvgY + margin + halfTextHeight
+		const centerX = (minSvgX + maxSvgX) / 2
+		const aboveY = Math.max(PADDING + halfH, minSvgY - margin - halfH)
+		const belowY = maxSvgY + margin + halfH
+
+		const padForEdges = preferBelow ? 2 : 1
+		function fitsAt(x: number, y: number): boolean {
+			const rect = { x: x - halfW, y: y - halfH, width: w, height: h, pad: padForEdges }
+			if (rectIntersectsAnySegment(rect)) return false
+			for (const r of placedLabelRects) {
+				// add extra separation so shape labels don't stack on top of vertex labels
+				if (rectsOverlapInflated({ x: rect.x, y: rect.y, width: rect.width, height: rect.height }, r, 10)) return false
+			}
+			return true
 		}
 
-		const labelX = (minSvgX + maxSvgX) / 2
+		function slideHoriz(x: number, y: number) {
+			let left = { x, y, it: 0 }
+			let right = { x, y, it: 0 }
+			const step = 4
+			const maxIt = 120
+			const minX = PADDING + halfW
+			const maxX = width - PADDING - halfW
+			while (!fitsAt(left.x, left.y) && left.it < maxIt) {
+				left.x -= step
+				if (left.x < minX) { left.x = minX; break }
+				left.it++
+			}
+			while (!fitsAt(right.x, right.y) && right.it < maxIt) {
+				right.x += step
+				if (right.x > maxX) { right.x = maxX; break }
+				right.it++
+			}
+			return left.it <= right.it ? left : right
+		}
+
+
+		// Prefer location based on caller; try preferred first then fallback
+		const above = slideHoriz(centerX, aboveY)
+		const below = slideHoriz(centerX, belowY)
+		let chosen
+		if (preferBelow) {
+			chosen = fitsAt(below.x, below.y) ? below : fitsAt(above.x, above.y) ? above : (below.it <= above.it ? below : above)
+		} else {
+			chosen = fitsAt(above.x, above.y) ? above : fitsAt(below.x, below.y) ? below : (above.it <= below.it ? above : below)
+		}
 
 		canvas.drawText({
-			x: labelX,
-			y: labelY,
+			x: chosen.x,
+			y: chosen.y,
 			text: shape.label,
 			anchor: "middle",
 			dominantBaseline: "middle",
@@ -692,10 +897,13 @@ export const generateTransformationDiagram: WidgetGenerator<typeof Transformatio
 			fontWeight: theme.font.weight.bold,
 			fill: shape.strokeColor
 		})
+
+		placedLabelRects.push({ x: chosen.x - halfW, y: chosen.y - halfH, width: w, height: h })
 	}
 
 	drawShapeLabel(preImage)
-	drawShapeLabel(image)
+	// Prefer placing the transformed figure label below its triangle to reduce clashes near vertex labels
+	drawShapeLabel(image, true)
 
 	if (centerPoint) {
 		drawPoint(centerPointInfo ?? { ...centerPoint, label: "P", style: "dot" })
