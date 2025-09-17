@@ -176,562 +176,406 @@ export type ThreeDIntersectionDiagramProps = z.infer<typeof ThreeDIntersectionDi
 
 // Type definitions for 3D vector math
 type Point3D = { x: number; y: number; z: number }
-type Edge = { startIdx: number; endIdx: number; isHidden: boolean | null }
+type Point2D = { x: number; y: number }
+// type Face = { vertices: number[]; normal: Point3D } // TODO: will need this for plane intersections
 
 /**
  * Generates an SVG diagram of a 3D solid being intersected by a plane,
- * highlighting the resulting 2D cross-section.
+ * showing the semi-transparent plane cutting through the solid.
  */
 export const generateThreeDIntersectionDiagram: WidgetGenerator<typeof ThreeDIntersectionDiagramPropsSchema> = async (
 	props
 ) => {
 	const { width, height, solid, plane, viewOptions } = props
-	const { projectionAngle, intersectionColor, showHiddenEdges } = viewOptions
+	const { intersectionColor } = viewOptions
 
 	const chartWidth = width - PADDING * 2
 	const chartHeight = height - PADDING * 2
-	let vertices: Point3D[] = []
-	let edges: Edge[] = []
-	let solidHeight = 0
-	let solidLength = 0
 
-	// 1. Define Vertices and Edges for the selected solid
-	// We center the solid at (0,0,0) for easier calculations
+	// Simple isometric projection - classic 3D view
+	const projectIsometric = (point: Point3D): Point2D => {
+		// Isometric projection matrix
+		// Rotate 45° around Y, then ~35° around X for classic isometric look
+		const cos45 = Math.cos(Math.PI / 4)
+		const sin45 = Math.sin(Math.PI / 4)
+		const cosIso = Math.cos(Math.atan(1/Math.sqrt(2))) // ~35.26°
+		const sinIso = Math.sin(Math.atan(1/Math.sqrt(2)))
+		
+		// First rotate around Y axis by 45°
+		const x1 = point.x * cos45 + point.z * sin45
+		const y1 = point.y
+		const z1 = -point.x * sin45 + point.z * cos45
+		
+		// Then rotate around X axis by ~35°
+		const x2 = x1
+		const y2 = y1 * cosIso - z1 * sinIso
+		
+		return { x: x2, y: -y2 } // flip Y for screen coordinates
+	}
+
+	// Define basic solid shapes - focus on getting them to look right first
+	let vertices: Point3D[] = []
+	let edges: Array<{start: number, end: number}> = []
+
 	switch (solid.type) {
 		case "rectangularPrism": {
-			const { w, h, d } = {
-				w: solid.width / 2,
-				h: solid.height / 2,
-				d: solid.depth / 2
-			}
-			solidHeight = solid.height
-			solidLength = solid.depth
+			const w = solid.width / 2
+			const h = solid.height / 2  
+			const d = solid.depth / 2
+			
+			// 8 vertices of a rectangular prism
 			vertices = [
 				{ x: -w, y: -h, z: -d }, // 0: back bottom left
-				{ x: w, y: -h, z: -d }, // 1: back bottom right
-				{ x: w, y: h, z: -d }, // 2: back top right
-				{ x: -w, y: h, z: -d }, // 3: back top left
-				{ x: -w, y: -h, z: d }, // 4: front bottom left
-				{ x: w, y: -h, z: d }, // 5: front bottom right
-				{ x: w, y: h, z: d }, // 6: front top right
-				{ x: -w, y: h, z: d } // 7: front top left
+				{ x:  w, y: -h, z: -d }, // 1: back bottom right
+				{ x:  w, y:  h, z: -d }, // 2: back top right
+				{ x: -w, y:  h, z: -d }, // 3: back top left
+				{ x: -w, y: -h, z:  d }, // 4: front bottom left
+				{ x:  w, y: -h, z:  d }, // 5: front bottom right
+				{ x:  w, y:  h, z:  d }, // 6: front top right
+				{ x: -w, y:  h, z:  d }  // 7: front top left
 			]
+			
+			// 12 edges of the rectangular prism
 			edges = [
-				{ startIdx: 0, endIdx: 1, isHidden: true },
-				{ startIdx: 1, endIdx: 2, isHidden: true },
-				{ startIdx: 2, endIdx: 3, isHidden: true },
-				{ startIdx: 3, endIdx: 0, isHidden: true },
-				{ startIdx: 4, endIdx: 5, isHidden: null },
-				{ startIdx: 5, endIdx: 6, isHidden: null },
-				{ startIdx: 6, endIdx: 7, isHidden: null },
-				{ startIdx: 7, endIdx: 4, isHidden: null },
-				{ startIdx: 0, endIdx: 4, isHidden: null },
-				{ startIdx: 1, endIdx: 5, isHidden: null },
-				{ startIdx: 2, endIdx: 6, isHidden: null },
-				{ startIdx: 3, endIdx: 7, isHidden: null }
+				// Back face
+				{start: 0, end: 1}, {start: 1, end: 2}, {start: 2, end: 3}, {start: 3, end: 0},
+				// Front face  
+				{start: 4, end: 5}, {start: 5, end: 6}, {start: 6, end: 7}, {start: 7, end: 4},
+				// Connecting edges
+				{start: 0, end: 4}, {start: 1, end: 5}, {start: 2, end: 6}, {start: 3, end: 7}
 			]
 			break
 		}
 		case "pentagonalPrism": {
-			const { side, height: h } = solid
-			solidHeight = h
-			const radius = side / (2 * Math.sin(Math.PI / 5)) // Circumradius of the pentagon
-			solidLength = radius * 2
-			vertices = []
-			edges = []
-			const h2 = h / 2
-
-			// Generate vertices
+			const radius = solid.side / (2 * Math.sin(Math.PI / 5))
+			const h = solid.height / 2
+			
+			// Pentagon vertices (bottom then top)
 			for (let i = 0; i < 5; i++) {
-				// Bottom vertices
-				const angle = (i * 2 * Math.PI) / 5 + Math.PI / 10 // Rotate to have a face forward
-				vertices.push({
-					x: radius * Math.cos(angle),
-					y: -h2,
-					z: radius * Math.sin(angle)
-				})
+				const angle = (i * 2 * Math.PI) / 5
+				const x = radius * Math.cos(angle)
+				const z = radius * Math.sin(angle)
+				
+				vertices.push({ x, y: -h, z }) // bottom vertex
+				vertices.push({ x, y:  h, z }) // top vertex
 			}
+			
+			// Pentagon edges
 			for (let i = 0; i < 5; i++) {
-				// Top vertices
-				const angle = (i * 2 * Math.PI) / 5 + Math.PI / 10
-				vertices.push({
-					x: radius * Math.cos(angle),
-					y: h2,
-					z: radius * Math.sin(angle)
-				})
-			}
-
-			// Generate edges
-			for (let i = 0; i < 5; i++) {
-				// Bottom edges
-				edges.push({ startIdx: i, endIdx: (i + 1) % 5, isHidden: null })
-				// Top edges
-				edges.push({
-					startIdx: 5 + i,
-					endIdx: 5 + ((i + 1) % 5),
-					isHidden: null
-				})
+				const next = (i + 1) % 5
+				// Bottom pentagon
+				edges.push({start: i * 2, end: next * 2})
+				// Top pentagon  
+				edges.push({start: i * 2 + 1, end: next * 2 + 1})
 				// Vertical edges
-				edges.push({ startIdx: i, endIdx: i + 5, isHidden: null })
+				edges.push({start: i * 2, end: i * 2 + 1})
 			}
 			break
 		}
 		case "squarePyramid": {
-			const { b, h } = { b: solid.baseSide / 2, h: solid.height }
-			solidHeight = solid.height
-			solidLength = solid.baseSide // For vertical slicing
+			const b = solid.baseSide / 2
+			const h = solid.height / 2
+			
 			vertices = [
-				{ x: -b, y: -h / 2, z: -b }, // 0: back bottom left
-				{ x: b, y: -h / 2, z: -b }, // 1: back bottom right
-				{ x: b, y: -h / 2, z: b }, // 2: front bottom right
-				{ x: -b, y: -h / 2, z: b }, // 3: front bottom left
-				{ x: 0, y: h / 2, z: 0 } // 4: apex
+				{ x: -b, y: -h, z: -b }, // 0: back bottom left
+				{ x:  b, y: -h, z: -b }, // 1: back bottom right
+				{ x:  b, y: -h, z:  b }, // 2: front bottom right
+				{ x: -b, y: -h, z:  b }, // 3: front bottom left
+				{ x:  0, y:  h, z:  0 }  // 4: apex
 			]
+			
 			edges = [
-				{ startIdx: 0, endIdx: 1, isHidden: true },
-				{ startIdx: 1, endIdx: 2, isHidden: null },
-				{ startIdx: 2, endIdx: 3, isHidden: null },
-				{ startIdx: 3, endIdx: 0, isHidden: null },
-				{ startIdx: 0, endIdx: 4, isHidden: null },
-				{ startIdx: 1, endIdx: 4, isHidden: null },
-				{ startIdx: 2, endIdx: 4, isHidden: null },
-				{ startIdx: 3, endIdx: 4, isHidden: null }
+				// Base square
+				{start: 0, end: 1}, {start: 1, end: 2}, {start: 2, end: 3}, {start: 3, end: 0},
+				// Edges to apex
+				{start: 0, end: 4}, {start: 1, end: 4}, {start: 2, end: 4}, {start: 3, end: 4}
 			]
 			break
 		}
 		case "cylinder": {
-			const { r, h } = { r: solid.radius, h: solid.height }
-			solidHeight = solid.height
-			solidLength = solid.radius * 2 // For vertical slicing
-			// Approximate cylinder with octagon for intersection calculations
-			const segments = 8
-			vertices = []
-			edges = []
-
-			// Bottom circle vertices
+			const r = solid.radius
+			const h = solid.height / 2
+			const segments = 12 // fewer segments for cleaner look
+			
+			// Generate circle vertices
 			for (let i = 0; i < segments; i++) {
 				const angle = (i * 2 * Math.PI) / segments
-				vertices.push({
-					x: r * Math.cos(angle),
-					y: -h / 2,
-					z: r * Math.sin(angle)
-				})
+				const x = r * Math.cos(angle)
+				const z = r * Math.sin(angle)
+				
+				vertices.push({ x, y: -h, z }) // bottom circle
+				vertices.push({ x, y:  h, z }) // top circle
 			}
-			// Top circle vertices
+			
+			// Generate edges
 			for (let i = 0; i < segments; i++) {
-				const angle = (i * 2 * Math.PI) / segments
-				vertices.push({
-					x: r * Math.cos(angle),
-					y: h / 2,
-					z: r * Math.sin(angle)
-				})
-			}
-
-			// Bottom circle edges (hidden)
-			for (let i = 0; i < segments; i++) {
-				edges.push({ startIdx: i, endIdx: (i + 1) % segments, isHidden: true })
-			}
-			// Top circle edges
-			for (let i = 0; i < segments; i++) {
-				edges.push({
-					startIdx: segments + i,
-					endIdx: segments + ((i + 1) % segments),
-					isHidden: false
-				})
-			}
-			// Vertical edges
-			for (let i = 0; i < segments; i++) {
-				const isHidden = i > segments / 4 && i < (3 * segments) / 4
-				edges.push({ startIdx: i, endIdx: segments + i, isHidden })
+				const next = (i + 1) % segments
+				// Bottom circle
+				edges.push({start: i * 2, end: next * 2})
+				// Top circle
+				edges.push({start: i * 2 + 1, end: next * 2 + 1})
+				// Vertical edges (only show some for clarity)
+				if (i % 3 === 0) { // every 3rd vertical line
+					edges.push({start: i * 2, end: i * 2 + 1})
+				}
 			}
 			break
 		}
 		case "cone": {
-			const { r, h } = { r: solid.radius, h: solid.height }
-			solidHeight = solid.height
-			solidLength = solid.radius * 2
-			// Approximate cone base with octagon
-			const segments = 8
-			vertices = []
-			edges = []
-
+			const r = solid.radius
+			const h = solid.height / 2
+			const segments = 12
+			
 			// Base circle vertices
 			for (let i = 0; i < segments; i++) {
 				const angle = (i * 2 * Math.PI) / segments
 				vertices.push({
 					x: r * Math.cos(angle),
-					y: -h / 2,
+					y: -h,
 					z: r * Math.sin(angle)
 				})
 			}
-			// Apex
-			vertices.push({ x: 0, y: h / 2, z: 0 })
-
-			// Base circle edges (hidden)
+			// Apex vertex
+			vertices.push({ x: 0, y: h, z: 0 })
+			const apexIndex = segments
+			
+			// Generate edges
 			for (let i = 0; i < segments; i++) {
-				edges.push({ startIdx: i, endIdx: (i + 1) % segments, isHidden: true })
-			}
-			// Slant edges to apex
-			for (let i = 0; i < segments; i++) {
-				const isHidden = i > segments / 4 && i < (3 * segments) / 4
-				edges.push({ startIdx: i, endIdx: segments, isHidden })
+				const next = (i + 1) % segments
+				// Base circle
+				edges.push({start: i, end: next})
+				// Lines to apex (only show some for clarity)
+				if (i % 2 === 0) { // every other line
+					edges.push({start: i, end: apexIndex})
+				}
 			}
 			break
 		}
 		case "sphere": {
-			const { radius } = solid
-			solidHeight = radius * 2
-			solidLength = radius * 2
-			vertices = []
-			edges = []
-
-			const stacks = 8 // rings of latitude
-			const sectors = 16 // slices of longitude
-
-			// Generate vertices for a UV sphere
+			const r = solid.radius
+			const stacks = 6  // latitude lines
+			const sectors = 12 // longitude lines
+			
+			// Generate vertices
 			for (let i = 0; i <= stacks; i++) {
-				const phi = (Math.PI * i) / stacks // from 0 (top) to PI (bottom)
-				const y = radius * Math.cos(phi)
-				const r_i = radius * Math.sin(phi)
-
+				const phi = (Math.PI * i) / stacks // 0 to PI
+				const y = r * Math.cos(phi)
+				const ringRadius = r * Math.sin(phi)
+				
 				for (let j = 0; j < sectors; j++) {
-					const theta = (2 * Math.PI * j) / sectors // from 0 to 2PI
-					const x = r_i * Math.cos(theta)
-					const z = r_i * Math.sin(theta)
+					const theta = (2 * Math.PI * j) / sectors
+					const x = ringRadius * Math.cos(theta)
+					const z = ringRadius * Math.sin(theta)
 					vertices.push({ x, y, z })
 				}
 			}
-
-			// Generate edges from the vertices
+			
+			// Generate edges for wireframe sphere
 			for (let i = 0; i < stacks; i++) {
 				for (let j = 0; j < sectors; j++) {
-					const first = i * sectors + j
-					const second = (i + 1) * sectors + j
-					const nextInRing = i * sectors + ((j + 1) % sectors)
-
-					const p1 = vertices[first]
-					const p2 = vertices[nextInRing]
-					const p3 = vertices[second]
-					if (!p1 || !p2 || !p3) continue
-
-					// An edge is hidden if both its vertices have a negative z-coordinate (are on the back of the sphere)
-					const checkHidden = (v1: Point3D, v2: Point3D) => v1.z < -1e-6 && v2.z < -1e-6 // tolerance
-
-					// Latitude edge (horizontal)
-					if (i > 0 && i < stacks) {
-						// Poles don't have latitude edges in this structure
-						edges.push({
-							startIdx: first,
-							endIdx: nextInRing,
-							isHidden: checkHidden(p1, p2) ? true : null
-						})
+					const current = i * sectors + j
+					const next = i * sectors + ((j + 1) % sectors)
+					const below = (i + 1) * sectors + j
+					
+					// Horizontal edges (longitude)
+					if (i < stacks) {
+						edges.push({start: current, end: next})
 					}
-					// Longitude edge (vertical)
-					edges.push({
-						startIdx: first,
-						endIdx: second,
-						isHidden: checkHidden(p1, p3) ? true : null
-					})
+					// Vertical edges (latitude) - only some for clarity
+					if (i < stacks && j % 2 === 0) {
+						edges.push({start: current, end: below})
+					}
 				}
 			}
 			break
 		}
 	}
 
-	// 2. 3D Math and Projection Setup
-	const angleRad = (projectionAngle * Math.PI) / 180
-	const project = (p: Point3D) => ({
-		x: p.x - p.z * Math.cos(angleRad),
-		y: p.y - p.z * Math.sin(angleRad)
+	// Project all vertices to 2D
+	const projected = vertices.map(projectIsometric)
+	
+	// Calculate bounds for scaling
+	const minX = Math.min(...projected.map(p => p.x))
+	const maxX = Math.max(...projected.map(p => p.x))
+	const minY = Math.min(...projected.map(p => p.y))
+	const maxY = Math.max(...projected.map(p => p.y))
+	
+	// Scale to fit in canvas with padding
+	const scaleX = chartWidth / (maxX - minX + 1)
+	const scaleY = chartHeight / (maxY - minY + 1)
+	const scale = Math.min(scaleX, scaleY) * 0.7 // leave some margin
+	
+	const centerX = PADDING + chartWidth / 2
+	const centerY = PADDING + chartHeight / 2
+	
+	// Convert 2D projected point to SVG coordinates
+	const toSvg = (p: Point2D): Point2D => ({
+		x: centerX + (p.x - (minX + maxX) / 2) * scale,
+		y: centerY + (p.y - (minY + maxY) / 2) * scale
 	})
 
-	const projected = vertices.map(project)
-	const minX = Math.min(...projected.map((p) => p.x))
-	const maxX = Math.max(...projected.map((p) => p.x))
-	const minY = Math.min(...projected.map((p) => p.y))
-	const maxY = Math.max(...projected.map((p) => p.y))
-
-	const scale = Math.min(chartWidth / (maxX - minX), chartHeight / (maxY - minY))
-	const toSvg = (p: { x: number; y: number }) => ({
-		x: PADDING + chartWidth / 2 + (p.x - (minX + maxX) / 2) * scale,
-		y: PADDING + chartHeight / 2 - (p.y - (minY + maxY) / 2) * scale
-	})
-
-	// 3. Define the Plane and Calculate Intersection Points
-	let planePoint: Point3D
-	let planeNormal: Point3D
-
-	if (plane.orientation === "horizontal") {
-		planeNormal = { x: 0, y: 1, z: 0 }
-		const yPos = -solidHeight / 2 + plane.position * solidHeight
-		planePoint = { x: 0, y: yPos, z: 0 }
-	} else if (plane.orientation === "vertical") {
-		planeNormal = { x: 0, y: 0, z: 1 }
-		const zPos = -solidLength / 2 + plane.position * solidLength
-		planePoint = { x: 0, y: 0, z: zPos }
-	} else {
-		// oblique
-		const angleRad = (plane.angle * Math.PI) / 180
-		planeNormal = { x: 0, y: Math.cos(angleRad), z: Math.sin(angleRad) }
-		// Position the plane based on the dominant axis
-		const yPos = -solidHeight / 2 + plane.position * solidHeight
-		const zPos = -solidLength / 2 + plane.position * solidLength
-		planePoint = {
-			x: 0,
-			y: yPos * 0.5 + zPos * 0.5,
-			z: zPos * 0.5 + yPos * 0.5
+	// Calculate rectangular plane that cuts through the solid
+	const calculateRectangularPlane = (): { planePoints: Point2D[], planeZ: number } => {
+		// Calculate bounds of the entire solid
+		const bounds = {
+			minX: Math.min(...vertices.map(v => v.x)),
+			maxX: Math.max(...vertices.map(v => v.x)),
+			minY: Math.min(...vertices.map(v => v.y)),
+			maxY: Math.max(...vertices.map(v => v.y)),
+			minZ: Math.min(...vertices.map(v => v.z)),
+			maxZ: Math.max(...vertices.map(v => v.z))
 		}
-	}
-
-	// Targeted fix: compute hidden/visible edges based on face orientation for prisms and pyramids
-	if (solid.type === "rectangularPrism" || solid.type === "squarePyramid" || solid.type === "pentagonalPrism") {
-		// Helper vector ops
-		const sub = (a: Point3D, b: Point3D): Point3D => ({
-			x: a.x - b.x,
-			y: a.y - b.y,
-			z: a.z - b.z
-		})
-		const cross = (a: Point3D, b: Point3D): Point3D => ({
-			x: a.y * b.z - a.z * b.y,
-			y: a.z * b.x - a.x * b.z,
-			z: a.x * b.y - a.y * b.x
-		})
-		const dot = (a: Point3D, b: Point3D): number => a.x * b.x + a.y * b.y + a.z * b.z
-		const add = (a: Point3D, b: Point3D): Point3D => ({
-			x: a.x + b.x,
-			y: a.y + b.y,
-			z: a.z + b.z
-		})
-		const scaleVec = (a: Point3D, s: number): Point3D => ({
-			x: a.x * s,
-			y: a.y * s,
-			z: a.z * s
-		})
-
-		// Camera view direction: looking along negative Z toward origin
-		const viewDir: Point3D = { x: 0, y: 0, z: -1 }
-
-		// Object centroid
-		const centroid = vertices.reduce<Point3D>((acc, v) => add(acc, v), {
-			x: 0,
-			y: 0,
-			z: 0
-		})
-		const objCenter = scaleVec(centroid, 1 / (vertices.length === 0 ? 1 : vertices.length))
-
-		// Define faces for each solid
-		type Face = { indices: number[]; normal: Point3D }
-		const faces: Face[] = []
-		let faceCycles: number[][] = []
-
-		if (solid.type === "rectangularPrism") {
-			// Faces defined by vertex cycles
-			faceCycles = [
-				[0, 1, 2, 3], // back
-				[4, 5, 6, 7], // front
-				[0, 4, 5, 1], // bottom (y-)
-				[3, 2, 6, 7], // top (y+)
-				[0, 3, 7, 4], // left (x-)
-				[1, 5, 6, 2] // right (x+)
+		
+		// Add some padding to make sure plane extends beyond solid
+		const padding = 1.2
+		const paddedBounds = {
+			minX: bounds.minX * padding,
+			maxX: bounds.maxX * padding,
+			minY: bounds.minY * padding,
+			maxY: bounds.maxY * padding,
+			minZ: bounds.minZ * padding,
+			maxZ: bounds.maxZ * padding
+		}
+		
+		let planeVertices: Point3D[] = []
+		let planeZ = 0
+		
+		if (plane.orientation === "vertical") {
+			// Vertical plane (parallel to YZ plane)
+			planeZ = paddedBounds.minZ + plane.position * (paddedBounds.maxZ - paddedBounds.minZ)
+			planeVertices = [
+				{ x: paddedBounds.minX, y: paddedBounds.minY, z: planeZ },
+				{ x: paddedBounds.maxX, y: paddedBounds.minY, z: planeZ },
+				{ x: paddedBounds.maxX, y: paddedBounds.maxY, z: planeZ },
+				{ x: paddedBounds.minX, y: paddedBounds.maxY, z: planeZ }
 			]
-		} else if (solid.type === "squarePyramid") {
-			faceCycles = [
-				[0, 1, 2, 3], // base (y constant)
-				[0, 1, 4],
-				[1, 2, 4],
-				[2, 3, 4],
-				[3, 0, 4]
+		} else if (plane.orientation === "horizontal") {
+			// Horizontal plane (parallel to XZ plane)
+			const planeY = paddedBounds.minY + plane.position * (paddedBounds.maxY - paddedBounds.minY)
+			planeZ = planeY // for depth sorting, use Y coordinate
+			planeVertices = [
+				{ x: paddedBounds.minX, y: planeY, z: paddedBounds.minZ },
+				{ x: paddedBounds.maxX, y: planeY, z: paddedBounds.minZ },
+				{ x: paddedBounds.maxX, y: planeY, z: paddedBounds.maxZ },
+				{ x: paddedBounds.minX, y: planeY, z: paddedBounds.maxZ }
 			]
 		} else {
-			// pentagonalPrism
-			faceCycles = [
-				[0, 1, 2, 3, 4], // bottom
-				[9, 8, 7, 6, 5], // top (reversed for outward normal)
-				[0, 1, 6, 5], // side
-				[1, 2, 7, 6], // side
-				[2, 3, 8, 7], // side
-				[3, 4, 9, 8], // side
-				[4, 0, 5, 9] // side
+			// Oblique plane
+			const angleRad = (plane.angle * Math.PI) / 180
+			const centerY = paddedBounds.minY + plane.position * (paddedBounds.maxY - paddedBounds.minY)
+			const centerZ = paddedBounds.minZ + plane.position * (paddedBounds.maxZ - paddedBounds.minZ)
+			planeZ = centerZ
+			
+			// Create tilted rectangular plane that spans the full width and depth
+			const yRange = paddedBounds.maxY - paddedBounds.minY
+			const tiltOffset = Math.tan(angleRad) * yRange / 2
+			
+			planeVertices = [
+				{ x: paddedBounds.minX, y: centerY - yRange/2, z: centerZ - tiltOffset },
+				{ x: paddedBounds.maxX, y: centerY - yRange/2, z: centerZ - tiltOffset },
+				{ x: paddedBounds.maxX, y: centerY + yRange/2, z: centerZ + tiltOffset },
+				{ x: paddedBounds.minX, y: centerY + yRange/2, z: centerZ + tiltOffset }
 			]
 		}
-
-		for (const cyc of faceCycles) {
-			const i0 = cyc[0]
-			const i1 = cyc[1]
-			const i2 = cyc[2]
-			if (i0 === undefined || i1 === undefined || i2 === undefined) continue
-			const a = vertices[i0]
-			const b = vertices[i1]
-			const c = vertices[i2]
-			if (!a || !b || !c) continue
-			let n = cross(sub(b, a), sub(c, a))
-			// Orient normal outward relative to object center
-			let sum: Point3D = { x: 0, y: 0, z: 0 }
-			let count = 0
-			for (const idx of cyc) {
-				const v = vertices[idx]
-				if (!v) {
-					count = -1
-					break
-				}
-				sum = add(sum, v)
-				count++
-			}
-			if (count !== cyc.length) continue
-			const fCenter = scaleVec(sum, 1 / count)
-			if (dot(n, sub(fCenter, objCenter)) < 0) n = scaleVec(n, -1)
-			faces.push({ indices: cyc, normal: n })
-		}
-
-		// Build edge -> adjacent faces map using face cycles (edges are undirected)
-		const edgeToFaces = new Map<string, Point3D[]>()
-		const makeKey = (i: number, j: number) => (i < j ? `${i}-${j}` : `${j}-${i}`)
-		for (const f of faces) {
-			const cyc = f.indices
-			for (let k = 0; k < cyc.length; k++) {
-				const i = cyc[k]
-				const j = cyc[(k + 1) % cyc.length]
-				if (i === undefined || j === undefined) continue
-				const key = makeKey(i, j)
-				const arr = edgeToFaces.get(key)
-				if (arr) arr.push(f.normal)
-				else edgeToFaces.set(key, [f.normal])
-			}
-		}
-
-		// Classify each edge: hidden iff all adjacent faces are back-facing
-		for (const edge of edges) {
-			const key = makeKey(edge.startIdx, edge.endIdx)
-			const normals = edgeToFaces.get(key) || []
-			if (normals.length === 0) {
-				// Fallback: treat as visible if no face association found
-				edge.isHidden = false
-				continue
-			}
-			let allBackFacing = true
-			for (const n of normals) {
-				// front-facing if dot(n, viewDir) < 0; treat == 0 as visible (silhouette)
-				const d = dot(n, viewDir)
-				if (d <= 0) {
-					allBackFacing = false
-					break
-				}
-			}
-			edge.isHidden = allBackFacing
-		}
+		
+		// Convert to 2D points
+		const planePoints = planeVertices.map(p => toSvg(projectIsometric(p)))
+		return { planePoints, planeZ }
 	}
+	
+	const { planePoints, planeZ } = calculateRectangularPlane()
 
-	const intersectLinePlane = (p1: Point3D, p2: Point3D): Point3D | null => {
-		const lineVec = { x: p2.x - p1.x, y: p2.y - p1.y, z: p2.z - p1.z }
-		const dot = lineVec.x * planeNormal.x + lineVec.y * planeNormal.y + lineVec.z * planeNormal.z
-		if (Math.abs(dot) < 1e-6) return null // Line is parallel to the plane
-
-		const w = {
-			x: p1.x - planePoint.x,
-			y: p1.y - planePoint.y,
-			z: p1.z - planePoint.z
-		}
-		const t = -(w.x * planeNormal.x + w.y * planeNormal.y + w.z * planeNormal.z) / dot
-		if (t < 0 || t > 1) return null // Intersection is outside the line segment
-
-		return {
-			x: p1.x + t * lineVec.x,
-			y: p1.y + t * lineVec.y,
-			z: p1.z + t * lineVec.z
-		}
-	}
-
-	const intersectionPoints: Point3D[] = []
+	// Separate edges into those behind and in front of the plane for proper depth ordering
+	const edgesBehindPlane: typeof edges = []
+	const edgesInFrontOfPlane: typeof edges = []
+	
 	for (const edge of edges) {
-		const p1 = vertices[edge.startIdx]
-		const p2 = vertices[edge.endIdx]
-		if (!p1 || !p2) continue
-		const intersection = intersectLinePlane(p1, p2)
-		if (intersection) {
-			intersectionPoints.push(intersection)
+		const startVertex = vertices[edge.start]
+		const endVertex = vertices[edge.end]
+		
+		if (startVertex && endVertex) {
+			// Determine if edge is mostly behind or in front of plane
+			let startZ, endZ
+			if (plane.orientation === "vertical") {
+				startZ = startVertex.z
+				endZ = endVertex.z
+			} else if (plane.orientation === "horizontal") {
+				startZ = startVertex.y
+				endZ = endVertex.y
+			} else {
+				// For oblique, use Z coordinate as approximation
+				startZ = startVertex.z
+				endZ = endVertex.z
+			}
+			
+			const avgZ = (startZ + endZ) / 2
+			if (avgZ < planeZ) {
+				edgesBehindPlane.push(edge)
+			} else {
+				edgesInFrontOfPlane.push(edge)
+			}
 		}
 	}
-
-	// 4. Sort Intersection Points to form a polygon
-	let sortedIntersectionPoints: Point3D[] = []
-	if (intersectionPoints.length > 2) {
-		const centroid = intersectionPoints.reduce((acc, p) => ({ x: acc.x + p.x, y: acc.y + p.y, z: acc.z + p.z }), {
-			x: 0,
-			y: 0,
-			z: 0
-		})
-		centroid.x /= intersectionPoints.length
-		centroid.y /= intersectionPoints.length
-		centroid.z /= intersectionPoints.length
-
-		sortedIntersectionPoints = intersectionPoints.sort((a, b) => {
-			const projA = project({
-				x: a.x - centroid.x,
-				y: a.y - centroid.y,
-				z: a.z - centroid.z
-			})
-			const projB = project({
-				x: b.x - centroid.x,
-				y: b.y - centroid.y,
-				z: b.z - centroid.z
-			})
-			return Math.atan2(projA.y, projA.x) - Math.atan2(projB.y, projB.x)
-		})
-	}
-
-	// 5. Generate SVG using Canvas API
+	
+	// Generate SVG using Canvas API
 	const canvas = new CanvasImpl({
 		chartArea: { left: 0, top: 0, width, height },
 		fontPxDefault: 12,
 		lineHeightDefault: 1.2
 	})
-
-	// Draw hidden edges
-	if (showHiddenEdges) {
-		for (const edge of edges) {
-			if (edge.isHidden !== true) continue
-			const proj1 = projected[edge.startIdx]
-			const proj2 = projected[edge.endIdx]
-			if (!proj1 || !proj2) continue
-			const p1 = toSvg(proj1)
-			const p2 = toSvg(proj2)
-			canvas.drawLine(p1.x, p1.y, p2.x, p2.y, {
-				stroke: theme.colors.hiddenEdge,
-				strokeWidth: theme.stroke.width.base,
-				dash: theme.stroke.dasharray.dashed
-			})
+	
+	// Draw edges behind the plane first
+	for (const edge of edgesBehindPlane) {
+		const startVertex = vertices[edge.start]
+		const endVertex = vertices[edge.end]
+		
+		if (startVertex && endVertex) {
+			const startProj = projected[edge.start]
+			const endProj = projected[edge.end]
+			
+			if (startProj && endProj) {
+				const startSvg = toSvg(startProj)
+				const endSvg = toSvg(endProj)
+				
+				canvas.drawLine(startSvg.x, startSvg.y, endSvg.x, endSvg.y, {
+					stroke: theme.colors.black,
+					strokeWidth: theme.stroke.width.base
+				})
+			}
 		}
 	}
-
-	// Draw visible edges
-	for (const edge of edges) {
-		if (edge.isHidden === true) continue
-		const proj1 = projected[edge.startIdx]
-		const proj2 = projected[edge.endIdx]
-		if (!proj1 || !proj2) continue
-		const p1 = toSvg(proj1)
-		const p2 = toSvg(proj2)
-		canvas.drawLine(p1.x, p1.y, p2.x, p2.y, {
-			stroke: theme.colors.black,
-			strokeWidth: theme.stroke.width.base
-		})
-	}
-
-	// Draw intersection polygon
-	if (sortedIntersectionPoints.length > 0) {
-		const polygonPoints = sortedIntersectionPoints.map((p) => {
-			const svgP = toSvg(project(p))
-			return { x: svgP.x, y: svgP.y }
-		})
-		canvas.drawPolygon(polygonPoints, {
+	
+	// Draw the rectangular plane
+	if (planePoints.length >= 3) {
+		canvas.drawPolygon(planePoints, {
 			fill: intersectionColor,
-			stroke: theme.colors.black,
-			strokeWidth: theme.stroke.width.thick
+			stroke: "none",
+			strokeWidth: 0
 		})
 	}
-
-	// NEW: Finalize the canvas and construct the root SVG element
+	
+	// Draw edges in front of the plane on top
+	for (const edge of edgesInFrontOfPlane) {
+		const startVertex = vertices[edge.start]
+		const endVertex = vertices[edge.end]
+		
+		if (startVertex && endVertex) {
+			const startProj = projected[edge.start]
+			const endProj = projected[edge.end]
+			
+			if (startProj && endProj) {
+				const startSvg = toSvg(startProj)
+				const endSvg = toSvg(endProj)
+				
+				canvas.drawLine(startSvg.x, startSvg.y, endSvg.x, endSvg.y, {
+					stroke: theme.colors.black,
+					strokeWidth: theme.stroke.width.base
+				})
+			}
+		}
+	}
+	
+	// Finalize and return SVG
 	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
-
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}">${svgBody}</svg>`
 }
