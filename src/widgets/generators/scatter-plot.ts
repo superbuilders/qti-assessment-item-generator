@@ -346,6 +346,22 @@ export const generateScatterPlot: WidgetGenerator<typeof ScatterPlotPropsSchema>
 		}
 	}
 
+	// Validate all data points lie within the declared axis domains
+	const outOfDomainPoints = points.filter(
+		(p) => p.x < xAxis.min || p.x > xAxis.max || p.y < yAxis.min || p.y > yAxis.max
+	)
+	if (outOfDomainPoints.length > 0) {
+		logger.error("points outside domain", {
+			count: outOfDomainPoints.length,
+			outOfDomainPoints,
+			xMin: xAxis.min,
+			xMax: xAxis.max,
+			yMin: yAxis.min,
+			yMax: yAxis.max
+		})
+		throw errors.new("points outside domain")
+	}
+
 	const canvas = new CanvasImpl({
 		chartArea: { left: 0, top: 0, width, height },
 		fontPxDefault: 12,

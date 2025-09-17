@@ -13,13 +13,9 @@ exports[`QTI Compiler End-to-End Tests should produce consistent XML output for 
     <qti-response-declaration identifier="RESPONSE" cardinality="single" base-type="string">
         <qti-correct-response>
             <qti-value>3/4</qti-value>
-            <qti-value>0.75</qti-value>
-            <qti-value>.75</qti-value>
         </qti-correct-response>
         <qti-mapping default-value="0">
             <qti-map-entry map-key="3/4" mapped-value="1"/>
-            <qti-map-entry map-key="0.75" mapped-value="1"/>
-            <qti-map-entry map-key=".75" mapped-value="1"/>
         </qti-mapping>
     </qti-response-declaration>
     <qti-outcome-declaration identifier="SCORE" cardinality="single" base-type="float">
@@ -78,11 +74,9 @@ exports[`QTI Compiler End-to-End Tests should produce consistent XML output for 
     <qti-response-declaration identifier="text_entry" cardinality="single" base-type="string">
         <qti-correct-response>
             <qti-value>27/2</qti-value>
-            <qti-value>13.5</qti-value>
         </qti-correct-response>
         <qti-mapping default-value="0">
             <qti-map-entry map-key="27/2" mapped-value="1"/>
-            <qti-map-entry map-key="13.5" mapped-value="1"/>
         </qti-mapping>
     </qti-response-declaration>
     <qti-outcome-declaration identifier="SCORE" cardinality="single" base-type="float">
@@ -146,6 +140,9 @@ exports[`QTI Compiler End-to-End Tests should produce consistent XML output for 
         <qti-correct-response>
             <qti-value>15</qti-value>
         </qti-correct-response>
+        <qti-mapping default-value="0">
+            <qti-map-entry map-key="15" mapped-value="1"/>
+        </qti-mapping>
     </qti-response-declaration>
     <qti-outcome-declaration identifier="SCORE" cardinality="single" base-type="float">
         <qti-default-value><qti-value>0</qti-value></qti-default-value>
@@ -247,6 +244,9 @@ exports[`QTI Compiler End-to-End Tests should produce consistent XML output for 
         <qti-correct-response>
             <qti-value>81</qti-value>
         </qti-correct-response>
+        <qti-mapping default-value="0">
+            <qti-map-entry map-key="81" mapped-value="1"/>
+        </qti-mapping>
     </qti-response-declaration>
     <qti-outcome-declaration identifier="SCORE" cardinality="single" base-type="float">
         <qti-default-value><qti-value>0</qti-value></qti-default-value>
@@ -467,21 +467,33 @@ exports[`QTI Compiler End-to-End Tests should produce consistent XML output for 
         <qti-correct-response>
             <qti-value>23</qti-value>
         </qti-correct-response>
+        <qti-mapping default-value="0">
+            <qti-map-entry map-key="23" mapped-value="1"/>
+        </qti-mapping>
     </qti-response-declaration>
     <qti-response-declaration identifier="RESP_B" cardinality="single" base-type="integer">
         <qti-correct-response>
             <qti-value>20</qti-value>
         </qti-correct-response>
+        <qti-mapping default-value="0">
+            <qti-map-entry map-key="20" mapped-value="1"/>
+        </qti-mapping>
     </qti-response-declaration>
     <qti-response-declaration identifier="RESP_C" cardinality="single" base-type="integer">
         <qti-correct-response>
             <qti-value>27</qti-value>
         </qti-correct-response>
+        <qti-mapping default-value="0">
+            <qti-map-entry map-key="27" mapped-value="1"/>
+        </qti-mapping>
     </qti-response-declaration>
     <qti-response-declaration identifier="RESP_D" cardinality="single" base-type="integer">
         <qti-correct-response>
             <qti-value>30</qti-value>
         </qti-correct-response>
+        <qti-mapping default-value="0">
+            <qti-map-entry map-key="30" mapped-value="1"/>
+        </qti-mapping>
     </qti-response-declaration>
     <qti-outcome-declaration identifier="SCORE" cardinality="single" base-type="float">
         <qti-default-value><qti-value>0</qti-value></qti-default-value>
@@ -644,16 +656,25 @@ exports[`QTI Compiler End-to-End Tests should produce consistent XML output for 
         <qti-correct-response>
             <qti-value>-9</qti-value>
         </qti-correct-response>
+        <qti-mapping default-value="0">
+            <qti-map-entry map-key="-9" mapped-value="1"/>
+        </qti-mapping>
     </qti-response-declaration>
     <qti-response-declaration identifier="RESPONSE_Y" cardinality="single" base-type="integer">
         <qti-correct-response>
             <qti-value>-7</qti-value>
         </qti-correct-response>
+        <qti-mapping default-value="0">
+            <qti-map-entry map-key="-7" mapped-value="1"/>
+        </qti-mapping>
     </qti-response-declaration>
     <qti-response-declaration identifier="RESPONSE_R" cardinality="single" base-type="integer">
         <qti-correct-response>
             <qti-value>5</qti-value>
         </qti-correct-response>
+        <qti-mapping default-value="0">
+            <qti-map-entry map-key="5" mapped-value="1"/>
+        </qti-mapping>
     </qti-response-declaration>
     <qti-outcome-declaration identifier="SCORE" cardinality="single" base-type="float">
         <qti-default-value><qti-value>0</qti-value></qti-default-value>
@@ -708,6 +729,9 @@ exports[`QTI Compiler End-to-End Tests should produce consistent XML output for 
         <qti-correct-response>
             <qti-value>87</qti-value>
         </qti-correct-response>
+        <qti-mapping default-value="0">
+            <qti-map-entry map-key="87" mapped-value="1"/>
+        </qti-mapping>
     </qti-response-declaration>
     <qti-outcome-declaration identifier="SCORE" cardinality="single" base-type="float">
         <qti-default-value><qti-value>0</qti-value></qti-default-value>
@@ -1138,6 +1162,9 @@ exports[`QTI Compiler End-to-End Tests should produce consistent XML output for 
         <qti-correct-response>
             <qti-value>14</qti-value>
         </qti-correct-response>
+        <qti-mapping default-value="0">
+            <qti-map-entry map-key="14" mapped-value="1"/>
+        </qti-mapping>
     </qti-response-declaration>
     <qti-outcome-declaration identifier="SCORE" cardinality="single" base-type="float">
         <qti-default-value><qti-value>0</qti-value></qti-default-value>
@@ -1188,6 +1215,9 @@ exports[`QTI Compiler End-to-End Tests should produce consistent XML output for 
         <qti-correct-response>
             <qti-value>5</qti-value>
         </qti-correct-response>
+        <qti-mapping default-value="0">
+            <qti-map-entry map-key="5" mapped-value="1"/>
+        </qti-mapping>
     </qti-response-declaration>
     <qti-outcome-declaration identifier="SCORE" cardinality="single" base-type="float">
         <qti-default-value><qti-value>0</qti-value></qti-default-value>
@@ -1237,11 +1267,17 @@ exports[`QTI Compiler End-to-End Tests should produce consistent XML output for 
         <qti-correct-response>
             <qti-value>12</qti-value>
         </qti-correct-response>
+        <qti-mapping default-value="0">
+            <qti-map-entry map-key="12" mapped-value="1"/>
+        </qti-mapping>
     </qti-response-declaration>
     <qti-response-declaration identifier="RESPONSE_MIN" cardinality="single" base-type="integer">
         <qti-correct-response>
             <qti-value>55</qti-value>
         </qti-correct-response>
+        <qti-mapping default-value="0">
+            <qti-map-entry map-key="55" mapped-value="1"/>
+        </qti-mapping>
     </qti-response-declaration>
     <qti-outcome-declaration identifier="SCORE" cardinality="single" base-type="float">
         <qti-default-value><qti-value>0</qti-value></qti-default-value>
@@ -1423,21 +1459,18 @@ exports[`QTI Compiler End-to-End Tests should produce consistent XML output for 
     <qti-response-declaration identifier="RESP_EQN" cardinality="single" base-type="string">
         <qti-correct-response>
             <qti-value>3s=6300</qti-value>
-            <qti-value>6300=3s</qti-value>
-            <qti-value>3s = 6300</qti-value>
-            <qti-value>6300 = 3s</qti-value>
         </qti-correct-response>
         <qti-mapping default-value="0">
             <qti-map-entry map-key="3s=6300" mapped-value="1"/>
-            <qti-map-entry map-key="6300=3s" mapped-value="1"/>
-            <qti-map-entry map-key="3s = 6300" mapped-value="1"/>
-            <qti-map-entry map-key="6300 = 3s" mapped-value="1"/>
         </qti-mapping>
     </qti-response-declaration>
     <qti-response-declaration identifier="RESP_STEPS" cardinality="single" base-type="integer">
         <qti-correct-response>
             <qti-value>2100</qti-value>
         </qti-correct-response>
+        <qti-mapping default-value="0">
+            <qti-map-entry map-key="2100" mapped-value="1"/>
+        </qti-mapping>
     </qti-response-declaration>
     <qti-outcome-declaration identifier="SCORE" cardinality="single" base-type="float">
         <qti-default-value><qti-value>0</qti-value></qti-default-value>

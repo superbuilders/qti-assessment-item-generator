@@ -73,11 +73,14 @@ export function setupCoordinatePlaneV2(
 	const scaleX = chartWidth / (xAxis.max - xAxis.min)
 	const scaleY = chartHeight / (yAxis.max - yAxis.min)
 
-	const toSvgX = (val: number) => margin.left + (val - xAxis.min) * scaleX
-	const toSvgY = (val: number) => height - margin.bottom - (val - yAxis.min) * scaleY
+    const toSvgX = (val: number) => margin.left + (val - xAxis.min) * scaleX
+    const toSvgY = (val: number) => height - margin.bottom - (val - yAxis.min) * scaleY
 
-	const zeroX = toSvgX(0)
-	const zeroY = toSvgY(0)
+    const zeroX = toSvgX(0)
+    const zeroY = toSvgY(0)
+    // Clamp axis anchors to chart edges when 0 is outside the visible domain
+    const anchorXPos = Math.min(Math.max(zeroX, margin.left), margin.left + chartWidth)
+    const anchorYPos = Math.min(Math.max(zeroY, margin.top), margin.top + chartHeight)
 
 	const chartArea = {
 		left: margin.left,
@@ -121,11 +124,11 @@ export function setupCoordinatePlaneV2(
 	}
 
 	// Axes lines
-	canvas.drawLine(margin.left, zeroY, width - margin.right, zeroY, {
+    canvas.drawLine(margin.left, anchorYPos, width - margin.right, anchorYPos, {
 		stroke: theme.colors.axis,
 		strokeWidth: 1.5
 	})
-	canvas.drawLine(zeroX, margin.top, zeroX, height - margin.bottom, {
+    canvas.drawLine(anchorXPos, margin.top, anchorXPos, height - margin.bottom, {
 		stroke: theme.colors.axis,
 		strokeWidth: 1.5
 	})
@@ -142,10 +145,10 @@ export function setupCoordinatePlaneV2(
 		fontPx: TICK_LABEL_FONT_PX,
 		minGapPx: X_AXIS_MIN_LABEL_PADDING_PX
 	})
-	xValues.forEach((t, i) => {
+    xValues.forEach((t, i) => {
 		if (Math.abs(t) < 1e-9) return // Skip origin
 		const x = toSvgX(t)
-		canvas.drawLine(x, zeroY - 4, x, zeroY + 4, {
+        canvas.drawLine(x, anchorYPos - 4, x, anchorYPos + 4, {
 			stroke: theme.colors.axis,
 			strokeWidth: 1
 		})
@@ -153,8 +156,8 @@ export function setupCoordinatePlaneV2(
 			const label = xLabels[i]
 			if (label !== undefined) {
 				canvas.drawText({
-					x: x,
-					y: zeroY + 15,
+                    x: x,
+                    y: anchorYPos + 15,
 					text: label,
 					fill: theme.colors.axisLabel,
 					anchor: "middle",
@@ -176,10 +179,10 @@ export function setupCoordinatePlaneV2(
 		fontPx: TICK_LABEL_FONT_PX,
 		minGapPx: Y_AXIS_MIN_LABEL_GAP_PX
 	})
-	yValues.forEach((t, i) => {
+    yValues.forEach((t, i) => {
 		if (Math.abs(t) < 1e-9) return // Skip origin
 		const y = toSvgY(t)
-		canvas.drawLine(zeroX - 4, y, zeroX + 4, y, {
+        canvas.drawLine(anchorXPos - 4, y, anchorXPos + 4, y, {
 			stroke: theme.colors.axis,
 			strokeWidth: 1
 		})
@@ -187,7 +190,7 @@ export function setupCoordinatePlaneV2(
 			const label = yLabels[i]
 			if (label !== undefined) {
 				canvas.drawText({
-					x: zeroX - 8,
+                    x: anchorXPos - 8,
 					y: y + 4,
 					text: label,
 					fill: theme.colors.axisLabel,
@@ -223,23 +226,19 @@ export function setupCoordinatePlaneV2(
 		rotate: { angle: -90, cx: yAxisTitleX, cy: yAxisTitleY }
 	})
 
-	// Quadrant labels
-	if (showQuadrantLabels) {
-		const hasPositiveX = xAxis.max > 0
-		const hasNegativeX = xAxis.min < 0
-		const hasPositiveY = yAxis.max > 0
-		const hasNegativeY = yAxis.min < 0
+    // Quadrant labels
+    if (showQuadrantLabels) {
+        const hasPositiveX = xAxis.max > 0
+        const hasNegativeX = xAxis.min < 0
+        const hasPositiveY = yAxis.max > 0
+        const hasNegativeY = yAxis.min < 0
 
-		const qLabelStyle = {
-			fill: "#ccc",
-			fontPx: 18,
-			anchor: "middle" as const,
-			dominantBaseline: "middle" as const
-		}
-
-		// Clamp the zero anchor to chart edges so labels stay inside the chart area
-		const anchorXPos = Math.min(Math.max(zeroX, chartArea.left), chartArea.left + chartArea.width)
-		const anchorYPos = Math.min(Math.max(zeroY, chartArea.top), chartArea.top + chartArea.height)
+        const qLabelStyle = {
+            fill: "#ccc",
+            fontPx: 18,
+            anchor: "middle" as const,
+            dominantBaseline: "middle" as const
+        }
 
 		// I: (+x, +y)
 		if (hasPositiveX && hasPositiveY) {
