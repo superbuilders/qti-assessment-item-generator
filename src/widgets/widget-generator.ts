@@ -19,7 +19,6 @@ import { generateCoordinatePlaneComprehensive } from "./generators/coordinate-pl
 import { generateCustomPolygonDiagram } from "./generators/custom-polygon-diagram"
 import { generateDataTable } from "./generators/data-table"
 import { generateDiscreteObjectRatioDiagram } from "./generators/discrete-object-ratio-diagram"
-import { generateDistanceFormulaGraph } from "./generators/distance-formula-graph"
 import { generateDivergentBarChart } from "./generators/divergent-bar-chart"
 import { generateDivisionAreaDiagram } from "./generators/division-area-diagram"
 import { generateDivisionModelDiagram } from "./generators/division-model-diagram"
@@ -152,8 +151,6 @@ export async function generateWidget(widgetInput: WidgetInput): Promise<string> 
 			return await generateCoordinatePlaneComprehensive(widget)
 		case "divergentBarChart":
 			return await generateDivergentBarChart(widget)
-		case "distanceFormulaGraph":
-			return await generateDistanceFormulaGraph(widget)
 		case "functionPlotGraph":
 			return await generateFunctionPlotGraph(widget)
 		case "keelingCurve":

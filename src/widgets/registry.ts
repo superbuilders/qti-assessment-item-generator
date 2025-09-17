@@ -20,7 +20,6 @@ import { CoordinatePlaneComprehensivePropsSchema } from "./generators/coordinate
 import { CustomPolygonDiagramPropsSchema } from "./generators/custom-polygon-diagram"
 import { DataTablePropsSchema } from "./generators/data-table"
 import { DiscreteObjectRatioDiagramPropsSchema } from "./generators/discrete-object-ratio-diagram"
-import { DistanceFormulaGraphPropsSchema } from "./generators/distance-formula-graph"
 import { DivergentBarChartPropsSchema } from "./generators/divergent-bar-chart"
 import { DivisionAreaDiagramPropsSchema } from "./generators/division-area-diagram"
 import { DivisionModelDiagramPropsSchema } from "./generators/division-model-diagram"
@@ -118,7 +117,6 @@ export const allWidgetSchemas = {
 	conceptualGraph: ConceptualGraphPropsSchema,
 	constraintGeometryDiagram: ConstraintGeometryDiagramPropsSchema,
 	coordinatePlane: CoordinatePlaneComprehensivePropsSchema,
-	distanceFormulaGraph: DistanceFormulaGraphPropsSchema,
 	divergentBarChart: DivergentBarChartPropsSchema,
 	functionPlotGraph: FunctionPlotGraphPropsSchema,
 	lineEquationGraph: LineEquationGraphPropsSchema,
@@ -219,7 +217,6 @@ export {
 	CoordinatePlaneComprehensivePropsSchema,
 	DataTablePropsSchema,
 	DiscreteObjectRatioDiagramPropsSchema,
-	DistanceFormulaGraphPropsSchema,
 	DivergentBarChartPropsSchema,
 	DivisionAreaDiagramPropsSchema,
 	DivisionModelDiagramPropsSchema,
@@ -317,7 +314,6 @@ export type ConstraintGeometryDiagramProps = z.input<typeof ConstraintGeometryDi
 export type CoordinatePlaneComprehensiveProps = z.input<typeof CoordinatePlaneComprehensivePropsSchema>
 export type DataTableProps = z.input<typeof DataTablePropsSchema>
 export type DiscreteObjectRatioDiagramProps = z.input<typeof DiscreteObjectRatioDiagramPropsSchema>
-export type DistanceFormulaGraphProps = z.input<typeof DistanceFormulaGraphPropsSchema>
 export type DivergentBarChartProps = z.input<typeof DivergentBarChartPropsSchema>
 export type DivisionAreaDiagramProps = z.input<typeof DivisionAreaDiagramPropsSchema>
 export type DivisionModelDiagramProps = z.input<typeof DivisionModelDiagramPropsSchema>
@@ -414,7 +410,6 @@ const widgetSchemasWithoutSpecialUnions = [
 	typedSchemas.conceptualGraph,
 	typedSchemas.constraintGeometryDiagram,
 	typedSchemas.coordinatePlane,
-	typedSchemas.distanceFormulaGraph,
 	typedSchemas.divergentBarChart,
 	typedSchemas.functionPlotGraph,
 	typedSchemas.lineEquationGraph,
