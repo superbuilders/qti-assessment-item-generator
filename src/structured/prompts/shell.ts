@@ -470,6 +470,47 @@ CORRECT shell structure:
 }
 \`\`\`
 
+**⚠️ CRITICAL: CANONICAL ANSWER FORMATTING AND USER INSTRUCTIONS ⚠️**
+
+This is a mandatory step for all questions involving a \`textEntryInteraction\`.
+
+1.  **Identify the Canonical Answer Format from Feedback**: Your primary source of truth for the correct answer's format is the **feedback text** or **hints** in the Perseus JSON. This is a universal rule. If the feedback shows a specific format (e.g., "The answer is \`100/9\`", "The correct equation is \`y=3x+2\`"), you **MUST** use that exact format as the canonical answer.
+
+2.  **Determine the Correct \`baseType\`**:
+    *   **Use \`baseType="float"\`** only when the canonical answer is a plain decimal or integer and no strict formatting rules are implied by the feedback or prompt (e.g., \`11.24\`, \`42\`, \`-0.5\`). \`float\` allows for scoring flexibility (e.g., \`.5\` is equivalent to \`0.5\`). If any formatting rule is present, you must use \`string\`.
+    *   **Use \`baseType="string"\`** when the format of the answer is critical or the value is not a plain number. This includes:
+        *   **Fractions or Mixed Numbers**: e.g., \`"100/9"\`
+        *   **Algebraic Equations or Expressions**: e.g., \`"y=3x+2"\`
+        *   **Strict Formatting Rules**: When the prompt or feedback implies a specific format, such as requiring a leading zero (\`"0.5"\`), a fixed number of decimal places (\`"1.20"\`), or a specific scientific notation format (\`"3.14 x 10^2"\`).
+        *   **Any non-numeric characters**: If the answer includes units or symbols that are part of the required input.
+
+3.  **Set the Correct Response**: In the \`responseDeclarations\`, the \`correct\` field **MUST** contain only the single canonical value. For \`baseType="float"\`, this will be a number. For \`baseType="string"\`, this will be a string.
+
+4.  **Add User Instructions (Only When Necessary)**: If and only if you set \`baseType="string"\` because of a strict formatting requirement, you **MUST** add a clear, concise instruction for the student within the assessment \`body\`. This instruction should be in a new paragraph or appended in parentheses to the question prompt.
+    *   **For Fractions:** Add \`(In the simplest form without spaces)\`.
+    *   **For Algebraic Expressions/Equations:** Add \`(Do not include spaces in your answer)\`.
+    *   **For Decimals less than 1:** Add \`(Include a leading zero if your answer is a decimal less than 1)\`.
+    *   **For Specific Rounding:** Add an instruction like \`(Your answer should be rounded to two decimal places)\`.
+    *   **For Scientific Notation:** Add an instruction like \`(Format your answer as X.XX x 10^XX)\`.
+
+**Example Workflow 1 (Fraction):**
+- **Perseus Feedback:** "Correct! The answer is <math>100/9</math>."
+- **Your Output:**
+    - **\`responseDeclarations\`:** \`baseType\` is \`"string"\`, \`correct\` is \`"100/9"\`.
+    - **\`body\`:** Add instruction: \`(In the simplest form without spaces)\`.
+
+**Example Workflow 2 (Algebraic Equation):**
+- **Perseus Feedback:** "The correct equation is \`y = 3x + 2\`."
+- **Your Output:**
+    - **\`responseDeclarations\`:** \`baseType\` is \`"string"\`, \`correct\` is \`"y=3x+2"\`.
+    - **\`body\`:** Add instruction: \`(Do not include spaces in your answer)\`.
+
+**Example Workflow 3 (Simple Float):**
+- **Perseus Feedback:** "The answer is 11.24."
+- **Your Output:**
+    - **\`responseDeclarations\`:** \`baseType\` is \`"float"\`, \`correct\` is \`11.24\`.
+    - **\`body\`:** No formatting instruction is added.
+
 **CRITICAL: NO CURRENCY SLOTS - STRICT MATHML ENFORCEMENT.**
 Currency symbols and amounts MUST NOT be represented as slots (widget or interaction). Do not generate any slotId that indicates currency (for example, names containing "currency" or ending with "_feedback"). 
 
