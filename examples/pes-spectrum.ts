@@ -54,7 +54,7 @@ export const pesSpectrumExamples: PESSpectrumProps[] = [
 		type: "pesSpectrum",
 		title: null,
 		width: 350,
-		height: 250,
+		height: 300,
 		yAxisLabel: "Number of Electrons",
 		peaks: [
 			{

@@ -35,7 +35,7 @@ export const protractorAngleDiagramExamples: ProtractorAngleDiagramProps[] = [
 	{
 		type: "protractorAngleDiagram",
 		width: 350,
-		height: 250,
+		height: 300,
 		smallerReading: 0,
 		largerReading: 90,
 		startPointLabel: "",

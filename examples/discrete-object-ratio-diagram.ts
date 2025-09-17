@@ -5,7 +5,7 @@ export const discreteObjectRatioDiagramExamples: DiscreteObjectRatioDiagramProps
 	{
 		type: "discreteObjectRatioDiagram",
 		width: 480,
-		height: 220,
+		height: 300,
 		title: null,
 		objects: [
 			{ count: 4, emoji: "🍎" },
@@ -16,7 +16,7 @@ export const discreteObjectRatioDiagramExamples: DiscreteObjectRatioDiagramProps
 	{
 		type: "discreteObjectRatioDiagram",
 		width: 480,
-		height: 220,
+		height: 300,
 		title: "Apples vs Bananas",
 		objects: [
 			{ count: 4, emoji: "🍎" },
@@ -27,7 +27,7 @@ export const discreteObjectRatioDiagramExamples: DiscreteObjectRatioDiagramProps
 	{
 		type: "discreteObjectRatioDiagram",
 		width: 420,
-		height: 180,
+		height: 300,
 		title: null,
 		objects: [
 			{ count: 3, emoji: "🍇" },

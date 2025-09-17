@@ -3,8 +3,8 @@ import type { CircleAngleDiagramProps } from "../src/widgets/generators/circle-a
 export const circleAngleDiagramExamples: CircleAngleDiagramProps[] = [
 	{
 		type: "circleAngleDiagram",
-		width: 250,
-		height: 250,
+		width: 300,
+		height: 300,
 		angle: 72,
 		rotation: -15,
 		labels: { center: "O", point1: "A", point2: "B" },
@@ -12,8 +12,8 @@ export const circleAngleDiagramExamples: CircleAngleDiagramProps[] = [
 	},
 	{
 		type: "circleAngleDiagram",
-		width: 250,
-		height: 250,
+		width: 300,
+		height: 300,
 		angle: 36,
 		rotation: 160,
 		labels: { center: "O", point1: "B", point2: "A" },
@@ -21,8 +21,8 @@ export const circleAngleDiagramExamples: CircleAngleDiagramProps[] = [
 	},
 	{
 		type: "circleAngleDiagram",
-		width: 250,
-		height: 250,
+		width: 300,
+		height: 300,
 		angle: 18,
 		rotation: -5,
 		labels: { center: "O", point1: "A", point2: "B" },

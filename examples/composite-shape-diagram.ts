@@ -12,7 +12,7 @@ import type { CompositeShapeDiagramProps } from "../src/widgets/generators/compo
  */
 export const compositeShapeExample: CompositeShapeDiagramProps = {
 	type: "compositeShapeDiagram",
-	width: 520,
+	width: 500,
 	height: 340,
 	vertices: [
 		{ x: 28.829, y: 2.883, id: "T" },
@@ -257,8 +257,8 @@ export const compositeFromNestedExamples: CompositeShapeDiagramProps[] = [
 	{
 		type: "compositeShapeDiagram",
 		fit: "none",
-		width: 240,
-		height: 240,
+		width: 300,
+		height: 300,
 		vertices: [
 			{ id: "O", x: 0, y: 0 },
 			{ id: "C0", x: 110, y: 0 },
@@ -296,8 +296,8 @@ export const compositeFromNestedExamples: CompositeShapeDiagramProps[] = [
 	{
 		type: "compositeShapeDiagram",
 		fit: "none",
-		width: 260,
-		height: 260,
+		width: 300,
+		height: 300,
 		vertices: [
 			{ id: "C", x: 0, y: 0 },
 			{ id: "P0", x: 120, y: 0 },
@@ -335,8 +335,8 @@ export const compositeFromNestedExamples: CompositeShapeDiagramProps[] = [
 	{
 		type: "compositeShapeDiagram",
 		fit: "none",
-		width: 210,
-		height: 175,
+		width: 300,
+		height: 300,
 		vertices: [
 			{ id: "A", x: 35, y: 35 },
 			{ id: "B", x: 140, y: 35 },
@@ -413,8 +413,8 @@ export const compositeFromNestedExamples: CompositeShapeDiagramProps[] = [
 	{
 		type: "compositeShapeDiagram",
 		fit: "none",
-		width: 280,
-		height: 280,
+		width: 300,
+		height: 300,
 		vertices: [
 			{ id: "O", x: 140, y: 140 },
 			{ id: "A", x: 70, y: 90 },
@@ -452,8 +452,8 @@ export const compositeFromNestedExamples: CompositeShapeDiagramProps[] = [
 	{
 		type: "compositeShapeDiagram",
 		fit: "none",
-		width: 200,
-		height: 200,
+		width: 300,
+		height: 300,
 		vertices: [
 			{ id: "O", x: 100, y: 100 },
 			{ id: "R1", x: 70, y: 80 },
@@ -535,8 +535,8 @@ export const compositeFromNestedExamples: CompositeShapeDiagramProps[] = [
 	{
 		type: "compositeShapeDiagram",
 		fit: "none",
-		width: 275,
-		height: 225,
+		width: 300,
+		height: 300,
 		vertices: [
 			{ id: "R1", x: 25, y: 25 },
 			{ id: "R2", x: 225, y: 25 },
@@ -579,8 +579,8 @@ export const compositeFromNestedExamples: CompositeShapeDiagramProps[] = [
 	{
 		type: "compositeShapeDiagram",
 		fit: "none",
-		width: 210,
-		height: 210,
+		width: 300,
+		height: 300,
 		vertices: [
 			{ id: "A", x: 35, y: 35 },
 			{ id: "B", x: 140, y: 35 },
@@ -701,8 +701,8 @@ export const compositeFromNestedExamples: CompositeShapeDiagramProps[] = [
 	{
 		type: "compositeShapeDiagram",
 		fit: "none",
-		width: 200,
-		height: 200,
+		width: 300,
+		height: 300,
 		vertices: [
 			{ id: "O", x: 100, y: 100 },
 			{ id: "S1", x: 70, y: 70 },

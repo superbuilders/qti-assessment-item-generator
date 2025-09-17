@@ -61,7 +61,7 @@ export const radiallyConstrainedAngleDiagramExamples: RadiallyConstrainedAngleDi
 	// Diagram matching: center A, rays B C D E, primaries 60-50-50, secondaries 110 and 160
 	{
 		type: "radiallyConstrainedAngleDiagram",
-		width: 520,
+		width: 500,
 		height: 420,
 		centerLabel: "A",
 		rayLabels: ["B", "C", "D", "E"],

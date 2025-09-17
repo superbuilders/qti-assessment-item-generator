@@ -9,11 +9,11 @@ export const threeDIntersectionDiagramExamples: ThreeDIntersectionDiagramProps[]
     },
     "solid": {
       "type": "squarePyramid",
-      "height": 6,
+      "height": 300,
       "baseSide": 10
     },
     "width": 300,
-    "height": 182,
+    "height": 300,
     "viewOptions": {
       "showLabels": false,
       "projectionAngle": 30,
@@ -30,8 +30,8 @@ export const threeDIntersectionDiagramExamples: ThreeDIntersectionDiagramProps[]
     "solid": {
       "type": "rectangularPrism",
       "depth": 8,
-      "width": 4,
-      "height": 4
+      "width": 300,
+      "height": 300
     },
     "width": 500,
     "height": 350,
@@ -50,7 +50,7 @@ export const threeDIntersectionDiagramExamples: ThreeDIntersectionDiagramProps[]
     },
     "solid": {
       "type": "cone",
-      "height": 10,
+      "height": 300,
       "radius": 6
     },
     "width": 500,
@@ -70,10 +70,10 @@ export const threeDIntersectionDiagramExamples: ThreeDIntersectionDiagramProps[]
     },
     "solid": {
       "type": "squarePyramid",
-      "height": 10,
+      "height": 300,
       "baseSide": 8
     },
-    "width": 520,
+    "width": 500,
     "height": 380,
     "viewOptions": {
       "showLabels": false,
@@ -91,8 +91,8 @@ export const threeDIntersectionDiagramExamples: ThreeDIntersectionDiagramProps[]
     "solid": {
       "type": "rectangularPrism",
       "depth": 2,
-      "width": 2,
-      "height": 4
+      "width": 300,
+      "height": 300
     },
     "width": 500,
     "height": 350,
@@ -112,7 +112,7 @@ export const threeDIntersectionDiagramExamples: ThreeDIntersectionDiagramProps[]
     "solid": {
       "type": "octagonalPrism",
       "side": 3,
-      "height": 8
+      "height": 300
     },
     "width": 400,
     "height": 350,

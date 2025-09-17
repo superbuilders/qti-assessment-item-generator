@@ -61,7 +61,7 @@ export const treeDiagramExamples: TreeDiagramProps[] = [
       { id: "n4", color: "#000000", label: "3 Rights", style: "circled", position: { x: 370, y: 94 } }
     ],
     width: 440,
-    height: 144,
+    height: 300,
     nodeRadius: 40,
     nodeFontSize: 12
   },
@@ -84,7 +84,7 @@ export const treeDiagramExamples: TreeDiagramProps[] = [
       { id: "nD", color: "#000000", label: "3 tails", style: "circled", position: { x: 370, y: 94 } }
     ],
     width: 440,
-    height: 144,
+    height: 300,
     nodeRadius: 36,
     nodeFontSize: 14
   },

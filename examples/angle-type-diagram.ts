@@ -5,8 +5,8 @@ export const angleTypeDiagramExamples: AngleTypeDiagramProps[] = [
 	{
 		// Full angle (360°)
 		type: "angleTypeDiagram",
-		width: 250,
-		height: 200,
+		width: 300,
+		height: 300,
 		angleType: { type: "full", value: 360 },
 		rotation: 0,
 		labels: { ray1Point: "A", vertex: "B", ray2Point: "C" },
@@ -16,8 +16,8 @@ export const angleTypeDiagramExamples: AngleTypeDiagramProps[] = [
 	{
 		// Question 4, Diagram 'b' - Obtuse Angle
 		type: "angleTypeDiagram",
-		width: 250,
-		height: 200,
+		width: 300,
+		height: 300,
 		angleType: { type: "obtuse", value: 135 },
 		rotation: 270,
 		labels: { ray1Point: "P", vertex: "Q", ray2Point: "R" },
@@ -27,8 +27,8 @@ export const angleTypeDiagramExamples: AngleTypeDiagramProps[] = [
 	{
 		// Question 4, Diagram 'c' - Right Angle
 		type: "angleTypeDiagram",
-		width: 250,
-		height: 200,
+		width: 300,
+		height: 300,
 		angleType: { type: "right", value: 90 },
 		rotation: 0,
 		labels: { ray1Point: "P", vertex: "Q", ray2Point: "R" },
@@ -38,8 +38,8 @@ export const angleTypeDiagramExamples: AngleTypeDiagramProps[] = [
 	{
 		// Question 4, Diagram 'd' - Straight Angle
 		type: "angleTypeDiagram",
-		width: 250,
-		height: 200,
+		width: 300,
+		height: 300,
 		angleType: { type: "straight", value: 180 },
 		rotation: 180,
 		labels: { ray1Point: "P", vertex: "Q", ray2Point: "R" },
@@ -49,8 +49,8 @@ export const angleTypeDiagramExamples: AngleTypeDiagramProps[] = [
 	{
 		// Question 4, Diagram 'e' - Reflex Angle
 		type: "angleTypeDiagram",
-		width: 250,
-		height: 200,
+		width: 300,
+		height: 300,
 		angleType: { type: "reflex", value: 270 },
 		rotation: 135,
 		labels: { ray1Point: "P", vertex: "Q", ray2Point: "R" },
@@ -60,8 +60,8 @@ export const angleTypeDiagramExamples: AngleTypeDiagramProps[] = [
 	{
 		// Question 4, Explanation Diagram - Obtuse Angle (Same as diagram 'b')
 		type: "angleTypeDiagram",
-		width: 250,
-		height: 200,
+		width: 300,
+		height: 300,
 		angleType: { type: "obtuse", value: 135 },
 		rotation: 270,
 		labels: { ray1Point: "P", vertex: "Q", ray2Point: "R" },
@@ -71,8 +71,8 @@ export const angleTypeDiagramExamples: AngleTypeDiagramProps[] = [
 	{
 		// Question 3, Diagram 'a' - Right Angle
 		type: "angleTypeDiagram",
-		width: 250,
-		height: 200,
+		width: 300,
+		height: 300,
 		angleType: { type: "right", value: 90 },
 		rotation: 0,
 		labels: { ray1Point: "A", vertex: "B", ray2Point: "C" },
@@ -82,8 +82,8 @@ export const angleTypeDiagramExamples: AngleTypeDiagramProps[] = [
 	{
 		// Question 3, Diagram 'b' - Obtuse Angle
 		type: "angleTypeDiagram",
-		width: 250,
-		height: 200,
+		width: 300,
+		height: 300,
 		angleType: { type: "obtuse", value: 135 },
 		rotation: 0,
 		labels: { ray1Point: "A", vertex: "B", ray2Point: "C" },
@@ -93,8 +93,8 @@ export const angleTypeDiagramExamples: AngleTypeDiagramProps[] = [
 	{
 		// Question 3, Diagram 'c' - Straight Angle
 		type: "angleTypeDiagram",
-		width: 250,
-		height: 200,
+		width: 300,
+		height: 300,
 		angleType: { type: "straight", value: 180 },
 		rotation: 0,
 		labels: { ray1Point: "A", vertex: "B", ray2Point: "C" },
@@ -104,8 +104,8 @@ export const angleTypeDiagramExamples: AngleTypeDiagramProps[] = [
 	{
 		// Question 3, Diagram 'd' - Acute Angle
 		type: "angleTypeDiagram",
-		width: 250,
-		height: 200,
+		width: 300,
+		height: 300,
 		angleType: { type: "acute", value: 45 },
 		rotation: 0,
 		labels: { ray1Point: "A", vertex: "B", ray2Point: "C" },
@@ -115,8 +115,8 @@ export const angleTypeDiagramExamples: AngleTypeDiagramProps[] = [
 	{
 		// Question 3, Explanation Diagram - Obtuse Angle (Same as diagram 'b')
 		type: "angleTypeDiagram",
-		width: 250,
-		height: 200,
+		width: 300,
+		height: 300,
 		angleType: { type: "obtuse", value: 135 },
 		rotation: 0,
 		labels: { ray1Point: "A", vertex: "B", ray2Point: "C" },
@@ -127,8 +127,8 @@ export const angleTypeDiagramExamples: AngleTypeDiagramProps[] = [
 	{
 		// Diagram (a): Obtuse Angle
 		type: "angleTypeDiagram",
-		width: 150,
-		height: 150,
+		width: 300,
+		height: 300,
 		angleType: { type: "obtuse", value: 110 },
 		rotation: 120,
 		labels: { ray1Point: "", vertex: "", ray2Point: "" },
@@ -138,8 +138,8 @@ export const angleTypeDiagramExamples: AngleTypeDiagramProps[] = [
 	{
 		// Diagram (b): Obtuse Angle
 		type: "angleTypeDiagram",
-		width: 150,
-		height: 150,
+		width: 300,
+		height: 300,
 		angleType: { type: "obtuse", value: 140 },
 		rotation: -30,
 		labels: { ray1Point: "", vertex: "", ray2Point: "" },
@@ -149,8 +149,8 @@ export const angleTypeDiagramExamples: AngleTypeDiagramProps[] = [
 	{
 		// Diagram (c): Acute Angle
 		type: "angleTypeDiagram",
-		width: 150,
-		height: 150,
+		width: 300,
+		height: 300,
 		angleType: { type: "acute", value: 35 },
 		rotation: 110,
 		labels: { ray1Point: "", vertex: "", ray2Point: "" },
@@ -160,8 +160,8 @@ export const angleTypeDiagramExamples: AngleTypeDiagramProps[] = [
 	{
 		// Diagram (d): The Correct Acute Angle (20°)
 		type: "angleTypeDiagram",
-		width: 150,
-		height: 150,
+		width: 300,
+		height: 300,
 		angleType: { type: "acute", value: 20 },
 		rotation: 115,
 		labels: { ray1Point: "", vertex: "", ray2Point: "" },
@@ -171,8 +171,8 @@ export const angleTypeDiagramExamples: AngleTypeDiagramProps[] = [
 	{
 		// Diagram (e): Obtuse Angle
 		type: "angleTypeDiagram",
-		width: 150,
-		height: 150,
+		width: 300,
+		height: 300,
 		angleType: { type: "obtuse", value: 155 },
 		rotation: 20,
 		labels: { ray1Point: "", vertex: "", ray2Point: "" },
@@ -182,8 +182,8 @@ export const angleTypeDiagramExamples: AngleTypeDiagramProps[] = [
 	{
 		// Explanation Diagram
 		type: "angleTypeDiagram",
-		width: 150,
-		height: 150,
+		width: 300,
+		height: 300,
 		angleType: { type: "acute", value: 20 },
 		rotation: 115,
 		labels: { ray1Point: "", vertex: "", ray2Point: "" },
@@ -194,8 +194,8 @@ export const angleTypeDiagramExamples: AngleTypeDiagramProps[] = [
 	{
 		// Diagram (a): Obtuse Angle
 		type: "angleTypeDiagram",
-		width: 150,
-		height: 150,
+		width: 300,
+		height: 300,
 		angleType: { type: "obtuse", value: 105 },
 		rotation: 125,
 		labels: { ray1Point: "", vertex: "", ray2Point: "" },
@@ -205,8 +205,8 @@ export const angleTypeDiagramExamples: AngleTypeDiagramProps[] = [
 	{
 		// Diagram (b): The Correct Obtuse Angle (155°)
 		type: "angleTypeDiagram",
-		width: 150,
-		height: 150,
+		width: 300,
+		height: 300,
 		angleType: { type: "obtuse", value: 155 },
 		rotation: 145,
 		labels: { ray1Point: "", vertex: "", ray2Point: "" },
@@ -216,8 +216,8 @@ export const angleTypeDiagramExamples: AngleTypeDiagramProps[] = [
 	{
 		// Diagram (c): Acute Angle
 		type: "angleTypeDiagram",
-		width: 150,
-		height: 150,
+		width: 300,
+		height: 300,
 		angleType: { type: "acute", value: 60 },
 		rotation: 120,
 		labels: { ray1Point: "", vertex: "", ray2Point: "" },
@@ -227,8 +227,8 @@ export const angleTypeDiagramExamples: AngleTypeDiagramProps[] = [
 	{
 		// Diagram (d): Obtuse Angle
 		type: "angleTypeDiagram",
-		width: 150,
-		height: 150,
+		width: 300,
+		height: 300,
 		angleType: { type: "obtuse", value: 130 },
 		rotation: 30,
 		labels: { ray1Point: "", vertex: "", ray2Point: "" },
@@ -238,8 +238,8 @@ export const angleTypeDiagramExamples: AngleTypeDiagramProps[] = [
 	{
 		// Diagram (e): Right Angle
 		type: "angleTypeDiagram",
-		width: 150,
-		height: 150,
+		width: 300,
+		height: 300,
 		angleType: { type: "right", value: 90 },
 		rotation: 135,
 		labels: { ray1Point: "", vertex: "", ray2Point: "" },
@@ -249,8 +249,8 @@ export const angleTypeDiagramExamples: AngleTypeDiagramProps[] = [
 	{
 		// Explanation Diagram
 		type: "angleTypeDiagram",
-		width: 150,
-		height: 150,
+		width: 300,
+		height: 300,
 		angleType: { type: "obtuse", value: 155 },
 		rotation: 145,
 		labels: { ray1Point: "", vertex: "", ray2Point: "" },

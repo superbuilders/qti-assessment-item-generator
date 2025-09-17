@@ -7,7 +7,7 @@ export const lineDiagramExamples: LineDiagramProps[] = [
 	{
 		type: "lineDiagram",
 		width: 320,
-		height: 240,
+		height: 300,
 		gridBounds: { minX: -5, maxX: 5, minY: -4, maxY: 4 },
 		lines: [
 			{
@@ -34,7 +34,7 @@ export const lineDiagramExamples: LineDiagramProps[] = [
 	{
 		type: "lineDiagram",
 		width: 320,
-		height: 240,
+		height: 300,
 		gridBounds: { minX: -6, maxX: 6, minY: -4, maxY: 4 },
 		lines: [
 			{
@@ -264,8 +264,8 @@ export const lineDiagramExamples: LineDiagramProps[] = [
 	},
 	{
 		type: "lineDiagram",
-		width: 250,
-		height: 250,
+		width: 300,
+		height: 300,
 		gridBounds: { minX: -2.5, maxX: 2.5, minY: -2.5, maxY: 2.5 },
 		lines: [
 			{
@@ -291,8 +291,8 @@ export const lineDiagramExamples: LineDiagramProps[] = [
 	},
 	{
 		type: "lineDiagram",
-		width: 250,
-		height: 250,
+		width: 300,
+		height: 300,
 		gridBounds: { minX: -2.5, maxX: 2.5, minY: -2.5, maxY: 2.5 },
 		lines: [
 			{
@@ -318,8 +318,8 @@ export const lineDiagramExamples: LineDiagramProps[] = [
 	},
 	{
 		type: "lineDiagram",
-		width: 250,
-		height: 250,
+		width: 300,
+		height: 300,
 		gridBounds: { minX: -2.5, maxX: 2.5, minY: -2.5, maxY: 2.5 },
 		lines: [
 			{
@@ -345,8 +345,8 @@ export const lineDiagramExamples: LineDiagramProps[] = [
 	},
 	{
 		type: "lineDiagram",
-		width: 250,
-		height: 250,
+		width: 300,
+		height: 300,
 		gridBounds: { minX: -2.5, maxX: 2.5, minY: -2.5, maxY: 2.5 },
 		lines: [
 			{
@@ -372,8 +372,8 @@ export const lineDiagramExamples: LineDiagramProps[] = [
 	},
 	{
 		type: "lineDiagram",
-		width: 250,
-		height: 250,
+		width: 300,
+		height: 300,
 		gridBounds: { minX: -2.5, maxX: 2.5, minY: -2.5, maxY: 2.5 },
 		lines: [
 			{
@@ -399,8 +399,8 @@ export const lineDiagramExamples: LineDiagramProps[] = [
 	},
 	{
 		type: "lineDiagram",
-		width: 250,
-		height: 250,
+		width: 300,
+		height: 300,
 		gridBounds: { minX: -2.5, maxX: 2.5, minY: -2.5, maxY: 2.5 },
 		lines: [
 			{

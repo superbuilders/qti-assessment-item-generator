@@ -4,7 +4,7 @@ export const fractionModelDiagramExamples: FractionModelDiagramProps[] = [
 	{
 		type: "fractionModelDiagram",
 		width: 400,
-		height: 200,
+		height: 300,
 		shapeType: "circle",
 		shapes: [
 			{
@@ -23,7 +23,7 @@ export const fractionModelDiagramExamples: FractionModelDiagramProps[] = [
 	{
 		type: "fractionModelDiagram",
 		width: 500,
-		height: 150,
+		height: 300,
 		shapeType: "box",
 		shapes: [
 			{
@@ -41,8 +41,8 @@ export const fractionModelDiagramExamples: FractionModelDiagramProps[] = [
 	},
 	{
 		type: "fractionModelDiagram",
-		width: 600,
-		height: 180,
+		width: 500,
+		height: 300,
 		shapeType: "polygon",
 		shapes: [
 			{

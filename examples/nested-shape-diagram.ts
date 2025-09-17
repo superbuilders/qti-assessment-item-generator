@@ -6,8 +6,8 @@ export const nestedShapeDiagramExamples: CompositeShapeDiagramProps[] = [
 	{
 		type: "compositeShapeDiagram",
 		fit: "none",
-		width: 240,
-		height: 240,
+		width: 300,
+		height: 300,
 		vertices: [
 			{ id: "O", x: 0, y: 0 },
 			{ id: "C0", x: 110, y: 0 },
@@ -45,8 +45,8 @@ export const nestedShapeDiagramExamples: CompositeShapeDiagramProps[] = [
 	{
 		type: "compositeShapeDiagram",
 		fit: "none",
-		width: 260,
-		height: 260,
+		width: 300,
+		height: 300,
 		vertices: [
 			{ id: "C", x: 0, y: 0 },
 			{ id: "P0", x: 120, y: 0 },
@@ -84,8 +84,8 @@ export const nestedShapeDiagramExamples: CompositeShapeDiagramProps[] = [
 	{
 		type: "compositeShapeDiagram",
 		fit: "none",
-		width: 210,
-		height: 175,
+		width: 300,
+		height: 300,
 		vertices: [
 			{ id: "A", x: 35, y: 35 },
 			{ id: "B", x: 140, y: 35 },

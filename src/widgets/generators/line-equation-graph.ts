@@ -1,4 +1,6 @@
 import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
+import * as errors from "@superbuilders/errors"
+import * as logger from "@superbuilders/slog"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import {
@@ -8,7 +10,7 @@ import {
 	renderLines,
 	renderPoints
 } from "../../utils/canvas-utils"
-import { PADDING } from "../../utils/constants"
+import { AXIS_VIEWBOX_PADDING } from "../../utils/constants"
 import { setupCoordinatePlaneV2 } from "../../utils/coordinate-plane-v2"
 import { theme } from "../../utils/theme"
 import type { WidgetGenerator } from "../types"
@@ -52,6 +54,28 @@ export type LineEquationGraphProps = z.infer<typeof LineEquationGraphPropsSchema
 export const generateLineEquationGraph: WidgetGenerator<typeof LineEquationGraphPropsSchema> = async (props) => {
 	const { width, height, xAxis, yAxis, showQuadrantLabels, lines, points } = props
 
+	// Validate that all points are within axis bounds
+	for (const point of points) {
+		if (point.x < xAxis.min || point.x > xAxis.max) {
+			logger.error("point x-coordinate out of bounds", {
+				pointId: point.id,
+				x: point.x,
+				xMin: xAxis.min,
+				xMax: xAxis.max
+			})
+			throw errors.new("point x-coordinate must be within xAxis range")
+		}
+		if (point.y < yAxis.min || point.y > yAxis.max) {
+			logger.error("point y-coordinate out of bounds", {
+				pointId: point.id,
+				y: point.y,
+				yMin: yAxis.min,
+				yMax: yAxis.max
+			})
+			throw errors.new("point y-coordinate must be within yAxis range")
+		}
+	}
+
 	// 1. Call the base generator and get the body content and extents object
 	const canvas = new CanvasImpl({
 		chartArea: { left: 0, top: 0, width, height },
@@ -92,7 +116,7 @@ export const generateLineEquationGraph: WidgetGenerator<typeof LineEquationGraph
 	renderPoints(points, baseInfo.toSvgX, baseInfo.toSvgY, canvas)
 
 	// NEW: Finalize the canvas and construct the root SVG element
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(AXIS_VIEWBOX_PADDING)
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.base}">${svgBody}</svg>`
 }

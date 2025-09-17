@@ -4,7 +4,7 @@ export const boxGridExamples: BoxGridProps[] = [
 	{
 		type: "boxGrid",
 		width: 300,
-		height: 200,
+		height: 300,
 		data: [
 			[
 				{
@@ -65,8 +65,8 @@ export const boxGridExamples: BoxGridProps[] = [
 	},
 	{
 		type: "boxGrid",
-		width: 250,
-		height: 150,
+		width: 300,
+		height: 300,
 		data: [
 			[
 				{

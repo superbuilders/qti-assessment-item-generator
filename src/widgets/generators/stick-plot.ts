@@ -3,7 +3,7 @@ import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
-import { PADDING } from "../../utils/constants"
+import { AXIS_VIEWBOX_PADDING } from "../../utils/constants"
 import { setupCoordinatePlaneBaseV2 } from "../../utils/coordinate-plane-utils"
 import { CSS_COLOR_PATTERN } from "../../utils/css-color"
 import { abbreviateMonth } from "../../utils/labels"
@@ -172,7 +172,7 @@ export const generateStickPlot: WidgetGenerator<typeof StickPlotPropsSchema> = a
 		})
 	}
 
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(AXIS_VIEWBOX_PADDING)
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.base}">${svgBody}</svg>`
 }
 

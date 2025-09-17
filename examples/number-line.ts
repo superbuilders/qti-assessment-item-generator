@@ -6,7 +6,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 500,
-		height: 120,
+		height: 300,
 		orientation: "horizontal",
 		min: 0,
 		max: 10,
@@ -38,7 +38,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 400,
-		height: 100,
+		height: 300,
 		orientation: "horizontal",
 		min: -5,
 		max: 5,
@@ -68,8 +68,8 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	// Example mirroring the provided diagram: two blue dots and an unknown box, label 125 on right dot
 	{
 		type: "numberLine",
-		width: 520,
-		height: 120,
+		width: 500,
+		height: 300,
 		orientation: "horizontal",
 		min: 0,
 		max: 200,
@@ -87,8 +87,8 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	// Example: labeled variables s, t, u at -8.5, -6.5, -5 respectively with halves as minor ticks
 	{
 		type: "numberLine",
-		width: 800,
-		height: 140,
+		width: 500,
+		height: 300,
 		orientation: "horizontal",
 		min: -9,
 		max: -4,
@@ -105,8 +105,8 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	// Example: single variable a to the left of 0 (variant 1)
 	{
 		type: "numberLine",
-		width: 900,
-		height: 140,
+		width: 500,
+		height: 300,
 		orientation: "horizontal",
 		min: -6,
 		max: 6,
@@ -121,8 +121,8 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	// Example: single variable a to the left of 0 (variant 2)
 	{
 		type: "numberLine",
-		width: 900,
-		height: 180,
+		width: 500,
+		height: 300,
 		orientation: "horizontal",
 		min: -6,
 		max: 6,
@@ -138,8 +138,8 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	// Example: fractional points -5/2 and 2/3 with distinct colors
 	{
 		type: "numberLine",
-		width: 900,
-		height: 220,
+		width: 500,
+		height: 300,
 		orientation: "horizontal",
 		min: -5,
 		max: 2,
@@ -156,8 +156,8 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	// New: Thirds with labeled points a, b, c
 	{
 		type: "numberLine",
-		width: 700,
-		height: 160,
+		width: 500,
+		height: 300,
 		orientation: "horizontal",
 		min: -2/3,
 		max: 1/3,
@@ -175,8 +175,8 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	// New: Thirds with model bar of 5 cells and segment from 0 to 1
 	{
 		type: "numberLine",
-		width: 720,
-		height: 200,
+		width: 500,
+		height: 300,
 		orientation: "horizontal",
 		min: 0,
 		max: 5/3,
@@ -198,8 +198,8 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	// New: Halves across 0..5 with 10-cell model and segment 0..1
 	{
 		type: "numberLine",
-		width: 720,
-		height: 200,
+		width: 500,
+		height: 300,
 		orientation: "horizontal",
 		min: 0,
 		max: 5,
@@ -221,8 +221,8 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	// New: Fifths across 0..2 with 10-cell model and segment 0..1
 	{
 		type: "numberLine",
-		width: 720,
-		height: 200,
+		width: 500,
+		height: 300,
 		orientation: "horizontal",
 		min: 0,
 		max: 2,
@@ -246,7 +246,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	// Widget key: image_1
 	{
 		type: "numberLine",
-		width: 240,
+		width: 300,
 		height: 325,
 		orientation: "vertical",
 		min: -20,
@@ -267,7 +267,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	// Widget key: image_1
 	{
 		type: "numberLine",
-		width: 240,
+		width: 300,
 		height: 325,
 		orientation: "vertical",
 		min: -50,
@@ -288,7 +288,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	// Widget key: image_1
 	{
 		type: "numberLine",
-		width: 240,
+		width: 300,
 		height: 325,
 		orientation: "vertical",
 		min: -50,
@@ -309,7 +309,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	// Widget key: image_1
 	{
 		type: "numberLine",
-		width: 240,
+		width: 300,
 		height: 325,
 		orientation: "vertical",
 		min: -20,
@@ -330,7 +330,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	// Widget key: image_1
 	{
 		type: "numberLine",
-		width: 240,
+		width: 300,
 		height: 325,
 		orientation: "vertical",
 		min: -90,
@@ -352,7 +352,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	// Widget key: image_1
 	{
 		type: "numberLine",
-		width: 240,
+		width: 300,
 		height: 325,
 		orientation: "vertical",
 		min: -90,
@@ -374,7 +374,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	// Widget key: image_1
 	{
 		type: "numberLine",
-		width: 144,
+		width: 300,
 		height: 325,
 		orientation: "vertical",
 		min: -100,
@@ -393,7 +393,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 380,
-		height: 120,
+		height: 300,
 		orientation: "horizontal",
 		min: -10,
 		max: 10,
@@ -410,7 +410,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	// Widget key: image_1
 	{
 		type: "numberLine",
-		width: 144,
+		width: 300,
 		height: 325,
 		orientation: "vertical",
 		min: -10,
@@ -428,7 +428,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 380,
-		height: 120,
+		height: 300,
 		orientation: "horizontal",
 		min: -400,
 		max: 400,
@@ -445,7 +445,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 380,
-		height: 120,
+		height: 300,
 		orientation: "horizontal",
 		min: -100,
 		max: 100,
@@ -461,7 +461,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	// Widget key: image_1
 	{
 		type: "numberLine",
-		width: 200,
+		width: 300,
 		height: 500,
 		orientation: "vertical",
 		min: -12,
@@ -478,7 +478,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	// Widget key: image_1
 	{
 		type: "numberLine",
-		width: 144,
+		width: 300,
 		height: 325,
 		orientation: "vertical",
 		min: -4000,
@@ -496,7 +496,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	// Widget key: image_1
 	{
 		type: "numberLine",
-		width: 144,
+		width: 300,
 		height: 325,
 		orientation: "vertical",
 		min: -3,
@@ -515,7 +515,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 380,
-		height: 120,
+		height: 300,
 		orientation: "horizontal",
 		min: -8,
 		max: 8,
@@ -533,7 +533,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 380,
-		height: 120,
+		height: 300,
 		orientation: "horizontal",
 		min: -200,
 		max: 1000,
@@ -549,7 +549,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	// Widget key: image_1
 	{
 		type: "numberLine",
-		width: 144,
+		width: 300,
 		height: 325,
 		orientation: "vertical",
 		min: -200,
@@ -568,7 +568,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 380,
-		height: 120,
+		height: 300,
 		orientation: "horizontal",
 		min: -5,
 		max: 5,
@@ -586,7 +586,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 360,
-		height: 48,
+		height: 300,
 		orientation: "horizontal",
 		min: -5,
 		max: 5,
@@ -602,8 +602,8 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	// Widget key: choice_b_nl
 	{
 		type: "numberLine",
-		width: 600,
-		height: 150,
+		width: 500,
+		height: 300,
 		orientation: "horizontal",
 		min: -5,
 		max: 5,
@@ -620,7 +620,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 460,
-		height: 150,
+		height: 300,
 		orientation: "horizontal",
 		min: -5,
 		max: 5,
@@ -637,7 +637,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 460,
-		height: 80,
+		height: 300,
 		orientation: "horizontal",
 		min: -2,
 		max: 2,
@@ -654,7 +654,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 460,
-		height: 80,
+		height: 300,
 		orientation: "horizontal",
 		min: -2,
 		max: 2,
@@ -671,7 +671,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 460,
-		height: 80,
+		height: 300,
 		orientation: "horizontal",
 		min: -2,
 		max: 2,
@@ -688,7 +688,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 460,
-		height: 80,
+		height: 300,
 		orientation: "horizontal",
 		min: -4,
 		max: 4,
@@ -705,7 +705,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 460,
-		height: 80,
+		height: 300,
 		orientation: "horizontal",
 		min: -8,
 		max: 8,
@@ -722,7 +722,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 460,
-		height: 80,
+		height: 300,
 		orientation: "horizontal",
 		min: -8,
 		max: 8,
@@ -740,7 +740,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 460,
-		height: 80,
+		height: 300,
 		orientation: "horizontal",
 		min: -8,
 		max: 8,
@@ -757,7 +757,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 460,
-		height: 80,
+		height: 300,
 		orientation: "horizontal",
 		min: -2,
 		max: 2,
@@ -774,7 +774,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 460,
-		height: 80,
+		height: 300,
 		orientation: "horizontal",
 		min: -2,
 		max: 2,
@@ -791,7 +791,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 460,
-		height: 80,
+		height: 300,
 		orientation: "horizontal",
 		min: -2,
 		max: 2,
@@ -808,7 +808,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 460,
-		height: 80,
+		height: 300,
 		orientation: "horizontal",
 		min: -5,
 		max: 10,
@@ -829,7 +829,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 460,
-		height: 80,
+		height: 300,
 		orientation: "horizontal",
 		min: -2,
 		max: 2,
@@ -846,7 +846,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 460,
-		height: 80,
+		height: 300,
 		orientation: "horizontal",
 		min: -0.6,
 		max: 0.6,
@@ -863,7 +863,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 460,
-		height: 80,
+		height: 300,
 		orientation: "horizontal",
 		min: -8,
 		max: 8,
@@ -880,7 +880,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 460,
-		height: 80,
+		height: 300,
 		orientation: "horizontal",
 		min: -8,
 		max: 8,
@@ -897,7 +897,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 460,
-		height: 80,
+		height: 300,
 		orientation: "horizontal",
 		min: -8,
 		max: 8,
@@ -914,7 +914,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 460,
-		height: 80,
+		height: 300,
 		orientation: "horizontal",
 		min: -8,
 		max: 8,
@@ -931,7 +931,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 460,
-		height: 80,
+		height: 300,
 		orientation: "horizontal",
 		min: -2,
 		max: 2,
@@ -948,7 +948,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 460,
-		height: 80,
+		height: 300,
 		orientation: "horizontal",
 		min: -8,
 		max: 8,
@@ -965,7 +965,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 460,
-		height: 80,
+		height: 300,
 		orientation: "horizontal",
 		min: -8,
 		max: 8,
@@ -982,7 +982,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 460,
-		height: 80,
+		height: 300,
 		orientation: "horizontal",
 		min: -8,
 		max: 8,
@@ -999,7 +999,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 460,
-		height: 150,
+		height: 300,
 		orientation: "horizontal",
 		min: -4,
 		max: 4,
@@ -1016,7 +1016,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 460,
-		height: 150,
+		height: 300,
 		orientation: "horizontal",
 		min: -4,
 		max: 4,
@@ -1033,7 +1033,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 460,
-		height: 150,
+		height: 300,
 		orientation: "horizontal",
 		min: -4,
 		max: 4,
@@ -1050,7 +1050,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 460,
-		height: 80,
+		height: 300,
 		orientation: "horizontal",
 		min: -2,
 		max: 2,
@@ -1067,7 +1067,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 460,
-		height: 80,
+		height: 300,
 		orientation: "horizontal",
 		min: -2,
 		max: 2,
@@ -1084,7 +1084,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 460,
-		height: 80,
+		height: 300,
 		orientation: "horizontal",
 		min: -2,
 		max: 2,
@@ -1101,7 +1101,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 460,
-		height: 80,
+		height: 300,
 		orientation: "horizontal",
 		min: -0.6,
 		max: 0.6,
@@ -1118,7 +1118,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 460,
-		height: 80,
+		height: 300,
 		orientation: "horizontal",
 		min: -2,
 		max: 2,
@@ -1135,7 +1135,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 460,
-		height: 80,
+		height: 300,
 		orientation: "horizontal",
 		min: -2,
 		max: 2,
@@ -1152,7 +1152,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 460,
-		height: 80,
+		height: 300,
 		orientation: "horizontal",
 		min: -2,
 		max: 2,
@@ -1169,7 +1169,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 460,
-		height: 80,
+		height: 300,
 		orientation: "horizontal",
 		min: -5,
 		max: 10,
@@ -1190,7 +1190,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 460,
-		height: 120,
+		height: 300,
 		orientation: "horizontal",
 		min: -4,
 		max: 4,
@@ -1207,7 +1207,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 460,
-		height: 120,
+		height: 300,
 		orientation: "horizontal",
 		min: -4,
 		max: 4,
@@ -1224,7 +1224,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 460,
-		height: 120,
+		height: 300,
 		orientation: "horizontal",
 		min: -4,
 		max: 4,
@@ -1241,7 +1241,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 460,
-		height: 80,
+		height: 300,
 		orientation: "horizontal",
 		min: -2,
 		max: 2,
@@ -1258,7 +1258,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 460,
-		height: 80,
+		height: 300,
 		orientation: "horizontal",
 		min: -2,
 		max: 2,
@@ -1275,7 +1275,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 460,
-		height: 80,
+		height: 300,
 		orientation: "horizontal",
 		min: -2,
 		max: 2,
@@ -1292,7 +1292,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 460,
-		height: 80,
+		height: 300,
 		orientation: "horizontal",
 		min: -2,
 		max: 2,
@@ -1309,7 +1309,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 460,
-		height: 80,
+		height: 300,
 		orientation: "horizontal",
 		min: -8,
 		max: 8,
@@ -1326,7 +1326,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 460,
-		height: 80,
+		height: 300,
 		orientation: "horizontal",
 		min: -8,
 		max: 8,
@@ -1343,7 +1343,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 460,
-		height: 80,
+		height: 300,
 		orientation: "horizontal",
 		min: -8,
 		max: 8,
@@ -1360,7 +1360,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 460,
-		height: 80,
+		height: 300,
 		orientation: "horizontal",
 		min: -2,
 		max: 2,
@@ -1377,7 +1377,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 460,
-		height: 80,
+		height: 300,
 		orientation: "horizontal",
 		min: -2,
 		max: 2,
@@ -1394,7 +1394,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 460,
-		height: 80,
+		height: 300,
 		orientation: "horizontal",
 		min: -2,
 		max: 2,
@@ -1411,7 +1411,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 460,
-		height: 80,
+		height: 300,
 		orientation: "horizontal",
 		min: -8,
 		max: 8,
@@ -1428,7 +1428,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 460,
-		height: 80,
+		height: 300,
 		orientation: "horizontal",
 		min: -2,
 		max: 2,
@@ -1445,7 +1445,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 460,
-		height: 80,
+		height: 300,
 		orientation: "horizontal",
 		min: -7,
 		max: 7,
@@ -1466,7 +1466,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 460,
-		height: 80,
+		height: 300,
 		orientation: "horizontal",
 		min: -0.6,
 		max: 0.6,
@@ -1483,7 +1483,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 460,
-		height: 80,
+		height: 300,
 		orientation: "horizontal",
 		min: -2,
 		max: 2,
@@ -1500,7 +1500,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 460,
-		height: 80,
+		height: 300,
 		orientation: "horizontal",
 		min: -2,
 		max: 2,
@@ -1517,7 +1517,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 460,
-		height: 80,
+		height: 300,
 		orientation: "horizontal",
 		min: -2,
 		max: 2,
@@ -1534,7 +1534,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
 		type: "numberLine",
 		width: 460,
-		height: 80,
+		height: 300,
 		orientation: "horizontal",
 		min: -5,
 		max: 10,

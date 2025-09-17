@@ -4,8 +4,8 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 	// Example 1: Classic additive model with proportional comparison
 	{
 		type: "tapeDiagram",
-		width: 600,
-		height: 250,
+		width: 500,
+		height: 300,
 		referenceUnitsTotal: 35,
 		topTape: {
 			label: "Total",
@@ -73,7 +73,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 	{
 		type: "tapeDiagram",
 		width: 500,
-		height: 180,
+		height: 300,
 		referenceUnitsTotal: null,
 		topTape: {
 			label: "Value",
@@ -106,7 +106,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 	{
 		type: "tapeDiagram",
 		width: 400,
-		height: 200,
+		height: 300,
 		referenceUnitsTotal: 7,
 		topTape: {
 			label: "Sarah's Money",
@@ -150,8 +150,8 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 	// Example 4: Mixed filled and unfilled regions
 	{
 		type: "tapeDiagram",
-		width: 600,
-		height: 150,
+		width: 500,
+		height: 300,
 		referenceUnitsTotal: null,
 		topTape: {
 			label: "Container",
@@ -189,8 +189,8 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 	// Example 5: Canonical percent tape (10 units, first 7 shaded) with straight brackets
 	{
 		type: "tapeDiagram",
-		width: 680,
-		height: 180,
+		width: 500,
+		height: 300,
 		referenceUnitsTotal: null,
 		topTape: {
 			label: null,
@@ -222,7 +222,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
   {
     "type": "tapeDiagram",
     "width": 320,
-    "height": 128,
+    "height": 300,
     "topTape": {
       "grid": {
         "show": true,
@@ -273,7 +273,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
   {
     "type": "tapeDiagram",
     "width": 320,
-    "height": 128,
+    "height": 300,
     "topTape": {
       "grid": {
         "show": true,
@@ -324,7 +324,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
   {
     "type": "tapeDiagram",
     "width": 320,
-    "height": 128,
+    "height": 300,
     "topTape": {
       "grid": {
         "show": true,
@@ -375,7 +375,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
   {
     "type": "tapeDiagram",
     "width": 320,
-    "height": 128,
+    "height": 300,
     "topTape": {
       "grid": {
         "show": true,
@@ -426,7 +426,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
   {
     "type": "tapeDiagram",
     "width": 320,
-    "height": 128,
+    "height": 300,
     "topTape": {
       "grid": {
         "show": true,
@@ -477,7 +477,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
   {
     "type": "tapeDiagram",
     "width": 320,
-    "height": 128,
+    "height": 300,
     "topTape": {
       "grid": {
         "show": true,
@@ -543,7 +543,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
   {
     "type": "tapeDiagram",
     "width": 320,
-    "height": 128,
+    "height": 300,
     "topTape": {
       "grid": {
         "show": true,
@@ -594,7 +594,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
   {
     "type": "tapeDiagram",
     "width": 320,
-    "height": 128,
+    "height": 300,
     "topTape": {
       "grid": {
         "show": true,
@@ -645,7 +645,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
   {
     "type": "tapeDiagram",
     "width": 320,
-    "height": 128,
+    "height": 300,
     "topTape": {
       "grid": {
         "show": true,
@@ -696,7 +696,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
   {
     "type": "tapeDiagram",
     "width": 320,
-    "height": 128,
+    "height": 300,
     "topTape": {
       "grid": {
         "show": true,
@@ -747,7 +747,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
   {
     "type": "tapeDiagram",
     "width": 320,
-    "height": 168,
+    "height": 300,
     "topTape": {
       "grid": {
         "show": true,
@@ -819,7 +819,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
   {
     "type": "tapeDiagram",
     "width": 320,
-    "height": 168,
+    "height": 300,
     "topTape": {
       "grid": {
         "show": true,
@@ -887,7 +887,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
   {
     "type": "tapeDiagram",
     "width": 320,
-    "height": 168,
+    "height": 300,
     "topTape": {
       "grid": {
         "show": true,
@@ -987,7 +987,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
   {
     "type": "tapeDiagram",
     "width": 320,
-    "height": 168,
+    "height": 300,
     "topTape": {
       "grid": {
         "show": true,
@@ -1087,7 +1087,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
   {
     "type": "tapeDiagram",
     "width": 320,
-    "height": 168,
+    "height": 300,
     "topTape": {
       "grid": {
         "show": true,
@@ -1187,7 +1187,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
   {
     "type": "tapeDiagram",
     "width": 320,
-    "height": 168,
+    "height": 300,
     "topTape": {
       "grid": {
         "show": true,
@@ -1287,7 +1287,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
   {
     "type": "tapeDiagram",
     "width": 320,
-    "height": 168,
+    "height": 300,
     "topTape": {
       "grid": {
         "show": true,
@@ -1386,8 +1386,8 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
   },
   {
     "type": "tapeDiagram",
-    "width": 200,
-    "height": 168,
+    "width": 300,
+    "height": 300,
     "topTape": {
       "grid": {
         "show": true,
@@ -1451,7 +1451,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
   {
     "type": "tapeDiagram",
     "width": 320,
-    "height": 168,
+    "height": 300,
     "topTape": {
       "grid": {
         "show": true,
@@ -1551,7 +1551,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
   {
     "type": "tapeDiagram",
     "width": 320,
-    "height": 168,
+    "height": 300,
     "topTape": {
       "grid": {
         "show": true,
@@ -1623,7 +1623,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
   {
     "type": "tapeDiagram",
     "width": 320,
-    "height": 168,
+    "height": 300,
     "topTape": {
       "grid": {
         "show": true,
@@ -1691,7 +1691,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
   {
     "type": "tapeDiagram",
     "width": 320,
-    "height": 168,
+    "height": 300,
     "topTape": {
       "grid": {
         "show": true,
@@ -1787,7 +1787,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
   {
     "type": "tapeDiagram",
     "width": 320,
-    "height": 168,
+    "height": 300,
     "topTape": {
       "grid": {
         "show": true,
@@ -1887,7 +1887,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
   {
     "type": "tapeDiagram",
     "width": 320,
-    "height": 168,
+    "height": 300,
     "topTape": {
       "grid": {
         "show": true,
@@ -1987,7 +1987,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
   {
     "type": "tapeDiagram",
     "width": 320,
-    "height": 168,
+    "height": 300,
     "topTape": {
       "grid": {
         "show": true,
@@ -2058,8 +2058,8 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
   },
   {
     "type": "tapeDiagram",
-    "width": 265,
-    "height": 168,
+    "width": 300,
+    "height": 300,
     "topTape": {
       "grid": {
         "show": true,
@@ -2158,8 +2158,8 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
   },
   {
     "type": "tapeDiagram",
-    "width": 520,
-    "height": 220,
+    "width": 500,
+    "height": 300,
     "topTape": {
       "grid": {
         "show": true,
@@ -2254,8 +2254,8 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
   },
   {
     "type": "tapeDiagram",
-    "width": 265,
-    "height": 168,
+    "width": 300,
+    "height": 300,
     "topTape": {
       "grid": {
         "show": true,
@@ -2351,7 +2351,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
   {
     "type": "tapeDiagram",
     "width": 320,
-    "height": 168,
+    "height": 300,
     "topTape": {
       "grid": {
         "show": true,
@@ -2450,8 +2450,8 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
   },
   {
     "type": "tapeDiagram",
-    "width": 265,
-    "height": 168,
+    "width": 300,
+    "height": 300,
     "topTape": {
       "grid": {
         "show": true,
@@ -2550,8 +2550,8 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
   },
   {
     "type": "tapeDiagram",
-    "width": 265,
-    "height": 168,
+    "width": 300,
+    "height": 300,
     "topTape": {
       "grid": {
         "show": true,
@@ -2651,7 +2651,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
   {
     "type": "tapeDiagram",
     "width": 320,
-    "height": 160,
+    "height": 300,
     "topTape": {
       "grid": {
         "show": false,
@@ -2734,7 +2734,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
   {
     "type": "tapeDiagram",
     "width": 320,
-    "height": 160,
+    "height": 300,
     "topTape": {
       "grid": {
         "show": false,
@@ -2817,7 +2817,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
   {
     "type": "tapeDiagram",
     "width": 320,
-    "height": 160,
+    "height": 300,
     "topTape": {
       "grid": {
         "show": false,
@@ -2900,7 +2900,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
   {
     "type": "tapeDiagram",
     "width": 320,
-    "height": 160,
+    "height": 300,
     "topTape": {
       "grid": {
         "show": false,
@@ -2983,7 +2983,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
   {
     "type": "tapeDiagram",
     "width": 320,
-    "height": 160,
+    "height": 300,
     "topTape": {
       "grid": {
         "show": true,
@@ -3066,7 +3066,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
   {
     "type": "tapeDiagram",
     "width": 320,
-    "height": 160,
+    "height": 300,
     "topTape": {
       "grid": {
         "show": true,
@@ -3173,7 +3173,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
   {
     "type": "tapeDiagram",
     "width": 320,
-    "height": 160,
+    "height": 300,
     "topTape": {
       "grid": {
         "show": false,
@@ -3255,7 +3255,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
   {
     "type": "tapeDiagram",
     "width": 320,
-    "height": 160,
+    "height": 300,
     "topTape": {
       "grid": {
         "show": false,
@@ -3385,7 +3385,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
   {
     "type": "tapeDiagram",
     "width": 320,
-    "height": 160,
+    "height": 300,
     "topTape": {
       "grid": {
         "show": true,
@@ -3532,7 +3532,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
   {
     "type": "tapeDiagram",
     "width": 320,
-    "height": 160,
+    "height": 300,
     "topTape": {
       "grid": {
         "show": false,
@@ -3711,7 +3711,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
   {
     "type": "tapeDiagram",
     "width": 320,
-    "height": 160,
+    "height": 300,
     "topTape": {
       "grid": {
         "show": true,
@@ -3826,7 +3826,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
   {
     "type": "tapeDiagram",
     "width": 320,
-    "height": 160,
+    "height": 300,
     "topTape": {
       "grid": {
         "show": false,
@@ -3988,7 +3988,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
   {
     "type": "tapeDiagram",
     "width": 320,
-    "height": 160,
+    "height": 300,
     "topTape": {
       "grid": {
         "show": false,
@@ -4103,7 +4103,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
   {
     "type": "tapeDiagram",
     "width": 480,
-    "height": 180,
+    "height": 300,
     "topTape": {
       "grid": {
         "show": true,
@@ -4186,7 +4186,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
   {
     "type": "tapeDiagram",
     "width": 320,
-    "height": 160,
+    "height": 300,
     "topTape": {
       "grid": {
         "show": false,
@@ -4269,7 +4269,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
   {
     "type": "tapeDiagram",
     "width": 320,
-    "height": 160,
+    "height": 300,
     "topTape": {
       "grid": {
         "show": false,
@@ -4352,7 +4352,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
   {
     "type": "tapeDiagram",
     "width": 320,
-    "height": 160,
+    "height": 300,
     "topTape": {
       "grid": {
         "show": false,
@@ -4435,7 +4435,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
   {
     "type": "tapeDiagram",
     "width": 320,
-    "height": 160,
+    "height": 300,
     "topTape": {
       "grid": {
         "show": false,
@@ -4518,7 +4518,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
   {
     "type": "tapeDiagram",
     "width": 320,
-    "height": 160,
+    "height": 300,
     "topTape": {
       "grid": {
         "show": false,
@@ -4601,7 +4601,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
   {
     "type": "tapeDiagram",
     "width": 320,
-    "height": 160,
+    "height": 300,
     "topTape": {
       "grid": {
         "show": true,
@@ -4748,7 +4748,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
   {
     "type": "tapeDiagram",
     "width": 320,
-    "height": 160,
+    "height": 300,
     "topTape": {
       "grid": {
         "show": true,
@@ -4895,7 +4895,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
   {
     "type": "tapeDiagram",
     "width": 320,
-    "height": 160,
+    "height": 300,
     "topTape": {
       "grid": {
         "show": false,
@@ -5026,7 +5026,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
   {
     "type": "tapeDiagram",
     "width": 480,
-    "height": 200,
+    "height": 300,
     "topTape": {
       "grid": {
         "show": false,
@@ -5109,7 +5109,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
   {
     "type": "tapeDiagram",
     "width": 320,
-    "height": 160,
+    "height": 300,
     "topTape": {
       "grid": {
         "show": true,

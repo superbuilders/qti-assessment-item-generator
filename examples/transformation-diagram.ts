@@ -9,7 +9,7 @@ export const transformationDiagramExamples: TransformationDiagramProps[] = [
   {
     type: "transformationDiagram",
     width: 325,
-    height: 200,
+    height: 300,
     preImage: {
       label: null,
       vertices: [
@@ -62,7 +62,7 @@ export const transformationDiagramExamples: TransformationDiagramProps[] = [
   {
     type: "transformationDiagram",
     width: 325,
-    height: 200,
+    height: 300,
     preImage: {
       label: "ABC",
       vertices: [
@@ -114,7 +114,7 @@ export const transformationDiagramExamples: TransformationDiagramProps[] = [
   {
     type: "transformationDiagram",
     width: 325,
-    height: 250,
+    height: 300,
     preImage: {
       label: "ABCD",
       vertices: [
@@ -141,7 +141,7 @@ export const transformationDiagramExamples: TransformationDiagramProps[] = [
   {
     type: "transformationDiagram",
     width: 325,
-    height: 231,
+    height: 300,
     preImage: {
       label: "center",
       vertices: [
@@ -169,7 +169,7 @@ export const transformationDiagramExamples: TransformationDiagramProps[] = [
   {
     type: "transformationDiagram",
     width: 300,
-    height: 225,
+    height: 300,
     preImage: {
       label: null,
       vertices: [
@@ -299,7 +299,7 @@ export const transformationDiagramExamples: TransformationDiagramProps[] = [
   {
     type: "transformationDiagram",
     width: 350,
-    height: 262.5,
+    height: 300,
     preImage: {
       label: "ABC",
       vertices: [
@@ -394,7 +394,7 @@ export const transformationDiagramExamples: TransformationDiagramProps[] = [
   // Widget key: image_1
   {
     type: "transformationDiagram",
-    width: 225,
+    width: 300,
     height: 350,
     preImage: {
       label: "ABCD",
@@ -426,7 +426,7 @@ export const transformationDiagramExamples: TransformationDiagramProps[] = [
   // Widget key: image_1
   {
     type: "transformationDiagram",
-    width: 296,
+    width: 300,
     height: 350,
     preImage: {
       label: "ABC",
@@ -489,7 +489,7 @@ export const transformationDiagramExamples: TransformationDiagramProps[] = [
   // Widget key: image_1
   {
     type: "transformationDiagram",
-    width: 286.364,
+    width: 300,
     height: 350,
     preImage: {
       label: "ABC",
@@ -526,7 +526,7 @@ export const transformationDiagramExamples: TransformationDiagramProps[] = [
   {
     type: "transformationDiagram",
     width: 350,
-    height: 239.474,
+    height: 300,
     preImage: {
       label: "ABC",
       vertices: [
@@ -555,7 +555,7 @@ export const transformationDiagramExamples: TransformationDiagramProps[] = [
   {
     type: "transformationDiagram",
     width: 350,
-    height: 255,
+    height: 300,
     preImage: {
       label: "ABCD",
       vertices: [
@@ -590,8 +590,8 @@ export const transformationDiagramExamples: TransformationDiagramProps[] = [
   // Widget key: choice_a_figure
   {
     type: "transformationDiagram",
-    width: 200,
-    height: 200,
+    width: 300,
+    height: 300,
     preImage: {
       label: "ABC",
       vertices: [
@@ -616,8 +616,8 @@ export const transformationDiagramExamples: TransformationDiagramProps[] = [
   // Widget key: choice_b_figure
   {
     type: "transformationDiagram",
-    width: 200,
-    height: 200,
+    width: 300,
+    height: 300,
     preImage: {
       label: "ABC",
       vertices: [
@@ -642,8 +642,8 @@ export const transformationDiagramExamples: TransformationDiagramProps[] = [
   // Widget key: choice_c_figure
   {
     type: "transformationDiagram",
-    width: 200,
-    height: 200,
+    width: 300,
+    height: 300,
     preImage: {
       label: "ABC",
       vertices: [
@@ -668,8 +668,8 @@ export const transformationDiagramExamples: TransformationDiagramProps[] = [
   // Widget key: choice_d_figure
   {
     type: "transformationDiagram",
-    width: 200,
-    height: 200,
+    width: 300,
+    height: 300,
     preImage: {
       label: "ABC",
       vertices: [
@@ -694,8 +694,8 @@ export const transformationDiagramExamples: TransformationDiagramProps[] = [
   // Widget key: image_1
   {
     type: "transformationDiagram",
-    width: 200,
-    height: 200,
+    width: 300,
+    height: 300,
     preImage: {
       label: "ABC",
       vertices: [
@@ -720,8 +720,8 @@ export const transformationDiagramExamples: TransformationDiagramProps[] = [
   // Widget key: choice_a_figure
   {
     type: "transformationDiagram",
-    width: 200,
-    height: 200,
+    width: 300,
+    height: 300,
     preImage: {
       label: "ABC",
       vertices: [
@@ -746,8 +746,8 @@ export const transformationDiagramExamples: TransformationDiagramProps[] = [
   // Widget key: choice_b_figure
   {
     type: "transformationDiagram",
-    width: 200,
-    height: 200,
+    width: 300,
+    height: 300,
     preImage: {
       label: "ABC",
       vertices: [
@@ -772,8 +772,8 @@ export const transformationDiagramExamples: TransformationDiagramProps[] = [
   // Widget key: choice_c_figure
   {
     type: "transformationDiagram",
-    width: 200,
-    height: 200,
+    width: 300,
+    height: 300,
     preImage: {
       label: "ABC",
       vertices: [
@@ -798,8 +798,8 @@ export const transformationDiagramExamples: TransformationDiagramProps[] = [
   // Widget key: choice_d_figure
   {
     type: "transformationDiagram",
-    width: 200,
-    height: 200,
+    width: 300,
+    height: 300,
     preImage: {
       label: "ABC",
       vertices: [
@@ -824,8 +824,8 @@ export const transformationDiagramExamples: TransformationDiagramProps[] = [
   // Widget key: image_1
   {
     type: "transformationDiagram",
-    width: 200,
-    height: 200,
+    width: 300,
+    height: 300,
     preImage: {
       label: "ABC",
       vertices: [
@@ -850,8 +850,8 @@ export const transformationDiagramExamples: TransformationDiagramProps[] = [
   // Widget key: choice_a_figure
   {
     type: "transformationDiagram",
-    width: 200,
-    height: 200,
+    width: 300,
+    height: 300,
     preImage: {
       label: "ABC",
       vertices: [
@@ -876,8 +876,8 @@ export const transformationDiagramExamples: TransformationDiagramProps[] = [
   // Widget key: choice_b_figure
   {
     type: "transformationDiagram",
-    width: 200,
-    height: 200,
+    width: 300,
+    height: 300,
     preImage: {
       label: "ABC",
       vertices: [
@@ -902,8 +902,8 @@ export const transformationDiagramExamples: TransformationDiagramProps[] = [
   // Widget key: choice_c_figure
   {
     type: "transformationDiagram",
-    width: 200,
-    height: 200,
+    width: 300,
+    height: 300,
     preImage: {
       label: "ABC",
       vertices: [
@@ -928,8 +928,8 @@ export const transformationDiagramExamples: TransformationDiagramProps[] = [
   // Widget key: choice_d_figure
   {
     type: "transformationDiagram",
-    width: 200,
-    height: 200,
+    width: 300,
+    height: 300,
     preImage: {
       label: "ABC",
       vertices: [
@@ -954,8 +954,8 @@ export const transformationDiagramExamples: TransformationDiagramProps[] = [
   // Widget key: choice_a_figure
   {
     type: "transformationDiagram",
-    width: 200,
-    height: 200,
+    width: 300,
+    height: 300,
     preImage: {
       label: "ABC",
       vertices: [
@@ -980,8 +980,8 @@ export const transformationDiagramExamples: TransformationDiagramProps[] = [
   // Widget key: choice_b_figure
   {
     type: "transformationDiagram",
-    width: 200,
-    height: 200,
+    width: 300,
+    height: 300,
     preImage: {
       label: "ABC",
       vertices: [
@@ -1006,8 +1006,8 @@ export const transformationDiagramExamples: TransformationDiagramProps[] = [
   // Widget key: choice_c_figure
   {
     type: "transformationDiagram",
-    width: 200,
-    height: 200,
+    width: 300,
+    height: 300,
     preImage: {
       label: "ABC",
       vertices: [
@@ -1032,8 +1032,8 @@ export const transformationDiagramExamples: TransformationDiagramProps[] = [
   // Widget key: choice_d_figure
   {
     type: "transformationDiagram",
-    width: 200,
-    height: 200,
+    width: 300,
+    height: 300,
     preImage: {
       label: "ABC",
       vertices: [
@@ -1058,8 +1058,8 @@ export const transformationDiagramExamples: TransformationDiagramProps[] = [
   // Widget key: choice_a_figure
   {
     type: "transformationDiagram",
-    width: 200,
-    height: 200,
+    width: 300,
+    height: 300,
     preImage: {
       label: "ABC",
       vertices: [
@@ -1084,8 +1084,8 @@ export const transformationDiagramExamples: TransformationDiagramProps[] = [
   // Widget key: choice_b_figure
   {
     type: "transformationDiagram",
-    width: 200,
-    height: 200,
+    width: 300,
+    height: 300,
     preImage: {
       label: "ABC",
       vertices: [
@@ -1110,8 +1110,8 @@ export const transformationDiagramExamples: TransformationDiagramProps[] = [
   // Widget key: choice_c_figure
   {
     type: "transformationDiagram",
-    width: 200,
-    height: 200,
+    width: 300,
+    height: 300,
     preImage: {
       label: "ABC",
       vertices: [
@@ -1136,8 +1136,8 @@ export const transformationDiagramExamples: TransformationDiagramProps[] = [
   // Widget key: choice_d_figure
   {
     type: "transformationDiagram",
-    width: 200,
-    height: 200,
+    width: 300,
+    height: 300,
     preImage: {
       label: "ABC",
       vertices: [
@@ -1162,8 +1162,8 @@ export const transformationDiagramExamples: TransformationDiagramProps[] = [
   // Widget key: choice_a_figure
   {
     type: "transformationDiagram",
-    width: 200,
-    height: 200,
+    width: 300,
+    height: 300,
     preImage: {
       label: "ABC",
       vertices: [
@@ -1188,8 +1188,8 @@ export const transformationDiagramExamples: TransformationDiagramProps[] = [
   // Widget key: choice_b_figure
   {
     type: "transformationDiagram",
-    width: 200,
-    height: 200,
+    width: 300,
+    height: 300,
     preImage: {
       label: "ABC",
       vertices: [
@@ -1214,8 +1214,8 @@ export const transformationDiagramExamples: TransformationDiagramProps[] = [
   // Widget key: choice_c_figure
   {
     type: "transformationDiagram",
-    width: 200,
-    height: 200,
+    width: 300,
+    height: 300,
     preImage: {
       label: "ABC",
       vertices: [
@@ -1240,8 +1240,8 @@ export const transformationDiagramExamples: TransformationDiagramProps[] = [
   // Widget key: choice_d_figure
   {
     type: "transformationDiagram",
-    width: 200,
-    height: 200,
+    width: 300,
+    height: 300,
     preImage: {
       label: "ABC",
       vertices: [

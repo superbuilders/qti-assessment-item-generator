@@ -36,7 +36,7 @@ export const stickPlotExamples: StickPlotProps[] = [
 	},
 	{
 		type: "stickPlot",
-		width: 600,
+		width: 500,
 		height: 350,
 		title: "Isotopic Distribution of Bromine",
 		xAxis: {

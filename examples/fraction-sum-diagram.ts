@@ -3,8 +3,8 @@ import type { FractionSumDiagramProps } from "../src/widgets/generators/fraction
 export const fractionSumDiagramExamples: FractionSumDiagramProps[] = [
 	{
 		type: "fractionSumDiagram",
-		width: 600,
-		height: 200,
+		width: 500,
+		height: 300,
 		denominator: 10,
 		groups: [
 			{ numerator: 4, color: "#FADBD8" },
@@ -14,8 +14,8 @@ export const fractionSumDiagramExamples: FractionSumDiagramProps[] = [
 	},
 	{
 		type: "fractionSumDiagram",
-		width: 600,
-		height: 200,
+		width: 500,
+		height: 300,
 		denominator: 8,
 		groups: [
 			{ numerator: 1, color: "#FADBD8" },

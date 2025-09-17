@@ -4,8 +4,8 @@ export const customPolygonDiagramExamples: CustomPolygonDiagramProps[] = [
 	// Example 1: Trapezoid-like shape (left vertical, top horizontal)
 	{
 		type: "customPolygonDiagram",
-		width: 280,
-		height: 220,
+		width: 300,
+		height: 300,
 		points: [
 			// P -> Q -> T -> R (closed automatically)
 			{ x: 10, y: 10, label: "P" },
@@ -19,8 +19,8 @@ export const customPolygonDiagramExamples: CustomPolygonDiagramProps[] = [
 	// Example 2: Parallelogram (bottom horizontal)
 	{
 		type: "customPolygonDiagram",
-		width: 280,
-		height: 220,
+		width: 300,
+		height: 300,
 		points: [
 			// P -> R -> T -> Q
 			{ x: 10, y: 10, label: "P" },

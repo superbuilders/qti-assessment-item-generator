@@ -3,8 +3,8 @@ import type { LabeledRectangleDiagramProps } from "../src/widgets/generators/lab
 export const labeledRectangleDiagramExamples: LabeledRectangleDiagramProps[] = [
 	{
 		type: "labeledRectangleDiagram",
-		width: 200,
-		height: 180,
+		width: 300,
+		height: 300,
 		topLabel: "<mn>5</mn><mtext>\u00A0cm</mtext>",
 		bottomLabel: "<mn>5</mn><mtext>\u00A0cm</mtext>",
 		leftLabel: "<mi>x</mi><mtext>\u00A0cm</mtext>",
@@ -16,8 +16,8 @@ export const labeledRectangleDiagramExamples: LabeledRectangleDiagramProps[] = [
 	},
 	{
 		type: "labeledRectangleDiagram",
-		width: 200,
-		height: 180,
+		width: 300,
+		height: 300,
 		topLabel: "<mn>4</mn><mtext>\u00A0cm</mtext>",
 		bottomLabel: "<mn>4</mn><mtext>\u00A0cm</mtext>",
 		leftLabel: "<mi>x</mi><mtext>\u00A0cm</mtext>",
@@ -29,8 +29,8 @@ export const labeledRectangleDiagramExamples: LabeledRectangleDiagramProps[] = [
 	},
 	{
 		type: "labeledRectangleDiagram",
-		width: 200,
-		height: 180,
+		width: 300,
+		height: 300,
 		topLabel: "<mn>5</mn><mtext>\u00A0cm</mtext>",
 		bottomLabel: "<mn>5</mn><mtext>\u00A0cm</mtext>",
 		leftLabel: "<mi>x</mi><mtext>\u00A0cm</mtext>",

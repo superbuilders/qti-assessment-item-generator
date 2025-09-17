@@ -1296,7 +1296,7 @@ export const polygonGraphExamples: PolygonGraphProps[] = [
 	// Example 19: Quadrilateral
 	{
 		type: "polygonGraph",
-		width: 265,
+		width: 300,
 		xAxis: {
 			max: 10,
 			min: 0,
@@ -1311,7 +1311,7 @@ export const polygonGraphExamples: PolygonGraphProps[] = [
 			tickInterval: 1,
 			showGridLines: true
 		},
-		height: 265,
+		height: 300,
 		points: [
 			{
 				x: 2,

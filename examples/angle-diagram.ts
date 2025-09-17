@@ -6,7 +6,7 @@ export const angleDiagramExamples: AngleDiagramProps[] = [
 	{
 		type: "angleDiagram",
 		width: 400,
-		height: 220,
+		height: 300,
 		points: [
 			{ x: 80, y: 120, id: "A", label: "A", shape: "circle" },
 			{ x: 320, y: 120, id: "B", label: "B", shape: "circle" },
@@ -59,7 +59,7 @@ export const angleDiagramExamples: AngleDiagramProps[] = [
 	{
 		type: "angleDiagram",
 		width: 300,
-		height: 188,
+		height: 300,
 		points: [
 			{ x: 150, y: 112.5, id: "A", label: "A", shape: "circle" },
 			{ x: 60, y: 112.5, id: "D", label: "D", shape: "circle" },
@@ -110,7 +110,7 @@ export const angleDiagramExamples: AngleDiagramProps[] = [
 	{
 		type: "angleDiagram",
 		width: 400,
-		height: 220,
+		height: 300,
 		points: [
 			{ x: 80, y: 120, id: "A", label: "A", shape: "circle" },
 			{ x: 320, y: 120, id: "B", label: "B", shape: "circle" },
@@ -215,7 +215,7 @@ export const angleDiagramExamples: AngleDiagramProps[] = [
 	{
 		type: "angleDiagram",
 		width: 300,
-		height: 150,
+		height: 300,
 		points: [
 			{ x: 81.818, y: 81.818, id: "A", label: "A", shape: "circle" },
 			{ x: 163.636, y: 81.818, id: "P", label: "P", shape: "circle" },
@@ -254,8 +254,8 @@ export const angleDiagramExamples: AngleDiagramProps[] = [
 	// Example 6: Right angle with complementary angles
 	{
 		type: "angleDiagram",
-		width: 168,
-		height: 198,
+		width: 300,
+		height: 300,
 		points: [
 			{ x: 18, y: 138, id: "Q", label: "Q", shape: "circle" },
 			{ x: 59.042, y: 25.237, id: "P", label: "P", shape: "circle" },
@@ -349,8 +349,8 @@ export const angleDiagramExamples: AngleDiagramProps[] = [
 	// Example 8: Compare angle x to 73 degrees
 	{
 		type: "angleDiagram",
-		width: 252,
-		height: 180,
+		width: 300,
+		height: 300,
 		points: [
 			{ x: 126, y: 90, id: "V", label: " ", shape: "circle" },
 			{ x: 231.954, y: 33.663, id: "A", label: " ", shape: "circle" },
@@ -388,8 +388,8 @@ export const angleDiagramExamples: AngleDiagramProps[] = [
 	// Example 9: Compare angle x to 100 degrees
 	{
 		type: "angleDiagram",
-		width: 252,
-		height: 180,
+		width: 300,
+		height: 300,
 		points: [
 			{ x: 126, y: 90, id: "V", label: " ", shape: "circle" },
 			{ x: 6, y: 90, id: "L", label: " ", shape: "circle" },
@@ -428,8 +428,8 @@ export const angleDiagramExamples: AngleDiagramProps[] = [
 	// Example 10: Compare angle x to 60°
 	{
 		type: "angleDiagram",
-		width: 252,
-		height: 180,
+		width: 300,
+		height: 300,
 		points: [
 			{ x: 6, y: 90, id: "L", label: " ", shape: "circle" },
 			{ x: 246, y: 90, id: "R", label: " ", shape: "circle" },
@@ -619,8 +619,8 @@ export const angleDiagramExamples: AngleDiagramProps[] = [
 	// Example 14: Angle comparison with labeled angles
 	{
 		type: "angleDiagram",
-		width: 288,
-		height: 186,
+		width: 300,
+		height: 300,
 		points: [
 			{ x: 31.237, y: 167.042, id: "W", label: "W", shape: "circle" },
 			{ x: 144, y: 126, id: "X", label: "X", shape: "circle" },
@@ -657,8 +657,8 @@ export const angleDiagramExamples: AngleDiagramProps[] = [
 	// Example 15: Right angle with complementary angles
 	{
 		type: "angleDiagram",
-		width: 180,
-		height: 162,
+		width: 300,
+		height: 300,
 		points: [
 			{ x: 30, y: 138, id: "O", label: "O", shape: "circle" },
 			{ x: 30, y: 18, id: "X", label: "X", shape: "circle" },
@@ -703,8 +703,8 @@ export const angleDiagramExamples: AngleDiagramProps[] = [
 	// Example 16: Adjacent angles on a straight line
 	{
 		type: "angleDiagram",
-		width: 288,
-		height: 150,
+		width: 300,
+		height: 300,
 		points: [
 			{ x: 24, y: 126, id: "A", label: "A", shape: "circle" },
 			{ x: 144, y: 126, id: "O", label: "O", shape: "circle" },
@@ -742,7 +742,7 @@ export const angleDiagramExamples: AngleDiagramProps[] = [
 	{
 		type: "angleDiagram",
 		width: 300,
-		height: 240,
+		height: 300,
 		points: [
 			{ x: 150, y: 120, id: "O", label: "O", shape: "circle" },
 			{ x: 60, y: 40, id: "A", label: "A", shape: "circle" },
@@ -781,8 +781,8 @@ export const angleDiagramExamples: AngleDiagramProps[] = [
 	// Example 18: Complementary angles with expressions
 	{
 		type: "angleDiagram",
-		width: 220,
-		height: 220,
+		width: 300,
+		height: 300,
 		points: [
 			{ x: 10, y: 210, id: "V", label: " ", shape: "circle" },
 			{ x: 10, y: 10, id: "U", label: " ", shape: "circle" },
@@ -828,7 +828,7 @@ export const angleDiagramExamples: AngleDiagramProps[] = [
 	{
 		type: "angleDiagram",
 		width: 300,
-		height: 150,
+		height: 300,
 		points: [
 			{ x: 150, y: 75, id: "O", label: "O", shape: "circle" },
 			{ x: 20, y: 75, id: "L", label: "L", shape: "circle" },
@@ -868,7 +868,7 @@ export const angleDiagramExamples: AngleDiagramProps[] = [
 	{
 		type: "angleDiagram",
 		width: 300,
-		height: 188,
+		height: 300,
 		points: [
 			{ x: 150, y: 95, id: "O", label: "O", shape: "circle" },
 			{ x: 280, y: 95, id: "A", label: "A", shape: "circle" },
@@ -914,7 +914,7 @@ export const angleDiagramExamples: AngleDiagramProps[] = [
 	{
 		type: "angleDiagram",
 		width: 300,
-		height: 210,
+		height: 300,
 		points: [
 			{ x: 150, y: 180, id: "A", label: "A", shape: "circle" },
 			{ x: 262.763, y: 138.958, id: "B", label: "B", shape: "circle" },
@@ -944,8 +944,8 @@ export const angleDiagramExamples: AngleDiagramProps[] = [
 	// Example 22: Simple angle comparison
 	{
 		type: "angleDiagram",
-		width: 264,
-		height: 156,
+		width: 300,
+		height: 300,
 		points: [
 			{ x: 12, y: 78, id: "L", label: " ", shape: "circle" },
 			{ x: 132, y: 78, id: "O", label: " ", shape: "circle" },
@@ -984,8 +984,8 @@ export const angleDiagramExamples: AngleDiagramProps[] = [
 	// Example 23: Angle addition with labeled angles
 	{
 		type: "angleDiagram",
-		width: 260,
-		height: 260,
+		width: 300,
+		height: 300,
 		points: [
 			{ x: 40, y: 220, id: "P", label: "P", shape: "circle" },
 			{ x: 220, y: 220, id: "S", label: "S", shape: "circle" },
@@ -1032,7 +1032,7 @@ export const angleDiagramExamples: AngleDiagramProps[] = [
 	{
 		type: "angleDiagram",
 		width: 300,
-		height: 188,
+		height: 300,
 		points: [
 			{ x: 150, y: 110, id: "A", label: "A", shape: "circle" },
 			{ x: 70, y: 150, id: "E", label: "E", shape: "circle" },

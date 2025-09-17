@@ -49,7 +49,7 @@ export const functionPlotGraphExamples: FunctionPlotGraphProps[] = [
 	},
 	{
 		type: "functionPlotGraph",
-		width: 600,
+		width: 500,
 		height: 400,
 		xAxis: {
 			label: "Time (s)",

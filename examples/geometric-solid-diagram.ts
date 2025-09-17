@@ -83,7 +83,7 @@ export const geometricSolidDiagramExamples: GeometricSolidDiagramProps[] = [
 	// Cones
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "cone", height: 6, radius: 10 },
+		shape: { type: "cone", height: 300, radius: 10 },
 		width: 300,
 		height: 300,
 		labels: [
@@ -93,7 +93,7 @@ export const geometricSolidDiagramExamples: GeometricSolidDiagramProps[] = [
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "cone", height: 10, radius: 4 },
+		shape: { type: "cone", height: 300, radius: 4 },
 		width: 300,
 		height: 300,
 		labels: [
@@ -103,7 +103,7 @@ export const geometricSolidDiagramExamples: GeometricSolidDiagramProps[] = [
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "cone", height: 9, radius: 2 },
+		shape: { type: "cone", height: 300, radius: 2 },
 		width: 300,
 		height: 300,
 		labels: [
@@ -113,7 +113,7 @@ export const geometricSolidDiagramExamples: GeometricSolidDiagramProps[] = [
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "cone", height: 8, radius: 6 },
+		shape: { type: "cone", height: 300, radius: 6 },
 		width: 300,
 		height: 300,
 		labels: [
@@ -123,7 +123,7 @@ export const geometricSolidDiagramExamples: GeometricSolidDiagramProps[] = [
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "cone", height: 6, radius: 5 },
+		shape: { type: "cone", height: 300, radius: 5 },
 		width: 300,
 		height: 300,
 		labels: [
@@ -133,7 +133,7 @@ export const geometricSolidDiagramExamples: GeometricSolidDiagramProps[] = [
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "cone", height: 5, radius: 5 },
+		shape: { type: "cone", height: 300, radius: 5 },
 		width: 300,
 		height: 300,
 		labels: [
@@ -143,7 +143,7 @@ export const geometricSolidDiagramExamples: GeometricSolidDiagramProps[] = [
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "cone", height: 3, radius: 5 },
+		shape: { type: "cone", height: 300, radius: 5 },
 		width: 300,
 		height: 300,
 		labels: [
@@ -153,7 +153,7 @@ export const geometricSolidDiagramExamples: GeometricSolidDiagramProps[] = [
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "cone", height: 7, radius: 7 },
+		shape: { type: "cone", height: 300, radius: 7 },
 		width: 300,
 		height: 300,
 		labels: [
@@ -163,7 +163,7 @@ export const geometricSolidDiagramExamples: GeometricSolidDiagramProps[] = [
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "cone", height: 5, radius: 2 },
+		shape: { type: "cone", height: 300, radius: 2 },
 		width: 300,
 		height: 300,
 		labels: [
@@ -173,7 +173,7 @@ export const geometricSolidDiagramExamples: GeometricSolidDiagramProps[] = [
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "cone", height: 4, radius: 6 },
+		shape: { type: "cone", height: 300, radius: 6 },
 		width: 300,
 		height: 300,
 		labels: [
@@ -183,7 +183,7 @@ export const geometricSolidDiagramExamples: GeometricSolidDiagramProps[] = [
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "cone", height: 2, radius: 3 },
+		shape: { type: "cone", height: 300, radius: 3 },
 		width: 300,
 		height: 300,
 		labels: [
@@ -193,7 +193,7 @@ export const geometricSolidDiagramExamples: GeometricSolidDiagramProps[] = [
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "cone", height: 4, radius: 3 },
+		shape: { type: "cone", height: 300, radius: 3 },
 		width: 300,
 		height: 300,
 		labels: [
@@ -205,7 +205,7 @@ export const geometricSolidDiagramExamples: GeometricSolidDiagramProps[] = [
 	// Cylinders
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "cylinder", height: 6, radius: 8 },
+		shape: { type: "cylinder", height: 300, radius: 8 },
 		width: 300,
 		height: 300,
 		labels: [
@@ -215,7 +215,7 @@ export const geometricSolidDiagramExamples: GeometricSolidDiagramProps[] = [
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "cylinder", height: 2, radius: 3 },
+		shape: { type: "cylinder", height: 300, radius: 3 },
 		width: 300,
 		height: 300,
 		labels: [
@@ -225,7 +225,7 @@ export const geometricSolidDiagramExamples: GeometricSolidDiagramProps[] = [
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "cylinder", height: 8, radius: 4 },
+		shape: { type: "cylinder", height: 300, radius: 4 },
 		width: 300,
 		height: 300,
 		labels: [
@@ -235,7 +235,7 @@ export const geometricSolidDiagramExamples: GeometricSolidDiagramProps[] = [
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "cylinder", height: 4, radius: 6 },
+		shape: { type: "cylinder", height: 300, radius: 6 },
 		width: 300,
 		height: 300,
 		labels: [
@@ -245,7 +245,7 @@ export const geometricSolidDiagramExamples: GeometricSolidDiagramProps[] = [
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "cylinder", height: 3, radius: 5 },
+		shape: { type: "cylinder", height: 300, radius: 5 },
 		width: 300,
 		height: 300,
 		labels: [
@@ -255,7 +255,7 @@ export const geometricSolidDiagramExamples: GeometricSolidDiagramProps[] = [
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "cylinder", height: 8, radius: 2 },
+		shape: { type: "cylinder", height: 300, radius: 2 },
 		width: 300,
 		height: 300,
 		labels: [
@@ -265,7 +265,7 @@ export const geometricSolidDiagramExamples: GeometricSolidDiagramProps[] = [
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "cylinder", height: 10, radius: 4 },
+		shape: { type: "cylinder", height: 300, radius: 4 },
 		width: 300,
 		height: 300,
 		labels: [
@@ -275,7 +275,7 @@ export const geometricSolidDiagramExamples: GeometricSolidDiagramProps[] = [
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "cylinder", height: 6, radius: 3 },
+		shape: { type: "cylinder", height: 300, radius: 3 },
 		width: 300,
 		height: 300,
 		labels: [
@@ -285,7 +285,7 @@ export const geometricSolidDiagramExamples: GeometricSolidDiagramProps[] = [
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "cylinder", height: 5, radius: 2 },
+		shape: { type: "cylinder", height: 300, radius: 2 },
 		width: 300,
 		height: 300,
 		labels: [
@@ -295,7 +295,7 @@ export const geometricSolidDiagramExamples: GeometricSolidDiagramProps[] = [
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "cylinder", height: 10, radius: 4 },
+		shape: { type: "cylinder", height: 300, radius: 4 },
 		width: 300,
 		height: 300,
 		labels: [
@@ -305,7 +305,7 @@ export const geometricSolidDiagramExamples: GeometricSolidDiagramProps[] = [
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "cylinder", height: 6, radius: 5 },
+		shape: { type: "cylinder", height: 300, radius: 5 },
 		width: 300,
 		height: 300,
 		labels: [
@@ -315,7 +315,7 @@ export const geometricSolidDiagramExamples: GeometricSolidDiagramProps[] = [
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "cylinder", height: 3, radius: 4 },
+		shape: { type: "cylinder", height: 300, radius: 4 },
 		width: 300,
 		height: 300,
 		labels: [
@@ -325,7 +325,7 @@ export const geometricSolidDiagramExamples: GeometricSolidDiagramProps[] = [
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "cylinder", height: 20, radius: 4 },
+		shape: { type: "cylinder", height: 300, radius: 4 },
 		width: 300,
 		height: 300,
 		labels: [
@@ -335,7 +335,7 @@ export const geometricSolidDiagramExamples: GeometricSolidDiagramProps[] = [
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "cylinder", height: 20, radius: 10 },
+		shape: { type: "cylinder", height: 300, radius: 10 },
 		width: 300,
 		height: 300,
 		labels: [
@@ -385,14 +385,14 @@ export const geometricSolidDiagramExamples: GeometricSolidDiagramProps[] = [
 	// Cones (unlabeled identification)
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "cone", height: 15, radius: 6 },
+		shape: { type: "cone", height: 300, radius: 6 },
 		width: 300,
 		height: 300,
 		labels: []
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "cone", height: 5, radius: 8 },
+		shape: { type: "cone", height: 300, radius: 8 },
 		width: 300,
 		height: 300,
 		labels: []
@@ -401,28 +401,28 @@ export const geometricSolidDiagramExamples: GeometricSolidDiagramProps[] = [
 	// Cylinders (unlabeled identification and special sizes)
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "cylinder", height: 12, radius: 4 },
+		shape: { type: "cylinder", height: 300, radius: 4 },
 		width: 300,
 		height: 300,
 		labels: []
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "cylinder", height: 24, radius: 8 },
+		shape: { type: "cylinder", height: 300, radius: 8 },
 		width: 300,
 		height: 300,
 		labels: []
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "cylinder", height: 3, radius: 6 },
+		shape: { type: "cylinder", height: 300, radius: 6 },
 		width: 300,
 		height: 300,
 		labels: []
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "cylinder", height: 2, radius: 4 },
+		shape: { type: "cylinder", height: 300, radius: 4 },
 		width: 300,
 		height: 300,
 		labels: [
