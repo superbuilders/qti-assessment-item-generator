@@ -1,14 +1,27 @@
 import { describe, expect, test } from "bun:test"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import { circleWithRectangleExample, compositeShapeExample } from "../../examples/composite-shape-diagram"
-import type { WidgetInput } from "../../src/widgets/registry"
+import {
+	circleWithRectangleExample,
+	compositeFromNestedExamples,
+	compositeShapeExample
+} from "../../examples/composite-shape-diagram"
+import { type WidgetInput, WidgetSchema } from "../../src/widgets/registry"
 import { generateWidget } from "../../src/widgets/widget-generator"
+
+function ensureWidgetInput(input: unknown): WidgetInput {
+	const parsed = WidgetSchema.safeParse(input)
+	if (!parsed.success) {
+		logger.error("test input validation failed", { error: parsed.error })
+		throw errors.wrap(parsed.error, "test input validation")
+	}
+	return parsed.data
+}
 
 describe("Widget: composite-shape-diagram", () => {
 	// Test the examples from the examples file
 	test("should produce consistent output for compositeShapeExample", async () => {
-		const result = await errors.try(generateWidget(compositeShapeExample as WidgetInput))
+		const result = await errors.try(generateWidget(ensureWidgetInput(compositeShapeExample)))
 		if (result.error) {
 			logger.error("widget generation failed", { error: result.error })
 			throw result.error
@@ -17,7 +30,7 @@ describe("Widget: composite-shape-diagram", () => {
 	})
 
 	test("should produce consistent output for circleWithRectangleExample", async () => {
-		const result = await errors.try(generateWidget(circleWithRectangleExample as WidgetInput))
+		const result = await errors.try(generateWidget(ensureWidgetInput(circleWithRectangleExample)))
 		if (result.error) {
 			logger.error("widget generation failed", { error: result.error })
 			throw result.error
@@ -27,7 +40,7 @@ describe("Widget: composite-shape-diagram", () => {
 
 	// Database regression tests
 	test("composite-shape-diagram - [x9b74005f28d0b824] Area of a shaded region between a circle and a rectangle", async () => {
-		const input = {
+		const input = ensureWidgetInput({
 			type: "compositeShapeDiagram",
 			width: 260,
 			height: 260,
@@ -108,7 +121,7 @@ describe("Widget: composite-shape-diagram", () => {
 				{ label: { unit: "cm", value: 12 }, style: "solid", toVertexId: "p0", fromVertexId: "center" }
 			],
 			rightAngleMarkers: null
-		} as WidgetInput
+		})
 
 		const result = await errors.try(generateWidget(input))
 		if (result.error) {
@@ -118,8 +131,21 @@ describe("Widget: composite-shape-diagram", () => {
 		expect(result.data).toMatchSnapshot()
 	})
 
+	// Migrated examples from nested-shape-diagram → composite-shape-diagram (fit: "none")
+	compositeFromNestedExamples.forEach((example, index) => {
+		test(`composite-shape-diagram migrated example #${index + 1}`, async () => {
+			const input = ensureWidgetInput(example)
+			const result = await errors.try(generateWidget(input))
+			if (result.error) {
+				logger.error("widget generation failed for migrated composite example", { error: result.error, index })
+				throw errors.wrap(result.error, "widget generation")
+			}
+			expect(result.data).toMatchSnapshot()
+		})
+	})
+
 	test("composite-shape-diagram - [xdd3424e759f98328] Area of a shaded region (circle and rectangle)", async () => {
-		const input = {
+		const input = ensureWidgetInput({
 			type: "compositeShapeDiagram",
 			width: 400,
 			height: 400,
@@ -221,7 +247,7 @@ describe("Widget: composite-shape-diagram", () => {
 				{ label: null, style: "solid", toVertexId: "R1", fromVertexId: "R4" }
 			],
 			rightAngleMarkers: null
-		} as WidgetInput
+		})
 
 		const result = await errors.try(generateWidget(input))
 		if (result.error) {
@@ -232,7 +258,7 @@ describe("Widget: composite-shape-diagram", () => {
 	})
 
 	test("composite-shape-diagram - [xd8c0fb6d8bfff96e] Area of a shaded region: circle minus rectangle", async () => {
-		const input = {
+		const input = ensureWidgetInput({
 			type: "compositeShapeDiagram",
 			width: 280,
 			height: 280,
@@ -285,7 +311,7 @@ describe("Widget: composite-shape-diagram", () => {
 				{ label: { unit: "cm", value: 6 }, style: "solid", toVertexId: "C0", fromVertexId: "center" }
 			],
 			rightAngleMarkers: null
-		} as WidgetInput
+		})
 
 		const result = await errors.try(generateWidget(input))
 		if (result.error) {
@@ -296,7 +322,7 @@ describe("Widget: composite-shape-diagram", () => {
 	})
 
 	test("composite-shape-diagram - [x3a68667079fdffdd] Area of a shaded region (circle and rectangle)", async () => {
-		const input = {
+		const input = ensureWidgetInput({
 			type: "compositeShapeDiagram",
 			width: 200,
 			height: 200,
@@ -347,7 +373,7 @@ describe("Widget: composite-shape-diagram", () => {
 			],
 			internalSegments: [{ label: { unit: "cm", value: 4 }, style: "solid", toVertexId: "C0", fromVertexId: "O" }],
 			rightAngleMarkers: null
-		} as WidgetInput
+		})
 
 		const result = await errors.try(generateWidget(input))
 		if (result.error) {
@@ -358,7 +384,7 @@ describe("Widget: composite-shape-diagram", () => {
 	})
 
 	test("composite-shape-diagram - [xaee2680b7bbe6277] Find the areas of two triangles and the whole figure", async () => {
-		const input = {
+		const input = ensureWidgetInput({
 			type: "compositeShapeDiagram",
 			width: 400,
 			height: 320,
@@ -386,7 +412,7 @@ describe("Widget: composite-shape-diagram", () => {
 				{ label: { unit: "units", value: 5 }, style: "dashed", toVertexId: "top", fromVertexId: "mid" }
 			],
 			rightAngleMarkers: null
-		} as WidgetInput
+		})
 
 		const result = await errors.try(generateWidget(input))
 		if (result.error) {
@@ -397,7 +423,7 @@ describe("Widget: composite-shape-diagram", () => {
 	})
 
 	test("composite-shape-diagram - [x317e33403062daa2] Find areas of parts of a composite figure", async () => {
-		const input = {
+		const input = ensureWidgetInput({
 			type: "compositeShapeDiagram",
 			width: 520,
 			height: 340,
@@ -441,7 +467,7 @@ describe("Widget: composite-shape-diagram", () => {
 				{ cornerVertexId: "H1", adjacentVertex1Id: "L", adjacentVertex2Id: "BL" },
 				{ cornerVertexId: "H2", adjacentVertex1Id: "R", adjacentVertex2Id: "BR" }
 			]
-		} as WidgetInput
+		})
 
 		const result = await errors.try(generateWidget(input))
 		if (result.error) {
@@ -452,7 +478,7 @@ describe("Widget: composite-shape-diagram", () => {
 	})
 
 	test("composite-shape-diagram - [xb0f43fd03d2eff7c] Find the area of a composite shape", async () => {
-		const input = {
+		const input = ensureWidgetInput({
 			type: "compositeShapeDiagram",
 			width: 480,
 			height: 360,
@@ -478,7 +504,7 @@ describe("Widget: composite-shape-diagram", () => {
 				{ label: { unit: "units", value: 3 }, style: "dashed", toVertexId: "midBase", fromVertexId: "apex" }
 			],
 			rightAngleMarkers: [{ cornerVertexId: "midBase", adjacentVertex1Id: "apex", adjacentVertex2Id: "D" }]
-		} as WidgetInput
+		})
 
 		const result = await errors.try(generateWidget(input))
 		if (result.error) {
@@ -489,7 +515,7 @@ describe("Widget: composite-shape-diagram", () => {
 	})
 
 	test("composite-shape-diagram - [x161673a7853ec0b5] Find the area of a composite shape", async () => {
-		const input = {
+		const input = ensureWidgetInput({
 			type: "compositeShapeDiagram",
 			width: 480,
 			height: 360,
@@ -547,7 +573,7 @@ describe("Widget: composite-shape-diagram", () => {
 					adjacentVertex2Id: "D_bottomRightInner"
 				}
 			]
-		} as WidgetInput
+		})
 
 		const result = await errors.try(generateWidget(input))
 		if (result.error) {
@@ -558,7 +584,7 @@ describe("Widget: composite-shape-diagram", () => {
 	})
 
 	test("composite-shape-diagram - [x08f3220a196255d1] Area of a composite shape with one pair of parallel sides", async () => {
-		const input = {
+		const input = ensureWidgetInput({
 			type: "compositeShapeDiagram",
 			width: 320,
 			height: 200,
@@ -594,7 +620,7 @@ describe("Widget: composite-shape-diagram", () => {
 				{ label: { unit: "units", value: 8 }, style: "dashed", toVertexId: "F_bottomAtC", fromVertexId: "B_apex" }
 			],
 			rightAngleMarkers: null
-		} as WidgetInput
+		})
 
 		const result = await errors.try(generateWidget(input))
 		if (result.error) {

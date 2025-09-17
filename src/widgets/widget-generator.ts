@@ -50,7 +50,6 @@ import { generateLineEquationGraph } from "./generators/line-equation-graph"
 import { generateLineGraph } from "./generators/line-graph"
 import { generateMarbleDiagram } from "./generators/marble-diagram"
 import { generateNPolygon } from "./generators/n-polygon"
-import { generateNestedShapeDiagram } from "./generators/nested-shape-diagram"
 import { generateNumberLine } from "./generators/number-line"
 import { generateNumberLineForOpposites } from "./generators/number-line-for-opposites"
 import { generateNumberLineWithAction } from "./generators/number-line-with-action"
@@ -153,8 +152,6 @@ export async function generateWidget(widgetInput: WidgetInput): Promise<string> 
 			return await generateFractionModelDiagram(widget)
 		case "compositeShapeDiagram":
 			return await generateCompositeShapeDiagram(widget)
-		case "nestedShapeDiagram":
-			return await generateNestedShapeDiagram(widget)
 		case "coordinatePlane":
 			return await generateCoordinatePlaneComprehensive(widget)
 		case "divergentBarChart":
