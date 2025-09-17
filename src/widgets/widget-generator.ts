@@ -1,7 +1,6 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { generateThreeDIntersectionDiagram } from "./generators/3d-intersection-diagram"
-import { generateAbsoluteValueNumberLine } from "./generators/absolute-value-number-line"
 import { generateAdditionWithRegrouping } from "./generators/addition-with-regrouping"
 import { generateAngleDiagram } from "./generators/angle-diagram"
 import { generateAngleTypeDiagram } from "./generators/angle-type-diagram"
@@ -130,8 +129,6 @@ export async function generateWidget(widgetInput: WidgetInput): Promise<string> 
 			return await generateAreaModelMultiplication(widget)
 		case "threeDIntersectionDiagram":
 			return await generateThreeDIntersectionDiagram(widget)
-		case "absoluteValueNumberLine":
-			return await generateAbsoluteValueNumberLine(widget)
 		case "angleDiagram":
 			return await generateAngleDiagram(widget)
 		case "angleTypeDiagram":

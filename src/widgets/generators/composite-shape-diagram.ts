@@ -332,6 +332,7 @@ export const CompositeShapeDiagramPropsSchema = z
 		// Optional shapes for composed shading and circle support (transplanted from nested-shape-diagram)
 		shapes: z
 			.array(createCompositeShapeSchema())
+			.nullable()
 			.optional()
 			.describe(
 				"Optional shapes collection supporting polygons and circles. Enables composed shaded regions and circle outlines."
@@ -368,6 +369,7 @@ export const CompositeShapeDiagramPropsSchema = z
 		// Rendering fit control to enable parity with nested-shape-diagram when needed
 		fit: z
 			.enum(["auto", "none"]) // no defaulting here to avoid schema-level silent fallbacks
+			.nullable()
 			.optional()
 			.describe(
 				"Rendering fit mode. 'auto' scales and centers to the canvas; 'none' renders in data coordinates for snapshot parity with nested-shape-diagram."

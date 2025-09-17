@@ -1,5 +1,4 @@
 import {
-	AbsoluteValueNumberLinePropsSchema,
 	AngleDiagramPropsSchema,
 	BarChartPropsSchema,
 	BoxGridPropsSchema,
@@ -23,6 +22,7 @@ import {
 	IntegerChipModelPropsSchema,
 	LineEquationGraphPropsSchema,
 	MarbleDiagramPropsSchema,
+	RadiallyConstrainedAngleDiagramPropsSchema,
 	NPolygonPropsSchema,
 	NumberLineForOppositesPropsSchema,
 	NumberLinePropsSchema,
@@ -62,8 +62,8 @@ export const mathCoreCollection = {
 	schemas: {
 		quadrantDiagram: QuadrantDiagramPropsSchema,
 		threeDIntersectionDiagram: ThreeDIntersectionDiagramPropsSchema,
-		absoluteValueNumberLine: AbsoluteValueNumberLinePropsSchema,
 		angleDiagram: AngleDiagramPropsSchema,
+		radiallyConstrainedAngleDiagram: RadiallyConstrainedAngleDiagramPropsSchema,
 		barChart: BarChartPropsSchema,
 		boxGrid: BoxGridPropsSchema,
 		boxPlot: BoxPlotPropsSchema,
@@ -120,8 +120,8 @@ export const mathCoreCollection = {
 	widgetTypeKeys: [
 		"threeDIntersectionDiagram",
 		"quadrantDiagram",
-		"absoluteValueNumberLine",
 		"angleDiagram",
+		"radiallyConstrainedAngleDiagram",
 		"barChart",
 		"boxGrid",
 		"boxPlot",

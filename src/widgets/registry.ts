@@ -2,7 +2,6 @@ import { z } from "zod"
 
 // Import individual schemas and keep their generators defined in their own files
 import { ThreeDIntersectionDiagramPropsSchema } from "./generators/3d-intersection-diagram"
-import { AbsoluteValueNumberLinePropsSchema } from "./generators/absolute-value-number-line"
 import { AdditionWithRegroupingPropsSchema } from "./generators/addition-with-regrouping"
 import { AngleDiagramPropsSchema } from "./generators/angle-diagram"
 import { AngleTypeDiagramPropsSchema } from "./generators/angle-type-diagram"
@@ -103,7 +102,6 @@ import { WheelDiagramPropsSchema } from "./generators/wheel-diagram"
 // Master registry of widget schemas for dynamic validation and prompting
 export const allWidgetSchemas = {
 	threeDIntersectionDiagram: ThreeDIntersectionDiagramPropsSchema,
-	absoluteValueNumberLine: AbsoluteValueNumberLinePropsSchema,
 	quadrantDiagram: QuadrantDiagramPropsSchema,
 	clockDiagram: ClockDiagramPropsSchema,
 	angleDiagram: AngleDiagramPropsSchema,
@@ -207,7 +205,6 @@ export const typedSchemas = allWidgetSchemas
 // Re-export all individual schemas for use in collections
 export {
 	ThreeDIntersectionDiagramPropsSchema,
-	AbsoluteValueNumberLinePropsSchema,
 	QuadrantDiagramPropsSchema,
 	AdditionWithRegroupingPropsSchema,
 	AngleDiagramPropsSchema,
@@ -308,7 +305,6 @@ export {
 
 // NEW: Input types for each schema
 export type ThreeDIntersectionDiagramProps = z.input<typeof ThreeDIntersectionDiagramPropsSchema>
-export type AbsoluteValueNumberLineProps = z.input<typeof AbsoluteValueNumberLinePropsSchema>
 export type QuadrantDiagramProps = z.input<typeof QuadrantDiagramPropsSchema>
 export type AdditionWithRegroupingProps = z.input<typeof AdditionWithRegroupingPropsSchema>
 export type AngleDiagramProps = z.input<typeof AngleDiagramPropsSchema>
@@ -408,7 +404,6 @@ export type MarbleDiagramProps = z.input<typeof MarbleDiagramPropsSchema>
 
 const widgetSchemasWithoutSpecialUnions = [
 	typedSchemas.threeDIntersectionDiagram,
-	typedSchemas.absoluteValueNumberLine,
 	typedSchemas.quadrantDiagram,
 	typedSchemas.clockDiagram,
 	typedSchemas.angleDiagram,
