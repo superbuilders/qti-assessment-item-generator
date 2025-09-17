@@ -603,11 +603,11 @@ export const generateNumberLine: WidgetGenerator<typeof NumberLinePropsSchema> =
 			})
 			if (showTickLabels && selectedLabels.has(i)) {
 				canvas.drawText({
-					x: xPos - 10,
+					x: xPos + 10,
 					y: y + 4,
 					text: majorLabels[i] ?? "",
 					fill: theme.colors.axis,
-					anchor: "end",
+					anchor: "start",
 					fontPx: theme.font.size.small
 				})
 			}
@@ -652,7 +652,8 @@ export const generateNumberLine: WidgetGenerator<typeof NumberLinePropsSchema> =
 				const labelHeight = 32
 				const desiredGapFromAxisPx = 15
 				// Place the foreignObject so that its LEFT edge is a fixed gap to the right of the axis
-				const safeX = Math.min(xPos + desiredGapFromAxisPx, width - PADDING - 2 - labelWidth)
+				// Do not clamp to the right edge; allow viewBox expansion to preserve consistent gap
+				const safeX = xPos + desiredGapFromAxisPx
 				// Left-align MathML inside the foreignObject so visual gap is consistent regardless of content width
 				const xhtml = `<!DOCTYPE html><div xmlns="http://www.w3.org/1999/xhtml" style="display:flex;align-items:center;justify-content:flex-start;width:100%;height:100%;line-height:1;font-family:${theme.font.family.sans};color:${p.color};"><math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\" style=\"font-size:${fontPx * 1.2}px;\">${inner}</math></div>`
 				canvas.drawForeignObject({

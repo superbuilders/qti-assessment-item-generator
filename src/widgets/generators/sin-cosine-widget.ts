@@ -166,7 +166,7 @@ function setupTrigCoordinatePlane(
 		minGapPx: X_AXIS_MIN_LABEL_PADDING_PX
 	})
 
-	xValues.forEach((t, i) => {
+		xValues.forEach((t, i) => {
 		if (Math.abs(t) < 1e-9) return // Skip origin
 		const x = toSvgX(t)
 		canvas.drawLine(x, zeroY - 4, x, zeroY + 4, {
@@ -177,7 +177,7 @@ function setupTrigCoordinatePlane(
 			canvas.drawText({
 				x: x,
 				y: zeroY + 15,
-				text: xPiLabels[i] ?? "",
+					text: xPiLabels[i],
 				fill: theme.colors.axisLabel,
 				anchor: "middle",
 				fontPx: TICK_LABEL_FONT_PX
@@ -198,7 +198,7 @@ function setupTrigCoordinatePlane(
 		minGapPx: 12
 	})
 
-	yValues.forEach((t, i) => {
+		yValues.forEach((t, i) => {
 		if (Math.abs(t) < 1e-9) return // Skip origin
 		const y = toSvgY(t)
 		canvas.drawLine(zeroX - 4, y, zeroX + 4, y, {
@@ -209,7 +209,7 @@ function setupTrigCoordinatePlane(
 			canvas.drawText({
 				x: zeroX - 10,
 				y: y + 4,
-				text: yLabels[i] ?? "",
+					text: yLabels[i],
 				fill: theme.colors.axisLabel,
 				anchor: "end",
 				fontPx: TICK_LABEL_FONT_PX
@@ -217,8 +217,8 @@ function setupTrigCoordinatePlane(
 		}
 	})
 
-	// Axis labels (only render if not null)
-	if (xAxis.label) {
+	// Axis labels
+	if (xAxis.label !== null) {
 		canvas.drawText({
 			x: width / 2,
 			y: height - 20,
@@ -229,7 +229,7 @@ function setupTrigCoordinatePlane(
 		})
 	}
 
-	if (yAxis.label) {
+	if (yAxis.label !== null) {
 		canvas.drawText({
 			x: 20,
 			y: height / 2,

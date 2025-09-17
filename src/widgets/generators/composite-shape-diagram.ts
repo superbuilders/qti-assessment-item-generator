@@ -210,15 +210,29 @@ function createShadedPathRegionSchema() {
 }
 
 /**
- * Shape union used to describe geometry for composed shading and circle support.
+ * Factory for shape union used to describe geometry for composed shading and circle support.
+ * Using a factory avoids shared Zod instances which would otherwise generate `$ref`s
+ * during OpenAI JSON Schema conversion.
  */
-const CompositePolygonShapeSchema = z
-	.object({ id: z.string(), type: z.literal("polygon"), vertexIds: z.array(z.string()).min(3) })
-	.strict()
-const CompositeCircleShapeSchema = z
-	.object({ id: z.string(), type: z.literal("circle"), centerId: z.string(), radius: z.number().positive() })
-	.strict()
-const CompositeShapeSchema = z.discriminatedUnion("type", [CompositePolygonShapeSchema, CompositeCircleShapeSchema])
+function createCompositeShapeSchema() {
+    return z.discriminatedUnion("type", [
+        z
+            .object({
+                id: z.string(),
+                type: z.literal("polygon"),
+                vertexIds: z.array(z.string()).min(3)
+            })
+            .strict(),
+        z
+            .object({
+                id: z.string(),
+                type: z.literal("circle"),
+                centerId: z.string(),
+                radius: z.number().positive()
+            })
+            .strict()
+    ])
+}
 
 /**
  * Defines a text label placed at an arbitrary position inside a region.
@@ -317,7 +331,7 @@ export const CompositeShapeDiagramPropsSchema = z
 
 		// Optional shapes for composed shading and circle support (transplanted from nested-shape-diagram)
 		shapes: z
-			.array(CompositeShapeSchema)
+			.array(createCompositeShapeSchema())
 			.optional()
 			.describe(
 				"Optional shapes collection supporting polygons and circles. Enables composed shaded regions and circle outlines."
