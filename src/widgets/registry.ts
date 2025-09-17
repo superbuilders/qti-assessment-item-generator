@@ -51,7 +51,7 @@ import { LineGraphPropsSchema } from "./generators/line-graph"
 import { MarbleDiagramPropsSchema } from "./generators/marble-diagram"
 import { NPolygonPropsSchema } from "./generators/n-polygon"
 import { NumberLinePropsSchema } from "./generators/number-line"
-import { NumberLineForOppositesPropsSchema } from "./generators/number-line-for-opposites"
+// removed: number-line-for-opposites
 import { NumberLineWithActionPropsSchema } from "./generators/number-line-with-action"
 import { NumberLineWithFractionGroupsPropsSchema } from "./generators/number-line-with-fraction-groups"
 import { NumberSetDiagramPropsSchema } from "./generators/number-set-diagram"
@@ -88,7 +88,6 @@ import { StickPlotPropsSchema } from "./generators/stick-plot"
 import { SubtractionWithRegroupingPropsSchema } from "./generators/subtraction-with-regrouping"
 import { TapeDiagramPropsSchema } from "./generators/tape-diagram"
 import { TransformationDiagramPropsSchema } from "./generators/transformation-diagram"
-import { TransformationOnAGridPropsSchema } from "./generators/transformation-on-a-grid"
 import { TransversalAngleDiagramPropsSchema } from "./generators/transversal-angle-diagram"
 import { TreeDiagramPropsSchema } from "./generators/tree-diagram"
 import { TriangleDiagramPropsSchema } from "./generators/triangle-diagram"
@@ -147,7 +146,6 @@ export const allWidgetSchemas = {
 	keelingCurve: KeelingCurvePropsSchema,
 	lineGraph: LineGraphPropsSchema,
 	numberLine: NumberLinePropsSchema,
-	numberLineForOpposites: NumberLineForOppositesPropsSchema,
 	numberLineWithAction: NumberLineWithActionPropsSchema,
 	numberLineWithFractionGroups: NumberLineWithFractionGroupsPropsSchema,
 	numberSetDiagram: NumberSetDiagramPropsSchema,
@@ -171,7 +169,6 @@ export const allWidgetSchemas = {
 	stackedItemsDiagram: StackedItemsDiagramPropsSchema,
 	tapeDiagram: TapeDiagramPropsSchema,
 	transformationDiagram: TransformationDiagramPropsSchema,
-	transformationOnAGrid: TransformationOnAGridPropsSchema,
 	transversalAngleDiagram: TransversalAngleDiagramPropsSchema,
 	treeDiagram: TreeDiagramPropsSchema,
 	triangleDiagram: TriangleDiagramPropsSchema,
@@ -249,7 +246,6 @@ export {
 	NPolygonPropsSchema,
 	PatternDiagramPropsSchema,
 	NumberLinePropsSchema,
-	NumberLineForOppositesPropsSchema,
 	NumberLineWithActionPropsSchema,
 	NumberLineWithFractionGroupsPropsSchema,
 	NumberSetDiagramPropsSchema,
@@ -284,7 +280,6 @@ export {
 	SubtractionWithRegroupingPropsSchema,
 	TapeDiagramPropsSchema,
 	TransformationDiagramPropsSchema,
-	TransformationOnAGridPropsSchema,
 	TransversalAngleDiagramPropsSchema,
 	TreeDiagramPropsSchema,
 	TriangleDiagramPropsSchema,
@@ -351,7 +346,6 @@ export type LineGraphProps = z.input<typeof LineGraphPropsSchema>
 export type NPolygonProps = z.input<typeof NPolygonPropsSchema>
 export type PatternDiagramProps = z.input<typeof PatternDiagramPropsSchema>
 export type NumberLineProps = z.input<typeof NumberLinePropsSchema>
-export type NumberLineForOppositesProps = z.input<typeof NumberLineForOppositesPropsSchema>
 export type NumberLineWithActionProps = z.input<typeof NumberLineWithActionPropsSchema>
 export type NumberLineWithFractionGroupsProps = z.input<typeof NumberLineWithFractionGroupsPropsSchema>
 export type NumberSetDiagramProps = z.input<typeof NumberSetDiagramPropsSchema>
@@ -384,7 +378,6 @@ export type StackedItemsDiagramProps = z.input<typeof StackedItemsDiagramPropsSc
 export type SubtractionWithRegroupingProps = z.input<typeof SubtractionWithRegroupingPropsSchema>
 export type TapeDiagramProps = z.input<typeof TapeDiagramPropsSchema>
 export type TransformationDiagramProps = z.input<typeof TransformationDiagramPropsSchema>
-export type TransformationOnAGridProps = z.input<typeof TransformationOnAGridPropsSchema>
 export type TransversalAngleDiagramProps = z.input<typeof TransversalAngleDiagramPropsSchema>
 export type TreeDiagramProps = z.input<typeof TreeDiagramPropsSchema>
 export type TriangleDiagramProps = z.input<typeof TriangleDiagramPropsSchema>
@@ -451,7 +444,6 @@ const widgetSchemasWithoutSpecialUnions = [
 	typedSchemas.keelingCurve,
 	typedSchemas.lineGraph,
 	typedSchemas.numberLine,
-	typedSchemas.numberLineForOpposites,
 	typedSchemas.numberLineWithAction,
 	typedSchemas.numberLineWithFractionGroups,
 	typedSchemas.numberSetDiagram,
@@ -471,7 +463,6 @@ const widgetSchemasWithoutSpecialUnions = [
 	typedSchemas.stackedItemsDiagram,
 	typedSchemas.tapeDiagram,
 	typedSchemas.transformationDiagram,
-	typedSchemas.transformationOnAGrid,
 	typedSchemas.transversalAngleDiagram,
 	typedSchemas.treeDiagram,
 	typedSchemas.triangleDiagram,

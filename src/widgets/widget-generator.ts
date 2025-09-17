@@ -50,7 +50,7 @@ import { generateLineGraph } from "./generators/line-graph"
 import { generateMarbleDiagram } from "./generators/marble-diagram"
 import { generateNPolygon } from "./generators/n-polygon"
 import { generateNumberLine } from "./generators/number-line"
-import { generateNumberLineForOpposites } from "./generators/number-line-for-opposites"
+// removed: number-line-for-opposites
 import { generateNumberLineWithAction } from "./generators/number-line-with-action"
 import { generateNumberLineWithFractionGroups } from "./generators/number-line-with-fraction-groups"
 import { generateNumberSetDiagram } from "./generators/number-set-diagram"
@@ -87,7 +87,6 @@ import { generateStickPlot } from "./generators/stick-plot"
 import { generateSubtractionWithRegrouping } from "./generators/subtraction-with-regrouping"
 import { generateTapeDiagram } from "./generators/tape-diagram"
 import { generateTransformationDiagram } from "./generators/transformation-diagram"
-import { generateTransformationOnAGrid } from "./generators/transformation-on-a-grid"
 import { generateTransversalAngleDiagram } from "./generators/transversal-angle-diagram"
 import { generateTreeDiagram } from "./generators/tree-diagram"
 import { generateTriangleDiagram } from "./generators/triangle-diagram"
@@ -197,8 +196,6 @@ export async function generateWidget(widgetInput: WidgetInput): Promise<string> 
 			return await generateInequalityNumberLine(widget)
 		case "numberLine":
 			return await generateNumberLine(widget)
-		case "numberLineForOpposites":
-			return await generateNumberLineForOpposites(widget)
 		case "numberLineWithAction":
 			return await generateNumberLineWithAction(widget)
 		case "numberLineWithFractionGroups":
@@ -243,8 +240,6 @@ export async function generateWidget(widgetInput: WidgetInput): Promise<string> 
 			return await generateTapeDiagram(widget)
 		case "transformationDiagram":
 			return await generateTransformationDiagram(widget)
-		case "transformationOnAGrid":
-			return await generateTransformationOnAGrid(widget)
 		case "transversalAngleDiagram":
 			return await generateTransversalAngleDiagram(widget)
 		case "treeDiagram":

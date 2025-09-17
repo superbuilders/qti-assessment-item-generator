@@ -206,6 +206,8 @@ export class CanvasImpl implements Canvas {
 	// Implementation of the scoped clipping method.
 	drawInClippedRegion(renderFn: (clippedCanvas: Canvas) => void): void {
 		const originalBody = this.svgBody
+	// Save extents so off-clip drawings do not expand the final viewBox
+		const savedExtents = { ...this.extents }
 		const clippedCanvas = new ClippedCanvas(this)
 
 		// Execute the user's drawing function. All drawing calls inside will
@@ -215,6 +217,8 @@ export class CanvasImpl implements Canvas {
 
 		// Reset the main svgBody to its state before the clipped drawing began.
 		this.svgBody = originalBody
+		// Restore extents to ignore any out-of-bounds geometry drawn inside the clip
+		this.extents = savedExtents
 
 		// Get the final concatenated string of all clipped elements.
 		const clippedContent = clippedCanvas.getContent()
