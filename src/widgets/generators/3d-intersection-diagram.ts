@@ -179,6 +179,94 @@ type Point3D = { x: number; y: number; z: number }
 type Point2D = { x: number; y: number }
 // type Face = { vertices: number[]; normal: Point3D } // TODO: will need this for plane intersections
 
+// Helper function to make any color transparent with enhanced saturation
+const makeColorTransparent = (color: string, opacity: number): string => {
+	// Helper to enhance saturation of RGB values
+	const enhanceSaturation = (r: number, g: number, b: number): [number, number, number] => {
+		// Convert RGB to HSL for saturation enhancement
+		const rNorm = r / 255
+		const gNorm = g / 255
+		const bNorm = b / 255
+		
+		const max = Math.max(rNorm, gNorm, bNorm)
+		const min = Math.min(rNorm, gNorm, bNorm)
+		const diff = max - min
+		
+		// Calculate lightness
+		const lightness = (max + min) / 2
+		
+		if (diff === 0) {
+			// Grayscale - no saturation to enhance
+			return [r, g, b]
+		}
+		
+		// Calculate current saturation
+		const saturation = lightness > 0.5 ? diff / (2 - max - min) : diff / (max + min)
+		
+		// Enhance saturation by 20% (capped at 1.0)
+		const enhancedSat = Math.min(saturation * 1.2, 1.0)
+		
+		// Convert back to RGB with enhanced saturation
+		const c = (1 - Math.abs(2 * lightness - 1)) * enhancedSat
+		const x = c * (1 - Math.abs(((max === rNorm ? (gNorm - bNorm) / diff : max === gNorm ? (bNorm - rNorm) / diff + 2 : (rNorm - gNorm) / diff + 4) % 6) - 1))
+		const m = lightness - c / 2
+		
+		let rNew, gNew, bNew
+		if (max === rNorm) {
+			[rNew, gNew, bNew] = [c + m, x + m, m]
+		} else if (max === gNorm) {
+			[rNew, gNew, bNew] = [x + m, c + m, m]
+		} else {
+			[rNew, gNew, bNew] = [m, x + m, c + m]
+		}
+		
+		return [Math.round(rNew * 255), Math.round(gNew * 255), Math.round(bNew * 255)]
+	}
+	
+	// Handle hex colors
+	if (color.startsWith('#')) {
+		const hex = color.slice(1)
+		let r: number, g: number, b: number
+		
+		if (hex.length === 3) {
+			// Short hex format #RGB
+			r = parseInt(hex[0] + hex[0], 16)
+			g = parseInt(hex[1] + hex[1], 16)
+			b = parseInt(hex[2] + hex[2], 16)
+		} else if (hex.length === 6) {
+			// Long hex format #RRGGBB
+			r = parseInt(hex.slice(0, 2), 16)
+			g = parseInt(hex.slice(2, 4), 16)
+			b = parseInt(hex.slice(4, 6), 16)
+		} else if (hex.length === 8) {
+			// Already has alpha #RRGGBBAA - extract RGB and ignore existing alpha
+			r = parseInt(hex.slice(0, 2), 16)
+			g = parseInt(hex.slice(2, 4), 16)
+			b = parseInt(hex.slice(4, 6), 16)
+		} else {
+			// Invalid hex format, return as-is
+			return color
+		}
+		
+		const [rEnhanced, gEnhanced, bEnhanced] = enhanceSaturation(r, g, b)
+		return `rgba(${rEnhanced}, ${gEnhanced}, ${bEnhanced}, ${opacity})`
+	}
+	
+	// Handle rgba/rgb colors - extract RGB values and apply enhancement
+	const rgbaMatch = color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*[\d.]+)?\)/)
+	if (rgbaMatch) {
+		const [, rStr, gStr, bStr] = rgbaMatch
+		const r = parseInt(rStr, 10)
+		const g = parseInt(gStr, 10)
+		const b = parseInt(bStr, 10)
+		const [rEnhanced, gEnhanced, bEnhanced] = enhanceSaturation(r, g, b)
+		return `rgba(${rEnhanced}, ${gEnhanced}, ${bEnhanced}, ${opacity})`
+	}
+	
+	// For named colors or other formats, return as-is (CSS will handle it)
+	return color
+}
+
 /**
  * Generates an SVG diagram of a 3D solid being intersected by a plane,
  * showing the semi-transparent plane cutting through the solid.
@@ -187,7 +275,10 @@ export const generateThreeDIntersectionDiagram: WidgetGenerator<typeof ThreeDInt
 	props
 ) => {
 	const { width, height, solid, plane, viewOptions } = props
-	const { intersectionColor } = viewOptions
+	const { intersectionColor: rawIntersectionColor } = viewOptions
+	
+	// Make the intersection color more transparent but still visible, with enhanced saturation
+	const intersectionColor = makeColorTransparent(rawIntersectionColor, 0.35) // 35% opacity
 
 	const chartWidth = width - PADDING * 2
 	const chartHeight = height - PADDING * 2
