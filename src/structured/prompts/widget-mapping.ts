@@ -172,7 +172,9 @@ Use "WIDGET_NOT_FOUND" **ONLY** if:
 
 - Prefer specific widgets over \`urlImage\`:
   - Graphs/charts/plots: choose graph/plot widgets (e.g., \`barChart\`, \`lineGraph\`, \`conceptualGraph\`, \`scatterPlot\`, \`populationBarChart\`, etc.)
-  - Tables: choose \`dataTable\`
+		  - Tables: choose \`dataTable\`
+		  - Tabular textual information with no numbers: prefer \`dataTable\` over \`boxGrid\`
+		  - Use \`boxGrid\` primarily for numeric/mathematical arrays or when per-cell highlighting is essential
   - Set comparisons: choose \`vennDiagram\`
   - Reference resources: choose specific resource widgets (e.g., \`periodicTable\`)
   - **CRITICAL: Semantic objects/things**: AGGRESSIVELY choose \`emojiImage\` for images of recognizable objects, animals, food, items, etc.
