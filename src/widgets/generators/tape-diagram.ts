@@ -334,7 +334,8 @@ export const generateTapeDiagram: WidgetGenerator<typeof TapeDiagramPropsSchema>
             } else if (fill.label.placement === "below" && overlaps(bottomBracketRanges)) {
                 cy = geom.y + tapeHeight + 40
             }
-            const labelColor = fill.label.placement === "inside" ? theme.colors.white : theme.colors.black
+            // ALWAYS render text in black for accessibility and consistency, regardless of placement
+            const labelColor = theme.colors.black
             canvas.drawText({
                 x: cx,
                 y: cy,
