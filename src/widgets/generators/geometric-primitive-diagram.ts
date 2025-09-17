@@ -28,8 +28,16 @@ type Point = { x: number; y: number; label: string | null }
 export const GeometricPrimitiveDiagramPropsSchema = z
 	.object({
 		type: z.literal("geometricPrimitiveDiagram"),
-		width: z.number().positive().describe("The total width of the SVG canvas in pixels."),
-		height: z.number().positive().describe("The total height of the SVG canvas in pixels."),
+			width: z
+				.number()
+				.min(300)
+				.max(1200)
+				.describe("The total width of the SVG canvas in pixels. Must be between 300 and 1200."),
+			height: z
+				.number()
+				.min(300)
+				.max(1200)
+				.describe("The total height of the SVG canvas in pixels. Must be between 300 and 1200."),
 		primitive: z
 			.discriminatedUnion("type", [
 				z

@@ -5,7 +5,7 @@ export const geometricPrimitiveDiagramExamples: GeometricPrimitiveDiagramProps[]
 	{
 		type: "geometricPrimitiveDiagram",
 		width: 300,
-		height: 150,
+		height: 300,
 		primitive: {
 			type: "segment",
 			pointOne: { label: "P" },
@@ -17,8 +17,8 @@ export const geometricPrimitiveDiagramExamples: GeometricPrimitiveDiagramProps[]
 	// First Image (Question 6) - horizontal segment PS from explanation
 	{
 		type: "geometricPrimitiveDiagram",
-		width: 200,
-		height: 80,
+		width: 300,
+		height: 300,
 		primitive: {
 			type: "segment",
 			pointOne: { label: "P" },
@@ -30,8 +30,8 @@ export const geometricPrimitiveDiagramExamples: GeometricPrimitiveDiagramProps[]
 	// Second Image (Question 5) - (a) Point Q
 	{
 		type: "geometricPrimitiveDiagram",
-		width: 100,
-		height: 100,
+		width: 300,
+		height: 300,
 		primitive: {
 			type: "point",
 			pointOne: { label: "Q" }
@@ -40,8 +40,8 @@ export const geometricPrimitiveDiagramExamples: GeometricPrimitiveDiagramProps[]
 	// Second Image (Question 5) - (b) Ray
 	{
 		type: "geometricPrimitiveDiagram",
-		width: 150,
-		height: 200,
+		width: 300,
+		height: 300,
 		primitive: {
 			type: "ray",
 			pointOne: { label: null },
@@ -53,8 +53,8 @@ export const geometricPrimitiveDiagramExamples: GeometricPrimitiveDiagramProps[]
 	// Second Image (Question 5) - (c) Arc
 	{
 		type: "geometricPrimitiveDiagram",
-		width: 150,
-		height: 150,
+		width: 300,
+		height: 300,
 		primitive: {
 			type: "arc",
 			pointOne: { label: null },
@@ -67,8 +67,8 @@ export const geometricPrimitiveDiagramExamples: GeometricPrimitiveDiagramProps[]
 	// Second Image (Question 5) - (d) Line
 	{
 		type: "geometricPrimitiveDiagram",
-		width: 150,
-		height: 200,
+		width: 300,
+		height: 300,
 		primitive: {
 			type: "line",
 			pointOne: { label: null },
@@ -80,8 +80,8 @@ export const geometricPrimitiveDiagramExamples: GeometricPrimitiveDiagramProps[]
 	// Second Image (Question 5) - (e) Segment (also used in explanation)
 	{
 		type: "geometricPrimitiveDiagram",
-		width: 150,
-		height: 200,
+		width: 300,
+		height: 300,
 		primitive: {
 			type: "segment",
 			pointOne: { label: null },
