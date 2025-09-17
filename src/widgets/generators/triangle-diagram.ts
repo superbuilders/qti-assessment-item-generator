@@ -65,10 +65,12 @@ function createAngleMarkSchema() {
 			from: z.string().regex(TRI_POINT_ID).describe("The point ID defining the starting ray of the angle. Combined with the vertex, this creates the first ray from vertex to 'from' point. The angle arc will begin from this ray."),
 			to: z.string().regex(TRI_POINT_ID).describe("The point ID defining the ending ray of the angle. Combined with the vertex, this creates the second ray from vertex to 'to' point. The angle is measured from the 'from' ray to the 'to' ray in the minor arc direction."),
 			value: createAngleValueSchema().describe("The angle measurement or symbol to display. For numeric values, this will be shown with a degree symbol. For symbolic values, the raw symbol text is displayed. This value should match the geometric constraint of the angle."),
-			color: z.string().regex(CSS_COLOR_PATTERN, "invalid css color").describe("CSS color for the angle arc. Use distinct colors to differentiate multiple angles or highlight specific angles. Common choices: 'red' for important angles, 'blue' for given angles, 'green' for calculated angles.")
+			color: z.string().regex(CSS_COLOR_PATTERN, "invalid css color").describe("CSS color for the angle arc. Use distinct colors to differentiate multiple angles or highlight specific angles. Common choices: 'red' for important angles, 'blue' for given angles, 'green' for calculated angles."),
+			showArc: z.boolean().describe("Whether to render the arc for this angle. Does not affect geometry."),
+			showLabel: z.boolean().describe("Whether to render the label for this angle (numeric text or symbol). Does not affect geometry.")
 		})
 		.strict()
-		.describe("Defines an angle marking in the triangle diagram. Angles are specified by three points: a vertex (center) and two points that define the rays. The angle is always drawn as the minor arc (less than 180°) from the 'from' ray to the 'to' ray. Multiple angle marks can overlap at the same vertex with different arc radii automatically adjusted for clarity.")
+		.describe("Defines an angle marking in the triangle diagram. Angles are specified by three points: a vertex (center) and two points that define the rays. The angle is always drawn as the minor arc (less than 180°) from the 'from' ray to the 'to' ray. Multiple angle marks can overlap at the same vertex with different arc radii automatically adjusted for clarity. Visibility of the arc and label can be controlled independently via showArc and showLabel.")
 }
 
 function createSidesLabelSchema() {
@@ -158,7 +160,7 @@ export const TriangleDiagramPropsSchema = z
 		height: z.number().positive().describe("The total height of the SVG diagram in pixels. The triangle and all constructions will be scaled to fit within this height while maintaining aspect ratio."),
 		points: createTrianglePointsSchema().describe("The three vertices that define the triangle. The triangle's shape is fully determined by the angle constraints specified in angleArcs."),
 		extraPoints: createAuxiliaryPointsSchema().describe("Additional points beyond the three triangle vertices. Used for constructions like angle bisectors, medians, or exterior angle demonstrations."),
-		angleArcs: z.array(createAngleMarkSchema()).min(2).describe("Array of angle markings to display. At least 2 numeric angle values are required to determine the triangle's shape. The third angle is automatically calculated to sum to 180°. Supports both interior angles (between triangle sides) and exterior angles (using auxiliary points and collinear constraints). Multiple angles at the same vertex are automatically given different arc radii for clarity."),
+		angleArcs: z.array(createAngleMarkSchema()).min(3).max(3).describe("Array of exactly three angle markings to display (one per triangle angle, interior or exterior construction). At least 2 numeric angle values are required to determine the triangle's shape. The third angle is automatically calculated to sum to 180°. If all three provided angles are numeric, their interior measures MUST sum exactly to 180°. If any angle is symbolic/variable, the sum requirement is not enforced at validation time. Supports both interior angles (between triangle sides) and exterior angles (using auxiliary points and collinear constraints). Multiple angles at the same vertex are automatically given different arc radii for clarity."),
 		sideLabels: createSidesLabelSchema().nullable().describe("Optional labels for the three sides of the triangle. Labels can show measurements, variables, or mathematical expressions."),
 		constructionLines: createConstructionLinesSchema().describe("Additional line segments for geometric constructions. These appear on top of the base triangle and can be styled (solid, dashed, dotted) to indicate their purpose."),
 		lines: createLinesSchema().describe("Collinearity constraints that position auxiliary points and enable extended constructions. Critical for creating exterior angles and precise geometric relationships."),
@@ -178,6 +180,7 @@ export const TriangleDiagramPropsSchema = z
 export type TriangleDiagramProps = z.infer<typeof TriangleDiagramPropsSchema>
 
 type Vec = { x: number; y: number }
+type AltitudeSpec = z.infer<ReturnType<typeof createAltitudeSchema>>
 
 function toRad(deg: number): number {
 	return (deg * Math.PI) / 180
@@ -283,6 +286,42 @@ export const generateTriangleDiagram: WidgetGenerator<typeof TriangleDiagramProp
 
 	const rightAt = new Set<string>((rightAngleMarks ?? []).map((r) => r.vertex))
 
+	// If all three provided angle marks are numeric (after interior conversion),
+	// validate that the interior angles sum to 180°.
+	function numericInteriorFromInput(vertex: string): number | null {
+		const others = vertex === idA ? [idB, idC] : vertex === idB ? [idA, idC] : [idA, idB]
+		const arcs = angleMarks.filter((a) => a.vertex === vertex && a.value.type === "numeric")
+		let v: number | null = null
+		for (const a of arcs) {
+			const f = a.from
+			const t = a.to
+			const val = (a.value as { type: "numeric"; value: number }).value
+			if ((f === others[0] && t === others[1]) || (f === others[1] && t === others[0])) { v = val; break }
+			if (
+				(f === others[0] && onSameLine(vertex, others[1], t)) ||
+				(t === others[0] && onSameLine(vertex, others[1], f)) ||
+				(f === others[1] && onSameLine(vertex, others[0], t)) ||
+				(t === others[1] && onSameLine(vertex, others[0], f))
+			) {
+				v = 180 - val
+				break
+			}
+		}
+		return v
+	}
+
+	const AinProvided = numericInteriorFromInput(idA)
+	const BinProvided = numericInteriorFromInput(idB)
+	const CinProvided = numericInteriorFromInput(idC)
+	const providedCount = [AinProvided, BinProvided, CinProvided].filter((x): x is number => x != null).length
+	if (providedCount === 3) {
+		const sumProvided = (AinProvided as number) + (BinProvided as number) + (CinProvided as number)
+		if (Math.abs(sumProvided - 180) > 1e-6) {
+			logger.error("interior angles do not sum to 180", { A: AinProvided, B: BinProvided, C: CinProvided, sum: sumProvided })
+			throw errors.new("angles sum invalid")
+		}
+	}
+
 	function tryInteriorDegFor(vertex: string): number | null {
 		const others = vertex === idA ? [idB, idC] : vertex === idB ? [idA, idC] : [idA, idB]
 		const arcs = angleMarks.filter((a) => a.vertex === vertex && a.value.type === "numeric")
@@ -365,6 +404,34 @@ export const generateTriangleDiagram: WidgetGenerator<typeof TriangleDiagramProp
 	const B = project(B_data)
 	const C = project(C_data)
 
+	// Precompute interior-bisector directions for each triangle vertex to keep
+	// angle labels inside the triangle consistently.
+	function normalize(v: Vec): Vec {
+		const L = Math.hypot(v.x, v.y) || 1
+		return { x: v.x / L, y: v.y / L }
+	}
+	const centroid: Vec = { x: (A.x + B.x + C.x) / 3, y: (A.y + B.y + C.y) / 3 }
+	const interiorDirByVertex = new Map<string, number>()
+	const sumVec = (p: Vec, q: Vec) => ({ x: p.x + q.x, y: p.y + q.y })
+	{
+		const uAB = normalize({ x: B.x - A.x, y: B.y - A.y })
+		const uAC = normalize({ x: C.x - A.x, y: C.y - A.y })
+		const insideA = normalize(sumVec(uAB, uAC))
+		interiorDirByVertex.set(idA, angleOf(insideA))
+	}
+	{
+		const uBA = normalize({ x: A.x - B.x, y: A.y - B.y })
+		const uBC = normalize({ x: C.x - B.x, y: C.y - B.y })
+		const insideB = normalize(sumVec(uBA, uBC))
+		interiorDirByVertex.set(idB, angleOf(insideB))
+	}
+	{
+		const uCA = normalize({ x: A.x - C.x, y: A.y - C.y })
+		const uCB = normalize({ x: B.x - C.x, y: B.y - C.y })
+		const insideC = normalize(sumVec(uCA, uCB))
+		interiorDirByVertex.set(idC, angleOf(insideC))
+	}
+
 	// We'll draw arcs first; lines and labels will be drawn after to sit on top
 	const vertexFont = theme.font.size.large
 
@@ -437,10 +504,48 @@ export const generateTriangleDiagram: WidgetGenerator<typeof TriangleDiagramProp
 		}
 	}
 
+	// Precompute altitude segments BEFORE placing angle labels so labels can avoid them
+	const precomputedAltitudes: Array<{ alt: AltitudeSpec; v: Vec; foot: Vec }> = []
+	if (altitudes) {
+		const sideMap: Record<"AB" | "BC" | "CA", { p1: Vec; p2: Vec }> = {
+			AB: { p1: A, p2: B },
+			BC: { p1: B, p2: C },
+			CA: { p1: C, p2: A }
+		}
+		const vertexMap: Record<string, Vec> = { [points.A.id]: A, [points.B.id]: B, [points.C.id]: C }
+		for (const alt of altitudes) {
+			const v = vertexMap[alt.vertex]
+			const base = sideMap[alt.toSide]
+			if (!v || !base) {
+				logger.error("altitude references unknown points", { alt })
+				throw errors.new("invalid altitude references")
+			}
+			const bx = base.p2.x - base.p1.x
+			const by = base.p2.y - base.p1.y
+			const len2 = bx * bx + by * by
+			if (len2 === 0) {
+				logger.error("altitude base degenerate", { alt })
+				throw errors.new("invalid altitude base")
+			}
+			const t = ((v.x - base.p1.x) * bx + (v.y - base.p1.y) * by) / len2
+			if (t < 0 || t > 1) {
+				logger.error("altitude foot outside segment", { alt, t })
+				throw errors.new("altitude foot outside segment")
+			}
+			const foot: Vec = { x: base.p1.x + t * bx, y: base.p1.y + t * by }
+			precomputedAltitudes.push({ alt, v, foot })
+			// include altitude line in collision segments so angle labels avoid it
+			screenSegments.push({ a: v, b: foot })
+		}
+	}
+
 	// Draw angle arcs by three points (uniform radius, minor arc only)
 	// Track preferred label directions: opposite the arc's mid-angle
 	const preferredOppositeByVertex = new Map<string, number>()
-	for (const mark of angleArcs) {
+    for (const mark of angleArcs) {
+        // Independent control for arc and label visibility
+        const drawArcVisible: boolean = mark.showArc === true
+        const drawLabelVisible: boolean = mark.showLabel === true
 		const center = idToPoint.get(mark.vertex)
 		const pf = idToPoint.get(mark.from)
 		const pt = idToPoint.get(mark.to)
@@ -465,14 +570,21 @@ export const generateTriangleDiagram: WidgetGenerator<typeof TriangleDiagramProp
 		const baseArcRadius = 36
 		const sweepRatio = Math.min(Math.max(sweep / Math.PI, 0), 1) // 0..1 for 0..180°
 		const sizeScale = 0.85 + (1 - sweepRatio) * 0.35 // 0.85..1.2
-		const arcRadius = baseArcRadius * sizeScale
-		drawArc(canvas, center, arcRadius, start, end, mark.color)
+        const arcRadius = baseArcRadius * sizeScale
+        if (drawArcVisible) {
+			drawArc(canvas, center, arcRadius, start, end, mark.color)
+		}
 
-		// Label with collision-aware placement using estimated text size
-		const mid = (start + end) / 2
-		// Save opposite direction for vertex label placement later
-		preferredOppositeByVertex.set(mark.vertex, (mid + Math.PI) % (2 * Math.PI))
+		// Label with collision-aware placement using estimated text size.
+		// Always prefer INSIDE the triangle. For triangle vertices use the
+		// interior angle bisector; for auxiliary points use the direction
+		// towards the triangle centroid.
+		const mid = (start + end) / 2 // kept for arc construction only
 		const baseR = arcRadius + 18
+		const centerToCentroid: Vec = { x: centroid.x - center.x, y: centroid.y - center.y }
+		const interiorAngle = interiorDirByVertex.get(mark.vertex) ?? angleOf(centerToCentroid)
+		// Save opposite (outward) direction for vertex letter placement later
+		preferredOppositeByVertex.set(mark.vertex, (interiorAngle + Math.PI) % (2 * Math.PI))
 	// const segments = [
 	// 	{ p1: A, p2: B },
 	// 	{ p1: B, p2: C },
@@ -515,6 +627,7 @@ export const generateTriangleDiagram: WidgetGenerator<typeof TriangleDiagramProp
 		// }
 		// return false
 	// }
+        if (!drawLabelVisible) continue
 		const text = angleValueToString(mark.value)
 		const fontPx = theme.font.size.medium
 		const { maxWidth, height: textH } = estimateWrappedTextDimensions(text, Number.POSITIVE_INFINITY, fontPx, 1.2)
@@ -535,27 +648,17 @@ export const generateTriangleDiagram: WidgetGenerator<typeof TriangleDiagramProp
 		// return !(hasNeg && hasPos)
 	// }
 		// Try interior first unless the angle is very acute; if collisions persist, flip outside
-		const acuteDeg = (sweep * 180) / Math.PI
-		const tryOrders: number[] = []
-		if (acuteDeg < 25) {
-			tryOrders.push(-1, 1) // prefer outside for very acute angles
-		} else {
-			tryOrders.push(1, -1) // otherwise prefer inside
-		}
-		for (const dirSign of tryOrders) {
-			for (const dr of [0, 8, -8, 16, -16, 24]) {
-				for (const dt of [0, Math.PI / 18, -Math.PI / 18]) {
-					const r = baseR + dr
-					const ang = mid + dt
-					const x = center.x + dirSign * r * Math.cos(ang)
-					const y = center.y + dirSign * r * Math.sin(ang)
-					const rect = { x: x - halfW, y: y - halfH, width: maxWidth, height: textH, pad: 2 }
-					const hits = rectIntersectsAnySegment(rect) ? 1 : 0
-					if (hits < minHits) {
-						minHits = hits
-						best = { x, y }
-					}
-					if (minHits === 0) break
+		for (const dr of [0, 8, -8, 16, -16, 24]) {
+			for (const dt of [0, Math.PI / 18, -Math.PI / 18]) {
+				const r = baseR + dr
+				const ang = interiorAngle + dt
+				const x = center.x + r * Math.cos(ang)
+				const y = center.y + r * Math.sin(ang)
+				const rect = { x: x - halfW, y: y - halfH, width: maxWidth, height: textH, pad: 2 }
+				const hits = rectIntersectsAnySegment(rect) ? 1 : 0
+				if (hits < minHits) {
+					minHits = hits
+					best = { x, y }
 				}
 				if (minHits === 0) break
 			}
@@ -578,48 +681,23 @@ export const generateTriangleDiagram: WidgetGenerator<typeof TriangleDiagramProp
 
 	// Altitudes (dropped heights)
 	if (altitudes) {
-		const sideMap: Record<"AB" | "BC" | "CA", { p1: Vec; p2: Vec }> = {
-			AB: { p1: A, p2: B },
-			BC: { p1: B, p2: C },
-			CA: { p1: C, p2: A }
-		}
-		const vertexMap: Record<string, Vec> = { [points.A.id]: A, [points.B.id]: B, [points.C.id]: C }
-		for (const alt of altitudes) {
-			const v = vertexMap[alt.vertex]
-			const base = sideMap[alt.toSide]
-			if (!v || !base) {
-				logger.error("altitude references unknown points", { alt })
-				throw errors.new("invalid altitude references")
-			}
-			const bx = base.p2.x - base.p1.x
-			const by = base.p2.y - base.p1.y
-			const len2 = bx * bx + by * by
-			if (len2 === 0) {
-				logger.error("altitude base degenerate", { alt })
-				throw errors.new("invalid altitude base")
-			}
-			const t = ((v.x - base.p1.x) * bx + (v.y - base.p1.y) * by) / len2
-			if (t < 0 || t > 1) {
-				logger.error("altitude foot outside segment", { alt, t })
-				throw errors.new("altitude foot outside segment")
-			}
-			const foot: Vec = { x: base.p1.x + t * bx, y: base.p1.y + t * by }
+		for (const { alt, v, foot } of precomputedAltitudes) {
 			const dash = alt.style === "dashed" ? "4 3" : "2 4"
 			canvas.drawLine(v.x, v.y, foot.x, foot.y, { stroke: alt.color, strokeWidth: theme.stroke.width.base, dash })
-			// add to collision segments
-			screenSegments.push({ a: v, b: foot })
 			if (alt.withRightAngle) {
 				// Draw right angle square at foot using base direction and altitude direction
-				const bl = Math.hypot(bx, by) || 1
-				const nbx = bx / bl
-				const nby = by / bl
-				const ax = v.x - foot.x
-				const ay = v.y - foot.y
-				const al = Math.hypot(ax, ay) || 1
-				const nax = ax / al
-				const nay = ay / al
+				const bx = foot.x - v.x
+				const by = foot.y - v.y
+				// base direction should be perpendicular to altitude; reuse triangle side for orthonormal marker
+				// approximate using small square aligned with altitude and a perpendicular
+				const al = Math.hypot(bx, by) || 1
+				const nax = (v.x - foot.x) / al
+				const nay = (v.y - foot.y) / al
+				// For the second leg, project along the triangle side direction nearest the altitude foot by using AB/BC/CA mapping
 				const s = 14
-				const p1 = { x: foot.x + nbx * s, y: foot.y + nby * s }
+				const perpX = -nay
+				const perpY = nax
+				const p1 = { x: foot.x + perpX * s, y: foot.y + perpY * s }
 				const p2 = { x: foot.x + nax * s, y: foot.y + nay * s }
 				const corner = { x: p1.x + nax * s, y: p1.y + nay * s }
 				canvas.drawLine(p1.x, p1.y, corner.x, corner.y, { stroke: theme.colors.black, strokeWidth: theme.stroke.width.thick })
@@ -627,21 +705,13 @@ export const generateTriangleDiagram: WidgetGenerator<typeof TriangleDiagramProp
 			}
 			if (alt.value) {
 				const mid = { x: (v.x + foot.x) / 2, y: (v.y + foot.y) / 2 }
-				// place slightly to one side of the segment
 				const dx = foot.x - v.x
 				const dy = foot.y - v.y
 				const L = Math.hypot(dx, dy) || 1
 				const nx = -dy / L
 				const ny = dx / L
 				const off = 14
-				canvas.drawText({
-					x: mid.x + nx * off,
-					y: mid.y + ny * off,
-					text: sideValueToString(alt.value),
-					fill: theme.colors.black,
-					anchor: "middle",
-					dominantBaseline: "middle"
-				})
+				canvas.drawText({ x: mid.x + nx * off, y: mid.y + ny * off, text: sideValueToString(alt.value), fill: theme.colors.black, anchor: "middle", dominantBaseline: "middle" })
 			}
 		}
 	}
