@@ -1,7 +1,7 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
-import { createWidthSchema } from "../../utils/schemas"
 import { theme } from "../../utils/theme"
 import type { WidgetGenerator } from "../types"
 
@@ -195,7 +195,7 @@ export const PolyhedronDiagramPropsSchema = z
 	.object({
 		type: z.literal("polyhedronDiagram").describe("Identifies this as a 3D polyhedron diagram widget."),
 		width: createWidthSchema(),
-		height: z.number().positive().describe("The height of the pyramid."),
+		height: createHeightSchema(),
 		shape: z
 			.discriminatedUnion("type", [
 				RectangularPrismDataSchema.describe("A box-shaped prism with rectangular faces."),
