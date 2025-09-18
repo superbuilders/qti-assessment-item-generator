@@ -1,7 +1,7 @@
-import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
+import { createWidthSchema } from "../../utils/schemas"
 import { theme } from "../../utils/theme"
 import type { WidgetGenerator } from "../types"
 
@@ -28,82 +28,80 @@ const FaceName = z
 		"Face identifier for polyhedra. 'frontFace' is the viewer-facing surface, 'backFace' is hidden behind, 'leftFace'/'rightFace' are side surfaces, 'topFace'/'bottomFace' are vertical extremes, and 'baseFace' is the foundation of pyramids."
 	)
 
-// Factory: creates a fresh Anchor schema to avoid $ref generation in OpenAI JSON Schema conversion
-function createAnchorSchema() {
-	return z
-		.discriminatedUnion("type", [
-			z
-				.object({
-					type: z.literal("vertex"),
-					index: z
-						.number()
-						.int()
-						.min(0)
-						.describe(
-							"Zero-based vertex index referring to a specific corner of the polyhedron. Vertex numbering follows the systematic ordering used by each shape type."
-						)
-				})
-				.strict()
-				.describe("References an existing vertex of the polyhedron by its index position."),
-			z
-				.object({
-					type: z.literal("edgeMidpoint"),
-					a: z.number().int().min(0).describe("Index of the first vertex that defines one endpoint of the edge."),
-					b: z
-						.number()
-						.int()
-						.min(0)
-						.describe(
-							"Index of the second vertex that defines the other endpoint of the edge. Must be different from 'a'."
-						)
-				})
-				.strict()
-				.describe(
-					"References the midpoint of an edge connecting two vertices. Useful for slant heights, edge bisectors, and construction lines."
-				),
-			z
-				.object({
-					type: z.literal("edgePoint"),
-					a: z.number().int().min(0).describe("Index of the first vertex defining the edge's starting point."),
-					b: z
-						.number()
-						.int()
-						.min(0)
-						.describe("Index of the second vertex defining the edge's ending point. Must be different from 'a'."),
-					t: z
-						.number()
-						.min(0)
-						.max(1)
-						.describe(
-							"Parametric position along the edge from vertex 'a' to vertex 'b'. 0 = at vertex a, 1 = at vertex b, 0.5 = midpoint, 0.25 = quarter way from a to b."
-						)
-				})
-				.strict()
-				.describe(
-					"References a specific point along an edge at a fractional distance between two vertices. Enables precise positioning for construction lines and measurements."
-				),
-			z
-				.object({
-					type: z.literal("faceCentroid"),
-					face: FaceName.describe("The face whose geometric center will be used as the anchor point.")
-				})
-				.strict()
-				.describe(
-					"References the geometric center (centroid) of a face polygon. Calculated as the average position of all vertices that define the face."
-				)
-		])
-		.describe(
-			"Flexible anchor system for positioning line segments and angle markers. Can reference vertices, points along edges, or face centers to enable complex geometric constructions like slant heights, altitudes, and construction lines."
-		)
-}
+// Single Anchor schema instance to avoid $ref issues and ensure consistency
+const AnchorSchema = z
+	.discriminatedUnion("type", [
+		z
+			.object({
+				type: z.literal("vertex"),
+				index: z
+					.number()
+					.int()
+					.min(0)
+					.describe(
+						"Zero-based vertex index referring to a specific corner of the polyhedron. Vertex numbering follows the systematic ordering used by each shape type."
+					)
+			})
+			.strict()
+			.describe("References an existing vertex of the polyhedron by its index position."),
+		z
+			.object({
+				type: z.literal("edgeMidpoint"),
+				a: z.number().int().min(0).describe("Index of the first vertex that defines one endpoint of the edge."),
+				b: z
+					.number()
+					.int()
+					.min(0)
+					.describe(
+						"Index of the second vertex that defines the other endpoint of the edge. Must be different from 'a'."
+					)
+			})
+			.strict()
+			.describe(
+				"References the midpoint of an edge connecting two vertices. Useful for slant heights, edge bisectors, and construction lines."
+			),
+		z
+			.object({
+				type: z.literal("edgePoint"),
+				a: z.number().int().min(0).describe("Index of the first vertex defining the edge's starting point."),
+				b: z
+					.number()
+					.int()
+					.min(0)
+					.describe("Index of the second vertex defining the edge's ending point. Must be different from 'a'."),
+				t: z
+					.number()
+					.min(0)
+					.max(1)
+					.describe(
+						"Parametric position along the edge from vertex 'a' to vertex 'b'. 0 = at vertex a, 1 = at vertex b, 0.5 = midpoint, 0.25 = quarter way from a to b."
+					)
+			})
+			.strict()
+			.describe(
+				"References a specific point along an edge at a fractional distance between two vertices. Enables precise positioning for construction lines and measurements."
+			),
+		z
+			.object({
+				type: z.literal("faceCentroid"),
+				face: FaceName.describe("The face whose geometric center will be used as the anchor point.")
+			})
+			.strict()
+			.describe(
+				"References the geometric center (centroid) of a face polygon. Calculated as the average position of all vertices that define the face."
+			)
+	])
+	.describe(
+		"Flexible anchor system for positioning line segments and angle markers. Can reference vertices, points along edges, or face centers to enable complex geometric constructions like slant heights, altitudes, and construction lines."
+	)
 
 // Defines a line segment between two anchor points with optional labeling
 const Segment = z
 	.object({
-		from: createAnchorSchema().describe(
+		from: AnchorSchema.describe(
 			"Starting point of the line segment. Can be any anchor type: vertex, edge point, or face center."
 		),
-		to: createAnchorSchema().describe(
+		to: AnchorSchema.describe(
 			"Ending point of the line segment. Can be any anchor type: vertex, edge point, or face center. Must be different from 'from'."
 		),
 		label: z
@@ -125,13 +123,13 @@ const AngleMarker = z
 		type: z
 			.literal("right")
 			.describe("Marker type identifier. Currently only 'right' is supported for right-angle square markers."),
-		at: createAnchorSchema().describe(
+		at: AnchorSchema.describe(
 			"The anchor point where the angle marker will be positioned. This is the vertex of the angle."
 		),
-		from: createAnchorSchema().describe(
+		from: AnchorSchema.describe(
 			"Reference anchor defining the first ray of the angle. A line from 'at' to 'from' forms one side of the angle."
 		),
-		to: createAnchorSchema().describe(
+		to: AnchorSchema.describe(
 			"Reference anchor defining the second ray of the angle. A line from 'at' to 'to' forms the other side of the angle."
 		),
 		sizePx: z
@@ -149,49 +147,28 @@ const AngleMarker = z
 // Defines the properties for a rectangular prism (including cubes)
 const RectangularPrismDataSchema = z
 	.object({
-		type: z.literal("rectangularPrism"),
-		length: z.number().positive().describe("The length of the prism (depth)."),
-		width: createWidthSchema(),
-		height: createHeightSchema()
+		type: z.literal("rectangularPrism")
 	})
 	.strict()
 
-// Factory: triangular base dimensions (avoid reusing schema instance to prevent $ref)
-function createTriangularBaseSchema() {
-	return z
-		.object({
-			b: z.number().positive().describe("The base length of the triangular face."),
-			h: z.number().positive().describe("The height of the triangular face."),
-			hypotenuse: z.number().positive().describe("The hypotenuse for a right-triangle base.")
-		})
-		.strict()
-}
-
-// Defines the properties for a triangular prism
+// Triangular prism type schema
 const TriangularPrismDataSchema = z
 	.object({
-		type: z.literal("triangularPrism"),
-		base: createTriangularBaseSchema().describe("The dimensions of the triangular base."),
-		length: z.number().positive().describe("The length (depth) of the prism, connecting the two triangular bases.")
+		type: z.literal("triangularPrism")
 	})
 	.strict()
 
 // Defines the properties for a rectangular pyramid
 const RectangularPyramidDataSchema = z
 	.object({
-		type: z.literal("rectangularPyramid"),
-		baseLength: z.number().positive().describe("The length of the rectangular base."),
-		baseWidth: z.number().positive().describe("The width of the rectangular base."),
-		height: createHeightSchema()
+		type: z.literal("rectangularPyramid")
 	})
 	.strict()
 
 // Defines the properties for a triangular pyramid (tetrahedron)
 const TriangularPyramidDataSchema = z
 	.object({
-		type: z.literal("triangularPyramid"),
-		base: createTriangularBaseSchema().describe("The dimensions of the triangular base."),
-		height: createHeightSchema()
+		type: z.literal("triangularPyramid")
 	})
 	.strict()
 
@@ -221,7 +198,7 @@ export const PolyhedronDiagramPropsSchema = z
 	.object({
 		type: z.literal("polyhedronDiagram").describe("Identifies this as a 3D polyhedron diagram widget."),
 		width: createWidthSchema(),
-		height: createHeightSchema(),
+		height: z.number().positive().describe("The height of the pyramid."),
 		shape: z
 			.discriminatedUnion("type", [
 				RectangularPrismDataSchema.describe("A box-shaped prism with rectangular faces."),
@@ -307,7 +284,7 @@ export const generatePolyhedronDiagram: WidgetGenerator<typeof PolyhedronDiagram
 	// Helper: resolve an Anchor to a concrete point using the projected vertices and faces
 	function resolveAnchor(
 		anchor:
-			| z.infer<ReturnType<typeof createAnchorSchema>>
+			| z.infer<typeof AnchorSchema>
 			| { type: "vertex"; index: number }
 			| { type: "edgeMidpoint"; a: number; b: number }
 			| { type: "edgePoint"; a: number; b: number; t: number }
@@ -445,9 +422,10 @@ export const generatePolyhedronDiagram: WidgetGenerator<typeof PolyhedronDiagram
 
 	switch (shape.type) {
 		case "rectangularPrism": {
-			const w = shape.width
-			const h = shape.height
-			const l = shape.length // depth
+			// Use default dimensions for rectangular prism
+			const w = 3
+			const h = 4
+			const l = 5 // depth
 
 			// Build vertices in data space (origin at front-bottom-left)
 			const raw = [
@@ -561,8 +539,10 @@ export const generatePolyhedronDiagram: WidgetGenerator<typeof PolyhedronDiagram
 			break
 		}
 		case "triangularPrism": {
-			const { b, h } = shape.base
-			const l = shape.length
+			// Use default dimensions for triangular prism
+			const b = 4 // base length
+			const h = 3 // triangle height
+			const l = 5 // prism length
 			const w = b
 
 			// Build vertices in data space
@@ -678,9 +658,10 @@ export const generatePolyhedronDiagram: WidgetGenerator<typeof PolyhedronDiagram
 			break
 		}
 		case "rectangularPyramid": {
-			const w = shape.baseWidth
-			const l = shape.baseLength
-			const h = shape.height
+			// Use default dimensions for rectangular pyramid
+			const w = 3 // base width
+			const l = 4 // base length
+			const h = 5 // pyramid height
 
 			// 5 vertices in data space
 			const raw = [
@@ -816,8 +797,10 @@ export const generatePolyhedronDiagram: WidgetGenerator<typeof PolyhedronDiagram
 			break
 		}
 		case "triangularPyramid": {
-			const { b, h } = shape.base // base length and base height
-			const pyrH = shape.height
+			// Use default dimensions for triangular pyramid
+			const b = 4 // base length
+			const h = 3 // base height
+			const pyrH = 5 // pyramid height
 
 			// Build vertices in data space
 			const frontLeft = { x: 0, y: 0 }
@@ -962,4 +945,3 @@ export const generatePolyhedronDiagram: WidgetGenerator<typeof PolyhedronDiagram
 	const viewBox = `${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}`
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${viewBox}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.base}">${svgBody}</svg>`
 }
-
