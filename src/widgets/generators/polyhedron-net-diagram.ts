@@ -1,4 +1,3 @@
-import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
@@ -78,8 +77,8 @@ function createPentagonBase() {
 const Cube = z
 	.object({
 		polyhedronType: z.literal("cube").describe("A cube net with 6 identical square faces in cross pattern."),
-		width: createWidthSchema(),
-		height: createHeightSchema(),
+		width: z.number().positive().describe("Total width of the widget in pixels (e.g., 600, 700, 500). Must accommodate the diagram content."),
+		height: z.number().positive().describe("Total height of the widget in pixels (e.g., 400, 350, 300). Must fit the diagram content."),
 		base: createSquareBase().describe("Dimensions of the square faces. All 6 faces are identical squares."),
 		showLabels: z
 			.boolean()
@@ -93,8 +92,8 @@ const RectPrism = z
 		polyhedronType: z
 			.literal("rectangularPrism")
 			.describe("A rectangular prism net with 6 rectangular faces (3 pairs)."),
-		width: createWidthSchema(),
-		height: createHeightSchema(),
+		width: z.number().positive().describe("Total width of the widget in pixels (e.g., 600, 700, 500). Must accommodate the diagram content."),
+		height: z.number().positive().describe("Total height of the widget in pixels (e.g., 400, 350, 300). Must fit the diagram content."),
 		base: createRectangleBase().describe(
 			"Dimensions of the rectangular base. Top and bottom faces use these dimensions."
 		),
@@ -115,8 +114,8 @@ const TriPrism = z
 		polyhedronType: z
 			.literal("triangularPrism")
 			.describe("A triangular prism net with 2 triangular faces and 3 rectangular faces."),
-		width: createWidthSchema(),
-		height: createHeightSchema(),
+		width: z.number().positive().describe("Total width of the widget in pixels (e.g., 600, 700, 500). Must accommodate the diagram content."),
+		height: z.number().positive().describe("Total height of the widget in pixels (e.g., 400, 350, 300). Must fit the diagram content."),
 		base: createTriangleBase().describe(
 			"Dimensions of the triangular base. Both triangular faces use these dimensions."
 		),
@@ -135,8 +134,8 @@ const SquarePyr = z
 		polyhedronType: z
 			.literal("squarePyramid")
 			.describe("A square pyramid net with 1 square base and 4 triangular faces."),
-		width: createWidthSchema(),
-		height: createHeightSchema(),
+		width: z.number().positive().describe("Total width of the widget in pixels (e.g., 600, 700, 500). Must accommodate the diagram content."),
+		height: z.number().positive().describe("Total height of the widget in pixels (e.g., 400, 350, 300). Must fit the diagram content."),
 		base: createSquareBase().describe("Dimensions of the square base. The central square in the net."),
 		lateralHeight: z
 			.number()
@@ -153,8 +152,8 @@ const TriPyr = z
 		polyhedronType: z
 			.literal("triangularPyramid")
 			.describe("A triangular pyramid (tetrahedron) net with 4 triangular faces."),
-		width: createWidthSchema(),
-		height: createHeightSchema(),
+		width: z.number().positive().describe("Total width of the widget in pixels (e.g., 600, 700, 500). Must accommodate the diagram content."),
+		height: z.number().positive().describe("Total height of the widget in pixels (e.g., 400, 350, 300). Must fit the diagram content."),
 		base: createTriangleBase().describe(
 			"Dimensions of the base triangle. Other faces are calculated from these and lateralHeight."
 		),
@@ -175,8 +174,8 @@ const PentPyr = z
 		polyhedronType: z
 			.literal("pentagonalPyramid")
 			.describe("A pentagonal pyramid net with 1 pentagon base and 5 triangular faces."),
-		width: createWidthSchema(),
-		height: createHeightSchema(),
+		width: z.number().positive().describe("Total width of the widget in pixels (e.g., 600, 700, 500). Must accommodate the diagram content."),
+		height: z.number().positive().describe("Total height of the widget in pixels (e.g., 400, 350, 300). Must fit the diagram content."),
 		base: createPentagonBase().describe("Dimensions of the regular pentagon base. The central pentagon in the net."),
 		lateralHeight: z
 			.number()

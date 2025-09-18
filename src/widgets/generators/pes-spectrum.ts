@@ -1,4 +1,3 @@
-import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
@@ -45,8 +44,8 @@ export const PESSpectrumPropsSchema = z
 			.describe(
 				"Optional chart title to display above the plot. If the graph does not have a title, do not include this field or pass an empty string."
 			),
-		width: createWidthSchema(),
-		height: createHeightSchema(),
+		width: z.number().positive().describe("Total width of the widget in pixels (e.g., 600, 700, 500). Must accommodate the diagram content."),
+		height: z.number().positive().describe("Total height of the widget in pixels (e.g., 400, 350, 300). Must fit the diagram content."),
 		yAxisLabel: z.string().describe("The label for the vertical axis."),
 		// Peaks to render, left-to-right positioning derived from their energy values.
 		peaks: z

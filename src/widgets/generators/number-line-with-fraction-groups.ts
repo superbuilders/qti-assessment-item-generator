@@ -1,4 +1,3 @@
-import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
@@ -13,8 +12,8 @@ export const NumberLineWithFractionGroupsPropsSchema = z
 		type: z
 			.literal("numberLineWithFractionGroups")
 			.describe("Identifies this as a number line with fraction groups showing repeated segments."),
-		width: createWidthSchema(),
-		height: createHeightSchema(),
+		width: z.number().positive().describe("Total width of the widget in pixels (e.g., 600, 700, 500). Must accommodate the diagram content."),
+		height: z.number().positive().describe("Total height of the widget in pixels (e.g., 400, 350, 300). Must fit the diagram content."),
 		axis: z
 			.object({
 				lowerBound: z.number().int().describe("Lower bound numerator (e.g., 0 for 0/4, -2 for -2/4)"),

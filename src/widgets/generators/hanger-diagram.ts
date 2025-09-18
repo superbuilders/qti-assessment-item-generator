@@ -1,4 +1,3 @@
-import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
@@ -37,8 +36,8 @@ export const HangerDiagramPropsSchema = z
 		type: z
 			.literal("hangerDiagram")
 			.describe("Identifies this as a hanger diagram (balance scale) for visualizing algebraic equations."),
-		width: createWidthSchema(),
-		height: createHeightSchema(),
+		width: z.number().positive().describe("Total width of the widget in pixels (e.g., 600, 700, 500). Must accommodate the diagram content."),
+		height: z.number().positive().describe("Total height of the widget in pixels (e.g., 400, 350, 300). Must fit the diagram content."),
 		leftSide: z
 			.array(createWeightSchema())
 			.describe(

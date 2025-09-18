@@ -1,4 +1,3 @@
-import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
@@ -131,8 +130,8 @@ export const ShapeTransformationGraphPropsSchema = z
 			.describe(
 				"Identifies this as a shape transformation graph showing geometric transformations on a coordinate plane."
 			),
-		width: createWidthSchema(),
-		height: createHeightSchema(),
+		width: z.number().positive().describe("Total width of the widget in pixels (e.g., 600, 700, 500). Must accommodate the diagram content."),
+		height: z.number().positive().describe("Total height of the widget in pixels (e.g., 400, 350, 300). Must fit the diagram content."),
 		xAxis: createAxisOptionsSchema().describe(
 			"Configuration for the horizontal axis including range, ticks, and grid. Should encompass both pre-image and image."
 		),

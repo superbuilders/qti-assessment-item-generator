@@ -1,4 +1,3 @@
-import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
@@ -9,8 +8,8 @@ import type { WidgetGenerator } from "../types"
 export const DivisionModelDiagramPropsSchema = z
 	.object({
 		type: z.literal("divisionModelDiagram").describe("Identifies this as a division model widget."),
-		width: createWidthSchema(),
-		height: createHeightSchema(),
+		width: z.number().positive().describe("Total width of the widget in pixels (e.g., 600, 700, 500). Must accommodate the diagram content."),
+		height: z.number().positive().describe("Total height of the widget in pixels (e.g., 400, 350, 300). Must fit the diagram content."),
 		dividend: z.number().int().min(0).describe("The total number of objects to be divided (the dividend)."),
 		divisor: z.number().int().positive().describe("The number of objects in each full row (the divisor)."),
 		objectColor: z.string().regex(CSS_COLOR_PATTERN, "invalid css color").describe("CSS color for the objects.")

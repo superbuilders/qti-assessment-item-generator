@@ -1,4 +1,3 @@
-import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { z } from "zod"
 import { theme } from "../../utils/theme"
 import type { WidgetGenerator } from "../types"
@@ -11,8 +10,8 @@ const SYMBOL_COLOR = "#212121"
 export const IntegerChipModelPropsSchema = z
 	.object({
 		type: z.literal("integerChipModel"),
-		width: createWidthSchema(),
-		height: createHeightSchema(),
+		width: z.number().positive().describe("Total width of the widget in pixels (e.g., 600, 700, 500). Must accommodate the diagram content."),
+		height: z.number().positive().describe("Total height of the widget in pixels (e.g., 400, 350, 300). Must fit the diagram content."),
 		chips: z
 			.array(
 				z

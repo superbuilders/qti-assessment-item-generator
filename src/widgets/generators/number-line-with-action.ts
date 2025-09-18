@@ -1,4 +1,3 @@
-import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
@@ -13,8 +12,8 @@ export const NumberLineWithActionPropsSchema = z
 		type: z
 			.literal("numberLineWithAction")
 			.describe("Identifies this as a number line with action arrows showing addition/subtraction operations."),
-		width: createWidthSchema(),
-		height: createHeightSchema(),
+		width: z.number().positive().describe("Total width of the widget in pixels (e.g., 600, 700, 500). Must accommodate the diagram content."),
+		height: z.number().positive().describe("Total height of the widget in pixels (e.g., 400, 350, 300). Must fit the diagram content."),
 		orientation: z
 			.enum(["horizontal", "vertical"])
 			.describe(

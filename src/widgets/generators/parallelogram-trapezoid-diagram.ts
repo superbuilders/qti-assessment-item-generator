@@ -4,7 +4,6 @@ import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
 import { Path2D } from "../../utils/path-builder"
-import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { theme } from "../../utils/theme"
 import type { WidgetGenerator } from "../types"
 
@@ -137,8 +136,8 @@ export const ParallelogramTrapezoidDiagramPropsSchema = z
 		type: z
 			.literal("parallelogramTrapezoidDiagram")
 			.describe("Identifies this as a parallelogram or trapezoid diagram widget."),
-		width: createWidthSchema(),
-		height: createHeightSchema(),
+		width: z.number().positive().describe("Total width of the widget in pixels (e.g., 600, 700, 500). Must accommodate the diagram content."),
+		height: z.number().positive().describe("Total height of the widget in pixels (e.g., 400, 350, 300). Must fit the diagram content."),
 		shape: z
 			.discriminatedUnion("type", [Parallelogram, RightTrapezoid, GeneralTrapezoid])
 			.describe("The specific quadrilateral to draw with its dimensions and labels.")

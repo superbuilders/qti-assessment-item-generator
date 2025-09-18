@@ -31,8 +31,3 @@ export const LABEL_AVG_CHAR_WIDTH_PX = 7
 export const X_AXIS_MIN_LABEL_PADDING_PX = 10
 export const Y_AXIS_MIN_LABEL_GAP_PX = 4
 
-// SVG diagram dimension constraints
-export const SVG_DIAGRAM_WIDTH_MIN = 300
-export const SVG_DIAGRAM_WIDTH_MAX = 500
-export const SVG_DIAGRAM_HEIGHT_MIN = 300
-export const SVG_DIAGRAM_HEIGHT_MAX = 500

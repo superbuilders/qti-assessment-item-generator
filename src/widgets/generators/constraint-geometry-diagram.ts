@@ -1,4 +1,3 @@
-import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { init as initZ3 } from "z3-solver"
@@ -360,8 +359,8 @@ export const ConstraintGeometryDiagramPropsSchema = z
 		type: z
 			.literal("constraintGeometryDiagram")
 			.describe("Identifies this widget as a pure constraint-based geometric diagram."),
-		width: createWidthSchema(),
-		height: createHeightSchema(),
+		width: z.number().positive().describe("Total width of the widget in pixels (e.g., 600, 700, 500). Must accommodate the diagram content."),
+		height: z.number().positive().describe("Total height of the widget in pixels (e.g., 400, 350, 300). Must fit the diagram content."),
 		vertices: z
 			.array(VertexSchema)
 			.min(1)

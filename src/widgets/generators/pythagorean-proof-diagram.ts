@@ -1,4 +1,3 @@
-import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
@@ -63,8 +62,8 @@ const NewPythagoreanPropsSchema = z
 		type: z
 			.literal("pythagoreanProofDiagram")
 			.describe("Identifies this as a Pythagorean proof diagram widget demonstrating a² + b² = c²."),
-		width: createWidthSchema(),
-		height: createHeightSchema(),
+		width: z.number().positive().describe("Total width of the widget in pixels (e.g., 600, 700, 500). Must accommodate the diagram content."),
+		height: z.number().positive().describe("Total height of the widget in pixels (e.g., 400, 350, 300). Must fit the diagram content."),
 		sideA: createTriangleSidePropsSchema().describe(
 			"First leg (a) of the right triangle, with optional label and optional attached square."
 		),

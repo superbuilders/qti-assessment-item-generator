@@ -1,4 +1,3 @@
-import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { createAxisOptionsSchema, createPlotPointSchema, renderPoints } from "../../utils/canvas-utils"
@@ -12,8 +11,8 @@ export const PointPlotGraphPropsSchema = z
 		type: z
 			.literal("pointPlotGraph")
 			.describe("Identifies this as a point plot graph for displaying individual coordinate points."),
-		width: createWidthSchema(),
-		height: createHeightSchema(),
+		width: z.number().positive().describe("Total width of the widget in pixels (e.g., 600, 700, 500). Must accommodate the diagram content."),
+		height: z.number().positive().describe("Total height of the widget in pixels (e.g., 400, 350, 300). Must fit the diagram content."),
 		xAxis: createAxisOptionsSchema().describe(
 			"Configuration for the horizontal x-axis including range, tick marks, labels, and optional grid lines."
 		),

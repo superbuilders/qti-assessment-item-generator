@@ -1,4 +1,3 @@
-import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
@@ -25,8 +24,8 @@ export const HistogramPropsSchema = z
 		type: z
 			.literal("histogram")
 			.describe("Identifies this as a histogram widget for displaying frequency distributions."),
-		width: createWidthSchema(),
-		height: createHeightSchema(),
+		width: z.number().positive().describe("Total width of the widget in pixels (e.g., 600, 700, 500). Must accommodate the diagram content."),
+		height: z.number().positive().describe("Total height of the widget in pixels (e.g., 400, 350, 300). Must fit the diagram content."),
 		title: z.string().describe("Title displayed above the histogram (e.g., 'Test Score Distribution', 'Age Groups')."),
 		xAxis: z
 			.object({

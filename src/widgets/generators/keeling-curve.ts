@@ -1,4 +1,3 @@
-import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { AXIS_VIEWBOX_PADDING } from "../../utils/constants"
@@ -14,8 +13,8 @@ const AnnotationSchema = z.object({
 export const KeelingCurvePropsSchema = z
 	.object({
 		type: z.literal("keelingCurve"),
-		width: createWidthSchema(),
-		height: createHeightSchema(),
+		width: z.number().positive().describe("Total width of the widget in pixels (e.g., 600, 700, 500). Must accommodate the diagram content."),
+		height: z.number().positive().describe("Total height of the widget in pixels (e.g., 400, 350, 300). Must fit the diagram content."),
 		xAxisLabel: z.string().describe("Label for the horizontal axis."),
 		yAxisLabel: z.string().describe("Label for the vertical axis, including units."),
 		annotations: z
