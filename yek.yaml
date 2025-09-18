@@ -8,6 +8,7 @@ ignore_patterns:
   - "package.json"
   - "**/__snapshots__/**"
   - "src/widgets/generators/**"
+  - "examples/**"
 priority_rules:
   - score: 99
     pattern: "^rules/"
