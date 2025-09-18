@@ -1,22 +1,21 @@
-import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
 import { Path2D } from "../../utils/path-builder"
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { theme } from "../../utils/theme"
 import type { WidgetGenerator } from "../types"
 
-// Label value as discriminated union: number, string, or none
-const createLabelValueSchema = () =>
-	z
-		.discriminatedUnion("type", [
-			z.object({ type: z.literal("number"), value: z.number() }),
-			z.object({ type: z.literal("string"), value: z.string().max(1) }),
-			z.object({ type: z.literal("none") })
-		])
-		.describe("Label value as number, single-letter string, or none")
+// Single LabelValueSchema instance to avoid $ref generation in OpenAI JSON Schema conversion
+const LabelValueSchema = z
+	.discriminatedUnion("type", [
+		z.object({ type: z.literal("number"), value: z.number() }),
+		z.object({ type: z.literal("string"), value: z.string().max(1) }),
+		z.object({ type: z.literal("none") })
+	])
+	.describe("Label value as number, single-letter string, or none")
 
 type LabelValue = { type: "number"; value: number } | { type: "string"; value: string } | { type: "none" }
 
@@ -27,23 +26,24 @@ const Parallelogram = z
 			.number()
 			.positive()
 			.describe("Length of the base (bottom side) in arbitrary units (e.g., 8, 10, 6.5). Parallel to the top side."),
-		height: createHeightSchema(),
+		height: z
+			.number()
+			.positive()
+			.describe("Perpendicular height of the parallelogram in arbitrary units (e.g., 4, 6, 7.5)"),
 		slantAngle: z
 			.number()
 			.min(1, "slant angle must be at least 1°")
 			.max(89, "slant angle must be at most 89°")
-			.describe(
-				"Angle between the base and the slanted side in degrees (acute). Defined at the bottom-left vertex."
-			),
+			.describe("Angle between the base and the slanted side in degrees (acute). Defined at the bottom-left vertex."),
 		labels: z
 			.object({
-				base: createLabelValueSchema().describe(
+				base: LabelValueSchema.describe(
 					"Label for the base: number or single-letter variable. Use type 'none' to hide. Positioned below the base."
 				),
-				height: createLabelValueSchema().describe(
+				height: LabelValueSchema.describe(
 					"Label for the height: number or single-letter variable. Use type 'none' to hide. Perpendicular distance."
 				),
-				slantAngle: createLabelValueSchema().describe(
+				slantAngle: LabelValueSchema.describe(
 					"Label for the slant angle in degrees: number or single-letter variable. Use type 'none' to hide. Positioned near the bottom-left vertex."
 				)
 			})
@@ -63,22 +63,25 @@ const RightTrapezoid = z
 			.number()
 			.positive()
 			.describe("Length of the bottom parallel side in arbitrary units (e.g., 10, 12, 8). Usually longer than top."),
-		height: createHeightSchema(),
+		height: z
+			.number()
+			.positive()
+			.describe("Perpendicular distance between parallel sides in arbitrary units (e.g., 5, 7, 4.5)"),
 		labels: z
 			.object({
-				topBase: createLabelValueSchema().describe(
+				topBase: LabelValueSchema.describe(
 					"Label for top base: number or single-letter variable. Use type 'none' to hide."
 				),
-				bottomBase: createLabelValueSchema().describe(
+				bottomBase: LabelValueSchema.describe(
 					"Label for bottom base: number or single-letter variable. Use type 'none' to hide."
 				),
-				height: createLabelValueSchema().describe(
+				height: LabelValueSchema.describe(
 					"Label for height/left side: number or single-letter variable. Use type 'none' to hide."
 				),
-				leftSide: createLabelValueSchema().describe(
+				leftSide: LabelValueSchema.describe(
 					"Label for left perpendicular side: number or single-letter variable. Often same as height. Use type 'none' to hide."
 				),
-				rightSide: createLabelValueSchema().describe(
+				rightSide: LabelValueSchema.describe(
 					"Label for right slanted side: number or single-letter variable. Use type 'none' to hide."
 				)
 			})
@@ -98,26 +101,29 @@ const GeneralTrapezoid = z
 			.number()
 			.positive()
 			.describe("Length of the bottom parallel side in arbitrary units (e.g., 9, 12, 8). Usually longer than top."),
-		height: createHeightSchema(),
+		height: z
+			.number()
+			.positive()
+			.describe("Perpendicular distance between parallel sides in arbitrary units (e.g., 4, 6, 5.5)"),
 		leftSideLength: z
 			.number()
 			.positive()
 			.describe("Length of the left slanted side in arbitrary units (e.g., 5, 7, 4.5). Can differ from right side."),
 		labels: z
 			.object({
-				topBase: createLabelValueSchema().describe(
+				topBase: LabelValueSchema.describe(
 					"Label for top base: number or single-letter variable. Use type 'none' to hide."
 				),
-				bottomBase: createLabelValueSchema().describe(
+				bottomBase: LabelValueSchema.describe(
 					"Label for bottom base: number or single-letter variable. Use type 'none' to hide."
 				),
-				height: createLabelValueSchema().describe(
+				height: LabelValueSchema.describe(
 					"Label for perpendicular height: number or single-letter variable. Shows with dashed line. Use type 'none' to hide."
 				),
-				leftSide: createLabelValueSchema().describe(
+				leftSide: LabelValueSchema.describe(
 					"Label for left slanted side: number or single-letter variable. Use type 'none' to hide."
 				),
-				rightSide: createLabelValueSchema().describe(
+				rightSide: LabelValueSchema.describe(
 					"Label for right slanted side: number or single-letter variable. Use type 'none' to hide."
 				)
 			})
@@ -603,4 +609,3 @@ export const generateParallelogramTrapezoidDiagram: WidgetGenerator<
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}">${svgBody}</svg>`
 }
-
