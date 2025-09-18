@@ -1,4 +1,3 @@
-import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
 import { CSS_COLOR_PATTERN } from "../utils/css-color"
@@ -501,8 +500,17 @@ export function renderLines(
 					}
 				}
 				if (!chosen) {
-					logger.error("label placement", { type: "line", id: l.id })
-					throw errors.new("label placement")
+					// fallback: use the last valid anchor position we found
+					logger.warn("no optimal label placement found, using fallback", { type: "line", id: l.id })
+					if (anchors.length > 0) {
+						const fallbackAnchor = anchors[anchors.length - 1]
+						chosen = { x: fallbackAnchor.x + nx * normalOffset, y: fallbackAnchor.y + ny * normalOffset, i: 0 }
+					} else {
+				// ultimate fallback: use line midpoint
+				const midX = (x1Svg + x2Svg) / 2
+				const midY = (y1Svg + y2Svg) / 2
+				chosen = { x: midX + nx * normalOffset, y: midY + ny * normalOffset, i: 0 }
+					}
 				}
 
 				// Enforce a minimum horizontal gap from the y-axis if visible
@@ -858,8 +866,21 @@ export function renderPolylines(
 							chosen = pos1 ?? pos2
 						}
 						if (!chosen) {
-							logger.error("label placement", { type: "polyline", id: polyline.id })
-							throw errors.new("label placement")
+					// fallback: use the midpoint of the polyline
+					logger.warn("no optimal label placement found, using fallback", { type: "polyline", id: polyline.id })
+					if (polyline.type === "points" && polyline.points.length > 0) {
+						const midIdx = Math.floor(polyline.points.length / 2)
+						const midPoint = polyline.points[midIdx]
+						const midX = toSvgX(midPoint.x)
+						const midY = toSvgY(midPoint.y)
+						chosen = { x: midX, y: midY - 20, i: 0 } // offset above the line
+					} else {
+						// for function polylines, use the first point with offset
+						const firstPoint = polyline.type === "function" && polyline.xRange 
+							? { x: polyline.xRange.min, y: 0 } 
+							: { x: 0, y: 0 }
+						chosen = { x: toSvgX(firstPoint.x), y: toSvgY(firstPoint.y) - 20, i: 0 }
+					}
 						}
 
 						clippedCanvas.drawText({
