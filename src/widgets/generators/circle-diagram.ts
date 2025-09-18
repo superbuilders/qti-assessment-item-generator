@@ -800,6 +800,21 @@ export const generateCircleDiagram: WidgetGenerator<typeof CircleDiagramPropsSch
 				const idealX = mid.x + offsetX
 				const idealY = mid.y + offsetY
 
+				// Calculate rotation angle to make text parallel to the segment line
+				let rotationAngle = seg.angle
+				
+				// For diameter, the line direction is the segment angle
+				// For radius/innerRadius, we want the text to align with the radial direction
+				if (seg.type !== "diameter") {
+					// For radius segments, align with the radial direction from center
+					rotationAngle = seg.angle
+				}
+				
+				// Ensure text is readable (not upside down) by flipping if needed
+				if (rotationAngle > 90 && rotationAngle <= 270) {
+					rotationAngle += 180
+				}
+
 				// Estimate label dimensions
 				const { maxWidth: labelWidth, height: labelHeight } = estimateWrappedTextDimensions(
 					seg.label,
@@ -826,7 +841,8 @@ export const generateCircleDiagram: WidgetGenerator<typeof CircleDiagramPropsSch
 						fontPx: theme.font.size.base,
 						fill: theme.colors.text,
 						anchor: "middle",
-						dominantBaseline: "middle"
+						dominantBaseline: "middle",
+						rotate: { angle: rotationAngle, cx: safePos.x, cy: safePos.y }
 					})
 				} else {
 					// Fallback to clamped position if no safe position found
@@ -848,7 +864,8 @@ export const generateCircleDiagram: WidgetGenerator<typeof CircleDiagramPropsSch
 						fontPx: theme.font.size.base,
 						fill: theme.colors.text,
 						anchor: "middle",
-						dominantBaseline: "middle"
+						dominantBaseline: "middle",
+						rotate: { angle: rotationAngle, cx: fallbackX, cy: fallbackY }
 					})
 				}
 			}
