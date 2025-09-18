@@ -1,4 +1,4 @@
-// Bun Snapshot v1, https://goo.gl/fbAQLP
+// Bun Snapshot v1, https://bun.sh/docs/test/snapshots
 
 exports[`Widget: integer-chip-legend should produce consistent output for example #1 1`] = `
 "<svg width="90.4" height="86" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
