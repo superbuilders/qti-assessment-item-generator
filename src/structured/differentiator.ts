@@ -18,6 +18,112 @@ const OPENAI_MODEL = "gpt-5"
  */
 export type ContentPlan = Omit<AssessmentItemInput, "widgets" | "identifier">
 
+// Simple type guards for runtime narrowing
+function isRecord(value: unknown): value is Record<string, unknown> {
+	return typeof value === "object" && value !== null && !Array.isArray(value)
+}
+
+// intentionally unused currently; keep for future guard expansions
+// function hasKey<K extends string>(obj: Record<string, unknown>, key: K): obj is Record<string, unknown> & { [P in K]: unknown } {
+// 	return key in obj
+// }
+
+function getProp(obj: unknown, key: string): unknown {
+	if (!isRecord(obj)) return undefined
+	return obj[key]
+}
+
+function isWidgetTypeName(value: unknown): value is keyof typeof allWidgetSchemas {
+	return typeof value === "string" && value in allWidgetSchemas
+}
+
+/**
+ * Builds an informational section for Shot 1 that lists the fixed widget mapping (slot → type)
+ * used in Shot 2. This is purely contextual so the planner avoids generating incompatible content.
+ */
+function buildShot1WidgetInfoSection(
+	assessmentItem: AssessmentItemInput,
+	logger: logger.Logger
+): string {
+	const widgets = assessmentItem.widgets
+	if (!widgets || typeof widgets !== "object") {
+		return ""
+	}
+
+	const mapping: Record<string, string> = {}
+	for (const [key, widget] of Object.entries(widgets)) {
+		if (!widget || typeof widget !== "object") {
+			logger.error("source widget is not an object", { key })
+			throw errors.new("invalid source item: widget invalid shape")
+		}
+		const typeUnknown = getProp(widget, "type")
+		if (typeof typeUnknown !== "string") {
+			logger.error("source widget is missing a 'type' property", { key })
+			throw errors.new("invalid source item: widget missing type")
+		}
+		const typeName = typeUnknown
+		if (!isWidgetTypeName(typeName)) {
+			logger.error("source widget has unknown type", { key, typeName })
+			throw errors.new("invalid source item: unknown widget type")
+		}
+		mapping[key] = typeName
+	}
+
+	// Build compact per-type schema digests to guide Shot 1 without overconstraining
+	const uniqueTypes = Array.from(new Set(Object.values(mapping)))
+	const digestSections: string[] = []
+	for (const typeName of uniqueTypes) {
+		if (!isWidgetTypeName(typeName)) {
+			logger.error("internal widget type mismatch after mapping build", { typeName })
+			throw errors.new("internal widget type mismatch")
+		}
+		const zodSchema = allWidgetSchemas[typeName]
+		const responseFormat = zodResponseFormat(zodSchema, `widget_${typeName}`)
+		// The helper returns an OpenAI-consumable JSON Schema with no $ref
+		// Extract only top-level properties and required to keep token usage small
+		const jsonSchemaContainer = responseFormat.json_schema
+		if (!jsonSchemaContainer) {
+			logger.error("missing json schema for widget type", { typeName })
+			throw errors.new("widget schema export missing json schema")
+		}
+		const jsonSchema = getProp(jsonSchemaContainer, "schema")
+		if (!isRecord(jsonSchema)) {
+			logger.error("invalid json schema structure for widget type", { typeName })
+			throw errors.new("widget json schema invalid structure")
+		}
+		const properties = getProp(jsonSchema, "properties")
+		if (!isRecord(properties)) {
+			logger.error("widget json schema missing properties", { typeName })
+			throw errors.new("widget json schema missing properties")
+		}
+		const required = getProp(jsonSchema, "required")
+		if (!Array.isArray(required)) {
+			logger.error("widget json schema missing required array", { typeName })
+			throw errors.new("widget json schema missing required")
+		}
+		const digest = { properties, required }
+		digestSections.push(
+			`#### ${typeName} \n\n\`\`\`json\n${JSON.stringify(digest, null, 2)}\n\`\`\``
+		)
+	}
+
+	return [
+		"## Widget constraints for Shot 2 (context only — do NOT edit widgets here)",
+		"- Widget slots and types are fixed and will be regenerated in Shot 2 using strict per-type schemas.",
+		"- This section is provided solely to help ensure your content plan remains compatible with the existing widgets.",
+		"- Do not include or modify any widgets in this shot.",
+		"",
+		"### Widget mapping (slot → widget type):",
+		"```json",
+		JSON.stringify(mapping, null, 2),
+		"```",
+		"",
+		"### Widget schema constraints (per type, context only):",
+		...digestSections,
+		""
+	].join("\n")
+}
+
 /**
  * [SHOT 1] Generates UI-agnostic content plans for an assessment item.
  * This function is strictly concerned with content and has no knowledge of widgets or UI.
@@ -57,7 +163,8 @@ async function planContentDifferentiation(
 		"You are a curriculum development expert generating content-only variations for an assessment item.",
 		"CRITICAL RULES:",
 		"- Your entire focus is on varying the content fields: title, body, interactions, responseDeclarations, feedback.",
-		"- Do NOT include or mention any UI, widgets, visuals, envelopes, or collections.",
+		"- Do NOT output any UI, widgets, visuals, envelopes, or collections.",
+		"- You may use the provided widget mapping and schema constraints as context. Do not output widgets.",
 		"- The JSON structure of your output MUST BE IDENTICAL to the source: same keys, same array lengths, same union choices.",
 		"- You MUST preserve the exact interaction keys and array lengths from the source.",
 		"- All variations must test the same concept at the same difficulty level.",
@@ -73,6 +180,8 @@ async function planContentDifferentiation(
 		"```json",
 		fullOriginalItemJson,
 		"```",
+		"",
+		buildShot1WidgetInfoSection(assessmentItem, logger),
 		"",
 		"## Content structure to match (widgets and identifier removed):",
 		"```json",
@@ -106,8 +215,8 @@ async function planContentDifferentiation(
 
 	// Convert the object-based structures from the AI back into our standard array-based format.
 	const transformedPlans = choice.message.parsed.plans.map((plan: unknown) => transformObjectsToArrays(plan))
-	// biome-ignore lint: Type assertion needed after transformation from AI response
-	const finalPlans = transformedPlans as any as ContentPlan[]
+	// Narrowed by zodResponseFormat schema; treat as ContentPlan[]
+	const finalPlans = transformedPlans as unknown as ContentPlan[]
 
 	// Post-validation: Ensure structural integrity of the generated plans.
 	for (const plan of finalPlans) {
@@ -118,14 +227,11 @@ async function planContentDifferentiation(
 
 		// 1) Interaction keys must match exactly
 		const sourceInteractions = assessmentItem.interactions
-		// biome-ignore lint: Type assertion needed for runtime validation
-		const planObj = plan as any
-		const planInteractions = planObj.interactions
+		const planInteractionsUnknown = getProp(plan, "interactions")
+		const planInteractions = planInteractionsUnknown
 		const sourceKeys = sourceInteractions ? Object.keys(sourceInteractions).sort() : []
 		const planKeys =
-			planInteractions && typeof planInteractions === "object" && planInteractions !== null
-				? Object.keys(planInteractions).sort()
-				: []
+			isRecord(planInteractions) ? Object.keys(planInteractions).sort() : []
 		if (JSON.stringify(sourceKeys) !== JSON.stringify(planKeys)) {
 			logger.error("plan interaction keys do not match source", { sourceKeys, planKeys })
 			throw errors.new("structural validation failed: interaction keys mismatch")
@@ -133,10 +239,8 @@ async function planContentDifferentiation(
 
 		// Helper to get array length for a given key if present; returns -1 when not an array
 		function arrayLengthOfKey(obj: unknown, key: string): number {
-			if (typeof obj !== "object" || obj === null) return -1
-			// biome-ignore lint: Type assertion needed for runtime property access
-			const objRec = obj as any
-			const value = objRec[key]
+			if (!isRecord(obj)) return -1
+			const value = obj[key]
 			return Array.isArray(value) ? value.length : -1
 		}
 
@@ -152,13 +256,9 @@ async function planContentDifferentiation(
 
 		// 3) For each interaction, enforce choices length equality when choices arrays exist
 		for (const key of sourceKeys) {
-			// biome-ignore lint: Type assertion needed for runtime property access
-			const sourceInteractionsObj = sourceInteractions as any
-			const srcInteraction = sourceInteractionsObj[key]
-			// biome-ignore lint: Type assertion needed for runtime property access
-			const planInteractionsObj = planInteractions as any
-			const planInteraction = planInteractionsObj ? planInteractionsObj[key] : undefined
-			const srcChoicesLen = arrayLengthOfKey(srcInteraction, "choices")
+			const srcInteraction = isRecord(sourceInteractions) ? sourceInteractions[key] : undefined
+			const planInteraction = isRecord(planInteractions) ? planInteractions[key] : undefined
+		const srcChoicesLen = arrayLengthOfKey(srcInteraction, "choices")
 			const planChoicesLen = arrayLengthOfKey(planInteraction, "choices")
 			if (srcChoicesLen !== -1 || planChoicesLen !== -1) {
 				if (srcChoicesLen !== planChoicesLen) {
@@ -309,8 +409,11 @@ export async function differentiateAssessmentItem(
 				logger.error("source widget is missing a 'type' property", { key })
 				throw errors.new("invalid source item: widget missing type")
 			}
-			// biome-ignore lint: Type assertion needed after runtime validation
-			widgetTypes[key] = widget.type as any
+			if (!isWidgetTypeName(widget.type)) {
+				logger.error("source widget has unknown type", { key, typeName: widget.type })
+				throw errors.new("invalid source item: unknown widget type")
+			}
+			widgetTypes[key] = widget.type
 		}
 	}
 
