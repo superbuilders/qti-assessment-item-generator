@@ -1,5 +1,61 @@
 // Bun Snapshot v1, https://bun.sh/docs/test/snapshots
 
+exports[`QTI Compiler End-to-End Tests should produce consistent XML output for "probability-not-purple-spinner" 1`] = `
+"<?xml version="1.0" encoding="UTF-8"?>
+<qti-assessment-item
+    xmlns="http://www.imsglobal.org/xsd/imsqtiasi_v3p0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqtiasi_v3p0 https://purl.imsglobal.org/spec/qti/v3p0/schema/xsd/imsqti_asiv3p0p1_v1p0.xsd http://www.w3.org/1998/Math/MathML https://purl.imsglobal.org/spec/mathml/v3p0/schema/xsd/mathml3.xsd"
+    identifier="probability-not-purple-spinner"
+    title="Probability of not purple on a spinner"
+    time-dependent="false"
+    xml:lang="en-US">
+    <qti-response-declaration identifier="RESPONSE" cardinality="single" base-type="string">
+        <qti-correct-response>
+            <qti-value>3/4</qti-value>
+        </qti-correct-response>
+        <qti-mapping default-value="0">
+            <qti-map-entry map-key="3/4" mapped-value="1"/>
+        </qti-mapping>
+    </qti-response-declaration>
+    <qti-outcome-declaration identifier="SCORE" cardinality="single" base-type="float">
+        <qti-default-value><qti-value>0</qti-value></qti-default-value>
+    </qti-outcome-declaration>
+    <qti-outcome-declaration identifier="FEEDBACK" cardinality="single" base-type="identifier"/>
+    <qti-outcome-declaration identifier="FEEDBACK-INLINE" cardinality="multiple" base-type="identifier"/>
+    <qti-item-body>
+        <p>You spin the spinner shown below once. The spinner has <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>4</mn></math> equal sectors colored pink, purple, blue, and green.</p>
+        <p>What is <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>P</mi><mo>(</mo><mtext>not purple</mtext><mo>)</mo></math>?</p>
+        <p>If necessary, round your answer to <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>2</mn></math> decimal places.</p>
+        <p>Answer: <qti-text-entry-interaction response-identifier="RESPONSE" expected-length="4"/></p>
+        <div><img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzQ3IiBoZWlnaHQ9IjM0MCIgdmlld0JveD0iLTIwIC0yMCAzNDcgMzQwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIj48ZGVmcz48c3R5bGU+LnRpdGxlIHsgZm9udC1zaXplOiAxNnB4OyBmb250LXdlaWdodDogYm9sZDsgdGV4dC1hbmNob3I6IG1pZGRsZTsgfTwvc3R5bGU+PC9kZWZzPjxwYXRoIGQ9Ik0gMTUwIDE1MCBMIDE1MCAyMCBBIDEzMCAxMzAgMCAwIDEgMjgwIDE1MCBaIiBmaWxsPSIjMjhhZTdiIiBzdHJva2U9IiMwMDAwMDAiIHN0cm9rZS13aWR0aD0iMS41Ii8+PHBhdGggZD0iTSAxNTAgMTUwIEwgMjgwIDE1MCBBIDEzMCAxMzAgMCAwIDEgMTUwIDI4MCBaIiBmaWxsPSIjNjQ5NWVkIiBzdHJva2U9IiMwMDAwMDAiIHN0cm9rZS13aWR0aD0iMS41Ii8+PHBhdGggZD0iTSAxNTAgMTUwIEwgMTUwIDI4MCBBIDEzMCAxMzAgMCAwIDEgMjAgMTUwLjAwMDAwMDAwMDAwMDAzIFoiIGZpbGw9IiM5ZDM4YmQiIHN0cm9rZT0iIzAwMDAwMCIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48cGF0aCBkPSJNIDE1MCAxNTAgTCAyMCAxNTAuMDAwMDAwMDAwMDAwMDMgQSAxMzAgMTMwIDAgMCAxIDE0OS45OTk5OTk5OTk5OTk5NyAyMCBaIiBmaWxsPSIjZmYwMGFmIiBzdHJva2U9IiMwMDAwMDAiIHN0cm9rZS13aWR0aD0iMS41Ii8+PGcgdHJhbnNmb3JtPSJyb3RhdGUoODAsIDE1MCwgMTUwKSI+PHBvbHlnb24gcG9pbnRzPSIxNTAsMTQ0IDI5NCwxNDQgMjk0LDEzOCAzMDYsMTUwIDI5NCwxNjIgMjk0LDE1NiAxNTAsMTU2IiBmaWxsPSIjNTU1NTU1IiBzdHJva2U9IiMwMDAwMDAiIHN0cm9rZS13aWR0aD0iMSIvPjwvZz48Y2lyY2xlIGN4PSIxNTAiIGN5PSIxNTAiIHI9IjEyIiBmaWxsPSIjZmFmYWZhIiBzdHJva2U9IiMwMDAwMDAiIHN0cm9rZS13aWR0aD0iMiIvPjwvc3ZnPg==" alt="Widget visualization" /></div>
+        <qti-feedback-block outcome-identifier="FEEDBACK" identifier="CORRECT" show-hide="show">
+            <qti-content-body><p>Correct! The probability of not landing on purple is <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>3</mn><mn>4</mn></mfrac></math> = <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>0.75</mn></math> (or <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>75</mn><mo>%</mo></math>).</p></qti-content-body>
+        </qti-feedback-block>
+        <qti-feedback-block outcome-identifier="FEEDBACK" identifier="INCORRECT" show-hide="show">
+            <qti-content-body><p>Not quite. There are 3 favorable outcomes out of 4 equally likely outcomes.</p></qti-content-body>
+        </qti-feedback-block>
+    </qti-item-body>
+    <qti-response-processing>
+        
+        <qti-set-outcome-value identifier="SCORE"><qti-map-response identifier="RESPONSE"/></qti-set-outcome-value>
+        
+        <qti-response-condition>
+            <qti-response-if>
+                <qti-gt>
+                    <qti-variable identifier="SCORE"/>
+                    <qti-base-value base-type="float">0</qti-base-value>
+                </qti-gt>
+                <qti-set-outcome-value identifier="FEEDBACK"><qti-base-value base-type="identifier">CORRECT</qti-base-value></qti-set-outcome-value>
+            </qti-response-if>
+            <qti-response-else>
+                <qti-set-outcome-value identifier="FEEDBACK"><qti-base-value base-type="identifier">INCORRECT</qti-base-value></qti-set-outcome-value>
+            </qti-response-else>
+        </qti-response-condition>
+    </qti-response-processing>
+</qti-assessment-item>"
+`;
+
 exports[`QTI Compiler End-to-End Tests should produce consistent XML output for "linear-model-equation-prediction" 1`] = `
 "<?xml version="1.0" encoding="UTF-8"?>
 <qti-assessment-item
@@ -121,6 +177,59 @@ exports[`QTI Compiler End-to-End Tests should produce consistent XML output for 
 </qti-assessment-item>"
 `;
 
+exports[`QTI Compiler End-to-End Tests should produce consistent XML output for "double-number-line-ratio" 1`] = `
+"<?xml version="1.0" encoding="UTF-8"?>
+<qti-assessment-item
+    xmlns="http://www.imsglobal.org/xsd/imsqtiasi_v3p0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqtiasi_v3p0 https://purl.imsglobal.org/spec/qti/v3p0/schema/xsd/imsqti_asiv3p0p1_v1p0.xsd http://www.w3.org/1998/Math/MathML https://purl.imsglobal.org/spec/mathml/v3p0/schema/xsd/mathml3.xsd"
+    identifier="double-number-line-ratio"
+    title="Equivalent Ratios on a Double Number Line"
+    time-dependent="false"
+    xml:lang="en-US">
+    <qti-response-declaration identifier="RESPONSE" cardinality="single" base-type="identifier">
+        <qti-correct-response>
+            <qti-value>A</qti-value>
+        </qti-correct-response>
+    </qti-response-declaration>
+    <qti-outcome-declaration identifier="SCORE" cardinality="single" base-type="float">
+        <qti-default-value><qti-value>0</qti-value></qti-default-value>
+    </qti-outcome-declaration>
+    <qti-outcome-declaration identifier="FEEDBACK" cardinality="single" base-type="identifier"/>
+    <qti-outcome-declaration identifier="FEEDBACK-INLINE" cardinality="multiple" base-type="identifier"/>
+    <qti-item-body>
+        <p>Cory hikes up a hill with a constant slope. The double number line shows that after Cory hikes <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>3</mn><mtext> km</mtext></math>, their elevation is <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>120</mn><mtext> m</mtext></math>.</p>
+        <div><img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDQwIiBoZWlnaHQ9IjM0MCIgdmlld0JveD0iLTIwIC0yMCA0NDAgMzQwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjEyIj48ZGVmcz48c3R5bGU+LmxpbmUtbGFiZWwgeyBmb250LXNpemU6IDE0cHg7IGZvbnQtd2VpZ2h0OiBib2xkOyB0ZXh0LWFuY2hvcjogbWlkZGxlOyB9PC9zdHlsZT48L2RlZnM+PGxpbmUgeDE9IjIwIiB5MT0iMTAwIiB4Mj0iMzgwIiB5Mj0iMTAwIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PHRleHQgeD0iMjAwIiB5PSI4MCIgZm9udC1zaXplPSIxNCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC13ZWlnaHQ9IjcwMCI+RGlzdGFuY2UsIGtpbG9tZXRlcnM8L3RleHQ+PGxpbmUgeDE9IjIwIiB5MT0iOTUiIHgyPSIyMCIgeTI9IjEwNSIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjx0ZXh0IHg9IjIwIiB5PSIxMjAiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMzMzMzMzMiPjA8L3RleHQ+PGxpbmUgeDE9IjExMCIgeTE9Ijk1IiB4Mj0iMTEwIiB5Mj0iMTA1IiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PHRleHQgeD0iMTEwIiB5PSIxMjAiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMzMzMzMzMiPjwvdGV4dD48bGluZSB4MT0iMjAwIiB5MT0iOTUiIHgyPSIyMDAiIHkyPSIxMDUiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48dGV4dCB4PSIyMDAiIHk9IjEyMCIgZm9udC1zaXplPSIxMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzMzMzMzMyI+PC90ZXh0PjxsaW5lIHgxPSIyOTAiIHkxPSI5NSIgeDI9IjI5MCIgeTI9IjEwNSIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjx0ZXh0IHg9IjI5MCIgeT0iMTIwIiBmb250LXNpemU9IjEyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMzMzMzMzIj4zPC90ZXh0PjxsaW5lIHgxPSIzODAiIHkxPSI5NSIgeDI9IjM4MCIgeTI9IjEwNSIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjx0ZXh0IHg9IjM4MCIgeT0iMTIwIiBmb250LXNpemU9IjEyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMzMzMzMzIj48L3RleHQ+PGxpbmUgeDE9IjIwIiB5MT0iMjAwIiB4Mj0iMzgwIiB5Mj0iMjAwIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PHRleHQgeD0iMjAwIiB5PSIyMzAiIGZvbnQtc2l6ZT0iMTQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtd2VpZ2h0PSI3MDAiPkVsZXZhdGlvbiwgbWV0ZXJzPC90ZXh0PjxsaW5lIHgxPSIyMCIgeTE9IjE5NSIgeDI9IjIwIiB5Mj0iMjA1IiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PHRleHQgeD0iMjAiIHk9IjE4NSIgZm9udC1zaXplPSIxMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzMzMzMzMyI+MDwvdGV4dD48bGluZSB4MT0iMTEwIiB5MT0iMTk1IiB4Mj0iMTEwIiB5Mj0iMjA1IiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PHRleHQgeD0iMTEwIiB5PSIxODUiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMzMzMzMzMiPjwvdGV4dD48bGluZSB4MT0iMjAwIiB5MT0iMTk1IiB4Mj0iMjAwIiB5Mj0iMjA1IiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PHRleHQgeD0iMjAwIiB5PSIxODUiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMzMzMzMzMiPjwvdGV4dD48bGluZSB4MT0iMjkwIiB5MT0iMTk1IiB4Mj0iMjkwIiB5Mj0iMjA1IiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PHRleHQgeD0iMjkwIiB5PSIxODUiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMzMzMzMzMiPjEyMDwvdGV4dD48bGluZSB4MT0iMzgwIiB5MT0iMTk1IiB4Mj0iMzgwIiB5Mj0iMjA1IiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PHRleHQgeD0iMzgwIiB5PSIxODUiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMzMzMzMzMiPjwvdGV4dD48bGluZSB4MT0iMjAiIHkxPSIxMDUiIHgyPSIyMCIgeTI9IjEwOCIgc3Ryb2tlPSIjY2NjY2NjIiBzdHJva2Utd2lkdGg9IjEuNSIgc3Ryb2tlLWRhc2hhcnJheT0iMiIvPjxsaW5lIHgxPSIyMCIgeTE9IjEyNiIgeDI9IjIwIiB5Mj0iMTczIiBzdHJva2U9IiNjY2NjY2MiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtZGFzaGFycmF5PSIyIi8+PGxpbmUgeDE9IjIwIiB5MT0iMTkxIiB4Mj0iMjAiIHkyPSIxOTUiIHN0cm9rZT0iI2NjY2NjYyIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1kYXNoYXJyYXk9IjIiLz48bGluZSB4MT0iMTEwIiB5MT0iMTA1IiB4Mj0iMTEwIiB5Mj0iMTk1IiBzdHJva2U9IiNjY2NjY2MiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtZGFzaGFycmF5PSIyIi8+PGxpbmUgeDE9IjIwMCIgeTE9IjEwNSIgeDI9IjIwMCIgeTI9IjE5NSIgc3Ryb2tlPSIjY2NjY2NjIiBzdHJva2Utd2lkdGg9IjEuNSIgc3Ryb2tlLWRhc2hhcnJheT0iMiIvPjxsaW5lIHgxPSIyOTAiIHkxPSIxMDUiIHgyPSIyOTAiIHkyPSIxMDgiIHN0cm9rZT0iI2NjY2NjYyIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1kYXNoYXJyYXk9IjIiLz48bGluZSB4MT0iMjkwIiB5MT0iMTI2IiB4Mj0iMjkwIiB5Mj0iMTczIiBzdHJva2U9IiNjY2NjY2MiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtZGFzaGFycmF5PSIyIi8+PGxpbmUgeDE9IjI5MCIgeTE9IjE5MSIgeDI9IjI5MCIgeTI9IjE5NSIgc3Ryb2tlPSIjY2NjY2NjIiBzdHJva2Utd2lkdGg9IjEuNSIgc3Ryb2tlLWRhc2hhcnJheT0iMiIvPjxsaW5lIHgxPSIzODAiIHkxPSIxMDUiIHgyPSIzODAiIHkyPSIxOTUiIHN0cm9rZT0iI2NjY2NjYyIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1kYXNoYXJyYXk9IjIiLz48L3N2Zz4=" alt="Widget visualization" /></div>
+        <div><div><qti-choice-interaction response-identifier="RESPONSE" shuffle="true" min-choices="1" max-choices="1">
+            <qti-prompt>Select the double number line that shows the other values of distance and elevation.</qti-prompt>
+            <qti-simple-choice identifier="A"><div><img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDQwIiBoZWlnaHQ9IjM0MCIgdmlld0JveD0iLTIwIC0yMCA0NDAgMzQwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjEyIj48ZGVmcz48c3R5bGU+LmxpbmUtbGFiZWwgeyBmb250LXNpemU6IDE0cHg7IGZvbnQtd2VpZ2h0OiBib2xkOyB0ZXh0LWFuY2hvcjogbWlkZGxlOyB9PC9zdHlsZT48L2RlZnM+PGxpbmUgeDE9IjIwIiB5MT0iMTAwIiB4Mj0iMzgwIiB5Mj0iMTAwIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PHRleHQgeD0iMjAwIiB5PSI4MCIgZm9udC1zaXplPSIxNCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC13ZWlnaHQ9IjcwMCI+RGlzdGFuY2UsIGtpbG9tZXRlcnM8L3RleHQ+PGxpbmUgeDE9IjIwIiB5MT0iOTUiIHgyPSIyMCIgeTI9IjEwNSIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjx0ZXh0IHg9IjIwIiB5PSIxMjAiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMzMzMzMzMiPjA8L3RleHQ+PGxpbmUgeDE9IjExMCIgeTE9Ijk1IiB4Mj0iMTEwIiB5Mj0iMTA1IiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PHRleHQgeD0iMTEwIiB5PSIxMjAiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMzMzMzMzMiPjE8L3RleHQ+PGxpbmUgeDE9IjIwMCIgeTE9Ijk1IiB4Mj0iMjAwIiB5Mj0iMTA1IiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PHRleHQgeD0iMjAwIiB5PSIxMjAiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMzMzMzMzMiPjI8L3RleHQ+PGxpbmUgeDE9IjI5MCIgeTE9Ijk1IiB4Mj0iMjkwIiB5Mj0iMTA1IiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PHRleHQgeD0iMjkwIiB5PSIxMjAiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMzMzMzMzMiPjM8L3RleHQ+PGxpbmUgeDE9IjM4MCIgeTE9Ijk1IiB4Mj0iMzgwIiB5Mj0iMTA1IiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PHRleHQgeD0iMzgwIiB5PSIxMjAiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMzMzMzMzMiPjQ8L3RleHQ+PGxpbmUgeDE9IjIwIiB5MT0iMjAwIiB4Mj0iMzgwIiB5Mj0iMjAwIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PHRleHQgeD0iMjAwIiB5PSIyMzAiIGZvbnQtc2l6ZT0iMTQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtd2VpZ2h0PSI3MDAiPkVsZXZhdGlvbiwgbWV0ZXJzPC90ZXh0PjxsaW5lIHgxPSIyMCIgeTE9IjE5NSIgeDI9IjIwIiB5Mj0iMjA1IiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PHRleHQgeD0iMjAiIHk9IjE4NSIgZm9udC1zaXplPSIxMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzMzMzMzMyI+MDwvdGV4dD48bGluZSB4MT0iMTEwIiB5MT0iMTk1IiB4Mj0iMTEwIiB5Mj0iMjA1IiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PHRleHQgeD0iMTEwIiB5PSIxODUiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMzMzMzMzMiPjQwPC90ZXh0PjxsaW5lIHgxPSIyMDAiIHkxPSIxOTUiIHgyPSIyMDAiIHkyPSIyMDUiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48dGV4dCB4PSIyMDAiIHk9IjE4NSIgZm9udC1zaXplPSIxMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzMzMzMzMyI+ODA8L3RleHQ+PGxpbmUgeDE9IjI5MCIgeTE9IjE5NSIgeDI9IjI5MCIgeTI9IjIwNSIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjx0ZXh0IHg9IjI5MCIgeT0iMTg1IiBmb250LXNpemU9IjEyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMzMzMzMzIj4xMjA8L3RleHQ+PGxpbmUgeDE9IjM4MCIgeTE9IjE5NSIgeDI9IjM4MCIgeTI9IjIwNSIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjx0ZXh0IHg9IjM4MCIgeT0iMTg1IiBmb250LXNpemU9IjEyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMzMzMzMzIj4xNjA8L3RleHQ+PGxpbmUgeDE9IjIwIiB5MT0iMTA1IiB4Mj0iMjAiIHkyPSIxMDgiIHN0cm9rZT0iI2NjY2NjYyIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1kYXNoYXJyYXk9IjIiLz48bGluZSB4MT0iMjAiIHkxPSIxMjYiIHgyPSIyMCIgeTI9IjE3MyIgc3Ryb2tlPSIjY2NjY2NjIiBzdHJva2Utd2lkdGg9IjEuNSIgc3Ryb2tlLWRhc2hhcnJheT0iMiIvPjxsaW5lIHgxPSIyMCIgeTE9IjE5MSIgeDI9IjIwIiB5Mj0iMTk1IiBzdHJva2U9IiNjY2NjY2MiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtZGFzaGFycmF5PSIyIi8+PGxpbmUgeDE9IjExMCIgeTE9IjEwNSIgeDI9IjExMCIgeTI9IjEwOCIgc3Ryb2tlPSIjY2NjY2NjIiBzdHJva2Utd2lkdGg9IjEuNSIgc3Ryb2tlLWRhc2hhcnJheT0iMiIvPjxsaW5lIHgxPSIxMTAiIHkxPSIxMjYiIHgyPSIxMTAiIHkyPSIxNzMiIHN0cm9rZT0iI2NjY2NjYyIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1kYXNoYXJyYXk9IjIiLz48bGluZSB4MT0iMTEwIiB5MT0iMTkxIiB4Mj0iMTEwIiB5Mj0iMTk1IiBzdHJva2U9IiNjY2NjY2MiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtZGFzaGFycmF5PSIyIi8+PGxpbmUgeDE9IjIwMCIgeTE9IjEwNSIgeDI9IjIwMCIgeTI9IjEwOCIgc3Ryb2tlPSIjY2NjY2NjIiBzdHJva2Utd2lkdGg9IjEuNSIgc3Ryb2tlLWRhc2hhcnJheT0iMiIvPjxsaW5lIHgxPSIyMDAiIHkxPSIxMjYiIHgyPSIyMDAiIHkyPSIxNzMiIHN0cm9rZT0iI2NjY2NjYyIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1kYXNoYXJyYXk9IjIiLz48bGluZSB4MT0iMjAwIiB5MT0iMTkxIiB4Mj0iMjAwIiB5Mj0iMTk1IiBzdHJva2U9IiNjY2NjY2MiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtZGFzaGFycmF5PSIyIi8+PGxpbmUgeDE9IjI5MCIgeTE9IjEwNSIgeDI9IjI5MCIgeTI9IjEwOCIgc3Ryb2tlPSIjY2NjY2NjIiBzdHJva2Utd2lkdGg9IjEuNSIgc3Ryb2tlLWRhc2hhcnJheT0iMiIvPjxsaW5lIHgxPSIyOTAiIHkxPSIxMjYiIHgyPSIyOTAiIHkyPSIxNzMiIHN0cm9rZT0iI2NjY2NjYyIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1kYXNoYXJyYXk9IjIiLz48bGluZSB4MT0iMjkwIiB5MT0iMTkxIiB4Mj0iMjkwIiB5Mj0iMTk1IiBzdHJva2U9IiNjY2NjY2MiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtZGFzaGFycmF5PSIyIi8+PGxpbmUgeDE9IjM4MCIgeTE9IjEwNSIgeDI9IjM4MCIgeTI9IjEwOCIgc3Ryb2tlPSIjY2NjY2NjIiBzdHJva2Utd2lkdGg9IjEuNSIgc3Ryb2tlLWRhc2hhcnJheT0iMiIvPjxsaW5lIHgxPSIzODAiIHkxPSIxMjYiIHgyPSIzODAiIHkyPSIxNzMiIHN0cm9rZT0iI2NjY2NjYyIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1kYXNoYXJyYXk9IjIiLz48bGluZSB4MT0iMzgwIiB5MT0iMTkxIiB4Mj0iMzgwIiB5Mj0iMTk1IiBzdHJva2U9IiNjY2NjY2MiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtZGFzaGFycmF5PSIyIi8+PC9zdmc+" alt="Widget visualization" /></div></qti-simple-choice>
+            <qti-simple-choice identifier="B"><div><img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDQwIiBoZWlnaHQ9IjM0MCIgdmlld0JveD0iLTIwIC0yMCA0NDAgMzQwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjEyIj48ZGVmcz48c3R5bGU+LmxpbmUtbGFiZWwgeyBmb250LXNpemU6IDE0cHg7IGZvbnQtd2VpZ2h0OiBib2xkOyB0ZXh0LWFuY2hvcjogbWlkZGxlOyB9PC9zdHlsZT48L2RlZnM+PGxpbmUgeDE9IjIwIiB5MT0iMTAwIiB4Mj0iMzgwIiB5Mj0iMTAwIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PHRleHQgeD0iMjAwIiB5PSI4MCIgZm9udC1zaXplPSIxNCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC13ZWlnaHQ9IjcwMCI+RGlzdGFuY2UsIGtpbG9tZXRlcnM8L3RleHQ+PGxpbmUgeDE9IjIwIiB5MT0iOTUiIHgyPSIyMCIgeTI9IjEwNSIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjx0ZXh0IHg9IjIwIiB5PSIxMjAiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMzMzMzMzMiPjA8L3RleHQ+PGxpbmUgeDE9IjExMCIgeTE9Ijk1IiB4Mj0iMTEwIiB5Mj0iMTA1IiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PHRleHQgeD0iMTEwIiB5PSIxMjAiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMzMzMzMzMiPjE8L3RleHQ+PGxpbmUgeDE9IjIwMCIgeTE9Ijk1IiB4Mj0iMjAwIiB5Mj0iMTA1IiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PHRleHQgeD0iMjAwIiB5PSIxMjAiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMzMzMzMzMiPjI8L3RleHQ+PGxpbmUgeDE9IjI5MCIgeTE9Ijk1IiB4Mj0iMjkwIiB5Mj0iMTA1IiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PHRleHQgeD0iMjkwIiB5PSIxMjAiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMzMzMzMzMiPjM8L3RleHQ+PGxpbmUgeDE9IjM4MCIgeTE9Ijk1IiB4Mj0iMzgwIiB5Mj0iMTA1IiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PHRleHQgeD0iMzgwIiB5PSIxMjAiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMzMzMzMzMiPjQ8L3RleHQ+PGxpbmUgeDE9IjIwIiB5MT0iMjAwIiB4Mj0iMzgwIiB5Mj0iMjAwIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PHRleHQgeD0iMjAwIiB5PSIyMzAiIGZvbnQtc2l6ZT0iMTQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtd2VpZ2h0PSI3MDAiPkVsZXZhdGlvbiwgbWV0ZXJzPC90ZXh0PjxsaW5lIHgxPSIyMCIgeTE9IjE5NSIgeDI9IjIwIiB5Mj0iMjA1IiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PHRleHQgeD0iMjAiIHk9IjE4NSIgZm9udC1zaXplPSIxMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzMzMzMzMyI+MDwvdGV4dD48bGluZSB4MT0iMTEwIiB5MT0iMTk1IiB4Mj0iMTEwIiB5Mj0iMjA1IiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PHRleHQgeD0iMTEwIiB5PSIxODUiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMzMzMzMzMiPjgwPC90ZXh0PjxsaW5lIHgxPSIyMDAiIHkxPSIxOTUiIHgyPSIyMDAiIHkyPSIyMDUiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48dGV4dCB4PSIyMDAiIHk9IjE4NSIgZm9udC1zaXplPSIxMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzMzMzMzMyI+MTAwPC90ZXh0PjxsaW5lIHgxPSIyOTAiIHkxPSIxOTUiIHgyPSIyOTAiIHkyPSIyMDUiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48dGV4dCB4PSIyOTAiIHk9IjE4NSIgZm9udC1zaXplPSIxMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzMzMzMzMyI+MTIwPC90ZXh0PjxsaW5lIHgxPSIzODAiIHkxPSIxOTUiIHgyPSIzODAiIHkyPSIyMDUiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48dGV4dCB4PSIzODAiIHk9IjE4NSIgZm9udC1zaXplPSIxMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzMzMzMzMyI+MTQwPC90ZXh0PjxsaW5lIHgxPSIyMCIgeTE9IjEwNSIgeDI9IjIwIiB5Mj0iMTA4IiBzdHJva2U9IiNjY2NjY2MiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtZGFzaGFycmF5PSIyIi8+PGxpbmUgeDE9IjIwIiB5MT0iMTI2IiB4Mj0iMjAiIHkyPSIxNzMiIHN0cm9rZT0iI2NjY2NjYyIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1kYXNoYXJyYXk9IjIiLz48bGluZSB4MT0iMjAiIHkxPSIxOTEiIHgyPSIyMCIgeTI9IjE5NSIgc3Ryb2tlPSIjY2NjY2NjIiBzdHJva2Utd2lkdGg9IjEuNSIgc3Ryb2tlLWRhc2hhcnJheT0iMiIvPjxsaW5lIHgxPSIxMTAiIHkxPSIxMDUiIHgyPSIxMTAiIHkyPSIxMDgiIHN0cm9rZT0iI2NjY2NjYyIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1kYXNoYXJyYXk9IjIiLz48bGluZSB4MT0iMTEwIiB5MT0iMTI2IiB4Mj0iMTEwIiB5Mj0iMTczIiBzdHJva2U9IiNjY2NjY2MiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtZGFzaGFycmF5PSIyIi8+PGxpbmUgeDE9IjExMCIgeTE9IjE5MSIgeDI9IjExMCIgeTI9IjE5NSIgc3Ryb2tlPSIjY2NjY2NjIiBzdHJva2Utd2lkdGg9IjEuNSIgc3Ryb2tlLWRhc2hhcnJheT0iMiIvPjxsaW5lIHgxPSIyMDAiIHkxPSIxMDUiIHgyPSIyMDAiIHkyPSIxMDgiIHN0cm9rZT0iI2NjY2NjYyIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1kYXNoYXJyYXk9IjIiLz48bGluZSB4MT0iMjAwIiB5MT0iMTI2IiB4Mj0iMjAwIiB5Mj0iMTczIiBzdHJva2U9IiNjY2NjY2MiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtZGFzaGFycmF5PSIyIi8+PGxpbmUgeDE9IjIwMCIgeTE9IjE5MSIgeDI9IjIwMCIgeTI9IjE5NSIgc3Ryb2tlPSIjY2NjY2NjIiBzdHJva2Utd2lkdGg9IjEuNSIgc3Ryb2tlLWRhc2hhcnJheT0iMiIvPjxsaW5lIHgxPSIyOTAiIHkxPSIxMDUiIHgyPSIyOTAiIHkyPSIxMDgiIHN0cm9rZT0iI2NjY2NjYyIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1kYXNoYXJyYXk9IjIiLz48bGluZSB4MT0iMjkwIiB5MT0iMTI2IiB4Mj0iMjkwIiB5Mj0iMTczIiBzdHJva2U9IiNjY2NjY2MiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtZGFzaGFycmF5PSIyIi8+PGxpbmUgeDE9IjI5MCIgeTE9IjE5MSIgeDI9IjI5MCIgeTI9IjE5NSIgc3Ryb2tlPSIjY2NjY2NjIiBzdHJva2Utd2lkdGg9IjEuNSIgc3Ryb2tlLWRhc2hhcnJheT0iMiIvPjxsaW5lIHgxPSIzODAiIHkxPSIxMDUiIHgyPSIzODAiIHkyPSIxMDgiIHN0cm9rZT0iI2NjY2NjYyIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1kYXNoYXJyYXk9IjIiLz48bGluZSB4MT0iMzgwIiB5MT0iMTI2IiB4Mj0iMzgwIiB5Mj0iMTczIiBzdHJva2U9IiNjY2NjY2MiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtZGFzaGFycmF5PSIyIi8+PGxpbmUgeDE9IjM4MCIgeTE9IjE5MSIgeDI9IjM4MCIgeTI9IjE5NSIgc3Ryb2tlPSIjY2NjY2NjIiBzdHJva2Utd2lkdGg9IjEuNSIgc3Ryb2tlLWRhc2hhcnJheT0iMiIvPjwvc3ZnPg==" alt="Widget visualization" /></div></qti-simple-choice>
+        </qti-choice-interaction></div></div>
+        <qti-feedback-block outcome-identifier="FEEDBACK" identifier="CORRECT" show-hide="show">
+            <qti-content-body><p>Correct! The ratio of distance to elevation is <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>3</mn><mo>:</mo><mn>120</mn></math>, which simplifies to a unit rate of <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>1</mn><mo>:</mo><mn>40</mn></math>. For every <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>1</mn><mtext> km</mtext></math> hiked, the elevation increases by <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>40</mn><mtext> m</mtext></math>. This matches the correct number line.</p></qti-content-body>
+        </qti-feedback-block>
+        <qti-feedback-block outcome-identifier="FEEDBACK" identifier="INCORRECT" show-hide="show">
+            <qti-content-body><p>Not quite. First, find the unit rate. If Cory's elevation is <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>120</mn><mtext> m</mtext></math> after <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>3</mn><mtext> km</mtext></math>, the rate is <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mrow><mn>120</mn><mtext> m</mtext></mrow><mrow><mn>3</mn><mtext> km</mtext></mrow></mfrac><mo>=</mo><mn>40</mn></math> meters per kilometer. Use this rate to fill in the other values on the number line.</p></qti-content-body>
+        </qti-feedback-block>
+    </qti-item-body>
+    <qti-response-processing>
+        <qti-response-condition>
+            <qti-response-if>
+                <qti-and>
+                    <qti-match><qti-variable identifier="RESPONSE"/><qti-correct identifier="RESPONSE"/></qti-match>
+                </qti-and>
+                <qti-set-outcome-value identifier="SCORE"><qti-base-value base-type="float">1</qti-base-value></qti-set-outcome-value>
+                <qti-set-outcome-value identifier="FEEDBACK"><qti-base-value base-type="identifier">CORRECT</qti-base-value></qti-set-outcome-value>
+            </qti-response-if>
+            <qti-response-else>
+                <qti-set-outcome-value identifier="SCORE"><qti-base-value base-type="float">0</qti-base-value></qti-set-outcome-value>
+                <qti-set-outcome-value identifier="FEEDBACK"><qti-base-value base-type="identifier">INCORRECT</qti-base-value></qti-set-outcome-value>
+            </qti-response-else>
+        </qti-response-condition>
+    </qti-response-processing>
+</qti-assessment-item>"
+`;
+
 exports[`QTI Compiler End-to-End Tests should produce consistent XML output for "eval-fractional-exponents" 1`] = `
 "<?xml version="1.0" encoding="UTF-8"?>
 <qti-assessment-item
@@ -209,6 +318,310 @@ exports[`QTI Compiler End-to-End Tests should produce consistent XML output for 
         </qti-feedback-block>
         <qti-feedback-block outcome-identifier="FEEDBACK" identifier="INCORRECT" show-hide="show">
             <qti-content-body><p>Not quite. Make sure the largest number is on the left and the symbol correctly represents the relationship.</p></qti-content-body>
+        </qti-feedback-block>
+    </qti-item-body>
+    <qti-response-processing>
+        <qti-response-condition>
+            <qti-response-if>
+                <qti-and>
+                    <qti-match><qti-variable identifier="RESPONSE"/><qti-correct identifier="RESPONSE"/></qti-match>
+                </qti-and>
+                <qti-set-outcome-value identifier="SCORE"><qti-base-value base-type="float">1</qti-base-value></qti-set-outcome-value>
+                <qti-set-outcome-value identifier="FEEDBACK"><qti-base-value base-type="identifier">CORRECT</qti-base-value></qti-set-outcome-value>
+            </qti-response-if>
+            <qti-response-else>
+                <qti-set-outcome-value identifier="SCORE"><qti-base-value base-type="float">0</qti-base-value></qti-set-outcome-value>
+                <qti-set-outcome-value identifier="FEEDBACK"><qti-base-value base-type="identifier">INCORRECT</qti-base-value></qti-set-outcome-value>
+            </qti-response-else>
+        </qti-response-condition>
+    </qti-response-processing>
+</qti-assessment-item>"
+`;
+
+exports[`QTI Compiler End-to-End Tests should produce consistent XML output for "inequality-number-line" 1`] = `
+"<?xml version="1.0" encoding="UTF-8"?>
+<qti-assessment-item
+    xmlns="http://www.imsglobal.org/xsd/imsqtiasi_v3p0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqtiasi_v3p0 https://purl.imsglobal.org/spec/qti/v3p0/schema/xsd/imsqti_asiv3p0p1_v1p0.xsd http://www.w3.org/1998/Math/MathML https://purl.imsglobal.org/spec/mathml/v3p0/schema/xsd/mathml3.xsd"
+    identifier="inequality-number-line"
+    title="Identify an inequality from a number-line graph"
+    time-dependent="false"
+    xml:lang="en-US">
+    <qti-response-declaration identifier="RESPONSE" cardinality="single" base-type="identifier">
+        <qti-correct-response>
+            <qti-value>C</qti-value>
+        </qti-correct-response>
+    </qti-response-declaration>
+    <qti-outcome-declaration identifier="SCORE" cardinality="single" base-type="float">
+        <qti-default-value><qti-value>0</qti-value></qti-default-value>
+    </qti-outcome-declaration>
+    <qti-outcome-declaration identifier="FEEDBACK" cardinality="single" base-type="identifier"/>
+    <qti-outcome-declaration identifier="FEEDBACK-INLINE" cardinality="multiple" base-type="identifier"/>
+    <qti-item-body>
+        <div><img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTQwIiBoZWlnaHQ9IjM0MCIgdmlld0JveD0iLTIwIC0yMCA1NDAgMzQwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjEyIj48ZGVmcz48bWFya2VyIGlkPSJhcnJvdyIgdmlld0JveD0iMCAwIDEwIDEwIiByZWZYPSI4IiByZWZZPSI1IiBtYXJrZXJXaWR0aD0iNiIgbWFya2VySGVpZ2h0PSI2IiBvcmllbnQ9ImF1dG8tc3RhcnQtcmV2ZXJzZSI+PHBhdGggZD0iTSAwIDAgTCAxMCA1IEwgMCAxMCB6IiBmaWxsPSIjMzMzMzMzIi8+PC9tYXJrZXI+PG1hcmtlciBpZD0iYXJyb3ctNDI4NWY0IiB2aWV3Qm94PSIwIDAgMTAgMTAiIHJlZlg9IjYiIHJlZlk9IjUiIG1hcmtlcldpZHRoPSIzIiBtYXJrZXJIZWlnaHQ9IjMiIG9yaWVudD0iYXV0by1zdGFydC1yZXZlcnNlIj48cGF0aCBkPSJNIDAgMCBMIDEwIDUgTCAwIDEwIHoiIGZpbGw9IiM0Mjg1ZjQiLz48L21hcmtlcj48L2RlZnM+PGxpbmUgeDE9IjIwIiB5MT0iMTUwIiB4Mj0iNDgwIiB5Mj0iMTUwIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41IiBtYXJrZXItc3RhcnQ9InVybCgjYXJyb3cpIiBtYXJrZXItZW5kPSJ1cmwoI2Fycm93KSIvPjxsaW5lIHgxPSIyMCIgeTE9IjE0MiIgeDI9IjIwIiB5Mj0iMTU4IiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PHRleHQgeD0iMjAiIHk9IjE3NSIgZm9udC1zaXplPSIxMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzMzMzMzMyI+LTU8L3RleHQ+PGxpbmUgeDE9IjY2IiB5MT0iMTQyIiB4Mj0iNjYiIHkyPSIxNTgiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48dGV4dCB4PSI2NiIgeT0iMTc1IiBmb250LXNpemU9IjEyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMzMzMzMzIj4tNDwvdGV4dD48bGluZSB4MT0iMTEyIiB5MT0iMTQyIiB4Mj0iMTEyIiB5Mj0iMTU4IiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PHRleHQgeD0iMTEyIiB5PSIxNzUiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMzMzMzMzMiPi0zPC90ZXh0PjxsaW5lIHgxPSIxNTgiIHkxPSIxNDIiIHgyPSIxNTgiIHkyPSIxNTgiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48dGV4dCB4PSIxNTgiIHk9IjE3NSIgZm9udC1zaXplPSIxMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzMzMzMzMyI+LTI8L3RleHQ+PGxpbmUgeDE9IjIwNCIgeTE9IjE0MiIgeDI9IjIwNCIgeTI9IjE1OCIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjx0ZXh0IHg9IjIwNCIgeT0iMTc1IiBmb250LXNpemU9IjEyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMzMzMzMzIj4tMTwvdGV4dD48bGluZSB4MT0iMjUwIiB5MT0iMTQyIiB4Mj0iMjUwIiB5Mj0iMTU4IiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PHRleHQgeD0iMjUwIiB5PSIxNzUiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMzMzMzMzMiPjA8L3RleHQ+PGxpbmUgeDE9IjI5NiIgeTE9IjE0MiIgeDI9IjI5NiIgeTI9IjE1OCIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjx0ZXh0IHg9IjI5NiIgeT0iMTc1IiBmb250LXNpemU9IjEyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMzMzMzMzIj4xPC90ZXh0PjxsaW5lIHgxPSIzNDIiIHkxPSIxNDIiIHgyPSIzNDIiIHkyPSIxNTgiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48dGV4dCB4PSIzNDIiIHk9IjE3NSIgZm9udC1zaXplPSIxMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzMzMzMzMyI+MjwvdGV4dD48bGluZSB4MT0iMzg4IiB5MT0iMTQyIiB4Mj0iMzg4IiB5Mj0iMTU4IiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PHRleHQgeD0iMzg4IiB5PSIxNzUiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMzMzMzMzMiPjM8L3RleHQ+PGxpbmUgeDE9IjQzNCIgeTE9IjE0MiIgeDI9IjQzNCIgeTI9IjE1OCIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjx0ZXh0IHg9IjQzNCIgeT0iMTc1IiBmb250LXNpemU9IjEyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMzMzMzMzIj40PC90ZXh0PjxsaW5lIHgxPSI0ODAiIHkxPSIxNDIiIHgyPSI0ODAiIHkyPSIxNTgiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48dGV4dCB4PSI0ODAiIHk9IjE3NSIgZm9udC1zaXplPSIxMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzMzMzMzMyI+NTwvdGV4dD48bGluZSB4MT0iMjUwIiB5MT0iMTUwIiB4Mj0iNDgwIiB5Mj0iMTUwIiBzdHJva2U9IiM0Mjg1ZjQiIHN0cm9rZS13aWR0aD0iNCIgc3Ryb2tlLWxpbmVjYXA9ImJ1dHQiIG1hcmtlci1lbmQ9InVybCgjYXJyb3ctNDI4NWY0KSIvPjxjaXJjbGUgY3g9IjI1MCIgY3k9IjE1MCIgcj0iNSIgZmlsbD0iI2ZhZmFmYSIgc3Ryb2tlPSIjNDI4NWY0IiBzdHJva2Utd2lkdGg9IjEuNSIvPjwvc3ZnPg==" alt="Widget visualization" /></div>
+        <div><div><qti-choice-interaction response-identifier="RESPONSE" shuffle="true" min-choices="1" max-choices="1">
+            <qti-prompt>Choose the inequality that represents the graph.</qti-prompt>
+            <qti-simple-choice identifier="A"><p><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi><mo>&lt;</mo><mn>0</mn></math></p></qti-simple-choice>
+            <qti-simple-choice identifier="B"><p><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi><mo>≤</mo><mn>0</mn></math></p></qti-simple-choice>
+            <qti-simple-choice identifier="C"><p><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi><mo>&gt;</mo><mn>0</mn></math></p></qti-simple-choice>
+            <qti-simple-choice identifier="D"><p><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi><mo>≥</mo><mn>0</mn></math></p></qti-simple-choice>
+        </qti-choice-interaction></div></div>
+        <qti-feedback-block outcome-identifier="FEEDBACK" identifier="CORRECT" show-hide="show">
+            <qti-content-body><p>Correct! The graph shows an open point at <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>0</mn></math> with an arrow to the right, representing all values strictly greater than <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>0</mn></math>, so the inequality is <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi><mo>&gt;</mo><mn>0</mn></math>.</p></qti-content-body>
+        </qti-feedback-block>
+        <qti-feedback-block outcome-identifier="FEEDBACK" identifier="INCORRECT" show-hide="show">
+            <qti-content-body><p>Not quite. The open point at <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>0</mn></math> means <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>0</mn></math> itself is not included, and the arrow pointing right indicates values greater than <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>0</mn></math>.</p></qti-content-body>
+        </qti-feedback-block>
+    </qti-item-body>
+    <qti-response-processing>
+        <qti-response-condition>
+            <qti-response-if>
+                <qti-and>
+                    <qti-match><qti-variable identifier="RESPONSE"/><qti-correct identifier="RESPONSE"/></qti-match>
+                </qti-and>
+                <qti-set-outcome-value identifier="SCORE"><qti-base-value base-type="float">1</qti-base-value></qti-set-outcome-value>
+                <qti-set-outcome-value identifier="FEEDBACK"><qti-base-value base-type="identifier">CORRECT</qti-base-value></qti-set-outcome-value>
+            </qti-response-if>
+            <qti-response-else>
+                <qti-set-outcome-value identifier="SCORE"><qti-base-value base-type="float">0</qti-base-value></qti-set-outcome-value>
+                <qti-set-outcome-value identifier="FEEDBACK"><qti-base-value base-type="identifier">INCORRECT</qti-base-value></qti-set-outcome-value>
+            </qti-response-else>
+        </qti-response-condition>
+    </qti-response-processing>
+</qti-assessment-item>"
+`;
+
+exports[`QTI Compiler End-to-End Tests should produce consistent XML output for "vertical-number-line-comparison" 1`] = `
+"<?xml version="1.0" encoding="UTF-8"?>
+<qti-assessment-item
+    xmlns="http://www.imsglobal.org/xsd/imsqtiasi_v3p0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqtiasi_v3p0 https://purl.imsglobal.org/spec/qti/v3p0/schema/xsd/imsqti_asiv3p0p1_v1p0.xsd http://www.w3.org/1998/Math/MathML https://purl.imsglobal.org/spec/mathml/v3p0/schema/xsd/mathml3.xsd"
+    identifier="vertical-number-line-comparison"
+    title="Compare numbers on a vertical number line"
+    time-dependent="false"
+    xml:lang="en-US">
+    <qti-response-declaration identifier="RESPONSE_POS" cardinality="single" base-type="identifier">
+        <qti-correct-response>
+            <qti-value>ABOVE</qti-value>
+        </qti-correct-response>
+    </qti-response-declaration>
+    <qti-response-declaration identifier="RESPONSE_COMP" cardinality="single" base-type="identifier">
+        <qti-correct-response>
+            <qti-value>GT</qti-value>
+        </qti-correct-response>
+    </qti-response-declaration>
+    <qti-outcome-declaration identifier="SCORE" cardinality="single" base-type="float">
+        <qti-default-value><qti-value>0</qti-value></qti-default-value>
+    </qti-outcome-declaration>
+    <qti-outcome-declaration identifier="FEEDBACK" cardinality="single" base-type="identifier"/>
+    <qti-outcome-declaration identifier="FEEDBACK-INLINE" cardinality="multiple" base-type="identifier"/>
+    <qti-item-body>
+        <p>Use the number line to compare the numbers.</p>
+        <div><img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDQ1IiBoZWlnaHQ9IjM5MCIgdmlld0JveD0iLTIwIC0yMCA0NDUgMzkwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjEyIj48bGluZSB4MT0iMTUwIiB5MT0iMjAiIHgyPSIxNTAiIHkyPSIzMzAiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIyIi8+PGxpbmUgeDE9IjE0NSIgeTE9IjMzMCIgeDI9IjE1MCIgeTI9IjMzMCIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjx0ZXh0IHg9IjE0MCIgeT0iMzM0IiBmb250LXNpemU9IjExIiB0ZXh0LWFuY2hvcj0iZW5kIiBmaWxsPSIjMzMzMzMzIj4tODwvdGV4dD48bGluZSB4MT0iMTQ1IiB5MT0iMjY4IiB4Mj0iMTUwIiB5Mj0iMjY4IiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PHRleHQgeD0iMTQwIiB5PSIyNzIiIGZvbnQtc2l6ZT0iMTEiIHRleHQtYW5jaG9yPSJlbmQiIGZpbGw9IiMzMzMzMzMiPi02PC90ZXh0PjxsaW5lIHgxPSIxNDUiIHkxPSIyMDYiIHgyPSIxNTAiIHkyPSIyMDYiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48dGV4dCB4PSIxNDAiIHk9IjIxMCIgZm9udC1zaXplPSIxMSIgdGV4dC1hbmNob3I9ImVuZCIgZmlsbD0iIzMzMzMzMyI+LTQ8L3RleHQ+PGxpbmUgeDE9IjE0NSIgeTE9IjE0NCIgeDI9IjE1MCIgeTI9IjE0NCIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjx0ZXh0IHg9IjE0MCIgeT0iMTQ4IiBmb250LXNpemU9IjExIiB0ZXh0LWFuY2hvcj0iZW5kIiBmaWxsPSIjMzMzMzMzIj4tMjwvdGV4dD48bGluZSB4MT0iMTQ1IiB5MT0iODIiIHgyPSIxNTAiIHkyPSI4MiIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjx0ZXh0IHg9IjE0MCIgeT0iODYiIGZvbnQtc2l6ZT0iMTEiIHRleHQtYW5jaG9yPSJlbmQiIGZpbGw9IiMzMzMzMzMiPjA8L3RleHQ+PGxpbmUgeDE9IjE0NSIgeTE9IjIwIiB4Mj0iMTUwIiB5Mj0iMjAiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48dGV4dCB4PSIxNDAiIHk9IjI0IiBmb250LXNpemU9IjExIiB0ZXh0LWFuY2hvcj0iZW5kIiBmaWxsPSIjMzMzMzMzIj4yPC90ZXh0PjxjaXJjbGUgY3g9IjE1MCIgY3k9IjEyNS40IiByPSI1IiBmaWxsPSIjODAwMDgwIiBzdHJva2U9IiM4MDAwODAiIHN0cm9rZS13aWR0aD0iMSIvPjxmb3JlaWduT2JqZWN0IHg9IjE2NSIgeT0iMTA5LjQiIHdpZHRoPSIyNDAiIGhlaWdodD0iMzIiPjwhRE9DVFlQRSBodG1sPjxkaXYgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGh0bWwiIHN0eWxlPSJkaXNwbGF5OmZsZXg7YWxpZ24taXRlbXM6Y2VudGVyO2p1c3RpZnktY29udGVudDpmbGV4LXN0YXJ0O3dpZHRoOjEwMCU7aGVpZ2h0OjEwMCU7bGluZS1oZWlnaHQ6MTtmb250LWZhbWlseTpzYW5zLXNlcmlmO2NvbG9yOiM4MDAwODA7Ij48bWF0aCB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMTk5OC9NYXRoL01hdGhNTCIgZGlzcGxheT0iaW5saW5lIiBzdHlsZT0iZm9udC1zaXplOjE5LjJweDsiPjxtbz4tPC9tbz48bW4+MS40PC9tbj48L21hdGg+PC9kaXY+PC9mb3JlaWduT2JqZWN0PjxjaXJjbGUgY3g9IjE1MCIgY3k9IjI4MC40MDAwMDAwMDAwMDAwMyIgcj0iNSIgZmlsbD0iIzgwMDAwMCIgc3Ryb2tlPSIjODAwMDAwIiBzdHJva2Utd2lkdGg9IjEiLz48Zm9yZWlnbk9iamVjdCB4PSIxNjUiIHk9IjI2NC40MDAwMDAwMDAwMDAwMyIgd2lkdGg9IjI0MCIgaGVpZ2h0PSIzMiI+PCFET0NUWVBFIGh0bWw+PGRpdiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94aHRtbCIgc3R5bGU9ImRpc3BsYXk6ZmxleDthbGlnbi1pdGVtczpjZW50ZXI7anVzdGlmeS1jb250ZW50OmZsZXgtc3RhcnQ7d2lkdGg6MTAwJTtoZWlnaHQ6MTAwJTtsaW5lLWhlaWdodDoxO2ZvbnQtZmFtaWx5OnNhbnMtc2VyaWY7Y29sb3I6IzgwMDAwMDsiPjxtYXRoIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8xOTk4L01hdGgvTWF0aE1MIiBkaXNwbGF5PSJpbmxpbmUiIHN0eWxlPSJmb250LXNpemU6MTkuMnB4OyI+PG1vPi08L21vPjxtbj42LjQ8L21uPjwvbWF0aD48L2Rpdj48L2ZvcmVpZ25PYmplY3Q+PC9zdmc+" alt="Widget visualization" /></div>
+        <p><math xmlns="http://www.w3.org/1998/Math/MathML"><mo>-</mo><mn>1.4</mn></math> is <qti-inline-choice-interaction response-identifier="RESPONSE_POS" shuffle="true">
+                <qti-inline-choice identifier="ABOVE">above</qti-inline-choice>
+                <qti-inline-choice identifier="BELOW">below</qti-inline-choice>
+            </qti-inline-choice-interaction> <math xmlns="http://www.w3.org/1998/Math/MathML"><mo>-</mo><mn>6.4</mn></math>, so <math xmlns="http://www.w3.org/1998/Math/MathML"><mo>-</mo><mn>1.4</mn></math> is <qti-inline-choice-interaction response-identifier="RESPONSE_COMP" shuffle="true">
+                <qti-inline-choice identifier="GT">greater than</qti-inline-choice>
+                <qti-inline-choice identifier="LT">less than</qti-inline-choice>
+            </qti-inline-choice-interaction> <math xmlns="http://www.w3.org/1998/Math/MathML"><mo>-</mo><mn>6.4</mn></math>.</p>
+        <qti-feedback-block outcome-identifier="FEEDBACK" identifier="CORRECT" show-hide="show">
+            <qti-content-body><p>Correct! On a vertical number line, numbers higher up are greater. Since <math xmlns="http://www.w3.org/1998/Math/MathML"><mo>-</mo><mn>1.4</mn></math> is above <math xmlns="http://www.w3.org/1998/Math/MathML"><mo>-</mo><mn>6.4</mn></math>, it is the greater number.</p></qti-content-body>
+        </qti-feedback-block>
+        <qti-feedback-block outcome-identifier="FEEDBACK" identifier="INCORRECT" show-hide="show">
+            <qti-content-body><p>Not quite. Look at the positions on the number line. <math xmlns="http://www.w3.org/1998/Math/MathML"><mo>-</mo><mn>1.4</mn></math> is located higher up than <math xmlns="http://www.w3.org/1998/Math/MathML"><mo>-</mo><mn>6.4</mn></math>. This means <math xmlns="http://www.w3.org/1998/Math/MathML"><mo>-</mo><mn>1.4</mn></math> is above <math xmlns="http://www.w3.org/1998/Math/MathML"><mo>-</mo><mn>6.4</mn></math>, and therefore <math xmlns="http://www.w3.org/1998/Math/MathML"><mo>-</mo><mn>1.4</mn></math> is greater than <math xmlns="http://www.w3.org/1998/Math/MathML"><mo>-</mo><mn>6.4</mn></math>.</p></qti-content-body>
+        </qti-feedback-block>
+    </qti-item-body>
+    <qti-response-processing>
+        <qti-response-condition>
+            <qti-response-if>
+                <qti-and>
+                    <qti-match><qti-variable identifier="RESPONSE_POS"/><qti-correct identifier="RESPONSE_POS"/></qti-match>
+                    <qti-match><qti-variable identifier="RESPONSE_COMP"/><qti-correct identifier="RESPONSE_COMP"/></qti-match>
+                </qti-and>
+                <qti-set-outcome-value identifier="SCORE"><qti-base-value base-type="float">1</qti-base-value></qti-set-outcome-value>
+                <qti-set-outcome-value identifier="FEEDBACK"><qti-base-value base-type="identifier">CORRECT</qti-base-value></qti-set-outcome-value>
+            </qti-response-if>
+            <qti-response-else>
+                <qti-set-outcome-value identifier="SCORE"><qti-base-value base-type="float">0</qti-base-value></qti-set-outcome-value>
+                <qti-set-outcome-value identifier="FEEDBACK"><qti-base-value base-type="identifier">INCORRECT</qti-base-value></qti-set-outcome-value>
+            </qti-response-else>
+        </qti-response-condition>
+    </qti-response-processing>
+</qti-assessment-item>"
+`;
+
+exports[`QTI Compiler End-to-End Tests should produce consistent XML output for "two-way-frequency-table-cold-study" 1`] = `
+"<?xml version="1.0" encoding="UTF-8"?>
+<qti-assessment-item
+    xmlns="http://www.imsglobal.org/xsd/imsqtiasi_v3p0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqtiasi_v3p0 https://purl.imsglobal.org/spec/qti/v3p0/schema/xsd/imsqti_asiv3p0p1_v1p0.xsd http://www.w3.org/1998/Math/MathML https://purl.imsglobal.org/spec/mathml/v3p0/schema/xsd/mathml3.xsd"
+    identifier="two-way-frequency-table-cold-study"
+    title="Complete a Two-Way Frequency Table"
+    time-dependent="false"
+    xml:lang="en-US">
+    <qti-response-declaration identifier="RESP_A" cardinality="single" base-type="integer">
+        <qti-correct-response>
+            <qti-value>23</qti-value>
+        </qti-correct-response>
+        <qti-mapping default-value="0">
+            <qti-map-entry map-key="23" mapped-value="1"/>
+        </qti-mapping>
+    </qti-response-declaration>
+    <qti-response-declaration identifier="RESP_B" cardinality="single" base-type="integer">
+        <qti-correct-response>
+            <qti-value>20</qti-value>
+        </qti-correct-response>
+        <qti-mapping default-value="0">
+            <qti-map-entry map-key="20" mapped-value="1"/>
+        </qti-mapping>
+    </qti-response-declaration>
+    <qti-response-declaration identifier="RESP_C" cardinality="single" base-type="integer">
+        <qti-correct-response>
+            <qti-value>27</qti-value>
+        </qti-correct-response>
+        <qti-mapping default-value="0">
+            <qti-map-entry map-key="27" mapped-value="1"/>
+        </qti-mapping>
+    </qti-response-declaration>
+    <qti-response-declaration identifier="RESP_D" cardinality="single" base-type="integer">
+        <qti-correct-response>
+            <qti-value>30</qti-value>
+        </qti-correct-response>
+        <qti-mapping default-value="0">
+            <qti-map-entry map-key="30" mapped-value="1"/>
+        </qti-mapping>
+    </qti-response-declaration>
+    <qti-outcome-declaration identifier="SCORE" cardinality="single" base-type="float">
+        <qti-default-value><qti-value>0</qti-value></qti-default-value>
+    </qti-outcome-declaration>
+    <qti-outcome-declaration identifier="FEEDBACK" cardinality="single" base-type="identifier"/>
+    <qti-outcome-declaration identifier="FEEDBACK-INLINE" cardinality="multiple" base-type="identifier"/>
+    <qti-item-body>
+        <p>The Cold Be Gone Company conducted a study with <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>100</mn></math> participants. Each participant either received cold medicine or did not receive cold medicine, and the company recorded whether the participant's cold lasted <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>7</mn></math> days or longer.</p>
+        <div><img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzkwIiBoZWlnaHQ9IjM0MCIgdmlld0JveD0iLTIwIC0yMCAzOTAgMzQwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIj48ZGVmcz48c3R5bGU+LmxhYmVsIHsgZm9udC1zaXplOiAxNnB4OyBmb250LXdlaWdodDogYm9sZDsgdGV4dC1hbmNob3I6IG1pZGRsZTsgfSAuY291bnQgeyBmb250LXNpemU6IDE4cHg7IHRleHQtYW5jaG9yOiBtaWRkbGU7IH08L3N0eWxlPjwvZGVmcz48cmVjdCB4PSIxIiB5PSIxIiB3aWR0aD0iMzQ4IiBoZWlnaHQ9IjI5OCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMzMzMzMzIi8+PGNpcmNsZSBjeD0iMTI2Ljg3NSIgY3k9IjE1MCIgcj0iODcuNSIgZmlsbD0iIzFFOTBGRjk5IiBzdHJva2U9IiMzMzMzMzMiIGZpbGwtb3BhY2l0eT0iMC42Ii8+PGNpcmNsZSBjeD0iMjIzLjEyNSIgY3k9IjE1MCIgcj0iODcuNSIgZmlsbD0iI0ZGNkI2Qjk5IiBzdHJva2U9IiMzMzMzMzMiIGZpbGwtb3BhY2l0eT0iMC42Ii8+PHRleHQgeD0iODMuMTI1IiB5PSIzMC4xNSIgZm9udC1zaXplPSIxNiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC13ZWlnaHQ9IjcwMCI+PHRzcGFuIHg9IjgzLjEyNSIgZHk9IjBlbSI+Q29sZCBNZWRpY2luZTwvdHNwYW4+PC90ZXh0Pjx0ZXh0IHg9IjI2Ni44NzUiIHk9IjIwLjU1IiBmb250LXNpemU9IjE2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXdlaWdodD0iNzAwIj48dHNwYW4geD0iMjY2Ljg3NSIgZHk9IjBlbSI+Q29sZCBsb25nZXI8L3RzcGFuPjx0c3BhbiB4PSIyNjYuODc1IiBkeT0iMS4yZW0iPnRoYW4gNyBkYXlzPC90c3Bhbj48L3RleHQ+PHRleHQgeD0iODMuMTI1IiB5PSIxNTAiIGZvbnQtc2l6ZT0iMTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiPjI3PC90ZXh0Pjx0ZXh0IHg9IjI2Ni44NzUiIHk9IjE1MCIgZm9udC1zaXplPSIxOCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSI+MjA8L3RleHQ+PHRleHQgeD0iMTc1IiB5PSIxNTAiIGZvbnQtc2l6ZT0iMTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiPjIzPC90ZXh0Pjx0ZXh0IHg9IjE3NSIgeT0iMjgwIiBmb250LXNpemU9IjE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj4zMDwvdGV4dD48L3N2Zz4=" alt="Widget visualization" /></div>
+        <p>Complete the following two-way frequency table.</p>
+        <div><table style="border-collapse: collapse; width: 100%; border: 1px solid #000000;"><thead><tr><th scope="col" style="border: 1px solid #000000; padding: 8px; text-align: left; font-weight: 700; background-color: #f2f2f2; text-align: left;"></th><th scope="col" style="border: 1px solid #000000; padding: 8px; text-align: left; font-weight: 700; background-color: #f2f2f2;">Received cold medicine</th><th scope="col" style="border: 1px solid #000000; padding: 8px; text-align: left; font-weight: 700; background-color: #f2f2f2;">Did not receive cold medicine</th></tr></thead><tbody><tr><th scope="row" style="border: 1px solid #000000; padding: 8px; text-align: left; font-weight: 700; background-color: #f2f2f2;">Cold lasted longer than 7 days</th><td style="border: 1px solid #000000; padding: 8px; text-align: left;"><qti-text-entry-interaction response-identifier="RESP_A" expected-length="3"/></td><td style="border: 1px solid #000000; padding: 8px; text-align: left;"><qti-text-entry-interaction response-identifier="RESP_B" expected-length="3"/></td></tr><tr><th scope="row" style="border: 1px solid #000000; padding: 8px; text-align: left; font-weight: 700; background-color: #f2f2f2;">Cold did not last longer than 7 days</th><td style="border: 1px solid #000000; padding: 8px; text-align: left;"><qti-text-entry-interaction response-identifier="RESP_C" expected-length="3"/></td><td style="border: 1px solid #000000; padding: 8px; text-align: left;"><qti-text-entry-interaction response-identifier="RESP_D" expected-length="3"/></td></tr></tbody></table></div>
+        <qti-feedback-block outcome-identifier="FEEDBACK" identifier="CORRECT" show-hide="show">
+            <qti-content-body><p>Correct! The completed table is:</p></qti-content-body>
+        </qti-feedback-block>
+        <qti-feedback-block outcome-identifier="FEEDBACK" identifier="INCORRECT" show-hide="show">
+            <qti-content-body><p>Not quite. Use the numbers in the Venn diagram. The overlap (<math xmlns="http://www.w3.org/1998/Math/MathML"><mn>23</mn></math>) belongs in the "Received medicine" &amp; "Cold <math xmlns="http://www.w3.org/1998/Math/MathML"><mo>≥</mo><mn>7</mn></math> days" cell. Then distribute the other counts accordingly.</p></qti-content-body>
+        </qti-feedback-block>
+    </qti-item-body>
+    <qti-response-processing>
+        <qti-response-condition>
+            <qti-response-if>
+                <qti-and>
+                    <qti-match><qti-variable identifier="RESP_A"/><qti-correct identifier="RESP_A"/></qti-match>
+                    <qti-match><qti-variable identifier="RESP_B"/><qti-correct identifier="RESP_B"/></qti-match>
+                    <qti-match><qti-variable identifier="RESP_C"/><qti-correct identifier="RESP_C"/></qti-match>
+                    <qti-match><qti-variable identifier="RESP_D"/><qti-correct identifier="RESP_D"/></qti-match>
+                </qti-and>
+                <qti-set-outcome-value identifier="SCORE"><qti-base-value base-type="float">1</qti-base-value></qti-set-outcome-value>
+                <qti-set-outcome-value identifier="FEEDBACK"><qti-base-value base-type="identifier">CORRECT</qti-base-value></qti-set-outcome-value>
+            </qti-response-if>
+            <qti-response-else>
+                <qti-set-outcome-value identifier="SCORE"><qti-base-value base-type="float">0</qti-base-value></qti-set-outcome-value>
+                <qti-set-outcome-value identifier="FEEDBACK"><qti-base-value base-type="identifier">INCORRECT</qti-base-value></qti-set-outcome-value>
+            </qti-response-else>
+        </qti-response-condition>
+    </qti-response-processing>
+</qti-assessment-item>"
+`;
+
+exports[`QTI Compiler End-to-End Tests should produce consistent XML output for "equivalent-fraction-images" 1`] = `
+"<?xml version="1.0" encoding="UTF-8"?>
+<qti-assessment-item
+    xmlns="http://www.imsglobal.org/xsd/imsqtiasi_v3p0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqtiasi_v3p0 https://purl.imsglobal.org/spec/qti/v3p0/schema/xsd/imsqti_asiv3p0p1_v1p0.xsd http://www.w3.org/1998/Math/MathML https://purl.imsglobal.org/spec/mathml/v3p0/schema/xsd/mathml3.xsd"
+    identifier="equivalent-fraction-images"
+    title="Identifying Equivalent Fractions with Images"
+    time-dependent="false"
+    xml:lang="en-US">
+    <qti-response-declaration identifier="RESPONSE" cardinality="multiple" base-type="identifier">
+        <qti-correct-response>
+            <qti-value>A</qti-value>
+            <qti-value>B</qti-value>
+        </qti-correct-response>
+    </qti-response-declaration>
+    <qti-outcome-declaration identifier="SCORE" cardinality="single" base-type="float">
+        <qti-default-value><qti-value>0</qti-value></qti-default-value>
+    </qti-outcome-declaration>
+    <qti-outcome-declaration identifier="FEEDBACK" cardinality="single" base-type="identifier"/>
+    <qti-outcome-declaration identifier="FEEDBACK-INLINE" cardinality="multiple" base-type="identifier"/>
+    <qti-item-body>
+        <p><math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>3</mn><mn>6</mn></mfrac></math> of the following rectangle is shaded.</p>
+        <div><img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzQxIiBoZWlnaHQ9IjM0MSIgdmlld0JveD0iLTIxIC0yMSAzNDEgMzQxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSI1MCIgaGVpZ2h0PSIzMDAiIGZpbGw9IiM0Mjg1RjQ4MCIgc3Ryb2tlPSIjZTBlMGUwIiBzdHJva2Utd2lkdGg9IjEiIGZpbGwtb3BhY2l0eT0iMC41Ii8+PHJlY3QgeD0iNTAiIHk9IjAiIHdpZHRoPSI1MCIgaGVpZ2h0PSIzMDAiIGZpbGw9IiM0Mjg1RjQ4MCIgc3Ryb2tlPSIjZTBlMGUwIiBzdHJva2Utd2lkdGg9IjEiIGZpbGwtb3BhY2l0eT0iMC41Ii8+PHJlY3QgeD0iMTAwIiB5PSIwIiB3aWR0aD0iNTAiIGhlaWdodD0iMzAwIiBmaWxsPSIjNDI4NUY0ODAiIHN0cm9rZT0iI2UwZTBlMCIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsLW9wYWNpdHk9IjAuNSIvPjxyZWN0IHg9IjE1MCIgeT0iMCIgd2lkdGg9IjUwIiBoZWlnaHQ9IjMwMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZTBlMGUwIiBzdHJva2Utd2lkdGg9IjEiIGZpbGwtb3BhY2l0eT0iMSIvPjxyZWN0IHg9IjIwMCIgeT0iMCIgd2lkdGg9IjUwIiBoZWlnaHQ9IjMwMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZTBlMGUwIiBzdHJva2Utd2lkdGg9IjEiIGZpbGwtb3BhY2l0eT0iMSIvPjxyZWN0IHg9IjI1MCIgeT0iMCIgd2lkdGg9IjUwIiBoZWlnaHQ9IjMwMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZTBlMGUwIiBzdHJva2Utd2lkdGg9IjEiIGZpbGwtb3BhY2l0eT0iMSIvPjwvc3ZnPg==" alt="Widget visualization" /></div>
+        <div><div><qti-choice-interaction response-identifier="RESPONSE" shuffle="true" min-choices="0" max-choices="3">
+            <qti-prompt>Which of the following rectangles have exactly <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>3</mn><mn>6</mn></mfrac></math> of their area shaded?</qti-prompt>
+            <qti-simple-choice identifier="A"><div><img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzQxIiBoZWlnaHQ9IjM0MSIgdmlld0JveD0iLTIxIC0yMSAzNDEgMzQxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSI3NSIgaGVpZ2h0PSIxNTAiIGZpbGw9IiM0Mjg1RjQ4MCIgc3Ryb2tlPSIjZTBlMGUwIiBzdHJva2Utd2lkdGg9IjEiIGZpbGwtb3BhY2l0eT0iMC41Ii8+PHJlY3QgeD0iNzUiIHk9IjAiIHdpZHRoPSI3NSIgaGVpZ2h0PSIxNTAiIGZpbGw9IiM0Mjg1RjQ4MCIgc3Ryb2tlPSIjZTBlMGUwIiBzdHJva2Utd2lkdGg9IjEiIGZpbGwtb3BhY2l0eT0iMC41Ii8+PHJlY3QgeD0iMTUwIiB5PSIwIiB3aWR0aD0iNzUiIGhlaWdodD0iMTUwIiBmaWxsPSIjNDI4NUY0ODAiIHN0cm9rZT0iI2UwZTBlMCIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsLW9wYWNpdHk9IjAuNSIvPjxyZWN0IHg9IjIyNSIgeT0iMCIgd2lkdGg9Ijc1IiBoZWlnaHQ9IjE1MCIgZmlsbD0iIzQyODVGNDgwIiBzdHJva2U9IiNlMGUwZTAiIHN0cm9rZS13aWR0aD0iMSIgZmlsbC1vcGFjaXR5PSIwLjUiLz48cmVjdCB4PSIwIiB5PSIxNTAiIHdpZHRoPSI3NSIgaGVpZ2h0PSIxNTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2UwZTBlMCIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsLW9wYWNpdHk9IjEiLz48cmVjdCB4PSI3NSIgeT0iMTUwIiB3aWR0aD0iNzUiIGhlaWdodD0iMTUwIiBmaWxsPSJub25lIiBzdHJva2U9IiNlMGUwZTAiIHN0cm9rZS13aWR0aD0iMSIgZmlsbC1vcGFjaXR5PSIxIi8+PHJlY3QgeD0iMTUwIiB5PSIxNTAiIHdpZHRoPSI3NSIgaGVpZ2h0PSIxNTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2UwZTBlMCIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsLW9wYWNpdHk9IjEiLz48cmVjdCB4PSIyMjUiIHk9IjE1MCIgd2lkdGg9Ijc1IiBoZWlnaHQ9IjE1MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZTBlMGUwIiBzdHJva2Utd2lkdGg9IjEiIGZpbGwtb3BhY2l0eT0iMSIvPjwvc3ZnPg==" alt="Widget visualization" /></div><qti-feedback-inline outcome-identifier="FEEDBACK-INLINE" identifier="A">Correct! This rectangle has <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>4</mn></math> out of <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>8</mn></math> parts shaded, which equals <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>4</mn><mn>8</mn></mfrac></math> = <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>1</mn><mn>2</mn></mfrac></math> = <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>3</mn><mn>6</mn></mfrac></math>.</qti-feedback-inline></qti-simple-choice>
+            <qti-simple-choice identifier="B"><div><img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzQxIiBoZWlnaHQ9IjM0MSIgdmlld0JveD0iLTIxIC0yMSAzNDEgMzQxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSIxNTAiIGhlaWdodD0iMTUwIiBmaWxsPSIjNDI4NUY0ODAiIHN0cm9rZT0iI2UwZTBlMCIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsLW9wYWNpdHk9IjAuNSIvPjxyZWN0IHg9IjE1MCIgeT0iMCIgd2lkdGg9IjE1MCIgaGVpZ2h0PSIxNTAiIGZpbGw9IiM0Mjg1RjQ4MCIgc3Ryb2tlPSIjZTBlMGUwIiBzdHJva2Utd2lkdGg9IjEiIGZpbGwtb3BhY2l0eT0iMC41Ii8+PHJlY3QgeD0iMCIgeT0iMTUwIiB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZTBlMGUwIiBzdHJva2Utd2lkdGg9IjEiIGZpbGwtb3BhY2l0eT0iMSIvPjxyZWN0IHg9IjE1MCIgeT0iMTUwIiB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZTBlMGUwIiBzdHJva2Utd2lkdGg9IjEiIGZpbGwtb3BhY2l0eT0iMSIvPjwvc3ZnPg==" alt="Widget visualization" /></div><qti-feedback-inline outcome-identifier="FEEDBACK-INLINE" identifier="B">Correct! This rectangle has <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>2</mn></math> out of <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>4</mn></math> parts shaded, which equals <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>2</mn><mn>4</mn></mfrac></math> = <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>1</mn><mn>2</mn></mfrac></math> = <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>3</mn><mn>6</mn></mfrac></math>.</qti-feedback-inline></qti-simple-choice>
+            <qti-simple-choice identifier="C"><div><img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzQxIiBoZWlnaHQ9IjM0MSIgdmlld0JveD0iLTIxIC0yMSAzNDEgMzQxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSIxNTAiIGhlaWdodD0iMTUwIiBmaWxsPSIjNDI4NUY0ODAiIHN0cm9rZT0iI2UwZTBlMCIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsLW9wYWNpdHk9IjAuNSIvPjxyZWN0IHg9IjE1MCIgeT0iMCIgd2lkdGg9IjE1MCIgaGVpZ2h0PSIxNTAiIGZpbGw9IiM0Mjg1RjQ4MCIgc3Ryb2tlPSIjZTBlMGUwIiBzdHJva2Utd2lkdGg9IjEiIGZpbGwtb3BhY2l0eT0iMC41Ii8+PHJlY3QgeD0iMCIgeT0iMTUwIiB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgZmlsbD0iIzQyODVGNDgwIiBzdHJva2U9IiNlMGUwZTAiIHN0cm9rZS13aWR0aD0iMSIgZmlsbC1vcGFjaXR5PSIwLjUiLz48cmVjdCB4PSIxNTAiIHk9IjE1MCIgd2lkdGg9IjE1MCIgaGVpZ2h0PSIxNTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2UwZTBlMCIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsLW9wYWNpdHk9IjEiLz48L3N2Zz4=" alt="Widget visualization" /></div><qti-feedback-inline outcome-identifier="FEEDBACK-INLINE" identifier="C">Not quite. This rectangle has <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>3</mn></math> out of <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>4</mn></math> parts shaded, which equals <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>3</mn><mn>4</mn></mfrac></math>. Since <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>3</mn><mn>4</mn></mfrac></math> is not equal to <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>3</mn><mn>6</mn></mfrac></math> (which equals <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>1</mn><mn>2</mn></mfrac></math>), this is incorrect.</qti-feedback-inline></qti-simple-choice>
+        </qti-choice-interaction></div></div>
+        <qti-feedback-block outcome-identifier="FEEDBACK" identifier="CORRECT" show-hide="show">
+            <qti-content-body><p>Excellent! You correctly identified that <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>3</mn><mn>6</mn></mfrac></math> = <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>1</mn><mn>2</mn></mfrac></math>, and found both rectangles that have exactly half of their area shaded: <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>4</mn><mn>8</mn></mfrac></math> and <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>2</mn><mn>4</mn></mfrac></math> both equal <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>1</mn><mn>2</mn></mfrac></math>.</p></qti-content-body>
+        </qti-feedback-block>
+        <qti-feedback-block outcome-identifier="FEEDBACK" identifier="INCORRECT" show-hide="show">
+            <qti-content-body><p>Not quite. First, simplify <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>3</mn><mn>6</mn></mfrac></math> to <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>1</mn><mn>2</mn></mfrac></math>. Then count the shaded parts in each rectangle and check if that fraction equals <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>1</mn><mn>2</mn></mfrac></math>. Remember: <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>4</mn><mn>8</mn></mfrac></math> = <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>1</mn><mn>2</mn></mfrac></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>2</mn><mn>4</mn></mfrac></math> = <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>1</mn><mn>2</mn></mfrac></math>, but <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>3</mn><mn>4</mn></mfrac></math> ≠ <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>1</mn><mn>2</mn></mfrac></math>.</p></qti-content-body>
+        </qti-feedback-block>
+    </qti-item-body>
+    <qti-response-processing>
+        <qti-response-condition>
+            <qti-response-if>
+                <qti-and>
+                    <qti-match><qti-variable identifier="RESPONSE"/><qti-correct identifier="RESPONSE"/></qti-match>
+                </qti-and>
+                <qti-set-outcome-value identifier="SCORE"><qti-base-value base-type="float">1</qti-base-value></qti-set-outcome-value>
+                <qti-set-outcome-value identifier="FEEDBACK"><qti-base-value base-type="identifier">CORRECT</qti-base-value></qti-set-outcome-value>
+            </qti-response-if>
+            <qti-response-else>
+                <qti-set-outcome-value identifier="SCORE"><qti-base-value base-type="float">0</qti-base-value></qti-set-outcome-value>
+                <qti-set-outcome-value identifier="FEEDBACK"><qti-base-value base-type="identifier">INCORRECT</qti-base-value></qti-set-outcome-value>
+            </qti-response-else>
+        </qti-response-condition>
+    </qti-response-processing>
+</qti-assessment-item>"
+`;
+
+exports[`QTI Compiler End-to-End Tests should produce consistent XML output for "calculate-shaded-area" 1`] = `
+"<?xml version="1.0" encoding="UTF-8"?>
+<qti-assessment-item
+    xmlns="http://www.imsglobal.org/xsd/imsqtiasi_v3p0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqtiasi_v3p0 https://purl.imsglobal.org/spec/qti/v3p0/schema/xsd/imsqti_asiv3p0p1_v1p0.xsd http://www.w3.org/1998/Math/MathML https://purl.imsglobal.org/spec/mathml/v3p0/schema/xsd/mathml3.xsd"
+    identifier="calculate-shaded-area"
+    title="Calculating Shaded Area of Multiple Shapes"
+    time-dependent="false"
+    xml:lang="en-US">
+    <qti-response-declaration identifier="RESPONSE" cardinality="multiple" base-type="identifier">
+        <qti-correct-response>
+            <qti-value>B</qti-value>
+            <qti-value>C</qti-value>
+        </qti-correct-response>
+    </qti-response-declaration>
+    <qti-outcome-declaration identifier="SCORE" cardinality="single" base-type="float">
+        <qti-default-value><qti-value>0</qti-value></qti-default-value>
+    </qti-outcome-declaration>
+    <qti-outcome-declaration identifier="FEEDBACK" cardinality="single" base-type="identifier"/>
+    <qti-outcome-declaration identifier="FEEDBACK-INLINE" cardinality="multiple" base-type="identifier"/>
+    <qti-item-body>
+        <div><img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTM4MCIgaGVpZ2h0PSIzNDAiIHZpZXdCb3g9Ii0yMCAtMjAgMTM4MCAzNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTSAxNjAgMTUwIEwgMTYwIDUgQSAxNDUgMTQ1IDAgMCAxIDMwNSAxNTAgWiIgZmlsbD0iIzQyODVGNDgwIiBzdHJva2U9IiNlMGUwZTAiIHN0cm9rZS13aWR0aD0iMSIgZmlsbC1vcGFjaXR5PSIwLjUiLz48cGF0aCBkPSJNIDE2MCAxNTAgTCAzMDUgMTUwIEEgMTQ1IDE0NSAwIDAgMSAxNjAgMjk1IFoiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2UwZTBlMCIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsLW9wYWNpdHk9IjEiLz48cGF0aCBkPSJNIDE2MCAxNTAgTCAxNjAgMjk1IEEgMTQ1IDE0NSAwIDAgMSAxNSAxNTAuMDAwMDAwMDAwMDAwMDMgWiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZTBlMGUwIiBzdHJva2Utd2lkdGg9IjEiIGZpbGwtb3BhY2l0eT0iMSIvPjxwYXRoIGQ9Ik0gMTYwIDE1MCBMIDE1IDE1MC4wMDAwMDAwMDAwMDAwMyBBIDE0NSAxNDUgMCAwIDEgMTU5Ljk5OTk5OTk5OTk5OTk3IDUgWiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZTBlMGUwIiBzdHJva2Utd2lkdGg9IjEiIGZpbGwtb3BhY2l0eT0iMSIvPjxwYXRoIGQ9Ik0gNTAwIDE1MCBMIDUwMCA1IEEgMTQ1IDE0NSAwIDAgMSA2NDUgMTUwIFoiIGZpbGw9IiM0Mjg1RjQ4MCIgc3Ryb2tlPSIjZTBlMGUwIiBzdHJva2Utd2lkdGg9IjEiIGZpbGwtb3BhY2l0eT0iMC41Ii8+PHBhdGggZD0iTSA1MDAgMTUwIEwgNjQ1IDE1MCBBIDE0NSAxNDUgMCAwIDEgNTAwIDI5NSBaIiBmaWxsPSJub25lIiBzdHJva2U9IiNlMGUwZTAiIHN0cm9rZS13aWR0aD0iMSIgZmlsbC1vcGFjaXR5PSIxIi8+PHBhdGggZD0iTSA1MDAgMTUwIEwgNTAwIDI5NSBBIDE0NSAxNDUgMCAwIDEgMzU1IDE1MC4wMDAwMDAwMDAwMDAwMyBaIiBmaWxsPSJub25lIiBzdHJva2U9IiNlMGUwZTAiIHN0cm9rZS13aWR0aD0iMSIgZmlsbC1vcGFjaXR5PSIxIi8+PHBhdGggZD0iTSA1MDAgMTUwIEwgMzU1IDE1MC4wMDAwMDAwMDAwMDAwMyBBIDE0NSAxNDUgMCAwIDEgNTAwIDUgWiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZTBlMGUwIiBzdHJva2Utd2lkdGg9IjEiIGZpbGwtb3BhY2l0eT0iMSIvPjxwYXRoIGQ9Ik0gODQwIDE1MCBMIDg0MCA1IEEgMTQ1IDE0NSAwIDAgMSA5ODUgMTUwIFoiIGZpbGw9IiM0Mjg1RjQ4MCIgc3Ryb2tlPSIjZTBlMGUwIiBzdHJva2Utd2lkdGg9IjEiIGZpbGwtb3BhY2l0eT0iMC41Ii8+PHBhdGggZD0iTSA4NDAgMTUwIEwgOTg1IDE1MCBBIDE0NSAxNDUgMCAwIDEgODQwIDI5NSBaIiBmaWxsPSJub25lIiBzdHJva2U9IiNlMGUwZTAiIHN0cm9rZS13aWR0aD0iMSIgZmlsbC1vcGFjaXR5PSIxIi8+PHBhdGggZD0iTSA4NDAgMTUwIEwgODQwIDI5NSBBIDE0NSAxNDUgMCAwIDEgNjk1IDE1MC4wMDAwMDAwMDAwMDAwMyBaIiBmaWxsPSJub25lIiBzdHJva2U9IiNlMGUwZTAiIHN0cm9rZS13aWR0aD0iMSIgZmlsbC1vcGFjaXR5PSIxIi8+PHBhdGggZD0iTSA4NDAgMTUwIEwgNjk1IDE1MC4wMDAwMDAwMDAwMDAwMyBBIDE0NSAxNDUgMCAwIDEgODQwIDUgWiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZTBlMGUwIiBzdHJva2Utd2lkdGg9IjEiIGZpbGwtb3BhY2l0eT0iMSIvPjxwYXRoIGQ9Ik0gMTE4MCAxNTAgTCAxMTgwIDUgQSAxNDUgMTQ1IDAgMCAxIDEzMjUgMTUwIFoiIGZpbGw9IiM0Mjg1RjQ4MCIgc3Ryb2tlPSIjZTBlMGUwIiBzdHJva2Utd2lkdGg9IjEiIGZpbGwtb3BhY2l0eT0iMC41Ii8+PHBhdGggZD0iTSAxMTgwIDE1MCBMIDEzMjUgMTUwIEEgMTQ1IDE0NSAwIDAgMSAxMTgwIDI5NSBaIiBmaWxsPSJub25lIiBzdHJva2U9IiNlMGUwZTAiIHN0cm9rZS13aWR0aD0iMSIgZmlsbC1vcGFjaXR5PSIxIi8+PHBhdGggZD0iTSAxMTgwIDE1MCBMIDExODAgMjk1IEEgMTQ1IDE0NSAwIDAgMSAxMDM1IDE1MC4wMDAwMDAwMDAwMDAwMyBaIiBmaWxsPSJub25lIiBzdHJva2U9IiNlMGUwZTAiIHN0cm9rZS13aWR0aD0iMSIgZmlsbC1vcGFjaXR5PSIxIi8+PHBhdGggZD0iTSAxMTgwIDE1MCBMIDEwMzUgMTUwLjAwMDAwMDAwMDAwMDAzIEEgMTQ1IDE0NSAwIDAgMSAxMTgwIDUgWiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZTBlMGUwIiBzdHJva2Utd2lkdGg9IjEiIGZpbGwtb3BhY2l0eT0iMSIvPjwvc3ZnPg==" alt="Widget visualization" /></div>
+        <div><div><qti-choice-interaction response-identifier="RESPONSE" shuffle="true" min-choices="0" max-choices="3">
+            <qti-prompt>How can we calculate the shaded area?</qti-prompt>
+            <qti-simple-choice identifier="A"><p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>4</mn><mo>×</mo><mfrac><mn>1</mn><mn>3</mn></mfrac></mrow></math></p><qti-feedback-inline outcome-identifier="FEEDBACK-INLINE" identifier="A">Not quite. This would mean <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>4</mn></math> groups of <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>1</mn><mn>3</mn></mfrac></math> each. But we have <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>3</mn></math> circles, each with <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>1</mn><mn>4</mn></mfrac></math> shaded, not <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>4</mn></math> groups of <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>1</mn><mn>3</mn></mfrac></math>.</qti-feedback-inline></qti-simple-choice>
+            <qti-simple-choice identifier="B"><p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mn>3</mn><mo>×</mo><mfrac><mn>1</mn><mn>4</mn></mfrac></mrow></math></p><qti-feedback-inline outcome-identifier="FEEDBACK-INLINE" identifier="B">Correct! There are <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>3</mn></math> circles and <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>1</mn><mn>4</mn></mfrac></math> of each circle is shaded. We can multiply: <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>3</mn><mo>×</mo><mfrac><mn>1</mn><mn>4</mn></mfrac></math>.</qti-feedback-inline></qti-simple-choice>
+            <qti-simple-choice identifier="C"><p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mn>1</mn><mn>4</mn></mfrac><mo>+</mo><mfrac><mn>1</mn><mn>4</mn></mfrac><mo>+</mo><mfrac><mn>1</mn><mn>4</mn></mfrac></mrow></math></p><qti-feedback-inline outcome-identifier="FEEDBACK-INLINE" identifier="C">Correct! Since we have <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>3</mn></math> circles and each has <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>1</mn><mn>4</mn></mfrac></math> shaded, we can add: <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>1</mn><mn>4</mn></mfrac><mo>+</mo><mfrac><mn>1</mn><mn>4</mn></mfrac><mo>+</mo><mfrac><mn>1</mn><mn>4</mn></mfrac></math>.</qti-feedback-inline></qti-simple-choice>
+        </qti-choice-interaction></div></div>
+        <qti-feedback-block outcome-identifier="FEEDBACK" identifier="CORRECT" show-hide="show">
+            <qti-content-body><p>Excellent! You found both correct ways to calculate the shaded area. Since we have <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>3</mn></math> circles with <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>1</mn><mn>4</mn></mfrac></math> shaded in each, we can either multiply <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>3</mn><mo>×</mo><mfrac><mn>1</mn><mn>4</mn></mfrac></math> or add <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>1</mn><mn>4</mn></mfrac><mo>+</mo><mfrac><mn>1</mn><mn>4</mn></mfrac><mo>+</mo><mfrac><mn>1</mn><mn>4</mn></mfrac></math>. Both give us <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>3</mn><mn>4</mn></mfrac></math> as the total shaded area.</p></qti-content-body>
+        </qti-feedback-block>
+        <qti-feedback-block outcome-identifier="FEEDBACK" identifier="INCORRECT" show-hide="show">
+            <qti-content-body><p>Not quite. Look carefully at the image. There are <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>3</mn></math> circles, and <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>1</mn><mn>4</mn></mfrac></math> of each circle is shaded. We can find the total shaded area by either: (1) multiplying <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>3</mn><mo>×</mo><mfrac><mn>1</mn><mn>4</mn></mfrac></math>, or (2) adding <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>1</mn><mn>4</mn></mfrac><mo>+</mo><mfrac><mn>1</mn><mn>4</mn></mfrac><mo>+</mo><mfrac><mn>1</mn><mn>4</mn></mfrac></math>.</p></qti-content-body>
         </qti-feedback-block>
     </qti-item-body>
     <qti-response-processing>
@@ -573,6 +986,59 @@ exports[`QTI Compiler End-to-End Tests should produce consistent XML output for 
 </qti-assessment-item>"
 `;
 
+exports[`QTI Compiler End-to-End Tests should produce consistent XML output for "count-apples-emoji" 1`] = `
+"<?xml version="1.0" encoding="UTF-8"?>
+<qti-assessment-item
+    xmlns="http://www.imsglobal.org/xsd/imsqtiasi_v3p0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqtiasi_v3p0 https://purl.imsglobal.org/spec/qti/v3p0/schema/xsd/imsqti_asiv3p0p1_v1p0.xsd http://www.w3.org/1998/Math/MathML https://purl.imsglobal.org/spec/mathml/v3p0/schema/xsd/mathml3.xsd"
+    identifier="count-apples-emoji"
+    title="Count the apples"
+    time-dependent="false"
+    xml:lang="en-US">
+    <qti-response-declaration identifier="RESPONSE" cardinality="single" base-type="identifier">
+        <qti-correct-response>
+            <qti-value>CHOICE_5</qti-value>
+        </qti-correct-response>
+    </qti-response-declaration>
+    <qti-outcome-declaration identifier="SCORE" cardinality="single" base-type="float">
+        <qti-default-value><qti-value>0</qti-value></qti-default-value>
+    </qti-outcome-declaration>
+    <qti-outcome-declaration identifier="FEEDBACK" cardinality="single" base-type="identifier"/>
+    <qti-outcome-declaration identifier="FEEDBACK-INLINE" cardinality="multiple" base-type="identifier"/>
+    <qti-item-body>
+        <div><div><qti-choice-interaction response-identifier="RESPONSE" shuffle="true" min-choices="1" max-choices="1">
+            <qti-prompt>Which box has <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>5</mn></math> apples?</qti-prompt>
+            <qti-simple-choice identifier="CHOICE_3"><div><img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzI0IiBoZWlnaHQ9IjMyNCIgdmlld0JveD0iLTEyIC0xMiAzMjQgMzI0IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0Ij48cmVjdCB4PSI2IiB5PSIzNCIgd2lkdGg9IjI4OCIgaGVpZ2h0PSIyNjAiIGZpbGw9IiNmYWZhZmEiIHN0cm9rZT0iI2UwZTBlMCIgc3Ryb2tlLXdpZHRoPSIyIi8+PHRleHQgeD0iNDciIHk9Ijc0IiBmb250LXNpemU9IjYxLjIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiPvCfjY48L3RleHQ+PHRleHQgeD0iMTM4IiB5PSI3NCIgZm9udC1zaXplPSI2MS4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIj7wn42OPC90ZXh0Pjx0ZXh0IHg9IjIyOSIgeT0iNzQiIGZvbnQtc2l6ZT0iNjEuMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSI+8J+NjjwvdGV4dD48L3N2Zz4=" alt="Widget visualization" /></div></qti-simple-choice>
+            <qti-simple-choice identifier="CHOICE_4"><div><img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzI0IiBoZWlnaHQ9IjMyNCIgdmlld0JveD0iLTEyIC0xMiAzMjQgMzI0IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0Ij48cmVjdCB4PSI2IiB5PSIzNCIgd2lkdGg9IjI4OCIgaGVpZ2h0PSIyNjAiIGZpbGw9IiNmYWZhZmEiIHN0cm9rZT0iI2UwZTBlMCIgc3Ryb2tlLXdpZHRoPSIyIi8+PHRleHQgeD0iMzkuNSIgeT0iNjUuNSIgZm9udC1zaXplPSI0NS45IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIj7wn42OPC90ZXh0Pjx0ZXh0IHg9IjEwNy41IiB5PSI2NS41IiBmb250LXNpemU9IjQ1LjkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiPvCfjY48L3RleHQ+PHRleHQgeD0iMTc1LjUiIHk9IjY1LjUiIGZvbnQtc2l6ZT0iNDUuOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSI+8J+NjjwvdGV4dD48dGV4dCB4PSIyNDMuNSIgeT0iNjUuNSIgZm9udC1zaXplPSI0NS45IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIj7wn42OPC90ZXh0Pjwvc3ZnPg==" alt="Widget visualization" /></div></qti-simple-choice>
+            <qti-simple-choice identifier="CHOICE_5"><div><img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzI0IiBoZWlnaHQ9IjMyNCIgdmlld0JveD0iLTEyIC0xMiAzMjQgMzI0IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0Ij48cmVjdCB4PSI2IiB5PSIzNCIgd2lkdGg9IjI4OCIgaGVpZ2h0PSIyNjAiIGZpbGw9IiNmYWZhZmEiIHN0cm9rZT0iI2UwZTBlMCIgc3Ryb2tlLXdpZHRoPSIyIi8+PHRleHQgeD0iMzUiIHk9IjYwIiBmb250LXNpemU9IjM2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIj7wn42OPC90ZXh0Pjx0ZXh0IHg9Ijg5IiB5PSI2MCIgZm9udC1zaXplPSIzNiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSI+8J+NjjwvdGV4dD48dGV4dCB4PSIxNDMiIHk9IjYwIiBmb250LXNpemU9IjM2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIj7wn42OPC90ZXh0Pjx0ZXh0IHg9IjE5NyIgeT0iNjAiIGZvbnQtc2l6ZT0iMzYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiPvCfjY48L3RleHQ+PHRleHQgeD0iMjUxIiB5PSI2MCIgZm9udC1zaXplPSIzNiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSI+8J+NjjwvdGV4dD48L3N2Zz4=" alt="Widget visualization" /></div></qti-simple-choice>
+            <qti-simple-choice identifier="CHOICE_6"><div><img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzI0IiBoZWlnaHQ9IjMyNCIgdmlld0JveD0iLTEyIC0xMiAzMjQgMzI0IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0Ij48cmVjdCB4PSI2IiB5PSIzNCIgd2lkdGg9IjI4OCIgaGVpZ2h0PSIyNjAiIGZpbGw9IiNmYWZhZmEiIHN0cm9rZT0iI2UwZTBlMCIgc3Ryb2tlLXdpZHRoPSIyIi8+PHRleHQgeD0iMzIiIHk9IjU3IiBmb250LXNpemU9IjMwLjYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiPvCfjY48L3RleHQ+PHRleHQgeD0iNzciIHk9IjU3IiBmb250LXNpemU9IjMwLjYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiPvCfjY48L3RleHQ+PHRleHQgeD0iMTIyIiB5PSI1NyIgZm9udC1zaXplPSIzMC42IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIj7wn42OPC90ZXh0Pjx0ZXh0IHg9IjE2NyIgeT0iNTciIGZvbnQtc2l6ZT0iMzAuNiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSI+8J+NjjwvdGV4dD48dGV4dCB4PSIyMTIiIHk9IjU3IiBmb250LXNpemU9IjMwLjYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiPvCfjY48L3RleHQ+PHRleHQgeD0iMjU3IiB5PSI1NyIgZm9udC1zaXplPSIzMC42IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIj7wn42OPC90ZXh0Pjwvc3ZnPg==" alt="Widget visualization" /></div></qti-simple-choice>
+        </qti-choice-interaction></div></div>
+        <qti-feedback-block outcome-identifier="FEEDBACK" identifier="CORRECT" show-hide="show">
+            <qti-content-body><p>Great job! That box has exactly five apples.</p></qti-content-body>
+        </qti-feedback-block>
+        <qti-feedback-block outcome-identifier="FEEDBACK" identifier="INCORRECT" show-hide="show">
+            <qti-content-body><p>Try again. Count the apples in each box to find the one with exactly five.</p></qti-content-body>
+        </qti-feedback-block>
+    </qti-item-body>
+    <qti-response-processing>
+        <qti-response-condition>
+            <qti-response-if>
+                <qti-and>
+                    <qti-match><qti-variable identifier="RESPONSE"/><qti-correct identifier="RESPONSE"/></qti-match>
+                </qti-and>
+                <qti-set-outcome-value identifier="SCORE"><qti-base-value base-type="float">1</qti-base-value></qti-set-outcome-value>
+                <qti-set-outcome-value identifier="FEEDBACK"><qti-base-value base-type="identifier">CORRECT</qti-base-value></qti-set-outcome-value>
+            </qti-response-if>
+            <qti-response-else>
+                <qti-set-outcome-value identifier="SCORE"><qti-base-value base-type="float">0</qti-base-value></qti-set-outcome-value>
+                <qti-set-outcome-value identifier="FEEDBACK"><qti-base-value base-type="identifier">INCORRECT</qti-base-value></qti-set-outcome-value>
+            </qti-response-else>
+        </qti-response-condition>
+    </qti-response-processing>
+</qti-assessment-item>"
+`;
+
 exports[`QTI Compiler End-to-End Tests should produce consistent XML output for "shape-bin-barchart-choice" 1`] = `
 "<?xml version="1.0" encoding="UTF-8"?>
 <qti-assessment-item
@@ -608,6 +1074,60 @@ exports[`QTI Compiler End-to-End Tests should produce consistent XML output for 
         </qti-feedback-block>
         <qti-feedback-block outcome-identifier="FEEDBACK" identifier="INCORRECT" show-hide="show">
             <qti-content-body><p>Not quite. Match the number of shapes from the table to the height of the bar for each shape type.</p></qti-content-body>
+        </qti-feedback-block>
+    </qti-item-body>
+    <qti-response-processing>
+        <qti-response-condition>
+            <qti-response-if>
+                <qti-and>
+                    <qti-match><qti-variable identifier="RESPONSE"/><qti-correct identifier="RESPONSE"/></qti-match>
+                </qti-and>
+                <qti-set-outcome-value identifier="SCORE"><qti-base-value base-type="float">1</qti-base-value></qti-set-outcome-value>
+                <qti-set-outcome-value identifier="FEEDBACK"><qti-base-value base-type="identifier">CORRECT</qti-base-value></qti-set-outcome-value>
+            </qti-response-if>
+            <qti-response-else>
+                <qti-set-outcome-value identifier="SCORE"><qti-base-value base-type="float">0</qti-base-value></qti-set-outcome-value>
+                <qti-set-outcome-value identifier="FEEDBACK"><qti-base-value base-type="identifier">INCORRECT</qti-base-value></qti-set-outcome-value>
+            </qti-response-else>
+        </qti-response-condition>
+    </qti-response-processing>
+</qti-assessment-item>"
+`;
+
+exports[`QTI Compiler End-to-End Tests should produce consistent XML output for "pencil-length-line-plot-choice" 1`] = `
+"<?xml version="1.0" encoding="UTF-8"?>
+<qti-assessment-item
+    xmlns="http://www.imsglobal.org/xsd/imsqtiasi_v3p0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqtiasi_v3p0 https://purl.imsglobal.org/spec/qti/v3p0/schema/xsd/imsqti_asiv3p0p1_v1p0.xsd http://www.w3.org/1998/Math/MathML https://purl.imsglobal.org/spec/mathml/v3p0/schema/xsd/mathml3.xsd"
+    identifier="pencil-length-line-plot-choice"
+    title="Represent Pencil Lengths on a Line Plot"
+    time-dependent="false"
+    xml:lang="en-US">
+    <qti-response-declaration identifier="RESPONSE" cardinality="single" base-type="identifier">
+        <qti-correct-response>
+            <qti-value>A</qti-value>
+        </qti-correct-response>
+    </qti-response-declaration>
+    <qti-outcome-declaration identifier="SCORE" cardinality="single" base-type="float">
+        <qti-default-value><qti-value>0</qti-value></qti-default-value>
+    </qti-outcome-declaration>
+    <qti-outcome-declaration identifier="FEEDBACK" cardinality="single" base-type="identifier"/>
+    <qti-outcome-declaration identifier="FEEDBACK-INLINE" cardinality="multiple" base-type="identifier"/>
+    <qti-item-body>
+        <p>The lengths of 4 pencils were measured. The lengths are <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>11</mn><mtext> cm</mtext></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>8</mn><mtext> cm</mtext></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>8</mn><mtext> cm</mtext></math>, and <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>3</mn><mtext> cm</mtext></math>.</p>
+        <div><div><qti-choice-interaction response-identifier="RESPONSE" shuffle="true" min-choices="1" max-choices="1">
+            <qti-prompt>Which line plot correctly shows the length of each pencil?</qti-prompt>
+            <qti-simple-choice identifier="A"><div><img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDkwIiBoZWlnaHQ9IjM0MCIgdmlld0JveD0iLTIwIC0yMCA0OTAgMzQwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjEyIj48bGluZSB4MT0iMjAiIHkxPSIyMzgiIHgyPSI0MzAiIHkyPSIyMzgiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48bGluZSB4MT0iMjAiIHkxPSIyMzMiIHgyPSIyMCIgeTI9IjI0MyIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjx0ZXh0IHg9IjIwIiB5PSIyNTgiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMzMzMzMzMiPjA8L3RleHQ+PGxpbmUgeDE9Ijg4LjMzMzMzMzMzMzMzMzMzIiB5MT0iMjMzIiB4Mj0iODguMzMzMzMzMzMzMzMzMzMiIHkyPSIyNDMiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48dGV4dCB4PSI4OC4zMzMzMzMzMzMzMzMzMyIgeT0iMjU4IiBmb250LXNpemU9IjEyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMzMzMzMzIj4yPC90ZXh0PjxsaW5lIHgxPSIxNTYuNjY2NjY2NjY2NjY2NjYiIHkxPSIyMzMiIHgyPSIxNTYuNjY2NjY2NjY2NjY2NjYiIHkyPSIyNDMiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48dGV4dCB4PSIxNTYuNjY2NjY2NjY2NjY2NjYiIHk9IjI1OCIgZm9udC1zaXplPSIxMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzMzMzMzMyI+NDwvdGV4dD48bGluZSB4MT0iMjI1IiB5MT0iMjMzIiB4Mj0iMjI1IiB5Mj0iMjQzIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PHRleHQgeD0iMjI1IiB5PSIyNTgiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMzMzMzMzMiPjY8L3RleHQ+PGxpbmUgeDE9IjI5My4zMzMzMzMzMzMzMzMzIiB5MT0iMjMzIiB4Mj0iMjkzLjMzMzMzMzMzMzMzMzMiIHkyPSIyNDMiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48dGV4dCB4PSIyOTMuMzMzMzMzMzMzMzMzMyIgeT0iMjU4IiBmb250LXNpemU9IjEyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMzMzMzMzIj44PC90ZXh0PjxsaW5lIHgxPSIzNjEuNjY2NjY2NjY2NjY2NjMiIHkxPSIyMzMiIHgyPSIzNjEuNjY2NjY2NjY2NjY2NjMiIHkyPSIyNDMiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48dGV4dCB4PSIzNjEuNjY2NjY2NjY2NjY2NjMiIHk9IjI1OCIgZm9udC1zaXplPSIxMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzMzMzMzMyI+MTA8L3RleHQ+PGxpbmUgeDE9IjQzMCIgeTE9IjIzMyIgeDI9IjQzMCIgeTI9IjI0MyIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjx0ZXh0IHg9IjQzMCIgeT0iMjU4IiBmb250LXNpemU9IjEyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMzMzMzMzIj4xMjwvdGV4dD48Y2lyY2xlIGN4PSIxMjIuNSIgY3k9IjIyMCIgcj0iOCIgZmlsbD0iIzAwNzRjOCIvPjxjaXJjbGUgY3g9IjI5My4zMzMzMzMzMzMzMzMzIiBjeT0iMjIwIiByPSI4IiBmaWxsPSIjMDA3NGM4Ii8+PGNpcmNsZSBjeD0iMjkzLjMzMzMzMzMzMzMzMzMiIGN5PSIyMDIiIHI9IjgiIGZpbGw9IiMwMDc0YzgiLz48Y2lyY2xlIGN4PSIzOTUuODMzMzMzMzMzMzMzMyIgY3k9IjIyMCIgcj0iOCIgZmlsbD0iIzAwNzRjOCIvPjwvc3ZnPg==" alt="Widget visualization" /></div><qti-feedback-inline outcome-identifier="FEEDBACK-INLINE" identifier="A">This plot correctly shows a dot for each of the 4 pencils at its measured length.</qti-feedback-inline></qti-simple-choice>
+            <qti-simple-choice identifier="B"><div><img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDkwIiBoZWlnaHQ9IjM0MCIgdmlld0JveD0iLTIwIC0yMCA0OTAgMzQwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjEyIj48bGluZSB4MT0iMjAiIHkxPSIyMzgiIHgyPSI0MzAiIHkyPSIyMzgiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48bGluZSB4MT0iMjAiIHkxPSIyMzMiIHgyPSIyMCIgeTI9IjI0MyIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjx0ZXh0IHg9IjIwIiB5PSIyNTgiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMzMzMzMzMiPjA8L3RleHQ+PGxpbmUgeDE9Ijg4LjMzMzMzMzMzMzMzMzMzIiB5MT0iMjMzIiB4Mj0iODguMzMzMzMzMzMzMzMzMzMiIHkyPSIyNDMiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48dGV4dCB4PSI4OC4zMzMzMzMzMzMzMzMzMyIgeT0iMjU4IiBmb250LXNpemU9IjEyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMzMzMzMzIj4yPC90ZXh0PjxsaW5lIHgxPSIxNTYuNjY2NjY2NjY2NjY2NjYiIHkxPSIyMzMiIHgyPSIxNTYuNjY2NjY2NjY2NjY2NjYiIHkyPSIyNDMiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48dGV4dCB4PSIxNTYuNjY2NjY2NjY2NjY2NjYiIHk9IjI1OCIgZm9udC1zaXplPSIxMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzMzMzMzMyI+NDwvdGV4dD48bGluZSB4MT0iMjI1IiB5MT0iMjMzIiB4Mj0iMjI1IiB5Mj0iMjQzIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PHRleHQgeD0iMjI1IiB5PSIyNTgiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMzMzMzMzMiPjY8L3RleHQ+PGxpbmUgeDE9IjI5My4zMzMzMzMzMzMzMzMzIiB5MT0iMjMzIiB4Mj0iMjkzLjMzMzMzMzMzMzMzMzMiIHkyPSIyNDMiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48dGV4dCB4PSIyOTMuMzMzMzMzMzMzMzMzMyIgeT0iMjU4IiBmb250LXNpemU9IjEyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMzMzMzMzIj44PC90ZXh0PjxsaW5lIHgxPSIzNjEuNjY2NjY2NjY2NjY2NjMiIHkxPSIyMzMiIHgyPSIzNjEuNjY2NjY2NjY2NjY2NjMiIHkyPSIyNDMiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48dGV4dCB4PSIzNjEuNjY2NjY2NjY2NjY2NjMiIHk9IjI1OCIgZm9udC1zaXplPSIxMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzMzMzMzMyI+MTA8L3RleHQ+PGxpbmUgeDE9IjQzMCIgeTE9IjIzMyIgeDI9IjQzMCIgeTI9IjI0MyIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjx0ZXh0IHg9IjQzMCIgeT0iMjU4IiBmb250LXNpemU9IjEyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMzMzMzMzIj4xMjwvdGV4dD48Y2lyY2xlIGN4PSIxMjIuNSIgY3k9IjIyMCIgcj0iOCIgZmlsbD0iIzAwNzRjOCIvPjxjaXJjbGUgY3g9IjI5My4zMzMzMzMzMzMzMzMzIiBjeT0iMjIwIiByPSI4IiBmaWxsPSIjMDA3NGM4Ii8+PGNpcmNsZSBjeD0iMzk1LjgzMzMzMzMzMzMzMzMiIGN5PSIyMjAiIHI9IjgiIGZpbGw9IiMwMDc0YzgiLz48L3N2Zz4=" alt="Widget visualization" /></div><qti-feedback-inline outcome-identifier="FEEDBACK-INLINE" identifier="B">This plot only shows one dot for the length of <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>8</mn><mtext> cm</mtext></math>. Remember, there were two pencils with this length.</qti-feedback-inline></qti-simple-choice>
+            <qti-simple-choice identifier="C"><div><img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDkwIiBoZWlnaHQ9IjM0MCIgdmlld0JveD0iLTIwIC0yMCA0OTAgMzQwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjEyIj48bGluZSB4MT0iMjAiIHkxPSIyMzgiIHgyPSI0MzAiIHkyPSIyMzgiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48bGluZSB4MT0iMjAiIHkxPSIyMzMiIHgyPSIyMCIgeTI9IjI0MyIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjx0ZXh0IHg9IjIwIiB5PSIyNTgiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMzMzMzMzMiPjA8L3RleHQ+PGxpbmUgeDE9Ijg4LjMzMzMzMzMzMzMzMzMzIiB5MT0iMjMzIiB4Mj0iODguMzMzMzMzMzMzMzMzMzMiIHkyPSIyNDMiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48dGV4dCB4PSI4OC4zMzMzMzMzMzMzMzMzMyIgeT0iMjU4IiBmb250LXNpemU9IjEyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMzMzMzMzIj4yPC90ZXh0PjxsaW5lIHgxPSIxNTYuNjY2NjY2NjY2NjY2NjYiIHkxPSIyMzMiIHgyPSIxNTYuNjY2NjY2NjY2NjY2NjYiIHkyPSIyNDMiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48dGV4dCB4PSIxNTYuNjY2NjY2NjY2NjY2NjYiIHk9IjI1OCIgZm9udC1zaXplPSIxMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzMzMzMzMyI+NDwvdGV4dD48bGluZSB4MT0iMjI1IiB5MT0iMjMzIiB4Mj0iMjI1IiB5Mj0iMjQzIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PHRleHQgeD0iMjI1IiB5PSIyNTgiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMzMzMzMzMiPjY8L3RleHQ+PGxpbmUgeDE9IjI5My4zMzMzMzMzMzMzMzMzIiB5MT0iMjMzIiB4Mj0iMjkzLjMzMzMzMzMzMzMzMzMiIHkyPSIyNDMiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48dGV4dCB4PSIyOTMuMzMzMzMzMzMzMzMzMyIgeT0iMjU4IiBmb250LXNpemU9IjEyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMzMzMzMzIj44PC90ZXh0PjxsaW5lIHgxPSIzNjEuNjY2NjY2NjY2NjY2NjMiIHkxPSIyMzMiIHgyPSIzNjEuNjY2NjY2NjY2NjY2NjMiIHkyPSIyNDMiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48dGV4dCB4PSIzNjEuNjY2NjY2NjY2NjY2NjMiIHk9IjI1OCIgZm9udC1zaXplPSIxMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzMzMzMzMyI+MTA8L3RleHQ+PGxpbmUgeDE9IjQzMCIgeTE9IjIzMyIgeDI9IjQzMCIgeTI9IjI0MyIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjx0ZXh0IHg9IjQzMCIgeT0iMjU4IiBmb250LXNpemU9IjEyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMzMzMzMzIj4xMjwvdGV4dD48Y2lyY2xlIGN4PSIxNTYuNjY2NjY2NjY2NjY2NjYiIGN5PSIyMjAiIHI9IjgiIGZpbGw9IiMwMDc0YzgiLz48Y2lyY2xlIGN4PSIxNTYuNjY2NjY2NjY2NjY2NjYiIGN5PSIyMDIiIHI9IjgiIGZpbGw9IiMwMDc0YzgiLz48Y2lyY2xlIGN4PSIxNTYuNjY2NjY2NjY2NjY2NjYiIGN5PSIxODQiIHI9IjgiIGZpbGw9IiMwMDc0YzgiLz48Y2lyY2xlIGN4PSIxNTYuNjY2NjY2NjY2NjY2NjYiIGN5PSIxNjYiIHI9IjgiIGZpbGw9IiMwMDc0YzgiLz48L3N2Zz4=" alt="Widget visualization" /></div><qti-feedback-inline outcome-identifier="FEEDBACK-INLINE" identifier="C">This plot shows four dots above the number <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>4</mn></math>. This represents the total number of pencils, not their individual lengths.</qti-feedback-inline></qti-simple-choice>
+            <qti-simple-choice identifier="D"><div><img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDkwIiBoZWlnaHQ9IjM0MCIgdmlld0JveD0iLTIwIC0yMCA0OTAgMzQwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjEyIj48bGluZSB4MT0iMjAiIHkxPSIyMzgiIHgyPSI0MzAiIHkyPSIyMzgiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48bGluZSB4MT0iMjAiIHkxPSIyMzMiIHgyPSIyMCIgeTI9IjI0MyIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjx0ZXh0IHg9IjIwIiB5PSIyNTgiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMzMzMzMzMiPjA8L3RleHQ+PGxpbmUgeDE9Ijg4LjMzMzMzMzMzMzMzMzMzIiB5MT0iMjMzIiB4Mj0iODguMzMzMzMzMzMzMzMzMzMiIHkyPSIyNDMiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48dGV4dCB4PSI4OC4zMzMzMzMzMzMzMzMzMyIgeT0iMjU4IiBmb250LXNpemU9IjEyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMzMzMzMzIj4yPC90ZXh0PjxsaW5lIHgxPSIxNTYuNjY2NjY2NjY2NjY2NjYiIHkxPSIyMzMiIHgyPSIxNTYuNjY2NjY2NjY2NjY2NjYiIHkyPSIyNDMiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48dGV4dCB4PSIxNTYuNjY2NjY2NjY2NjY2NjYiIHk9IjI1OCIgZm9udC1zaXplPSIxMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzMzMzMzMyI+NDwvdGV4dD48bGluZSB4MT0iMjI1IiB5MT0iMjMzIiB4Mj0iMjI1IiB5Mj0iMjQzIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PHRleHQgeD0iMjI1IiB5PSIyNTgiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMzMzMzMzMiPjY8L3RleHQ+PGxpbmUgeDE9IjI5My4zMzMzMzMzMzMzMzMzIiB5MT0iMjMzIiB4Mj0iMjkzLjMzMzMzMzMzMzMzMzMiIHkyPSIyNDMiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48dGV4dCB4PSIyOTMuMzMzMzMzMzMzMzMzMyIgeT0iMjU4IiBmb250LXNpemU9IjEyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMzMzMzMzIj44PC90ZXh0PjxsaW5lIHgxPSIzNjEuNjY2NjY2NjY2NjY2NjMiIHkxPSIyMzMiIHgyPSIzNjEuNjY2NjY2NjY2NjY2NjMiIHkyPSIyNDMiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48dGV4dCB4PSIzNjEuNjY2NjY2NjY2NjY2NjMiIHk9IjI1OCIgZm9udC1zaXplPSIxMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzMzMzMzMyI+MTA8L3RleHQ+PGxpbmUgeDE9IjQzMCIgeTE9IjIzMyIgeDI9IjQzMCIgeTI9IjI0MyIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjx0ZXh0IHg9IjQzMCIgeT0iMjU4IiBmb250LXNpemU9IjEyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMzMzMzMzIj4xMjwvdGV4dD48Y2lyY2xlIGN4PSIxNTYuNjY2NjY2NjY2NjY2NjYiIGN5PSIyMjAiIHI9IjgiIGZpbGw9IiMwMDc0YzgiLz48Y2lyY2xlIGN4PSIzMjcuNSIgY3k9IjIyMCIgcj0iOCIgZmlsbD0iIzAwNzRjOCIvPjxjaXJjbGUgY3g9IjMyNy41IiBjeT0iMjAyIiByPSI4IiBmaWxsPSIjMDA3NGM4Ii8+PGNpcmNsZSBjeD0iNDMwIiBjeT0iMjIwIiByPSI4IiBmaWxsPSIjMDA3NGM4Ii8+PC9zdmc+" alt="Widget visualization" /></div><qti-feedback-inline outcome-identifier="FEEDBACK-INLINE" identifier="D">Check the data again carefully to make sure the dots are placed above the correct numbers.</qti-feedback-inline></qti-simple-choice>
+        </qti-choice-interaction></div></div>
+        <qti-feedback-block outcome-identifier="FEEDBACK" identifier="CORRECT" show-hide="show">
+            <qti-content-body><p>Correct! The chosen plot correctly displays a dot for each of these measurements.</p></qti-content-body>
+        </qti-feedback-block>
+        <qti-feedback-block outcome-identifier="FEEDBACK" identifier="INCORRECT" show-hide="show">
+            <qti-content-body><p>Not quite. To create the line plot, place one dot above the correct number on the line for each pencil measured.</p></qti-content-body>
         </qti-feedback-block>
     </qti-item-body>
     <qti-response-processing>
@@ -668,6 +1188,119 @@ exports[`QTI Compiler End-to-End Tests should produce consistent XML output for 
             <qti-response-if>
                 <qti-and>
                     <qti-match><qti-variable identifier="RESPONSE"/><qti-correct identifier="RESPONSE"/></qti-match>
+                </qti-and>
+                <qti-set-outcome-value identifier="SCORE"><qti-base-value base-type="float">1</qti-base-value></qti-set-outcome-value>
+                <qti-set-outcome-value identifier="FEEDBACK"><qti-base-value base-type="identifier">CORRECT</qti-base-value></qti-set-outcome-value>
+            </qti-response-if>
+            <qti-response-else>
+                <qti-set-outcome-value identifier="SCORE"><qti-base-value base-type="float">0</qti-base-value></qti-set-outcome-value>
+                <qti-set-outcome-value identifier="FEEDBACK"><qti-base-value base-type="identifier">INCORRECT</qti-base-value></qti-set-outcome-value>
+            </qti-response-else>
+        </qti-response-condition>
+    </qti-response-processing>
+</qti-assessment-item>"
+`;
+
+exports[`QTI Compiler End-to-End Tests should produce consistent XML output for "doll-height-line-plot" 1`] = `
+"<?xml version="1.0" encoding="UTF-8"?>
+<qti-assessment-item
+    xmlns="http://www.imsglobal.org/xsd/imsqtiasi_v3p0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqtiasi_v3p0 https://purl.imsglobal.org/spec/qti/v3p0/schema/xsd/imsqti_asiv3p0p1_v1p0.xsd http://www.w3.org/1998/Math/MathML https://purl.imsglobal.org/spec/mathml/v3p0/schema/xsd/mathml3.xsd"
+    identifier="doll-height-line-plot"
+    title="Interpreting a line plot"
+    time-dependent="false"
+    xml:lang="en-US">
+    <qti-response-declaration identifier="RESPONSE" cardinality="single" base-type="integer">
+        <qti-correct-response>
+            <qti-value>5</qti-value>
+        </qti-correct-response>
+        <qti-mapping default-value="0">
+            <qti-map-entry map-key="5" mapped-value="1"/>
+        </qti-mapping>
+    </qti-response-declaration>
+    <qti-outcome-declaration identifier="SCORE" cardinality="single" base-type="float">
+        <qti-default-value><qti-value>0</qti-value></qti-default-value>
+    </qti-outcome-declaration>
+    <qti-outcome-declaration identifier="FEEDBACK" cardinality="single" base-type="identifier"/>
+    <qti-outcome-declaration identifier="FEEDBACK-INLINE" cardinality="multiple" base-type="identifier"/>
+    <qti-item-body>
+        <p>The heights of Sabrina's dolls are shown below.</p>
+        <div><img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzkwIiBoZWlnaHQ9IjM0MCIgdmlld0JveD0iLTIwIC0yMCAzOTAgMzQwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjEyIj48bGluZSB4MT0iMjAiIHkxPSIyMzgiIHgyPSIzMzAiIHkyPSIyMzgiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48dGV4dCB4PSIxNzUiIHk9IjI4NCIgZm9udC1zaXplPSIxNCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzMzMzMzMyI+RG9sbCBIZWlnaHQgKGNlbnRpbWV0ZXJzKTwvdGV4dD48bGluZSB4MT0iMjAiIHkxPSIyMzMiIHgyPSIyMCIgeTI9IjI0MyIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjx0ZXh0IHg9IjIwIiB5PSIyNTgiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMzMzMzMzMiPjIwPC90ZXh0PjxsaW5lIHgxPSI4MiIgeTE9IjIzMyIgeDI9IjgyIiB5Mj0iMjQzIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PHRleHQgeD0iODIiIHk9IjI1OCIgZm9udC1zaXplPSIxMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzMzMzMzMyI+MjE8L3RleHQ+PGxpbmUgeDE9IjE0NCIgeTE9IjIzMyIgeDI9IjE0NCIgeTI9IjI0MyIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjx0ZXh0IHg9IjE0NCIgeT0iMjU4IiBmb250LXNpemU9IjEyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMzMzMzMzIj4yMjwvdGV4dD48bGluZSB4MT0iMjA2IiB5MT0iMjMzIiB4Mj0iMjA2IiB5Mj0iMjQzIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PHRleHQgeD0iMjA2IiB5PSIyNTgiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMzMzMzMzMiPjIzPC90ZXh0PjxsaW5lIHgxPSIyNjgiIHkxPSIyMzMiIHgyPSIyNjgiIHkyPSIyNDMiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48dGV4dCB4PSIyNjgiIHk9IjI1OCIgZm9udC1zaXplPSIxMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzMzMzMzMyI+MjQ8L3RleHQ+PGxpbmUgeDE9IjMzMCIgeTE9IjIzMyIgeDI9IjMzMCIgeTI9IjI0MyIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjx0ZXh0IHg9IjMzMCIgeT0iMjU4IiBmb250LXNpemU9IjEyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMzMzMzMzIj4yNTwvdGV4dD48Y2lyY2xlIGN4PSI4MiIgY3k9IjIyMiIgcj0iNiIgZmlsbD0iIzMzMzMzMyIvPjxjaXJjbGUgY3g9IjE0NCIgY3k9IjIyMiIgcj0iNiIgZmlsbD0iIzMzMzMzMyIvPjxjaXJjbGUgY3g9IjE0NCIgY3k9IjIwOCIgcj0iNiIgZmlsbD0iIzMzMzMzMyIvPjxjaXJjbGUgY3g9IjIwNiIgY3k9IjIyMiIgcj0iNiIgZmlsbD0iIzMzMzMzMyIvPjxjaXJjbGUgY3g9IjIwNiIgY3k9IjIwOCIgcj0iNiIgZmlsbD0iIzMzMzMzMyIvPjxjaXJjbGUgY3g9IjIwNiIgY3k9IjE5NCIgcj0iNiIgZmlsbD0iIzMzMzMzMyIvPjxjaXJjbGUgY3g9IjI2OCIgY3k9IjIyMiIgcj0iNiIgZmlsbD0iIzMzMzMzMyIvPjxjaXJjbGUgY3g9IjI2OCIgY3k9IjIwOCIgcj0iNiIgZmlsbD0iIzMzMzMzMyIvPjwvc3ZnPg==" alt="Widget visualization" /></div>
+        <p>How many dolls are taller than <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>22</mn></math> centimeters? <qti-text-entry-interaction response-identifier="RESPONSE" expected-length="3"/></p>
+        <qti-feedback-block outcome-identifier="FEEDBACK" identifier="CORRECT" show-hide="show">
+            <qti-content-body><p>Correct! <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>5</mn></math> dolls are taller than <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>22</mn><mtext> cm</mtext></math>.</p></qti-content-body>
+        </qti-feedback-block>
+        <qti-feedback-block outcome-identifier="FEEDBACK" identifier="INCORRECT" show-hide="show">
+            <qti-content-body><p>Not quite. Count all the dots that are to the right of <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>22</mn></math> on the line plot.</p></qti-content-body>
+        </qti-feedback-block>
+    </qti-item-body>
+    <qti-response-processing>
+        <qti-response-condition>
+            <qti-response-if>
+                <qti-and>
+                    <qti-match><qti-variable identifier="RESPONSE"/><qti-correct identifier="RESPONSE"/></qti-match>
+                </qti-and>
+                <qti-set-outcome-value identifier="SCORE"><qti-base-value base-type="float">1</qti-base-value></qti-set-outcome-value>
+                <qti-set-outcome-value identifier="FEEDBACK"><qti-base-value base-type="identifier">CORRECT</qti-base-value></qti-set-outcome-value>
+            </qti-response-if>
+            <qti-response-else>
+                <qti-set-outcome-value identifier="SCORE"><qti-base-value base-type="float">0</qti-base-value></qti-set-outcome-value>
+                <qti-set-outcome-value identifier="FEEDBACK"><qti-base-value base-type="identifier">INCORRECT</qti-base-value></qti-set-outcome-value>
+            </qti-response-else>
+        </qti-response-condition>
+    </qti-response-processing>
+</qti-assessment-item>"
+`;
+
+exports[`QTI Compiler End-to-End Tests should produce consistent XML output for "time-on-number-line-detailed-final" 1`] = `
+"<?xml version="1.0" encoding="UTF-8"?>
+<qti-assessment-item
+    xmlns="http://www.imsglobal.org/xsd/imsqtiasi_v3p0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqtiasi_v3p0 https://purl.imsglobal.org/spec/qti/v3p0/schema/xsd/imsqti_asiv3p0p1_v1p0.xsd http://www.w3.org/1998/Math/MathML https://purl.imsglobal.org/spec/mathml/v3p0/schema/xsd/mathml3.xsd"
+    identifier="time-on-number-line-detailed-final"
+    title="What time is shown on the number line?"
+    time-dependent="false"
+    xml:lang="en-US">
+    <qti-response-declaration identifier="RESPONSE_HR" cardinality="single" base-type="integer">
+        <qti-correct-response>
+            <qti-value>12</qti-value>
+        </qti-correct-response>
+        <qti-mapping default-value="0">
+            <qti-map-entry map-key="12" mapped-value="1"/>
+        </qti-mapping>
+    </qti-response-declaration>
+    <qti-response-declaration identifier="RESPONSE_MIN" cardinality="single" base-type="integer">
+        <qti-correct-response>
+            <qti-value>55</qti-value>
+        </qti-correct-response>
+        <qti-mapping default-value="0">
+            <qti-map-entry map-key="55" mapped-value="1"/>
+        </qti-mapping>
+    </qti-response-declaration>
+    <qti-outcome-declaration identifier="SCORE" cardinality="single" base-type="float">
+        <qti-default-value><qti-value>0</qti-value></qti-default-value>
+    </qti-outcome-declaration>
+    <qti-outcome-declaration identifier="FEEDBACK" cardinality="single" base-type="identifier"/>
+    <qti-outcome-declaration identifier="FEEDBACK-INLINE" cardinality="multiple" base-type="identifier"/>
+    <qti-item-body>
+        <p>Look at the following number line.</p>
+        <div><img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTQyIiBoZWlnaHQ9IjM0MCIgdmlld0JveD0iLTIwIC0yMCA1NDIgMzQwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjEyIj48bGluZSB4MT0iMjAiIHkxPSIxNTAiIHgyPSI0ODAiIHkyPSIxNTAiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIyIi8+PGxpbmUgeDE9IjI3LjY2NjY2NjY2NjY2NjY2OCIgeTE9IjE0NyIgeDI9IjI3LjY2NjY2NjY2NjY2NjY2OCIgeTI9IjE1MyIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjxsaW5lIHgxPSIzNS4zMzMzMzMzMzMzMzMzMzYiIHkxPSIxNDciIHgyPSIzNS4zMzMzMzMzMzMzMzMzMzYiIHkyPSIxNTMiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48bGluZSB4MT0iNDMiIHkxPSIxNDciIHgyPSI0MyIgeTI9IjE1MyIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjxsaW5lIHgxPSI1MC42NjY2NjY2NjY2NjY2NyIgeTE9IjE0NyIgeDI9IjUwLjY2NjY2NjY2NjY2NjY3IiB5Mj0iMTUzIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PGxpbmUgeDE9IjU4LjMzMzMzMzMzMzMzMzMzNiIgeTE9IjE0NyIgeDI9IjU4LjMzMzMzMzMzMzMzMzMzNiIgeTI9IjE1MyIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjxsaW5lIHgxPSI2NiIgeTE9IjE0NyIgeDI9IjY2IiB5Mj0iMTUzIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PGxpbmUgeDE9IjczLjY2NjY2NjY2NjY2NjY3IiB5MT0iMTQ3IiB4Mj0iNzMuNjY2NjY2NjY2NjY2NjciIHkyPSIxNTMiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48bGluZSB4MT0iODEuMzMzMzMzMzMzMzMzMzQiIHkxPSIxNDciIHgyPSI4MS4zMzMzMzMzMzMzMzMzNCIgeTI9IjE1MyIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjxsaW5lIHgxPSI4OSIgeTE9IjE0NyIgeDI9Ijg5IiB5Mj0iMTUzIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PGxpbmUgeDE9Ijk2LjY2NjY2NjY2NjY2NjY3IiB5MT0iMTQ3IiB4Mj0iOTYuNjY2NjY2NjY2NjY2NjciIHkyPSIxNTMiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48bGluZSB4MT0iMTA0LjMzMzMzMzMzMzMzMzM0IiB5MT0iMTQ3IiB4Mj0iMTA0LjMzMzMzMzMzMzMzMzM0IiB5Mj0iMTUzIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PGxpbmUgeDE9IjExMiIgeTE9IjE0NyIgeDI9IjExMiIgeTI9IjE1MyIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjxsaW5lIHgxPSIxMTkuNjY2NjY2NjY2NjY2NjciIHkxPSIxNDciIHgyPSIxMTkuNjY2NjY2NjY2NjY2NjciIHkyPSIxNTMiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48bGluZSB4MT0iMTI3LjMzMzMzMzMzMzMzMzM0IiB5MT0iMTQ3IiB4Mj0iMTI3LjMzMzMzMzMzMzMzMzM0IiB5Mj0iMTUzIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PGxpbmUgeDE9IjE0Mi42NjY2NjY2NjY2NjY2OSIgeTE9IjE0NyIgeDI9IjE0Mi42NjY2NjY2NjY2NjY2OSIgeTI9IjE1MyIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjxsaW5lIHgxPSIxNTAuMzMzMzMzMzMzMzMzMzQiIHkxPSIxNDciIHgyPSIxNTAuMzMzMzMzMzMzMzMzMzQiIHkyPSIxNTMiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48bGluZSB4MT0iMTU4IiB5MT0iMTQ3IiB4Mj0iMTU4IiB5Mj0iMTUzIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PGxpbmUgeDE9IjE2NS42NjY2NjY2NjY2NjY2OSIgeTE9IjE0NyIgeDI9IjE2NS42NjY2NjY2NjY2NjY2OSIgeTI9IjE1MyIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjxsaW5lIHgxPSIxNzMuMzMzMzMzMzMzMzMzMzQiIHkxPSIxNDciIHgyPSIxNzMuMzMzMzMzMzMzMzMzMzQiIHkyPSIxNTMiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48bGluZSB4MT0iMTgxIiB5MT0iMTQ3IiB4Mj0iMTgxIiB5Mj0iMTUzIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PGxpbmUgeDE9IjE4OC42NjY2NjY2NjY2NjY2OSIgeTE9IjE0NyIgeDI9IjE4OC42NjY2NjY2NjY2NjY2OSIgeTI9IjE1MyIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjxsaW5lIHgxPSIxOTYuMzMzMzMzMzMzMzMzMzQiIHkxPSIxNDciIHgyPSIxOTYuMzMzMzMzMzMzMzMzMzQiIHkyPSIxNTMiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48bGluZSB4MT0iMjA0IiB5MT0iMTQ3IiB4Mj0iMjA0IiB5Mj0iMTUzIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PGxpbmUgeDE9IjIxMS42NjY2NjY2NjY2NjY2OSIgeTE9IjE0NyIgeDI9IjIxMS42NjY2NjY2NjY2NjY2OSIgeTI9IjE1MyIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjxsaW5lIHgxPSIyMTkuMzMzMzMzMzMzMzMzMzQiIHkxPSIxNDciIHgyPSIyMTkuMzMzMzMzMzMzMzMzMzQiIHkyPSIxNTMiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48bGluZSB4MT0iMjI3IiB5MT0iMTQ3IiB4Mj0iMjI3IiB5Mj0iMTUzIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PGxpbmUgeDE9IjIzNC42NjY2NjY2NjY2NjY2OSIgeTE9IjE0NyIgeDI9IjIzNC42NjY2NjY2NjY2NjY2OSIgeTI9IjE1MyIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjxsaW5lIHgxPSIyNDIuMzMzMzMzMzMzMzMzMzQiIHkxPSIxNDciIHgyPSIyNDIuMzMzMzMzMzMzMzMzMzQiIHkyPSIxNTMiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48bGluZSB4MT0iMjU3LjY2NjY2NjY2NjY2NjciIHkxPSIxNDciIHgyPSIyNTcuNjY2NjY2NjY2NjY2NyIgeTI9IjE1MyIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjxsaW5lIHgxPSIyNjUuMzMzMzMzMzMzMzMzMzciIHkxPSIxNDciIHgyPSIyNjUuMzMzMzMzMzMzMzMzMzciIHkyPSIxNTMiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48bGluZSB4MT0iMjczIiB5MT0iMTQ3IiB4Mj0iMjczIiB5Mj0iMTUzIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PGxpbmUgeDE9IjI4MC42NjY2NjY2NjY2NjY3IiB5MT0iMTQ3IiB4Mj0iMjgwLjY2NjY2NjY2NjY2NjciIHkyPSIxNTMiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48bGluZSB4MT0iMjg4LjMzMzMzMzMzMzMzMzM3IiB5MT0iMTQ3IiB4Mj0iMjg4LjMzMzMzMzMzMzMzMzM3IiB5Mj0iMTUzIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PGxpbmUgeDE9IjI5NiIgeTE9IjE0NyIgeDI9IjI5NiIgeTI9IjE1MyIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjxsaW5lIHgxPSIzMDMuNjY2NjY2NjY2NjY2NyIgeTE9IjE0NyIgeDI9IjMwMy42NjY2NjY2NjY2NjY3IiB5Mj0iMTUzIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PGxpbmUgeDE9IjMxMS4zMzMzMzMzMzMzMzMzNyIgeTE9IjE0NyIgeDI9IjMxMS4zMzMzMzMzMzMzMzMzNyIgeTI9IjE1MyIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjxsaW5lIHgxPSIzMTkiIHkxPSIxNDciIHgyPSIzMTkiIHkyPSIxNTMiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48bGluZSB4MT0iMzI2LjY2NjY2NjY2NjY2NjciIHkxPSIxNDciIHgyPSIzMjYuNjY2NjY2NjY2NjY2NyIgeTI9IjE1MyIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjxsaW5lIHgxPSIzMzQuMzMzMzMzMzMzMzMzMzciIHkxPSIxNDciIHgyPSIzMzQuMzMzMzMzMzMzMzMzMzciIHkyPSIxNTMiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48bGluZSB4MT0iMzQyIiB5MT0iMTQ3IiB4Mj0iMzQyIiB5Mj0iMTUzIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PGxpbmUgeDE9IjM0OS42NjY2NjY2NjY2NjY3IiB5MT0iMTQ3IiB4Mj0iMzQ5LjY2NjY2NjY2NjY2NjciIHkyPSIxNTMiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48bGluZSB4MT0iMzU3LjMzMzMzMzMzMzMzMzM3IiB5MT0iMTQ3IiB4Mj0iMzU3LjMzMzMzMzMzMzMzMzM3IiB5Mj0iMTUzIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PGxpbmUgeDE9IjM3Mi42NjY2NjY2NjY2NjY3IiB5MT0iMTQ3IiB4Mj0iMzcyLjY2NjY2NjY2NjY2NjciIHkyPSIxNTMiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48bGluZSB4MT0iMzgwLjMzMzMzMzMzMzMzMzM3IiB5MT0iMTQ3IiB4Mj0iMzgwLjMzMzMzMzMzMzMzMzM3IiB5Mj0iMTUzIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PGxpbmUgeDE9IjM4OCIgeTE9IjE0NyIgeDI9IjM4OCIgeTI9IjE1MyIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjxsaW5lIHgxPSIzOTUuNjY2NjY2NjY2NjY2NyIgeTE9IjE0NyIgeDI9IjM5NS42NjY2NjY2NjY2NjY3IiB5Mj0iMTUzIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PGxpbmUgeDE9IjQwMy4zMzMzMzMzMzMzMzMzNyIgeTE9IjE0NyIgeDI9IjQwMy4zMzMzMzMzMzMzMzMzNyIgeTI9IjE1MyIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjxsaW5lIHgxPSI0MTEiIHkxPSIxNDciIHgyPSI0MTEiIHkyPSIxNTMiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48bGluZSB4MT0iNDE4LjY2NjY2NjY2NjY2NjciIHkxPSIxNDciIHgyPSI0MTguNjY2NjY2NjY2NjY2NyIgeTI9IjE1MyIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjxsaW5lIHgxPSI0MjYuMzMzMzMzMzMzMzMzMzciIHkxPSIxNDciIHgyPSI0MjYuMzMzMzMzMzMzMzMzMzciIHkyPSIxNTMiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48bGluZSB4MT0iNDM0IiB5MT0iMTQ3IiB4Mj0iNDM0IiB5Mj0iMTUzIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PGxpbmUgeDE9IjQ0MS42NjY2NjY2NjY2NjY3IiB5MT0iMTQ3IiB4Mj0iNDQxLjY2NjY2NjY2NjY2NjciIHkyPSIxNTMiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48bGluZSB4MT0iNDQ5LjMzMzMzMzMzMzMzMzM3IiB5MT0iMTQ3IiB4Mj0iNDQ5LjMzMzMzMzMzMzMzMzM3IiB5Mj0iMTUzIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PGxpbmUgeDE9IjQ1NyIgeTE9IjE0NyIgeDI9IjQ1NyIgeTI9IjE1MyIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjxsaW5lIHgxPSI0NjQuNjY2NjY2NjY2NjY2NyIgeTE9IjE0NyIgeDI9IjQ2NC42NjY2NjY2NjY2NjY3IiB5Mj0iMTUzIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PGxpbmUgeDE9IjQ3Mi4zMzMzMzMzMzMzMzMzNyIgeTE9IjE0NyIgeDI9IjQ3Mi4zMzMzMzMzMzMzMzMzNyIgeTI9IjE1MyIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjxsaW5lIHgxPSIyMCIgeTE9IjE0NSIgeDI9IjIwIiB5Mj0iMTU1IiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PHRleHQgeD0iMjAiIHk9IjE3MCIgZm9udC1zaXplPSIxMSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzMzMzMzMyI+MDwvdGV4dD48bGluZSB4MT0iMTM1IiB5MT0iMTQ1IiB4Mj0iMTM1IiB5Mj0iMTU1IiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PHRleHQgeD0iMTM1IiB5PSIxNzAiIGZvbnQtc2l6ZT0iMTEiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMzMzMzMzMiPjE1PC90ZXh0PjxsaW5lIHgxPSIyNTAiIHkxPSIxNDUiIHgyPSIyNTAiIHkyPSIxNTUiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48dGV4dCB4PSIyNTAiIHk9IjE3MCIgZm9udC1zaXplPSIxMSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzMzMzMzMyI+MzA8L3RleHQ+PGxpbmUgeDE9IjM2NSIgeTE9IjE0NSIgeDI9IjM2NSIgeTI9IjE1NSIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjx0ZXh0IHg9IjM2NSIgeT0iMTcwIiBmb250LXNpemU9IjExIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMzMzMzMzIj40NTwvdGV4dD48bGluZSB4MT0iNDgwIiB5MT0iMTQ1IiB4Mj0iNDgwIiB5Mj0iMTU1IiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PHRleHQgeD0iNDgwIiB5PSIxNzAiIGZvbnQtc2l6ZT0iMTEiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMzMzMzMzMiPjYwPC90ZXh0PjxjaXJjbGUgY3g9IjQ0MS42NjY2NjY2NjY2NjY3IiBjeT0iMTUwIiByPSI1IiBmaWxsPSIjQTA1MjJEIiBzdHJva2U9IiNBMDUyMkQiIHN0cm9rZS13aWR0aD0iMSIvPjxmb3JlaWduT2JqZWN0IHg9IjM4MS42NjY2NjY2NjY2NjY3IiB5PSIxMDAiIHdpZHRoPSIxMjAiIGhlaWdodD0iMzIiPjwhRE9DVFlQRSBodG1sPjxkaXYgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGh0bWwiIHN0eWxlPSJkaXNwbGF5OmZsZXg7YWxpZ24taXRlbXM6ZmxleC1lbmQ7anVzdGlmeS1jb250ZW50OmNlbnRlcjt3aWR0aDoxMDAlO2hlaWdodDoxMDAlO2xpbmUtaGVpZ2h0OjE7Zm9udC1mYW1pbHk6c2Fucy1zZXJpZjtjb2xvcjojQTA1MjJEOyI+PG1hdGggeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzE5OTgvTWF0aC9NYXRoTUwiIGRpc3BsYXk9ImlubGluZSIgc3R5bGU9ImZvbnQtc2l6ZToxOS4ycHg7Ij48bW4+NTU8L21uPjwvbWF0aD48L2Rpdj48L2ZvcmVpZ25PYmplY3Q+PC9zdmc+" alt="Widget visualization" /></div>
+        <p>What time is shown on the number line? <qti-text-entry-interaction response-identifier="RESPONSE_HR" expected-length="2"/>:<qti-text-entry-interaction response-identifier="RESPONSE_MIN" expected-length="2"/></p>
+        <qti-feedback-block outcome-identifier="FEEDBACK" identifier="CORRECT" show-hide="show">
+            <qti-content-body><p>Correct! The time shown is 12:55.</p></qti-content-body>
+        </qti-feedback-block>
+        <qti-feedback-block outcome-identifier="FEEDBACK" identifier="INCORRECT" show-hide="show">
+            <qti-content-body><p>Not quite. Point A is located after the 12:00 mark but before the 1:00 mark. The time is 12:55.</p></qti-content-body>
+        </qti-feedback-block>
+    </qti-item-body>
+    <qti-response-processing>
+        <qti-response-condition>
+            <qti-response-if>
+                <qti-and>
+                    <qti-match><qti-variable identifier="RESPONSE_HR"/><qti-correct identifier="RESPONSE_HR"/></qti-match>
+                    <qti-match><qti-variable identifier="RESPONSE_MIN"/><qti-correct identifier="RESPONSE_MIN"/></qti-match>
                 </qti-and>
                 <qti-set-outcome-value identifier="SCORE"><qti-base-value base-type="float">1</qti-base-value></qti-set-outcome-value>
                 <qti-set-outcome-value identifier="FEEDBACK"><qti-base-value base-type="identifier">CORRECT</qti-base-value></qti-set-outcome-value>
@@ -1169,6 +1802,192 @@ exports[`QTI Compiler End-to-End Tests should produce consistent XML output for 
                     <qti-match><qti-variable identifier="dropdown_1"/><qti-correct identifier="dropdown_1"/></qti-match>
                     <qti-match><qti-variable identifier="dropdown_2"/><qti-correct identifier="dropdown_2"/></qti-match>
                     <qti-match><qti-variable identifier="dropdown_3"/><qti-correct identifier="dropdown_3"/></qti-match>
+                </qti-and>
+                <qti-set-outcome-value identifier="SCORE"><qti-base-value base-type="float">1</qti-base-value></qti-set-outcome-value>
+                <qti-set-outcome-value identifier="FEEDBACK"><qti-base-value base-type="identifier">CORRECT</qti-base-value></qti-set-outcome-value>
+            </qti-response-if>
+            <qti-response-else>
+                <qti-set-outcome-value identifier="SCORE"><qti-base-value base-type="float">0</qti-base-value></qti-set-outcome-value>
+                <qti-set-outcome-value identifier="FEEDBACK"><qti-base-value base-type="identifier">INCORRECT</qti-base-value></qti-set-outcome-value>
+            </qti-response-else>
+        </qti-response-condition>
+    </qti-response-processing>
+</qti-assessment-item>"
+`;
+
+exports[`QTI Compiler End-to-End Tests should produce consistent XML output for "ke-mass-speed-relationships" 1`] = `
+"<?xml version="1.0" encoding="UTF-8"?>
+<qti-assessment-item
+    xmlns="http://www.imsglobal.org/xsd/imsqtiasi_v3p0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqtiasi_v3p0 https://purl.imsglobal.org/spec/qti/v3p0/schema/xsd/imsqti_asiv3p0p1_v1p0.xsd http://www.w3.org/1998/Math/MathML https://purl.imsglobal.org/spec/mathml/v3p0/schema/xsd/mathml3.xsd"
+    identifier="ke-mass-speed-relationships"
+    title="Kinetic energy relationships with mass and speed"
+    time-dependent="false"
+    xml:lang="en-US">
+    <qti-response-declaration identifier="dropdown_1" cardinality="single" base-type="identifier">
+        <qti-correct-response>
+            <qti-value>linear</qti-value>
+        </qti-correct-response>
+    </qti-response-declaration>
+    <qti-response-declaration identifier="dropdown_3" cardinality="single" base-type="identifier">
+        <qti-correct-response>
+            <qti-value>one_half</qti-value>
+        </qti-correct-response>
+    </qti-response-declaration>
+    <qti-response-declaration identifier="dropdown_2" cardinality="single" base-type="identifier">
+        <qti-correct-response>
+            <qti-value>nonlinear</qti-value>
+        </qti-correct-response>
+    </qti-response-declaration>
+    <qti-response-declaration identifier="dropdown_5" cardinality="single" base-type="identifier">
+        <qti-correct-response>
+            <qti-value>one_fourth</qti-value>
+        </qti-correct-response>
+    </qti-response-declaration>
+    <qti-outcome-declaration identifier="SCORE" cardinality="single" base-type="float">
+        <qti-default-value><qti-value>0</qti-value></qti-default-value>
+    </qti-outcome-declaration>
+    <qti-outcome-declaration identifier="FEEDBACK" cardinality="single" base-type="identifier"/>
+    <qti-outcome-declaration identifier="FEEDBACK-INLINE" cardinality="multiple" base-type="identifier"/>
+    <qti-item-body>
+        <p>A moving object's kinetic energy is related to its mass and speed.</p>
+        <p>The relationship between kinetic energy and mass for an object with constant speed is modeled by the graph below.</p>
+        <div><img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzk2IiBoZWlnaHQ9IjM4MSIgdmlld0JveD0iLTg3IC05IDM5NiAzODEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTYiPjxkZWZzPjxjbGlwUGF0aCBpZD0iY2xpcC0wIj48cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIvPjwvY2xpcFBhdGg+PG1hcmtlciBpZD0iZ3JhcGgtYXJyb3ciIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOCIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjYiIG1hcmtlckhlaWdodD0iNiIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPjxwYXRoIGQ9Ik0gMCAwIEwgMTAgNSBMIDAgMTAgeiIgZmlsbD0iIzAwMDAwMCIvPjwvbWFya2VyPjwvZGVmcz48bGluZSB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMzAwIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PGxpbmUgeDE9IjAiIHkxPSIzMDAiIHgyPSIwIiB5Mj0iMzAwIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PGxpbmUgeDE9IjAiIHkxPSIyMjUiIHgyPSIwIiB5Mj0iMjI1IiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PGxpbmUgeDE9IjAiIHkxPSIxNTAiIHgyPSIwIiB5Mj0iMTUwIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PGxpbmUgeDE9IjAiIHkxPSI3NSIgeDI9IjAiIHkyPSI3NSIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjxsaW5lIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIwIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PHRleHQgeD0iLTY4LjYwMDAwMDAwMDAwMDAxIiB5PSIxNTAiIGZvbnQtc2l6ZT0iMTYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMzMzMzMzMiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiIHRyYW5zZm9ybT0icm90YXRlKC05MCwgLTY4LjYwMDAwMDAwMDAwMDAxLCAxNTApIj48dHNwYW4geD0iLTY4LjYwMDAwMDAwMDAwMDAxIiBkeT0iMGVtIj5raW5ldGljIGVuZXJneTwvdHNwYW4+PC90ZXh0PjxsaW5lIHgxPSIwIiB5MT0iMzAwIiB4Mj0iMzAwIiB5Mj0iMzAwIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PGxpbmUgeDE9IjAiIHkxPSIzMDAiIHgyPSIwIiB5Mj0iMzAwIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PGxpbmUgeDE9Ijc1IiB5MT0iMzAwIiB4Mj0iNzUiIHkyPSIzMDAiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48bGluZSB4MT0iMTUwIiB5MT0iMzAwIiB4Mj0iMTUwIiB5Mj0iMzAwIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PGxpbmUgeDE9IjIyNSIgeTE9IjMwMCIgeDI9IjIyNSIgeTI9IjMwMCIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjxsaW5lIHgxPSIzMDAiIHkxPSIzMDAiIHgyPSIzMDAiIHkyPSIzMDAiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48dGV4dCB4PSIxNTAiIHk9IjM0NyIgZm9udC1zaXplPSIxNiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzMzMzMzMyI+PHRzcGFuIHg9IjE1MCIgZHk9IjBlbSI+bWFzczwvdHNwYW4+PC90ZXh0PjxsaW5lIHgxPSIwIiB5MT0iMzAwIiB4Mj0iMCIgeTI9IjAiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIyIiBtYXJrZXItZW5kPSJ1cmwoI2dyYXBoLWFycm93KSIvPjxsaW5lIHgxPSIwIiB5MT0iMzAwIiB4Mj0iMzAwIiB5Mj0iMzAwIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMiIgbWFya2VyLWVuZD0idXJsKCNncmFwaC1hcnJvdykiLz48ZyBjbGlwLXBhdGg9InVybCgjY2xpcC0wKSI+PHBvbHlsaW5lIHBvaW50cz0iMCwzMDAgMzAwLDAiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGZpbGw9Im5vbmUiLz48L2c+PC9zdmc+" alt="Widget visualization" /></div>
+        <p>The relationship between kinetic energy and speed for an object with constant mass is modeled by the graph below.</p>
+        <div><img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzk2IiBoZWlnaHQ9IjM4MSIgdmlld0JveD0iLTg3IC05IDM5NiAzODEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTYiPjxkZWZzPjxjbGlwUGF0aCBpZD0iY2xpcC0wIj48cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIvPjwvY2xpcFBhdGg+PG1hcmtlciBpZD0iZ3JhcGgtYXJyb3ciIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOCIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjYiIG1hcmtlckhlaWdodD0iNiIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPjxwYXRoIGQ9Ik0gMCAwIEwgMTAgNSBMIDAgMTAgeiIgZmlsbD0iIzAwMDAwMCIvPjwvbWFya2VyPjwvZGVmcz48bGluZSB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMzAwIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PGxpbmUgeDE9IjAiIHkxPSIzMDAiIHgyPSIwIiB5Mj0iMzAwIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PGxpbmUgeDE9IjAiIHkxPSIyMjUiIHgyPSIwIiB5Mj0iMjI1IiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PGxpbmUgeDE9IjAiIHkxPSIxNTAiIHgyPSIwIiB5Mj0iMTUwIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PGxpbmUgeDE9IjAiIHkxPSI3NSIgeDI9IjAiIHkyPSI3NSIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjxsaW5lIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIwIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PHRleHQgeD0iLTY4LjYwMDAwMDAwMDAwMDAxIiB5PSIxNTAiIGZvbnQtc2l6ZT0iMTYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMzMzMzMzMiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiIHRyYW5zZm9ybT0icm90YXRlKC05MCwgLTY4LjYwMDAwMDAwMDAwMDAxLCAxNTApIj48dHNwYW4geD0iLTY4LjYwMDAwMDAwMDAwMDAxIiBkeT0iMGVtIj5raW5ldGljIGVuZXJneTwvdHNwYW4+PC90ZXh0PjxsaW5lIHgxPSIwIiB5MT0iMzAwIiB4Mj0iMzAwIiB5Mj0iMzAwIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PGxpbmUgeDE9IjAiIHkxPSIzMDAiIHgyPSIwIiB5Mj0iMzAwIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PGxpbmUgeDE9Ijc1IiB5MT0iMzAwIiB4Mj0iNzUiIHkyPSIzMDAiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48bGluZSB4MT0iMTUwIiB5MT0iMzAwIiB4Mj0iMTUwIiB5Mj0iMzAwIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PGxpbmUgeDE9IjIyNSIgeTE9IjMwMCIgeDI9IjIyNSIgeTI9IjMwMCIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjxsaW5lIHgxPSIzMDAiIHkxPSIzMDAiIHgyPSIzMDAiIHkyPSIzMDAiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48dGV4dCB4PSIxNTAiIHk9IjM0NyIgZm9udC1zaXplPSIxNiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzMzMzMzMyI+PHRzcGFuIHg9IjE1MCIgZHk9IjBlbSI+c3BlZWQ8L3RzcGFuPjwvdGV4dD48bGluZSB4MT0iMCIgeTE9IjMwMCIgeDI9IjAiIHkyPSIwIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMiIgbWFya2VyLWVuZD0idXJsKCNncmFwaC1hcnJvdykiLz48bGluZSB4MT0iMCIgeTE9IjMwMCIgeDI9IjMwMCIgeTI9IjMwMCIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjIiIG1hcmtlci1lbmQ9InVybCgjZ3JhcGgtYXJyb3cpIi8+PGcgY2xpcC1wYXRoPSJ1cmwoI2NsaXAtMCkiPjxwb2x5bGluZSBwb2ludHM9IjAsMzAwIDYwLDI4OCAxMjAsMjUyIDE4MCwxOTIgMjQwLDEwOCAzMDAsMCIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgZmlsbD0ibm9uZSIvPjwvZz48L3N2Zz4=" alt="Widget visualization" /></div>
+        <p>Use the patterns on the graphs to complete the statements.</p>
+        <p>• The relationship between kinetic energy and mass is <qti-inline-choice-interaction response-identifier="dropdown_1" shuffle="true">
+                <qti-inline-choice identifier="linear">linear</qti-inline-choice>
+                <qti-inline-choice identifier="nonlinear">nonlinear</qti-inline-choice>
+            </qti-inline-choice-interaction>. If an object's mass is cut in half while its speed stays the same, its kinetic energy becomes <qti-inline-choice-interaction response-identifier="dropdown_3" shuffle="true">
+                <qti-inline-choice identifier="one_fourth">one-fourth</qti-inline-choice>
+                <qti-inline-choice identifier="one_half">one-half</qti-inline-choice>
+                <qti-inline-choice identifier="two_times">two times</qti-inline-choice>
+                <qti-inline-choice identifier="four_times">four times</qti-inline-choice>
+            </qti-inline-choice-interaction> its original value.</p>
+        <p>• The relationship between kinetic energy and speed is <qti-inline-choice-interaction response-identifier="dropdown_2" shuffle="true">
+                <qti-inline-choice identifier="linear">linear</qti-inline-choice>
+                <qti-inline-choice identifier="nonlinear">nonlinear</qti-inline-choice>
+            </qti-inline-choice-interaction>. If an object's speed is cut in half while its mass stays the same, its kinetic energy becomes <qti-inline-choice-interaction response-identifier="dropdown_5" shuffle="true">
+                <qti-inline-choice identifier="one_fourth">one-fourth</qti-inline-choice>
+                <qti-inline-choice identifier="one_half">one-half</qti-inline-choice>
+                <qti-inline-choice identifier="two_times">two times</qti-inline-choice>
+                <qti-inline-choice identifier="four_times">four times</qti-inline-choice>
+            </qti-inline-choice-interaction> its original value.</p>
+        <qti-feedback-block outcome-identifier="FEEDBACK" identifier="CORRECT" show-hide="show">
+            <qti-content-body><p>Correct! The mass–kinetic energy relationship is linear, so halving the mass (at constant speed) halves the kinetic energy.</p>
+        <p>The speed–kinetic energy relationship is nonlinear (quadratic), so halving the speed (at constant mass) reduces the kinetic energy to one-fourth of its original value.</p></qti-content-body>
+        </qti-feedback-block>
+        <qti-feedback-block outcome-identifier="FEEDBACK" identifier="INCORRECT" show-hide="show">
+            <qti-content-body><p>Not quite. On the first graph, the straight line shows a linear pattern: when mass is scaled by a factor, kinetic energy scales by the same factor at constant speed.</p>
+        <p>On the second graph, the curved shape indicates a nonlinear (quadratic) pattern: when speed is halved, kinetic energy becomes one-fourth of its original value at constant mass.</p></qti-content-body>
+        </qti-feedback-block>
+    </qti-item-body>
+    <qti-response-processing>
+        <qti-response-condition>
+            <qti-response-if>
+                <qti-and>
+                    <qti-match><qti-variable identifier="dropdown_1"/><qti-correct identifier="dropdown_1"/></qti-match>
+                    <qti-match><qti-variable identifier="dropdown_3"/><qti-correct identifier="dropdown_3"/></qti-match>
+                    <qti-match><qti-variable identifier="dropdown_2"/><qti-correct identifier="dropdown_2"/></qti-match>
+                    <qti-match><qti-variable identifier="dropdown_5"/><qti-correct identifier="dropdown_5"/></qti-match>
+                </qti-and>
+                <qti-set-outcome-value identifier="SCORE"><qti-base-value base-type="float">1</qti-base-value></qti-set-outcome-value>
+                <qti-set-outcome-value identifier="FEEDBACK"><qti-base-value base-type="identifier">CORRECT</qti-base-value></qti-set-outcome-value>
+            </qti-response-if>
+            <qti-response-else>
+                <qti-set-outcome-value identifier="SCORE"><qti-base-value base-type="float">0</qti-base-value></qti-set-outcome-value>
+                <qti-set-outcome-value identifier="FEEDBACK"><qti-base-value base-type="identifier">INCORRECT</qti-base-value></qti-set-outcome-value>
+            </qti-response-else>
+        </qti-response-condition>
+    </qti-response-processing>
+</qti-assessment-item>"
+`;
+
+exports[`QTI Compiler End-to-End Tests should produce consistent XML output for "reactant-amounts-temp-change-table-perseus" 1`] = `
+"<?xml version="1.0" encoding="UTF-8"?>
+<qti-assessment-item
+    xmlns="http://www.imsglobal.org/xsd/imsqtiasi_v3p0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqtiasi_v3p0 https://purl.imsglobal.org/spec/qti/v3p0/schema/xsd/imsqti_asiv3p0p1_v1p0.xsd http://www.w3.org/1998/Math/MathML https://purl.imsglobal.org/spec/mathml/v3p0/schema/xsd/mathml3.xsd"
+    identifier="reactant-amounts-temp-change-table-perseus"
+    title="Identify reactants and amounts from temperature changes"
+    time-dependent="false"
+    xml:lang="en-US">
+    <qti-response-declaration identifier="dropdown_13" cardinality="single" base-type="identifier">
+        <qti-correct-response>
+            <qti-value>NEG_3_2_C</qti-value>
+        </qti-correct-response>
+    </qti-response-declaration>
+    <qti-response-declaration identifier="dropdown_12" cardinality="single" base-type="identifier">
+        <qti-correct-response>
+            <qti-value>POS_4_2_C</qti-value>
+        </qti-correct-response>
+    </qti-response-declaration>
+    <qti-response-declaration identifier="dropdown_11" cardinality="single" base-type="identifier">
+        <qti-correct-response>
+            <qti-value>POS_2_0_C</qti-value>
+        </qti-correct-response>
+    </qti-response-declaration>
+    <qti-response-declaration identifier="dropdown_9" cardinality="single" base-type="identifier">
+        <qti-correct-response>
+            <qti-value>KOH</qti-value>
+        </qti-correct-response>
+    </qti-response-declaration>
+    <qti-response-declaration identifier="dropdown_10" cardinality="single" base-type="identifier">
+        <qti-correct-response>
+            <qti-value>BaOH2</qti-value>
+        </qti-correct-response>
+    </qti-response-declaration>
+    <qti-outcome-declaration identifier="SCORE" cardinality="single" base-type="float">
+        <qti-default-value><qti-value>0</qti-value></qti-default-value>
+    </qti-outcome-declaration>
+    <qti-outcome-declaration identifier="FEEDBACK" cardinality="single" base-type="identifier"/>
+    <qti-outcome-declaration identifier="FEEDBACK-INLINE" cardinality="multiple" base-type="identifier"/>
+    <qti-item-body>
+        <p>Several students tested how the temperature changed when dissolving different solids in the same amount of water. The substances they tested were <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Na</mi><msub><mi>C</mi><mn>2</mn></msub><msub><mi>H</mi><mn>3</mn></msub><msub><mi>O</mi><mn>2</mn></msub></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>K</mi><mi>O</mi><mi>H</mi></mrow></math>, and <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Ba</mi><msub><mrow><mo>(</mo><mi>OH</mi><mo>)</mo></mrow><mn>2</mn></msub></mrow></math>.</p>
+        <p>Only one student kept track of everyone's data. Unfortunately, their lab notebook got wet, and some of the labels were damaged.</p>
+        <div><div style="display: inline-block; text-align: center;"><img src="https://cdn.kastatic.org/ka-content-images/7bebb0e8fd90795225d76add80eb4c2d9d7d4f0d.jpg" alt="A diagram of the lab setup, including a flask with liquid and a thermometer inside, and a solid powder being poured in. Another flask is tipped over and has spilled onto a notebook on the lab desk." style="display: block; width: 372px; height: 300px;" /></div></div>
+        <p>Use the data provided to identify the reactant and amount that caused each temperature change. Each option is only used once.</p>
+        <div><table style="border-collapse: collapse; width: 100%; border: 1px solid #000000;"><caption style="padding: 8px; font-size: 1.2em; font-weight: 700; caption-side: top;">Experiment data</caption><thead><tr><th scope="col" style="border: 1px solid #000000; padding: 8px; text-align: left; font-weight: 700; background-color: #f2f2f2; text-align: left;">Experiment</th><th scope="col" style="border: 1px solid #000000; padding: 8px; text-align: left; font-weight: 700; background-color: #f2f2f2;">Reactant</th><th scope="col" style="border: 1px solid #000000; padding: 8px; text-align: left; font-weight: 700; background-color: #f2f2f2;">Amount of reactant</th><th scope="col" style="border: 1px solid #000000; padding: 8px; text-align: left; font-weight: 700; background-color: #f2f2f2;">Temperature change</th></tr></thead><tbody><tr><th scope="row" style="border: 1px solid #000000; padding: 8px; text-align: left; font-weight: 700; background-color: #f2f2f2;">A</th><td style="border: 1px solid #000000; padding: 8px; text-align: left;"><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Na</mi><msub><mi>C</mi><mn>2</mn></msub><msub><mi>H</mi><mn>3</mn></msub><msub><mi>O</mi><mn>2</mn></msub></mrow></math></td><td style="border: 1px solid #000000; padding: 8px; text-align: left;"><math xmlns="http://www.w3.org/1998/Math/MathML"><mn>4.0</mn></math> grams</td><td style="border: 1px solid #000000; padding: 8px; text-align: left;"><math xmlns="http://www.w3.org/1998/Math/MathML"><mo>-</mo><mn>1.6</mn><mo>°</mo><mi>C</mi></math></td></tr><tr><th scope="row" style="border: 1px solid #000000; padding: 8px; text-align: left; font-weight: 700; background-color: #f2f2f2;">B</th><td style="border: 1px solid #000000; padding: 8px; text-align: left;"><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>K</mi><mi>O</mi><mi>H</mi></mrow></math></td><td style="border: 1px solid #000000; padding: 8px; text-align: left;"><math xmlns="http://www.w3.org/1998/Math/MathML"><mn>3.0</mn></math> grams</td><td style="border: 1px solid #000000; padding: 8px; text-align: left;"><math xmlns="http://www.w3.org/1998/Math/MathML"><mo>+</mo><mn>2.1</mn><mo>°</mo><mi>C</mi></math></td></tr><tr><th scope="row" style="border: 1px solid #000000; padding: 8px; text-align: left; font-weight: 700; background-color: #f2f2f2;">C</th><td style="border: 1px solid #000000; padding: 8px; text-align: left;"><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Na</mi><msub><mi>C</mi><mn>2</mn></msub><msub><mi>H</mi><mn>3</mn></msub><msub><mi>O</mi><mn>2</mn></msub></mrow></math></td><td style="border: 1px solid #000000; padding: 8px; text-align: left;"><math xmlns="http://www.w3.org/1998/Math/MathML"><mn>8.0</mn></math> grams</td><td style="border: 1px solid #000000; padding: 8px; text-align: left;"><qti-inline-choice-interaction response-identifier="dropdown_13" shuffle="false">
+				<qti-inline-choice identifier="NEG_3_2_C"><math xmlns="http://www.w3.org/1998/Math/MathML"><mo>-</mo><mn>3.2</mn><mo>°</mo><mi>C</mi></math></qti-inline-choice>
+                <qti-inline-choice identifier="POS_2_0_C"><math xmlns="http://www.w3.org/1998/Math/MathML"><mo>+</mo><mn>2.0</mn><mo>°</mo><mi>C</mi></math></qti-inline-choice>
+                <qti-inline-choice identifier="POS_4_2_C"><math xmlns="http://www.w3.org/1998/Math/MathML"><mo>+</mo><mn>4.2</mn><mo>°</mo><mi>C</mi></math></qti-inline-choice>
+			</qti-inline-choice-interaction></td></tr><tr><th scope="row" style="border: 1px solid #000000; padding: 8px; text-align: left; font-weight: 700; background-color: #f2f2f2;">D</th><td style="border: 1px solid #000000; padding: 8px; text-align: left;"><qti-inline-choice-interaction response-identifier="dropdown_9" shuffle="false">
+				<qti-inline-choice identifier="NaC2H3O2"><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Na</mi><msub><mi>C</mi><mn>2</mn></msub><msub><mi>H</mi><mn>3</mn></msub><msub><mi>O</mi><mn>2</mn></msub></mrow></math></qti-inline-choice>
+                <qti-inline-choice identifier="KOH"><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>K</mi><mi>O</mi><mi>H</mi></mrow></math></qti-inline-choice>
+                <qti-inline-choice identifier="BaOH2"><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Ba</mi><msub><mrow><mo>(</mo><mi>OH</mi><mo>)</mo></mrow><mn>2</mn></msub></mrow></math></qti-inline-choice>
+			</qti-inline-choice-interaction></td><td style="border: 1px solid #000000; padding: 8px; text-align: left;"><math xmlns="http://www.w3.org/1998/Math/MathML"><mn>6.0</mn></math> grams</td><td style="border: 1px solid #000000; padding: 8px; text-align: left;"><qti-inline-choice-interaction response-identifier="dropdown_12" shuffle="false">
+				<qti-inline-choice identifier="NEG_3_2_C"><math xmlns="http://www.w3.org/1998/Math/MathML"><mo>-</mo><mn>3.2</mn><mo>°</mo><mi>C</mi></math></qti-inline-choice>
+                <qti-inline-choice identifier="POS_2_0_C"><math xmlns="http://www.w3.org/1998/Math/MathML"><mo>+</mo><mn>2.0</mn><mo>°</mo><mi>C</mi></math></qti-inline-choice>
+                <qti-inline-choice identifier="POS_4_2_C"><math xmlns="http://www.w3.org/1998/Math/MathML"><mo>+</mo><mn>4.2</mn><mo>°</mo><mi>C</mi></math></qti-inline-choice>
+			</qti-inline-choice-interaction></td></tr><tr><th scope="row" style="border: 1px solid #000000; padding: 8px; text-align: left; font-weight: 700; background-color: #f2f2f2;">E</th><td style="border: 1px solid #000000; padding: 8px; text-align: left;"><qti-inline-choice-interaction response-identifier="dropdown_10" shuffle="false">
+				<qti-inline-choice identifier="NaC2H3O2"><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Na</mi><msub><mi>C</mi><mn>2</mn></msub><msub><mi>H</mi><mn>3</mn></msub><msub><mi>O</mi><mn>2</mn></msub></mrow></math></qti-inline-choice>
+                <qti-inline-choice identifier="KOH"><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>K</mi><mi>O</mi><mi>H</mi></mrow></math></qti-inline-choice>
+                <qti-inline-choice identifier="BaOH2"><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Ba</mi><msub><mrow><mo>(</mo><mi>OH</mi><mo>)</mo></mrow><mn>2</mn></msub></mrow></math></qti-inline-choice>
+			</qti-inline-choice-interaction></td><td style="border: 1px solid #000000; padding: 8px; text-align: left;"><math xmlns="http://www.w3.org/1998/Math/MathML"><mn>2.0</mn></math> grams</td><td style="border: 1px solid #000000; padding: 8px; text-align: left;"><qti-inline-choice-interaction response-identifier="dropdown_11" shuffle="false">
+				<qti-inline-choice identifier="NEG_3_2_C"><math xmlns="http://www.w3.org/1998/Math/MathML"><mo>-</mo><mn>3.2</mn><mo>°</mo><mi>C</mi></math></qti-inline-choice>
+                <qti-inline-choice identifier="POS_2_0_C"><math xmlns="http://www.w3.org/1998/Math/MathML"><mo>+</mo><mn>2.0</mn><mo>°</mo><mi>C</mi></math></qti-inline-choice>
+                <qti-inline-choice identifier="POS_4_2_C"><math xmlns="http://www.w3.org/1998/Math/MathML"><mo>+</mo><mn>4.2</mn><mo>°</mo><mi>C</mi></math></qti-inline-choice>
+			</qti-inline-choice-interaction></td></tr></tbody></table></div>
+        <qti-feedback-block outcome-identifier="FEEDBACK" identifier="CORRECT" show-hide="show">
+            <qti-content-body><p>Correct! You used the patterns in the data to match each unknown entry.</p>
+        <p>Experiment C has twice the amount of sodium acetate as experiment A, so its temperature change is twice as large and negative: <math xmlns="http://www.w3.org/1998/Math/MathML"><mo>-</mo><mn>3.2</mn><mo>°</mo><mi>C</mi></math>. Experiment D corresponds to <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>K</mi><mi>O</mi><mi>H</mi></mrow></math> with a temperature increase of <math xmlns="http://www.w3.org/1998/Math/MathML"><mo>+</mo><mn>4.2</mn><mo>°</mo><mi>C</mi></math>, and experiment E corresponds to <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Ba</mi><msub><mrow><mo>(</mo><mi>OH</mi><mo>)</mo></mrow><mn>2</mn></msub></mrow></math> with a temperature increase of <math xmlns="http://www.w3.org/1998/Math/MathML"><mo>+</mo><mn>2.0</mn><mo>°</mo><mi>C</mi></math>.</p></qti-content-body>
+        </qti-feedback-block>
+        <qti-feedback-block outcome-identifier="FEEDBACK" identifier="INCORRECT" show-hide="show">
+            <qti-content-body><p>Not quite. First, decide which reactions are endothermic (temperature decreases) and which are exothermic (temperature increases). Then use how the amount changes (for example, twice as much) to match proportional changes in temperature.</p></qti-content-body>
+        </qti-feedback-block>
+    </qti-item-body>
+    <qti-response-processing>
+        <qti-response-condition>
+            <qti-response-if>
+                <qti-and>
+                    <qti-match><qti-variable identifier="dropdown_13"/><qti-correct identifier="dropdown_13"/></qti-match>
+                    <qti-match><qti-variable identifier="dropdown_12"/><qti-correct identifier="dropdown_12"/></qti-match>
+                    <qti-match><qti-variable identifier="dropdown_11"/><qti-correct identifier="dropdown_11"/></qti-match>
+                    <qti-match><qti-variable identifier="dropdown_9"/><qti-correct identifier="dropdown_9"/></qti-match>
+                    <qti-match><qti-variable identifier="dropdown_10"/><qti-correct identifier="dropdown_10"/></qti-match>
                 </qti-and>
                 <qti-set-outcome-value identifier="SCORE"><qti-base-value base-type="float">1</qti-base-value></qti-set-outcome-value>
                 <qti-set-outcome-value identifier="FEEDBACK"><qti-base-value base-type="identifier">CORRECT</qti-base-value></qti-set-outcome-value>

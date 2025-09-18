@@ -16,7 +16,7 @@ export const probabilityNotPurpleSpinner: AssessmentItemInput = {
 		image_1: {
 			type: "probabilitySpinner",
 			title: null,
-			width: 200,
+			width: 300,
 			groups: [
 				{
 					color: "#28ae7b",
@@ -39,7 +39,7 @@ export const probabilityNotPurpleSpinner: AssessmentItemInput = {
 					emoji: null
 				}
 			],
-			height: 200,
+			height: 300,
 			pointerAngle: 80
 		}
 	},
@@ -340,21 +340,21 @@ export const doubleNumberLineRatio: AssessmentItemInput = {
 		stimulus_dnl: {
 			type: "doubleNumberLine",
 			width: 400,
-			height: 150,
+			height: 300,
 			topLine: { label: "Distance, kilometers", ticks: [0, "", "", 3, ""] },
 			bottomLine: { label: "Elevation, meters", ticks: [0, "", "", 120, ""] }
 		},
 		choice_a_dnl: {
 			type: "doubleNumberLine",
 			width: 400,
-			height: 150,
+			height: 300,
 			topLine: { label: "Distance, kilometers", ticks: [0, 1, 2, 3, 4] },
 			bottomLine: { label: "Elevation, meters", ticks: [0, 40, 80, 120, 160] }
 		},
 		choice_b_dnl: {
 			type: "doubleNumberLine",
 			width: 400,
-			height: 150,
+			height: 300,
 			topLine: { label: "Distance, kilometers", ticks: [0, 1, 2, 3, 4] },
 			bottomLine: { label: "Elevation, meters", ticks: [0, 80, 100, 120, 140] }
 		}
@@ -650,7 +650,7 @@ export const inequalityNumberLine: AssessmentItemInput = {
 		inequality_widget: {
 			type: "inequalityNumberLine",
 			width: 500,
-			height: 100,
+			height: 300,
 			min: -5,
 			max: 5,
 			tickInterval: 1,
@@ -777,7 +777,7 @@ export const verticalNumberLineComparison: AssessmentItemInput = {
 	widgets: {
 		vertical_nl: {
 			type: "numberLine",
-			width: 120,
+			width: 300,
 			height: 350,
 			orientation: "vertical",
 			min: -8,
@@ -898,7 +898,7 @@ export const twoWayFrequencyTable: AssessmentItemInput = {
 		venn_widget: {
 			type: "vennDiagram",
 			width: 350,
-			height: 262,
+			height: 300,
 			circleA: { label: "Cold Medicine", count: 27, color: "#1E90FF99" },
 			circleB: { label: "Cold longer than 7 days", count: 20, color: "#FF6B6B99" },
 			intersectionCount: 23,
@@ -992,8 +992,8 @@ export const equivalentFractionImages: AssessmentItemInput = {
 		stimulus_shape: {
 			type: "partitionedShape",
 			mode: "partition",
-			width: 180,
-			height: 88,
+			width: 300,
+			height: 300,
 			layout: "horizontal",
 			overlays: [],
 			shapes: [
@@ -1012,8 +1012,8 @@ export const equivalentFractionImages: AssessmentItemInput = {
 		choice_a_shape: {
 			type: "partitionedShape",
 			mode: "partition",
-			width: 180,
-			height: 88,
+			width: 300,
+			height: 300,
 			layout: "horizontal",
 			overlays: [],
 			shapes: [
@@ -1032,8 +1032,8 @@ export const equivalentFractionImages: AssessmentItemInput = {
 		choice_b_shape: {
 			type: "partitionedShape",
 			mode: "partition",
-			width: 180,
-			height: 88,
+			width: 300,
+			height: 300,
 			layout: "horizontal",
 			overlays: [],
 			shapes: [
@@ -1052,8 +1052,8 @@ export const equivalentFractionImages: AssessmentItemInput = {
 		choice_c_shape: {
 			type: "partitionedShape",
 			mode: "partition",
-			width: 180,
-			height: 88,
+			width: 300,
+			height: 300,
 			layout: "horizontal",
 			overlays: [],
 			shapes: [
@@ -1217,7 +1217,7 @@ export const calculateShadedArea: AssessmentItemInput = {
 			type: "partitionedShape",
 			mode: "partition",
 			width: 320,
-			height: 103,
+			height: 300,
 			layout: "horizontal",
 			overlays: [],
 			shapes: [
@@ -2112,29 +2112,29 @@ export const countApplesEmoji: AssessmentItemInput = {
 		choice_3_apples: {
 			type: "discreteObjectRatioDiagram",
 			title: null,
-			width: 250,
-			height: 120,
+			width: 300,
+			height: 300,
 			objects: [{ count: 3, emoji: "🍎" }]
 		},
 		choice_4_apples: {
 			type: "discreteObjectRatioDiagram",
 			title: null,
-			width: 250,
-			height: 120,
+			width: 300,
+			height: 300,
 			objects: [{ count: 4, emoji: "🍎" }]
 		},
 		choice_5_apples: {
 			type: "discreteObjectRatioDiagram",
 			title: null,
-			width: 250,
-			height: 120,
+			width: 300,
+			height: 300,
 			objects: [{ count: 5, emoji: "🍎" }]
 		},
 		choice_6_apples: {
 			type: "discreteObjectRatioDiagram",
 			title: null,
-			width: 250,
-			height: 120,
+			width: 300,
+			height: 300,
 			objects: [{ count: 6, emoji: "🍎" }]
 		}
 	},
@@ -2635,7 +2635,7 @@ export const pencilLengthLinePlot: AssessmentItemInput = {
 		plot_a: {
 			type: "dotPlot",
 			width: 450,
-			height: 150,
+			height: 300,
 			axis: { min: 0, max: 12, tickInterval: 2, label: null },
 			data: [
 				{ value: 3, count: 1 },
@@ -2648,7 +2648,7 @@ export const pencilLengthLinePlot: AssessmentItemInput = {
 		plot_b: {
 			type: "dotPlot",
 			width: 450,
-			height: 150,
+			height: 300,
 			axis: { min: 0, max: 12, tickInterval: 2, label: null },
 			data: [
 				{ value: 3, count: 1 },
@@ -2661,7 +2661,7 @@ export const pencilLengthLinePlot: AssessmentItemInput = {
 		plot_c: {
 			type: "dotPlot",
 			width: 450,
-			height: 150,
+			height: 300,
 			axis: { min: 0, max: 12, tickInterval: 2, label: null },
 			data: [{ value: 4, count: 4 }],
 			dotColor: "#0074c8",
@@ -2670,7 +2670,7 @@ export const pencilLengthLinePlot: AssessmentItemInput = {
 		plot_d: {
 			type: "dotPlot",
 			width: 450,
-			height: 150,
+			height: 300,
 			axis: { min: 0, max: 12, tickInterval: 2, label: null },
 			data: [
 				{ value: 4, count: 1 },
@@ -2872,7 +2872,7 @@ export const dollHeightLinePlot: AssessmentItemInput = {
 		doll_plot: {
 			type: "dotPlot",
 			width: 350,
-			height: 200,
+			height: 300,
 			axis: {
 				label: "Doll Height (centimeters)",
 				min: 20,
@@ -2948,8 +2948,8 @@ export const timeOnNumberLine: AssessmentItemInput = {
 	widgets: {
 		time_line: {
 			type: "numberLine",
-			width: 700,
-			height: 100,
+			width: 500,
+			height: 300,
 			orientation: "horizontal",
 			min: 0,
 			max: 60,
@@ -3810,8 +3810,8 @@ export const kineticEnergyMassSpeedRelationships: AssessmentItemInput = {
 	widgets: {
 		image_2: {
 			type: "conceptualGraph",
-			width: 200,
-			height: 191,
+			width: 300,
+			height: 300,
 			curveColor: "#333333",
 			xAxisLabel: "mass",
 			yAxisLabel: "kinetic energy",
@@ -3825,8 +3825,8 @@ export const kineticEnergyMassSpeedRelationships: AssessmentItemInput = {
 		},
 		image_3: {
 			type: "conceptualGraph",
-			width: 200,
-			height: 195,
+			width: 300,
+			height: 300,
 			curveColor: "#333333",
 			xAxisLabel: "speed",
 			yAxisLabel: "kinetic energy",
@@ -4117,7 +4117,7 @@ export const reactantAmountsTempChangeTablePerseus: AssessmentItemInput = {
 			url: "https://cdn.kastatic.org/ka-content-images/7bebb0e8fd90795225d76add80eb4c2d9d7d4f0d.jpg",
 			type: "urlImage",
 			width: 372,
-			height: 209,
+			height: 300,
 			caption: null,
 			attribution: "Created with Chemix"
 		},
