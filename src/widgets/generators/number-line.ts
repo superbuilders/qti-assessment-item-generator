@@ -579,7 +579,8 @@ export const generateNumberLine: WidgetGenerator<typeof NumberLinePropsSchema> =
 
 		for (const t of minorValues) {
 			if (!majorValues.some((mt) => Math.abs(mt - t) < 1e-9)) {
-				canvas.drawLine(xPos - 3, toSvgY(t), xPos + 3, toSvgY(t), {
+				// Minor ticks on the LEFT side only for vertical orientation
+				canvas.drawLine(xPos - 3, toSvgY(t), xPos, toSvgY(t), {
 					stroke: theme.colors.axis,
 					strokeWidth: theme.stroke.width.base
 				})
@@ -588,17 +589,19 @@ export const generateNumberLine: WidgetGenerator<typeof NumberLinePropsSchema> =
 
 		majorValues.forEach((t, i) => {
 			const y = toSvgY(t)
-			canvas.drawLine(xPos - 5, y, xPos + 5, y, {
+			// Major ticks on the LEFT side only
+			canvas.drawLine(xPos - 5, y, xPos, y, {
 				stroke: theme.colors.axis,
 				strokeWidth: theme.stroke.width.base
 			})
 			if (showTickLabels && selectedLabels.has(i)) {
+				// Place tick labels on the LEFT side, opposite from highlighted text labels
 				canvas.drawText({
-					x: xPos + 10,
+					x: xPos - 10,
 					y: y + 4,
 					text: majorLabels[i] ?? "",
 					fill: theme.colors.axis,
-					anchor: "start",
+					anchor: "end",
 					fontPx: theme.font.size.small
 				})
 			}
@@ -639,7 +642,7 @@ export const generateNumberLine: WidgetGenerator<typeof NumberLinePropsSchema> =
 
 				// Render label near the point (larger font). Ensure consistent gap from vertical axis
 				const fontPx = theme.font.size.large
-				const labelWidth = 120
+				const labelWidth = 240
 				const labelHeight = 32
 				const desiredGapFromAxisPx = 15
 				// Place the foreignObject so that its LEFT edge is a fixed gap to the right of the axis

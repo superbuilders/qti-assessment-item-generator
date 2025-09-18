@@ -374,9 +374,9 @@ export class CanvasImpl implements Canvas {
 			const strokeExpansion = typeof opts.strokeWidth === "number" ? opts.strokeWidth : 0
 			this.updateExtents(
 				minX - strokeExpansion,
-				minX + textWidth + strokeExpansion,
+				minX + maxLineWidth + strokeExpansion,
 				minY - strokeExpansion,
-				minY + textHeight + strokeExpansion
+				minY + actualTextHeight + strokeExpansion
 			)
 		}
 
