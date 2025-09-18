@@ -1,67 +1,47 @@
-import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
 import { Path2D } from "../../utils/path-builder"
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { estimateWrappedTextDimensions } from "../../utils/text"
 import { theme } from "../../utils/theme"
 import type { WidgetGenerator } from "../types"
 
+// Factory functions for label schemas to avoid $ref in OpenAI JSON Schema
+const createRadiusLabelSchema = () =>
+	z
+		.string()
+		.nullable()
+		.describe(
+			"Nullable radius label text (e.g., 'r = 5', '10 cm', 'd = 10'). Can include units, equations, or simple values."
+		)
+
+const createHeightLabelSchema = () =>
+	z
+		.string()
+		.nullable()
+		.describe("Nullable height label text (e.g., 'h = 8', '6 cm'). Can include units, equations, or simple values.")
+
 const Cylinder = z
 	.object({
 		type: z.literal("cylinder").describe("Specifies a circular cylinder shape."),
-		radius: z
-			.number()
-			.describe(
-				"Radius of the circular base in arbitrary units (e.g., 3, 5, 4.5). The cylinder has uniform circular cross-sections."
-			),
-		height: z
-			.number()
-			.describe(
-				"Height of the cylinder along its axis in arbitrary units (e.g., 8, 10, 6.5). The distance between the two circular bases."
-			)
+		radiusLabel: createRadiusLabelSchema(),
+		heightLabel: createHeightLabelSchema()
 	})
 	.strict()
 
 const Cone = z
 	.object({
 		type: z.literal("cone").describe("Specifies a circular cone shape."),
-		radius: z
-			.number()
-			.describe(
-				"Radius of the circular base in arbitrary units (e.g., 4, 6, 3.5). The base is at the bottom of the cone."
-			),
-		height: z
-			.number()
-			.describe(
-				"Perpendicular height from base to apex in arbitrary units (e.g., 7, 9, 5.5). Measured along the cone's axis."
-			)
+		radiusLabel: createRadiusLabelSchema(),
+		heightLabel: createHeightLabelSchema()
 	})
 	.strict()
 
 const Sphere = z
 	.object({
 		type: z.literal("sphere").describe("Specifies a perfect sphere shape."),
-		radius: z
-			.number()
-			.describe(
-				"Radius of the sphere in arbitrary units (e.g., 5, 8, 4). All points on the surface are equidistant from center."
-			)
-	})
-	.strict()
-
-const DimensionLabel = z
-	.object({
-		target: z
-			.enum(["radius", "height"])
-			.describe(
-				"Which dimension to label. 'radius' labels the radius/diameter, 'height' labels vertical dimension (not applicable for spheres)."
-			),
-		text: z
-			.string()
-			.describe(
-				"The label text to display (e.g., 'r = 5', '10 cm', 'h = 8', 'd = 10'). Can include units, equations, or simple values."
-			)
+		radiusLabel: createRadiusLabelSchema()
 	})
 	.strict()
 
@@ -74,12 +54,7 @@ export const GeometricSolidDiagramPropsSchema = z
 		height: createHeightSchema(),
 		shape: z
 			.discriminatedUnion("type", [Cylinder, Cone, Sphere])
-			.describe("The 3D geometric solid to display. Each type has specific dimension requirements."),
-		labels: z
-			.array(DimensionLabel)
-			.describe(
-				"Dimension labels to display on the shape. Empty array means no labels. Can label radius, height, or both as appropriate for the shape type."
-			)
+			.describe("The 3D geometric solid to display with its dimension labels.")
 	})
 	.strict()
 	.describe(
@@ -93,11 +68,11 @@ export type GeometricSolidDiagramProps = z.infer<typeof GeometricSolidDiagramPro
  * Supports dimension labels for volume and surface area problems.
  */
 export const generateGeometricSolidDiagram: WidgetGenerator<typeof GeometricSolidDiagramPropsSchema> = async (data) => {
-	const { width, height, shape, labels } = data
+	const { width, height, shape } = data
 
 	// --- NEW SCALING AND DRAWING LOGIC ---
 
-	const labelSpace = labels.length > 0 ? 40 : 0 // Extra space for external labels
+	const labelSpace = 40 // Extra space for external labels if needed
 
 	const canvas = new CanvasImpl({
 		chartArea: { left: 0, top: 0, width, height },
@@ -113,9 +88,11 @@ export const generateGeometricSolidDiagram: WidgetGenerator<typeof GeometricSoli
 	const availableHeight = height - 2 * PADDING - labelSpace
 
 	if (shape.type === "cylinder") {
-		let scale = Math.min(availableWidth / (shape.radius * 2), availableHeight / shape.height)
-		let r = shape.radius * scale
-		let h = shape.height * scale
+		const radius = 5 // default radius
+		const shapeHeight = 6 // default height
+		let scale = Math.min(availableWidth / (radius * 2), availableHeight / shapeHeight)
+		let r = radius * scale
+		let h = shapeHeight * scale
 		let ry = r * 0.25 // Ellipse perspective ratio
 
 		// Auto-scale boost if rendered content is too small relative to available area
@@ -128,8 +105,8 @@ export const generateGeometricSolidDiagram: WidgetGenerator<typeof GeometricSoli
 			if (occupancy > 0 && occupancy < targetOccupancy) {
 				const boost = targetOccupancy / occupancy
 				scale *= boost
-				r = shape.radius * scale
-				h = shape.height * scale
+				r = radius * scale
+				h = shapeHeight * scale
 				ry = r * 0.25
 			}
 		}
@@ -171,45 +148,45 @@ export const generateGeometricSolidDiagram: WidgetGenerator<typeof GeometricSoli
 			strokeWidth: theme.stroke.width.thick
 		})
 
-		for (const l of labels) {
-			if (l.target === "radius") {
-				// Dashed line for radius on the bottom base
-				canvas.drawLine(cx, bottomY, cx + r, bottomY, {
-					stroke: theme.colors.black,
-					strokeWidth: theme.stroke.width.base,
-					dash: theme.stroke.dasharray.backEdge
-				})
-                const textY = Math.min(bottomY + 18, height - 10) // Ensure text stays within bounds
-				canvas.drawText({
-					x: cx + r / 2,
-					y: textY,
-					text: l.text,
-					anchor: "middle",
-                    fontPx: theme.font.size.base
-				})
-			}
-			if (l.target === "height") {
-				// External line with arrows for height
-				const lineX = Math.min(cx + r + 15, width - 50) // Ensure it stays within bounds
-				canvas.drawLine(lineX, topY, lineX, bottomY, {
-					stroke: theme.colors.black,
-					strokeWidth: theme.stroke.width.base,
-					markerStart: "url(#arrow)",
-					markerEnd: "url(#arrow)"
-				})
-				canvas.drawText({
-					x: lineX + 10,
-					y: height / 2,
-					text: l.text,
-					anchor: "start",
-                    fontPx: theme.font.size.base
-				})
-			}
+		if (shape.radiusLabel) {
+			// Dashed line for radius on the bottom base
+			canvas.drawLine(cx, bottomY, cx + r, bottomY, {
+				stroke: theme.colors.black,
+				strokeWidth: theme.stroke.width.base,
+				dash: theme.stroke.dasharray.backEdge
+			})
+			const textY = Math.min(bottomY + 18, height - 10) // Ensure text stays within bounds
+			canvas.drawText({
+				x: cx + r / 2,
+				y: textY,
+				text: shape.radiusLabel,
+				anchor: "middle",
+				fontPx: theme.font.size.base
+			})
+		}
+		if (shape.heightLabel) {
+			// External line with arrows for height
+			const lineX = Math.min(cx + r + 15, width - 50) // Ensure it stays within bounds
+			canvas.drawLine(lineX, topY, lineX, bottomY, {
+				stroke: theme.colors.black,
+				strokeWidth: theme.stroke.width.base,
+				markerStart: "url(#arrow)",
+				markerEnd: "url(#arrow)"
+			})
+			canvas.drawText({
+				x: lineX + 20,
+				y: height / 2,
+				text: shape.heightLabel,
+				anchor: "start",
+				fontPx: theme.font.size.base
+			})
 		}
 	} else if (shape.type === "cone") {
-		let scale = Math.min(availableWidth / (shape.radius * 2), availableHeight / shape.height)
-		let r = shape.radius * scale
-		let h = shape.height * scale
+		const radius = 4 // default radius
+		const shapeHeight = 6 // default height
+		let scale = Math.min(availableWidth / (radius * 2), availableHeight / shapeHeight)
+		let r = radius * scale
+		let h = shapeHeight * scale
 		let ry = r * 0.25 // Ellipse perspective ratio
 
 		// Auto-scale boost if rendered content is too small relative to available area
@@ -222,8 +199,8 @@ export const generateGeometricSolidDiagram: WidgetGenerator<typeof GeometricSoli
 			if (occupancy > 0 && occupancy < targetOccupancy) {
 				const boost = targetOccupancy / occupancy
 				scale *= boost
-				r = shape.radius * scale
-				h = shape.height * scale
+				r = radius * scale
+				h = shapeHeight * scale
 				ry = r * 0.25
 			}
 		}
@@ -258,52 +235,51 @@ export const generateGeometricSolidDiagram: WidgetGenerator<typeof GeometricSoli
 			strokeWidth: theme.stroke.width.thick
 		})
 
-		for (const l of labels) {
-			if (l.target === "radius") {
-				// Dashed line from center to right for radius
-				canvas.drawLine(cx, baseY, cx + r, baseY, {
-					stroke: theme.colors.black,
-					strokeWidth: theme.stroke.width.base,
-					dash: theme.stroke.dasharray.backEdge
-				})
-                const textY = Math.min(baseY + 18, height - 10) // Ensure text stays within bounds
-				canvas.drawText({
-					x: cx + r / 2,
-					y: textY,
-					text: l.text,
-					anchor: "middle",
-                    fontPx: theme.font.size.base
-				})
-			}
-			if (l.target === "height") {
-				// Dashed line from apex to center for height
-				canvas.drawLine(cx, apexY, cx, baseY, {
-					stroke: theme.colors.black,
-					strokeWidth: theme.stroke.width.base,
-					dash: theme.stroke.dasharray.backEdge
-				})
-				// Right angle indicator
-				const indicatorSize = Math.min(10, r * 0.2)
-				const indicatorPath = new Path2D()
-					.moveTo(cx + indicatorSize, baseY)
-					.lineTo(cx + indicatorSize, baseY - indicatorSize)
-					.lineTo(cx, baseY - indicatorSize)
-				canvas.drawPath(indicatorPath, {
-					stroke: theme.colors.black,
-					strokeWidth: theme.stroke.width.thin
-				})
-				canvas.drawText({
-					x: cx - 10,
-					y: height / 2,
-					text: l.text,
-					anchor: "end",
-                    fontPx: theme.font.size.base
-				})
-			}
+		if (shape.radiusLabel) {
+			// Dashed line from center to right for radius
+			canvas.drawLine(cx, baseY, cx + r, baseY, {
+				stroke: theme.colors.black,
+				strokeWidth: theme.stroke.width.base,
+				dash: theme.stroke.dasharray.backEdge
+			})
+			const textY = Math.min(baseY + 18, height - 10) // Ensure text stays within bounds
+			canvas.drawText({
+				x: cx + r / 2,
+				y: textY,
+				text: shape.radiusLabel,
+				anchor: "middle",
+				fontPx: theme.font.size.base
+			})
+		}
+		if (shape.heightLabel) {
+			// Dashed line from apex to center for height
+			canvas.drawLine(cx, apexY, cx, baseY, {
+				stroke: theme.colors.black,
+				strokeWidth: theme.stroke.width.base,
+				dash: theme.stroke.dasharray.backEdge
+			})
+			// Right angle indicator
+			const indicatorSize = Math.min(10, r * 0.2)
+			const indicatorPath = new Path2D()
+				.moveTo(cx + indicatorSize, baseY)
+				.lineTo(cx + indicatorSize, baseY - indicatorSize)
+				.lineTo(cx, baseY - indicatorSize)
+			canvas.drawPath(indicatorPath, {
+				stroke: theme.colors.black,
+				strokeWidth: theme.stroke.width.thin
+			})
+			canvas.drawText({
+				x: cx - 10,
+				y: height / 2,
+				text: shape.heightLabel,
+				anchor: "end",
+				fontPx: theme.font.size.base
+			})
 		}
 	} else if (shape.type === "sphere") {
-		let scale = Math.min(availableWidth / (shape.radius * 2), availableHeight / (shape.radius * 2))
-		let r = shape.radius * scale
+		const radius = 5 // default radius
+		let scale = Math.min(availableWidth / (radius * 2), availableHeight / (radius * 2))
+		let r = radius * scale
 		let ry = r * 0.3 // Ellipse perspective ratio for equator
 
 		// Auto-scale boost if rendered content is too small relative to available area
@@ -316,7 +292,7 @@ export const generateGeometricSolidDiagram: WidgetGenerator<typeof GeometricSoli
 			if (occupancy > 0 && occupancy < targetOccupancy) {
 				const boost = targetOccupancy / occupancy
 				scale *= boost
-				r = shape.radius * scale
+				r = radius * scale
 				ry = r * 0.3
 			}
 		}
@@ -346,31 +322,29 @@ export const generateGeometricSolidDiagram: WidgetGenerator<typeof GeometricSoli
 			strokeWidth: theme.stroke.width.base
 		})
 
-		for (const l of labels) {
-			if (l.target === "radius") {
-				// Dashed line from center to circumference for radius
-				canvas.drawLine(cx, cy, cx + r, cy, {
-					stroke: theme.colors.black,
-					strokeWidth: theme.stroke.width.base,
-					dash: theme.stroke.dasharray.backEdge
-				})
+		if (shape.radiusLabel) {
+			// Dashed line from center to circumference for radius
+			canvas.drawLine(cx, cy, cx + r, cy, {
+				stroke: theme.colors.black,
+				strokeWidth: theme.stroke.width.base,
+				dash: theme.stroke.dasharray.backEdge
+			})
 
-				// Place label centered above the dashed radius with a minimal non-overlapping gap
-                const fontPx = theme.font.size.base
-				const dims = estimateWrappedTextDimensions(l.text, Number.POSITIVE_INFINITY, fontPx, 1.2)
-				const minGap = theme.stroke.width.base + 2
-				const labelX = cx + r / 2
-				const labelY = cy - (dims.height / 2 + minGap)
+			// Place label centered above the dashed radius with a minimal non-overlapping gap
+			const fontPx = theme.font.size.base
+			const dims = estimateWrappedTextDimensions(shape.radiusLabel, Number.POSITIVE_INFINITY, fontPx, 1.2)
+			const minGap = theme.stroke.width.base + 2
+			const labelX = cx + r / 2
+			const labelY = cy - (dims.height / 2 + minGap)
 
-				canvas.drawText({
-					x: labelX,
-					y: labelY,
-					text: l.text,
-					anchor: "middle",
-					dominantBaseline: "middle",
-					fontPx
-				})
-			}
+			canvas.drawText({
+				x: labelX,
+				y: labelY,
+				text: shape.radiusLabel,
+				anchor: "middle",
+				dominantBaseline: "middle",
+				fontPx
+			})
 		}
 	}
 

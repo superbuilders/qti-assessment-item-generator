@@ -1,433 +1,468 @@
 import type { GeometricSolidDiagramProps } from "../src/widgets/generators/geometric-solid-diagram"
 
 export const geometricSolidDiagramExamples: GeometricSolidDiagramProps[] = [
-	// Spheres
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "sphere", radius: 9 },
+		shape: {
+			type: "sphere",
+			radiusLabel: "9 units"
+		},
 		width: 300,
-		height: 300,
-		labels: [{ text: "9 units", target: "radius" }]
+		height: 300
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "sphere", radius: 4 },
+		shape: {
+			type: "sphere",
+			radiusLabel: "4 units"
+		},
 		width: 300,
-		height: 300,
-		labels: [{ text: "4 units", target: "radius" }]
+		height: 300
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "sphere", radius: 0.5 },
+		shape: {
+			type: "sphere",
+			radiusLabel: "r = 1/2 unit"
+		},
 		width: 300,
-		height: 300,
-		labels: [{ text: "r = 1/2 unit", target: "radius" }]
+		height: 300
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "sphere", radius: 10 },
+		shape: {
+			type: "sphere",
+			radiusLabel: "10 units"
+		},
 		width: 300,
-		height: 300,
-		labels: [{ text: "10 units", target: "radius" }]
+		height: 300
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "sphere", radius: 0.25 },
+		shape: {
+			type: "sphere",
+			radiusLabel: "r = 1/4 unit"
+		},
 		width: 300,
-		height: 300,
-		labels: [{ text: "r = 1/4 unit", target: "radius" }]
+		height: 300
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "sphere", radius: 3 },
+		shape: {
+			type: "sphere",
+			radiusLabel: "3 units"
+		},
 		width: 300,
-		height: 300,
-		labels: [{ text: "3 units", target: "radius" }]
+		height: 300
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "sphere", radius: 2 },
+		shape: {
+			type: "sphere",
+			radiusLabel: "2 units"
+		},
 		width: 300,
-		height: 300,
-		labels: [{ text: "2 units", target: "radius" }]
+		height: 300
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "sphere", radius: 7 },
+		shape: {
+			type: "sphere",
+			radiusLabel: "7 units"
+		},
 		width: 300,
-		height: 300,
-		labels: [{ text: "7 units", target: "radius" }]
+		height: 300
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "sphere", radius: 1 },
+		shape: {
+			type: "sphere",
+			radiusLabel: "1 unit"
+		},
 		width: 300,
-		height: 300,
-		labels: [{ text: "1 unit", target: "radius" }]
+		height: 300
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "sphere", radius: 5 },
+		shape: {
+			type: "sphere",
+			radiusLabel: "5 units"
+		},
 		width: 300,
-		height: 300,
-		labels: [{ text: "5 units", target: "radius" }]
+		height: 300
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "sphere", radius: 6 },
+		shape: {
+			type: "sphere",
+			radiusLabel: "6 units"
+		},
 		width: 300,
-		height: 300,
-		labels: [{ text: "6 units", target: "radius" }]
-	},
-
-	// Cones
-	{
-		type: "geometricSolidDiagram",
-		shape: { type: "cone", height: 300, radius: 10 },
-		width: 300,
-		height: 300,
-		labels: [
-			{ text: "10 units", target: "radius" },
-			{ text: "6 units", target: "height" }
-		]
+		height: 300
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "cone", height: 300, radius: 4 },
+		shape: {
+			type: "cone",
+			radiusLabel: "10 units",
+			heightLabel: "6 units"
+		},
 		width: 300,
-		height: 300,
-		labels: [
-			{ text: "4 units", target: "radius" },
-			{ text: "10 units", target: "height" }
-		]
+		height: 300
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "cone", height: 300, radius: 2 },
+		shape: {
+			type: "cone",
+			radiusLabel: "4 units",
+			heightLabel: "10 units"
+		},
 		width: 300,
-		height: 300,
-		labels: [
-			{ text: "2 units", target: "radius" },
-			{ text: "9 units", target: "height" }
-		]
+		height: 300
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "cone", height: 300, radius: 6 },
+		shape: {
+			type: "cone",
+			radiusLabel: "2 units",
+			heightLabel: "9 units"
+		},
 		width: 300,
-		height: 300,
-		labels: [
-			{ text: "6 units", target: "radius" },
-			{ text: "8 units", target: "height" }
-		]
+		height: 300
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "cone", height: 300, radius: 5 },
+		shape: {
+			type: "cone",
+			radiusLabel: "6 units",
+			heightLabel: "8 units"
+		},
 		width: 300,
-		height: 300,
-		labels: [
-			{ text: "5 units", target: "radius" },
-			{ text: "6 units", target: "height" }
-		]
+		height: 300
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "cone", height: 300, radius: 5 },
+		shape: {
+			type: "cone",
+			radiusLabel: "5 units",
+			heightLabel: "6 units"
+		},
 		width: 300,
-		height: 300,
-		labels: [
-			{ text: "5 units", target: "radius" },
-			{ text: "5 units", target: "height" }
-		]
+		height: 300
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "cone", height: 300, radius: 5 },
+		shape: {
+			type: "cone",
+			radiusLabel: "5 units",
+			heightLabel: "5 units"
+		},
 		width: 300,
-		height: 300,
-		labels: [
-			{ text: "5 units", target: "radius" },
-			{ text: "3 units", target: "height" }
-		]
+		height: 300
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "cone", height: 300, radius: 7 },
+		shape: {
+			type: "cone",
+			radiusLabel: "5 units",
+			heightLabel: "3 units"
+		},
 		width: 300,
-		height: 300,
-		labels: [
-			{ text: "7 units", target: "radius" },
-			{ text: "7 units", target: "height" }
-		]
+		height: 300
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "cone", height: 300, radius: 2 },
+		shape: {
+			type: "cone",
+			radiusLabel: "7 units",
+			heightLabel: "7 units"
+		},
 		width: 300,
-		height: 300,
-		labels: [
-			{ text: "2 units", target: "radius" },
-			{ text: "5 units", target: "height" }
-		]
+		height: 300
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "cone", height: 300, radius: 6 },
+		shape: {
+			type: "cone",
+			radiusLabel: "2 units",
+			heightLabel: "5 units"
+		},
 		width: 300,
-		height: 300,
-		labels: [
-			{ text: "6 units", target: "radius" },
-			{ text: "4 units", target: "height" }
-		]
+		height: 300
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "cone", height: 300, radius: 3 },
+		shape: {
+			type: "cone",
+			radiusLabel: "6 units",
+			heightLabel: "4 units"
+		},
 		width: 300,
-		height: 300,
-		labels: [
-			{ text: "3 units", target: "radius" },
-			{ text: "2 units", target: "height" }
-		]
+		height: 300
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "cone", height: 300, radius: 3 },
+		shape: {
+			type: "cone",
+			radiusLabel: "3 units",
+			heightLabel: "2 units"
+		},
 		width: 300,
-		height: 300,
-		labels: [
-			{ text: "3 units", target: "radius" },
-			{ text: "4 units", target: "height" }
-		]
-	},
-
-	// Cylinders
-	{
-		type: "geometricSolidDiagram",
-		shape: { type: "cylinder", height: 300, radius: 8 },
-		width: 300,
-		height: 300,
-		labels: [
-			{ text: "8 units", target: "radius" },
-			{ text: "6 units", target: "height" }
-		]
+		height: 300
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "cylinder", height: 300, radius: 3 },
+		shape: {
+			type: "cone",
+			radiusLabel: "3 units",
+			heightLabel: "4 units"
+		},
 		width: 300,
-		height: 300,
-		labels: [
-			{ text: "3 units", target: "radius" },
-			{ text: "2 units", target: "height" }
-		]
+		height: 300
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "cylinder", height: 300, radius: 4 },
+		shape: {
+			type: "cylinder",
+			radiusLabel: "8 units",
+			heightLabel: "6 units"
+		},
 		width: 300,
-		height: 300,
-		labels: [
-			{ text: "4 units", target: "radius" },
-			{ text: "8 units", target: "height" }
-		]
+		height: 300
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "cylinder", height: 300, radius: 6 },
+		shape: {
+			type: "cylinder",
+			radiusLabel: "3 units",
+			heightLabel: "2 units"
+		},
 		width: 300,
-		height: 300,
-		labels: [
-			{ text: "6 units", target: "radius" },
-			{ text: "4 units", target: "height" }
-		]
+		height: 300
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "cylinder", height: 300, radius: 5 },
+		shape: {
+			type: "cylinder",
+			radiusLabel: "4 units",
+			heightLabel: "8 units"
+		},
 		width: 300,
-		height: 300,
-		labels: [
-			{ text: "5 units", target: "radius" },
-			{ text: "3 units", target: "height" }
-		]
+		height: 300
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "cylinder", height: 300, radius: 2 },
+		shape: {
+			type: "cylinder",
+			radiusLabel: "6 units",
+			heightLabel: "4 units"
+		},
 		width: 300,
-		height: 300,
-		labels: [
-			{ text: "2 units", target: "radius" },
-			{ text: "8 units", target: "height" }
-		]
+		height: 300
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "cylinder", height: 300, radius: 4 },
+		shape: {
+			type: "cylinder",
+			radiusLabel: "5 units",
+			heightLabel: "3 units"
+		},
 		width: 300,
-		height: 300,
-		labels: [
-			{ text: "4 units", target: "radius" },
-			{ text: "10 units", target: "height" }
-		]
+		height: 300
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "cylinder", height: 300, radius: 3 },
+		shape: {
+			type: "cylinder",
+			radiusLabel: "2 units",
+			heightLabel: "8 units"
+		},
 		width: 300,
-		height: 300,
-		labels: [
-			{ text: "3 units", target: "radius" },
-			{ text: "6 units", target: "height" }
-		]
+		height: 300
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "cylinder", height: 300, radius: 2 },
+		shape: {
+			type: "cylinder",
+			radiusLabel: "4 units",
+			heightLabel: "10 units"
+		},
 		width: 300,
-		height: 300,
-		labels: [
-			{ text: "2 units", target: "radius" },
-			{ text: "5 units", target: "height" }
-		]
+		height: 300
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "cylinder", height: 300, radius: 4 },
+		shape: {
+			type: "cylinder",
+			radiusLabel: "3 units",
+			heightLabel: "6 units"
+		},
 		width: 300,
-		height: 300,
-		labels: [
-			{ text: "4 units", target: "radius" },
-			{ text: "10 units", target: "height" }
-		]
+		height: 300
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "cylinder", height: 300, radius: 5 },
+		shape: {
+			type: "cylinder",
+			radiusLabel: "2 units",
+			heightLabel: "5 units"
+		},
 		width: 300,
-		height: 300,
-		labels: [
-			{ text: "5 units", target: "radius" },
-			{ text: "6 units", target: "height" }
-		]
+		height: 300
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "cylinder", height: 300, radius: 4 },
+		shape: {
+			type: "cylinder",
+			radiusLabel: "4 units",
+			heightLabel: "10 units"
+		},
 		width: 300,
-		height: 300,
-		labels: [
-			{ text: "4 units", target: "radius" },
-			{ text: "3 units", target: "height" }
-		]
+		height: 300
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "cylinder", height: 300, radius: 4 },
+		shape: {
+			type: "cylinder",
+			radiusLabel: "5 units",
+			heightLabel: "6 units"
+		},
 		width: 300,
-		height: 300,
-		labels: [
-			{ text: "4 cm", target: "radius" },
-			{ text: "20 cm", target: "height" }
-		]
+		height: 300
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "cylinder", height: 300, radius: 10 },
+		shape: {
+			type: "cylinder",
+			radiusLabel: "4 units",
+			heightLabel: "3 units"
+		},
 		width: 300,
-		height: 300,
-		labels: [
-			{ text: "10 inches", target: "radius" },
-			{ text: "20 inches", target: "height" }
-		]
-	},
-
-	// Additional extracted-like coverage: unlabeled identification and varied sizes
-	// Spheres (unlabeled and varied canvas sizes)
-	{
-		type: "geometricSolidDiagram",
-		shape: { type: "sphere", radius: 8 },
-		width: 300,
-		height: 300,
-		labels: [{ text: "8 units", target: "radius" }]
+		height: 300
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "sphere", radius: 15 },
+		shape: {
+			type: "cylinder",
+			radiusLabel: "4 cm",
+			heightLabel: "20 cm"
+		},
 		width: 300,
-		height: 300,
-		labels: [{ text: "15 cm", target: "radius" }]
+		height: 300
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "sphere", radius: 5 },
+		shape: {
+			type: "cylinder",
+			radiusLabel: "10 inches",
+			heightLabel: "20 inches"
+		},
 		width: 300,
-		height: 300,
-		labels: []
+		height: 300
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "sphere", radius: 5 },
+		shape: {
+			type: "sphere",
+			radiusLabel: "8 units"
+		},
 		width: 300,
-		height: 300,
-		labels: []
+		height: 300
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "sphere", radius: 45.455 },
+		shape: {
+			type: "sphere",
+			radiusLabel: "15 cm"
+		},
 		width: 300,
-		height: 300,
-		labels: []
-	},
-
-	// Cones (unlabeled identification)
-	{
-		type: "geometricSolidDiagram",
-		shape: { type: "cone", height: 300, radius: 6 },
-		width: 300,
-		height: 300,
-		labels: []
+		height: 300
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "cone", height: 300, radius: 8 },
+		shape: {
+			type: "sphere",
+			radiusLabel: null
+		},
 		width: 300,
-		height: 300,
-		labels: []
-	},
-
-	// Cylinders (unlabeled identification and special sizes)
-	{
-		type: "geometricSolidDiagram",
-		shape: { type: "cylinder", height: 300, radius: 4 },
-		width: 300,
-		height: 300,
-		labels: []
+		height: 300
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "cylinder", height: 300, radius: 8 },
+		shape: {
+			type: "sphere",
+			radiusLabel: null
+		},
 		width: 300,
-		height: 300,
-		labels: []
+		height: 300
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "cylinder", height: 300, radius: 6 },
+		shape: {
+			type: "sphere",
+			radiusLabel: null
+		},
 		width: 300,
-		height: 300,
-		labels: []
+		height: 300
 	},
 	{
 		type: "geometricSolidDiagram",
-		shape: { type: "cylinder", height: 300, radius: 4 },
+		shape: {
+			type: "cone",
+			radiusLabel: null,
+			heightLabel: null
+		},
 		width: 300,
-		height: 300,
-		labels: [
-			{ text: "4 feet", target: "radius" },
-			{ text: "2 feet", target: "height" }
-		]
+		height: 300
+	},
+	{
+		type: "geometricSolidDiagram",
+		shape: {
+			type: "cone",
+			radiusLabel: null,
+			heightLabel: null
+		},
+		width: 300,
+		height: 300
+	},
+	{
+		type: "geometricSolidDiagram",
+		shape: {
+			type: "cylinder",
+			radiusLabel: null,
+			heightLabel: null
+		},
+		width: 300,
+		height: 300
+	},
+	{
+		type: "geometricSolidDiagram",
+		shape: {
+			type: "cylinder",
+			radiusLabel: null,
+			heightLabel: null
+		},
+		width: 300,
+		height: 300
+	},
+	{
+		type: "geometricSolidDiagram",
+		shape: {
+			type: "cylinder",
+			radiusLabel: null,
+			heightLabel: null
+		},
+		width: 300,
+		height: 300
+	},
+	{
+		type: "geometricSolidDiagram",
+		shape: {
+			type: "cylinder",
+			radiusLabel: "4 feet",
+			heightLabel: "2 feet"
+		},
+		width: 300,
+		height: 300
 	}
-	]
+]
