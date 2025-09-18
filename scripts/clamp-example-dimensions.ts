@@ -33,9 +33,9 @@ function processExampleFile(filePath: string): void {
 	let modified = false
 
 	// Match width: <number> patterns (both with and without quotes)
-	const widthRegex = /(\s+(?:")?width(?:")?\s*:\s*)(\d+)([,\s])/g
+	const widthRegex = /(\s+(?:")?width(?:")?\s*:\s*)(\d+(?:\.\d+)?)([,\s])/g
 	content = content.replace(widthRegex, (match, prefix, widthStr, suffix) => {
-		const originalWidth = Number.parseInt(widthStr, 10)
+		const originalWidth = Number.parseFloat(widthStr)
 		const clampedWidth = clampValue(originalWidth, SVG_DIAGRAM_WIDTH_MIN, SVG_DIAGRAM_WIDTH_MAX)
 
 		if (originalWidth !== clampedWidth) {
@@ -51,9 +51,9 @@ function processExampleFile(filePath: string): void {
 	})
 
 	// Match height: <number> patterns (both with and without quotes)
-	const heightRegex = /(\s+(?:")?height(?:")?\s*:\s*)(\d+)([,\s])/g
+	const heightRegex = /(\s+(?:")?height(?:")?\s*:\s*)(\d+(?:\.\d+)?)([,\s])/g
 	content = content.replace(heightRegex, (match, prefix, heightStr, suffix) => {
-		const originalHeight = Number.parseInt(heightStr, 10)
+		const originalHeight = Number.parseFloat(heightStr)
 		const clampedHeight = clampValue(originalHeight, SVG_DIAGRAM_HEIGHT_MIN, SVG_DIAGRAM_HEIGHT_MAX)
 
 		if (originalHeight !== clampedHeight) {

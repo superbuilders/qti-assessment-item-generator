@@ -247,6 +247,9 @@ export const generateFigureComparisonDiagram: WidgetGenerator<typeof FigureCompa
 		}
 	}
 
+	// Track all placed labels to prevent overlaps between side labels and figure labels
+	const placedLabelRects: Array<{ x: number; y: number; width: number; height: number }> = []
+
 	// Render all figures with spacing applied in screen space
 	for (let i = 0; i < figureGeometries.length; i++) {
 		const figureGeom = figureGeometries[i]
@@ -363,6 +366,14 @@ export const generateFigureComparisonDiagram: WidgetGenerator<typeof FigureCompa
 				fontPx: labelFontPx,
 				fontWeight: theme.font.weight.bold
 			})
+
+			// Track this side label's bounding box for figure label collision detection
+			placedLabelRects.push({
+				x: chosen.x - textWidthPx / 2,
+				y: chosen.y - textHeightPx / 2,
+				width: textWidthPx,
+				height: textHeightPx
+			})
 		}
 
 		// Calculate figure label position based on final transformed bounds
@@ -443,16 +454,32 @@ export const generateFigureComparisonDiagram: WidgetGenerator<typeof FigureCompa
 			let iter = 0
 			const maxIter = 60
 			const step = 2
-			while (
-				polygonIntersectsRect(transformedVertices, {
-					x: flX - halfW,
-					y: flY - halfH,
+			
+			// Check collision against both polygon edges and placed side labels
+			function hasCollision(x: number, y: number): boolean {
+				const figureRect = {
+					x: x - halfW,
+					y: y - halfH,
 					width: figTextW,
-					height: figTextH,
-					pad: 1
-				}) &&
-				iter < maxIter
-			) {
+					height: figTextH
+				}
+				
+				// Check collision with polygon edges
+				if (polygonIntersectsRect(transformedVertices, { ...figureRect, pad: 1 })) {
+					return true
+				}
+				
+				// Check collision with placed side labels
+				for (const placedRect of placedLabelRects) {
+					if (rectanglesOverlap(figureRect, placedRect)) {
+						return true
+					}
+				}
+				
+				return false
+			}
+			
+			while (hasCollision(flX, flY) && iter < maxIter) {
 				flX += dirX * step
 				flY += dirY * step
 				iter++
@@ -765,5 +792,17 @@ function pointInPolygon(point: { x: number; y: number }, polygon: Array<{ x: num
 		if (intersect) inside = !inside
 	}
 	return inside
+}
+
+function rectanglesOverlap(
+	rect1: { x: number; y: number; width: number; height: number },
+	rect2: { x: number; y: number; width: number; height: number }
+): boolean {
+	return !(
+		rect1.x + rect1.width <= rect2.x ||
+		rect2.x + rect2.width <= rect1.x ||
+		rect1.y + rect1.height <= rect2.y ||
+		rect2.y + rect2.height <= rect1.y
+	)
 }
 
