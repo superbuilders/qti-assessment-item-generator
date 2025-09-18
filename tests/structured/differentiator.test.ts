@@ -16,9 +16,8 @@ mock.module("openai", () => {
 							{
 								message: {
 									parsed: {
-										differentiated_items: [
+										plans: [
 											{
-												identifier: "differentiated-item-1",
 												title: "Differentiated Item",
 												responseDeclarations: {
 													__sb_idx__0: {
@@ -39,7 +38,6 @@ mock.module("openai", () => {
 														}
 													}
 												},
-												widgets: {},
 												interactions: {},
 												feedback: {
 													correct: {

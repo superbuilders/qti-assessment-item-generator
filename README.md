@@ -78,7 +78,7 @@ console.log(xml);
 
 ### AI-Powered Item Differentiation
 
-Generate unique variations of an existing assessment item while preserving its structure and difficulty.
+Generate unique variations of an existing assessment item using a robust, two-shot pipeline that separates content planning from visual generation. This process is fully independent of the `AiContextEnvelope` used for initial item creation.
 
 ```ts
 import OpenAI from "openai";
@@ -91,11 +91,10 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 // Assume `sourceItem` is a valid AssessmentItemInput object you already have.
 const sourceItem: AssessmentItemInput = { /* ... */ };
 
-// Generate 3 new variations of the source item.
+// To generate 3 new variations of the source item, including deterministically regenerated widgets:
 const items = await differentiateAssessmentItem(openai, logger, sourceItem, 3);
-// `items` is now an array of 3 AssessmentItemInput objects.
-
-console.log(`Generated ${items.length} new items.`);
+// `items` is now an array of up to 3 valid AssessmentItemInput objects.
+console.log(`Generated ${items.length} new items with regenerated widgets.`);
 ```
 
 ### Standalone Widget Compilation
@@ -159,7 +158,8 @@ console.log(svgString);
 ### `structured/differentiator`
 
 -   `differentiateAssessmentItem(openai, logger, item, n) => Promise<AssessmentItemInput[]>`
-    -   Generates `n` new variations of a structured `AssessmentItemInput`.
+    -   The main entry point for the AI differentiation pipeline. Generates `n` new variations of a structured `AssessmentItemInput` using a two-shot process for content planning and deterministic widget regeneration.
+    -   This function is completely independent of `AiContextEnvelope` and `widgetCollectionName`.
 
 ### `compiler`
 
