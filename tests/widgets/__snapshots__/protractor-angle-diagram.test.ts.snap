@@ -1,4 +1,4 @@
-// Bun Snapshot v1, https://bun.sh/docs/test/snapshots
+// Bun Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Widget: protractor-angle-diagram should produce consistent output for example #1 1`] = `
 "<svg width="440" height="340" viewBox="-20 -20 440 340" xmlns="http://www.w3.org/2000/svg" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"><g transform="translate(40, 12.687350773246834) scale(0.0791045366451766)">
