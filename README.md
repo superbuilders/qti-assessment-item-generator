@@ -91,7 +91,7 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 // Assume `sourceItem` is a valid AssessmentItemInput object you already have.
 const sourceItem: AssessmentItemInput = { /* ... */ };
 
-// To generate 3 new variations of the source item, including deterministically regenerated widgets:
+// To generate 3 new variations of the source item; Shot 2 will generate widgets via LLM using authoritative schemas:
 const items = await differentiateAssessmentItem(openai, logger, sourceItem, 3);
 // `items` is now an array of up to 3 valid AssessmentItemInput objects.
 console.log(`Generated ${items.length} new items with regenerated widgets.`);
@@ -158,7 +158,7 @@ console.log(svgString);
 ### `structured/differentiator`
 
 -   `differentiateAssessmentItem(openai, logger, item, n) => Promise<AssessmentItemInput[]>`
-    -   The main entry point for the AI differentiation pipeline. Generates `n` new variations of a structured `AssessmentItemInput` using a two-shot process for content planning and deterministic widget regeneration.
+    -   The main entry point for the AI differentiation pipeline. Generates `n` new variations of a structured `AssessmentItemInput` using a two-shot process: content planning (Shot 1) and widget generation via LLM using authoritative schemas (Shot 2).
     -   This function is completely independent of `AiContextEnvelope` and `widgetCollectionName`.
 
 ### `compiler`

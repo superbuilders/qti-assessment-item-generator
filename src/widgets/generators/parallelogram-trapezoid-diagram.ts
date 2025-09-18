@@ -28,11 +28,12 @@ const Parallelogram = z
 			.positive()
 			.describe("Length of the base (bottom side) in arbitrary units (e.g., 8, 10, 6.5). Parallel to the top side."),
 		height: createHeightSchema(),
-		sideLength: z
+		slantAngle: z
 			.number()
-			.positive()
+			.min(1, "slant angle must be at least 1°")
+			.max(89, "slant angle must be at most 89°")
 			.describe(
-				"Length of the slanted side in arbitrary units (e.g., 6, 8, 5.5). Both slanted sides have equal length."
+				"Angle between the base and the slanted side in degrees (acute). Defined at the bottom-left vertex."
 			),
 		labels: z
 			.object({
@@ -42,8 +43,8 @@ const Parallelogram = z
 				height: createLabelValueSchema().describe(
 					"Label for the height: number or single-letter variable. Use type 'none' to hide. Perpendicular distance."
 				),
-				sideLength: createLabelValueSchema().describe(
-					"Label for the slanted side: number or single-letter variable. Use type 'none' to hide. Positioned along the side."
+				slantAngle: createLabelValueSchema().describe(
+					"Label for the slant angle in degrees: number or single-letter variable. Use type 'none' to hide. Positioned near the bottom-left vertex."
 				)
 			})
 			.strict()
@@ -170,7 +171,8 @@ export const generateParallelogramTrapezoidDiagram: WidgetGenerator<
 	let shapeHeight = 0
 
 	if (shape.type === "parallelogram") {
-		const offset = Math.sqrt(shape.sideLength ** 2 - shape.height ** 2)
+		const angleRad = (shape.slantAngle * Math.PI) / 180
+		const offset = shape.height / Math.tan(angleRad)
 		shapeWidth = shape.base + offset
 		shapeHeight = shape.height
 	} else if (shape.type === "trapezoidRight") {
@@ -191,21 +193,12 @@ export const generateParallelogramTrapezoidDiagram: WidgetGenerator<
 	const centerY = height / 2
 
 	if (shape.type === "parallelogram") {
-		const { base, height: h, sideLength, labels } = shape
-
-		// Validate that side length is at least as long as height for a valid parallelogram
-		if (sideLength < h) {
-			logger.error("invalid parallelogram dimensions", {
-				sideLength,
-				height: h
-			})
-			throw errors.new("side length must be greater than or equal to height for a valid parallelogram")
-		}
+		const { base, height: h, slantAngle, labels } = shape
 
 		const scaledBase = base * scale
 		const scaledH = h * scale
-		const scaledSide = sideLength * scale
-		const scaledOffset = Math.sqrt(scaledSide * scaledSide - scaledH * scaledH)
+		const angleRad = (slantAngle * Math.PI) / 180
+		const scaledOffset = scaledH / Math.tan(angleRad)
 
 		// Center the shape
 		const shapeActualWidth = scaledBase + scaledOffset
@@ -266,8 +259,8 @@ export const generateParallelogramTrapezoidDiagram: WidgetGenerator<
 			})
 		}
 
-		// Right side label
-		const rightLabel = labelToString(labels.sideLength)
+		// Slant angle label (placed near right slanted side for visibility)
+		const rightLabel = labelToString(labels.slantAngle)
 		if (rightLabel !== undefined) {
 			const rightLabelX = xOffset + scaledBase + scaledOffset / 2
 			const rightLabelY = yOffset + scaledH / 2
@@ -293,8 +286,8 @@ export const generateParallelogramTrapezoidDiagram: WidgetGenerator<
 			})
 		}
 
-		// Left side label
-		const leftLabel = labelToString(labels.sideLength)
+		// Mirror of slant angle label on the left side when provided
+		const leftLabel = labelToString(labels.slantAngle)
 		if (leftLabel !== undefined) {
 			const leftLabelX = xOffset + scaledOffset / 2
 			const leftLabelY = yOffset + scaledH / 2
