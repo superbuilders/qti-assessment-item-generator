@@ -249,6 +249,17 @@ export const generateParallelogramTrapezoidDiagram: WidgetGenerator<
 			})
 		}
 
+		// If the vertical height drops outside the base segment, extend the base with a dashed line
+		// so the extension meets the foot of the height.
+		const baseEndX = xOffset + scaledBase
+		if (v4 && v4.x > baseEndX) {
+			canvas.drawLine(baseEndX, yOffset + scaledH, v4.x, yOffset + scaledH, {
+				stroke: theme.colors.black,
+				strokeWidth: theme.stroke.width.base,
+				dash: theme.stroke.dasharray.dashedShort
+			})
+		}
+
 		// Draw labels only when provided
 		// Base label (bottom)
 		const baseLabel = labelToString(labels.base)
