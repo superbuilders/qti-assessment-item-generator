@@ -1,73 +1,26 @@
-import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
 import { CSS_COLOR_PATTERN } from "../../utils/css-color"
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { theme } from "../../utils/theme"
 import type { WidgetGenerator } from "../types"
 
-// Defines the properties for a rectangular prism solid
-const RectangularPrismDataSchema = z
+// Simplified solid object schema with just the type enum
+const SolidObjectSchema = z
 	.object({
-		type: z.literal("rectangularPrism"),
-		width: createWidthSchema(),
-		height: createHeightSchema(),
-		depth: z.number().positive().describe("The depth (z-axis) of the prism.")
+		type: z.enum([
+			"rectangularPrism",
+			"pentagonalPrism",
+			"octagonalPrism",
+			"squarePyramid",
+			"cylinder",
+			"cone",
+			"sphere"
+		])
 	})
 	.strict()
-
-// Defines the properties for a pentagonal prism solid
-const PentagonalPrismDataSchema = z
-	.object({
-		type: z.literal("pentagonalPrism"),
-		side: z.number().positive().describe("The side length of the pentagonal bases."),
-		height: createHeightSchema()
-	})
-	.strict()
-
-// Defines the properties for an octagonal prism solid
-const OctagonalPrismDataSchema = z
-	.object({
-		type: z.literal("octagonalPrism"),
-		side: z.number().positive().describe("The side length of the octagonal bases."),
-		height: createHeightSchema()
-	})
-	.strict()
-
-// Defines the properties for a square pyramid solid
-const SquarePyramidDataSchema = z
-	.object({
-		type: z.literal("squarePyramid"),
-		baseSide: z.number().positive().describe("The side length of the square base."),
-		height: createHeightSchema()
-	})
-	.strict()
-
-// Defines the properties for a cylinder solid
-const CylinderDataSchema = z
-	.object({
-		type: z.literal("cylinder"),
-		radius: z.number().positive().describe("The radius of the circular bases."),
-		height: createHeightSchema()
-	})
-	.strict()
-
-// Defines the properties for a cone solid
-const ConeDataSchema = z
-	.object({
-		type: z.literal("cone"),
-		radius: z.number().positive().describe("The radius of the circular base."),
-		height: createHeightSchema()
-	})
-	.strict()
-
-// Defines the properties for a sphere solid
-const SphereDataSchema = z
-	.object({
-		type: z.literal("sphere"),
-		radius: z.number().positive().describe("The radius of the sphere.")
-	})
-	.strict()
+	.describe("The 3D solid to be intersected by the plane.")
 
 // Defines the intersecting plane's properties as a discriminated union
 const PlaneSchema = z.discriminatedUnion("orientation", [
@@ -130,17 +83,7 @@ export const ThreeDIntersectionDiagramPropsSchema = z
 		type: z.literal("threeDIntersectionDiagram"),
 		width: createWidthSchema(),
 		height: createHeightSchema(),
-		solid: z
-			.discriminatedUnion("type", [
-				RectangularPrismDataSchema,
-				PentagonalPrismDataSchema,
-				OctagonalPrismDataSchema,
-				SquarePyramidDataSchema,
-				CylinderDataSchema,
-				ConeDataSchema,
-				SphereDataSchema
-			])
-			.describe("The geometric data defining the 3D solid shape."),
+		solid: SolidObjectSchema,
 		plane: PlaneSchema.describe("The properties of the intersecting plane."),
 		viewOptions: z
 			.object({
@@ -183,40 +126,40 @@ type Point2D = { x: number; y: number }
 // Helper function to make any color transparent (simplified version)
 const makeColorTransparent = (color: string, opacity: number): string => {
 	// Handle hex colors
-	if (color.startsWith('#')) {
+	if (color.startsWith("#")) {
 		const hex = color.slice(1)
 		let r: number, g: number, b: number
-		
+
 		if (hex.length === 3) {
 			// Short hex format #RGB
-			r = parseInt(hex[0] + hex[0], 16)
-			g = parseInt(hex[1] + hex[1], 16)
-			b = parseInt(hex[2] + hex[2], 16)
+			r = Number.parseInt(hex[0] + hex[0], 16)
+			g = Number.parseInt(hex[1] + hex[1], 16)
+			b = Number.parseInt(hex[2] + hex[2], 16)
 		} else if (hex.length === 6) {
 			// Long hex format #RRGGBB
-			r = parseInt(hex.slice(0, 2), 16)
-			g = parseInt(hex.slice(2, 4), 16)
-			b = parseInt(hex.slice(4, 6), 16)
+			r = Number.parseInt(hex.slice(0, 2), 16)
+			g = Number.parseInt(hex.slice(2, 4), 16)
+			b = Number.parseInt(hex.slice(4, 6), 16)
 		} else if (hex.length === 8) {
 			// Already has alpha #RRGGBBAA - extract RGB and ignore existing alpha
-			r = parseInt(hex.slice(0, 2), 16)
-			g = parseInt(hex.slice(2, 4), 16)
-			b = parseInt(hex.slice(4, 6), 16)
+			r = Number.parseInt(hex.slice(0, 2), 16)
+			g = Number.parseInt(hex.slice(2, 4), 16)
+			b = Number.parseInt(hex.slice(4, 6), 16)
 		} else {
 			// Invalid hex format, return as-is
 			return color
 		}
-		
+
 		return `rgba(${r}, ${g}, ${b}, ${opacity})`
 	}
-	
+
 	// Handle rgba/rgb colors - extract RGB values and apply new opacity
 	const rgbaMatch = color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*[\d.]+)?\)/)
 	if (rgbaMatch) {
 		const [, r, g, b] = rgbaMatch
 		return `rgba(${r}, ${g}, ${b}, ${opacity})`
 	}
-	
+
 	// For named colors or other formats, return as-is (CSS will handle it)
 	return color
 }
@@ -230,12 +173,17 @@ export const generateThreeDIntersectionDiagram: WidgetGenerator<typeof ThreeDInt
 ) => {
 	const { width, height, solid, plane, viewOptions } = props
 	const { intersectionColor: rawIntersectionColor } = viewOptions
-	
+
 	// Make the intersection color more transparent but still visible, with enhanced saturation
 	const intersectionColor = makeColorTransparent(rawIntersectionColor, 0.35) // 35% opacity
 
 	const chartWidth = width - PADDING * 2
 	const chartHeight = height - PADDING * 2
+
+	// Calculate solid dimensions based on canvas size for deterministic rendering
+	const canvasPadding = 40
+	const maxDrawingHeight = height - canvasPadding * 2
+	const maxDrawingWidth = width - canvasPadding * 2
 
 	// Simple isometric projection - classic 3D view
 	const projectIsometric = (point: Point3D): Point2D => {
@@ -243,84 +191,98 @@ export const generateThreeDIntersectionDiagram: WidgetGenerator<typeof ThreeDInt
 		// Rotate 45° around Y, then ~35° around X for classic isometric look
 		const cos45 = Math.cos(Math.PI / 4)
 		const sin45 = Math.sin(Math.PI / 4)
-		const cosIso = Math.cos(Math.atan(1/Math.sqrt(2))) // ~35.26°
-		const sinIso = Math.sin(Math.atan(1/Math.sqrt(2)))
-		
+		const cosIso = Math.cos(Math.atan(1 / Math.sqrt(2))) // ~35.26°
+		const sinIso = Math.sin(Math.atan(1 / Math.sqrt(2)))
+
 		// First rotate around Y axis by 45°
 		const x1 = point.x * cos45 + point.z * sin45
 		const y1 = point.y
 		const z1 = -point.x * sin45 + point.z * cos45
-		
+
 		// Then rotate around X axis by ~35°
 		const x2 = x1
 		const y2 = y1 * cosIso - z1 * sinIso
-		
+
 		return { x: x2, y: -y2 } // flip Y for screen coordinates
 	}
 
 	// Define basic solid shapes - focus on getting them to look right first
 	let vertices: Point3D[] = []
-	let edges: Array<{start: number, end: number}> = []
+	let edges: Array<{ start: number; end: number }> = []
 
 	switch (solid.type) {
 		case "rectangularPrism": {
-			const w = solid.width / 2
-			const h = solid.height / 2  
-			const d = solid.depth / 2
-			
+			// Calculate dimensions based on canvas size
+			const h = maxDrawingHeight * 0.4 // height
+			const w = maxDrawingWidth * 0.3 // width
+			const d = maxDrawingWidth * 0.2 // depth
+
 			// 8 vertices of a rectangular prism
 			vertices = [
 				{ x: -w, y: -h, z: -d }, // 0: back bottom left
-				{ x:  w, y: -h, z: -d }, // 1: back bottom right
-				{ x:  w, y:  h, z: -d }, // 2: back top right
-				{ x: -w, y:  h, z: -d }, // 3: back top left
-				{ x: -w, y: -h, z:  d }, // 4: front bottom left
-				{ x:  w, y: -h, z:  d }, // 5: front bottom right
-				{ x:  w, y:  h, z:  d }, // 6: front top right
-				{ x: -w, y:  h, z:  d }  // 7: front top left
+				{ x: w, y: -h, z: -d }, // 1: back bottom right
+				{ x: w, y: h, z: -d }, // 2: back top right
+				{ x: -w, y: h, z: -d }, // 3: back top left
+				{ x: -w, y: -h, z: d }, // 4: front bottom left
+				{ x: w, y: -h, z: d }, // 5: front bottom right
+				{ x: w, y: h, z: d }, // 6: front top right
+				{ x: -w, y: h, z: d } // 7: front top left
 			]
-			
+
 			// 12 edges of the rectangular prism
 			edges = [
 				// Back face
-				{start: 0, end: 1}, {start: 1, end: 2}, {start: 2, end: 3}, {start: 3, end: 0},
-				// Front face  
-				{start: 4, end: 5}, {start: 5, end: 6}, {start: 6, end: 7}, {start: 7, end: 4},
+				{ start: 0, end: 1 },
+				{ start: 1, end: 2 },
+				{ start: 2, end: 3 },
+				{ start: 3, end: 0 },
+				// Front face
+				{ start: 4, end: 5 },
+				{ start: 5, end: 6 },
+				{ start: 6, end: 7 },
+				{ start: 7, end: 4 },
 				// Connecting edges
-				{start: 0, end: 4}, {start: 1, end: 5}, {start: 2, end: 6}, {start: 3, end: 7}
+				{ start: 0, end: 4 },
+				{ start: 1, end: 5 },
+				{ start: 2, end: 6 },
+				{ start: 3, end: 7 }
 			]
 			break
 		}
 		case "pentagonalPrism": {
-			const radius = solid.side / (2 * Math.sin(Math.PI / 5))
-			const h = solid.height / 2
-			
+			// Calculate dimensions based on canvas size
+			const h = maxDrawingHeight * 0.4
+			const side = maxDrawingWidth * 0.15
+			const radius = side / (2 * Math.sin(Math.PI / 5))
+
 			// Pentagon vertices (bottom then top)
 			for (let i = 0; i < 5; i++) {
 				const angle = (i * 2 * Math.PI) / 5
 				const x = radius * Math.cos(angle)
 				const z = radius * Math.sin(angle)
-				
+
 				vertices.push({ x, y: -h, z }) // bottom vertex
-				vertices.push({ x, y:  h, z }) // top vertex
+				vertices.push({ x, y: h, z }) // top vertex
 			}
-			
+
 			// Pentagon edges
 			for (let i = 0; i < 5; i++) {
 				const next = (i + 1) % 5
 				// Bottom pentagon
-				edges.push({start: i * 2, end: next * 2})
-				// Top pentagon  
-				edges.push({start: i * 2 + 1, end: next * 2 + 1})
+				edges.push({ start: i * 2, end: next * 2 })
+				// Top pentagon
+				edges.push({ start: i * 2 + 1, end: next * 2 + 1 })
 				// Vertical edges
-				edges.push({start: i * 2, end: i * 2 + 1})
+				edges.push({ start: i * 2, end: i * 2 + 1 })
 			}
 			break
 		}
 		case "octagonalPrism": {
-			const radius = solid.side / (2 * Math.sin(Math.PI / 8)) // circumradius of octagon
-			const h = solid.height / 2
-			
+			// Calculate dimensions based on canvas size
+			const h = maxDrawingHeight * 0.4
+			const side = maxDrawingWidth * 0.12
+			const radius = side / (2 * Math.sin(Math.PI / 8)) // circumradius of octagon
+
 			// Octagon vertices (bottom then top)
 			// Rotate by π/8 (22.5°) so that a flat face is parallel to the Z-axis
 			const rotationOffset = Math.PI / 8
@@ -328,77 +290,87 @@ export const generateThreeDIntersectionDiagram: WidgetGenerator<typeof ThreeDInt
 				const angle = (i * 2 * Math.PI) / 8 + rotationOffset
 				const x = radius * Math.cos(angle)
 				const z = radius * Math.sin(angle)
-				
+
 				vertices.push({ x, y: -h, z }) // bottom vertex
-				vertices.push({ x, y:  h, z }) // top vertex
+				vertices.push({ x, y: h, z }) // top vertex
 			}
-			
+
 			// Octagon edges
 			for (let i = 0; i < 8; i++) {
 				const next = (i + 1) % 8
 				// Bottom octagon
-				edges.push({start: i * 2, end: next * 2})
-				// Top octagon  
-				edges.push({start: i * 2 + 1, end: next * 2 + 1})
+				edges.push({ start: i * 2, end: next * 2 })
+				// Top octagon
+				edges.push({ start: i * 2 + 1, end: next * 2 + 1 })
 				// Vertical edges
-				edges.push({start: i * 2, end: i * 2 + 1})
+				edges.push({ start: i * 2, end: i * 2 + 1 })
 			}
 			break
 		}
 		case "squarePyramid": {
-			const b = solid.baseSide / 2
-			const h = solid.height / 2
-			
+			// Calculate dimensions based on canvas size
+			const h = maxDrawingHeight * 0.45 // pyramid height
+			const b = maxDrawingWidth * 0.25 // half of base side
+
 			vertices = [
 				{ x: -b, y: -h, z: -b }, // 0: back bottom left
-				{ x:  b, y: -h, z: -b }, // 1: back bottom right
-				{ x:  b, y: -h, z:  b }, // 2: front bottom right
-				{ x: -b, y: -h, z:  b }, // 3: front bottom left
-				{ x:  0, y:  h, z:  0 }  // 4: apex
+				{ x: b, y: -h, z: -b }, // 1: back bottom right
+				{ x: b, y: -h, z: b }, // 2: front bottom right
+				{ x: -b, y: -h, z: b }, // 3: front bottom left
+				{ x: 0, y: h, z: 0 } // 4: apex
 			]
-			
+
 			edges = [
 				// Base square
-				{start: 0, end: 1}, {start: 1, end: 2}, {start: 2, end: 3}, {start: 3, end: 0},
+				{ start: 0, end: 1 },
+				{ start: 1, end: 2 },
+				{ start: 2, end: 3 },
+				{ start: 3, end: 0 },
 				// Edges to apex
-				{start: 0, end: 4}, {start: 1, end: 4}, {start: 2, end: 4}, {start: 3, end: 4}
+				{ start: 0, end: 4 },
+				{ start: 1, end: 4 },
+				{ start: 2, end: 4 },
+				{ start: 3, end: 4 }
 			]
 			break
 		}
 		case "cylinder": {
-			const r = solid.radius
-			const h = solid.height / 2
+			// Calculate dimensions based on canvas size
+			const h = maxDrawingHeight * 0.4
+			const r = maxDrawingWidth * 0.15
 			const segments = 12 // fewer segments for cleaner look
-			
+
 			// Generate circle vertices
 			for (let i = 0; i < segments; i++) {
 				const angle = (i * 2 * Math.PI) / segments
 				const x = r * Math.cos(angle)
 				const z = r * Math.sin(angle)
-				
+
 				vertices.push({ x, y: -h, z }) // bottom circle
-				vertices.push({ x, y:  h, z }) // top circle
+				vertices.push({ x, y: h, z }) // top circle
 			}
-			
+
 			// Generate edges
 			for (let i = 0; i < segments; i++) {
 				const next = (i + 1) % segments
 				// Bottom circle
-				edges.push({start: i * 2, end: next * 2})
+				edges.push({ start: i * 2, end: next * 2 })
 				// Top circle
-				edges.push({start: i * 2 + 1, end: next * 2 + 1})
+				edges.push({ start: i * 2 + 1, end: next * 2 + 1 })
 				// Vertical edges (only show some for clarity)
-				if (i % 3 === 0) { // every 3rd vertical line
-					edges.push({start: i * 2, end: i * 2 + 1})
+				if (i % 3 === 0) {
+					// every 3rd vertical line
+					edges.push({ start: i * 2, end: i * 2 + 1 })
 				}
 			}
 			break
 		}
 		case "cone": {
-			const r = solid.radius
-			const h = solid.height / 2
+			// Calculate dimensions based on canvas size
+			const h = maxDrawingHeight * 0.45
+			const r = maxDrawingWidth * 0.2
 			const segments = 12
-			
+
 			// Base circle vertices
 			for (let i = 0; i < segments; i++) {
 				const angle = (i * 2 * Math.PI) / segments
@@ -411,30 +383,32 @@ export const generateThreeDIntersectionDiagram: WidgetGenerator<typeof ThreeDInt
 			// Apex vertex
 			vertices.push({ x: 0, y: h, z: 0 })
 			const apexIndex = segments
-			
+
 			// Generate edges
 			for (let i = 0; i < segments; i++) {
 				const next = (i + 1) % segments
 				// Base circle
-				edges.push({start: i, end: next})
+				edges.push({ start: i, end: next })
 				// Lines to apex (only show some for clarity)
-				if (i % 2 === 0) { // every other line
-					edges.push({start: i, end: apexIndex})
+				if (i % 2 === 0) {
+					// every other line
+					edges.push({ start: i, end: apexIndex })
 				}
 			}
 			break
 		}
 		case "sphere": {
-			const r = solid.radius
-			const stacks = 6  // latitude lines
+			// Calculate dimensions based on canvas size
+			const r = Math.min(maxDrawingWidth, maxDrawingHeight) * 0.25
+			const stacks = 6 // latitude lines
 			const sectors = 12 // longitude lines
-			
+
 			// Generate vertices
 			for (let i = 0; i <= stacks; i++) {
 				const phi = (Math.PI * i) / stacks // 0 to PI
 				const y = r * Math.cos(phi)
 				const ringRadius = r * Math.sin(phi)
-				
+
 				for (let j = 0; j < sectors; j++) {
 					const theta = (2 * Math.PI * j) / sectors
 					const x = ringRadius * Math.cos(theta)
@@ -442,21 +416,21 @@ export const generateThreeDIntersectionDiagram: WidgetGenerator<typeof ThreeDInt
 					vertices.push({ x, y, z })
 				}
 			}
-			
+
 			// Generate edges for wireframe sphere
 			for (let i = 0; i < stacks; i++) {
 				for (let j = 0; j < sectors; j++) {
 					const current = i * sectors + j
 					const next = i * sectors + ((j + 1) % sectors)
 					const below = (i + 1) * sectors + j
-					
+
 					// Horizontal edges (longitude)
 					if (i < stacks) {
-						edges.push({start: current, end: next})
+						edges.push({ start: current, end: next })
 					}
 					// Vertical edges (latitude) - only some for clarity
 					if (i < stacks && j % 2 === 0) {
-						edges.push({start: current, end: below})
+						edges.push({ start: current, end: below })
 					}
 				}
 			}
@@ -466,21 +440,21 @@ export const generateThreeDIntersectionDiagram: WidgetGenerator<typeof ThreeDInt
 
 	// Project all vertices to 2D
 	const projected = vertices.map(projectIsometric)
-	
+
 	// Calculate bounds for scaling
-	const minX = Math.min(...projected.map(p => p.x))
-	const maxX = Math.max(...projected.map(p => p.x))
-	const minY = Math.min(...projected.map(p => p.y))
-	const maxY = Math.max(...projected.map(p => p.y))
-	
+	const minX = Math.min(...projected.map((p) => p.x))
+	const maxX = Math.max(...projected.map((p) => p.x))
+	const minY = Math.min(...projected.map((p) => p.y))
+	const maxY = Math.max(...projected.map((p) => p.y))
+
 	// Scale to fit in canvas with padding
 	const scaleX = chartWidth / (maxX - minX + 1)
 	const scaleY = chartHeight / (maxY - minY + 1)
 	const scale = Math.min(scaleX, scaleY) * 0.7 // leave some margin
-	
+
 	const centerX = PADDING + chartWidth / 2
 	const centerY = PADDING + chartHeight / 2
-	
+
 	// Convert 2D projected point to SVG coordinates
 	const toSvg = (p: Point2D): Point2D => ({
 		x: centerX + (p.x - (minX + maxX) / 2) * scale,
@@ -488,17 +462,17 @@ export const generateThreeDIntersectionDiagram: WidgetGenerator<typeof ThreeDInt
 	})
 
 	// Calculate rectangular plane that cuts through the solid
-	const calculateRectangularPlane = (): { planePoints: Point2D[], planeZ: number } => {
+	const calculateRectangularPlane = (): { planePoints: Point2D[]; planeZ: number } => {
 		// Calculate bounds of the entire solid
 		const bounds = {
-			minX: Math.min(...vertices.map(v => v.x)),
-			maxX: Math.max(...vertices.map(v => v.x)),
-			minY: Math.min(...vertices.map(v => v.y)),
-			maxY: Math.max(...vertices.map(v => v.y)),
-			minZ: Math.min(...vertices.map(v => v.z)),
-			maxZ: Math.max(...vertices.map(v => v.z))
+			minX: Math.min(...vertices.map((v) => v.x)),
+			maxX: Math.max(...vertices.map((v) => v.x)),
+			minY: Math.min(...vertices.map((v) => v.y)),
+			maxY: Math.max(...vertices.map((v) => v.y)),
+			minZ: Math.min(...vertices.map((v) => v.z)),
+			maxZ: Math.max(...vertices.map((v) => v.z))
 		}
-		
+
 		// Add some padding to make sure plane extends beyond solid
 		const padding = 1.2
 		const paddedBounds = {
@@ -509,10 +483,10 @@ export const generateThreeDIntersectionDiagram: WidgetGenerator<typeof ThreeDInt
 			minZ: bounds.minZ * padding,
 			maxZ: bounds.maxZ * padding
 		}
-		
+
 		let planeVertices: Point3D[] = []
 		let planeZ = 0
-		
+
 		if (plane.orientation === "vertical") {
 			// Vertical plane (parallel to YZ plane)
 			planeZ = paddedBounds.minZ + plane.position * (paddedBounds.maxZ - paddedBounds.minZ)
@@ -538,34 +512,34 @@ export const generateThreeDIntersectionDiagram: WidgetGenerator<typeof ThreeDInt
 			const centerY = paddedBounds.minY + plane.position * (paddedBounds.maxY - paddedBounds.minY)
 			const centerZ = paddedBounds.minZ + plane.position * (paddedBounds.maxZ - paddedBounds.minZ)
 			planeZ = centerZ
-			
+
 			// Create tilted rectangular plane that spans the full width and depth
 			const yRange = paddedBounds.maxY - paddedBounds.minY
-			const tiltOffset = Math.tan(angleRad) * yRange / 2
-			
+			const tiltOffset = (Math.tan(angleRad) * yRange) / 2
+
 			planeVertices = [
-				{ x: paddedBounds.minX, y: centerY - yRange/2, z: centerZ - tiltOffset },
-				{ x: paddedBounds.maxX, y: centerY - yRange/2, z: centerZ - tiltOffset },
-				{ x: paddedBounds.maxX, y: centerY + yRange/2, z: centerZ + tiltOffset },
-				{ x: paddedBounds.minX, y: centerY + yRange/2, z: centerZ + tiltOffset }
+				{ x: paddedBounds.minX, y: centerY - yRange / 2, z: centerZ - tiltOffset },
+				{ x: paddedBounds.maxX, y: centerY - yRange / 2, z: centerZ - tiltOffset },
+				{ x: paddedBounds.maxX, y: centerY + yRange / 2, z: centerZ + tiltOffset },
+				{ x: paddedBounds.minX, y: centerY + yRange / 2, z: centerZ + tiltOffset }
 			]
 		}
-		
+
 		// Convert to 2D points
-		const planePoints = planeVertices.map(p => toSvg(projectIsometric(p)))
+		const planePoints = planeVertices.map((p) => toSvg(projectIsometric(p)))
 		return { planePoints, planeZ }
 	}
-	
+
 	const { planePoints, planeZ } = calculateRectangularPlane()
 
 	// Separate edges into those behind and in front of the plane for proper depth ordering
 	const edgesBehindPlane: typeof edges = []
 	const edgesInFrontOfPlane: typeof edges = []
-	
+
 	for (const edge of edges) {
 		const startVertex = vertices[edge.start]
 		const endVertex = vertices[edge.end]
-		
+
 		if (startVertex && endVertex) {
 			// Determine if edge is mostly behind or in front of plane
 			let startZ, endZ
@@ -580,7 +554,7 @@ export const generateThreeDIntersectionDiagram: WidgetGenerator<typeof ThreeDInt
 				startZ = startVertex.z
 				endZ = endVertex.z
 			}
-			
+
 			const avgZ = (startZ + endZ) / 2
 			if (avgZ < planeZ) {
 				edgesBehindPlane.push(edge)
@@ -589,27 +563,27 @@ export const generateThreeDIntersectionDiagram: WidgetGenerator<typeof ThreeDInt
 			}
 		}
 	}
-	
+
 	// Generate SVG using Canvas API
 	const canvas = new CanvasImpl({
 		chartArea: { left: 0, top: 0, width, height },
 		fontPxDefault: 12,
 		lineHeightDefault: 1.2
 	})
-	
+
 	// Draw edges behind the plane first
 	for (const edge of edgesBehindPlane) {
 		const startVertex = vertices[edge.start]
 		const endVertex = vertices[edge.end]
-		
+
 		if (startVertex && endVertex) {
 			const startProj = projected[edge.start]
 			const endProj = projected[edge.end]
-			
+
 			if (startProj && endProj) {
 				const startSvg = toSvg(startProj)
 				const endSvg = toSvg(endProj)
-				
+
 				canvas.drawLine(startSvg.x, startSvg.y, endSvg.x, endSvg.y, {
 					stroke: theme.colors.black,
 					strokeWidth: theme.stroke.width.base
@@ -617,7 +591,7 @@ export const generateThreeDIntersectionDiagram: WidgetGenerator<typeof ThreeDInt
 			}
 		}
 	}
-	
+
 	// Draw the rectangular plane
 	if (planePoints.length >= 3) {
 		canvas.drawPolygon(planePoints, {
@@ -626,20 +600,20 @@ export const generateThreeDIntersectionDiagram: WidgetGenerator<typeof ThreeDInt
 			strokeWidth: 0
 		})
 	}
-	
+
 	// Draw edges in front of the plane on top
 	for (const edge of edgesInFrontOfPlane) {
 		const startVertex = vertices[edge.start]
 		const endVertex = vertices[edge.end]
-		
+
 		if (startVertex && endVertex) {
 			const startProj = projected[edge.start]
 			const endProj = projected[edge.end]
-			
+
 			if (startProj && endProj) {
 				const startSvg = toSvg(startProj)
 				const endSvg = toSvg(endProj)
-				
+
 				canvas.drawLine(startSvg.x, startSvg.y, endSvg.x, endSvg.y, {
 					stroke: theme.colors.black,
 					strokeWidth: theme.stroke.width.base
@@ -647,9 +621,8 @@ export const generateThreeDIntersectionDiagram: WidgetGenerator<typeof ThreeDInt
 			}
 		}
 	}
-	
+
 	// Finalize and return SVG
 	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}">${svgBody}</svg>`
 }
-
