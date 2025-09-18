@@ -1,4 +1,3 @@
-import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { z } from "zod"
 import { renderInlineContent } from "../../compiler/content-renderer"
 // Import the SAFE_IDENTIFIER_REGEX for consistent enforcement

@@ -1,4 +1,3 @@
-import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { z } from "zod"
 import { theme } from "../../utils/theme"
 import type { WidgetGenerator } from "../types"
