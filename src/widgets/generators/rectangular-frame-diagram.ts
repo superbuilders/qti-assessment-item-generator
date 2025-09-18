@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
@@ -58,8 +59,8 @@ export const RectangularFrameDiagramPropsSchema = z
 		type: z
 			.literal("rectangularFrameDiagram")
 			.describe("Identifies this as a 3D rectangular frame (hollow box) diagram."),
-		width: z.number().positive().describe("Total width of the widget in pixels (e.g., 600, 700, 500). Must accommodate the diagram content."),
-		height: z.number().positive().describe("Total height of the widget in pixels (e.g., 400, 350, 300). Must fit the diagram content."),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		outerLength: z
 			.number()
 			.describe(

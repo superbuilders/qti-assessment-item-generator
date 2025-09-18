@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
@@ -305,8 +306,8 @@ export const CompositeShapeDiagramPropsSchema = z
 		type: z
 			.literal("compositeShapeDiagram")
 			.describe("Widget type identifier for composite shape diagrams with complex polygons and annotations."),
-		width: z.number().positive().describe("Total width of the widget in pixels (e.g., 600, 700, 500). Must accommodate the diagram content."),
-		height: z.number().positive().describe("Total height of the widget in pixels (e.g., 400, 350, 300). Must fit the diagram content."),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		vertices: z
 			.array(createVertexSchema())
 			.describe(

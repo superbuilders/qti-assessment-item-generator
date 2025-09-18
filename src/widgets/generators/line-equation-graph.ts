@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
@@ -19,8 +20,8 @@ export const LineEquationGraphPropsSchema = z
 		type: z
 			.literal("lineEquationGraph")
 			.describe("Identifies this as a line equation graph for plotting linear functions and points."),
-		width: z.number().positive().describe("Total width of the widget in pixels (e.g., 600, 700, 500). Must accommodate the diagram content."),
-		height: z.number().positive().describe("Total height of the widget in pixels (e.g., 400, 350, 300). Must fit the diagram content."),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		xAxis: createAxisOptionsSchema().describe(
 			"Configuration for the horizontal x-axis including range, tick marks, labels, and optional grid lines. Should encompass all relevant x-values."
 		),

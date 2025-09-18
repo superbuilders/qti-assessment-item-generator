@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
@@ -80,8 +81,8 @@ export const BoxPlotPropsSchema = z
 		type: z
 			.literal("boxPlot")
 			.describe("Identifies this as a box plot widget for displaying five-number summary statistics."),
-		width: z.number().positive().describe("Total width of the widget in pixels (e.g., 600, 700, 500). Must accommodate the diagram content."),
-		height: z.number().positive().describe("Total height of the widget in pixels (e.g., 400, 350, 300). Must fit the diagram content."),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		axis: BoxPlotAxisSchema.describe("Configuration for the horizontal scale including range and tick marks."),
 		summary: BoxPlotSummarySchema.describe("The five-number summary used to draw the plot."),
 		boxColor: z

@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
@@ -156,8 +157,8 @@ function createAltitudeSchema() {
 export const TriangleDiagramPropsSchema = z
 	.object({
 		type: z.literal("triangleDiagram").describe("Identifies this widget as a triangle diagram. Always use the exact value 'triangleDiagram'."),
-		width: z.number().positive().describe("Total width of the widget in pixels (e.g., 600, 700, 500). Must accommodate the diagram content."),
-		height: z.number().positive().describe("Total height of the widget in pixels (e.g., 400, 350, 300). Must fit the diagram content."),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		points: createTrianglePointsSchema().describe("The three vertices that define the triangle. The triangle's shape is fully determined by the angle constraints specified in angleArcs."),
 		extraPoints: createAuxiliaryPointsSchema().describe("Additional points beyond the three triangle vertices. Used for constructions like angle bisectors, medians, or exterior angle demonstrations."),
 		angleArcs: z.array(createAngleMarkSchema()).min(3).max(3).describe("Array of exactly three angle markings to display (one per triangle angle, interior or exterior construction). At least 2 numeric angle values are required to determine the triangle's shape. The third angle is automatically calculated to sum to 180°. If all three provided angles are numeric, their interior measures MUST sum exactly to 180°. If any angle is symbolic/variable, the sum requirement is not enforced at validation time. Supports both interior angles (between triangle sides) and exterior angles (using auxiliary points and collinear constraints). Multiple angles at the same vertex are automatically given different arc radii for clarity."),

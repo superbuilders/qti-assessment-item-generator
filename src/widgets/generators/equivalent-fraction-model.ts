@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
@@ -11,8 +12,8 @@ export const EquivalentFractionModelPropsSchema = z
 		type: z
 			.literal("equivalentFractionModel")
 			.describe("Identifies this as a widget for comparing equivalent fractions (tenths and hundredths)."),
-		width: z.number().positive().describe("Total width of the widget in pixels (e.g., 600, 700, 500). Must accommodate the diagram content."),
-		height: z.number().positive().describe("Total height of the widget in pixels (e.g., 400, 350, 300). Must fit the diagram content."),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		numerator: z
 			.number()
 			.int()

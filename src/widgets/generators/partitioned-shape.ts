@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
@@ -133,8 +134,8 @@ export const PartitionedShapePropsSchema = z
 		z
 			.object({
 				type: z.literal("partitionedShape").describe("Widget type identifier."),
-				width: z.number().positive().describe("Total width of the widget in pixels (e.g., 600, 700, 500). Must accommodate the diagram content."),
-				height: z.number().positive().describe("Total height of the widget in pixels (e.g., 400, 350, 300). Must fit the diagram content."),
+				width: createWidthSchema(),
+				height: createHeightSchema(),
 				mode: z.literal("partition").describe("Partition mode: shows shapes divided into equal parts for fractions."),
 				shapes: z
 					.array(createPartitionShapeSchema())
@@ -156,8 +157,8 @@ export const PartitionedShapePropsSchema = z
 		z
 			.object({
 				type: z.literal("partitionedShape").describe("Widget type identifier."),
-				width: z.number().positive().describe("Total width of the widget in pixels (e.g., 600, 700, 500). Must accommodate the diagram content."),
-				height: z.number().positive().describe("Total height of the widget in pixels (e.g., 400, 350, 300). Must fit the diagram content."),
+				width: createWidthSchema(),
+				height: createHeightSchema(),
 				mode: z.literal("geometry").describe("Geometry mode: shows a coordinate grid with polygons and lines."),
 				grid: z
 					.object({

@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
@@ -196,7 +197,7 @@ const Diagonal = z
 export const PolyhedronDiagramPropsSchema = z
 	.object({
 		type: z.literal("polyhedronDiagram").describe("Identifies this as a 3D polyhedron diagram widget."),
-		width: z.number().positive().describe("Total width of the widget in pixels (e.g., 600, 700, 500). Must accommodate the diagram content."),
+		width: createWidthSchema(),
 		height: z.number().positive().describe("The height of the pyramid."),
 		shape: z
 			.discriminatedUnion("type", [

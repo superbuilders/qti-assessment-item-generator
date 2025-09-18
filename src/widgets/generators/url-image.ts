@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
@@ -21,8 +22,8 @@ export const UrlImageWidgetPropsSchema = z
 			.describe(
 				"Required alternative text describing the image for accessibility. Plaintext only; no markdown or HTML."
 			),
-		width: z.number().positive().describe("Total width of the widget in pixels (e.g., 600, 700, 500). Must accommodate the diagram content.").nullable(),
-		height: z.number().positive().describe("Total height of the widget in pixels (e.g., 400, 350, 300). Must fit the diagram content.").nullable(),
+		width: createWidthSchema().nullable(),
+		height: createHeightSchema().nullable(),
 		caption: z
 			.string()
 			.nullable()

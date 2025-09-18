@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
@@ -54,8 +55,8 @@ export const FractionMultiplicationModelPropsSchema = z
 		type: z
 			.literal("fractionMultiplicationModel")
 			.describe("Identifies this as a widget for showing a fraction multiplication equation using visual models."),
-		width: z.number().positive().describe("Total width of the widget in pixels (e.g., 600, 700, 500). Must accommodate the diagram content."),
-		height: z.number().positive().describe("Total height of the widget in pixels (e.g., 400, 350, 300). Must fit the diagram content."),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		leftOperand: createBaseFractionModelSchema().describe("The fraction model on the left side of the equation."),
 		middleTerm: createMiddleTermSchema().describe("The multiplier, which can be a number or a placeholder."),
 		rightOperand: createBaseFractionModelSchema().describe(

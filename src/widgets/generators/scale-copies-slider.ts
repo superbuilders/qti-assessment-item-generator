@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
@@ -8,8 +9,18 @@ import type { WidgetGenerator } from "../types"
 function createRectSchema() {
 	return z
 		.object({
-			width: z.number().positive().describe("Total width of the widget in pixels (e.g., 600, 700, 500). Must accommodate the diagram content."),
-			height: z.number().positive().describe("Total height of the widget in pixels (e.g., 400, 350, 300). Must fit the diagram content.")
+			width: z
+				.number()
+				.positive()
+				.describe(
+					"Width of the rectangle in relative units (e.g., 4, 6, 2.5). Not pixels - scaled to fit display area."
+				),
+			height: z
+				.number()
+				.positive()
+				.describe(
+					"Height of the rectangle in relative units (e.g., 3, 4, 1.5). Proportions matter more than absolute values."
+				)
 		})
 		.strict()
 }
@@ -48,8 +59,8 @@ export const ScaleCopiesSliderPropsSchema = z
 			.describe(
 				"Identifies this as a scale copies comparison widget showing proportional vs non-proportional scaling."
 			),
-		width: z.number().positive().describe("Total width of the widget in pixels (e.g., 600, 700, 500). Must accommodate the diagram content."),
-		height: z.number().positive().describe("Total height of the widget in pixels (e.g., 400, 350, 300). Must fit the diagram content."),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		shapeA: createGroupSchema().describe(
 			"First shape transformation, typically showing proportional scaling where width and height scale by same factor."
 		),

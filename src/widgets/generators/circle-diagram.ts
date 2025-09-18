@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
@@ -120,8 +121,8 @@ export const CircleDiagramPropsSchema = z
 			.describe(
 				"Rotation angle in degrees for the entire shape. 0° means no rotation. For semicircle: 0° = flat edge at bottom, 90° = flat edge at left. Positive values rotate counter-clockwise."
 			),
-		width: z.number().positive().describe("Total width of the widget in pixels (e.g., 600, 700, 500). Must accommodate the diagram content."),
-		height: z.number().positive().describe("Total height of the widget in pixels (e.g., 400, 350, 300). Must fit the diagram content."),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		radius: z
 			.number()
 			.positive()

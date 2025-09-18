@@ -1,3 +1,4 @@
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
@@ -34,8 +35,8 @@ export const RadiallyConstrainedAngleDiagramPropsSchema = z
 		type: z
 			.literal("radiallyConstrainedAngleDiagram")
 			.describe("Identifies this as a radially constrained angle diagram."),
-		width: z.number().positive().describe("Total width of the widget in pixels (e.g., 600, 700, 500). Must accommodate the diagram content."),
-		height: z.number().positive().describe("Total height of the widget in pixels (e.g., 400, 350, 300). Must fit the diagram content."),
+		width: createWidthSchema(),
+		height: createHeightSchema(),
 		centerLabel: z
 			.string()
 			.nullable()
