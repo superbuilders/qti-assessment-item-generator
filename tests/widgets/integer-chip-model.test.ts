@@ -25,8 +25,8 @@ describe("Widget: integer-chip-model", () => {
 		test("should handle single chip", async () => {
 			const props: IntegerChipModelProps = {
 				type: "integerChipModel",
-				width: 100,
-				height: 100,
+				width: 300,
+				height: 300,
 				chips: [{ sign: "plus", crossedOut: false }]
 			}
 			const result = await errors.try(generateWidget(props))
@@ -40,8 +40,8 @@ describe("Widget: integer-chip-model", () => {
 		test("should handle all crossed-out chips", async () => {
 			const props: IntegerChipModelProps = {
 				type: "integerChipModel",
-				width: 200,
-				height: 120,
+				width: 300,
+				height: 300,
 				chips: [
 					{ sign: "plus", crossedOut: true },
 					{ sign: "minus", crossedOut: true },
@@ -59,7 +59,7 @@ describe("Widget: integer-chip-model", () => {
 		test("should handle narrow width forcing vertical layout", async () => {
 			const props: IntegerChipModelProps = {
 				type: "integerChipModel",
-				width: 80,
+				width: 300,
 				height: 300,
 				chips: [
 					{ sign: "plus", crossedOut: false },
@@ -81,7 +81,7 @@ describe("Widget: integer-chip-model", () => {
 			const props: IntegerChipModelProps = {
 				type: "integerChipModel",
 				width: 400,
-				height: 120,
+				height: 300,
 				chips: [
 					{ sign: "plus", crossedOut: false },
 					{ sign: "minus", crossedOut: false },
@@ -104,8 +104,8 @@ describe("Widget: integer-chip-model", () => {
 		test("should handle minimum width constraint", async () => {
 			const props: IntegerChipModelProps = {
 				type: "integerChipModel",
-				width: 50, // Very narrow
-				height: 200,
+				width: 300, // Very narrow
+				height: 300,
 				chips: [
 					{ sign: "plus", crossedOut: false },
 					{ sign: "minus", crossedOut: false }
@@ -126,7 +126,7 @@ describe("Widget: integer-chip-model", () => {
 			const props: IntegerChipModelProps = {
 				type: "integerChipModel",
 				width: 320,
-				height: 91,
+				height: 300,
 				chips: [
 					{ sign: "plus", crossedOut: false },
 					{ sign: "plus", crossedOut: false },
@@ -152,8 +152,8 @@ describe("Widget: integer-chip-model", () => {
 		test("should handle wide layout with many chips", async () => {
 			const props: IntegerChipModelProps = {
 				type: "integerChipModel",
-				width: 250,
-				height: 63,
+				width: 300,
+				height: 300,
 				chips: [
 					{ sign: "minus", crossedOut: false },
 					{ sign: "minus", crossedOut: false },
@@ -177,7 +177,7 @@ describe("Widget: integer-chip-model", () => {
 			const props: IntegerChipModelProps = {
 				type: "integerChipModel",
 				width: 320,
-				height: 80,
+				height: 300,
 				chips: [
 					{ sign: "plus", crossedOut: false },
 					{ sign: "plus", crossedOut: false },
@@ -200,7 +200,7 @@ describe("Widget: integer-chip-model", () => {
 			const props: IntegerChipModelProps = {
 				type: "integerChipModel",
 				width: 320,
-				height: 80,
+				height: 300,
 				chips: [
 					{ sign: "plus", crossedOut: true },
 					{ sign: "plus", crossedOut: true },
@@ -222,7 +222,7 @@ describe("Widget: integer-chip-model", () => {
 			const props: IntegerChipModelProps = {
 				type: "integerChipModel",
 				width: 320,
-				height: 80,
+				height: 300,
 				chips: [
 					{ sign: "minus", crossedOut: true },
 					{ sign: "minus", crossedOut: true },
@@ -243,7 +243,7 @@ describe("Widget: integer-chip-model", () => {
 			const props: IntegerChipModelProps = {
 				type: "integerChipModel",
 				width: 320,
-				height: 80,
+				height: 300,
 				chips: [
 					{ sign: "minus", crossedOut: false },
 					{ sign: "minus", crossedOut: false },
@@ -267,7 +267,7 @@ describe("Widget: integer-chip-model", () => {
 			const props: IntegerChipModelProps = {
 				type: "integerChipModel",
 				width: 320,
-				height: 80,
+				height: 300,
 				chips: [
 					{ sign: "minus", crossedOut: true },
 					{ sign: "minus", crossedOut: true },
@@ -291,7 +291,7 @@ describe("Widget: integer-chip-model", () => {
 			const props: IntegerChipModelProps = {
 				type: "integerChipModel",
 				width: 320,
-				height: 71,
+				height: 300,
 				chips: [
 					{ sign: "minus", crossedOut: false },
 					{ sign: "minus", crossedOut: false },
@@ -325,7 +325,7 @@ describe("Widget: integer-chip-model", () => {
 			const props: IntegerChipModelProps = {
 				type: "integerChipModel",
 				width: 320,
-				height: 80,
+				height: 300,
 				chips: [
 					{ sign: "plus", crossedOut: false },
 					{ sign: "plus", crossedOut: false },
@@ -353,7 +353,7 @@ describe("Widget: integer-chip-model", () => {
 			const props: IntegerChipModelProps = {
 				type: "integerChipModel",
 				width: 320,
-				height: 91,
+				height: 300,
 				chips: [
 					{ sign: "minus", crossedOut: false },
 					{ sign: "minus", crossedOut: false },
@@ -377,7 +377,7 @@ describe("Widget: integer-chip-model", () => {
 			const props: IntegerChipModelProps = {
 				type: "integerChipModel",
 				width: 320,
-				height: 91,
+				height: 300,
 				chips: [
 					{ sign: "plus", crossedOut: false },
 					{ sign: "plus", crossedOut: false },
@@ -401,7 +401,7 @@ describe("Widget: integer-chip-model", () => {
 			const props: IntegerChipModelProps = {
 				type: "integerChipModel",
 				width: 320,
-				height: 64,
+				height: 300,
 				chips: [
 					{ sign: "plus", crossedOut: false },
 					{ sign: "plus", crossedOut: false },
@@ -431,7 +431,7 @@ describe("Widget: integer-chip-model", () => {
 			const props: IntegerChipModelProps = {
 				type: "integerChipModel",
 				width: 320,
-				height: 80,
+				height: 300,
 				chips: [
 					{ sign: "minus", crossedOut: true },
 					{ sign: "minus", crossedOut: false },
@@ -450,7 +450,7 @@ describe("Widget: integer-chip-model", () => {
 			const props: IntegerChipModelProps = {
 				type: "integerChipModel",
 				width: 320,
-				height: 80,
+				height: 300,
 				chips: [
 					{ sign: "minus", crossedOut: true },
 					{ sign: "minus", crossedOut: true },
@@ -475,7 +475,7 @@ describe("Widget: integer-chip-model", () => {
 			const props: IntegerChipModelProps = {
 				type: "integerChipModel",
 				width: 320,
-				height: 80,
+				height: 300,
 				chips: [
 					{ sign: "minus", crossedOut: true },
 					{ sign: "minus", crossedOut: true },
@@ -496,7 +496,7 @@ describe("Widget: integer-chip-model", () => {
 			const props: IntegerChipModelProps = {
 				type: "integerChipModel",
 				width: 320,
-				height: 80,
+				height: 300,
 				chips: [
 					{ sign: "minus", crossedOut: false },
 					{ sign: "minus", crossedOut: false },

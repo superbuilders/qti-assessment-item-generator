@@ -821,7 +821,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 			}
 		  }
 		],
-		"width": 280,
+		"width": 300,
 		"xAxis": {
 		  "max": 8,
 		  "min": -8,
@@ -836,7 +836,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 		  "tickInterval": 1,
 		  "showGridLines": true
 		},
-		"height": 280,
+		"height": 300,
 		"points": [],
 		"showQuadrantLabels": false
 	  },
@@ -866,7 +866,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 			}
 		  }
 		],
-		"width": 280,
+		"width": 300,
 		"xAxis": {
 		  "max": 8,
 		  "min": -8,
@@ -881,7 +881,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 		  "tickInterval": 1,
 		  "showGridLines": true
 		},
-		"height": 280,
+		"height": 300,
 		"points": [],
 		"showQuadrantLabels": false
 	  },
@@ -911,7 +911,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 			}
 		  }
 		],
-		"width": 280,
+		"width": 300,
 		"xAxis": {
 		  "max": 8,
 		  "min": -8,
@@ -926,7 +926,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 		  "tickInterval": 1,
 		  "showGridLines": true
 		},
-		"height": 280,
+		"height": 300,
 		"points": [
 		  {
 			"x": -2,
@@ -964,7 +964,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 			}
 		  }
 		],
-		"width": 280,
+		"width": 300,
 		"xAxis": {
 		  "max": 8,
 		  "min": -8,
@@ -979,7 +979,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 		  "tickInterval": 1,
 		  "showGridLines": true
 		},
-		"height": 280,
+		"height": 300,
 		"points": [
 		  {
 			"x": -2,
@@ -5952,7 +5952,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 			}
 		  }
 		],
-		"width": 280,
+		"width": 300,
 		"xAxis": {
 		  "max": 8,
 		  "min": -8,
@@ -5967,14 +5967,14 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 		  "tickInterval": 1,
 		  "showGridLines": true
 		},
-		"height": 280,
+		"height": 300,
 		"points": [],
 		"showQuadrantLabels": false
 	  },
 	  {
 		"type": "lineEquationGraph",
 		"lines": [],
-		"width": 280,
+		"width": 300,
 		"xAxis": {
 		  "max": 8,
 		  "min": -8,
@@ -5989,7 +5989,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 		  "tickInterval": 1,
 		  "showGridLines": true
 		},
-		"height": 280,
+		"height": 300,
 		"points": [],
 		"showQuadrantLabels": false
 	  },
@@ -6070,7 +6070,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 	  {
 		"type": "lineEquationGraph",
 		"lines": [],
-		"width": 280,
+		"width": 300,
 		"xAxis": {
 		  "max": 8,
 		  "min": -8,
@@ -6085,14 +6085,14 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 		  "tickInterval": 1,
 		  "showGridLines": true
 		},
-		"height": 280,
+		"height": 300,
 		"points": [],
 		"showQuadrantLabels": false
 	  },
 	  {
 		"type": "lineEquationGraph",
 		"lines": [],
-		"width": 280,
+		"width": 300,
 		"xAxis": {
 		  "max": 8,
 		  "min": -8,
@@ -6107,7 +6107,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 		  "tickInterval": 1,
 		  "showGridLines": true
 		},
-		"height": 280,
+		"height": 300,
 		"points": [],
 		"showQuadrantLabels": false
 	  },
@@ -6160,7 +6160,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 			}
 		  }
 		],
-		"width": 290,
+		"width": 300,
 		"xAxis": {
 		  "max": 10,
 		  "min": 0,
@@ -6175,7 +6175,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 		  "tickInterval": 25,
 		  "showGridLines": true
 		},
-		"height": 290,
+		"height": 300,
 		"points": [
 		  {
 			"x": 0,
@@ -6216,7 +6216,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 			}
 		  }
 		],
-		"width": 290,
+		"width": 300,
 		"xAxis": {
 		  "max": 100,
 		  "min": 0,
@@ -6231,7 +6231,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 		  "tickInterval": 10,
 		  "showGridLines": true
 		},
-		"height": 290,
+		"height": 300,
 		"points": [],
 		"showQuadrantLabels": false
 	  },
@@ -6352,7 +6352,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 			}
 		  }
 		],
-		"width": 290,
+		"width": 300,
 		"xAxis": {
 		  "max": 50,
 		  "min": 0,
@@ -6367,7 +6367,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 		  "tickInterval": 10,
 		  "showGridLines": true
 		},
-		"height": 290,
+		"height": 300,
 		"points": [],
 		"showQuadrantLabels": false
 	  },
@@ -6386,7 +6386,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 			}
 		  }
 		],
-		"width": 290,
+		"width": 300,
 		"xAxis": {
 		  "max": 10,
 		  "min": 0,
@@ -6401,7 +6401,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 		  "tickInterval": 10,
 		  "showGridLines": true
 		},
-		"height": 290,
+		"height": 300,
 		"points": [],
 		"showQuadrantLabels": false
 	  },
@@ -9223,7 +9223,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 			}
 		  }
 		],
-		"width": 223,
+		"width": 300,
 		"xAxis": {
 		  "max": 4,
 		  "min": 0,
@@ -9238,7 +9238,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 		  "tickInterval": 20,
 		  "showGridLines": true
 		},
-		"height": 196,
+		"height": 300,
 		"points": [
 		  {
 			"x": 1,
@@ -9321,7 +9321,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 			}
 		  }
 		],
-		"width": 209,
+		"width": 300,
 		"xAxis": {
 		  "max": 10,
 		  "min": 0,
@@ -9336,7 +9336,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 		  "tickInterval": 2,
 		  "showGridLines": true
 		},
-		"height": 209,
+		"height": 300,
 		"points": [
 		  {
 			"x": 1,
@@ -9419,7 +9419,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 			}
 		  }
 		],
-		"width": 223,
+		"width": 300,
 		"xAxis": {
 		  "max": 4,
 		  "min": 0,
@@ -9434,7 +9434,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 		  "tickInterval": 1,
 		  "showGridLines": true
 		},
-		"height": 223,
+		"height": 300,
 		"points": [
 		  {
 			"x": 3,
@@ -9461,7 +9461,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 			}
 		  }
 		],
-		"width": 229,
+		"width": 300,
 		"xAxis": {
 		  "max": 3,
 		  "min": 0,
@@ -9476,7 +9476,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 		  "tickInterval": 50,
 		  "showGridLines": true
 		},
-		"height": 196,
+		"height": 300,
 		"points": [
 		  {
 			"x": 1,
@@ -9503,7 +9503,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 			}
 		  }
 		],
-		"width": 209,
+		"width": 300,
 		"xAxis": {
 		  "max": 10,
 		  "min": 0,
@@ -9518,7 +9518,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 		  "tickInterval": 2,
 		  "showGridLines": true
 		},
-		"height": 209,
+		"height": 300,
 		"points": [
 		  {
 			"x": 1,
@@ -9601,7 +9601,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 			}
 		  }
 		],
-		"width": 223,
+		"width": 300,
 		"xAxis": {
 		  "max": 4,
 		  "min": 0,
@@ -9616,7 +9616,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 		  "tickInterval": 5,
 		  "showGridLines": true
 		},
-		"height": 202,
+		"height": 300,
 		"points": [
 		  {
 			"x": 1,
@@ -14406,7 +14406,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 			}
 		  }
 		],
-		"width": 195,
+		"width": 300,
 		"xAxis": {
 		  "max": 10,
 		  "min": 0,
@@ -14421,7 +14421,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 		  "tickInterval": 2,
 		  "showGridLines": true
 		},
-		"height": 195,
+		"height": 300,
 		"points": [
 		  {
 			"x": 2,
@@ -14448,7 +14448,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 			}
 		  }
 		],
-		"width": 195,
+		"width": 300,
 		"xAxis": {
 		  "max": 10,
 		  "min": 0,
@@ -14463,7 +14463,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 		  "tickInterval": 2,
 		  "showGridLines": true
 		},
-		"height": 195,
+		"height": 300,
 		"points": [
 		  {
 			"x": 5,
@@ -14490,7 +14490,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 			}
 		  }
 		],
-		"width": 195,
+		"width": 300,
 		"xAxis": {
 		  "max": 10,
 		  "min": 0,
@@ -14505,7 +14505,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 		  "tickInterval": 2,
 		  "showGridLines": true
 		},
-		"height": 195,
+		"height": 300,
 		"points": [
 		  {
 			"x": 5,
@@ -14532,7 +14532,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 			}
 		  }
 		],
-		"width": 195,
+		"width": 300,
 		"xAxis": {
 		  "max": 10,
 		  "min": 0,
@@ -14547,7 +14547,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 		  "tickInterval": 2,
 		  "showGridLines": true
 		},
-		"height": 195,
+		"height": 300,
 		"points": [
 		  {
 			"x": 1,
@@ -14574,7 +14574,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 			}
 		  }
 		],
-		"width": 195,
+		"width": 300,
 		"xAxis": {
 		  "max": 10,
 		  "min": 0,
@@ -14589,7 +14589,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 		  "tickInterval": 2,
 		  "showGridLines": true
 		},
-		"height": 195,
+		"height": 300,
 		"points": [
 		  {
 			"x": 8,
@@ -14616,7 +14616,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 			}
 		  }
 		],
-		"width": 195,
+		"width": 300,
 		"xAxis": {
 		  "max": 10,
 		  "min": 0,
@@ -14631,7 +14631,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 		  "tickInterval": 2,
 		  "showGridLines": true
 		},
-		"height": 195,
+		"height": 300,
 		"points": [
 		  {
 			"x": 2,
@@ -14658,7 +14658,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 			}
 		  }
 		],
-		"width": 220,
+		"width": 300,
 		"xAxis": {
 		  "max": 8,
 		  "min": 0,
@@ -14673,7 +14673,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 		  "tickInterval": 20,
 		  "showGridLines": true
 		},
-		"height": 195,
+		"height": 300,
 		"points": [
 		  {
 			"x": 4,
@@ -14700,7 +14700,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 			}
 		  }
 		],
-		"width": 195,
+		"width": 300,
 		"xAxis": {
 		  "max": 4,
 		  "min": 0,
@@ -14715,7 +14715,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 		  "tickInterval": 4,
 		  "showGridLines": true
 		},
-		"height": 195,
+		"height": 300,
 		"points": [
 		  {
 			"x": 1,
@@ -14742,7 +14742,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 			}
 		  }
 		],
-		"width": 195,
+		"width": 300,
 		"xAxis": {
 		  "max": 2,
 		  "min": 0,
@@ -14757,7 +14757,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 		  "tickInterval": 2,
 		  "showGridLines": true
 		},
-		"height": 195,
+		"height": 300,
 		"points": [
 		  {
 			"x": 2,
@@ -14784,7 +14784,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 			}
 		  }
 		],
-		"width": 195,
+		"width": 300,
 		"xAxis": {
 		  "max": 4,
 		  "min": 0,
@@ -14799,7 +14799,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 		  "tickInterval": 4,
 		  "showGridLines": true
 		},
-		"height": 195,
+		"height": 300,
 		"points": [
 		  {
 			"x": 4,
@@ -14826,7 +14826,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 			}
 		  }
 		],
-		"width": 220,
+		"width": 300,
 		"xAxis": {
 		  "max": 10,
 		  "min": 0,
@@ -14841,7 +14841,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 		  "tickInterval": 2,
 		  "showGridLines": true
 		},
-		"height": 195,
+		"height": 300,
 		"points": [
 		  {
 			"x": 4,
@@ -14868,7 +14868,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 			}
 		  }
 		],
-		"width": 220,
+		"width": 300,
 		"xAxis": {
 		  "max": 6,
 		  "min": 0,
@@ -14883,7 +14883,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 		  "tickInterval": 50,
 		  "showGridLines": true
 		},
-		"height": 195,
+		"height": 300,
 		"points": [
 		  {
 			"x": 2,
@@ -14910,7 +14910,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 			}
 		  }
 		],
-		"width": 195,
+		"width": 300,
 		"xAxis": {
 		  "max": 10,
 		  "min": 0,
@@ -14925,7 +14925,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 		  "tickInterval": 2,
 		  "showGridLines": true
 		},
-		"height": 195,
+		"height": 300,
 		"points": [
 		  {
 			"x": 8,
@@ -14952,7 +14952,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 			}
 		  }
 		],
-		"width": 195,
+		"width": 300,
 		"xAxis": {
 		  "max": 10,
 		  "min": 0,
@@ -14967,7 +14967,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 		  "tickInterval": 2,
 		  "showGridLines": true
 		},
-		"height": 195,
+		"height": 300,
 		"points": [
 		  {
 			"x": 4,
@@ -14994,7 +14994,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 			}
 		  }
 		],
-		"width": 195,
+		"width": 300,
 		"xAxis": {
 		  "max": 10,
 		  "min": 0,
@@ -15009,7 +15009,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 		  "tickInterval": 3,
 		  "showGridLines": true
 		},
-		"height": 195,
+		"height": 300,
 		"points": [
 		  {
 			"x": 1,
@@ -15036,7 +15036,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 			}
 		  }
 		],
-		"width": 195,
+		"width": 300,
 		"xAxis": {
 		  "max": 10,
 		  "min": 0,
@@ -15051,7 +15051,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 		  "tickInterval": 2,
 		  "showGridLines": true
 		},
-		"height": 195,
+		"height": 300,
 		"points": [],
 		"showQuadrantLabels": false
 	  },
@@ -15070,7 +15070,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 			}
 		  }
 		],
-		"width": 195,
+		"width": 300,
 		"xAxis": {
 		  "max": 10,
 		  "min": 0,
@@ -15085,7 +15085,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 		  "tickInterval": 2,
 		  "showGridLines": true
 		},
-		"height": 195,
+		"height": 300,
 		"points": [],
 		"showQuadrantLabels": false
 	  },
@@ -15104,7 +15104,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 			}
 		  }
 		],
-		"width": 195,
+		"width": 300,
 		"xAxis": {
 		  "max": 10,
 		  "min": 0,
@@ -15119,7 +15119,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 		  "tickInterval": 2,
 		  "showGridLines": true
 		},
-		"height": 195,
+		"height": 300,
 		"points": [
 		  {
 			"x": 2,
@@ -15146,7 +15146,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 			}
 		  }
 		],
-		"width": 195,
+		"width": 300,
 		"xAxis": {
 		  "max": 10,
 		  "min": 0,
@@ -15161,7 +15161,7 @@ export const lineEquationGraphExamples: LineEquationGraphProps[] = [
 		  "tickInterval": 2,
 		  "showGridLines": true
 		},
-		"height": 195,
+		"height": 300,
 		"points": [
 		  {
 			"x": 1,

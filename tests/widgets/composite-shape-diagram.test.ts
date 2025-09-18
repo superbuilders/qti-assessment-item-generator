@@ -42,8 +42,8 @@ describe("Widget: composite-shape-diagram", () => {
 	test("composite-shape-diagram - [x9b74005f28d0b824] Area of a shaded region between a circle and a rectangle", async () => {
 		const input = ensureWidgetInput({
 			type: "compositeShapeDiagram",
-			width: 260,
-			height: 260,
+			width: 300,
+			height: 300,
 			vertices: [
 				{ x: 130, y: 130, id: "center" },
 				{ x: 250, y: 130, id: "p0" },
@@ -260,8 +260,8 @@ describe("Widget: composite-shape-diagram", () => {
 	test("composite-shape-diagram - [xd8c0fb6d8bfff96e] Area of a shaded region: circle minus rectangle", async () => {
 		const input = ensureWidgetInput({
 			type: "compositeShapeDiagram",
-			width: 280,
-			height: 280,
+			width: 300,
+			height: 300,
 			vertices: [
 				{ x: 260, y: 140, id: "C0" },
 				{ x: 243.923, y: 80, id: "C1" },
@@ -324,8 +324,8 @@ describe("Widget: composite-shape-diagram", () => {
 	test("composite-shape-diagram - [x3a68667079fdffdd] Area of a shaded region (circle and rectangle)", async () => {
 		const input = ensureWidgetInput({
 			type: "compositeShapeDiagram",
-			width: 200,
-			height: 200,
+			width: 300,
+			height: 300,
 			vertices: [
 				{ x: 100, y: 100, id: "O" },
 				{ x: 70, y: 80, id: "R1" },
@@ -425,7 +425,7 @@ describe("Widget: composite-shape-diagram", () => {
 	test("composite-shape-diagram - [x317e33403062daa2] Find areas of parts of a composite figure", async () => {
 		const input = ensureWidgetInput({
 			type: "compositeShapeDiagram",
-			width: 520,
+			width: 500,
 			height: 340,
 			vertices: [
 				{ x: 28.829, y: 2.883, id: "T" },
@@ -587,7 +587,7 @@ describe("Widget: composite-shape-diagram", () => {
 		const input = ensureWidgetInput({
 			type: "compositeShapeDiagram",
 			width: 320,
-			height: 200,
+			height: 300,
 			vertices: [
 				{ x: 1.975, y: 160, id: "A_leftBase" },
 				{ x: 160, y: 1.975, id: "B_apex" },

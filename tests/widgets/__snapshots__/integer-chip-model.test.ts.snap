@@ -1,0 +1,483 @@
+// Bun Snapshot v1, https://bun.sh/docs/test/snapshots
+
+exports[`Widget: integer-chip-model edge cases and special scenarios should handle single chip 1`] = `
+"<svg width="300" height="300" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
+  <circle cx="34" cy="34" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="34" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+</svg>"
+`;
+
+exports[`Widget: integer-chip-model edge cases and special scenarios should handle all crossed-out chips 1`] = `
+"<svg width="300" height="300" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
+  <circle cx="34" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="34" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text><line x1="5.199999999999999" y1="62.8" x2="62.8" y2="5.199999999999999" stroke="#212121" stroke-width="1" />
+  <circle cx="34" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="34" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text><line x1="5.199999999999999" y1="120.8" x2="62.8" y2="63.2" stroke="#212121" stroke-width="1" />
+  <circle cx="92" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="92" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text><line x1="63.2" y1="120.8" x2="120.8" y2="63.2" stroke="#212121" stroke-width="1" />
+</svg>"
+`;
+
+exports[`Widget: integer-chip-model edge cases and special scenarios should handle narrow width forcing vertical layout 1`] = `
+"<svg width="300" height="300" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
+  <circle cx="34" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="34" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="92" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="92" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="34" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="34" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="92" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="92" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="150" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="150" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+</svg>"
+`;
+
+exports[`Widget: integer-chip-model edge cases and special scenarios should handle alternating pattern 1`] = `
+"<svg width="400" height="300" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
+  <circle cx="34" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="34" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="92" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="92" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="150" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="150" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="208" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="208" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="34" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="34" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="92" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="92" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="150" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="150" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="208" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="208" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+</svg>"
+`;
+
+exports[`Widget: integer-chip-model edge cases and special scenarios should handle minimum width constraint 1`] = `
+"<svg width="300" height="300" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
+  <circle cx="34" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="34" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="34" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="34" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+</svg>"
+`;
+
+exports[`Widget: integer-chip-model database-extracted test scenarios should handle large collection with mixed signs 1`] = `
+"<svg width="320" height="300" viewBox="0 0 320 300" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
+  <circle cx="34" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="34" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="92" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="92" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="150" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="150" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="208" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="208" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="34" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="34" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="92" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="92" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="150" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="150" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="208" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="208" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="266" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="266" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="34" cy="150" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="34" y="150" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="92" cy="150" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="92" y="150" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+</svg>"
+`;
+
+exports[`Widget: integer-chip-model database-extracted test scenarios should handle wide layout with many chips 1`] = `
+"<svg width="300" height="300" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
+  <circle cx="34" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="34" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="92" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="92" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="34" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="34" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="92" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="92" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="150" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="150" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="208" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="208" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="34" cy="150" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="34" y="150" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="92" cy="150" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="92" y="150" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+</svg>"
+`;
+
+exports[`Widget: integer-chip-model database-extracted test scenarios should handle subtraction with single crossed out chip 1`] = `
+"<svg width="320" height="300" viewBox="0 0 320 300" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
+  <circle cx="34" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="34" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text><line x1="5.199999999999999" y1="62.8" x2="62.8" y2="5.199999999999999" stroke="#212121" stroke-width="1" />
+  <circle cx="34" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="34" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="92" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="92" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="150" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="150" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="208" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="208" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="266" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="266" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="34" cy="150" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="34" y="150" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+</svg>"
+`;
+
+exports[`Widget: integer-chip-model database-extracted test scenarios should handle multiple positive chips crossed out 1`] = `
+"<svg width="320" height="300" viewBox="0 0 320 300" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
+  <circle cx="34" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="34" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="34" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="34" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text><line x1="5.199999999999999" y1="120.8" x2="62.8" y2="63.2" stroke="#212121" stroke-width="1" />
+  <circle cx="92" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="92" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text><line x1="63.2" y1="120.8" x2="120.8" y2="63.2" stroke="#212121" stroke-width="1" />
+  <circle cx="150" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="150" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text><line x1="121.2" y1="120.8" x2="178.8" y2="63.2" stroke="#212121" stroke-width="1" />
+  <circle cx="208" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="208" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text><line x1="179.2" y1="120.8" x2="236.8" y2="63.2" stroke="#212121" stroke-width="1" />
+  <circle cx="266" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="266" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text><line x1="237.2" y1="120.8" x2="294.8" y2="63.2" stroke="#212121" stroke-width="1" />
+</svg>"
+`;
+
+exports[`Widget: integer-chip-model database-extracted test scenarios should handle mixed crossed out negative chips 1`] = `
+"<svg width="320" height="300" viewBox="0 0 320 300" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
+  <circle cx="34" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="34" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text><line x1="5.199999999999999" y1="62.8" x2="62.8" y2="5.199999999999999" stroke="#212121" stroke-width="1" />
+  <circle cx="92" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="92" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text><line x1="63.2" y1="62.8" x2="120.8" y2="5.199999999999999" stroke="#212121" stroke-width="1" />
+  <circle cx="150" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="150" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text><line x1="121.2" y1="62.8" x2="178.8" y2="5.199999999999999" stroke="#212121" stroke-width="1" />
+  <circle cx="34" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="34" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="92" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="92" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+</svg>"
+`;
+
+exports[`Widget: integer-chip-model database-extracted test scenarios should handle complex subtraction pattern 1`] = `
+"<svg width="320" height="300" viewBox="0 0 320 300" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
+  <circle cx="34" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="34" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="92" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="92" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="150" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="150" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="208" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="208" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="266" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="266" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="34" cy="92" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="34" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="34" cy="150" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="34" y="150" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text><line x1="5.199999999999999" y1="178.8" x2="62.8" y2="121.2" stroke="#212121" stroke-width="1" />
+  <circle cx="92" cy="150" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="92" y="150" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text><line x1="63.2" y1="178.8" x2="120.8" y2="121.2" stroke="#212121" stroke-width="1" />
+</svg>"
+`;
+
+exports[`Widget: integer-chip-model database-extracted test scenarios should handle mostly crossed out negative chips 1`] = `
+"<svg width="320" height="300" viewBox="0 0 320 300" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
+  <circle cx="34" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="34" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text><line x1="5.199999999999999" y1="62.8" x2="62.8" y2="5.199999999999999" stroke="#212121" stroke-width="1" />
+  <circle cx="92" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="92" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text><line x1="63.2" y1="62.8" x2="120.8" y2="5.199999999999999" stroke="#212121" stroke-width="1" />
+  <circle cx="150" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="150" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text><line x1="121.2" y1="62.8" x2="178.8" y2="5.199999999999999" stroke="#212121" stroke-width="1" />
+  <circle cx="208" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="208" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text><line x1="179.2" y1="62.8" x2="236.8" y2="5.199999999999999" stroke="#212121" stroke-width="1" />
+  <circle cx="266" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="266" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text><line x1="237.2" y1="62.8" x2="294.8" y2="5.199999999999999" stroke="#212121" stroke-width="1" />
+  <circle cx="34" cy="92" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="34" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text><line x1="5.199999999999999" y1="120.8" x2="62.8" y2="63.2" stroke="#212121" stroke-width="1" />
+  <circle cx="92" cy="92" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="92" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="150" cy="92" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="150" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+</svg>"
+`;
+
+exports[`Widget: integer-chip-model database-extracted test scenarios should handle large collection with different height 1`] = `
+"<svg width="320" height="300" viewBox="0 0 320 300" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
+  <circle cx="34" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="34" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="92" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="92" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="150" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="150" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="208" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="208" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="266" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="266" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="34" cy="92" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="34" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="92" cy="92" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="92" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="150" cy="92" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="150" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="208" cy="92" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="208" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="34" cy="150" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="34" y="150" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="92" cy="150" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="92" y="150" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="150" cy="150" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="150" y="150" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="208" cy="150" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="208" y="150" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="266" cy="150" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="266" y="150" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="34" cy="208" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="34" y="208" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="92" cy="208" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="92" y="208" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="150" cy="208" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="150" y="208" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="208" cy="208" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="208" y="208" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+</svg>"
+`;
+
+exports[`Widget: integer-chip-model database-extracted test scenarios should handle complex subtraction with multiple crossed out 1`] = `
+"<svg width="320" height="300" viewBox="0 0 320 300" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
+  <circle cx="34" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="34" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text><line x1="5.199999999999999" y1="62.8" x2="62.8" y2="5.199999999999999" stroke="#212121" stroke-width="1" />
+  <circle cx="92" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="92" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text><line x1="63.2" y1="62.8" x2="120.8" y2="5.199999999999999" stroke="#212121" stroke-width="1" />
+  <circle cx="150" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="150" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text><line x1="121.2" y1="62.8" x2="178.8" y2="5.199999999999999" stroke="#212121" stroke-width="1" />
+  <circle cx="208" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="208" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text><line x1="179.2" y1="62.8" x2="236.8" y2="5.199999999999999" stroke="#212121" stroke-width="1" />
+  <circle cx="266" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="266" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text><line x1="237.2" y1="62.8" x2="294.8" y2="5.199999999999999" stroke="#212121" stroke-width="1" />
+  <circle cx="34" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="34" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="92" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="92" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="150" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="150" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="208" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="208" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="266" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="266" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="34" cy="150" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="34" y="150" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="92" cy="150" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="92" y="150" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+</svg>"
+`;
+
+exports[`Widget: integer-chip-model database-extracted test scenarios should handle all negative chips only 1`] = `
+"<svg width="320" height="300" viewBox="0 0 320 300" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
+  <circle cx="34" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="34" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="92" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="92" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="150" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="150" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="208" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="208" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="266" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="266" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="34" cy="92" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="34" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="92" cy="92" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="92" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="150" cy="92" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="150" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+</svg>"
+`;
+
+exports[`Widget: integer-chip-model database-extracted test scenarios should handle mixed evaluation scenario 1`] = `
+"<svg width="320" height="300" viewBox="0 0 320 300" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
+  <circle cx="34" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="34" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="92" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="92" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="150" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="150" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="208" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="208" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="266" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="266" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="34" cy="92" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="34" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="34" cy="150" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="34" y="150" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="92" cy="150" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="92" y="150" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+</svg>"
+`;
+
+exports[`Widget: integer-chip-model database-extracted test scenarios should handle small collection with different dimensions 1`] = `
+"<svg width="320" height="300" viewBox="0 0 320 300" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
+  <circle cx="34" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="34" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="92" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="92" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="150" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="150" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="208" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="208" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="34" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="34" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="92" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="92" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="150" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="150" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="208" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="208" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="266" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="266" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="34" cy="150" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="34" y="150" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="92" cy="150" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="92" y="150" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="150" cy="150" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="150" y="150" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="208" cy="150" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="208" y="150" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="266" cy="150" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="266" y="150" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+</svg>"
+`;
+
+exports[`Widget: integer-chip-model database-extracted test scenarios should handle single crossed out negative chip 1`] = `
+"<svg width="320" height="300" viewBox="0 0 320 300" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
+  <circle cx="34" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="34" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text><line x1="5.199999999999999" y1="62.8" x2="62.8" y2="5.199999999999999" stroke="#212121" stroke-width="1" />
+  <circle cx="92" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="92" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="150" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="150" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+</svg>"
+`;
+
+exports[`Widget: integer-chip-model database-extracted test scenarios should handle mixed crossed out positive chips 1`] = `
+"<svg width="320" height="300" viewBox="0 0 320 300" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
+  <circle cx="34" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="34" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text><line x1="5.199999999999999" y1="62.8" x2="62.8" y2="5.199999999999999" stroke="#212121" stroke-width="1" />
+  <circle cx="92" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="92" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text><line x1="63.2" y1="62.8" x2="120.8" y2="5.199999999999999" stroke="#212121" stroke-width="1" />
+  <circle cx="150" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="150" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text><line x1="121.2" y1="62.8" x2="178.8" y2="5.199999999999999" stroke="#212121" stroke-width="1" />
+  <circle cx="208" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="208" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text><line x1="179.2" y1="62.8" x2="236.8" y2="5.199999999999999" stroke="#212121" stroke-width="1" />
+  <circle cx="266" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="266" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text><line x1="237.2" y1="62.8" x2="294.8" y2="5.199999999999999" stroke="#212121" stroke-width="1" />
+  <circle cx="34" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="34" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="92" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="92" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="150" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="150" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="208" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="208" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+</svg>"
+`;
+
+exports[`Widget: integer-chip-model database-extracted test scenarios should handle partial subtraction pattern 1`] = `
+"<svg width="320" height="300" viewBox="0 0 320 300" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
+  <circle cx="34" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="34" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text><line x1="5.199999999999999" y1="62.8" x2="62.8" y2="5.199999999999999" stroke="#212121" stroke-width="1" />
+  <circle cx="92" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="92" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text><line x1="63.2" y1="62.8" x2="120.8" y2="5.199999999999999" stroke="#212121" stroke-width="1" />
+  <circle cx="150" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="150" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="208" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="208" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="266" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="266" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+</svg>"
+`;
+
+exports[`Widget: integer-chip-model database-extracted test scenarios should handle subtraction with crossed out negative chips 1`] = `
+"<svg width="320" height="300" viewBox="0 0 320 300" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
+  <circle cx="34" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="34" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="92" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="92" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="150" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="150" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text><line x1="121.2" y1="62.8" x2="178.8" y2="5.199999999999999" stroke="#212121" stroke-width="1" />
+  <circle cx="208" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="208" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text><line x1="179.2" y1="62.8" x2="236.8" y2="5.199999999999999" stroke="#212121" stroke-width="1" />
+  <circle cx="266" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="266" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="34" cy="92" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="34" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="92" cy="92" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="92" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+</svg>"
+`;
+
+exports[`Widget: integer-chip-model should produce consistent output for example #1 1`] = `
+"<svg width="300" height="300" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
+  <circle cx="34" cy="34" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="34" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="92" cy="34" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="92" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="150" cy="34" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="150" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="208" cy="34" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="208" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="34" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="34" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+</svg>"
+`;
+
+exports[`Widget: integer-chip-model should produce consistent output for example #2 1`] = `
+"<svg width="320" height="300" viewBox="0 0 320 300" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
+  <circle cx="34" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="34" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="92" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="92" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="150" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="150" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="34" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="34" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="92" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="92" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="150" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="150" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+</svg>"
+`;
+
+exports[`Widget: integer-chip-model should produce consistent output for example #3 1`] = `
+"<svg width="300" height="300" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
+  <circle cx="34" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="34" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text><line x1="5.199999999999999" y1="62.8" x2="62.8" y2="5.199999999999999" stroke="#212121" stroke-width="1" />
+  <circle cx="92" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="92" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="34" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="34" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="92" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="92" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="150" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="150" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="208" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="208" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="34" cy="150" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="34" y="150" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="92" cy="150" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="92" y="150" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text><line x1="63.2" y1="178.8" x2="120.8" y2="121.2" stroke="#212121" stroke-width="1" />
+</svg>"
+`;
+
+exports[`Widget: integer-chip-model should produce consistent output for example #4 1`] = `
+"<svg width="300" height="300" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
+  <circle cx="34" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="34" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="92" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="92" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="150" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="150" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="208" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="208" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="34" cy="92" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="34" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="92" cy="92" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="92" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="150" cy="92" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="150" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="208" cy="92" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="208" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="34" cy="150" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="34" y="150" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="92" cy="150" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="92" y="150" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+</svg>"
+`;
+
+exports[`Widget: integer-chip-model should produce consistent output for example #5 1`] = `
+"<svg width="360" height="300" viewBox="0 0 360 300" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
+  <circle cx="34" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="34" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text><line x1="5.199999999999999" y1="62.8" x2="62.8" y2="5.199999999999999" stroke="#212121" stroke-width="1" />
+  <circle cx="92" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="92" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="150" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="150" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="208" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="208" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="266" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="266" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="34" cy="92" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="34" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text><line x1="5.199999999999999" y1="120.8" x2="62.8" y2="63.2" stroke="#212121" stroke-width="1" />
+  <circle cx="34" cy="150" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="34" y="150" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="92" cy="150" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="92" y="150" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="150" cy="150" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="150" y="150" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="208" cy="150" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="208" y="150" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text><line x1="179.2" y1="178.8" x2="236.8" y2="121.2" stroke="#212121" stroke-width="1" />
+  <circle cx="266" cy="150" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="266" y="150" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text><line x1="237.2" y1="178.8" x2="294.8" y2="121.2" stroke="#212121" stroke-width="1" />
+  <circle cx="34" cy="208" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="34" y="208" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="92" cy="208" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="92" y="208" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="150" cy="208" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="150" y="208" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+</svg>"
+`;
+
+exports[`Widget: integer-chip-model should produce consistent output for example #6 1`] = `
+"<svg width="300" height="300" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
+  
+</svg>"
+`;
+
+exports[`Widget: integer-chip-model should produce consistent output for example #7 1`] = `
+"<svg width="300" height="300" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
+  <circle cx="34" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="34" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="34" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="34" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+</svg>"
+`;
+
+exports[`Widget: integer-chip-model should produce consistent output for example #8 1`] = `
+"<svg width="320" height="300" viewBox="0 0 320 300" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
+  <circle cx="34" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="34" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="92" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="92" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="150" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="150" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="208" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="208" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="34" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="34" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="92" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="92" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="150" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="150" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="208" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="208" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="266" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="266" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="34" cy="150" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="34" y="150" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="92" cy="150" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="92" y="150" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+</svg>"
+`;
+
+exports[`Widget: integer-chip-model should produce consistent output for example #9 1`] = `
+"<svg width="300" height="300" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
+  <circle cx="34" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="34" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="92" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="92" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="34" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="34" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="92" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="92" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="150" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="150" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="208" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="208" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="34" cy="150" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="34" y="150" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="92" cy="150" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="92" y="150" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+</svg>"
+`;
+
+exports[`Widget: integer-chip-model should produce consistent output for example #10 1`] = `
+"<svg width="320" height="300" viewBox="0 0 320 300" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
+  <circle cx="34" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="34" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text><line x1="5.199999999999999" y1="62.8" x2="62.8" y2="5.199999999999999" stroke="#212121" stroke-width="1" />
+  <circle cx="34" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="34" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="92" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="92" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="150" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="150" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="208" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="208" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="266" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="266" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="34" cy="150" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="34" y="150" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+</svg>"
+`;
+
+exports[`Widget: integer-chip-model should produce consistent output for example #11 1`] = `
+"<svg width="320" height="300" viewBox="0 0 320 300" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
+  <circle cx="34" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="34" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="34" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="34" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text><line x1="5.199999999999999" y1="120.8" x2="62.8" y2="63.2" stroke="#212121" stroke-width="1" />
+  <circle cx="92" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="92" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text><line x1="63.2" y1="120.8" x2="120.8" y2="63.2" stroke="#212121" stroke-width="1" />
+  <circle cx="150" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="150" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text><line x1="121.2" y1="120.8" x2="178.8" y2="63.2" stroke="#212121" stroke-width="1" />
+  <circle cx="208" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="208" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text><line x1="179.2" y1="120.8" x2="236.8" y2="63.2" stroke="#212121" stroke-width="1" />
+  <circle cx="266" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="266" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text><line x1="237.2" y1="120.8" x2="294.8" y2="63.2" stroke="#212121" stroke-width="1" />
+</svg>"
+`;
+
+exports[`Widget: integer-chip-model should produce consistent output for example #12 1`] = `
+"<svg width="320" height="300" viewBox="0 0 320 300" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
+  <circle cx="34" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="34" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text><line x1="5.199999999999999" y1="62.8" x2="62.8" y2="5.199999999999999" stroke="#212121" stroke-width="1" />
+  <circle cx="92" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="92" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text><line x1="63.2" y1="62.8" x2="120.8" y2="5.199999999999999" stroke="#212121" stroke-width="1" />
+  <circle cx="150" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="150" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text><line x1="121.2" y1="62.8" x2="178.8" y2="5.199999999999999" stroke="#212121" stroke-width="1" />
+  <circle cx="34" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="34" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="92" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="92" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+</svg>"
+`;
+
+exports[`Widget: integer-chip-model should produce consistent output for example #13 1`] = `
+"<svg width="320" height="300" viewBox="0 0 320 300" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
+  <circle cx="34" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="34" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="92" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="92" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="150" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="150" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="208" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="208" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="266" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="266" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="34" cy="92" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="34" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="34" cy="150" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="34" y="150" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text><line x1="5.199999999999999" y1="178.8" x2="62.8" y2="121.2" stroke="#212121" stroke-width="1" />
+  <circle cx="92" cy="150" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="92" y="150" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text><line x1="63.2" y1="178.8" x2="120.8" y2="121.2" stroke="#212121" stroke-width="1" />
+</svg>"
+`;
+
+exports[`Widget: integer-chip-model should produce consistent output for example #14 1`] = `
+"<svg width="320" height="300" viewBox="0 0 320 300" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
+  <circle cx="34" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="34" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text><line x1="5.199999999999999" y1="62.8" x2="62.8" y2="5.199999999999999" stroke="#212121" stroke-width="1" />
+  <circle cx="92" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="92" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text><line x1="63.2" y1="62.8" x2="120.8" y2="5.199999999999999" stroke="#212121" stroke-width="1" />
+  <circle cx="150" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="150" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text><line x1="121.2" y1="62.8" x2="178.8" y2="5.199999999999999" stroke="#212121" stroke-width="1" />
+  <circle cx="208" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="208" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text><line x1="179.2" y1="62.8" x2="236.8" y2="5.199999999999999" stroke="#212121" stroke-width="1" />
+  <circle cx="266" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="266" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text><line x1="237.2" y1="62.8" x2="294.8" y2="5.199999999999999" stroke="#212121" stroke-width="1" />
+  <circle cx="34" cy="92" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="34" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text><line x1="5.199999999999999" y1="120.8" x2="62.8" y2="63.2" stroke="#212121" stroke-width="1" />
+  <circle cx="92" cy="92" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="92" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="150" cy="92" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="150" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+</svg>"
+`;
+
+exports[`Widget: integer-chip-model should produce consistent output for example #15 1`] = `
+"<svg width="320" height="300" viewBox="0 0 320 300" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
+  <circle cx="34" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="34" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="92" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="92" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="150" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="150" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="208" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="208" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="266" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="266" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="34" cy="92" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="34" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="34" cy="150" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="34" y="150" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+</svg>"
+`;
+
+exports[`Widget: integer-chip-model should produce consistent output for example #16 1`] = `
+"<svg width="320" height="300" viewBox="0 0 320 300" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
+  <circle cx="34" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="34" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="92" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="92" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="150" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="150" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="208" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="208" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="266" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="266" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="34" cy="92" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="34" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="92" cy="92" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="92" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="150" cy="92" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="150" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="208" cy="92" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="208" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text>
+  <circle cx="34" cy="150" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="34" y="150" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="92" cy="150" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="92" y="150" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="150" cy="150" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="150" y="150" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="208" cy="150" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="208" y="150" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="266" cy="150" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="266" y="150" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="34" cy="208" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="34" y="208" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="92" cy="208" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="92" y="208" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="150" cy="208" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="150" y="208" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="208" cy="208" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="208" y="208" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+</svg>"
+`;
+
+exports[`Widget: integer-chip-model should produce consistent output for example #17 1`] = `
+"<svg width="320" height="300" viewBox="0 0 320 300" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
+  <circle cx="34" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="34" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text><line x1="5.199999999999999" y1="62.8" x2="62.8" y2="5.199999999999999" stroke="#212121" stroke-width="1" />
+  <circle cx="92" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="92" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text><line x1="63.2" y1="62.8" x2="120.8" y2="5.199999999999999" stroke="#212121" stroke-width="1" />
+  <circle cx="150" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="150" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text><line x1="121.2" y1="62.8" x2="178.8" y2="5.199999999999999" stroke="#212121" stroke-width="1" />
+  <circle cx="208" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="208" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text><line x1="179.2" y1="62.8" x2="236.8" y2="5.199999999999999" stroke="#212121" stroke-width="1" />
+  <circle cx="266" cy="34" r="24" fill="#FADBD8" stroke="#212121" stroke-width="2" /><text x="266" y="34" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">−</text><line x1="237.2" y1="62.8" x2="294.8" y2="5.199999999999999" stroke="#212121" stroke-width="1" />
+  <circle cx="34" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="34" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="92" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="92" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="150" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="150" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="208" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="208" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="266" cy="92" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="266" y="92" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="34" cy="150" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="34" y="150" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+  <circle cx="92" cy="150" r="24" fill="#FEF9E7" stroke="#212121" stroke-width="2" /><text x="92" y="150" font-size="32px" font-weight="600" fill="#212121" text-anchor="middle" dominant-baseline="central">+</text>
+</svg>"
+`;

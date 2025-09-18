@@ -3,7 +3,7 @@ import type { ScatterPlotProps } from "../src/widgets/generators/scatter-plot"
 export const scatterPlotExamples: ScatterPlotProps[] = [
   {
     type: "scatterPlot",
-    width: 640,
+    width: 500,
     height: 420,
     title: "Height vs. Arm Span",
     xAxis: {
@@ -40,7 +40,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
   },
   {
     type: "scatterPlot",
-    width: 600,
+    width: 500,
     height: 400,
     title: "Time vs. Bacteria Count",
     xAxis: {
@@ -8016,7 +8016,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Life expectancy vs. income",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 60,
       "min": 0,
@@ -8159,7 +8159,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Average score vs. period",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 9,
       "min": 0,
@@ -8382,7 +8382,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 5,
       "min": 0,
@@ -8555,7 +8555,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Group size vs. time, in minutes",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 8,
       "min": 0,
@@ -8876,7 +8876,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 100,
       "min": 0,
@@ -9019,7 +9019,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Change in average world temperature over time",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 45,
       "min": 0,
@@ -9942,7 +9942,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Average income vs. average rent",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 50000,
       "min": 30000,
@@ -10118,7 +10118,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Scores versus grams of sugar",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 40,
       "min": 0,
@@ -10459,7 +10459,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 600,
       "min": 0,
@@ -10602,7 +10602,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Average global temperature change over time",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 45,
       "min": 0,
@@ -10735,7 +10735,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Fuel used vs. Speed",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 140,
       "min": 0,
@@ -10819,7 +10819,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Heights of fathers and sons (in centimeters)",
-    "width": 260,
+    "width": 300,
     "xAxis": {
       "max": 188,
       "min": 148,
@@ -10834,7 +10834,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
       "gridLines": true,
       "tickInterval": 5
     },
-    "height": 255,
+    "height": 300,
     "points": [
       {
         "x": 150,
@@ -11002,7 +11002,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Time to solve vs. group size",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 8,
       "min": 0,
@@ -11145,7 +11145,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Number of hurricanes over time",
-    "width": 275,
+    "width": 300,
     "xAxis": {
       "max": 40,
       "min": 0,
@@ -11160,7 +11160,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
       "gridLines": true,
       "tickInterval": 1
     },
-    "height": 275,
+    "height": 300,
     "points": [
       {
         "x": 0,
@@ -11273,7 +11273,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Scores vs. Sugar Content",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 40,
       "min": 0,
@@ -11629,7 +11629,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Average score versus period",
-    "width": 700,
+    "width": 500,
     "xAxis": {
       "max": 9,
       "min": 0,
@@ -11827,7 +11827,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Complaints vs. Buses per Hour",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 8,
       "min": 0,
@@ -11886,7 +11886,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Population density and average 1-bedroom rent",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 40000,
       "min": 0,
@@ -12029,7 +12029,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Age vs. Accidents per 100 Drivers (2009)",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 25,
       "min": 16,
@@ -12097,7 +12097,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Life expectancy vs. infant mortality rate",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 100,
       "min": 0,
@@ -12270,7 +12270,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Temperature and Gas Use",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 14,
       "min": 0,
@@ -12323,7 +12323,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Test scores vs. study time",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 5,
       "min": 0,
@@ -12516,7 +12516,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Age vs. internet use",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 60,
       "min": 0,
@@ -12584,7 +12584,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Test grades vs. shoe sizes",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 11,
       "min": 4,
@@ -12727,7 +12727,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Average income vs. average 1-bedroom rent",
-    "width": 279,
+    "width": 300,
     "xAxis": {
       "max": 60,
       "min": 30,
@@ -12742,7 +12742,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
       "gridLines": true,
       "tickInterval": 100
     },
-    "height": 275,
+    "height": 300,
     "points": [
       {
         "x": 36.5,
@@ -12815,7 +12815,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Graph A",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 60,
       "min": 0,
@@ -12868,7 +12868,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Graph B",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 150,
       "min": 0,
@@ -12921,7 +12921,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Graph C",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 4,
       "min": 0,
@@ -12974,7 +12974,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Graph D",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 14,
       "min": 0,
@@ -13239,7 +13239,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Graph A",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 50,
       "min": 0,
@@ -13287,7 +13287,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Graph B",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 25,
       "min": 0,
@@ -13335,7 +13335,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Graph C",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 180,
       "min": 0,
@@ -13383,7 +13383,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Graph D",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 60,
       "min": 0,
@@ -13643,7 +13643,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Graph A",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 80,
       "min": 0,
@@ -13696,7 +13696,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Graph B",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 100,
       "min": 0,
@@ -13749,7 +13749,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Graph C",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 240,
       "min": 0,
@@ -13802,7 +13802,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Graph D",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 300,
       "min": 0,
@@ -14279,7 +14279,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Graph A",
-    "width": 520,
+    "width": 500,
     "xAxis": {
       "max": 12,
       "min": 0,
@@ -14327,7 +14327,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Graph B",
-    "width": 520,
+    "width": 500,
     "xAxis": {
       "max": 10,
       "min": 0,
@@ -14375,7 +14375,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Graph C",
-    "width": 520,
+    "width": 500,
     "xAxis": {
       "max": 35,
       "min": 0,
@@ -14423,7 +14423,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Graph D",
-    "width": 520,
+    "width": 500,
     "xAxis": {
       "max": 30,
       "min": 0,
@@ -14855,7 +14855,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Graph A",
-    "width": 520,
+    "width": 500,
     "xAxis": {
       "max": 15,
       "min": 0,
@@ -14903,7 +14903,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Graph B",
-    "width": 520,
+    "width": 500,
     "xAxis": {
       "max": 2.5,
       "min": 0,
@@ -14951,7 +14951,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Graph C",
-    "width": 520,
+    "width": 500,
     "xAxis": {
       "max": 36,
       "min": 0,
@@ -14999,7 +14999,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Graph D",
-    "width": 520,
+    "width": 500,
     "xAxis": {
       "max": 7.5,
       "min": 0,
@@ -15047,7 +15047,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Graph A",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 500,
       "min": 0,
@@ -15105,7 +15105,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Graph B",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 1500,
       "min": 0,
@@ -15163,7 +15163,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Graph C",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 30,
       "min": 0,
@@ -15221,7 +15221,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Graph D",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 90,
       "min": 0,
@@ -15511,7 +15511,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Graph A",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 60,
       "min": 0,
@@ -15564,7 +15564,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Graph B",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 40,
       "min": 0,
@@ -15617,7 +15617,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Graph C",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 25,
       "min": 0,
@@ -15670,7 +15670,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Graph D",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 14,
       "min": 0,
@@ -15723,7 +15723,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Graph A",
-    "width": 520,
+    "width": 500,
     "xAxis": {
       "max": 20,
       "min": 0,
@@ -15776,7 +15776,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Graph B",
-    "width": 520,
+    "width": 500,
     "xAxis": {
       "max": 150,
       "min": 0,
@@ -15829,7 +15829,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Graph C",
-    "width": 520,
+    "width": 500,
     "xAxis": {
       "max": 6,
       "min": 0,
@@ -15882,7 +15882,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Graph D",
-    "width": 520,
+    "width": 500,
     "xAxis": {
       "max": 50,
       "min": 0,
@@ -16386,7 +16386,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
       }
     ],
     "title": "Mood Rating vs. Hours Playing Sports",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 4.5,
       "min": 0,
@@ -16462,7 +16462,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
       }
     ],
     "title": "Percent of adults who smoke vs. Years since 1945",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 45,
       "min": 0,
@@ -16568,7 +16568,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
       }
     ],
     "title": "Average income vs. rent",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 50000,
       "min": 0,
@@ -16679,7 +16679,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
       }
     ],
     "title": "Score vs. Release year",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 2010,
       "min": 1950,
@@ -16815,7 +16815,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
       }
     ],
     "title": "Winning percentage vs. salary",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 5,
       "min": 0,
@@ -17046,7 +17046,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
       }
     ],
     "title": "Winning percentage vs. Salary (millions of dollars)",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 5,
       "min": 0,
@@ -17252,7 +17252,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
       }
     ],
     "title": "Study time vs. score",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 4.5,
       "min": 0,
@@ -17403,7 +17403,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
       }
     ],
     "title": "Ear circumference vs. age",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 90,
       "min": 0,
@@ -17559,7 +17559,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
       }
     ],
     "title": "Scatterplot and regression line",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 55,
       "min": 0,
@@ -17873,7 +17873,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 8,
       "min": 0,
@@ -17895,7 +17895,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 8,
       "min": 0,
@@ -17948,7 +17948,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 8,
       "min": 0,
@@ -18001,7 +18001,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 8,
       "min": 0,
@@ -18054,7 +18054,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 5,
       "min": 0,
@@ -18102,7 +18102,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 8,
       "min": 0,
@@ -18150,7 +18150,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 5,
       "min": 0,
@@ -18357,7 +18357,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Meditation (minutes) vs. Sleep (hours)",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 24,
       "min": 0,
@@ -18410,7 +18410,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Meditation (minutes) vs. Sleep (hours)",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 24,
       "min": 0,
@@ -18454,7 +18454,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
       },
       {
         "x": 10,
-        "y": 18,
+        "y": 8,
         "label": ""
       }
     ]
@@ -18463,7 +18463,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Meditation (minutes) vs. Sleep (hours)",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 24,
       "min": 0,
@@ -18516,7 +18516,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Study Time vs. Score",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 3.5,
       "min": 0,
@@ -18569,7 +18569,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Study Time vs. Score",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 3.5,
       "min": 0,
@@ -18622,7 +18622,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Study Time vs. Score",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 3.5,
       "min": 0,
@@ -18857,7 +18857,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Height vs. Petal length",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 42,
       "min": -4,
@@ -18910,7 +18910,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Height vs. Petal length",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 42,
       "min": -4,
@@ -18963,7 +18963,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Height vs. Petal length",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 42,
       "min": -4,
@@ -19160,7 +19160,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 10,
       "min": 0,
@@ -19213,7 +19213,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 10,
       "min": 0,
@@ -19266,7 +19266,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 10,
       "min": 0,
@@ -19319,7 +19319,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Gold vs. Silver medals",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 10,
       "min": 0,
@@ -19341,7 +19341,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Mean heights by age",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 13,
       "min": 0,
@@ -19389,7 +19389,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Mean heights by age",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 2,
       "min": 0,
@@ -19437,7 +19437,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Mean heights by age",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 13,
       "min": 0,
@@ -19485,7 +19485,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Study time (hours) vs. Score",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 4,
       "min": 0,
@@ -19538,7 +19538,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Study time (hours) vs. Score",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 4,
       "min": 0,
@@ -19591,7 +19591,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Study time (hours) vs. Score",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 4,
       "min": 0,
@@ -19644,7 +19644,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 8,
       "min": 0,
@@ -19697,7 +19697,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 100,
       "min": 0,
@@ -19750,7 +19750,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 8,
       "min": 0,
@@ -20250,7 +20250,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 40,
       "min": 0,
@@ -20298,7 +20298,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 13,
       "min": 0,
@@ -20346,7 +20346,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 40,
       "min": 0,
@@ -20697,7 +20697,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Predicted (x) vs. Actual (y)",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 30,
       "min": 0,
@@ -20750,7 +20750,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Predicted (x) vs. Actual (y)",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 30,
       "min": 0,
@@ -20803,7 +20803,7 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
     "type": "scatterPlot",
     "lines": [],
     "title": "Predicted (x) vs. Actual (y)",
-    "width": 600,
+    "width": 500,
     "xAxis": {
       "max": 30,
       "min": 0,
