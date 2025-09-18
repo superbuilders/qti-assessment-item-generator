@@ -165,8 +165,8 @@ export const generateGeometricSolidDiagram: WidgetGenerator<typeof GeometricSoli
 			})
 		}
 		if (shape.heightLabel) {
-			// External line with arrows for height
-			const lineX = Math.min(cx + r + 15, width - 50) // Ensure it stays within bounds
+			// External line with arrows for height - positioned with adequate spacing
+			const lineX = cx + r + 10 // Fixed distance from cylinder edge
 			canvas.drawLine(lineX, topY, lineX, bottomY, {
 				stroke: theme.colors.black,
 				strokeWidth: theme.stroke.width.base,
@@ -174,7 +174,7 @@ export const generateGeometricSolidDiagram: WidgetGenerator<typeof GeometricSoli
 				markerEnd: "url(#arrow)"
 			})
 			canvas.drawText({
-				x: lineX + 20,
+				x: lineX + 10,
 				y: height / 2,
 				text: shape.heightLabel,
 				anchor: "start",
