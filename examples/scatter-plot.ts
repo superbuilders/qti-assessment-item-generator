@@ -20851,6 +20851,149 @@ export const scatterPlotExamples: ScatterPlotProps[] = [
         "label": ""
       }
     ]
+  },
+  {
+    type: "scatterPlot",
+    lines: [],
+    title: "Population density vs. CO2 emissions per person (36 Japanese cities)",
+    width: 375,
+    xAxis: {
+      max: 3500,
+      min: 0,
+      label: "People, per square kilometer",
+      gridLines: true,
+      tickInterval: 500
+    },
+    yAxis: {
+      max: 25,
+      min: 0,
+      label: "CO2 emissions per person, in metric tons",
+      gridLines: true,
+      tickInterval: 1
+    },
+    height: 375,
+    points: [
+      {
+        x: 400,
+        y: 6.5,
+        label: ""
+      },
+      {
+        x: 550,
+        y: 5.8,
+        label: ""
+      },
+      {
+        x: 600,
+        y: 7.2,
+        label: ""
+      },
+      {
+        x: 700,
+        y: 6.9,
+        label: ""
+      },
+      {
+        x: 800,
+        y: 8.1,
+        label: ""
+      },
+      {
+        x: 900,
+        y: 7.4,
+        label: ""
+      },
+      {
+        x: 1000,
+        y: 9,
+        label: ""
+      },
+      {
+        x: 750,
+        y: 5.5,
+        label: ""
+      },
+      {
+        x: 650,
+        y: 7.9,
+        label: ""
+      },
+      {
+        x: 850,
+        y: 6.3,
+        label: ""
+      },
+      {
+        x: 1200,
+        y: 10.5,
+        label: ""
+      },
+      {
+        x: 1400,
+        y: 9.8,
+        label: ""
+      },
+      {
+        x: 1600,
+        y: 11.2,
+        label: ""
+      },
+      {
+        x: 1800,
+        y: 10,
+        label: ""
+      },
+      {
+        x: 2000,
+        y: 12.5,
+        label: ""
+      },
+      {
+        x: 2500,
+        y: 15,
+        label: ""
+      },
+      {
+        x: 3000,
+        y: 18.2,
+        label: ""
+      },
+      {
+        x: 3200,
+        y: 20.4,
+        label: ""
+      },
+      {
+        x: 3400,
+        y: 17.1,
+        label: ""
+      },
+      {
+        x: 1500,
+        y: 21,
+        label: ""
+      },
+      {
+        x: 2200,
+        y: 4,
+        label: ""
+      },
+      {
+        x: 2800,
+        y: 7,
+        label: ""
+      },
+      {
+        x: 500,
+        y: 14,
+        label: ""
+      },
+      {
+        x: 3100,
+        y: 6,
+        label: ""
+      }
+    ]
   }
 ]
 
