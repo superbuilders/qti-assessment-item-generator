@@ -1,7 +1,7 @@
-import { createWidthSchema } from "../../utils/schemas"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
+import { createWidthSchema } from "../../utils/schemas"
 import { theme } from "../../utils/theme"
 import type { WidgetGenerator } from "../types"
 
@@ -28,9 +28,9 @@ const FaceName = z
 		"Face identifier for polyhedra. 'frontFace' is the viewer-facing surface, 'backFace' is hidden behind, 'leftFace'/'rightFace' are side surfaces, 'topFace'/'bottomFace' are vertical extremes, and 'baseFace' is the foundation of pyramids."
 	)
 
-// Single Anchor schema instance to avoid $ref issues and ensure consistency
-const AnchorSchema = z
-	.discriminatedUnion("type", [
+// Factory function to create anchor schema - avoids $ref in OpenAI JSON schema
+const createAnchorSchema = () =>
+	z.discriminatedUnion("type", [
 		z
 			.object({
 				type: z.literal("vertex"),
@@ -91,17 +91,14 @@ const AnchorSchema = z
 				"References the geometric center (centroid) of a face polygon. Calculated as the average position of all vertices that define the face."
 			)
 	])
-	.describe(
-		"Flexible anchor system for positioning line segments and angle markers. Can reference vertices, points along edges, or face centers to enable complex geometric constructions like slant heights, altitudes, and construction lines."
-	)
 
 // Defines a line segment between two anchor points with optional labeling
 const Segment = z
 	.object({
-		from: AnchorSchema.describe(
+		from: createAnchorSchema().describe(
 			"Starting point of the line segment. Can be any anchor type: vertex, edge point, or face center."
 		),
-		to: AnchorSchema.describe(
+		to: createAnchorSchema().describe(
 			"Ending point of the line segment. Can be any anchor type: vertex, edge point, or face center. Must be different from 'from'."
 		),
 		label: z
@@ -123,13 +120,13 @@ const AngleMarker = z
 		type: z
 			.literal("right")
 			.describe("Marker type identifier. Currently only 'right' is supported for right-angle square markers."),
-		at: AnchorSchema.describe(
+		at: createAnchorSchema().describe(
 			"The anchor point where the angle marker will be positioned. This is the vertex of the angle."
 		),
-		from: AnchorSchema.describe(
+		from: createAnchorSchema().describe(
 			"Reference anchor defining the first ray of the angle. A line from 'at' to 'from' forms one side of the angle."
 		),
-		to: AnchorSchema.describe(
+		to: createAnchorSchema().describe(
 			"Reference anchor defining the second ray of the angle. A line from 'at' to 'to' forms the other side of the angle."
 		),
 		sizePx: z
@@ -284,7 +281,7 @@ export const generatePolyhedronDiagram: WidgetGenerator<typeof PolyhedronDiagram
 	// Helper: resolve an Anchor to a concrete point using the projected vertices and faces
 	function resolveAnchor(
 		anchor:
-			| z.infer<typeof AnchorSchema>
+			| z.infer<ReturnType<typeof createAnchorSchema>>
 			| { type: "vertex"; index: number }
 			| { type: "edgeMidpoint"; a: number; b: number }
 			| { type: "edgePoint"; a: number; b: number; t: number }

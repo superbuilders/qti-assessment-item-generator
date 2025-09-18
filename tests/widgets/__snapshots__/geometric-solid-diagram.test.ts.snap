@@ -1,4 +1,4 @@
-// Bun Snapshot v1, https://bun.sh/docs/test/snapshots
+// Bun Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Widget: geometric-solid-diagram should produce consistent output for example #1 1`] = `"<svg width="340" height="340" viewBox="-20 -20 340 340" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif" font-size="14"><defs><marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#000000" /></marker></defs><ellipse cx="150" cy="150" rx="110" ry="110" fill="rgba(220, 220, 220, 0.4)" stroke="#000000" stroke-width="2"/><path d="M 40 150 A 110 33 0 0 0 260 150" fill="none" stroke="#000000" stroke-width="1.5" stroke-dasharray="5 3"/><path d="M 40 150 A 110 33 0 0 1 260 150" fill="none" stroke="#000000" stroke-width="1.5"/><line x1="150" y1="150" x2="260" y2="150" stroke="#000000" stroke-width="1.5" stroke-dasharray="3 2"/><text x="205" y="139.3" font-size="12" text-anchor="middle" dominant-baseline="middle">9 units</text></svg>"`;
 

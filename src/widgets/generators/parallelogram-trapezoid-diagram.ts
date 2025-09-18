@@ -1,21 +1,20 @@
-import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
 import { Path2D } from "../../utils/path-builder"
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { theme } from "../../utils/theme"
 import type { WidgetGenerator } from "../types"
 
-// Single LabelValueSchema instance to avoid $ref generation in OpenAI JSON Schema conversion
-const LabelValueSchema = z
-	.discriminatedUnion("type", [
+// Factory function to create label value schema - avoids $ref in OpenAI JSON schema
+const createLabelValueSchema = () =>
+	z.discriminatedUnion("type", [
 		z.object({ type: z.literal("number"), value: z.number() }),
 		z.object({ type: z.literal("string"), value: z.string().max(1) }),
 		z.object({ type: z.literal("none") })
 	])
-	.describe("Label value as number, single-letter string, or none")
 
 type LabelValue = { type: "number"; value: number } | { type: "string"; value: string } | { type: "none" }
 
@@ -37,13 +36,13 @@ const Parallelogram = z
 			.describe("Angle between the base and the slanted side in degrees (acute). Defined at the bottom-left vertex."),
 		labels: z
 			.object({
-				base: LabelValueSchema.describe(
+				base: createLabelValueSchema().describe(
 					"Label for the base: number or single-letter variable. Use type 'none' to hide. Positioned below the base."
 				),
-				height: LabelValueSchema.describe(
+				height: createLabelValueSchema().describe(
 					"Label for the height: number or single-letter variable. Use type 'none' to hide. Perpendicular distance."
 				),
-				slantAngle: LabelValueSchema.describe(
+				slantAngle: createLabelValueSchema().describe(
 					"Label for the slant angle in degrees: number or single-letter variable. Use type 'none' to hide. Positioned near the bottom-left vertex."
 				)
 			})
@@ -69,19 +68,19 @@ const RightTrapezoid = z
 			.describe("Perpendicular distance between parallel sides in arbitrary units (e.g., 5, 7, 4.5)"),
 		labels: z
 			.object({
-				topBase: LabelValueSchema.describe(
+				topBase: createLabelValueSchema().describe(
 					"Label for top base: number or single-letter variable. Use type 'none' to hide."
 				),
-				bottomBase: LabelValueSchema.describe(
+				bottomBase: createLabelValueSchema().describe(
 					"Label for bottom base: number or single-letter variable. Use type 'none' to hide."
 				),
-				height: LabelValueSchema.describe(
+				height: createLabelValueSchema().describe(
 					"Label for height/left side: number or single-letter variable. Use type 'none' to hide."
 				),
-				leftSide: LabelValueSchema.describe(
+				leftSide: createLabelValueSchema().describe(
 					"Label for left perpendicular side: number or single-letter variable. Often same as height. Use type 'none' to hide."
 				),
-				rightSide: LabelValueSchema.describe(
+				rightSide: createLabelValueSchema().describe(
 					"Label for right slanted side: number or single-letter variable. Use type 'none' to hide."
 				)
 			})
@@ -111,19 +110,19 @@ const GeneralTrapezoid = z
 			.describe("Length of the left slanted side in arbitrary units (e.g., 5, 7, 4.5). Can differ from right side."),
 		labels: z
 			.object({
-				topBase: LabelValueSchema.describe(
+				topBase: createLabelValueSchema().describe(
 					"Label for top base: number or single-letter variable. Use type 'none' to hide."
 				),
-				bottomBase: LabelValueSchema.describe(
+				bottomBase: createLabelValueSchema().describe(
 					"Label for bottom base: number or single-letter variable. Use type 'none' to hide."
 				),
-				height: LabelValueSchema.describe(
+				height: createLabelValueSchema().describe(
 					"Label for perpendicular height: number or single-letter variable. Shows with dashed line. Use type 'none' to hide."
 				),
-				leftSide: LabelValueSchema.describe(
+				leftSide: createLabelValueSchema().describe(
 					"Label for left slanted side: number or single-letter variable. Use type 'none' to hide."
 				),
-				rightSide: LabelValueSchema.describe(
+				rightSide: createLabelValueSchema().describe(
 					"Label for right slanted side: number or single-letter variable. Use type 'none' to hide."
 				)
 			})

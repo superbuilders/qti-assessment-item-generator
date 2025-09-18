@@ -1,4 +1,4 @@
-// Bun Snapshot v1, https://bun.sh/docs/test/snapshots
+// Bun Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Widget: marble-diagram should produce consistent output for example #1 1`] = `
 "<svg width="290" height="290" viewBox="0 0 290 290" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
