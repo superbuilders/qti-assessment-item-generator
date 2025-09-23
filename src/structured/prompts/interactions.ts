@@ -39,6 +39,7 @@ We FULLY support the following QTI interaction types:
 - **orderInteraction**: Ordering/sequencing questions (maps from Perseus \`sorter\` widgets) - students arrange items in correct order
 - **textEntryInteraction**: Numeric/text input (maps from Perseus \`numeric-input\`, \`expression\`, \`input-number\` widgets)
 - **inlineChoiceInteraction**: Dropdown selection within text (maps from Perseus \`dropdown\` widgets)
+- **gapMatchInteraction**: Drag-and-drop words/terms into gaps (maps from Perseus \`matcher\` widgets when appropriate)
 
 **CRITICAL: Perseus \`sorter\` widgets should be converted to QTI \`orderInteraction\`.** This is a fully supported interaction type where students drag items to arrange them in the correct sequence.
 
@@ -87,10 +88,46 @@ Positive examples — chemistry using MathML in dropdown choices:
 }
 \`\`\`
 
+**GAP MATCH INTERACTION GENERATION**
+When the shell has classified a Perseus matcher as gapMatchInteraction:
+1. Extract draggable items from the Perseus left array - these become gapTexts
+2. The gaps themselves are NOT defined here - they're embedded in body content
+3. Generate the interaction object with gapTexts and gap definitions
+4. Use semantic identifiers like WORD_SOLAR, TERM_ORBIT for gapTexts
+5. Use GAP_1, GAP_2 for gap identifiers
+
+Example gapMatchInteraction:
+\`\`\`json
+{
+  "gap_match_1": {
+    "type": "gapMatchInteraction",
+    "responseIdentifier": "RESPONSE",
+    "shuffle": true,
+    "gapTexts": [
+      {
+        "identifier": "WORD_SOLAR",
+        "matchMax": 1,
+        "content": [{ "type": "text", "content": "solar" }]
+      },
+      {
+        "identifier": "WORD_ORBIT", 
+        "matchMax": 1,
+        "content": [{ "type": "text", "content": "orbit" }]
+      }
+    ],
+    "gaps": [
+      { "identifier": "GAP_1", "required": false },
+      { "identifier": "GAP_2", "required": false }
+    ]
+  }
+}
+\`\`\`
+
 **UNSUPPORTED INTERACTION HANDLING**
 Some Perseus widgets require complex, dynamic user input that we do not support. You MUST identify these and flag them.
 
-- **Unsupported Perseus Types**: \`interactive-graph\`, \`plotter\`, \`grapher\`, \`matcher\`, \`number-line\` (the interactive version, not a static image), \`label-image\` (drag-and-label on image interactions).
+- **Unsupported Perseus Types**: \`interactive-graph\`, \`plotter\`, \`grapher\`, \`number-line\` (the interactive version, not a static image), \`label-image\` (drag-and-label on image interactions).
+- **Note**: \`matcher\` is NOW SUPPORTED via gapMatchInteraction when the shell classifies it as such
 - **Your Task**: Look at the original Perseus JSON. If an interaction slot in the shell corresponds to a Perseus widget with one of these unsupported types, you MUST generate a specific JSON object for that slot:
 \`\`\`json
 {

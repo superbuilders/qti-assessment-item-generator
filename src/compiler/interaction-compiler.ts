@@ -67,6 +67,24 @@ export function compileInteraction(interaction: AnyInteraction, slots: Map<strin
             </qti-inline-choice-interaction>`
 			break
 		}
+		case "gapMatchInteraction": {
+			const gapTextsXml = interaction.gapTexts
+				.map((gt) => {
+					const contentXml = renderInlineContent(gt.content, slots)
+					return `<qti-gap-text identifier="${escapeXmlAttribute(gt.identifier)}" match-max="${gt.matchMax}">${contentXml}</qti-gap-text>`
+				})
+				.join("\n            ")
+
+			// Note: The actual gaps are embedded in body content via { type: "gap", gapId: "GAP_1" }
+			// and are rendered by the content renderer, not here
+			const innerContent = interaction.content
+				? `\n            ${renderBlockContent(interaction.content, slots)}\n        `
+				: ""
+			interactionXml = `<qti-gap-match-interaction response-identifier="${escapeXmlAttribute(interaction.responseIdentifier)}" shuffle="${interaction.shuffle}" max-associations="0">
+            ${gapTextsXml}${innerContent}
+        </qti-gap-match-interaction>`
+			break
+		}
 		default: {
 			// This should never happen if all interaction types are handled
 			// We can't access properties on 'never', so we throw a generic error
@@ -77,13 +95,16 @@ export function compileInteraction(interaction: AnyInteraction, slots: Map<strin
 		}
 	}
 
-	// Wrap block-level interactions in div to comply with QTI content model
-	// Inline interactions (textEntryInteraction, inlineChoiceInteraction) must remain unwrapped
-	// as they need to be placed inside text containers like <p> tags
-	if (interaction.type === "textEntryInteraction" || interaction.type === "inlineChoiceInteraction") {
-		// Inline interactions: return unwrapped for placement inside text containers
+	// Wrapping policy:
+	// - Inline interactions (textEntryInteraction, inlineChoiceInteraction) remain unwrapped
+	// - gapMatchInteraction must also remain unwrapped so that it can directly contain its own inner content
+	// - Other block interactions are wrapped in a div for safe mixing with other block elements
+	if (
+		interaction.type === "textEntryInteraction" ||
+		interaction.type === "inlineChoiceInteraction" ||
+		interaction.type === "gapMatchInteraction"
+	) {
 		return interactionXml
 	}
-	// Block interactions: wrap in div to satisfy QTI content model when mixed with other block elements
 	return `<div>${interactionXml}</div>`
 }

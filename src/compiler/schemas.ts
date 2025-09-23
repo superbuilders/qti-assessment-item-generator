@@ -35,7 +35,17 @@ function createInlineContentItemSchema() {
 					slotId: z.string().describe("Unique identifier that matches a widget or interaction key")
 				})
 				.strict()
-				.describe("Placeholder for inline content that will be filled with a widget or interaction")
+				.describe("Placeholder for inline content that will be filled with a widget or interaction"),
+			z
+				.object({
+					type: z.literal("gap").describe("Identifies this as a gap for gap match interaction"),
+					gapId: z
+						.string()
+						.regex(SAFE_IDENTIFIER_REGEX, "invalid gap identifier: must match [A-Za-z_][A-Za-z0-9_]*")
+						.describe("References a gap defined in a gapMatchInteraction")
+				})
+				.strict()
+				.describe("A gap placeholder that users can drag items into in a gap match interaction")
 		])
 		.describe("Union type representing any inline content element")
 }
@@ -68,6 +78,22 @@ function createBlockContentItemSchema() {
 				})
 				.strict()
 				.describe("A preformatted code block that must be rendered with <pre><code>"),
+			z
+				.object({
+					type: z.literal("unorderedList").describe("Identifies this as an unordered list"),
+					items: z.array(createInlineContentSchema()).nonempty().describe("List items as arrays of inline content")
+				})
+				.strict()
+				.describe("An unordered list with each item rendered as a list item containing a paragraph"),
+			z
+				.object({
+					type: z.literal("table").describe("Identifies this as a simple data table"),
+					className: z.string().nullable().describe("Optional CSS class name for table, e.g., 'grid'"),
+					header: z.array(z.string()).describe("Header cells as plain text"),
+					rows: z.array(z.array(z.string())).describe("Body rows (arrays of plain text cells)")
+				})
+				.strict()
+				.describe("Simple HTML table with optional class and text-only cells"),
 			z
 				.object({
 					type: z.literal("blockSlot").describe("Identifies this as a block-level placeholder"),
@@ -219,6 +245,60 @@ export function createDynamicAssessmentItemSchema(widgetMapping: Record<string, 
 			"An interaction where users arrange items in a specific sequence or order. Prompts must never be vague (e.g., 'Arrange the items in correct order'). They must specify the sort property, the direction (ascending/descending using 'least to greatest'/'greatest to least'), and include the axis phrase '(top to bottom)'."
 		)
 
+	const GapMatchInteractionSchema = z
+		.object({
+			type: z.literal("gapMatchInteraction").describe("Identifies this as a gap match (drag-and-drop) interaction."),
+			responseIdentifier: z
+				.string()
+				.regex(SAFE_IDENTIFIER_REGEX, "invalid response identifier")
+				.describe("Links this interaction to its response declaration for scoring."),
+			shuffle: z.boolean().describe("Whether to shuffle the order of gap-text items (draggable tokens)."),
+			content: createBlockContentSchema()
+				.nullable()
+				.describe(
+					"Optional block content (e.g., <ul>/<li>/<p>) containing sentences with gap placeholders to render inside the interaction."
+				),
+			gapTexts: z
+				.array(
+					z
+						.object({
+							identifier: z
+								.string()
+								.regex(SAFE_IDENTIFIER_REGEX, "invalid identifier: must match [A-Za-z_][A-Za-z0-9_]*")
+								.describe("Unique identifier for this draggable item (e.g., WORD_SOLAR)."),
+							matchMax: z
+								.number()
+								.int()
+								.min(0)
+								.describe("Maximum times this item can be used. 0 = unlimited, 1 = use once only."),
+							content: createInlineContentSchema().describe("The content of the draggable item (text or math).")
+						})
+						.strict()
+						.describe("A draggable item that can be placed into gaps")
+				)
+				.describe("Array of draggable items that can be placed into gaps."),
+			gaps: z
+				.array(
+					z
+						.object({
+							identifier: z
+								.string()
+								.regex(SAFE_IDENTIFIER_REGEX, "invalid identifier: must match [A-Za-z_][A-Za-z0-9_]*")
+								.describe("Unique identifier for this gap (e.g., GAP_1)."),
+							required: z.boolean().nullable().describe("Whether this gap must be filled for a correct response.")
+						})
+						.strict()
+						.describe("A gap definition that appears in the body content")
+				)
+				.describe(
+					"Array of gap definitions. The gaps themselves appear in body content using { type: 'gap', gapId: 'GAP_1' }."
+				)
+		})
+		.strict()
+		.describe(
+			"A drag-and-drop interaction where users drag text/terms into gaps within sentences. Gaps are embedded in body content."
+		)
+
 	const UnsupportedInteractionSchema = z
 		.object({
 			type: z
@@ -238,6 +318,7 @@ export function createDynamicAssessmentItemSchema(widgetMapping: Record<string, 
 			InlineChoiceInteractionSchema,
 			TextEntryInteractionSchema,
 			OrderInteractionSchema,
+			GapMatchInteractionSchema,
 			UnsupportedInteractionSchema
 		])
 		.describe("A discriminated union representing any possible QTI interaction type supported by the system.")
@@ -269,9 +350,34 @@ export function createDynamicAssessmentItemSchema(widgetMapping: Record<string, 
 			.describe("The correct identifier(s). For multiple correct answers, provide an array of identifiers.")
 	}).strict()
 
+	// Schema for directedPair responses (like gapMatchInteraction)
+	const DirectedPairResponseDeclarationSchema = BaseResponseDeclarationSchema.extend({
+		baseType: z.literal("directedPair"),
+		cardinality: z.enum(["multiple", "ordered"]).describe("Gap match always uses multiple or ordered cardinality."),
+		correct: z
+			.array(
+				z.object({
+					source: z
+						.string()
+						.regex(SAFE_IDENTIFIER_REGEX, "invalid source identifier")
+						.describe("The identifier of the gap-text (draggable item)."),
+					target: z
+						.string()
+						.regex(SAFE_IDENTIFIER_REGEX, "invalid target identifier")
+						.describe("The identifier of the gap where the item should be placed.")
+				})
+			)
+			.describe("Array of correct source->target pairs for gap match."),
+		allowEmpty: z.boolean().describe("If true, an empty response (no items placed) can be correct.")
+	}).strict()
+
 	// The new ResponseDeclarationSchema is a discriminated union based on 'baseType'
 	const ResponseDeclarationSchema = z
-		.discriminatedUnion("baseType", [TextualResponseDeclarationSchema, IdentifierResponseDeclarationSchema])
+		.discriminatedUnion("baseType", [
+			TextualResponseDeclarationSchema,
+			IdentifierResponseDeclarationSchema,
+			DirectedPairResponseDeclarationSchema
+		])
 		.describe(
 			"Defines the correct answer for an interaction, with a structure that varies based on the response's baseType."
 		)

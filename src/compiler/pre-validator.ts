@@ -225,40 +225,40 @@ function validateBlockContent(items: BlockContent, _context: string, logger: log
  * All formatting instructions and canonicalization guidance are handled in prompting, not here.
  */
 function validateTextEntryCanonicalAnswerRules(item: AssessmentItemInput, logger: logger.Logger): void {
-    if (!item.interactions || !item.responseDeclarations) {
-        return
-    }
+	if (!item.interactions || !item.responseDeclarations) {
+		return
+	}
 
-    // Find all response identifiers that belong to a textEntryInteraction.
-    const textEntryDeclarations = item.responseDeclarations.filter((decl) =>
-        Object.values(item.interactions ?? {}).some(
-            (interaction) => interaction.type === "textEntryInteraction" && interaction.responseIdentifier === decl.identifier
-        )
-    )
+	// Find all response identifiers that belong to a textEntryInteraction.
+	const textEntryDeclarations = item.responseDeclarations.filter((decl) =>
+		Object.values(item.interactions ?? {}).some(
+			(interaction) => interaction.type === "textEntryInteraction" && interaction.responseIdentifier === decl.identifier
+		)
+	)
 
-    if (textEntryDeclarations.length === 0) {
-        return
-    }
+	if (textEntryDeclarations.length === 0) {
+		return
+	}
 
-    for (const decl of textEntryDeclarations) {
-        const correctValue = String(decl.correct)
-        const isPlainNumber = /^-?\d+(\.\d+)?$/.test(correctValue)
+	for (const decl of textEntryDeclarations) {
+		const correctValue = String(decl.correct)
+		const isPlainNumber = /^-?\d+(\.\d+)?$/.test(correctValue)
 
-        // Enforce: numeric base types MUST have numeric values
-        if ((decl.baseType === "integer" || decl.baseType === "float") && !isPlainNumber) {
-            logger.error("baseType mismatch: numeric baseType used for non-numeric string", {
-                responseIdentifier: decl.identifier,
-                baseType: decl.baseType,
-                correctValue
-            })
-            throw errors.new(
-                "baseType mismatch: float/integer cannot be used for formatted strings like fractions or equations"
-            )
-        }
+		// Enforce: numeric base types MUST have numeric values
+		if ((decl.baseType === "integer" || decl.baseType === "float") && !isPlainNumber) {
+			logger.error("baseType mismatch: numeric baseType used for non-numeric string", {
+				responseIdentifier: decl.identifier,
+				baseType: decl.baseType,
+				correctValue
+			})
+			throw errors.new(
+				"baseType mismatch: float/integer cannot be used for formatted strings like fractions or equations"
+			)
+		}
 
-        // Do not enforce instruction presence or restrict string baseType for numeric-looking answers.
-        // Prompting is responsible for producing canonical formats and student-facing instructions.
-    }
+		// Do not enforce instruction presence or restrict string baseType for numeric-looking answers.
+		// Prompting is responsible for producing canonical formats and student-facing instructions.
+	}
 }
 
 export function validateAssessmentItemInput(item: AssessmentItemInput, logger: logger.Logger): void {
@@ -394,6 +394,45 @@ export function validateAssessmentItemInput(item: AssessmentItemInput, logger: l
 								logger
 							)
 						}
+					}
+					break
+				}
+				case "gapMatchInteraction": {
+					// Validate gap texts
+					if (interaction.gapTexts.length < 1) {
+						logger.error("gap match interaction has no gap texts", {
+							interactionKey: key
+						})
+						throw errors.new(`gap match interaction must have at least one draggable item in interaction[${key}]`)
+					}
+					for (const gapText of interaction.gapTexts) {
+						validateInlineContent(gapText.content, `interaction[${key}].gapText[${gapText.identifier}]`, logger)
+					}
+
+					// Validate gaps are defined
+					if (interaction.gaps.length < 1) {
+						logger.error("gap match interaction has no gaps defined", {
+							interactionKey: key
+						})
+						throw errors.new(`gap match interaction must define at least one gap in interaction[${key}]`)
+					}
+
+					// Validate response declaration exists and is correct type
+					const decl = item.responseDeclarations.find((d) => d.identifier === interaction.responseIdentifier)
+					if (!decl) {
+						logger.error("missing gap match response declaration", {
+							interactionKey: key,
+							responseIdentifier: interaction.responseIdentifier
+						})
+						throw errors.new("missing gap match response declaration")
+					}
+					if (decl.baseType !== "directedPair") {
+						logger.error("gap match requires directedPair base type", {
+							interactionKey: key,
+							responseIdentifier: interaction.responseIdentifier,
+							actualBaseType: decl.baseType
+						})
+						throw errors.new("gap match interaction requires directedPair response declaration")
 					}
 					break
 				}

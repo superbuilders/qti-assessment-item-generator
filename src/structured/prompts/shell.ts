@@ -145,22 +145,272 @@ Perseus misleadingly calls both types "widgets" - you MUST reclassify based on w
 
 ${supportedInteractionTypes}
 
-**Common Perseus elements that are UNSUPPORTED and their required conversions:**
+	**Common Perseus elements that are UNSUPPORTED and their required conversions:**
 - \`plotter\` - interactive plotting/drawing → convert to \`choiceInteraction\` with static visuals in choices
 - \`interactive-graph\` - interactive graphing → convert to \`choiceInteraction\` with static visuals
 - \`grapher\` - interactive function graphing → convert to \`choiceInteraction\` with static visuals
-- \`matcher\` - matching items → convert to a SINGLE \`dataTable\` widget with inline dropdowns in the right column (see CRITICAL rule below)
+- \`matcher\` - matching items → SEE CRITICAL MATCHER RULES BELOW for when to use \`gapMatchInteraction\` vs \`dataTable\`
 - \`number-line\` - when used for plotting points (not just display) → convert to \`choiceInteraction\` with static visuals
 
 **Remember:** Perseus misleadingly calls interactive elements "widgets" in its JSON. IGNORE THIS. Reclassify based on whether user input is required, EXCEPT for tables which are ALWAYS widgets.
 
-### CRITICAL: Matcher Conversion to Table + Dropdowns
-- When the original Perseus uses a \`matcher\` interaction, you MUST:
-  1) Create exactly one widget slot named \`data_table\` and include a \`{ "type": "blockSlot", "slotId": "data_table" }\` in the body where the interaction belongs.
-  2) Do NOT generate any multiple-choice interactions for matching. The \`interactions\` array MUST NOT include a \`choiceInteraction\` for matching.
-  3) Do NOT create per-choice tables or slots like \`choice_a_table\`, \`choice_b_table\`, \`match_*\`, or \`matching_*\`.
-  4) The left column lists the left-side items (e.g., formulas, values). The right column uses inline dropdowns (rendered as inline choice interactions) with choices taken from the right-side set.
-  5) The correct identifiers must be encoded in response declarations for each dropdown (handled downstream by the generator/validator).
+	### CRITICAL: Matcher Conversion Rules - Gap Match vs Table
+
+**WHEN TO USE gapMatchInteraction (PREFERRED for fill-in-the-blank patterns):**
+- The left items are SHORT (single words, terms, numbers, or short phrases)
+- The right items contain GAPS indicated by underscores (___) or blanks
+- The interaction is about filling in missing parts of sentences/equations
+- Example: left=["solar", "orbit", "immense"], right=["The rocket uses ___ power", "Moon's ___ around Earth"]
+
+**For gapMatchInteraction:**
+1) Create an interaction slot with type "gapMatchInteraction" 
+2) Each gap in text gets a unique identifier (GAP_1, GAP_2, etc.)
+3) Each draggable item gets an identifier (WORD_SOLAR, TERM_1, etc.)
+4) In the body content, embed gaps using { "type": "gap", "gapId": "GAP_1" } where blanks appear
+5) Response declaration uses baseType "directedPair" with source->target pairs
+
+**WHEN TO USE dataTable with dropdowns (FALLBACK for traditional matching):**
+- Both sides have complete sentences or longer phrases
+- No clear "gap" pattern in the right side items
+- Traditional two-column matching exercise
+- Example: left=["Photosynthesis is...", "Respiration is..."], right=["Process using sunlight", "Process using oxygen"]
+
+**For dataTable:**
+1) Create exactly one widget slot named \`data_table\`
+2) Include a \`{ "type": "blockSlot", "slotId": "data_table" }\` in the body
+3) The left column lists items, right column has dropdowns
+
+	#### Worked Example — Gap Match (Perseus → Shell → QTI)
+
+	**Why This Is Perfect for Gap Match Interaction:**
+	This Perseus question is an ideal candidate for gapMatchInteraction because:
+	- **Short draggable items**: Left side has single words ("solar", "orbit", "immense")
+	- **Clear gaps in sentences**: Right side contains sentences with blanks (underscores)
+	- **Fill-in-the-blank pattern**: Students drag words into sentence gaps
+	- **Semantic matching**: Each word has a specific contextual fit
+
+	**Complete Perseus Input:**
+	\`\`\`json
+	{
+	  "hints": [
+	    {
+	      "images": {},
+	      "content": "\nWhen completing sentences with missing words, pay attention to parts of speech! If you know a sentence is missing a verb, focus only on answer choices that are verbs. The same goes for other parts of speech. \n\n",
+	      "replace": false,
+	      "widgets": {}
+	    },
+	    {
+	      "images": {},
+	      "content": "\n**Correct answers:**\n\nSentence | Word | Explanation\n- | - | -\nThe scientists hoped they would be able to build a __solar__-powered rocket that would allow astronauts to travel using only the energy of the sun.  | solar | *Solar* means "having to do with the sun." We know that the rocket will be powered by "the energy of the sun," so it will run on *solar* power.\nIf the moon ever left its __orbit__ around Earth, our days would be much shorter, because the moon's gravity slows down how fast the Earth turns. | orbit | *Orbit* means "the rounded path of one object in space around a larger object." The word *around* in the sentence gives us clue: it tells us that we are talking about how the moon goes *around* the Earth, or travels around it in a rounded path.\n"The universe is so __immense__," said Reggie, "that the human mind can't really even understand its size." | immense | We're looking for a word that describes a size that the human mind really can't understand. That word is *immense,* which means "very large." \n",
+	      "replace": false,
+	      "widgets": {}
+	    }
+	  ],
+	  "question": {
+	    "images": {},
+	    "content": "\n\n**Match each word to the sentence it best completes.**\n\n\n\n[[☃ matcher 1]]\n\n",
+	    "widgets": {
+	      "matcher 1": {
+	        "type": "matcher",
+	        "graded": true,
+	        "static": false,
+	        "options": {
+	          "left": ["solar", "orbit", "immense"],
+	          "right": [
+	            "The scientists hoped they would be able to build a _______-powered rocket that would allow astronauts to travel using only the energy of the sun.",
+	            "If the moon ever left its _______ around Earth, our days would be much shorter, because the moon's gravity slows down how fast the Earth turns.",
+	            ""The universe is so _______," said Reggie, "that the human mind can't really even understand its size.""
+	          ],
+	          "labels": ["Word", "Sentence"],
+	          "padding": true,
+	          "orderMatters": false
+	        },
+	        "version": {"major": 0, "minor": 0},
+	        "alignment": "default"
+	      }
+	    }
+	  },
+	  "answerArea": {
+	    "tTable": false,
+	    "zTable": false,
+	    "chi2Table": false,
+	    "calculator": false,
+	    "periodicTable": false,
+	    "periodicTableWithKey": false,
+	    "financialCalculatorTotalAmount": false,
+	    "financialCalculatorTimeToPayOff": false,
+	    "financialCalculatorMonthlyPayment": false
+	  },
+	  "itemDataVersion": {"major": 0, "minor": 1}
+	}
+	\`\`\`
+
+	**Complete Gap Match AssessmentItemInput Example:**
+	The Perseus input above converts to this complete structured JSON, showing the full gap match structure including interactions, response declarations, and feedback with table support. Notice how the hints table becomes the feedback table, and the underscores become gap placeholders:
+
+	\`\`\`json
+	{
+	  "identifier": "vocabulary-gap-match-1",
+	  "title": "Vocabulary Sentence Completion (Drag and Drop)",
+	  "responseDeclarations": [
+	    {
+	      "identifier": "RESPONSE",
+	      "cardinality": "multiple",
+	      "baseType": "directedPair",
+	      "correct": [
+	        { "source": "WORD_SOLAR", "target": "GAP_1" },
+	        { "source": "WORD_ORBIT", "target": "GAP_2" },
+	        { "source": "WORD_IMMENSE", "target": "GAP_3" }
+	      ],
+	      "allowEmpty": false
+	    }
+	  ],
+	  "body": [
+	    {
+	      "type": "paragraph",
+	      "content": [{ "type": "text", "content": "Drag each word to the sentence it best completes." }]
+	    },
+	    {
+	      "type": "blockSlot",
+	      "slotId": "GAP_MATCH"
+	    }
+	  ],
+	  "widgets": null,
+	  "interactions": {
+	    "GAP_MATCH": {
+	      "type": "gapMatchInteraction",
+	      "responseIdentifier": "RESPONSE",
+	      "shuffle": true,
+	      "gapTexts": [
+	        { "identifier": "WORD_SOLAR", "matchMax": 1, "content": [{ "type": "text", "content": "solar" }] },
+	        { "identifier": "WORD_ORBIT", "matchMax": 1, "content": [{ "type": "text", "content": "orbit" }] },
+	        { "identifier": "WORD_IMMENSE", "matchMax": 1, "content": [{ "type": "text", "content": "immense" }] }
+	      ],
+	      "gaps": [
+	        { "identifier": "GAP_1", "required": true },
+	        { "identifier": "GAP_2", "required": true },
+	        { "identifier": "GAP_3", "required": true }
+	      ],
+	      "content": [
+	        {
+	          "type": "unorderedList",
+	          "items": [
+	            [
+	              { "type": "text", "content": "The scientists hoped they would be able to build a " },
+	              { "type": "gap", "gapId": "GAP_1" },
+	              { "type": "text", "content": "-powered rocket that would allow astronauts to travel using only the energy of the sun." }
+	            ],
+	            [
+	              { "type": "text", "content": "If the moon ever left its " },
+	              { "type": "gap", "gapId": "GAP_2" },
+	              { "type": "text", "content": " around Earth, our days would be much shorter, because the moon's gravity slows down how fast the Earth turns." }
+	            ],
+	            [
+	              { "type": "text", "content": "\\"The universe is so " },
+	              { "type": "gap", "gapId": "GAP_3" },
+	              { "type": "text", "content": "\\", said Reggie, \\"that the human mind can't really even understand its size.\\"" }
+	            ]
+	          ]
+	        }
+	      ]
+	    }
+	  },
+	  "feedback": {
+	    "correct": [
+	      {
+	        "type": "paragraph",
+	        "content": [{ "type": "text", "content": "Correct! Well done." }]
+	      }
+	    ],
+	    "incorrect": [
+	      {
+	        "type": "table",
+	        "className": "feedback-table",
+	        "header": ["Sentence", "Word", "Explanation"],
+	        "rows": [
+	          [
+	            "The scientists hoped they would be able to build a solar-powered rocket...",
+	            "solar",
+	            "Solar means \\"having to do with the sun.\\""
+	          ],
+	          [
+	            "If the moon ever left its orbit around Earth...",
+	            "orbit",
+	            "Orbit means \\"the rounded path of one object in space around a larger object.\\""
+	          ],
+	          [
+	            "\\"The universe is so immense,\\" said Reggie...",
+	            "immense",
+	            "Immense means \\"very large.\\""
+	          ]
+	        ]
+	      }
+	    ]
+	  }
+	}
+	\`\`\`
+
+	Expected shell (Shot 1) using gapMatchInteraction:
+	\`\`\`json
+	{
+	  "identifier": "vocabulary-gap-match-1",
+	  "title": "Vocabulary Sentence Completion (Drag and Drop)",
+	  "body": [
+	    { "type": "paragraph", "content": [{ "type": "text", "content": "Drag each word to the sentence it best completes." }] },
+	    { "type": "blockSlot", "slotId": "gap_match_interaction" }
+	  ],
+	  "widgets": [],
+	  "interactions": ["gap_match_interaction"],
+	  "responseDeclarations": [
+	    {
+	      "identifier": "RESPONSE",
+	      "cardinality": "multiple",
+	      "baseType": "directedPair",
+	      "correct": [
+	        "WORD_SOLAR GAP_1",
+	        "WORD_ORBIT GAP_2",
+	        "WORD_IMMENSE GAP_3"
+	      ]
+	    }
+	  ],
+	  "feedback": {
+	    "correct": [
+	      { "type": "paragraph", "content": [{ "type": "text", "content": "Correct! Well done." }] }
+	    ],
+	    "incorrect": [
+	      { "type": "paragraph", "content": [{ "type": "text", "content": "Correct answers appear after submission." }] }
+	    ]
+	  }
+	}
+	\`\`\`
+
+	Reference QTI outcome (result of compilation):
+	\`\`\`xml
+	<?xml version="1.0" encoding="UTF-8"?>
+	<qti-assessment-item xmlns="http://www.imsglobal.org/xsd/imsqtiasi_v3p0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqtiasi_v3p0 https://purl.imsglobal.org/spec/qti/v3p0/schema/xsd/imsqti_asiv3p0p1_v1p0.xsd" identifier="vocabulary-gap-match-1" title="Vocabulary Sentence Completion (Drag and Drop)" adaptive="false" time-dependent="false" xml:lang="en-US">
+	  <qti-response-declaration identifier="RESPONSE" cardinality="multiple" base-type="directedPair">
+	    <qti-correct-response>
+	      <qti-value>WORD_SOLAR GAP_1</qti-value>
+	      <qti-value>WORD_ORBIT GAP_2</qti-value>
+	      <qti-value>WORD_IMMENSE GAP_3</qti-value>
+	    </qti-correct-response>
+	    <qti-mapping lower-bound="0" upper-bound="3" default-value="0">
+	      <qti-map-entry map-key="WORD_SOLAR GAP_1" mapped-value="1"/>
+	      <qti-map-entry map-key="WORD_ORBIT GAP_2" mapped-value="1"/>
+	      <qti-map-entry map-key="WORD_IMMENSE GAP_3" mapped-value="1"/>
+	    </qti-mapping>
+	  </qti-response-declaration>
+	  <qti-item-body>
+	    <p>Drag each word to the sentence it best completes.</p>
+	    <qti-gap-match-interaction response-identifier="RESPONSE" shuffle="true">
+	      <qti-gap-text identifier="WORD_SOLAR" match-max="1">solar</qti-gap-text>
+	      <qti-gap-text identifier="WORD_ORBIT" match-max="1">orbit</qti-gap-text>
+	      <qti-gap-text identifier="WORD_IMMENSE" match-max="1">immense</qti-gap-text>
+	      <!-- Sentences with gaps rendered here -->
+	    </qti-gap-match-interaction>
+	  </qti-item-body>
+	</qti-assessment-item>
+	\`\`\`
 
 Example shell for matcher conversion:
 \`\`\`json
@@ -711,6 +961,7 @@ Below are examples of the exact 'shell' structure you must generate. Study them 
 \`\`\`json
 ${JSON.stringify(exampleShells, null, 2)}
 \`\`\`
+
 
   ## CRITICAL Instructions:
 - **Analyze Images**: Use the raster images provided to your vision to understand the visual components of the question. Any SVG content is provided directly in the 'Raw Source Input' blocks.

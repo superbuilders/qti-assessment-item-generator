@@ -35,6 +35,10 @@ export function renderInlineContent(inlineItems: InlineContent | null | undefine
 					}
 					return content // Render directly, no wrapper
 				}
+				case "gap": {
+					// Render gap element for gap match interaction
+					return `<qti-gap identifier="${item.gapId}"/>`
+				}
 				default:
 					logger.error("unsupported inline content type", { item })
 					throw errors.new("unsupported inline content type")
@@ -52,6 +56,22 @@ export function renderBlockContent(blockItems: BlockContent | null | undefined, 
 					return `<p>${renderInlineContent(item.content, slots)}</p>`
 				case "codeBlock":
 					return `<pre><code>${escapeXmlText(item.code)}</code></pre>`
+				case "table": {
+					const classAttr = item.className ? ` class="${sanitizeXmlAttributeValue(item.className)}"` : ""
+					const headerCells = item.header.map((h) => `<th>${escapeXmlText(h)}</th>`).join("")
+					const thead = item.header.length > 0 ? `<thead><tr>${headerCells}</tr></thead>` : ""
+					const tbodyRows = item.rows
+						.map((row) => {
+							const cells = row.map((c) => `<td>${escapeXmlText(String(c))}</td>`).join("")
+							return `<tr>${cells}</tr>`
+						})
+						.join("")
+					return `<table${classAttr}>${thead}<tbody>${tbodyRows}</tbody></table>`
+				}
+				case "unorderedList": {
+					const itemsXml = item.items.map((inline) => `<li><p>${renderInlineContent(inline, slots)}</p></li>`).join("")
+					return `<ul>${itemsXml}</ul>`
+				}
 				case "blockSlot": {
 					const content = slots.get(item.slotId)
 					if (content === undefined) {
@@ -61,7 +81,7 @@ export function renderBlockContent(blockItems: BlockContent | null | undefined, 
 						})
 						throw errors.new(`Compiler Error: Content for block slot '${item.slotId}' not found.`)
 					}
-					return `<div>${content}</div>` // ALWAYS wrap block slots in a div
+					return content
 				}
 				default:
 					logger.error("unsupported block content type", { item })
