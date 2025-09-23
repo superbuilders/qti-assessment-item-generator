@@ -4,8 +4,9 @@
 // input shape, and the core types it needs to produce from your library.
 // -----------------------------------------------------------------------------
 import { z } from "zod";
-import type { TemplateModule } from "../types";
-import type { AssessmentItemInput } from "../../compiler/schemas";
+import { FractionSchema } from "../schemas";
+import { AssessmentItemSchema } from "../../compiler/schemas";
+import { TemplateModule } from "../types";
 
 // -----------------------------------------------------------------------------
 // 2. FUNDAMENTAL DATA TYPE & TEMPLATE PROPS SCHEMA
@@ -17,23 +18,19 @@ import type { AssessmentItemInput } from "../../compiler/schemas";
 /**
  * Defines the structure for a simple fraction.
  */
-export const FractionSchema = z.object({
-  numerator: z.number().int().describe("The integer numerator of the fraction."),
-  denominator: z.number().int().positive().describe("The positive integer denominator of the fraction."),
-});
-export type Fraction = z.infer<typeof FractionSchema>;
+export type Fraction = { numerator: number; denominator: number };
 
 /**
  * Zod schema defining the inputs required by the Fraction Addition template.
  * It requires exactly two fractions.
  */
-export const FractionAdditionTemplatePropsSchema = z.object({
-  addend1: FractionSchema.describe("The first fraction in the addition problem."),
-  addend2: FractionSchema.describe("The second fraction in the addition problem."),
-});
-
-// The TypeScript type for the template's input, inferred from the Zod schema.
-export type FractionAdditionTemplateInput = z.input<typeof FractionAdditionTemplatePropsSchema>;
+// Strict props schema (fractions only)
+export const PropsSchema = z
+  .object({
+    addend1: FractionSchema.describe("The first addend (fraction only)."),
+    addend2: FractionSchema.describe("The second addend (fraction only)."),
+  })
+  .strict()
 
 // -----------------------------------------------------------------------------
 // 3. THE TEMPLATE GENERATOR FUNCTION
@@ -47,7 +44,10 @@ export type FractionAdditionTemplateInput = z.input<typeof FractionAdditionTempl
  * @param props - An object containing the two fractions to be added.
  * @returns An AssessmentItemInput object ready for the QTI compiler.
  */
-export function generateFractionAdditionQuestion(props: FractionAdditionTemplateInput): AssessmentItemInput {
+export function generateFractionAdditionQuestion(
+  props: z.input<typeof PropsSchema>
+): z.input<typeof AssessmentItemSchema> {
+  const { addend1, addend2 } = props
   // --- 3a. Self-Contained Mathematical Helpers ---
   // To ensure the template is a pure, dependency-free module, all core
   // mathematical logic is implemented directly within its scope.
@@ -73,30 +73,36 @@ export function generateFractionAdditionQuestion(props: FractionAdditionTemplate
   };
 
   // --- 3b. Core Logic: Calculate Answer and Pedagogically-Sound Distractors ---
-  const { addend1, addend2 } = props;
-  const correctAnswer = addFractions(addend1, addend2);
+  // Convert input fraction schema to computation form
+  const toFraction = (v: { type: "fraction"; numerator: number; denominator: number; sign?: "+" | "-" }): Fraction => {
+    return { numerator: v.numerator * ((v.sign ?? "+") === "-" ? -1 : 1), denominator: v.denominator };
+  };
+
+  const f1 = toFraction(addend1);
+  const f2 = toFraction(addend2);
+  const correctAnswer = addFractions(f1, f2);
 
   // Distractors are generated based on common student misconceptions.
   // Each distractor is tagged with its error type for targeted feedback.
   const distractors: { fraction: Fraction; type: 'ADD_ACROSS' | 'ADD_NUM_COMMON_DEN' | 'CROSS_MULTIPLY' }[] = [
     {
       fraction: simplifyFraction({
-        numerator: addend1.numerator + addend2.numerator,
-        denominator: addend1.denominator + addend2.denominator,
+        numerator: f1.numerator + f2.numerator,
+        denominator: f1.denominator + f2.denominator,
       }),
       type: 'ADD_ACROSS',
     },
     {
       fraction: simplifyFraction({
-        numerator: addend1.numerator + addend2.numerator,
-        denominator: Math.max(addend1.denominator, addend2.denominator),
+        numerator: f1.numerator + f2.numerator,
+        denominator: Math.max(f1.denominator, f2.denominator),
       }),
       type: 'ADD_NUM_COMMON_DEN',
     },
     {
         fraction: simplifyFraction({
-            numerator: (addend1.numerator * addend2.denominator) + (addend2.numerator * addend1.denominator),
-            denominator: addend1.denominator + addend2.denominator
+            numerator: (f1.numerator * f2.denominator) + (f2.numerator * f1.denominator),
+            denominator: f1.denominator + f2.denominator
         }),
         type: 'CROSS_MULTIPLY'
     }
@@ -129,9 +135,9 @@ export function generateFractionAdditionQuestion(props: FractionAdditionTemplate
   const correctChoiceIndex = finalChoices.findIndex(c => c.isCorrect);
 
   // --- 3d. Construct the Final AssessmentItemInput Object ---
-  const assessmentItem: AssessmentItemInput = {
-    identifier: `fraction-addition-${addend1.numerator}-${addend1.denominator}-plus-${addend2.numerator}-${addend2.denominator}`,
-    title: `Fraction Addition: ${addend1.numerator}/${addend1.denominator} + ${addend2.numerator}/${addend2.denominator}`,
+  const assessmentItem: z.input<typeof AssessmentItemSchema> = {
+    identifier: `fraction-addition-${f1.numerator}-${f1.denominator}-plus-${f2.numerator}-${f2.denominator}`,
+    title: `Fraction Addition: ${f1.numerator}/${f1.denominator} + ${f2.numerator}/${f2.denominator}`,
     
     body: [
       {
@@ -145,11 +151,11 @@ export function generateFractionAdditionQuestion(props: FractionAdditionTemplate
         content: [
           {
             type: "math",
-            mathml: `${formatFractionMathML(addend1)}<mo>+</mo>${formatFractionMathML(addend2)}`,
+            mathml: `${formatFractionMathML(f1)}<mo>+</mo>${formatFractionMathML(f2)}`,
           },
         ],
       },
-      { type: "blockSlot", slotId: "sum_visual" },
+      // removed sum_visual slot to avoid missing widget error in compiler-only POC
       { type: "blockSlot", slotId: "choice_interaction" },
     ],
     
@@ -230,7 +236,7 @@ export function generateFractionAdditionQuestion(props: FractionAdditionTemplate
             type: "paragraph",
             content: [
                 { type: "text", content: "Here is the step-by-step solution: " },
-                { type: "math", mathml: `${formatFractionMathML(addend1)}<mo>+</mo>${formatFractionMathML(addend2)}<mo>=</mo><mfrac><mn>${addend1.numerator * addend2.denominator}</mn><mn>${addend1.denominator * addend2.denominator}</mn></mfrac><mo>+</mo><mfrac><mn>${addend2.numerator * addend1.denominator}</mn><mn>${addend2.denominator * addend1.denominator}</mn></mfrac><mo>=</mo>${formatFractionMathML(correctAnswer)}`},
+                { type: "math", mathml: `${formatFractionMathML(f1)}<mo>+</mo>${formatFractionMathML(f2)}<mo>=</mo><mfrac><mn>${Math.abs(f1.numerator) * f2.denominator}</mn><mn>${f1.denominator * f2.denominator}</mn></mfrac><mo>+</mo><mfrac><mn>${Math.abs(f2.numerator) * f1.denominator}</mn><mn>${f2.denominator * f1.denominator}</mn></mfrac><mo>=</mo>${formatFractionMathML(correctAnswer)}`},
             ]
         }
       ],
@@ -245,14 +251,14 @@ export function generateFractionAdditionQuestion(props: FractionAdditionTemplate
             type: "paragraph",
             content: [
                 { type: "text", content: "For example: " },
-                { type: "math", mathml: `${formatFractionMathML(addend1)}<mo>+</mo>${formatFractionMathML(addend2)}<mo>=</mo>${formatFractionMathML(correctAnswer)}`},
+                { type: "math", mathml: `${formatFractionMathML(f1)}<mo>+</mo>${formatFractionMathML(f2)}<mo>=</mo>${formatFractionMathML(correctAnswer)}`},
             ]
         }
       ],
     },
   };
 
-  return assessmentItem;
+  return assessmentItem
 }
 
 // -----------------------------------------------------------------------------
@@ -263,11 +269,11 @@ export function generateFractionAdditionQuestion(props: FractionAdditionTemplate
 export const templateId = "math.fraction-addition";
 export const version = "1.0.0";
 
-const templateModule: TemplateModule<typeof FractionAdditionTemplatePropsSchema> = {
+const templateModule: TemplateModule<typeof PropsSchema> = {
   templateId,
   version,
-  propsSchema: FractionAdditionTemplatePropsSchema,
-  generate: generateFractionAdditionQuestion,
+  propsSchema: PropsSchema,
+  generate: (props: z.input<typeof PropsSchema>) => generateFractionAdditionQuestion(props),
 };
 
 export default templateModule;
