@@ -1,0 +1,647 @@
+/**
+ * Template Code Generator
+ * Converts pedagogical analysis into executable TypeScript templates
+ * Uses Claude Opus 4.1 for superior code generation with pedagogical understanding
+ */
+
+import Anthropic from '@anthropic-ai/sdk';
+import { 
+  PedagogicalAnalysis, 
+  GeneratedTemplate,
+  TemplateOutput,
+  TemplateSpecification,
+  ExportedFunction,
+  TemplateExample
+} from './types';
+
+export class TemplateCodeGenerator {
+  private anthropic: Anthropic;
+
+  constructor(apiKey: string) {
+    this.anthropic = new Anthropic({
+      apiKey: apiKey,
+    });
+  }
+
+  async generateTemplate(
+    analysis: PedagogicalAnalysis, 
+    markdownReport: string,
+    options: {
+      templateStyle?: 'function' | 'class-based';
+      includeVisualGeneration?: boolean;
+      widgetAnalysis?: any; // WidgetAnalysis type
+    } = {}
+  ): Promise<GeneratedTemplate> {
+    const { 
+      templateStyle = 'class-based',
+      includeVisualGeneration = false 
+    } = options;
+
+    const prompt = this.constructTemplatePrompt(
+      analysis, 
+      markdownReport, 
+      templateStyle,
+      includeVisualGeneration
+    );
+
+    // Retry logic for handling overload errors
+    const maxRetries = 5;
+    let lastError: any;
+    
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+      try {
+        const message = await this.anthropic.messages.create({
+          model: 'claude-opus-4-1-20250805',
+          max_tokens: 8192,
+          temperature: 0.1, // Low temperature for consistent code generation
+          messages: [
+            {
+              role: 'user',
+              content: prompt
+            }
+          ]
+        });
+
+        const responseText = message.content[0].type === 'text' 
+          ? message.content[0].text 
+          : '';
+
+        // Extract code from the response
+        const codeMatch = responseText.match(/```typescript\n([\s\S]*?)\n```/);
+        const code = codeMatch ? codeMatch[1] : responseText;
+
+        // Extract exports and dependencies from the generated code
+        const exports = this.extractExports(code);
+        const dependencies = this.extractDependencies(code);
+        const documentation = this.generateDocumentation(analysis);
+        const examples = await this.generateExamples(analysis, code);
+
+        return {
+          code,
+          language: 'typescript',
+          dependencies,
+          exports,
+          documentation,
+          examples
+        };
+      } catch (error: any) {
+        lastError = error;
+        
+        // Check if it's a retryable error
+        if (error.status === 529 || 
+            error.status === 503 || 
+            error.status === 502 ||
+            (error.status === 500 && attempt < maxRetries - 1)) {
+          
+          // Exponential backoff: 2^attempt seconds (1s, 2s, 4s, 8s, 16s)
+          const backoffSeconds = Math.pow(2, attempt);
+          console.log(`  ⏳ API overloaded (${error.status}), retrying in ${backoffSeconds}s... (attempt ${attempt + 1}/${maxRetries})`);
+          await new Promise(resolve => setTimeout(resolve, backoffSeconds * 1000));
+          continue;
+        }
+        
+        // Non-retryable error or last attempt
+        break;
+      }
+    }
+
+    // If we get here, all retries failed
+    throw new Error(`Failed to generate template after ${maxRetries} attempts: ${lastError.status} ${lastError.message || lastError}`);
+  }
+
+  private constructTemplatePrompt(
+    analysis: PedagogicalAnalysis,
+    markdownReport: string,
+    templateStyle: string,
+    includeVisualGeneration: boolean
+  ): string {
+    const visualGenerationCode = includeVisualGeneration ? `
+\`\`\`typescript
+import { TemplateOutput } from '../types';
+
+export function generateVisual(
+  inputs: { [key: string]: any }
+): { base64: string; alt: string } {
+  // Placeholder for visual generation logic
+  return { base64: 'data:image/png;base64,iVBORw0KG...', alt: 'Placeholder Visual' };
+}
+\`\`\`
+` : '';
+
+    return `You are an expert TypeScript developer specializing in educational technology. 
+Generate a complete, production-ready TypeScript template based on the following pedagogical analysis.
+
+CRITICAL: The template MUST generate problems that look EXACTLY like the original. Do not add features, visual elements, or variations that weren't in the original problem. The goal is to create a parameterized version of THIS SPECIFIC problem format, not a general-purpose math problem generator.
+
+## Pedagogical Analysis:
+${markdownReport}
+
+## Template Requirements:
+
+1. **MANDATORY SCHEMA EXPORTS**: Your template MUST include:
+   
+   a) **Input Parameter Schema**:
+   \`\`\`typescript
+   import { z } from 'zod';
+   
+   export class YourTemplate {
+     // REQUIRED: Export the parameter schema
+     static parameterSchema = z.object({
+       param1: z.number().min(1).max(100),
+       param2: z.string().optional(),
+       // ... all parameters with constraints
+     });
+     
+     // REQUIRED: Type the constructor input using the schema
+     constructor(input: z.infer<typeof YourTemplate.parameterSchema>) {
+       // Validate input against schema
+       const validated = YourTemplate.parameterSchema.parse(input);
+       // ... rest of constructor
+     }
+   }
+   \`\`\`
+   
+   b) **Output Validation**: Import and use the output schema:
+   \`\`\`typescript
+   import { TemplateOutput, validateTemplateOutput } from '../template-output-schema';
+   
+   generate(): TemplateOutput {
+     const output = {
+       questionHTML: this.generateQuestion(),
+       answers: {
+         A: this.generateAnswerA(),
+         B: this.generateAnswerB(),
+         // ... etc
+       },
+       explanations: {
+         A: this.generateExplanationA(),
+         B: this.generateExplanationB(),
+         // ... etc
+       },
+       correctAnswer: this.determineCorrectAnswer()
+     };
+     
+     // REQUIRED: Validate output before returning
+     return validateTemplateOutput(output);
+   }
+   \`\`\`
+
+2. **Output Format**: The template must generate a TemplateOutput object:
+   \`\`\`typescript
+   interface TemplateOutput {
+     questionHTML: string;
+     answers: {
+       A: string;
+       B: string;
+       C: string;
+       D: string;
+       E: string;
+     };
+     explanations: {
+       A: string;
+       B: string;
+       C: string;
+       D: string;
+       E: string;
+     };
+   }
+   \`\`\`
+   - The questionHTML should match the exact wording and structure of the original
+   - The answers object contains 5 choices (A-E) preserving exact phrasing patterns
+   - The explanations object contains 5 explanations (A-E)
+
+3. **Template Structure**: Create a ${templateStyle} template that:
+   - Accepts validated inputs based on the independent variables
+   - Generates all dependent variables according to the analysis
+   - Implements all pedagogical techniques identified
+   - Produces pedagogically sound distractors
+   - Includes comprehensive feedback for each choice
+
+4. **Code Requirements**:
+   - Use TypeScript with full type safety
+   - Include input validation
+   - Implement all constraints from the analysis
+   - Add helpful comments explaining pedagogical decisions
+   - Make the code reusable and maintainable
+   - Include utilities for fraction math, visual generation, etc. as needed
+
+## Math Content Formatting
+
+ALL mathematical expressions MUST use MathML (Mathematical Markup Language).
+
+### HTML Structure Guidelines
+
+1. **Line Breaks and Spacing**:
+   - Each equation or mathematical expression should be on its own line
+   - Use \`<br>\` tags or wrap equations in \`<div>\` elements for proper spacing
+   - Never put multiple equations on the same line unless they're part of the same thought
+   
+2. **Question Formatting**:
+   \`\`\`typescript
+   // BAD: Everything runs together
+   "Find the value. 24 = 6 × □ 24 = 4 × 3 × △ Find □ + △."
+   
+   // GOOD: Proper separation
+   \`Find the value.<br><br>
+   24 = 6 × □<br>
+   24 = 4 × 3 × △<br><br>
+   Find □ + △.\`
+   
+   // ALSO GOOD: Using divs
+   \`<div>Find the value.</div>
+   <div style="margin: 10px 0;">24 = 6 × □</div>
+   <div style="margin: 10px 0;">24 = 4 × 3 × △</div>
+   <div style="margin-top: 10px;">Find □ + △.</div>\`
+   \`\`\`
+
+3. **Apply to All Content**:
+   - Questions: Separate clauses and equations
+   - Answers: Keep concise unless showing work
+   - Explanations: Use line breaks between steps or concepts
+   
+4. **Enhanced Line Breaking Rules**:
+   - **Every sentence** should generally be on its own line
+   - Use \`<br>\` or \`<div>\` tags between sentences
+   - Use \`<div style="margin: 10px 0;">\` for major sections
+   - Bullet points should use \`<ul>\` and \`<li>\` tags
+   - Example formatting for explanations:
+   \`\`\`typescript
+   // BAD: Run-on paragraph
+   "First we find the factors. Then we multiply them. The result is the product."
+   
+   // GOOD: Properly separated
+   \`<div>First, we find the factors.</div>
+   <div>Then we multiply them.</div>
+   <div>The result is the product.</div>\`
+   
+   // ALSO GOOD: With spacing
+   \`First, we find the factors.<br><br>
+   Then we multiply them.<br><br>
+   The result is the product.\`
+   \`\`\`
+
+### MathML Formatting
+
+- Use MathML for all mathematical expressions to ensure QTI 3.0 compliance
+- Generate inline MathML using the <math> element with proper namespace
+- Examples:
+  * Simple number: <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>42</mn></math>
+  * Multiplication: <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>7</mn><mo>×</mo><mn>11</mn><mo>=</mo><mn>77</mn></math>
+  * Fractions: <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>7</mn><mn>11</mn></mfrac></math>
+  * Variables: <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi><mo>+</mo><mn>5</mn></math>
+- For complex expressions, build proper MathML tree structure
+- Use semantic elements: <mn> for numbers, <mo> for operators, <mi> for identifiers
+- Always include the xmlns attribute for namespace compliance
+- This ensures proper rendering across all QTI 3.0 compliant players
+
+6. **Visual Generation**:
+   - If the problem includes visuals, generate SVG or Canvas-based images
+   - Return as base64 data URIs
+   - Ensure visuals match the pedagogical requirements
+
+7. **Distractor Generation**:
+   - Implement the distractor generation rules from the analysis
+   - Ensure distractors target specific misconceptions
+   - Include appropriate feedback for each distractor
+
+8. **Feedback Structure**:
+   - Each answer choice should have TWO parts:
+     a) **Personalized feedback** specific to why that choice is correct/incorrect
+     b) **Complete worked example** showing the full correct solution
+   
+   - **CRITICAL REQUIREMENT: All Explanations Must Include Full Worked Example**
+     - For CORRECT answers: Start with positive feedback, then show the complete worked solution
+     - For INCORRECT answers: 
+       1. First explain why the specific answer is wrong
+       2. Then ALWAYS include the complete worked example showing the correct solution
+       3. This ensures students always see how to solve the problem correctly
+   
+   - **Formatting Requirements for Clean Presentation**:
+     - Use proper HTML structure with divs and spacing
+     - Each major step should be in its own '<div>' with margin
+     - Use styled spans for highlighting calculated values:
+       \`\`\`html
+       <span style="color: #0066cc; font-weight: bold;">calculated_value</span>
+       \`\`\`
+     - Use consistent indentation for sub-steps:
+       \`\`\`html
+       <div style="margin-left: 20px;">Sub-step content</div>
+       \`\`\`
+     - Example structure:
+       
+       For each explanation method, follow this pattern:
+       
+       1. Check if the answer is correct
+       2. Show appropriate feedback (green checkmark for correct, red X for incorrect)
+       3. For incorrect answers, explain why it's wrong
+       4. ALWAYS include the complete worked solution
+       
+       Each explanation should return well-formatted HTML with:
+       - Clear step separation using divs with margins
+       - Indented sub-steps using margin-left
+       - Highlighted calculated values using styled spans
+       - Proper MathML for all mathematical expressions
+   
+   - **Visual Formatting Guidelines**:
+     - Use color #0066cc for calculated/important values
+     - Use color green (#008000) for correct feedback
+     - Use color red (#cc0000) for incorrect feedback
+     - Maintain consistent 10px margins between major sections
+     - Use 20px left margin for indented content
+     - Bold important keywords and step headers
+   
+   - **CRITICAL: Explanation Morphing**
+     - The original explanation is from ONE specific example difficulty
+     - You MUST adapt it to match the EXACT format of your generated problem
+     - Keep the pedagogical approach but update:
+       * Numbers to match your problem
+       * Variables/unknowns to match your format
+       * Steps to match your problem structure
+   
+   - Example of morphing:
+   \`\`\`typescript
+   // Original explanation (for 24 = 2 × 3 × □):
+   // "We know that 2 × 3 = 6. Therefore, 24 = 6 × □. So □ = 4."
+   
+   // Morphed for difficulty 2 (24 = 6 × □ and 24 = 4 × 3 × △):
+   morphExplanation(): string {
+     return \`
+       <div>Let's consider the two equations in turn.</div>
+       <div style="margin: 10px 0;">
+         <div>First, let's consider the equation <math>24 = 6 × □</math>.</div>
+         <div>We know that <math>24 = 6 × 4</math>.</div>
+         <div>Therefore, <math>□ = 4</math>.</div>
+       </div>
+       <div style="margin: 10px 0;">
+         <div>Next, we consider the equation <math>24 = 4 × 3 × △</math>.</div>
+         <div>Notice that this equation can be simplified as <math>24 = 12 × △</math>.</div>
+         <div>Since <math>24 = 12 × 2</math>, we have <math>△ = 2</math>.</div>
+       </div>
+       <div style="margin-top: 10px;">
+         <div>Finally, <math>□ + △ = 4 + 2 = 6</math>.</div>
+       </div>
+     \`;
+   }
+   \`\`\`
+   
+   - Format with proper line breaks and structure
+   - Maintain direct instruction principles
+   - Match the exact problem format
+
+9. **Explanation Morphing Implementation**:
+   - If an original explanation is provided, store it in your template
+   - Create a morphExplanation() method that adapts the explanation to your specific problem
+   - The method should intelligently replace:
+     * Numbers from the original with your problem's numbers
+     * Unknown symbols to match your format
+     * Problem structure (single vs multiple equations)
+   - Example implementation pattern:
+   \`\`\`typescript
+   private originalExplanation = \`[ORIGINAL EXPLANATION FROM ANALYSIS]\`;
+   
+   private morphExplanation(): string {
+     // Parse and adapt the explanation
+     // Keep pedagogical structure but update specifics
+     return adaptedExplanation;
+   }
+   \`\`\`
+
+Generate complete, working code that implements all aspects of the pedagogical analysis. 
+
+## Template Specification:
+\`\`\`typescript
+import { TemplateOutput } from '../types';
+
+${templateStyle === 'class-based' ? `
+export class ${this.generateClassName(analysis.metadata.problemType)}Template {
+  // Class implementation
+}
+` : `
+export function generate${this.generateFunctionName(analysis.metadata.problemType)}(
+  inputs: ${this.generateInputTypeName(analysis.metadata.problemType)}
+): TemplateOutput {
+  // Function implementation
+}
+`}
+\`\`\`
+
+${visualGenerationCode}
+`;
+  }
+
+  private extractExports(code: string): ExportedFunction[] {
+    const exports: ExportedFunction[] = [];
+    
+    // Extract class exports
+    const classRegex = /export\s+class\s+(\w+)/g;
+    const classMatches = [...code.matchAll(classRegex)];
+
+    for (const match of classMatches) {
+      exports.push({
+        name: match[1],
+        signature: `class ${match[1]}`,
+        description: `Template class for generating problems`,
+        parameters: [],
+        returns: 'TemplateOutput'
+      });
+    }
+    
+    // Extract function exports
+    const functionRegex = /export\s+(?:async\s+)?function\s+(\w+)\s*\((.*?)\)\s*:\s*(.+?)\s*{/g;
+    const functionMatches = [...code.matchAll(functionRegex)];
+    
+    for (const match of functionMatches) {
+      exports.push({
+        name: match[1],
+        signature: `function ${match[1]}(${match[2]}): ${match[3]}`,
+        description: `Generates problems`,
+        parameters: this.parseParameters(match[2]),
+        returns: match[3].trim()
+      });
+    }
+    
+    return exports;
+  }
+
+  private extractDependencies(code: string): string[] {
+    const dependencies: string[] = [];
+    
+    // Extract import statements
+    const importRegex = /import\s+.*?\s+from\s+['"](.+?)['"]/g;
+    const matches = [...code.matchAll(importRegex)];
+
+    for (const match of matches) {
+      const dep = match[1];
+      if (!dep.startsWith('.') && !dep.startsWith('@/')) {
+        dependencies.push(dep);
+      }
+    }
+    
+    return [...new Set(dependencies)];
+  }
+
+  private parseParameters(paramString: string): any[] {
+    if (!paramString.trim()) return [];
+    
+    // Simple parameter parsing - in production, use a proper TypeScript parser
+    const params = paramString.split(',').map(p => p.trim());
+    
+    return params.map(param => {
+      const [nameAndType, defaultValue] = param.split('=').map(s => s.trim());
+      const [name, type] = nameAndType.split(':').map(s => s.trim());
+      
+      return {
+        name,
+        type: type || 'any',
+        description: `Parameter ${name}`,
+        required: !defaultValue,
+        default: defaultValue
+      };
+    });
+  }
+
+  private async generateExamples(analysis: PedagogicalAnalysis, code: string): Promise<TemplateExample[]> {
+    // Generate example inputs based on the analysis
+    const examples: TemplateExample[] = [];
+    
+    // Create a basic example
+    const exampleInput = this.createExampleInput(analysis);
+    
+    examples.push({
+      title: 'Basic Example',
+      input: exampleInput,
+      output: {
+        questionHTML: '<p>Example question</p>',
+        answers: {
+          A: 'Answer A',
+          B: 'Answer B', 
+          C: 'Answer C',
+          D: 'Answer D',
+          E: 'Answer E'
+        },
+        explanations: {
+          A: 'Explanation A',
+          B: 'Explanation B',
+          C: 'Explanation C', 
+          D: 'Explanation D',
+          E: 'Explanation E'
+        },
+        correctAnswer: 'A',
+        metadata: {
+          title: analysis.metadata.title,
+          topic: analysis.metadata.topic,
+          difficulty: analysis.metadata.difficulty,
+          grade: analysis.metadata.gradeLevel
+        }
+      },
+      explanation: 'Example showing basic usage of the template'
+    });
+    
+    return examples;
+  }
+
+  private createExampleInput(analysis: PedagogicalAnalysis): any {
+    const input: any = {};
+    
+    // Create example values for each independent variable
+    for (const variable of analysis.variables.independent) {
+      switch (variable.type) {
+        case 'fraction':
+          input[variable.name] = '1/2';
+          break;
+        case 'integer':
+          input[variable.name] = variable.range ? 
+            Math.floor(((variable.range.min as number) + (variable.range.max as number)) / 2) : 5;
+          break;
+        case 'decimal':
+          input[variable.name] = 3.14;
+          break;
+        default:
+          input[variable.name] = 'example';
+      }
+    }
+    
+    return input;
+  }
+
+  private generateDocumentation(analysis: PedagogicalAnalysis): string {
+    return `# ${analysis.metadata.title} Template
+
+## Overview
+This template generates ${analysis.metadata.problemType} problems for grade ${analysis.metadata.gradeLevel}.
+
+## Topic
+${analysis.metadata.topic}
+
+## Skills Covered
+${analysis.metadata.skills.join('\n- ')}
+
+## Usage
+Import and use the template to generate variations of this problem type.
+`;
+  }
+
+  private generateClassName(problemType: string): string {
+    // Convert problem-type to PascalCase
+    return problemType
+      .split('-')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join('');
+  }
+
+  private generateFunctionName(problemType: string): string {
+    // Convert problem-type to camelCase
+    const words = problemType.split('-');
+    return words[0] + words.slice(1)
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join('');
+  }
+
+  private generateInputTypeName(problemType: string): string {
+    return this.generateClassName(problemType) + 'Input';
+  }
+
+  /**
+   * Validates that generated code produces correct output format
+   */
+  async validateTemplate(
+    code: string,
+    testInputs: any[]
+  ): Promise<{ isValid: boolean; errors: string[] }> {
+    const errors: string[] = [];
+    
+    try {
+      // This would ideally compile and run the code in a sandbox
+      // For now, we'll do static validation
+      
+      // Check for required exports
+      if (!code.includes('export')) {
+        errors.push('No exports found in generated code');
+      }
+      
+      // Check for TemplateOutput return type
+      if (!code.includes('TemplateOutput')) {
+        errors.push('Code does not return TemplateOutput type');
+      }
+      
+      // Check for all required answer options
+      const answerKeys = ['A', 'B', 'C', 'D', 'E'];
+      for (const key of answerKeys) {
+        if (!code.includes(`${key}:`)) {
+          errors.push(`Missing answer option ${key}`);
+        }
+      }
+      
+      return {
+        isValid: errors.length === 0,
+        errors
+      };
+    } catch (error) {
+      errors.push(`Validation error: ${error}`);
+      return {
+        isValid: false,
+        errors
+      };
+    }
+  }
+} 
