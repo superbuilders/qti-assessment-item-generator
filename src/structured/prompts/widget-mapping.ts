@@ -114,6 +114,14 @@ Choose this widget whenever the problem context involves counting marbles by col
 - "Draw a marble at random; the bag has red and blue marbles" → marbleDiagram
 - "A jar contains 2 red, 3 blue, and 5 green marbles" → marbleDiagram`
 					}
+
+					// NEW: Add description for the video widget
+					if (typeName === "video") {
+						description += `
+
+**SELECTION GUIDANCE FOR video:**
+Choose this widget ONLY when the Perseus source contains a widget of type \`video\`. This widget is used to embed video content from a URL.`
+					}
 					
 					return `- ${typeName}: ${description}`
 				}

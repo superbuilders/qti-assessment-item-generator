@@ -179,6 +179,13 @@ SCAN ALL text content in widgets (labels, captions, content) for '$' - these MUS
 - /$(?=s*d)/ - dollar before number
 - NEVER use HTML spans for currency
 
+**VIDEO WIDGET GENERATION**
+When generating a \`video\` widget from a Perseus source:
+- The \`url\` property must be a full, valid embed URL.
+- The Perseus \`video\` widget has an \`options.location\` property which is a unique identifier.
+- You MUST construct a standard YouTube embed URL using this location identifier: \`https://www.youtube.com/embed/\${location}\`
+- Example: If Perseus \`location\` is "dQw4w9WgXcQ", the output \`url\` MUST be "https://www.youtube.com/embed/dQw4w9WgXcQ".
+
   **DEDICATED RULE: ANSWER LEAKAGE IS STRICTLY PROHIBITED**
   Widgets must NEVER reveal, hint at, or encode the correct answer in any way.
   - Do not pre-label target values (angles, lengths, coordinates, categories) with the correct answer

@@ -95,6 +95,7 @@ import { UrlImageWidgetPropsSchema } from "./generators/url-image"
 import { VectorDiagramPropsSchema } from "./generators/vector-diagram"
 import { VennDiagramPropsSchema } from "./generators/venn-diagram"
 import { VerticalArithmeticSetupPropsSchema } from "./generators/vertical-arithmetic-setup"
+import { VideoPropsSchema } from "./generators/video"
 import { WheelDiagramPropsSchema } from "./generators/wheel-diagram"
 
 // Master registry of widget schemas for dynamic validation and prompting
@@ -192,6 +193,7 @@ export const allWidgetSchemas = {
 	lineDiagram: LineDiagramPropsSchema,
 	pesSpectrum: PESSpectrumPropsSchema,
 	stickPlot: StickPlotPropsSchema,
+	video: VideoPropsSchema,
 	marbleDiagram: MarbleDiagramPropsSchema
 } as const
 
@@ -292,6 +294,7 @@ export {
 	LineDiagramPropsSchema,
 	PESSpectrumPropsSchema,
 	StickPlotPropsSchema,
+	VideoPropsSchema,
 	MarbleDiagramPropsSchema
 }
 
@@ -389,6 +392,7 @@ export type CustomPolygonDiagramProps = z.input<typeof CustomPolygonDiagramProps
 export type LineDiagramProps = z.input<typeof LineDiagramPropsSchema>
 export type PESSpectrumProps = z.input<typeof PESSpectrumPropsSchema>
 export type StickPlotProps = z.input<typeof StickPlotPropsSchema>
+export type VideoProps = z.input<typeof VideoPropsSchema>
 export type MarbleDiagramProps = z.input<typeof MarbleDiagramPropsSchema>
 
 const widgetSchemasWithoutSpecialUnions = [
@@ -483,6 +487,7 @@ const widgetSchemasWithoutSpecialUnions = [
 	typedSchemas.lineDiagram,
 	typedSchemas.pesSpectrum,
 	typedSchemas.stickPlot,
+	typedSchemas.video,
 	typedSchemas.marbleDiagram
 ] as const
 

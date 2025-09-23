@@ -3,7 +3,8 @@ import {
 	EmojiImagePropsSchema,
 	PeriodicTableWidgetPropsSchema,
 	UrlImageWidgetPropsSchema,
-	VennDiagramPropsSchema
+	VennDiagramPropsSchema,
+	VideoPropsSchema
 } from "../registry"
 
 export const simpleVisualCollection = {
@@ -13,7 +14,8 @@ export const simpleVisualCollection = {
 		emojiImage: EmojiImagePropsSchema,
 		urlImage: UrlImageWidgetPropsSchema,
 		vennDiagram: VennDiagramPropsSchema,
-		periodicTable: PeriodicTableWidgetPropsSchema
+		periodicTable: PeriodicTableWidgetPropsSchema,
+		video: VideoPropsSchema
 	},
-	widgetTypeKeys: ["dataTable", "emojiImage", "urlImage", "vennDiagram", "periodicTable"] as const
+	widgetTypeKeys: ["dataTable", "emojiImage", "urlImage", "vennDiagram", "periodicTable", "video"] as const
 } as const
