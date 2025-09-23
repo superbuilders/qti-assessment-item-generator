@@ -4,6 +4,7 @@
 // input shape, and the core types it needs to produce from your library.
 // -----------------------------------------------------------------------------
 import { z } from "zod";
+import type { TemplateModule } from "../types";
 import type { AssessmentItemInput } from "../../compiler/schemas";
 
 // -----------------------------------------------------------------------------
@@ -253,3 +254,20 @@ export function generateFractionAdditionQuestion(props: FractionAdditionTemplate
 
   return assessmentItem;
 }
+
+// -----------------------------------------------------------------------------
+// 4. CANONICAL TEMPLATE EXPORT
+// Provides a consistent interface for dynamic loading systems.
+// -----------------------------------------------------------------------------
+
+export const templateId = "math.fraction-addition";
+export const version = "1.0.0";
+
+const templateModule: TemplateModule<typeof FractionAdditionTemplatePropsSchema> = {
+  templateId,
+  version,
+  propsSchema: FractionAdditionTemplatePropsSchema,
+  generate: generateFractionAdditionQuestion,
+};
+
+export default templateModule;

@@ -1,10 +1,10 @@
 import * as errors from "@superbuilders/errors";
 import * as logger from "@superbuilders/slog";
 import { compile } from "../src/compiler/compiler";
-import { generateFractionAdditionQuestion } from "../src/templates/math/fraction-addition";
+import fractionAddition from "../src/templates/math/fraction-addition";
 
 async function main() {
-	logger.info("starting template poc test");
+	logger.info("starting template poc test", { templateId: fractionAddition.templateId, version: fractionAddition.version });
 
 	// 1. Define the input data for the template.
 	// This data object conforms to FractionAdditionTemplateInput.
@@ -14,9 +14,16 @@ async function main() {
 	};
 	logger.debug("defined question props", { props: questionProps });
 
-	// 2. Call the template function to generate the AssessmentItemInput.
+	// 2. Validate input props against the template's schema.
+	const validationResult = fractionAddition.propsSchema.safeParse(questionProps);
+	if (!validationResult.success) {
+		logger.error("template input validation failed", { error: validationResult.error });
+		throw errors.wrap(validationResult.error, "template input validation");
+	}
+
+	// 3. Call the template's generate() to produce AssessmentItemInput.
 	// This is a synchronous, deterministic call.
-	const itemInputResult = errors.trySync(() => generateFractionAdditionQuestion(questionProps));
+	const itemInputResult = errors.trySync(() => fractionAddition.generate(validationResult.data));
 	if (itemInputResult.error) {
 		logger.error("template function failed", { error: itemInputResult.error });
 		throw errors.wrap(itemInputResult.error, "template generation");
@@ -24,7 +31,7 @@ async function main() {
 	const assessmentItemInput = itemInputResult.data;
 	logger.info("successfully generated assessmentiteminput from template");
 
-	// 3. Pass the generated data structure to the compiler.
+	// 4. Pass the generated data structure to the compiler.
 	const compileResult = await errors.try(compile(assessmentItemInput));
 	if (compileResult.error) {
 		logger.error("qti compilation failed", { error: compileResult.error });
@@ -33,7 +40,7 @@ async function main() {
 	const qtiXml = compileResult.data;
 	logger.info("successfully compiled qti xml");
 
-	// 4. Log the final output.
+	// 5. Log the final output.
 	console.log("\n✅ Template POC Succeeded!");
 	console.log("✨ Generated QTI 3.0 XML ✨\n");
 	console.log("========================================");
