@@ -87,7 +87,7 @@ function createBlockContentItemSchema() {
 			z
 				.object({
 					type: z.literal("unorderedList").describe("Identifies this as an unordered list"),
-					items: z.array(createInlineContentSchema()).nonempty().describe("List items as arrays of inline content")
+					items: z.array(createInlineContentSchema()).min(1).describe("List items as arrays of inline content")
 				})
 				.strict()
 				.describe("An unordered list with each item rendered as a list item containing a paragraph"),
@@ -175,7 +175,7 @@ export function createDynamicAssessmentItemSchema(widgetMapping: Record<string, 
 						.strict()
 						.describe("A single choice option with content and optional feedback")
 				)
-				// NOTE: OpenAI structured outputs don't support .min() constraints, so we validate length at runtime
+				.min(1)
 				.describe("Array of selectable choice options."),
 			shuffle: z.literal(true).describe("Whether to randomize the order of choices. Always true to ensure fairness."),
 			minChoices: z.number().int().min(0).describe("The minimum number of choices the user must select."),
@@ -191,7 +191,7 @@ export function createDynamicAssessmentItemSchema(widgetMapping: Record<string, 
 				.string()
 				.regex(SAFE_IDENTIFIER_REGEX, "invalid response identifier")
 				.describe("Links this interaction to its response declaration for scoring."),
-			choices: z.array(InlineChoiceSchema).describe("Array of options available in the dropdown menu."),
+			choices: z.array(InlineChoiceSchema).min(1).describe("Array of options available in the dropdown menu."),
 			shuffle: z.literal(true).describe("Whether to randomize dropdown options. Always true to ensure fairness.")
 		})
 		.strict()
@@ -233,7 +233,7 @@ export function createDynamicAssessmentItemSchema(widgetMapping: Record<string, 
 						.strict()
 						.describe("An orderable item with content and optional feedback")
 				)
-				// NOTE: OpenAI structured outputs don't support .min() constraints, so we validate length at runtime
+				.min(1)
 				.describe("Array of items to be arranged in order."),
 			shuffle: z
 				.literal(true)
@@ -280,6 +280,7 @@ export function createDynamicAssessmentItemSchema(widgetMapping: Record<string, 
 						.strict()
 						.describe("A draggable item that can be placed into gaps")
 				)
+				.min(1)
 				.describe("Array of draggable items that can be placed into gaps."),
 			gaps: z
 				.array(
@@ -294,6 +295,7 @@ export function createDynamicAssessmentItemSchema(widgetMapping: Record<string, 
 						.strict()
 						.describe("A gap definition that appears in the body content")
 				)
+				.min(1)
 				.describe(
 					"Array of gap definitions. The gaps themselves appear in body content using { type: 'gap', gapId: 'GAP_1' }."
 				)
@@ -408,6 +410,7 @@ export function createDynamicAssessmentItemSchema(widgetMapping: Record<string, 
 			title: z.string().describe("Human-readable title of the assessment item."),
 			responseDeclarations: z
 				.array(ResponseDeclarationSchema)
+				.min(1)
 				.describe("Defines correct answers and scoring for all interactions in this item."),
 			body: createBlockContentSchema().nullable().describe("The main content of the item as structured blocks."),
 			widgets: DynamicWidgetsSchema.nullable().describe(
@@ -421,7 +424,7 @@ export function createDynamicAssessmentItemSchema(widgetMapping: Record<string, 
 			// NEW: Add the `feedbackBlocks` array, which must be non-empty.
 			feedbackBlocks: z
 				.array(FeedbackBlockSchema)
-				.nonempty()
+				.min(1)
 				.describe("A list of feedback blocks to be displayed based on outcomes.")
 		})
 		.strict()
@@ -555,7 +558,7 @@ export function createDynamicAssessmentItemSchema(widgetMapping: Record<string, 
 				.describe("A list of unique identifiers for interaction slots that must be filled."),
 			feedbackBlocks: z
 				.array(FeedbackBlockSchema)
-				.nonempty()
+				.min(1)
 				.describe("A list of feedback blocks to be displayed based on outcomes.")
 		})
 		.strict()

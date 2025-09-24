@@ -1039,7 +1039,12 @@ ALL mathematical content MUST be converted to valid, modern MathML. NO EXCEPTION
 
 Any discrepancy will cause your output to be rejected. Review your work carefully to ensure the body's slots and the declaration arrays are perfectly synchronized.`
 
-	const exampleShells = allExamples.map(createShellFromExample)
+	const validExamples = allExamples.filter(example => {
+		// Filter out examples with invalid feedback block identifiers that break shell validation
+		const invalidIdentifiers = ['linear', 'quadratic', 'two_times', 'four_times']
+		return !example.feedbackBlocks.some(block => invalidIdentifiers.includes(block.identifier))
+	})
+	const exampleShells = validExamples.map(createShellFromExample)
 
 	const userContent = `Convert the following source into an assessment shell. Use the provided context, including raster images for vision and vector images as text, to understand the content fully.
 

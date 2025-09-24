@@ -10,33 +10,23 @@ import {
 import type { AssessmentItemInput } from "../../src/compiler/schemas"
 
 describe("Compiler Identifier Validation Integration Tests", () => {
-	const baseItem: AssessmentItemInput = {
-		identifier: "base-item-for-validation",
-		title: "Base Item for Validation",
-		body: [],
-		feedback: {
-			correct: [],
-			incorrect: []
-		},
-		interactions: {},
-		widgets: {},
-		responseDeclarations: [
-			{ identifier: "RESPONSE_1", cardinality: "single", baseType: "identifier", correct: "A" },
-			{ identifier: "RESPONSE_2", cardinality: "single", baseType: "identifier", correct: "X" }
-		]
-	}
-
 	test("should throw ErrDuplicateResponseIdentifier for duplicates across interactions", async () => {
 		const itemWithDuplicate: AssessmentItemInput = {
-			...baseItem,
+			identifier: "test-duplicate-response",
+			title: "Test Duplicate Response",
+			body: [],
+			feedbackBlocks: [
+				{ identifier: "CORRECT", outcomeIdentifier: "FEEDBACK__GLOBAL", content: [{ type: "paragraph", content: [{ type: "text", content: "Correct" }] }] },
+				{ identifier: "INCORRECT", outcomeIdentifier: "FEEDBACK__GLOBAL", content: [{ type: "paragraph", content: [{ type: "text", content: "Incorrect" }] }] }
+			],
 			interactions: {
 				interaction_1: {
 					type: "choiceInteraction",
 					responseIdentifier: "RESPONSE_1",
 					prompt: [],
 					choices: [
-						{ identifier: "A", content: [], feedback: null },
-						{ identifier: "B", content: [], feedback: null }
+						{ identifier: "A", content: [] },
+						{ identifier: "B", content: [] }
 					],
 					shuffle: true,
 					minChoices: 1,
@@ -50,29 +40,41 @@ describe("Compiler Identifier Validation Integration Tests", () => {
 						{ identifier: "Y", content: [] }
 					],
 					shuffle: true
-				}
+				},
+				text_entry: { type: "textEntryInteraction", responseIdentifier: "RESPONSE_TEXT", expectedLength: 10 }
 			},
-			responseDeclarations: [{ identifier: "RESPONSE_1", cardinality: "single", baseType: "identifier", correct: "A" }]
+			widgets: {},
+			responseDeclarations: [
+				{ identifier: "RESPONSE_1", cardinality: "single", baseType: "identifier", correct: "A" },
+				{ identifier: "RESPONSE_TEXT", cardinality: "single", baseType: "string", correct: "test" }
+			]
 		}
 		return expect(compile(itemWithDuplicate)).rejects.toThrow(ErrDuplicateResponseIdentifier)
 	})
 
 	test("should throw ErrDuplicateResponseIdentifier for duplicates between an interaction and a widget", async () => {
 		const itemWithDuplicate: AssessmentItemInput = {
-			...baseItem,
+			identifier: "test-interaction-widget-duplicate",
+			title: "Test Interaction Widget Duplicate",
+			body: [],
+			feedbackBlocks: [
+				{ identifier: "CORRECT", outcomeIdentifier: "FEEDBACK__GLOBAL", content: [{ type: "paragraph", content: [{ type: "text", content: "Correct" }] }] },
+				{ identifier: "INCORRECT", outcomeIdentifier: "FEEDBACK__GLOBAL", content: [{ type: "paragraph", content: [{ type: "text", content: "Incorrect" }] }] }
+			],
 			interactions: {
 				interaction_1: {
 					type: "choiceInteraction",
 					responseIdentifier: "RESPONSE_1",
 					prompt: [],
 					choices: [
-						{ identifier: "A", content: [], feedback: null },
-						{ identifier: "B", content: [], feedback: null }
+						{ identifier: "A", content: [] },
+						{ identifier: "B", content: [] }
 					],
 					shuffle: true,
 					minChoices: 1,
 					maxChoices: 1
-				}
+				},
+				text_entry: { type: "textEntryInteraction", responseIdentifier: "RESPONSE_TEXT", expectedLength: 10 }
 			},
 			widgets: {
 				table_1: {
@@ -96,36 +98,56 @@ describe("Compiler Identifier Validation Integration Tests", () => {
 					footer: []
 				}
 			},
-			responseDeclarations: [{ identifier: "RESPONSE_1", cardinality: "single", baseType: "identifier", correct: "A" }]
+			responseDeclarations: [
+				{ identifier: "RESPONSE_1", cardinality: "single", baseType: "identifier", correct: "A" },
+				{ identifier: "RESPONSE_TEXT", cardinality: "single", baseType: "string", correct: "test" }
+			]
 		}
 		return expect(compile(itemWithDuplicate)).rejects.toThrow(ErrDuplicateResponseIdentifier)
 	})
 
 	test("should throw ErrDuplicateChoiceIdentifier for duplicates within a choiceInteraction", async () => {
 		const itemWithDuplicate: AssessmentItemInput = {
-			...baseItem,
+			identifier: "test-choice-duplicate",
+			title: "Test Choice Duplicate",
+			body: [],
+			feedbackBlocks: [
+				{ identifier: "A", outcomeIdentifier: "FEEDBACK__RESPONSE_1", content: [{ type: "paragraph", content: [{ type: "text", content: "Choice A" }] }] }
+			],
 			interactions: {
 				interaction_1: {
 					type: "choiceInteraction",
 					responseIdentifier: "RESPONSE_1",
 					prompt: [],
 					choices: [
-						{ identifier: "A", content: [], feedback: null },
-						{ identifier: "A", content: [], feedback: null } // DUPLICATE
+						{ identifier: "A", content: [] },
+						{ identifier: "A", content: [] } // DUPLICATE
 					],
 					shuffle: true,
 					minChoices: 1,
 					maxChoices: 1
 				}
 			},
-			responseDeclarations: [{ identifier: "RESPONSE_1", cardinality: "single", baseType: "identifier", correct: "A" }]
+			widgets: {},
+			responseDeclarations: [
+				{ identifier: "RESPONSE_1", cardinality: "single", baseType: "identifier", correct: "A" }
+			]
 		}
 		return expect(compile(itemWithDuplicate)).rejects.toThrow(ErrDuplicateChoiceIdentifier)
 	})
 
 	test("should throw ErrDuplicateChoiceIdentifier for duplicates within a dataTable dropdown", async () => {
 		const itemWithDuplicate: AssessmentItemInput = {
-			...baseItem,
+			identifier: "test-datatable-duplicate",
+			title: "Test DataTable Duplicate",
+			body: [],
+			feedbackBlocks: [
+				{ identifier: "CORRECT", outcomeIdentifier: "FEEDBACK__GLOBAL", content: [{ type: "paragraph", content: [{ type: "text", content: "Correct" }] }] },
+				{ identifier: "INCORRECT", outcomeIdentifier: "FEEDBACK__GLOBAL", content: [{ type: "paragraph", content: [{ type: "text", content: "Incorrect" }] }] }
+			],
+			interactions: {
+				text_entry: { type: "textEntryInteraction", responseIdentifier: "RESPONSE_TEXT", expectedLength: 10 }
+			},
 			widgets: {
 				table_1: {
 					type: "dataTable",
@@ -148,27 +170,37 @@ describe("Compiler Identifier Validation Integration Tests", () => {
 					footer: []
 				}
 			},
-			responseDeclarations: [{ identifier: "RESPONSE_1", cardinality: "single", baseType: "identifier", correct: "A" }]
+			responseDeclarations: [
+				{ identifier: "RESPONSE_1", cardinality: "single", baseType: "identifier", correct: "A" },
+				{ identifier: "RESPONSE_TEXT", cardinality: "single", baseType: "string", correct: "test" }
+			]
 		}
 		return expect(compile(itemWithDuplicate)).rejects.toThrow(ErrDuplicateChoiceIdentifier)
 	})
 
 	test("should throw ErrInvalidRowHeaderKey for a non-existent rowHeaderKey", async () => {
 		const itemWithInvalidKey: AssessmentItemInput = {
-			...baseItem,
+			identifier: "test-invalid-rowheader",
+			title: "Test Invalid RowHeader",
+			body: [],
+			feedbackBlocks: [
+				{ identifier: "CORRECT", outcomeIdentifier: "FEEDBACK__GLOBAL", content: [{ type: "paragraph", content: [{ type: "text", content: "Correct" }] }] },
+				{ identifier: "INCORRECT", outcomeIdentifier: "FEEDBACK__GLOBAL", content: [{ type: "paragraph", content: [{ type: "text", content: "Incorrect" }] }] }
+			],
 			interactions: {
 				interaction_1: {
 					type: "choiceInteraction",
 					responseIdentifier: "RESPONSE_1",
 					prompt: [],
 					choices: [
-						{ identifier: "A", content: [], feedback: null },
-						{ identifier: "B", content: [], feedback: null }
+						{ identifier: "A", content: [] },
+						{ identifier: "B", content: [] }
 					],
 					shuffle: true,
 					minChoices: 1,
 					maxChoices: 1
-				}
+				},
+				text_entry: { type: "textEntryInteraction", responseIdentifier: "RESPONSE_TEXT", expectedLength: 10 }
 			},
 			widgets: {
 				table_1: {
@@ -188,27 +220,37 @@ describe("Compiler Identifier Validation Integration Tests", () => {
 					footer: []
 				}
 			},
-			responseDeclarations: [{ identifier: "RESPONSE_1", cardinality: "single", baseType: "identifier", correct: "A" }]
+			responseDeclarations: [
+				{ identifier: "RESPONSE_1", cardinality: "single", baseType: "identifier", correct: "A" },
+				{ identifier: "RESPONSE_TEXT", cardinality: "single", baseType: "string", correct: "test" }
+			]
 		}
 		return expect(compile(itemWithInvalidKey)).rejects.toThrow(ErrInvalidRowHeaderKey)
 	})
 
 	test("should compile successfully with complex valid identifiers", async () => {
 		const validItem: AssessmentItemInput = {
-			...baseItem,
+			identifier: "test-valid-complex",
+			title: "Test Valid Complex",
+			body: [],
+			feedbackBlocks: [
+				{ identifier: "CORRECT", outcomeIdentifier: "FEEDBACK__GLOBAL", content: [{ type: "paragraph", content: [{ type: "text", content: "Correct" }] }] },
+				{ identifier: "INCORRECT", outcomeIdentifier: "FEEDBACK__GLOBAL", content: [{ type: "paragraph", content: [{ type: "text", content: "Incorrect" }] }] }
+			],
 			interactions: {
 				interaction_1: {
 					type: "choiceInteraction",
 					responseIdentifier: "RESPONSE_1",
 					prompt: [],
 					choices: [
-						{ identifier: "A", content: [], feedback: null },
-						{ identifier: "B", content: [], feedback: null }
+						{ identifier: "A", content: [] },
+						{ identifier: "B", content: [] }
 					],
 					shuffle: true,
 					minChoices: 1,
 					maxChoices: 1
-				}
+				},
+				text_entry: { type: "textEntryInteraction", responseIdentifier: "RESPONSE_TEXT", expectedLength: 10 }
 			},
 			widgets: {
 				table_1: {
@@ -234,7 +276,8 @@ describe("Compiler Identifier Validation Integration Tests", () => {
 			},
 			responseDeclarations: [
 				{ identifier: "RESPONSE_1", cardinality: "single", baseType: "identifier", correct: "A" },
-				{ identifier: "RESPONSE_2", cardinality: "single", baseType: "identifier", correct: "X" }
+				{ identifier: "RESPONSE_2", cardinality: "single", baseType: "identifier", correct: "X" },
+				{ identifier: "RESPONSE_TEXT", cardinality: "single", baseType: "string", correct: "test" }
 			]
 		}
 

@@ -68,10 +68,18 @@ mock.module("openai", () => {
 											],
 											widgets: ["image_widget"],
 											interactions: ["text_entry"],
-											feedback: {
-												correct: [{ type: "paragraph", content: [{ type: "text", content: "Correct" }] }],
-												incorrect: [{ type: "paragraph", content: [{ type: "text", content: "Incorrect" }] }]
-											}
+											feedbackBlocks: [
+												{
+													identifier: "CORRECT",
+													outcomeIdentifier: "FEEDBACK__GLOBAL",
+													content: [{ type: "paragraph", content: [{ type: "text", content: "Correct" }] }]
+												},
+												{
+													identifier: "INCORRECT",
+													outcomeIdentifier: "FEEDBACK__GLOBAL",
+													content: [{ type: "paragraph", content: [{ type: "text", content: "Incorrect" }] }]
+												}
+											]
 										} satisfies AssessmentItemShell,
 										refusal: null
 									}
@@ -252,7 +260,10 @@ describe("Structured AI Pipeline", () => {
 												body: [{ type: "blockSlot", slotId: "image_widget" }],
 												widgets: [], // <-- INTENTIONALLY EMPTY
 												interactions: [],
-												feedback: { correct: [], incorrect: [] }
+												feedbackBlocks: [
+													{ identifier: "CORRECT", outcomeIdentifier: "FEEDBACK__GLOBAL", content: [{ type: "paragraph", content: [{ type: "text", content: "Correct" }] }] },
+													{ identifier: "INCORRECT", outcomeIdentifier: "FEEDBACK__GLOBAL", content: [{ type: "paragraph", content: [{ type: "text", content: "Incorrect" }] }] }
+												]
 											} satisfies AssessmentItemShell,
 											refusal: null
 										}

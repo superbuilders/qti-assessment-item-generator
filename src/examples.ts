@@ -621,6 +621,12 @@ export const compare3DigitNumbers: AssessmentItemInput = {
 			cardinality: "ordered",
 			baseType: "identifier",
 			correct: ["A", "B", "C"]
+		},
+		{
+			identifier: "TEXT_ENTRY",
+			cardinality: "single",
+			baseType: "string",
+			correct: "correct"
 		}
 	],
 	body: [{ type: "blockSlot", slotId: "order_interaction" }],
@@ -660,6 +666,11 @@ export const compare3DigitNumbers: AssessmentItemInput = {
 					]
 				}
 			]
+		},
+		text_entry: {
+			type: "textEntryInteraction",
+			responseIdentifier: "TEXT_ENTRY",
+			expectedLength: 10
 		}
 	},
 	widgets: null,
@@ -2314,7 +2325,8 @@ export const reactantAmountsTemperatureTableWithDropdowns: AssessmentItemInput =
 		{ identifier: "RESP_REACT_D", cardinality: "single", baseType: "identifier", correct: "NH4CL" },
 		{ identifier: "RESP_AMT_D", cardinality: "single", baseType: "identifier", correct: "AMT_3_0" },
 		{ identifier: "RESP_REACT_E", cardinality: "single", baseType: "identifier", correct: "CACL2" },
-		{ identifier: "RESP_AMT_E", cardinality: "single", baseType: "identifier", correct: "AMT_8_0" }
+		{ identifier: "RESP_AMT_E", cardinality: "single", baseType: "identifier", correct: "AMT_8_0" },
+		{ identifier: "TEXT_ENTRY", cardinality: "single", baseType: "string", correct: "done" }
 	],
 	widgets: {
 		react_temp_table: {
@@ -2433,7 +2445,9 @@ export const reactantAmountsTemperatureTableWithDropdowns: AssessmentItemInput =
 			content: [{ type: "text", content: "Select the reactant and amount for rows C, D, and E directly in the table." }]
 		}
 	],
-	interactions: {},
+	interactions: {
+		text_entry: { type: "textEntryInteraction", responseIdentifier: "TEXT_ENTRY", expectedLength: 10 }
+	},
 	feedbackBlocks: [
 		{
 			identifier: "CORRECT",
@@ -2471,7 +2485,8 @@ export const attractRepelCompletionTable: AssessmentItemInput = {
 		{ identifier: "RESP_R1", cardinality: "single", baseType: "identifier", correct: "REPEL" },
 		{ identifier: "RESP_R2", cardinality: "single", baseType: "identifier", correct: "ATTRACT" },
 		{ identifier: "RESP_R3", cardinality: "single", baseType: "identifier", correct: "ATTRACT" },
-		{ identifier: "RESP_R4", cardinality: "single", baseType: "identifier", correct: "REPEL" }
+		{ identifier: "RESP_R4", cardinality: "single", baseType: "identifier", correct: "REPEL" },
+		{ identifier: "TEXT_ENTRY", cardinality: "single", baseType: "string", correct: "done" }
 	],
 	widgets: {
 		attract_repel_table: {
@@ -2559,16 +2574,12 @@ export const attractRepelCompletionTable: AssessmentItemInput = {
 		{ type: "paragraph", content: [{ type: "text", content: "Complete the table for each pair of objects." }] },
 		{ type: "blockSlot", slotId: "attract_repel_table" }
 	],
-	interactions: {},
+	interactions: {
+		text_entry: { type: "textEntryInteraction", responseIdentifier: "TEXT_ENTRY", expectedLength: 10 }
+	},
 	feedbackBlocks: [
-		{ identifier: "ATTRACT", outcomeIdentifier: "FEEDBACK__RESP_R1", content: [{ type: "paragraph", content: [{ type: "text", content: "Opposite charges/poles attract." }] }] },
-		{ identifier: "REPEL", outcomeIdentifier: "FEEDBACK__RESP_R1", content: [{ type: "paragraph", content: [{ type: "text", content: "Like charges/poles repel." }] }] },
-		{ identifier: "ATTRACT", outcomeIdentifier: "FEEDBACK__RESP_R2", content: [{ type: "paragraph", content: [{ type: "text", content: "Opposite charges/poles attract." }] }] },
-		{ identifier: "REPEL", outcomeIdentifier: "FEEDBACK__RESP_R2", content: [{ type: "paragraph", content: [{ type: "text", content: "Like charges/poles repel." }] }] },
-		{ identifier: "ATTRACT", outcomeIdentifier: "FEEDBACK__RESP_R3", content: [{ type: "paragraph", content: [{ type: "text", content: "Opposite charges/poles attract." }] }] },
-		{ identifier: "REPEL", outcomeIdentifier: "FEEDBACK__RESP_R3", content: [{ type: "paragraph", content: [{ type: "text", content: "Like charges/poles repel." }] }] },
-		{ identifier: "ATTRACT", outcomeIdentifier: "FEEDBACK__RESP_R4", content: [{ type: "paragraph", content: [{ type: "text", content: "Opposite charges/poles attract." }] }] },
-		{ identifier: "REPEL", outcomeIdentifier: "FEEDBACK__RESP_R4", content: [{ type: "paragraph", content: [{ type: "text", content: "Like charges/poles repel." }] }] }
+		{ identifier: "CORRECT", outcomeIdentifier: "FEEDBACK__GLOBAL", content: [{ type: "paragraph", content: [{ type: "text", content: "Correct! Likes repel and opposites attract." }] }] },
+		{ identifier: "INCORRECT", outcomeIdentifier: "FEEDBACK__GLOBAL", content: [{ type: "paragraph", content: [{ type: "text", content: "Not quite. Remember: like charges/poles repel; opposite charges/poles attract." }] }] }
 	]
 }
 
@@ -3866,19 +3877,13 @@ export const reactionRateChangesTable: AssessmentItemInput = {
 		}
 	},
 	feedbackBlocks: [
-		{ identifier: "INCREASE", outcomeIdentifier: "FEEDBACK__dropdown_1", content: [{ type: "paragraph", content: [{ type: "text", content: "Correct: stirring increases collision frequency." }] }] },
-		{ identifier: "DECREASE", outcomeIdentifier: "FEEDBACK__dropdown_1", content: [{ type: "paragraph", content: [{ type: "text", content: "Not quite: stirring increases collision frequency." }] }] },
-		{ identifier: "INCREASE", outcomeIdentifier: "FEEDBACK__dropdown_3", content: [{ type: "paragraph", content: [{ type: "text", content: "Correct: heating increases reaction rate." }] }] },
-		{ identifier: "DECREASE", outcomeIdentifier: "FEEDBACK__dropdown_3", content: [{ type: "paragraph", content: [{ type: "text", content: "Not quite: heating increases reaction rate." }] }] },
-		{ identifier: "INCREASE", outcomeIdentifier: "FEEDBACK__dropdown_4", content: [{ type: "paragraph", content: [{ type: "text", content: "Not quite: decreasing concentration lowers rate." }] }] },
-		{ identifier: "DECREASE", outcomeIdentifier: "FEEDBACK__dropdown_4", content: [{ type: "paragraph", content: [{ type: "text", content: "Correct: fewer particles means fewer effective collisions." }] }] },
-		{ identifier: "linear", outcomeIdentifier: "FEEDBACK__dropdown_2", content: [{ type: "paragraph", content: [{ type: "text", content: "Correct: KE is linear in mass at constant speed." }] }] },
-		{ identifier: "quadratic", outcomeIdentifier: "FEEDBACK__dropdown_2", content: [{ type: "paragraph", content: [{ type: "text", content: "Not quite: with constant speed, mass scales KE linearly." }] }] },
-		{ identifier: "two_times", outcomeIdentifier: "FEEDBACK__dropdown_5", content: [{ type: "paragraph", content: [{ type: "text", content: "Not quite: halving speed reduces KE to a quarter." }] }] },
-		{ identifier: "four_times", outcomeIdentifier: "FEEDBACK__dropdown_5", content: [{ type: "paragraph", content: [{ type: "text", content: "Correct: KE ∝ v²; halving v gives quarter KE." }] }] }
+		{ identifier: "CORRECT", outcomeIdentifier: "FEEDBACK__GLOBAL", content: [{ type: "paragraph", content: [{ type: "text", content: "Correct! Stirring and heating increase the frequency of effective collisions, so they increase the reaction rate. Decreasing concentration reduces collisions and decreases the rate." }] }] },
+		{ identifier: "INCORRECT", outcomeIdentifier: "FEEDBACK__GLOBAL", content: [{ type: "paragraph", content: [{ type: "text", content: "Not quite. Stirring and heating bring reactant particles into contact more often, which increases collisions and speeds up the reaction. Lowering the concentration leads to fewer collisions, which slows the reaction." }] }] }
 	],
 	identifier: "reaction-rate-changes-table",
-	interactions: {},
+	interactions: {
+		text_entry: { type: "textEntryInteraction", responseIdentifier: "TEXT_ENTRY", expectedLength: 10 }
+	},
 	responseDeclarations: [
 		{
 			correct: "INCREASE",
@@ -3897,7 +3902,8 @@ export const reactionRateChangesTable: AssessmentItemInput = {
 			baseType: "identifier",
 			identifier: "dropdown_3",
 			cardinality: "single"
-		}
+		},
+		{ identifier: "TEXT_ENTRY", cardinality: "single", baseType: "string", correct: "done" }
 	]
 }
 
@@ -4228,7 +4234,8 @@ export const kineticEnergyMassSpeedRelationships: AssessmentItemInput = {
 			],
 			shuffle: true,
 			responseIdentifier: "dropdown_5"
-		}
+		},
+		text_entry: { type: "textEntryInteraction", responseIdentifier: "TEXT_ENTRY", expectedLength: 10 }
 	},
 	responseDeclarations: [
 		{
@@ -4254,7 +4261,8 @@ export const kineticEnergyMassSpeedRelationships: AssessmentItemInput = {
 			baseType: "identifier",
 			identifier: "dropdown_5",
 			cardinality: "single"
-		}
+		},
+		{ identifier: "TEXT_ENTRY", cardinality: "single", baseType: "string", correct: "test" }
 	]
 }
 
@@ -4576,13 +4584,16 @@ export const reactantAmountsTempChangeTablePerseus: AssessmentItemInput = {
 		}
 	],
 	identifier: "reactant-amounts-temp-change-table-perseus",
-	interactions: {},
+	interactions: {
+		text_entry: { type: "textEntryInteraction", responseIdentifier: "TEXT_ENTRY", expectedLength: 10 }
+	},
 	responseDeclarations: [
 		{ correct: "NEG_3_2_C", baseType: "identifier", identifier: "dropdown_13", cardinality: "single" },
 		{ correct: "POS_4_2_C", baseType: "identifier", identifier: "dropdown_12", cardinality: "single" },
 		{ correct: "POS_2_0_C", baseType: "identifier", identifier: "dropdown_11", cardinality: "single" },
 		{ correct: "KOH", baseType: "identifier", identifier: "dropdown_9", cardinality: "single" },
-		{ correct: "BaOH2", baseType: "identifier", identifier: "dropdown_10", cardinality: "single" }
+		{ correct: "BaOH2", baseType: "identifier", identifier: "dropdown_10", cardinality: "single" },
+		{ identifier: "TEXT_ENTRY", cardinality: "single", baseType: "string", correct: "done" }
 	]
 }
 

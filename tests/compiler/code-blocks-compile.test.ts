@@ -23,7 +23,10 @@ describe("Compiler: code blocks", () => {
 			interactions: {
 				TE_INT: { type: "textEntryInteraction", responseIdentifier: "TE", expectedLength: null }
 			},
-			feedback: { correct: [], incorrect: [] }
+			feedbackBlocks: [
+				{ identifier: "CORRECT", outcomeIdentifier: "FEEDBACK__GLOBAL", content: [] },
+				{ identifier: "INCORRECT", outcomeIdentifier: "FEEDBACK__GLOBAL", content: [] }
+			]
 		}
 		const xml = await compile(item)
 		expect(xml).toContain("<pre><code>")

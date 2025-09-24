@@ -402,6 +402,99 @@ exports[`QTI Compiler End-to-End Tests should produce consistent XML output for 
 </qti-assessment-item>"
 `;
 
+exports[`QTI Compiler End-to-End Tests should produce consistent XML output for "compare-3-digit-numbers" 1`] = `
+"<?xml version="1.0" encoding="UTF-8"?>
+<qti-assessment-item
+    xmlns="http://www.imsglobal.org/xsd/imsqtiasi_v3p0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqtiasi_v3p0 https://purl.imsglobal.org/spec/qti/v3p0/schema/xsd/imsqti_asiv3p0p1_v1p0.xsd http://www.w3.org/1998/Math/MathML https://purl.imsglobal.org/spec/mathml/v3p0/schema/xsd/mathml3.xsd"
+    identifier="compare-3-digit-numbers"
+    title="Compare 3-digit numbers"
+    time-dependent="false"
+    xml:lang="en-US">
+    <qti-response-declaration identifier="RESPONSE" cardinality="ordered" base-type="identifier">
+        <qti-correct-response>
+            <qti-value>A</qti-value>
+            <qti-value>B</qti-value>
+            <qti-value>C</qti-value>
+        </qti-correct-response>
+    </qti-response-declaration>
+    <qti-response-declaration identifier="TEXT_ENTRY" cardinality="single" base-type="string">
+        <qti-correct-response>
+            <qti-value>correct</qti-value>
+        </qti-correct-response>
+        <qti-mapping default-value="0">
+            <qti-map-entry map-key="correct" mapped-value="1"/>
+        </qti-mapping>
+    </qti-response-declaration>
+    <qti-outcome-declaration identifier="SCORE" cardinality="single" base-type="float">
+        <qti-default-value><qti-value>0</qti-value></qti-default-value>
+    </qti-outcome-declaration>
+    <qti-outcome-declaration identifier="FEEDBACK__GLOBAL" cardinality="single" base-type="identifier"/>
+    <qti-item-body>
+        <div><qti-order-interaction response-identifier="RESPONSE" shuffle="true" orientation="vertical">
+            <qti-prompt>Arrange the cards to make a true comparison.</qti-prompt>
+            <qti-simple-choice identifier="A"><p><math xmlns="http://www.w3.org/1998/Math/MathML"><mn>708</mn></math></p></qti-simple-choice>
+            <qti-simple-choice identifier="B"><p><math xmlns="http://www.w3.org/1998/Math/MathML"><mo>&gt;</mo></math></p></qti-simple-choice>
+            <qti-simple-choice identifier="C"><p><math xmlns="http://www.w3.org/1998/Math/MathML"><mn>79</mn></math></p></qti-simple-choice>
+        </qti-order-interaction></div>
+        <qti-feedback-block outcome-identifier="FEEDBACK__GLOBAL" identifier="CORRECT" show-hide="show">
+            <qti-content-body><p>Correct! You have arranged the cards as <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>708</mn><mo>&gt;</mo><mn>79</mn></math>, which is a true comparison.</p></qti-content-body>
+        </qti-feedback-block>
+        <qti-feedback-block outcome-identifier="FEEDBACK__GLOBAL" identifier="INCORRECT" show-hide="show">
+            <qti-content-body><p>Not quite. Make sure the largest number is on the left and the symbol correctly represents the relationship.</p></qti-content-body>
+        </qti-feedback-block>
+    </qti-item-body>
+    <qti-response-processing>
+        
+    <qti-response-condition>
+        <qti-response-if>
+            <qti-match>
+                <qti-variable identifier="RESPONSE"/>
+                <qti-correct identifier="RESPONSE"/>
+            </qti-match>
+            <qti-set-outcome-value identifier="FEEDBACK__GLOBAL">
+                <qti-base-value base-type="identifier">CORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-if>
+        <qti-response-else>
+            <qti-set-outcome-value identifier="FEEDBACK__GLOBAL">
+                <qti-base-value base-type="identifier">INCORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-else>
+    </qti-response-condition>
+    <qti-response-condition>
+        <qti-response-if>
+            <qti-match>
+                <qti-variable identifier="TEXT_ENTRY"/>
+                <qti-correct identifier="TEXT_ENTRY"/>
+            </qti-match>
+            <qti-set-outcome-value identifier="FEEDBACK__GLOBAL">
+                <qti-base-value base-type="identifier">CORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-if>
+        <qti-response-else>
+            <qti-set-outcome-value identifier="FEEDBACK__GLOBAL">
+                <qti-base-value base-type="identifier">INCORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-else>
+    </qti-response-condition>
+    <qti-response-condition>
+        <qti-response-if>
+            <qti-and>
+                <qti-match><qti-variable identifier="RESPONSE"/><qti-correct identifier="RESPONSE"/></qti-match>
+                        <qti-match><qti-variable identifier="TEXT_ENTRY"/><qti-correct identifier="TEXT_ENTRY"/></qti-match>
+            </qti-and>
+            <qti-set-outcome-value identifier="SCORE"><qti-base-value base-type="float">1.0</qti-base-value></qti-set-outcome-value>
+        </qti-response-if>
+        <qti-response-else>
+            <qti-set-outcome-value identifier="SCORE"><qti-base-value base-type="float">0.0</qti-base-value></qti-set-outcome-value>
+        </qti-response-else>
+    </qti-response-condition>
+    </qti-response-processing>
+</qti-assessment-item>"
+`;
+
 exports[`QTI Compiler End-to-End Tests should produce consistent XML output for "inequality-number-line" 1`] = `
 "<?xml version="1.0" encoding="UTF-8"?>
 <qti-assessment-item
@@ -2340,6 +2433,958 @@ exports[`QTI Compiler End-to-End Tests should produce consistent XML output for 
         <qti-response-if>
             <qti-and>
                 <qti-match><qti-variable identifier="RESPONSE"/><qti-correct identifier="RESPONSE"/></qti-match>
+            </qti-and>
+            <qti-set-outcome-value identifier="SCORE"><qti-base-value base-type="float">1.0</qti-base-value></qti-set-outcome-value>
+        </qti-response-if>
+        <qti-response-else>
+            <qti-set-outcome-value identifier="SCORE"><qti-base-value base-type="float">0.0</qti-base-value></qti-set-outcome-value>
+        </qti-response-else>
+    </qti-response-condition>
+    </qti-response-processing>
+</qti-assessment-item>"
+`;
+
+exports[`QTI Compiler End-to-End Tests should produce consistent XML output for "reactant-amounts-temp-change-table" 1`] = `
+"<?xml version="1.0" encoding="UTF-8"?>
+<qti-assessment-item
+    xmlns="http://www.imsglobal.org/xsd/imsqtiasi_v3p0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqtiasi_v3p0 https://purl.imsglobal.org/spec/qti/v3p0/schema/xsd/imsqti_asiv3p0p1_v1p0.xsd http://www.w3.org/1998/Math/MathML https://purl.imsglobal.org/spec/mathml/v3p0/schema/xsd/mathml3.xsd"
+    identifier="reactant-amounts-temp-change-table"
+    title="Identify reactants and amounts from temperature change table"
+    time-dependent="false"
+    xml:lang="en-US">
+    <qti-response-declaration identifier="RESP_REACT_C" cardinality="single" base-type="identifier">
+        <qti-correct-response>
+            <qti-value>MGSO4</qti-value>
+        </qti-correct-response>
+    </qti-response-declaration>
+    <qti-response-declaration identifier="RESP_AMT_C" cardinality="single" base-type="identifier">
+        <qti-correct-response>
+            <qti-value>AMT_2_5</qti-value>
+        </qti-correct-response>
+    </qti-response-declaration>
+    <qti-response-declaration identifier="RESP_REACT_D" cardinality="single" base-type="identifier">
+        <qti-correct-response>
+            <qti-value>NH4CL</qti-value>
+        </qti-correct-response>
+    </qti-response-declaration>
+    <qti-response-declaration identifier="RESP_AMT_D" cardinality="single" base-type="identifier">
+        <qti-correct-response>
+            <qti-value>AMT_3_0</qti-value>
+        </qti-correct-response>
+    </qti-response-declaration>
+    <qti-response-declaration identifier="RESP_REACT_E" cardinality="single" base-type="identifier">
+        <qti-correct-response>
+            <qti-value>CACL2</qti-value>
+        </qti-correct-response>
+    </qti-response-declaration>
+    <qti-response-declaration identifier="RESP_AMT_E" cardinality="single" base-type="identifier">
+        <qti-correct-response>
+            <qti-value>AMT_8_0</qti-value>
+        </qti-correct-response>
+    </qti-response-declaration>
+    <qti-response-declaration identifier="TEXT_ENTRY" cardinality="single" base-type="string">
+        <qti-correct-response>
+            <qti-value>done</qti-value>
+        </qti-correct-response>
+        <qti-mapping default-value="0">
+            <qti-map-entry map-key="done" mapped-value="1"/>
+        </qti-mapping>
+    </qti-response-declaration>
+    <qti-outcome-declaration identifier="SCORE" cardinality="single" base-type="float">
+        <qti-default-value><qti-value>0</qti-value></qti-default-value>
+    </qti-outcome-declaration>
+    <qti-outcome-declaration identifier="FEEDBACK__GLOBAL" cardinality="single" base-type="identifier"/>
+    <qti-item-body>
+        <p>Use the data provided to identify the reactant and amount that caused each temperature change. Each option is only used once.</p>
+        <table style="border-collapse: collapse; width: 100%; border: 1px solid #000000;"><thead><tr><th scope="col" style="border: 1px solid #000000; padding: 8px; text-align: left; font-weight: 700; background-color: #f2f2f2; text-align: left;">Experiment</th><th scope="col" style="border: 1px solid #000000; padding: 8px; text-align: left; font-weight: 700; background-color: #f2f2f2;">Reactant</th><th scope="col" style="border: 1px solid #000000; padding: 8px; text-align: left; font-weight: 700; background-color: #f2f2f2;">Amount of reactant (grams)</th><th scope="col" style="border: 1px solid #000000; padding: 8px; text-align: left; font-weight: 700; background-color: #f2f2f2;">Temperature change</th></tr></thead><tbody><tr><th scope="row" style="border: 1px solid #000000; padding: 8px; text-align: left; font-weight: 700; background-color: #f2f2f2;">A</th><td style="border: 1px solid #000000; padding: 8px; text-align: left;">NH4Cl</td><td style="border: 1px solid #000000; padding: 8px; text-align: left;"><math xmlns="http://www.w3.org/1998/Math/MathML"><mn>6.0</mn><mtext> grams</mtext></math></td><td style="border: 1px solid #000000; padding: 8px; text-align: left;"><math xmlns="http://www.w3.org/1998/Math/MathML"><mo>-</mo><mn>3.6</mn><mo>°</mo><mi>C</mi></math></td></tr><tr><th scope="row" style="border: 1px solid #000000; padding: 8px; text-align: left; font-weight: 700; background-color: #f2f2f2;">B</th><td style="border: 1px solid #000000; padding: 8px; text-align: left;">MgSO4</td><td style="border: 1px solid #000000; padding: 8px; text-align: left;"><math xmlns="http://www.w3.org/1998/Math/MathML"><mn>5.0</mn><mtext> grams</mtext></math></td><td style="border: 1px solid #000000; padding: 8px; text-align: left;"><math xmlns="http://www.w3.org/1998/Math/MathML"><mo>+</mo><mn>1.0</mn><mo>°</mo><mi>C</mi></math></td></tr><tr><th scope="row" style="border: 1px solid #000000; padding: 8px; text-align: left; font-weight: 700; background-color: #f2f2f2;">C</th><td style="border: 1px solid #000000; padding: 8px; text-align: left;"><qti-inline-choice-interaction response-identifier="RESP_REACT_C" shuffle="true">
+				<qti-inline-choice identifier="NH4CL">NH4Cl</qti-inline-choice>
+                <qti-inline-choice identifier="MGSO4">MgSO4</qti-inline-choice>
+                <qti-inline-choice identifier="CACL2">CaCl2</qti-inline-choice>
+			</qti-inline-choice-interaction></td><td style="border: 1px solid #000000; padding: 8px; text-align: left;"><qti-inline-choice-interaction response-identifier="RESP_AMT_C" shuffle="true">
+				<qti-inline-choice identifier="AMT_2_5"><math xmlns="http://www.w3.org/1998/Math/MathML"><mn>2.5</mn></math></qti-inline-choice>
+                <qti-inline-choice identifier="AMT_3_0"><math xmlns="http://www.w3.org/1998/Math/MathML"><mn>3.0</mn></math></qti-inline-choice>
+                <qti-inline-choice identifier="AMT_8_0"><math xmlns="http://www.w3.org/1998/Math/MathML"><mn>8.0</mn></math></qti-inline-choice>
+			</qti-inline-choice-interaction></td><td style="border: 1px solid #000000; padding: 8px; text-align: left;"><math xmlns="http://www.w3.org/1998/Math/MathML"><mo>+</mo><mn>0.5</mn><mo>°</mo><mi>C</mi></math></td></tr><tr><th scope="row" style="border: 1px solid #000000; padding: 8px; text-align: left; font-weight: 700; background-color: #f2f2f2;">D</th><td style="border: 1px solid #000000; padding: 8px; text-align: left;"><qti-inline-choice-interaction response-identifier="RESP_REACT_D" shuffle="true">
+				<qti-inline-choice identifier="NH4CL">NH4Cl</qti-inline-choice>
+                <qti-inline-choice identifier="MGSO4">MgSO4</qti-inline-choice>
+                <qti-inline-choice identifier="CACL2">CaCl2</qti-inline-choice>
+			</qti-inline-choice-interaction></td><td style="border: 1px solid #000000; padding: 8px; text-align: left;"><qti-inline-choice-interaction response-identifier="RESP_AMT_D" shuffle="true">
+				<qti-inline-choice identifier="AMT_2_5"><math xmlns="http://www.w3.org/1998/Math/MathML"><mn>2.5</mn></math></qti-inline-choice>
+                <qti-inline-choice identifier="AMT_3_0"><math xmlns="http://www.w3.org/1998/Math/MathML"><mn>3.0</mn></math></qti-inline-choice>
+                <qti-inline-choice identifier="AMT_8_0"><math xmlns="http://www.w3.org/1998/Math/MathML"><mn>8.0</mn></math></qti-inline-choice>
+			</qti-inline-choice-interaction></td><td style="border: 1px solid #000000; padding: 8px; text-align: left;"><math xmlns="http://www.w3.org/1998/Math/MathML"><mo>-</mo><mn>1.8</mn><mo>°</mo><mi>C</mi></math></td></tr><tr><th scope="row" style="border: 1px solid #000000; padding: 8px; text-align: left; font-weight: 700; background-color: #f2f2f2;">E</th><td style="border: 1px solid #000000; padding: 8px; text-align: left;"><qti-inline-choice-interaction response-identifier="RESP_REACT_E" shuffle="true">
+				<qti-inline-choice identifier="NH4CL">NH4Cl</qti-inline-choice>
+                <qti-inline-choice identifier="MGSO4">MgSO4</qti-inline-choice>
+                <qti-inline-choice identifier="CACL2">CaCl2</qti-inline-choice>
+			</qti-inline-choice-interaction></td><td style="border: 1px solid #000000; padding: 8px; text-align: left;"><qti-inline-choice-interaction response-identifier="RESP_AMT_E" shuffle="true">
+				<qti-inline-choice identifier="AMT_2_5"><math xmlns="http://www.w3.org/1998/Math/MathML"><mn>2.5</mn></math></qti-inline-choice>
+                <qti-inline-choice identifier="AMT_3_0"><math xmlns="http://www.w3.org/1998/Math/MathML"><mn>3.0</mn></math></qti-inline-choice>
+                <qti-inline-choice identifier="AMT_8_0"><math xmlns="http://www.w3.org/1998/Math/MathML"><mn>8.0</mn></math></qti-inline-choice>
+			</qti-inline-choice-interaction></td><td style="border: 1px solid #000000; padding: 8px; text-align: left;"><math xmlns="http://www.w3.org/1998/Math/MathML"><mo>+</mo><mn>3.2</mn><mo>°</mo><mi>C</mi></math></td></tr></tbody></table>
+        <p>Select the reactant and amount for rows C, D, and E directly in the table.</p>
+        <qti-feedback-block outcome-identifier="FEEDBACK__GLOBAL" identifier="CORRECT" show-hide="show">
+            <qti-content-body><p>Great job! You matched reactants and amounts to the temperature changes.</p></qti-content-body>
+        </qti-feedback-block>
+        <qti-feedback-block outcome-identifier="FEEDBACK__GLOBAL" identifier="INCORRECT" show-hide="show">
+            <qti-content-body><p>Not quite. Identify whether the temperature increases (exothermic) or decreases (endothermic), then compare magnitudes to match amounts.</p></qti-content-body>
+        </qti-feedback-block>
+    </qti-item-body>
+    <qti-response-processing>
+        
+    <qti-response-condition>
+        <qti-response-if>
+            <qti-match>
+                <qti-variable identifier="RESP_REACT_C"/>
+                <qti-correct identifier="RESP_REACT_C"/>
+            </qti-match>
+            <qti-set-outcome-value identifier="FEEDBACK__GLOBAL">
+                <qti-base-value base-type="identifier">CORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-if>
+        <qti-response-else>
+            <qti-set-outcome-value identifier="FEEDBACK__GLOBAL">
+                <qti-base-value base-type="identifier">INCORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-else>
+    </qti-response-condition>
+    <qti-response-condition>
+        <qti-response-if>
+            <qti-match>
+                <qti-variable identifier="RESP_AMT_C"/>
+                <qti-correct identifier="RESP_AMT_C"/>
+            </qti-match>
+            <qti-set-outcome-value identifier="FEEDBACK__GLOBAL">
+                <qti-base-value base-type="identifier">CORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-if>
+        <qti-response-else>
+            <qti-set-outcome-value identifier="FEEDBACK__GLOBAL">
+                <qti-base-value base-type="identifier">INCORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-else>
+    </qti-response-condition>
+    <qti-response-condition>
+        <qti-response-if>
+            <qti-match>
+                <qti-variable identifier="RESP_REACT_D"/>
+                <qti-correct identifier="RESP_REACT_D"/>
+            </qti-match>
+            <qti-set-outcome-value identifier="FEEDBACK__GLOBAL">
+                <qti-base-value base-type="identifier">CORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-if>
+        <qti-response-else>
+            <qti-set-outcome-value identifier="FEEDBACK__GLOBAL">
+                <qti-base-value base-type="identifier">INCORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-else>
+    </qti-response-condition>
+    <qti-response-condition>
+        <qti-response-if>
+            <qti-match>
+                <qti-variable identifier="RESP_AMT_D"/>
+                <qti-correct identifier="RESP_AMT_D"/>
+            </qti-match>
+            <qti-set-outcome-value identifier="FEEDBACK__GLOBAL">
+                <qti-base-value base-type="identifier">CORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-if>
+        <qti-response-else>
+            <qti-set-outcome-value identifier="FEEDBACK__GLOBAL">
+                <qti-base-value base-type="identifier">INCORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-else>
+    </qti-response-condition>
+    <qti-response-condition>
+        <qti-response-if>
+            <qti-match>
+                <qti-variable identifier="RESP_REACT_E"/>
+                <qti-correct identifier="RESP_REACT_E"/>
+            </qti-match>
+            <qti-set-outcome-value identifier="FEEDBACK__GLOBAL">
+                <qti-base-value base-type="identifier">CORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-if>
+        <qti-response-else>
+            <qti-set-outcome-value identifier="FEEDBACK__GLOBAL">
+                <qti-base-value base-type="identifier">INCORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-else>
+    </qti-response-condition>
+    <qti-response-condition>
+        <qti-response-if>
+            <qti-match>
+                <qti-variable identifier="RESP_AMT_E"/>
+                <qti-correct identifier="RESP_AMT_E"/>
+            </qti-match>
+            <qti-set-outcome-value identifier="FEEDBACK__GLOBAL">
+                <qti-base-value base-type="identifier">CORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-if>
+        <qti-response-else>
+            <qti-set-outcome-value identifier="FEEDBACK__GLOBAL">
+                <qti-base-value base-type="identifier">INCORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-else>
+    </qti-response-condition>
+    <qti-response-condition>
+        <qti-response-if>
+            <qti-match>
+                <qti-variable identifier="TEXT_ENTRY"/>
+                <qti-correct identifier="TEXT_ENTRY"/>
+            </qti-match>
+            <qti-set-outcome-value identifier="FEEDBACK__GLOBAL">
+                <qti-base-value base-type="identifier">CORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-if>
+        <qti-response-else>
+            <qti-set-outcome-value identifier="FEEDBACK__GLOBAL">
+                <qti-base-value base-type="identifier">INCORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-else>
+    </qti-response-condition>
+    <qti-response-condition>
+        <qti-response-if>
+            <qti-and>
+                <qti-match><qti-variable identifier="RESP_REACT_C"/><qti-correct identifier="RESP_REACT_C"/></qti-match>
+                        <qti-match><qti-variable identifier="RESP_AMT_C"/><qti-correct identifier="RESP_AMT_C"/></qti-match>
+                        <qti-match><qti-variable identifier="RESP_REACT_D"/><qti-correct identifier="RESP_REACT_D"/></qti-match>
+                        <qti-match><qti-variable identifier="RESP_AMT_D"/><qti-correct identifier="RESP_AMT_D"/></qti-match>
+                        <qti-match><qti-variable identifier="RESP_REACT_E"/><qti-correct identifier="RESP_REACT_E"/></qti-match>
+                        <qti-match><qti-variable identifier="RESP_AMT_E"/><qti-correct identifier="RESP_AMT_E"/></qti-match>
+                        <qti-match><qti-variable identifier="TEXT_ENTRY"/><qti-correct identifier="TEXT_ENTRY"/></qti-match>
+            </qti-and>
+            <qti-set-outcome-value identifier="SCORE"><qti-base-value base-type="float">1.0</qti-base-value></qti-set-outcome-value>
+        </qti-response-if>
+        <qti-response-else>
+            <qti-set-outcome-value identifier="SCORE"><qti-base-value base-type="float">0.0</qti-base-value></qti-set-outcome-value>
+        </qti-response-else>
+    </qti-response-condition>
+    </qti-response-processing>
+</qti-assessment-item>"
+`;
+
+exports[`QTI Compiler End-to-End Tests should produce consistent XML output for "attract-repel-completion-table" 1`] = `
+"<?xml version="1.0" encoding="UTF-8"?>
+<qti-assessment-item
+    xmlns="http://www.imsglobal.org/xsd/imsqtiasi_v3p0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqtiasi_v3p0 https://purl.imsglobal.org/spec/qti/v3p0/schema/xsd/imsqti_asiv3p0p1_v1p0.xsd http://www.w3.org/1998/Math/MathML https://purl.imsglobal.org/spec/mathml/v3p0/schema/xsd/mathml3.xsd"
+    identifier="attract-repel-completion-table"
+    title="Complete the table: attract or repel"
+    time-dependent="false"
+    xml:lang="en-US">
+    <qti-response-declaration identifier="RESP_R1" cardinality="single" base-type="identifier">
+        <qti-correct-response>
+            <qti-value>REPEL</qti-value>
+        </qti-correct-response>
+    </qti-response-declaration>
+    <qti-response-declaration identifier="RESP_R2" cardinality="single" base-type="identifier">
+        <qti-correct-response>
+            <qti-value>ATTRACT</qti-value>
+        </qti-correct-response>
+    </qti-response-declaration>
+    <qti-response-declaration identifier="RESP_R3" cardinality="single" base-type="identifier">
+        <qti-correct-response>
+            <qti-value>ATTRACT</qti-value>
+        </qti-correct-response>
+    </qti-response-declaration>
+    <qti-response-declaration identifier="RESP_R4" cardinality="single" base-type="identifier">
+        <qti-correct-response>
+            <qti-value>REPEL</qti-value>
+        </qti-correct-response>
+    </qti-response-declaration>
+    <qti-response-declaration identifier="TEXT_ENTRY" cardinality="single" base-type="string">
+        <qti-correct-response>
+            <qti-value>done</qti-value>
+        </qti-correct-response>
+        <qti-mapping default-value="0">
+            <qti-map-entry map-key="done" mapped-value="1"/>
+        </qti-mapping>
+    </qti-response-declaration>
+    <qti-outcome-declaration identifier="SCORE" cardinality="single" base-type="float">
+        <qti-default-value><qti-value>0</qti-value></qti-default-value>
+    </qti-outcome-declaration>
+    <qti-outcome-declaration identifier="FEEDBACK__GLOBAL" cardinality="single" base-type="identifier"/>
+    <qti-item-body>
+        <p>Complete the table for each pair of objects.</p>
+        <table style="border-collapse: collapse; width: 100%; border: 1px solid #000000;"><thead><tr><th scope="col" style="border: 1px solid #000000; padding: 8px; text-align: left; font-weight: 700; background-color: #f2f2f2;">Description of objects</th><th scope="col" style="border: 1px solid #000000; padding: 8px; text-align: left; font-weight: 700; background-color: #f2f2f2;">Will the objects attract or repel each other?</th></tr></thead><tbody><tr><td style="border: 1px solid #000000; padding: 8px; text-align: left;">two charged objects, both with positive charge</td><td style="border: 1px solid #000000; padding: 8px; text-align: left;"><qti-inline-choice-interaction response-identifier="RESP_R1" shuffle="false">
+				<qti-inline-choice identifier="ATTRACT">attract</qti-inline-choice>
+                <qti-inline-choice identifier="REPEL">repel</qti-inline-choice>
+			</qti-inline-choice-interaction></td></tr><tr><td style="border: 1px solid #000000; padding: 8px; text-align: left;">two charged objects, one with positive charge and the other with negative charge</td><td style="border: 1px solid #000000; padding: 8px; text-align: left;"><qti-inline-choice-interaction response-identifier="RESP_R2" shuffle="false">
+				<qti-inline-choice identifier="ATTRACT">attract</qti-inline-choice>
+                <qti-inline-choice identifier="REPEL">repel</qti-inline-choice>
+			</qti-inline-choice-interaction></td></tr><tr><td style="border: 1px solid #000000; padding: 8px; text-align: left;">two magnets, with the north pole of one facing the south pole of the other</td><td style="border: 1px solid #000000; padding: 8px; text-align: left;"><qti-inline-choice-interaction response-identifier="RESP_R3" shuffle="false">
+				<qti-inline-choice identifier="ATTRACT">attract</qti-inline-choice>
+                <qti-inline-choice identifier="REPEL">repel</qti-inline-choice>
+			</qti-inline-choice-interaction></td></tr><tr><td style="border: 1px solid #000000; padding: 8px; text-align: left;">two magnets, with their south poles facing each other</td><td style="border: 1px solid #000000; padding: 8px; text-align: left;"><qti-inline-choice-interaction response-identifier="RESP_R4" shuffle="false">
+				<qti-inline-choice identifier="ATTRACT">attract</qti-inline-choice>
+                <qti-inline-choice identifier="REPEL">repel</qti-inline-choice>
+			</qti-inline-choice-interaction></td></tr></tbody></table>
+        <qti-feedback-block outcome-identifier="FEEDBACK__GLOBAL" identifier="CORRECT" show-hide="show">
+            <qti-content-body><p>Correct! Likes repel and opposites attract.</p></qti-content-body>
+        </qti-feedback-block>
+        <qti-feedback-block outcome-identifier="FEEDBACK__GLOBAL" identifier="INCORRECT" show-hide="show">
+            <qti-content-body><p>Not quite. Remember: like charges/poles repel; opposite charges/poles attract.</p></qti-content-body>
+        </qti-feedback-block>
+    </qti-item-body>
+    <qti-response-processing>
+        
+    <qti-response-condition>
+        <qti-response-if>
+            <qti-match>
+                <qti-variable identifier="RESP_R1"/>
+                <qti-correct identifier="RESP_R1"/>
+            </qti-match>
+            <qti-set-outcome-value identifier="FEEDBACK__GLOBAL">
+                <qti-base-value base-type="identifier">CORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-if>
+        <qti-response-else>
+            <qti-set-outcome-value identifier="FEEDBACK__GLOBAL">
+                <qti-base-value base-type="identifier">INCORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-else>
+    </qti-response-condition>
+    <qti-response-condition>
+        <qti-response-if>
+            <qti-match>
+                <qti-variable identifier="RESP_R2"/>
+                <qti-correct identifier="RESP_R2"/>
+            </qti-match>
+            <qti-set-outcome-value identifier="FEEDBACK__GLOBAL">
+                <qti-base-value base-type="identifier">CORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-if>
+        <qti-response-else>
+            <qti-set-outcome-value identifier="FEEDBACK__GLOBAL">
+                <qti-base-value base-type="identifier">INCORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-else>
+    </qti-response-condition>
+    <qti-response-condition>
+        <qti-response-if>
+            <qti-match>
+                <qti-variable identifier="RESP_R3"/>
+                <qti-correct identifier="RESP_R3"/>
+            </qti-match>
+            <qti-set-outcome-value identifier="FEEDBACK__GLOBAL">
+                <qti-base-value base-type="identifier">CORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-if>
+        <qti-response-else>
+            <qti-set-outcome-value identifier="FEEDBACK__GLOBAL">
+                <qti-base-value base-type="identifier">INCORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-else>
+    </qti-response-condition>
+    <qti-response-condition>
+        <qti-response-if>
+            <qti-match>
+                <qti-variable identifier="RESP_R4"/>
+                <qti-correct identifier="RESP_R4"/>
+            </qti-match>
+            <qti-set-outcome-value identifier="FEEDBACK__GLOBAL">
+                <qti-base-value base-type="identifier">CORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-if>
+        <qti-response-else>
+            <qti-set-outcome-value identifier="FEEDBACK__GLOBAL">
+                <qti-base-value base-type="identifier">INCORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-else>
+    </qti-response-condition>
+    <qti-response-condition>
+        <qti-response-if>
+            <qti-match>
+                <qti-variable identifier="TEXT_ENTRY"/>
+                <qti-correct identifier="TEXT_ENTRY"/>
+            </qti-match>
+            <qti-set-outcome-value identifier="FEEDBACK__GLOBAL">
+                <qti-base-value base-type="identifier">CORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-if>
+        <qti-response-else>
+            <qti-set-outcome-value identifier="FEEDBACK__GLOBAL">
+                <qti-base-value base-type="identifier">INCORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-else>
+    </qti-response-condition>
+    <qti-response-condition>
+        <qti-response-if>
+            <qti-and>
+                <qti-match><qti-variable identifier="RESP_R1"/><qti-correct identifier="RESP_R1"/></qti-match>
+                        <qti-match><qti-variable identifier="RESP_R2"/><qti-correct identifier="RESP_R2"/></qti-match>
+                        <qti-match><qti-variable identifier="RESP_R3"/><qti-correct identifier="RESP_R3"/></qti-match>
+                        <qti-match><qti-variable identifier="RESP_R4"/><qti-correct identifier="RESP_R4"/></qti-match>
+                        <qti-match><qti-variable identifier="TEXT_ENTRY"/><qti-correct identifier="TEXT_ENTRY"/></qti-match>
+            </qti-and>
+            <qti-set-outcome-value identifier="SCORE"><qti-base-value base-type="float">1.0</qti-base-value></qti-set-outcome-value>
+        </qti-response-if>
+        <qti-response-else>
+            <qti-set-outcome-value identifier="SCORE"><qti-base-value base-type="float">0.0</qti-base-value></qti-set-outcome-value>
+        </qti-response-else>
+    </qti-response-condition>
+    </qti-response-processing>
+</qti-assessment-item>"
+`;
+
+exports[`QTI Compiler End-to-End Tests should produce consistent XML output for "reaction-rate-changes-table" 1`] = `
+"<?xml version="1.0" encoding="UTF-8"?>
+<qti-assessment-item
+    xmlns="http://www.imsglobal.org/xsd/imsqtiasi_v3p0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqtiasi_v3p0 https://purl.imsglobal.org/spec/qti/v3p0/schema/xsd/imsqti_asiv3p0p1_v1p0.xsd http://www.w3.org/1998/Math/MathML https://purl.imsglobal.org/spec/mathml/v3p0/schema/xsd/mathml3.xsd"
+    identifier="reaction-rate-changes-table"
+    title="How changes affect the reaction rate"
+    time-dependent="false"
+    xml:lang="en-US">
+    <qti-response-declaration identifier="dropdown_1" cardinality="single" base-type="identifier">
+        <qti-correct-response>
+            <qti-value>INCREASE</qti-value>
+        </qti-correct-response>
+    </qti-response-declaration>
+    <qti-response-declaration identifier="dropdown_2" cardinality="single" base-type="identifier">
+        <qti-correct-response>
+            <qti-value>INCREASE</qti-value>
+        </qti-correct-response>
+    </qti-response-declaration>
+    <qti-response-declaration identifier="dropdown_3" cardinality="single" base-type="identifier">
+        <qti-correct-response>
+            <qti-value>DECREASE</qti-value>
+        </qti-correct-response>
+    </qti-response-declaration>
+    <qti-response-declaration identifier="TEXT_ENTRY" cardinality="single" base-type="string">
+        <qti-correct-response>
+            <qti-value>done</qti-value>
+        </qti-correct-response>
+        <qti-mapping default-value="0">
+            <qti-map-entry map-key="done" mapped-value="1"/>
+        </qti-mapping>
+    </qti-response-declaration>
+    <qti-outcome-declaration identifier="SCORE" cardinality="single" base-type="float">
+        <qti-default-value><qti-value>0</qti-value></qti-default-value>
+    </qti-outcome-declaration>
+    <qti-outcome-declaration identifier="FEEDBACK__GLOBAL" cardinality="single" base-type="identifier"/>
+    <qti-item-body>
+        <p>Different situations call for chemical reactions that release energy quickly, such as an explosion, or slowly, such as a hand warmer.</p>
+        <p>To control how quickly energy is released or absorbed, we can make adjustments to change how fast the reaction occurs.</p>
+        <p>Complete the table to show how the reaction rate is typically affected by each change.</p>
+        <table style="border-collapse: collapse; width: 100%; border: 1px solid #000000;"><caption style="padding: 8px; font-size: 1.2em; font-weight: 700; caption-side: top;">How changes affect the reaction rate</caption><thead><tr><th scope="col" style="border: 1px solid #000000; padding: 8px; text-align: left; font-weight: 700; background-color: #f2f2f2; text-align: left;">Change</th><th scope="col" style="border: 1px solid #000000; padding: 8px; text-align: left; font-weight: 700; background-color: #f2f2f2;">Effect on rate</th></tr></thead><tbody><tr><th scope="row" style="border: 1px solid #000000; padding: 8px; text-align: left; font-weight: 700; background-color: #f2f2f2;">Stir the reactants</th><td style="border: 1px solid #000000; padding: 8px; text-align: left;"><qti-inline-choice-interaction response-identifier="dropdown_1" shuffle="false">
+				<qti-inline-choice identifier="INCREASE">increase</qti-inline-choice>
+                <qti-inline-choice identifier="DECREASE">decrease</qti-inline-choice>
+			</qti-inline-choice-interaction></td></tr><tr><th scope="row" style="border: 1px solid #000000; padding: 8px; text-align: left; font-weight: 700; background-color: #f2f2f2;">Heat the reactants</th><td style="border: 1px solid #000000; padding: 8px; text-align: left;"><qti-inline-choice-interaction response-identifier="dropdown_2" shuffle="false">
+				<qti-inline-choice identifier="INCREASE">increase</qti-inline-choice>
+                <qti-inline-choice identifier="DECREASE">decrease</qti-inline-choice>
+			</qti-inline-choice-interaction></td></tr><tr><th scope="row" style="border: 1px solid #000000; padding: 8px; text-align: left; font-weight: 700; background-color: #f2f2f2;">Decrease the concentration of the reactants</th><td style="border: 1px solid #000000; padding: 8px; text-align: left;"><qti-inline-choice-interaction response-identifier="dropdown_3" shuffle="false">
+				<qti-inline-choice identifier="INCREASE">increase</qti-inline-choice>
+                <qti-inline-choice identifier="DECREASE">decrease</qti-inline-choice>
+			</qti-inline-choice-interaction></td></tr></tbody></table>
+        <qti-feedback-block outcome-identifier="FEEDBACK__GLOBAL" identifier="CORRECT" show-hide="show">
+            <qti-content-body><p>Correct! Stirring and heating increase the frequency of effective collisions, so they increase the reaction rate. Decreasing concentration reduces collisions and decreases the rate.</p></qti-content-body>
+        </qti-feedback-block>
+        <qti-feedback-block outcome-identifier="FEEDBACK__GLOBAL" identifier="INCORRECT" show-hide="show">
+            <qti-content-body><p>Not quite. Stirring and heating bring reactant particles into contact more often, which increases collisions and speeds up the reaction. Lowering the concentration leads to fewer collisions, which slows the reaction.</p></qti-content-body>
+        </qti-feedback-block>
+    </qti-item-body>
+    <qti-response-processing>
+        
+    <qti-response-condition>
+        <qti-response-if>
+            <qti-match>
+                <qti-variable identifier="dropdown_1"/>
+                <qti-correct identifier="dropdown_1"/>
+            </qti-match>
+            <qti-set-outcome-value identifier="FEEDBACK__GLOBAL">
+                <qti-base-value base-type="identifier">CORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-if>
+        <qti-response-else>
+            <qti-set-outcome-value identifier="FEEDBACK__GLOBAL">
+                <qti-base-value base-type="identifier">INCORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-else>
+    </qti-response-condition>
+    <qti-response-condition>
+        <qti-response-if>
+            <qti-match>
+                <qti-variable identifier="dropdown_2"/>
+                <qti-correct identifier="dropdown_2"/>
+            </qti-match>
+            <qti-set-outcome-value identifier="FEEDBACK__GLOBAL">
+                <qti-base-value base-type="identifier">CORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-if>
+        <qti-response-else>
+            <qti-set-outcome-value identifier="FEEDBACK__GLOBAL">
+                <qti-base-value base-type="identifier">INCORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-else>
+    </qti-response-condition>
+    <qti-response-condition>
+        <qti-response-if>
+            <qti-match>
+                <qti-variable identifier="dropdown_3"/>
+                <qti-correct identifier="dropdown_3"/>
+            </qti-match>
+            <qti-set-outcome-value identifier="FEEDBACK__GLOBAL">
+                <qti-base-value base-type="identifier">CORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-if>
+        <qti-response-else>
+            <qti-set-outcome-value identifier="FEEDBACK__GLOBAL">
+                <qti-base-value base-type="identifier">INCORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-else>
+    </qti-response-condition>
+    <qti-response-condition>
+        <qti-response-if>
+            <qti-match>
+                <qti-variable identifier="TEXT_ENTRY"/>
+                <qti-correct identifier="TEXT_ENTRY"/>
+            </qti-match>
+            <qti-set-outcome-value identifier="FEEDBACK__GLOBAL">
+                <qti-base-value base-type="identifier">CORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-if>
+        <qti-response-else>
+            <qti-set-outcome-value identifier="FEEDBACK__GLOBAL">
+                <qti-base-value base-type="identifier">INCORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-else>
+    </qti-response-condition>
+    <qti-response-condition>
+        <qti-response-if>
+            <qti-and>
+                <qti-match><qti-variable identifier="dropdown_1"/><qti-correct identifier="dropdown_1"/></qti-match>
+                        <qti-match><qti-variable identifier="dropdown_2"/><qti-correct identifier="dropdown_2"/></qti-match>
+                        <qti-match><qti-variable identifier="dropdown_3"/><qti-correct identifier="dropdown_3"/></qti-match>
+                        <qti-match><qti-variable identifier="TEXT_ENTRY"/><qti-correct identifier="TEXT_ENTRY"/></qti-match>
+            </qti-and>
+            <qti-set-outcome-value identifier="SCORE"><qti-base-value base-type="float">1.0</qti-base-value></qti-set-outcome-value>
+        </qti-response-if>
+        <qti-response-else>
+            <qti-set-outcome-value identifier="SCORE"><qti-base-value base-type="float">0.0</qti-base-value></qti-set-outcome-value>
+        </qti-response-else>
+    </qti-response-condition>
+    </qti-response-processing>
+</qti-assessment-item>"
+`;
+
+exports[`QTI Compiler End-to-End Tests should produce consistent XML output for "ke-mass-speed-relationships" 1`] = `
+"<?xml version="1.0" encoding="UTF-8"?>
+<qti-assessment-item
+    xmlns="http://www.imsglobal.org/xsd/imsqtiasi_v3p0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqtiasi_v3p0 https://purl.imsglobal.org/spec/qti/v3p0/schema/xsd/imsqti_asiv3p0p1_v1p0.xsd http://www.w3.org/1998/Math/MathML https://purl.imsglobal.org/spec/mathml/v3p0/schema/xsd/mathml3.xsd"
+    identifier="ke-mass-speed-relationships"
+    title="Kinetic energy relationships with mass and speed"
+    time-dependent="false"
+    xml:lang="en-US">
+    <qti-response-declaration identifier="dropdown_1" cardinality="single" base-type="identifier">
+        <qti-correct-response>
+            <qti-value>linear</qti-value>
+        </qti-correct-response>
+    </qti-response-declaration>
+    <qti-response-declaration identifier="dropdown_3" cardinality="single" base-type="identifier">
+        <qti-correct-response>
+            <qti-value>one_half</qti-value>
+        </qti-correct-response>
+    </qti-response-declaration>
+    <qti-response-declaration identifier="dropdown_2" cardinality="single" base-type="identifier">
+        <qti-correct-response>
+            <qti-value>nonlinear</qti-value>
+        </qti-correct-response>
+    </qti-response-declaration>
+    <qti-response-declaration identifier="dropdown_5" cardinality="single" base-type="identifier">
+        <qti-correct-response>
+            <qti-value>one_fourth</qti-value>
+        </qti-correct-response>
+    </qti-response-declaration>
+    <qti-response-declaration identifier="TEXT_ENTRY" cardinality="single" base-type="string">
+        <qti-correct-response>
+            <qti-value>test</qti-value>
+        </qti-correct-response>
+        <qti-mapping default-value="0">
+            <qti-map-entry map-key="test" mapped-value="1"/>
+        </qti-mapping>
+    </qti-response-declaration>
+    <qti-outcome-declaration identifier="SCORE" cardinality="single" base-type="float">
+        <qti-default-value><qti-value>0</qti-value></qti-default-value>
+    </qti-outcome-declaration>
+    <qti-outcome-declaration identifier="FEEDBACK__GLOBAL" cardinality="single" base-type="identifier"/>
+    <qti-item-body>
+        <p>A moving object's kinetic energy is related to its mass and speed.</p>
+        <p>The relationship between kinetic energy and mass for an object with constant speed is modeled by the graph below.</p>
+        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzk2IiBoZWlnaHQ9IjM4MSIgdmlld0JveD0iLTg3IC05IDM5NiAzODEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTYiPjxkZWZzPjxjbGlwUGF0aCBpZD0iY2xpcC0wIj48cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIvPjwvY2xpcFBhdGg+PG1hcmtlciBpZD0iZ3JhcGgtYXJyb3ciIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOCIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjYiIG1hcmtlckhlaWdodD0iNiIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPjxwYXRoIGQ9Ik0gMCAwIEwgMTAgNSBMIDAgMTAgeiIgZmlsbD0iIzAwMDAwMCIvPjwvbWFya2VyPjwvZGVmcz48bGluZSB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMzAwIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PGxpbmUgeDE9IjAiIHkxPSIzMDAiIHgyPSIwIiB5Mj0iMzAwIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PGxpbmUgeDE9IjAiIHkxPSIyMjUiIHgyPSIwIiB5Mj0iMjI1IiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PGxpbmUgeDE9IjAiIHkxPSIxNTAiIHgyPSIwIiB5Mj0iMTUwIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PGxpbmUgeDE9IjAiIHkxPSI3NSIgeDI9IjAiIHkyPSI3NSIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjxsaW5lIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIwIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PHRleHQgeD0iLTY4LjYwMDAwMDAwMDAwMDAxIiB5PSIxNTAiIGZvbnQtc2l6ZT0iMTYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMzMzMzMzMiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiIHRyYW5zZm9ybT0icm90YXRlKC05MCwgLTY4LjYwMDAwMDAwMDAwMDAxLCAxNTApIj48dHNwYW4geD0iLTY4LjYwMDAwMDAwMDAwMDAxIiBkeT0iMGVtIj5raW5ldGljIGVuZXJneTwvdHNwYW4+PC90ZXh0PjxsaW5lIHgxPSIwIiB5MT0iMzAwIiB4Mj0iMzAwIiB5Mj0iMzAwIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PGxpbmUgeDE9IjAiIHkxPSIzMDAiIHgyPSIwIiB5Mj0iMzAwIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PGxpbmUgeDE9Ijc1IiB5MT0iMzAwIiB4Mj0iNzUiIHkyPSIzMDAiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48bGluZSB4MT0iMTUwIiB5MT0iMzAwIiB4Mj0iMTUwIiB5Mj0iMzAwIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PGxpbmUgeDE9IjIyNSIgeTE9IjMwMCIgeDI9IjIyNSIgeTI9IjMwMCIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjxsaW5lIHgxPSIzMDAiIHkxPSIzMDAiIHgyPSIzMDAiIHkyPSIzMDAiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48dGV4dCB4PSIxNTAiIHk9IjM0NyIgZm9udC1zaXplPSIxNiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzMzMzMzMyI+PHRzcGFuIHg9IjE1MCIgZHk9IjBlbSI+bWFzczwvdHNwYW4+PC90ZXh0PjxsaW5lIHgxPSIwIiB5MT0iMzAwIiB4Mj0iMCIgeTI9IjAiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIyIiBtYXJrZXItZW5kPSJ1cmwoI2dyYXBoLWFycm93KSIvPjxsaW5lIHgxPSIwIiB5MT0iMzAwIiB4Mj0iMzAwIiB5Mj0iMzAwIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMiIgbWFya2VyLWVuZD0idXJsKCNncmFwaC1hcnJvdykiLz48ZyBjbGlwLXBhdGg9InVybCgjY2xpcC0wKSI+PHBvbHlsaW5lIHBvaW50cz0iMCwzMDAgMzAwLDAiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGZpbGw9Im5vbmUiLz48L2c+PC9zdmc+" alt="Widget visualization" />
+        <p>The relationship between kinetic energy and speed for an object with constant mass is modeled by the graph below.</p>
+        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzk2IiBoZWlnaHQ9IjM4MSIgdmlld0JveD0iLTg3IC05IDM5NiAzODEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTYiPjxkZWZzPjxjbGlwUGF0aCBpZD0iY2xpcC0wIj48cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIvPjwvY2xpcFBhdGg+PG1hcmtlciBpZD0iZ3JhcGgtYXJyb3ciIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOCIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjYiIG1hcmtlckhlaWdodD0iNiIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPjxwYXRoIGQ9Ik0gMCAwIEwgMTAgNSBMIDAgMTAgeiIgZmlsbD0iIzAwMDAwMCIvPjwvbWFya2VyPjwvZGVmcz48bGluZSB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMzAwIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PGxpbmUgeDE9IjAiIHkxPSIzMDAiIHgyPSIwIiB5Mj0iMzAwIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PGxpbmUgeDE9IjAiIHkxPSIyMjUiIHgyPSIwIiB5Mj0iMjI1IiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PGxpbmUgeDE9IjAiIHkxPSIxNTAiIHgyPSIwIiB5Mj0iMTUwIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PGxpbmUgeDE9IjAiIHkxPSI3NSIgeDI9IjAiIHkyPSI3NSIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjxsaW5lIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIwIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PHRleHQgeD0iLTY4LjYwMDAwMDAwMDAwMDAxIiB5PSIxNTAiIGZvbnQtc2l6ZT0iMTYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMzMzMzMzMiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiIHRyYW5zZm9ybT0icm90YXRlKC05MCwgLTY4LjYwMDAwMDAwMDAwMDAxLCAxNTApIj48dHNwYW4geD0iLTY4LjYwMDAwMDAwMDAwMDAxIiBkeT0iMGVtIj5raW5ldGljIGVuZXJneTwvdHNwYW4+PC90ZXh0PjxsaW5lIHgxPSIwIiB5MT0iMzAwIiB4Mj0iMzAwIiB5Mj0iMzAwIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PGxpbmUgeDE9IjAiIHkxPSIzMDAiIHgyPSIwIiB5Mj0iMzAwIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PGxpbmUgeDE9Ijc1IiB5MT0iMzAwIiB4Mj0iNzUiIHkyPSIzMDAiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48bGluZSB4MT0iMTUwIiB5MT0iMzAwIiB4Mj0iMTUwIiB5Mj0iMzAwIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PGxpbmUgeDE9IjIyNSIgeTE9IjMwMCIgeDI9IjIyNSIgeTI9IjMwMCIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjxsaW5lIHgxPSIzMDAiIHkxPSIzMDAiIHgyPSIzMDAiIHkyPSIzMDAiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48dGV4dCB4PSIxNTAiIHk9IjM0NyIgZm9udC1zaXplPSIxNiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzMzMzMzMyI+PHRzcGFuIHg9IjE1MCIgZHk9IjBlbSI+c3BlZWQ8L3RzcGFuPjwvdGV4dD48bGluZSB4MT0iMCIgeTE9IjMwMCIgeDI9IjAiIHkyPSIwIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMiIgbWFya2VyLWVuZD0idXJsKCNncmFwaC1hcnJvdykiLz48bGluZSB4MT0iMCIgeTE9IjMwMCIgeDI9IjMwMCIgeTI9IjMwMCIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjIiIG1hcmtlci1lbmQ9InVybCgjZ3JhcGgtYXJyb3cpIi8+PGcgY2xpcC1wYXRoPSJ1cmwoI2NsaXAtMCkiPjxwb2x5bGluZSBwb2ludHM9IjAsMzAwIDYwLDI4OCAxMjAsMjUyIDE4MCwxOTIgMjQwLDEwOCAzMDAsMCIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgZmlsbD0ibm9uZSIvPjwvZz48L3N2Zz4=" alt="Widget visualization" />
+        <p>Use the patterns on the graphs to complete the statements.</p>
+        <p>• The relationship between kinetic energy and mass is <qti-inline-choice-interaction response-identifier="dropdown_1" shuffle="true">
+                <qti-inline-choice identifier="linear">linear</qti-inline-choice>
+                <qti-inline-choice identifier="nonlinear">nonlinear</qti-inline-choice>
+            </qti-inline-choice-interaction>. If an object's mass is cut in half while its speed stays the same, its kinetic energy becomes <qti-inline-choice-interaction response-identifier="dropdown_3" shuffle="true">
+                <qti-inline-choice identifier="one_fourth">one-fourth</qti-inline-choice>
+                <qti-inline-choice identifier="one_half">one-half</qti-inline-choice>
+                <qti-inline-choice identifier="two_times">two times</qti-inline-choice>
+                <qti-inline-choice identifier="four_times">four times</qti-inline-choice>
+            </qti-inline-choice-interaction> its original value.</p>
+        <p>• The relationship between kinetic energy and speed is <qti-inline-choice-interaction response-identifier="dropdown_2" shuffle="true">
+                <qti-inline-choice identifier="linear">linear</qti-inline-choice>
+                <qti-inline-choice identifier="nonlinear">nonlinear</qti-inline-choice>
+            </qti-inline-choice-interaction>. If an object's speed is cut in half while its mass stays the same, its kinetic energy becomes <qti-inline-choice-interaction response-identifier="dropdown_5" shuffle="true">
+                <qti-inline-choice identifier="one_fourth">one-fourth</qti-inline-choice>
+                <qti-inline-choice identifier="one_half">one-half</qti-inline-choice>
+                <qti-inline-choice identifier="two_times">two times</qti-inline-choice>
+                <qti-inline-choice identifier="four_times">four times</qti-inline-choice>
+            </qti-inline-choice-interaction> its original value.</p>
+        <qti-feedback-block outcome-identifier="FEEDBACK__GLOBAL" identifier="CORRECT" show-hide="show">
+            <qti-content-body><p>Correct! The mass–kinetic energy relationship is linear, so halving the mass (at constant speed) halves the kinetic energy.</p>
+        <p>The speed–kinetic energy relationship is nonlinear (quadratic), so halving the speed (at constant mass) reduces the kinetic energy to one-fourth of its original value.</p></qti-content-body>
+        </qti-feedback-block>
+        <qti-feedback-block outcome-identifier="FEEDBACK__GLOBAL" identifier="INCORRECT" show-hide="show">
+            <qti-content-body><p>Not quite. On the first graph, the straight line shows a linear pattern: when mass is scaled by a factor, kinetic energy scales by the same factor at constant speed.</p>
+        <p>On the second graph, the curved shape indicates a nonlinear (quadratic) pattern: when speed is halved, kinetic energy becomes one-fourth of its original value at constant mass.</p></qti-content-body>
+        </qti-feedback-block>
+    </qti-item-body>
+    <qti-response-processing>
+        <qti-response-condition>
+        <qti-response-if>
+            <qti-match>
+                <qti-variable identifier="dropdown_1"/>
+                <qti-base-value base-type="identifier">linear</qti-base-value>
+            </qti-match>
+            <qti-set-outcome-value identifier="FEEDBACK__dropdown_1">
+                <qti-base-value base-type="identifier">linear</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-if>
+        <qti-response-else-if>
+            <qti-match>
+                <qti-variable identifier="dropdown_1"/>
+                <qti-base-value base-type="identifier">nonlinear</qti-base-value>
+            </qti-match>
+            <qti-set-outcome-value identifier="FEEDBACK__dropdown_1">
+                <qti-base-value base-type="identifier">nonlinear</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-else-if></qti-response-condition>
+<qti-response-condition>
+        <qti-response-if>
+            <qti-match>
+                <qti-variable identifier="dropdown_3"/>
+                <qti-base-value base-type="identifier">one_fourth</qti-base-value>
+            </qti-match>
+            <qti-set-outcome-value identifier="FEEDBACK__dropdown_3">
+                <qti-base-value base-type="identifier">one_fourth</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-if>
+        <qti-response-else-if>
+            <qti-match>
+                <qti-variable identifier="dropdown_3"/>
+                <qti-base-value base-type="identifier">one_half</qti-base-value>
+            </qti-match>
+            <qti-set-outcome-value identifier="FEEDBACK__dropdown_3">
+                <qti-base-value base-type="identifier">one_half</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-else-if>
+        <qti-response-else-if>
+            <qti-match>
+                <qti-variable identifier="dropdown_3"/>
+                <qti-base-value base-type="identifier">two_times</qti-base-value>
+            </qti-match>
+            <qti-set-outcome-value identifier="FEEDBACK__dropdown_3">
+                <qti-base-value base-type="identifier">two_times</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-else-if>
+        <qti-response-else-if>
+            <qti-match>
+                <qti-variable identifier="dropdown_3"/>
+                <qti-base-value base-type="identifier">four_times</qti-base-value>
+            </qti-match>
+            <qti-set-outcome-value identifier="FEEDBACK__dropdown_3">
+                <qti-base-value base-type="identifier">four_times</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-else-if></qti-response-condition>
+<qti-response-condition>
+        <qti-response-if>
+            <qti-match>
+                <qti-variable identifier="dropdown_2"/>
+                <qti-base-value base-type="identifier">linear</qti-base-value>
+            </qti-match>
+            <qti-set-outcome-value identifier="FEEDBACK__dropdown_2">
+                <qti-base-value base-type="identifier">linear</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-if>
+        <qti-response-else-if>
+            <qti-match>
+                <qti-variable identifier="dropdown_2"/>
+                <qti-base-value base-type="identifier">nonlinear</qti-base-value>
+            </qti-match>
+            <qti-set-outcome-value identifier="FEEDBACK__dropdown_2">
+                <qti-base-value base-type="identifier">nonlinear</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-else-if></qti-response-condition>
+<qti-response-condition>
+        <qti-response-if>
+            <qti-match>
+                <qti-variable identifier="dropdown_5"/>
+                <qti-base-value base-type="identifier">one_fourth</qti-base-value>
+            </qti-match>
+            <qti-set-outcome-value identifier="FEEDBACK__dropdown_5">
+                <qti-base-value base-type="identifier">one_fourth</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-if>
+        <qti-response-else-if>
+            <qti-match>
+                <qti-variable identifier="dropdown_5"/>
+                <qti-base-value base-type="identifier">one_half</qti-base-value>
+            </qti-match>
+            <qti-set-outcome-value identifier="FEEDBACK__dropdown_5">
+                <qti-base-value base-type="identifier">one_half</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-else-if>
+        <qti-response-else-if>
+            <qti-match>
+                <qti-variable identifier="dropdown_5"/>
+                <qti-base-value base-type="identifier">two_times</qti-base-value>
+            </qti-match>
+            <qti-set-outcome-value identifier="FEEDBACK__dropdown_5">
+                <qti-base-value base-type="identifier">two_times</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-else-if>
+        <qti-response-else-if>
+            <qti-match>
+                <qti-variable identifier="dropdown_5"/>
+                <qti-base-value base-type="identifier">four_times</qti-base-value>
+            </qti-match>
+            <qti-set-outcome-value identifier="FEEDBACK__dropdown_5">
+                <qti-base-value base-type="identifier">four_times</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-else-if></qti-response-condition>
+    <qti-response-condition>
+        <qti-response-if>
+            <qti-match>
+                <qti-variable identifier="TEXT_ENTRY"/>
+                <qti-correct identifier="TEXT_ENTRY"/>
+            </qti-match>
+            <qti-set-outcome-value identifier="FEEDBACK__GLOBAL">
+                <qti-base-value base-type="identifier">CORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-if>
+        <qti-response-else>
+            <qti-set-outcome-value identifier="FEEDBACK__GLOBAL">
+                <qti-base-value base-type="identifier">INCORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-else>
+    </qti-response-condition>
+    <qti-response-condition>
+        <qti-response-if>
+            <qti-and>
+                <qti-match><qti-variable identifier="dropdown_1"/><qti-correct identifier="dropdown_1"/></qti-match>
+                        <qti-match><qti-variable identifier="dropdown_3"/><qti-correct identifier="dropdown_3"/></qti-match>
+                        <qti-match><qti-variable identifier="dropdown_2"/><qti-correct identifier="dropdown_2"/></qti-match>
+                        <qti-match><qti-variable identifier="dropdown_5"/><qti-correct identifier="dropdown_5"/></qti-match>
+                        <qti-match><qti-variable identifier="TEXT_ENTRY"/><qti-correct identifier="TEXT_ENTRY"/></qti-match>
+            </qti-and>
+            <qti-set-outcome-value identifier="SCORE"><qti-base-value base-type="float">1.0</qti-base-value></qti-set-outcome-value>
+        </qti-response-if>
+        <qti-response-else>
+            <qti-set-outcome-value identifier="SCORE"><qti-base-value base-type="float">0.0</qti-base-value></qti-set-outcome-value>
+        </qti-response-else>
+    </qti-response-condition>
+    </qti-response-processing>
+</qti-assessment-item>"
+`;
+
+exports[`QTI Compiler End-to-End Tests should produce consistent XML output for "reactant-amounts-temp-change-table-perseus" 1`] = `
+"<?xml version="1.0" encoding="UTF-8"?>
+<qti-assessment-item
+    xmlns="http://www.imsglobal.org/xsd/imsqtiasi_v3p0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqtiasi_v3p0 https://purl.imsglobal.org/spec/qti/v3p0/schema/xsd/imsqti_asiv3p0p1_v1p0.xsd http://www.w3.org/1998/Math/MathML https://purl.imsglobal.org/spec/mathml/v3p0/schema/xsd/mathml3.xsd"
+    identifier="reactant-amounts-temp-change-table-perseus"
+    title="Identify reactants and amounts from temperature changes"
+    time-dependent="false"
+    xml:lang="en-US">
+    <qti-response-declaration identifier="dropdown_13" cardinality="single" base-type="identifier">
+        <qti-correct-response>
+            <qti-value>NEG_3_2_C</qti-value>
+        </qti-correct-response>
+    </qti-response-declaration>
+    <qti-response-declaration identifier="dropdown_12" cardinality="single" base-type="identifier">
+        <qti-correct-response>
+            <qti-value>POS_4_2_C</qti-value>
+        </qti-correct-response>
+    </qti-response-declaration>
+    <qti-response-declaration identifier="dropdown_11" cardinality="single" base-type="identifier">
+        <qti-correct-response>
+            <qti-value>POS_2_0_C</qti-value>
+        </qti-correct-response>
+    </qti-response-declaration>
+    <qti-response-declaration identifier="dropdown_9" cardinality="single" base-type="identifier">
+        <qti-correct-response>
+            <qti-value>KOH</qti-value>
+        </qti-correct-response>
+    </qti-response-declaration>
+    <qti-response-declaration identifier="dropdown_10" cardinality="single" base-type="identifier">
+        <qti-correct-response>
+            <qti-value>BaOH2</qti-value>
+        </qti-correct-response>
+    </qti-response-declaration>
+    <qti-response-declaration identifier="TEXT_ENTRY" cardinality="single" base-type="string">
+        <qti-correct-response>
+            <qti-value>done</qti-value>
+        </qti-correct-response>
+        <qti-mapping default-value="0">
+            <qti-map-entry map-key="done" mapped-value="1"/>
+        </qti-mapping>
+    </qti-response-declaration>
+    <qti-outcome-declaration identifier="SCORE" cardinality="single" base-type="float">
+        <qti-default-value><qti-value>0</qti-value></qti-default-value>
+    </qti-outcome-declaration>
+    <qti-outcome-declaration identifier="FEEDBACK__GLOBAL" cardinality="single" base-type="identifier"/>
+    <qti-item-body>
+        <p>Several students tested how the temperature changed when dissolving different solids in the same amount of water. The substances they tested were <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Na</mi><msub><mi>C</mi><mn>2</mn></msub><msub><mi>H</mi><mn>3</mn></msub><msub><mi>O</mi><mn>2</mn></msub></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>K</mi><mi>O</mi><mi>H</mi></mrow></math>, and <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Ba</mi><msub><mrow><mo>(</mo><mi>OH</mi><mo>)</mo></mrow><mn>2</mn></msub></mrow></math>.</p>
+        <p>Only one student kept track of everyone's data. Unfortunately, their lab notebook got wet, and some of the labels were damaged.</p>
+        <div style="display: inline-block; text-align: center;"><img src="https://cdn.kastatic.org/ka-content-images/7bebb0e8fd90795225d76add80eb4c2d9d7d4f0d.jpg" alt="A diagram of the lab setup, including a flask with liquid and a thermometer inside, and a solid powder being poured in. Another flask is tipped over and has spilled onto a notebook on the lab desk." style="display: block; width: 372px; height: 300px;" /></div>
+        <p>Use the data provided to identify the reactant and amount that caused each temperature change. Each option is only used once.</p>
+        <table style="border-collapse: collapse; width: 100%; border: 1px solid #000000;"><caption style="padding: 8px; font-size: 1.2em; font-weight: 700; caption-side: top;">Experiment data</caption><thead><tr><th scope="col" style="border: 1px solid #000000; padding: 8px; text-align: left; font-weight: 700; background-color: #f2f2f2; text-align: left;">Experiment</th><th scope="col" style="border: 1px solid #000000; padding: 8px; text-align: left; font-weight: 700; background-color: #f2f2f2;">Reactant</th><th scope="col" style="border: 1px solid #000000; padding: 8px; text-align: left; font-weight: 700; background-color: #f2f2f2;">Amount of reactant</th><th scope="col" style="border: 1px solid #000000; padding: 8px; text-align: left; font-weight: 700; background-color: #f2f2f2;">Temperature change</th></tr></thead><tbody><tr><th scope="row" style="border: 1px solid #000000; padding: 8px; text-align: left; font-weight: 700; background-color: #f2f2f2;">A</th><td style="border: 1px solid #000000; padding: 8px; text-align: left;"><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Na</mi><msub><mi>C</mi><mn>2</mn></msub><msub><mi>H</mi><mn>3</mn></msub><msub><mi>O</mi><mn>2</mn></msub></mrow></math></td><td style="border: 1px solid #000000; padding: 8px; text-align: left;"><math xmlns="http://www.w3.org/1998/Math/MathML"><mn>4.0</mn></math> grams</td><td style="border: 1px solid #000000; padding: 8px; text-align: left;"><math xmlns="http://www.w3.org/1998/Math/MathML"><mo>-</mo><mn>1.6</mn><mo>°</mo><mi>C</mi></math></td></tr><tr><th scope="row" style="border: 1px solid #000000; padding: 8px; text-align: left; font-weight: 700; background-color: #f2f2f2;">B</th><td style="border: 1px solid #000000; padding: 8px; text-align: left;"><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>K</mi><mi>O</mi><mi>H</mi></mrow></math></td><td style="border: 1px solid #000000; padding: 8px; text-align: left;"><math xmlns="http://www.w3.org/1998/Math/MathML"><mn>3.0</mn></math> grams</td><td style="border: 1px solid #000000; padding: 8px; text-align: left;"><math xmlns="http://www.w3.org/1998/Math/MathML"><mo>+</mo><mn>2.1</mn><mo>°</mo><mi>C</mi></math></td></tr><tr><th scope="row" style="border: 1px solid #000000; padding: 8px; text-align: left; font-weight: 700; background-color: #f2f2f2;">C</th><td style="border: 1px solid #000000; padding: 8px; text-align: left;"><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Na</mi><msub><mi>C</mi><mn>2</mn></msub><msub><mi>H</mi><mn>3</mn></msub><msub><mi>O</mi><mn>2</mn></msub></mrow></math></td><td style="border: 1px solid #000000; padding: 8px; text-align: left;"><math xmlns="http://www.w3.org/1998/Math/MathML"><mn>8.0</mn></math> grams</td><td style="border: 1px solid #000000; padding: 8px; text-align: left;"><qti-inline-choice-interaction response-identifier="dropdown_13" shuffle="false">
+				<qti-inline-choice identifier="NEG_3_2_C"><math xmlns="http://www.w3.org/1998/Math/MathML"><mo>-</mo><mn>3.2</mn><mo>°</mo><mi>C</mi></math></qti-inline-choice>
+                <qti-inline-choice identifier="POS_2_0_C"><math xmlns="http://www.w3.org/1998/Math/MathML"><mo>+</mo><mn>2.0</mn><mo>°</mo><mi>C</mi></math></qti-inline-choice>
+                <qti-inline-choice identifier="POS_4_2_C"><math xmlns="http://www.w3.org/1998/Math/MathML"><mo>+</mo><mn>4.2</mn><mo>°</mo><mi>C</mi></math></qti-inline-choice>
+			</qti-inline-choice-interaction></td></tr><tr><th scope="row" style="border: 1px solid #000000; padding: 8px; text-align: left; font-weight: 700; background-color: #f2f2f2;">D</th><td style="border: 1px solid #000000; padding: 8px; text-align: left;"><qti-inline-choice-interaction response-identifier="dropdown_9" shuffle="false">
+				<qti-inline-choice identifier="NaC2H3O2"><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Na</mi><msub><mi>C</mi><mn>2</mn></msub><msub><mi>H</mi><mn>3</mn></msub><msub><mi>O</mi><mn>2</mn></msub></mrow></math></qti-inline-choice>
+                <qti-inline-choice identifier="KOH"><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>K</mi><mi>O</mi><mi>H</mi></mrow></math></qti-inline-choice>
+                <qti-inline-choice identifier="BaOH2"><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Ba</mi><msub><mrow><mo>(</mo><mi>OH</mi><mo>)</mo></mrow><mn>2</mn></msub></mrow></math></qti-inline-choice>
+			</qti-inline-choice-interaction></td><td style="border: 1px solid #000000; padding: 8px; text-align: left;"><math xmlns="http://www.w3.org/1998/Math/MathML"><mn>6.0</mn></math> grams</td><td style="border: 1px solid #000000; padding: 8px; text-align: left;"><qti-inline-choice-interaction response-identifier="dropdown_12" shuffle="false">
+				<qti-inline-choice identifier="NEG_3_2_C"><math xmlns="http://www.w3.org/1998/Math/MathML"><mo>-</mo><mn>3.2</mn><mo>°</mo><mi>C</mi></math></qti-inline-choice>
+                <qti-inline-choice identifier="POS_2_0_C"><math xmlns="http://www.w3.org/1998/Math/MathML"><mo>+</mo><mn>2.0</mn><mo>°</mo><mi>C</mi></math></qti-inline-choice>
+                <qti-inline-choice identifier="POS_4_2_C"><math xmlns="http://www.w3.org/1998/Math/MathML"><mo>+</mo><mn>4.2</mn><mo>°</mo><mi>C</mi></math></qti-inline-choice>
+			</qti-inline-choice-interaction></td></tr><tr><th scope="row" style="border: 1px solid #000000; padding: 8px; text-align: left; font-weight: 700; background-color: #f2f2f2;">E</th><td style="border: 1px solid #000000; padding: 8px; text-align: left;"><qti-inline-choice-interaction response-identifier="dropdown_10" shuffle="false">
+				<qti-inline-choice identifier="NaC2H3O2"><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Na</mi><msub><mi>C</mi><mn>2</mn></msub><msub><mi>H</mi><mn>3</mn></msub><msub><mi>O</mi><mn>2</mn></msub></mrow></math></qti-inline-choice>
+                <qti-inline-choice identifier="KOH"><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>K</mi><mi>O</mi><mi>H</mi></mrow></math></qti-inline-choice>
+                <qti-inline-choice identifier="BaOH2"><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Ba</mi><msub><mrow><mo>(</mo><mi>OH</mi><mo>)</mo></mrow><mn>2</mn></msub></mrow></math></qti-inline-choice>
+			</qti-inline-choice-interaction></td><td style="border: 1px solid #000000; padding: 8px; text-align: left;"><math xmlns="http://www.w3.org/1998/Math/MathML"><mn>2.0</mn></math> grams</td><td style="border: 1px solid #000000; padding: 8px; text-align: left;"><qti-inline-choice-interaction response-identifier="dropdown_11" shuffle="false">
+				<qti-inline-choice identifier="NEG_3_2_C"><math xmlns="http://www.w3.org/1998/Math/MathML"><mo>-</mo><mn>3.2</mn><mo>°</mo><mi>C</mi></math></qti-inline-choice>
+                <qti-inline-choice identifier="POS_2_0_C"><math xmlns="http://www.w3.org/1998/Math/MathML"><mo>+</mo><mn>2.0</mn><mo>°</mo><mi>C</mi></math></qti-inline-choice>
+                <qti-inline-choice identifier="POS_4_2_C"><math xmlns="http://www.w3.org/1998/Math/MathML"><mo>+</mo><mn>4.2</mn><mo>°</mo><mi>C</mi></math></qti-inline-choice>
+			</qti-inline-choice-interaction></td></tr></tbody></table>
+        <qti-feedback-block outcome-identifier="FEEDBACK__GLOBAL" identifier="CORRECT" show-hide="show">
+            <qti-content-body><p>Correct! You used the patterns in the data to match each unknown entry.</p>
+        <p>Experiment C has twice the amount of sodium acetate as experiment A, so its temperature change is twice as large and negative: <math xmlns="http://www.w3.org/1998/Math/MathML"><mo>-</mo><mn>3.2</mn><mo>°</mo><mi>C</mi></math>. Experiment D corresponds to <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>K</mi><mi>O</mi><mi>H</mi></mrow></math> with a temperature increase of <math xmlns="http://www.w3.org/1998/Math/MathML"><mo>+</mo><mn>4.2</mn><mo>°</mo><mi>C</mi></math>, and experiment E corresponds to <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Ba</mi><msub><mrow><mo>(</mo><mi>OH</mi><mo>)</mo></mrow><mn>2</mn></msub></mrow></math> with a temperature increase of <math xmlns="http://www.w3.org/1998/Math/MathML"><mo>+</mo><mn>2.0</mn><mo>°</mo><mi>C</mi></math>.</p></qti-content-body>
+        </qti-feedback-block>
+        <qti-feedback-block outcome-identifier="FEEDBACK__GLOBAL" identifier="INCORRECT" show-hide="show">
+            <qti-content-body><p>Not quite. First, decide which reactions are endothermic (temperature decreases) and which are exothermic (temperature increases). Then use how the amount changes (for example, twice as much) to match proportional changes in temperature.</p></qti-content-body>
+        </qti-feedback-block>
+    </qti-item-body>
+    <qti-response-processing>
+        
+    <qti-response-condition>
+        <qti-response-if>
+            <qti-match>
+                <qti-variable identifier="dropdown_13"/>
+                <qti-correct identifier="dropdown_13"/>
+            </qti-match>
+            <qti-set-outcome-value identifier="FEEDBACK__GLOBAL">
+                <qti-base-value base-type="identifier">CORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-if>
+        <qti-response-else>
+            <qti-set-outcome-value identifier="FEEDBACK__GLOBAL">
+                <qti-base-value base-type="identifier">INCORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-else>
+    </qti-response-condition>
+    <qti-response-condition>
+        <qti-response-if>
+            <qti-match>
+                <qti-variable identifier="dropdown_12"/>
+                <qti-correct identifier="dropdown_12"/>
+            </qti-match>
+            <qti-set-outcome-value identifier="FEEDBACK__GLOBAL">
+                <qti-base-value base-type="identifier">CORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-if>
+        <qti-response-else>
+            <qti-set-outcome-value identifier="FEEDBACK__GLOBAL">
+                <qti-base-value base-type="identifier">INCORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-else>
+    </qti-response-condition>
+    <qti-response-condition>
+        <qti-response-if>
+            <qti-match>
+                <qti-variable identifier="dropdown_11"/>
+                <qti-correct identifier="dropdown_11"/>
+            </qti-match>
+            <qti-set-outcome-value identifier="FEEDBACK__GLOBAL">
+                <qti-base-value base-type="identifier">CORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-if>
+        <qti-response-else>
+            <qti-set-outcome-value identifier="FEEDBACK__GLOBAL">
+                <qti-base-value base-type="identifier">INCORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-else>
+    </qti-response-condition>
+    <qti-response-condition>
+        <qti-response-if>
+            <qti-match>
+                <qti-variable identifier="dropdown_9"/>
+                <qti-correct identifier="dropdown_9"/>
+            </qti-match>
+            <qti-set-outcome-value identifier="FEEDBACK__GLOBAL">
+                <qti-base-value base-type="identifier">CORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-if>
+        <qti-response-else>
+            <qti-set-outcome-value identifier="FEEDBACK__GLOBAL">
+                <qti-base-value base-type="identifier">INCORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-else>
+    </qti-response-condition>
+    <qti-response-condition>
+        <qti-response-if>
+            <qti-match>
+                <qti-variable identifier="dropdown_10"/>
+                <qti-correct identifier="dropdown_10"/>
+            </qti-match>
+            <qti-set-outcome-value identifier="FEEDBACK__GLOBAL">
+                <qti-base-value base-type="identifier">CORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-if>
+        <qti-response-else>
+            <qti-set-outcome-value identifier="FEEDBACK__GLOBAL">
+                <qti-base-value base-type="identifier">INCORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-else>
+    </qti-response-condition>
+    <qti-response-condition>
+        <qti-response-if>
+            <qti-match>
+                <qti-variable identifier="TEXT_ENTRY"/>
+                <qti-correct identifier="TEXT_ENTRY"/>
+            </qti-match>
+            <qti-set-outcome-value identifier="FEEDBACK__GLOBAL">
+                <qti-base-value base-type="identifier">CORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-if>
+        <qti-response-else>
+            <qti-set-outcome-value identifier="FEEDBACK__GLOBAL">
+                <qti-base-value base-type="identifier">INCORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-else>
+    </qti-response-condition>
+    <qti-response-condition>
+        <qti-response-if>
+            <qti-and>
+                <qti-match><qti-variable identifier="dropdown_13"/><qti-correct identifier="dropdown_13"/></qti-match>
+                        <qti-match><qti-variable identifier="dropdown_12"/><qti-correct identifier="dropdown_12"/></qti-match>
+                        <qti-match><qti-variable identifier="dropdown_11"/><qti-correct identifier="dropdown_11"/></qti-match>
+                        <qti-match><qti-variable identifier="dropdown_9"/><qti-correct identifier="dropdown_9"/></qti-match>
+                        <qti-match><qti-variable identifier="dropdown_10"/><qti-correct identifier="dropdown_10"/></qti-match>
+                        <qti-match><qti-variable identifier="TEXT_ENTRY"/><qti-correct identifier="TEXT_ENTRY"/></qti-match>
             </qti-and>
             <qti-set-outcome-value identifier="SCORE"><qti-base-value base-type="float">1.0</qti-base-value></qti-set-outcome-value>
         </qti-response-if>
