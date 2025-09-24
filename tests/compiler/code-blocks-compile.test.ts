@@ -9,7 +9,7 @@ describe("Compiler: code blocks", () => {
 			title: "Code Block Support",
 			responseDeclarations: [
 				{
-					identifier: "TE",
+					identifier: "RESPONSE_TE",
 					cardinality: "single",
 					baseType: "string",
 					correct: "ok"
@@ -21,7 +21,7 @@ describe("Compiler: code blocks", () => {
 			],
 			widgets: null,
 			interactions: {
-				TE_INT: { type: "textEntryInteraction", responseIdentifier: "TE", expectedLength: null }
+				TE_INT: { type: "textEntryInteraction", responseIdentifier: "RESPONSE_TE", expectedLength: null }
 			},
 			feedbackBlocks: [
 				{ identifier: "CORRECT", outcomeIdentifier: "FEEDBACK__GLOBAL", content: [] },

@@ -10,7 +10,7 @@ exports[`Compiler: code blocks should render code blocks in body and escape corr
     title="Code Block Support"
     time-dependent="false"
     xml:lang="en-US">
-    <qti-response-declaration identifier="TE" cardinality="single" base-type="string">
+    <qti-response-declaration identifier="RESPONSE_TE" cardinality="single" base-type="string">
         <qti-correct-response>
             <qti-value>ok</qti-value>
         </qti-correct-response>
@@ -38,8 +38,8 @@ exports[`Compiler: code blocks should render code blocks in body and escape corr
     <qti-response-condition>
         <qti-response-if>
             <qti-match>
-                <qti-variable identifier="TE"/>
-                <qti-correct identifier="TE"/>
+                <qti-variable identifier="RESPONSE_TE"/>
+                <qti-correct identifier="RESPONSE_TE"/>
             </qti-match>
             <qti-set-outcome-value identifier="FEEDBACK__GLOBAL">
                 <qti-base-value base-type="identifier">CORRECT</qti-base-value>
@@ -54,7 +54,7 @@ exports[`Compiler: code blocks should render code blocks in body and escape corr
     <qti-response-condition>
         <qti-response-if>
             <qti-and>
-                <qti-match><qti-variable identifier="TE"/><qti-correct identifier="TE"/></qti-match>
+                <qti-match><qti-variable identifier="RESPONSE_TE"/><qti-correct identifier="RESPONSE_TE"/></qti-match>
             </qti-and>
             <qti-set-outcome-value identifier="SCORE"><qti-base-value base-type="float">1.0</qti-base-value></qti-set-outcome-value>
         </qti-response-if>

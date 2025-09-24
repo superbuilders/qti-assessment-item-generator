@@ -3,13 +3,13 @@ import * as logger from "@superbuilders/slog"
 import { z } from "zod"
 import { MATHML_INNER_PATTERN } from "../utils/mathml"
 import { typedSchemas } from "../widgets/registry"
-import { SAFE_IDENTIFIER_REGEX } from "./qti-constants"
-
-// NEW: Add regex constants for feedback system identifiers
-// Uniform naming: either FEEDBACK__GLOBAL or FEEDBACK__<responseId>
-export const OUTCOME_IDENTIFIER_REGEX = /^FEEDBACK__(?:GLOBAL|[A-Za-z0-9_]+)$/
-export const FEEDBACK_BLOCK_ID_REGEX = /^(CORRECT|INCORRECT|[A-Z][A-Z0-9_]*)$/
-export const RESPONSE_IDENTIFIER_REGEX = /^(RESP|RESPONSE)(?:__[A-Za-z0-9_]+)?$/
+import {
+	RESPONSE_IDENTIFIER_REGEX,
+	OUTCOME_IDENTIFIER_REGEX,
+	FEEDBACK_BLOCK_IDENTIFIER_REGEX,
+	CHOICE_IDENTIFIER_REGEX,
+	SLOT_IDENTIFIER_REGEX
+} from "./qti-constants"
 
 // LEVEL 2: INLINE CONTENT (for paragraphs, prompts, etc.)
 // Factory functions to create fresh schema instances (avoids $ref in JSON Schema)
@@ -38,7 +38,7 @@ function createInlineContentItemSchema() {
 					type: z
 						.literal("inlineSlot")
 						.describe("Identifies this as an inline placeholder for widgets or interactions"),
-					slotId: z.string().describe("Unique identifier that matches a widget or interaction key")
+					slotId: z.string().regex(SLOT_IDENTIFIER_REGEX, "invalid slot identifier: must be lowercase with underscores").describe("Unique identifier that matches a widget or interaction key")
 				})
 				.strict()
 				.describe("Placeholder for inline content that will be filled with a widget or interaction"),
@@ -47,7 +47,7 @@ function createInlineContentItemSchema() {
 					type: z.literal("gap").describe("Identifies this as a gap for gap match interaction"),
 					gapId: z
 						.string()
-						.regex(SAFE_IDENTIFIER_REGEX, "invalid gap identifier: must match [A-Za-z_][A-Za-z0-9_]*")
+						.regex(CHOICE_IDENTIFIER_REGEX, "invalid gap identifier: must be uppercase")
 						.describe("References a gap defined in a gapMatchInteraction")
 				})
 				.strict()
@@ -103,7 +103,7 @@ function createBlockContentItemSchema() {
 			z
 				.object({
 					type: z.literal("blockSlot").describe("Identifies this as a block-level placeholder"),
-					slotId: z.string().describe("Unique identifier that matches a widget or interaction key")
+					slotId: z.string().regex(SLOT_IDENTIFIER_REGEX, "invalid slot identifier: must be lowercase with underscores").describe("Unique identifier that matches a widget or interaction key")
 				})
 				.strict()
 				.describe("Placeholder for block-level content that will be filled with a widget or interaction")
@@ -144,7 +144,7 @@ export function createDynamicAssessmentItemSchema(widgetMapping: Record<string, 
 		.object({
 			identifier: z
 				.string()
-				.regex(SAFE_IDENTIFIER_REGEX, "invalid identifier: must match [A-Za-z_][A-Za-z0-9_]*")
+				.regex(CHOICE_IDENTIFIER_REGEX, "invalid identifier: must be uppercase")
 				.describe("Unique identifier for this inline choice option."),
 			content: createInlineContentSchema().describe("The inline content displayed in the dropdown menu.")
 		})
@@ -156,7 +156,7 @@ export function createDynamicAssessmentItemSchema(widgetMapping: Record<string, 
 			type: z.literal("choiceInteraction").describe("Identifies this as a multiple choice interaction."),
 			responseIdentifier: z
 				.string()
-				.regex(SAFE_IDENTIFIER_REGEX, "invalid response identifier")
+				.regex(RESPONSE_IDENTIFIER_REGEX, "invalid response identifier: must start with RESPONSE")
 				.describe("Links this interaction to its response declaration for scoring."),
 			prompt: createInlineContentSchema().describe("The question or instruction presented to the user."),
 			choices: z
@@ -165,7 +165,7 @@ export function createDynamicAssessmentItemSchema(widgetMapping: Record<string, 
 						.object({
 							identifier: z
 								.string()
-								.regex(SAFE_IDENTIFIER_REGEX, "invalid identifier: must match [A-Za-z_][A-Za-z0-9_]*")
+								.regex(CHOICE_IDENTIFIER_REGEX, "invalid identifier: must be uppercase")
 								.describe("Unique identifier for this choice option, used for response matching."),
 							content: createBlockContentSchema().describe(
 								"Rich content for this choice option, supporting text, math, and embedded widgets."
@@ -189,7 +189,7 @@ export function createDynamicAssessmentItemSchema(widgetMapping: Record<string, 
 			type: z.literal("inlineChoiceInteraction").describe("Identifies this as an inline dropdown interaction."),
 			responseIdentifier: z
 				.string()
-				.regex(SAFE_IDENTIFIER_REGEX, "invalid response identifier")
+				.regex(RESPONSE_IDENTIFIER_REGEX, "invalid response identifier: must start with RESPONSE")
 				.describe("Links this interaction to its response declaration for scoring."),
 			choices: z.array(InlineChoiceSchema).min(1).describe("Array of options available in the dropdown menu."),
 			shuffle: z.literal(true).describe("Whether to randomize dropdown options. Always true to ensure fairness.")
@@ -202,7 +202,7 @@ export function createDynamicAssessmentItemSchema(widgetMapping: Record<string, 
 			type: z.literal("textEntryInteraction").describe("Identifies this as a text input interaction."),
 			responseIdentifier: z
 				.string()
-				.regex(SAFE_IDENTIFIER_REGEX, "invalid response identifier")
+				.regex(RESPONSE_IDENTIFIER_REGEX, "invalid response identifier: must start with RESPONSE")
 				.describe("Links this interaction to its response declaration for scoring."),
 			expectedLength: z.number().int().nullable().describe("Optional hint for expected answer length in characters.")
 		})
@@ -214,7 +214,7 @@ export function createDynamicAssessmentItemSchema(widgetMapping: Record<string, 
 			type: z.literal("orderInteraction").describe("Identifies this as an ordering/sequencing interaction."),
 			responseIdentifier: z
 				.string()
-				.regex(SAFE_IDENTIFIER_REGEX, "invalid response identifier")
+				.regex(RESPONSE_IDENTIFIER_REGEX, "invalid response identifier: must start with RESPONSE")
 				.describe("Links this interaction to its response declaration for scoring."),
 			prompt: createInlineContentSchema().describe(
 				"Explicit instructions for arranging items that MUST: (1) name the sort property (e.g., density, size, value), (2) state the sort direction using unambiguous phrases like 'least to greatest' or 'greatest to least', and (3) include the axis phrase '(top to bottom)' to match the enforced vertical orientation."
@@ -225,7 +225,7 @@ export function createDynamicAssessmentItemSchema(widgetMapping: Record<string, 
 						.object({
 							identifier: z
 								.string()
-								.regex(SAFE_IDENTIFIER_REGEX, "invalid identifier: must match [A-Za-z_][A-Za-z0-9_]*")
+								.regex(CHOICE_IDENTIFIER_REGEX, "invalid identifier: must be uppercase")
 								.describe("Unique identifier for this choice option, used for response matching."),
 							content: createBlockContentSchema().describe("Rich content for this orderable item."),
 								// REMOVED: The `feedback` field is no longer supported on choices.
@@ -254,7 +254,7 @@ export function createDynamicAssessmentItemSchema(widgetMapping: Record<string, 
 			type: z.literal("gapMatchInteraction").describe("Identifies this as a gap match (drag-and-drop) interaction."),
 			responseIdentifier: z
 				.string()
-				.regex(SAFE_IDENTIFIER_REGEX, "invalid response identifier")
+				.regex(RESPONSE_IDENTIFIER_REGEX, "invalid response identifier: must start with RESPONSE")
 				.describe("Links this interaction to its response declaration for scoring."),
 			shuffle: z.boolean().describe("Whether to shuffle the order of gap-text items (draggable tokens)."),
 			content: createBlockContentSchema()
@@ -268,7 +268,7 @@ export function createDynamicAssessmentItemSchema(widgetMapping: Record<string, 
 						.object({
 							identifier: z
 								.string()
-								.regex(SAFE_IDENTIFIER_REGEX, "invalid identifier: must match [A-Za-z_][A-Za-z0-9_]*")
+								.regex(CHOICE_IDENTIFIER_REGEX, "invalid identifier: must be uppercase")
 								.describe("Unique identifier for this draggable item (e.g., WORD_SOLAR)."),
 							matchMax: z
 								.number()
@@ -288,7 +288,7 @@ export function createDynamicAssessmentItemSchema(widgetMapping: Record<string, 
 						.object({
 							identifier: z
 								.string()
-								.regex(SAFE_IDENTIFIER_REGEX, "invalid identifier: must match [A-Za-z_][A-Za-z0-9_]*")
+								.regex(CHOICE_IDENTIFIER_REGEX, "invalid identifier: must be uppercase")
 								.describe("Unique identifier for this gap (e.g., GAP_1)."),
 							required: z.boolean().nullable().describe("Whether this gap must be filled for a correct response.")
 						})
@@ -333,7 +333,7 @@ export function createDynamicAssessmentItemSchema(widgetMapping: Record<string, 
 	const BaseResponseDeclarationSchema = z.object({
 		identifier: z
 			.string()
-			.regex(SAFE_IDENTIFIER_REGEX, "invalid response identifier")
+			.regex(RESPONSE_IDENTIFIER_REGEX, "invalid response identifier: must start with RESPONSE")
 			.describe("Unique ID linking an interaction to this response declaration."),
 		cardinality: z
 			.enum(["single", "multiple", "ordered"])
@@ -365,11 +365,11 @@ export function createDynamicAssessmentItemSchema(widgetMapping: Record<string, 
 				z.object({
 					source: z
 						.string()
-						.regex(SAFE_IDENTIFIER_REGEX, "invalid source identifier")
+						.regex(CHOICE_IDENTIFIER_REGEX, "invalid source identifier: must be uppercase")
 						.describe("The identifier of the gap-text (draggable item)."),
 					target: z
 						.string()
-						.regex(SAFE_IDENTIFIER_REGEX, "invalid target identifier")
+						.regex(CHOICE_IDENTIFIER_REGEX, "invalid target identifier: must be uppercase")
 						.describe("The identifier of the gap where the item should be placed.")
 				})
 			)
@@ -393,7 +393,7 @@ export function createDynamicAssessmentItemSchema(widgetMapping: Record<string, 
 		.object({
 			identifier: z
 				.string()
-				.regex(FEEDBACK_BLOCK_ID_REGEX, "invalid feedback block identifier")
+				.regex(FEEDBACK_BLOCK_IDENTIFIER_REGEX, "invalid feedback block identifier")
 				.describe("Identifier for the feedback block, e.g., 'A', 'B', 'CORRECT'."),
 			outcomeIdentifier: z
 				.string()

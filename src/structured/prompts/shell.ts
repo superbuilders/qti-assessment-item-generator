@@ -1233,12 +1233,12 @@ ${JSON.stringify(exampleShells, null, 2)}
       }
     ],
     "responseDeclarations": [
-      { "identifier": "RESP_REACT_C", "cardinality": "single", "baseType": "identifier", "correct": "MGSO4" },
-      { "identifier": "RESP_AMT_C",   "cardinality": "single", "baseType": "identifier", "correct": "AMT_2_5" },
-      { "identifier": "RESP_REACT_D", "cardinality": "single", "baseType": "identifier", "correct": "NH4CL" },
-      { "identifier": "RESP_AMT_D",   "cardinality": "single", "baseType": "identifier", "correct": "AMT_3_0" },
-      { "identifier": "RESP_REACT_E", "cardinality": "single", "baseType": "identifier", "correct": "CACL2" },
-      { "identifier": "RESP_AMT_E",   "cardinality": "single", "baseType": "identifier", "correct": "AMT_8_0" }
+      { "identifier": "RESPONSE_REACT_C", "cardinality": "single", "baseType": "identifier", "correct": "MGSO4" },
+      { "identifier": "RESPONSE_AMT_C",   "cardinality": "single", "baseType": "identifier", "correct": "AMT_2_5" },
+      { "identifier": "RESPONSE_REACT_D", "cardinality": "single", "baseType": "identifier", "correct": "NH4CL" },
+      { "identifier": "RESPONSE_AMT_D",   "cardinality": "single", "baseType": "identifier", "correct": "AMT_3_0" },
+      { "identifier": "RESPONSE_REACT_E", "cardinality": "single", "baseType": "identifier", "correct": "CACL2" },
+      { "identifier": "RESPONSE_AMT_E",   "cardinality": "single", "baseType": "identifier", "correct": "AMT_8_0" }
     ]
   }
   \`\`\`

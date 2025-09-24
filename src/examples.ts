@@ -181,7 +181,7 @@ export const linearModelEquationPrediction: AssessmentItemInput = {
 		// Feedback for choice_interaction (per-choice)
 		{
 			identifier: "A",
-			outcomeIdentifier: "FEEDBACK__choice_interaction",
+			outcomeIdentifier: "FEEDBACK__RESPONSE_CHOICE",
 			content: [
 				{
 					type: "paragraph",
@@ -203,7 +203,7 @@ export const linearModelEquationPrediction: AssessmentItemInput = {
 		},
 		{
 			identifier: "B",
-			outcomeIdentifier: "FEEDBACK__choice_interaction",
+			outcomeIdentifier: "FEEDBACK__RESPONSE_CHOICE",
 			content: [
 				{
 					type: "paragraph",
@@ -215,7 +215,7 @@ export const linearModelEquationPrediction: AssessmentItemInput = {
 		},
 		{
 			identifier: "C",
-			outcomeIdentifier: "FEEDBACK__choice_interaction",
+			outcomeIdentifier: "FEEDBACK__RESPONSE_CHOICE",
 			content: [
 				{
 					type: "paragraph",
@@ -227,7 +227,7 @@ export const linearModelEquationPrediction: AssessmentItemInput = {
 		},
 		{
 			identifier: "D",
-			outcomeIdentifier: "FEEDBACK__choice_interaction",
+			outcomeIdentifier: "FEEDBACK__RESPONSE_CHOICE",
 			content: [
 				{
 					type: "paragraph",
@@ -303,7 +303,7 @@ export const linearModelEquationPrediction: AssessmentItemInput = {
 	],
 	identifier: "linear-model-equation-prediction",
 	interactions: {
-		text_entry: { type: "textEntryInteraction", expectedLength: null, responseIdentifier: "text_entry" },
+		text_entry: { type: "textEntryInteraction", expectedLength: null, responseIdentifier: "RESPONSE_TEXT" },
 		choice_interaction: {
 			type: "choiceInteraction",
 			prompt: [],
@@ -372,12 +372,12 @@ export const linearModelEquationPrediction: AssessmentItemInput = {
 			shuffle: true,
 			maxChoices: 1,
 			minChoices: 1,
-			responseIdentifier: "choice_interaction"
+			responseIdentifier: "RESPONSE_CHOICE"
 		}
 	},
 	responseDeclarations: [
-		{ correct: "A", baseType: "identifier", identifier: "choice_interaction", cardinality: "single" },
-		{ correct: "27/2", baseType: "string", identifier: "text_entry", cardinality: "single" }
+		{ correct: "A", baseType: "identifier", identifier: "RESPONSE_CHOICE", cardinality: "single" },
+		{ correct: "27/2", baseType: "string", identifier: "RESPONSE_TEXT", cardinality: "single" }
 	]
 }
 
@@ -623,7 +623,7 @@ export const compare3DigitNumbers: AssessmentItemInput = {
 			correct: ["A", "B", "C"]
 		},
 		{
-			identifier: "TEXT_ENTRY",
+			identifier: "RESPONSE_TEXT_ENTRY",
 			cardinality: "single",
 			baseType: "string",
 			correct: "correct"
@@ -669,7 +669,7 @@ export const compare3DigitNumbers: AssessmentItemInput = {
 		},
 		text_entry: {
 			type: "textEntryInteraction",
-			responseIdentifier: "TEXT_ENTRY",
+			responseIdentifier: "RESPONSE_TEXT_ENTRY",
 			expectedLength: 10
 		}
 	},
@@ -953,10 +953,10 @@ export const twoWayFrequencyTable: AssessmentItemInput = {
 	identifier: "two-way-frequency-table-cold-study",
 	title: "Complete a Two-Way Frequency Table",
 	responseDeclarations: [
-		{ identifier: "RESP_A", cardinality: "single", baseType: "integer", correct: 23 },
-		{ identifier: "RESP_B", cardinality: "single", baseType: "integer", correct: 20 },
-		{ identifier: "RESP_C", cardinality: "single", baseType: "integer", correct: 27 },
-		{ identifier: "RESP_D", cardinality: "single", baseType: "integer", correct: 30 }
+		{ identifier: "RESPONSE_A", cardinality: "single", baseType: "integer", correct: 23 },
+		{ identifier: "RESPONSE_B", cardinality: "single", baseType: "integer", correct: 20 },
+		{ identifier: "RESPONSE_C", cardinality: "single", baseType: "integer", correct: 27 },
+		{ identifier: "RESPONSE_D", cardinality: "single", baseType: "integer", correct: 30 }
 	],
 	widgets: {
 		venn_widget: {
@@ -984,13 +984,13 @@ export const twoWayFrequencyTable: AssessmentItemInput = {
 			data: [
 				[
 					{ type: "inline", content: [{ type: "text", content: "Cold lasted longer than 7 days" }] },
-					{ type: "input", responseIdentifier: "RESP_A", expectedLength: 3 },
-					{ type: "input", responseIdentifier: "RESP_B", expectedLength: 3 }
+					{ type: "input", responseIdentifier: "RESPONSE_A", expectedLength: 3 },
+					{ type: "input", responseIdentifier: "RESPONSE_B", expectedLength: 3 }
 				],
 				[
 					{ type: "inline", content: [{ type: "text", content: "Cold did not last longer than 7 days" }] },
-					{ type: "input", responseIdentifier: "RESP_C", expectedLength: 3 },
-					{ type: "input", responseIdentifier: "RESP_D", expectedLength: 3 }
+					{ type: "input", responseIdentifier: "RESPONSE_C", expectedLength: 3 },
+					{ type: "input", responseIdentifier: "RESPONSE_D", expectedLength: 3 }
 				]
 			],
 			footer: []
@@ -2320,13 +2320,13 @@ export const reactantAmountsTemperatureTableWithDropdowns: AssessmentItemInput =
 	identifier: "reactant-amounts-temp-change-table",
 	title: "Identify reactants and amounts from temperature change table",
 	responseDeclarations: [
-		{ identifier: "RESP_REACT_C", cardinality: "single", baseType: "identifier", correct: "MGSO4" },
-		{ identifier: "RESP_AMT_C", cardinality: "single", baseType: "identifier", correct: "AMT_2_5" },
-		{ identifier: "RESP_REACT_D", cardinality: "single", baseType: "identifier", correct: "NH4CL" },
-		{ identifier: "RESP_AMT_D", cardinality: "single", baseType: "identifier", correct: "AMT_3_0" },
-		{ identifier: "RESP_REACT_E", cardinality: "single", baseType: "identifier", correct: "CACL2" },
-		{ identifier: "RESP_AMT_E", cardinality: "single", baseType: "identifier", correct: "AMT_8_0" },
-		{ identifier: "TEXT_ENTRY", cardinality: "single", baseType: "string", correct: "done" }
+		{ identifier: "RESPONSE_REACT_C", cardinality: "single", baseType: "identifier", correct: "MGSO4" },
+		{ identifier: "RESPONSE_AMT_C", cardinality: "single", baseType: "identifier", correct: "AMT_2_5" },
+		{ identifier: "RESPONSE_REACT_D", cardinality: "single", baseType: "identifier", correct: "NH4CL" },
+		{ identifier: "RESPONSE_AMT_D", cardinality: "single", baseType: "identifier", correct: "AMT_3_0" },
+		{ identifier: "RESPONSE_REACT_E", cardinality: "single", baseType: "identifier", correct: "CACL2" },
+		{ identifier: "RESPONSE_AMT_E", cardinality: "single", baseType: "identifier", correct: "AMT_8_0" },
+		{ identifier: "RESPONSE_TEXT_ENTRY", cardinality: "single", baseType: "string", correct: "done" }
 	],
 	widgets: {
 		react_temp_table: {
@@ -2356,7 +2356,7 @@ export const reactantAmountsTemperatureTableWithDropdowns: AssessmentItemInput =
 					{ type: "inline", content: [{ type: "text", content: "C" }] },
 					{
 						type: "dropdown",
-						responseIdentifier: "RESP_REACT_C",
+						responseIdentifier: "RESPONSE_REACT_C",
 						shuffle: true,
 						choices: [
 							{ identifier: "NH4CL", content: [{ type: "text", content: "NH4Cl" }] },
@@ -2366,7 +2366,7 @@ export const reactantAmountsTemperatureTableWithDropdowns: AssessmentItemInput =
 					},
 					{
 						type: "dropdown",
-						responseIdentifier: "RESP_AMT_C",
+						responseIdentifier: "RESPONSE_AMT_C",
 						shuffle: true,
 						choices: [
 							{ identifier: "AMT_2_5", content: [{ type: "math", mathml: "<mn>2.5</mn>" }] },
@@ -2380,7 +2380,7 @@ export const reactantAmountsTemperatureTableWithDropdowns: AssessmentItemInput =
 					{ type: "inline", content: [{ type: "text", content: "D" }] },
 					{
 						type: "dropdown",
-						responseIdentifier: "RESP_REACT_D",
+						responseIdentifier: "RESPONSE_REACT_D",
 						shuffle: true,
 						choices: [
 							{ identifier: "NH4CL", content: [{ type: "text", content: "NH4Cl" }] },
@@ -2390,7 +2390,7 @@ export const reactantAmountsTemperatureTableWithDropdowns: AssessmentItemInput =
 					},
 					{
 						type: "dropdown",
-						responseIdentifier: "RESP_AMT_D",
+						responseIdentifier: "RESPONSE_AMT_D",
 						shuffle: true,
 						choices: [
 							{ identifier: "AMT_2_5", content: [{ type: "math", mathml: "<mn>2.5</mn>" }] },
@@ -2404,7 +2404,7 @@ export const reactantAmountsTemperatureTableWithDropdowns: AssessmentItemInput =
 					{ type: "inline", content: [{ type: "text", content: "E" }] },
 					{
 						type: "dropdown",
-						responseIdentifier: "RESP_REACT_E",
+						responseIdentifier: "RESPONSE_REACT_E",
 						shuffle: true,
 						choices: [
 							{ identifier: "NH4CL", content: [{ type: "text", content: "NH4Cl" }] },
@@ -2414,7 +2414,7 @@ export const reactantAmountsTemperatureTableWithDropdowns: AssessmentItemInput =
 					},
 					{
 						type: "dropdown",
-						responseIdentifier: "RESP_AMT_E",
+						responseIdentifier: "RESPONSE_AMT_E",
 						shuffle: true,
 						choices: [
 							{ identifier: "AMT_2_5", content: [{ type: "math", mathml: "<mn>2.5</mn>" }] },
@@ -2446,7 +2446,7 @@ export const reactantAmountsTemperatureTableWithDropdowns: AssessmentItemInput =
 		}
 	],
 	interactions: {
-		text_entry: { type: "textEntryInteraction", responseIdentifier: "TEXT_ENTRY", expectedLength: 10 }
+		text_entry: { type: "textEntryInteraction", responseIdentifier: "RESPONSE_TEXT_ENTRY", expectedLength: 10 }
 	},
 	feedbackBlocks: [
 		{
@@ -2482,11 +2482,11 @@ export const attractRepelCompletionTable: AssessmentItemInput = {
 	identifier: "attract-repel-completion-table",
 	title: "Complete the table: attract or repel",
 	responseDeclarations: [
-		{ identifier: "RESP_R1", cardinality: "single", baseType: "identifier", correct: "REPEL" },
-		{ identifier: "RESP_R2", cardinality: "single", baseType: "identifier", correct: "ATTRACT" },
-		{ identifier: "RESP_R3", cardinality: "single", baseType: "identifier", correct: "ATTRACT" },
-		{ identifier: "RESP_R4", cardinality: "single", baseType: "identifier", correct: "REPEL" },
-		{ identifier: "TEXT_ENTRY", cardinality: "single", baseType: "string", correct: "done" }
+		{ identifier: "RESPONSE_R1", cardinality: "single", baseType: "identifier", correct: "REPEL" },
+		{ identifier: "RESPONSE_R2", cardinality: "single", baseType: "identifier", correct: "ATTRACT" },
+		{ identifier: "RESPONSE_R3", cardinality: "single", baseType: "identifier", correct: "ATTRACT" },
+		{ identifier: "RESPONSE_R4", cardinality: "single", baseType: "identifier", correct: "REPEL" },
+		{ identifier: "RESPONSE_TEXT_ENTRY", cardinality: "single", baseType: "string", correct: "done" }
 	],
 	widgets: {
 		attract_repel_table: {
@@ -2506,7 +2506,7 @@ export const attractRepelCompletionTable: AssessmentItemInput = {
 					{ type: "inline", content: [{ type: "text", content: "two charged objects, both with positive charge" }] },
 					{
 						type: "dropdown",
-						responseIdentifier: "RESP_R1",
+						responseIdentifier: "RESPONSE_R1",
 						shuffle: false,
 						choices: [
 							{ identifier: "ATTRACT", content: [{ type: "text", content: "attract" }] },
@@ -2526,7 +2526,7 @@ export const attractRepelCompletionTable: AssessmentItemInput = {
 					},
 					{
 						type: "dropdown",
-						responseIdentifier: "RESP_R2",
+						responseIdentifier: "RESPONSE_R2",
 						shuffle: false,
 						choices: [
 							{ identifier: "ATTRACT", content: [{ type: "text", content: "attract" }] },
@@ -2543,7 +2543,7 @@ export const attractRepelCompletionTable: AssessmentItemInput = {
 					},
 					{
 						type: "dropdown",
-						responseIdentifier: "RESP_R3",
+						responseIdentifier: "RESPONSE_R3",
 						shuffle: false,
 						choices: [
 							{ identifier: "ATTRACT", content: [{ type: "text", content: "attract" }] },
@@ -2558,7 +2558,7 @@ export const attractRepelCompletionTable: AssessmentItemInput = {
 					},
 					{
 						type: "dropdown",
-						responseIdentifier: "RESP_R4",
+						responseIdentifier: "RESPONSE_R4",
 						shuffle: false,
 						choices: [
 							{ identifier: "ATTRACT", content: [{ type: "text", content: "attract" }] },
@@ -2575,7 +2575,7 @@ export const attractRepelCompletionTable: AssessmentItemInput = {
 		{ type: "blockSlot", slotId: "attract_repel_table" }
 	],
 	interactions: {
-		text_entry: { type: "textEntryInteraction", responseIdentifier: "TEXT_ENTRY", expectedLength: 10 }
+		text_entry: { type: "textEntryInteraction", responseIdentifier: "RESPONSE_TEXT_ENTRY", expectedLength: 10 }
 	},
 	feedbackBlocks: [
 		{ identifier: "CORRECT", outcomeIdentifier: "FEEDBACK__GLOBAL", content: [{ type: "paragraph", content: [{ type: "text", content: "Correct! Likes repel and opposites attract." }] }] },
@@ -3393,9 +3393,9 @@ export const threeDataTablesMultipleChoice: AssessmentItemInput = {
 	identifier: "three-data-tables-mc",
 	title: "Read three different tables and answer three questions",
 	responseDeclarations: [
-		{ identifier: "RESP_Q1", cardinality: "single", baseType: "identifier", correct: "B" },
-		{ identifier: "RESP_Q2", cardinality: "single", baseType: "identifier", correct: "C" },
-		{ identifier: "RESP_Q3", cardinality: "single", baseType: "identifier", correct: "C" }
+		{ identifier: "RESPONSE_Q1", cardinality: "single", baseType: "identifier", correct: "B" },
+		{ identifier: "RESPONSE_Q2", cardinality: "single", baseType: "identifier", correct: "C" },
+		{ identifier: "RESPONSE_Q3", cardinality: "single", baseType: "identifier", correct: "C" }
 	],
 	widgets: {
 		table_q1: {
@@ -3486,7 +3486,7 @@ export const threeDataTablesMultipleChoice: AssessmentItemInput = {
 	interactions: {
 		choice_q1: {
 			type: "choiceInteraction",
-			responseIdentifier: "RESP_Q1",
+			responseIdentifier: "RESPONSE_Q1",
 			shuffle: true,
 			minChoices: 1,
 			maxChoices: 1,
@@ -3508,7 +3508,7 @@ export const threeDataTablesMultipleChoice: AssessmentItemInput = {
 		},
 		choice_q2: {
 			type: "choiceInteraction",
-			responseIdentifier: "RESP_Q2",
+			responseIdentifier: "RESPONSE_Q2",
 			shuffle: true,
 			minChoices: 1,
 			maxChoices: 1,
@@ -3530,7 +3530,7 @@ export const threeDataTablesMultipleChoice: AssessmentItemInput = {
 		},
 		choice_q3: {
 			type: "choiceInteraction",
-			responseIdentifier: "RESP_Q3",
+			responseIdentifier: "RESPONSE_Q3",
 			shuffle: true,
 			minChoices: 1,
 			maxChoices: 1,
@@ -3552,17 +3552,17 @@ export const threeDataTablesMultipleChoice: AssessmentItemInput = {
 		}
 	},
 	feedbackBlocks: [
-		{ identifier: "A", outcomeIdentifier: "FEEDBACK__RESP_Q1", content: [{ type: "paragraph", content: [{ type: "text", content: "Check the fruit counts carefully." }] }] },
-		{ identifier: "B", outcomeIdentifier: "FEEDBACK__RESP_Q1", content: [{ type: "paragraph", content: [{ type: "text", content: "Correct for Q1." }] }] },
-		{ identifier: "C", outcomeIdentifier: "FEEDBACK__RESP_Q1", content: [{ type: "paragraph", content: [{ type: "text", content: "Check the fruit counts carefully." }] }] },
+		{ identifier: "A", outcomeIdentifier: "FEEDBACK__RESPONSE_Q1", content: [{ type: "paragraph", content: [{ type: "text", content: "Check the fruit counts carefully." }] }] },
+		{ identifier: "B", outcomeIdentifier: "FEEDBACK__RESPONSE_Q1", content: [{ type: "paragraph", content: [{ type: "text", content: "Correct for Q1." }] }] },
+		{ identifier: "C", outcomeIdentifier: "FEEDBACK__RESPONSE_Q1", content: [{ type: "paragraph", content: [{ type: "text", content: "Check the fruit counts carefully." }] }] },
 
-		{ identifier: "A", outcomeIdentifier: "FEEDBACK__RESP_Q2", content: [{ type: "paragraph", content: [{ type: "text", content: "Compare all three city readings." }] }] },
-		{ identifier: "B", outcomeIdentifier: "FEEDBACK__RESP_Q2", content: [{ type: "paragraph", content: [{ type: "text", content: "Compare all three city readings." }] }] },
-		{ identifier: "C", outcomeIdentifier: "FEEDBACK__RESP_Q2", content: [{ type: "paragraph", content: [{ type: "text", content: "Correct for Q2." }] }] },
+		{ identifier: "A", outcomeIdentifier: "FEEDBACK__RESPONSE_Q2", content: [{ type: "paragraph", content: [{ type: "text", content: "Compare all three city readings." }] }] },
+		{ identifier: "B", outcomeIdentifier: "FEEDBACK__RESPONSE_Q2", content: [{ type: "paragraph", content: [{ type: "text", content: "Compare all three city readings." }] }] },
+		{ identifier: "C", outcomeIdentifier: "FEEDBACK__RESPONSE_Q2", content: [{ type: "paragraph", content: [{ type: "text", content: "Correct for Q2." }] }] },
 
-		{ identifier: "A", outcomeIdentifier: "FEEDBACK__RESP_Q3", content: [{ type: "paragraph", content: [{ type: "text", content: "Look at the minutes column." }] }] },
-		{ identifier: "B", outcomeIdentifier: "FEEDBACK__RESP_Q3", content: [{ type: "paragraph", content: [{ type: "text", content: "Look at the minutes column." }] }] },
-		{ identifier: "C", outcomeIdentifier: "FEEDBACK__RESP_Q3", content: [{ type: "paragraph", content: [{ type: "text", content: "Correct for Q3." }] }] }
+		{ identifier: "A", outcomeIdentifier: "FEEDBACK__RESPONSE_Q3", content: [{ type: "paragraph", content: [{ type: "text", content: "Look at the minutes column." }] }] },
+		{ identifier: "B", outcomeIdentifier: "FEEDBACK__RESPONSE_Q3", content: [{ type: "paragraph", content: [{ type: "text", content: "Look at the minutes column." }] }] },
+		{ identifier: "C", outcomeIdentifier: "FEEDBACK__RESPONSE_Q3", content: [{ type: "paragraph", content: [{ type: "text", content: "Correct for Q3." }] }] }
 	]
 }
 
@@ -3570,8 +3570,8 @@ export const gustaveStepsPerMile: AssessmentItemInput = {
 	identifier: "gustave-steps-per-mile",
 	title: "Write an equation and find steps per mile",
 	responseDeclarations: [
-		{ identifier: "RESP_EQN", cardinality: "single", baseType: "string", correct: "3s=6300" },
-		{ identifier: "RESP_STEPS", cardinality: "single", baseType: "integer", correct: 2100 }
+		{ identifier: "RESPONSE_EQN", cardinality: "single", baseType: "string", correct: "3s=6300" },
+		{ identifier: "RESPONSE_STEPS", cardinality: "single", baseType: "integer", correct: 2100 }
 	],
 	widgets: {
 		gustave_shoe_image: {
@@ -3605,8 +3605,8 @@ export const gustaveStepsPerMile: AssessmentItemInput = {
 		}
 	],
 	interactions: {
-		equation_entry: { type: "textEntryInteraction", responseIdentifier: "RESP_EQN", expectedLength: 7 },
-		steps_entry: { type: "textEntryInteraction", responseIdentifier: "RESP_STEPS", expectedLength: 4 }
+		equation_entry: { type: "textEntryInteraction", responseIdentifier: "RESPONSE_EQN", expectedLength: 7 },
+		steps_entry: { type: "textEntryInteraction", responseIdentifier: "RESPONSE_STEPS", expectedLength: 4 }
 	},
 	feedbackBlocks: [
 		{
@@ -3772,7 +3772,7 @@ export const reactionRateChangesTable: AssessmentItemInput = {
 							}
 						],
 						shuffle: false,
-						responseIdentifier: "dropdown_1"
+						responseIdentifier: "RESPONSE_DROPDOWN_1"
 					}
 				],
 				[
@@ -3808,7 +3808,7 @@ export const reactionRateChangesTable: AssessmentItemInput = {
 							}
 						],
 						shuffle: false,
-						responseIdentifier: "dropdown_2"
+						responseIdentifier: "RESPONSE_DROPDOWN_2"
 					}
 				],
 				[
@@ -3844,7 +3844,7 @@ export const reactionRateChangesTable: AssessmentItemInput = {
 							}
 						],
 						shuffle: false,
-						responseIdentifier: "dropdown_3"
+						responseIdentifier: "RESPONSE_DROPDOWN_3"
 					}
 				]
 			],
@@ -3882,28 +3882,28 @@ export const reactionRateChangesTable: AssessmentItemInput = {
 	],
 	identifier: "reaction-rate-changes-table",
 	interactions: {
-		text_entry: { type: "textEntryInteraction", responseIdentifier: "TEXT_ENTRY", expectedLength: 10 }
+		text_entry: { type: "textEntryInteraction", responseIdentifier: "RESPONSE_TEXT_ENTRY", expectedLength: 10 }
 	},
 	responseDeclarations: [
 		{
 			correct: "INCREASE",
 			baseType: "identifier",
-			identifier: "dropdown_1",
+			identifier: "RESPONSE_DROPDOWN_1",
 			cardinality: "single"
 		},
 		{
 			correct: "INCREASE",
 			baseType: "identifier",
-			identifier: "dropdown_2",
+			identifier: "RESPONSE_DROPDOWN_2",
 			cardinality: "single"
 		},
 		{
 			correct: "DECREASE",
 			baseType: "identifier",
-			identifier: "dropdown_3",
+			identifier: "RESPONSE_DROPDOWN_3",
 			cardinality: "single"
 		},
-		{ identifier: "TEXT_ENTRY", cardinality: "single", baseType: "string", correct: "done" }
+		{ identifier: "RESPONSE_TEXT_ENTRY", cardinality: "single", baseType: "string", correct: "done" }
 	]
 }
 
@@ -4109,7 +4109,7 @@ export const kineticEnergyMassSpeedRelationships: AssessmentItemInput = {
 							content: "linear"
 						}
 					],
-					identifier: "linear"
+					identifier: "LINEAR"
 				},
 				{
 					content: [
@@ -4118,11 +4118,11 @@ export const kineticEnergyMassSpeedRelationships: AssessmentItemInput = {
 							content: "nonlinear"
 						}
 					],
-					identifier: "nonlinear"
+					identifier: "NONLINEAR"
 				}
 			],
 			shuffle: true,
-			responseIdentifier: "dropdown_1"
+			responseIdentifier: "RESPONSE_DROPDOWN_1"
 		},
 		dropdown_2: {
 			type: "inlineChoiceInteraction",
@@ -4134,7 +4134,7 @@ export const kineticEnergyMassSpeedRelationships: AssessmentItemInput = {
 							content: "linear"
 						}
 					],
-					identifier: "linear"
+					identifier: "LINEAR"
 				},
 				{
 					content: [
@@ -4143,11 +4143,11 @@ export const kineticEnergyMassSpeedRelationships: AssessmentItemInput = {
 							content: "nonlinear"
 						}
 					],
-					identifier: "nonlinear"
+					identifier: "NONLINEAR"
 				}
 			],
 			shuffle: true,
-			responseIdentifier: "dropdown_2"
+			responseIdentifier: "RESPONSE_DROPDOWN_2"
 		},
 		dropdown_3: {
 			type: "inlineChoiceInteraction",
@@ -4159,7 +4159,7 @@ export const kineticEnergyMassSpeedRelationships: AssessmentItemInput = {
 							content: "one-fourth"
 						}
 					],
-					identifier: "one_fourth"
+					identifier: "ONE_FOURTH"
 				},
 				{
 					content: [
@@ -4168,7 +4168,7 @@ export const kineticEnergyMassSpeedRelationships: AssessmentItemInput = {
 							content: "one-half"
 						}
 					],
-					identifier: "one_half"
+					identifier: "ONE_HALF"
 				},
 				{
 					content: [
@@ -4177,7 +4177,7 @@ export const kineticEnergyMassSpeedRelationships: AssessmentItemInput = {
 							content: "two times"
 						}
 					],
-					identifier: "two_times"
+					identifier: "TWO_TIMES"
 				},
 				{
 					content: [
@@ -4186,11 +4186,11 @@ export const kineticEnergyMassSpeedRelationships: AssessmentItemInput = {
 							content: "four times"
 						}
 					],
-					identifier: "four_times"
+					identifier: "FOUR_TIMES"
 				}
 			],
 			shuffle: true,
-			responseIdentifier: "dropdown_3"
+			responseIdentifier: "RESPONSE_DROPDOWN_3"
 		},
 		dropdown_5: {
 			type: "inlineChoiceInteraction",
@@ -4202,7 +4202,7 @@ export const kineticEnergyMassSpeedRelationships: AssessmentItemInput = {
 							content: "one-fourth"
 						}
 					],
-					identifier: "one_fourth"
+					identifier: "ONE_FOURTH"
 				},
 				{
 					content: [
@@ -4211,7 +4211,7 @@ export const kineticEnergyMassSpeedRelationships: AssessmentItemInput = {
 							content: "one-half"
 						}
 					],
-					identifier: "one_half"
+					identifier: "ONE_HALF"
 				},
 				{
 					content: [
@@ -4220,7 +4220,7 @@ export const kineticEnergyMassSpeedRelationships: AssessmentItemInput = {
 							content: "two times"
 						}
 					],
-					identifier: "two_times"
+					identifier: "TWO_TIMES"
 				},
 				{
 					content: [
@@ -4229,40 +4229,40 @@ export const kineticEnergyMassSpeedRelationships: AssessmentItemInput = {
 							content: "four times"
 						}
 					],
-					identifier: "four_times"
+					identifier: "FOUR_TIMES"
 				}
 			],
 			shuffle: true,
-			responseIdentifier: "dropdown_5"
+			responseIdentifier: "RESPONSE_DROPDOWN_5"
 		},
-		text_entry: { type: "textEntryInteraction", responseIdentifier: "TEXT_ENTRY", expectedLength: 10 }
+		text_entry: { type: "textEntryInteraction", responseIdentifier: "RESPONSE_TEXT_ENTRY", expectedLength: 10 }
 	},
 	responseDeclarations: [
 		{
-			correct: "linear",
+			correct: "LINEAR",
 			baseType: "identifier",
-			identifier: "dropdown_1",
+			identifier: "RESPONSE_DROPDOWN_1",
 			cardinality: "single"
 		},
 		{
-			correct: "one_half",
+			correct: "ONE_HALF",
 			baseType: "identifier",
-			identifier: "dropdown_3",
+			identifier: "RESPONSE_DROPDOWN_3",
 			cardinality: "single"
 		},
 		{
-			correct: "nonlinear",
+			correct: "NONLINEAR",
 			baseType: "identifier",
-			identifier: "dropdown_2",
+			identifier: "RESPONSE_DROPDOWN_2",
 			cardinality: "single"
 		},
 		{
-			correct: "one_fourth",
+			correct: "ONE_FOURTH",
 			baseType: "identifier",
-			identifier: "dropdown_5",
+			identifier: "RESPONSE_DROPDOWN_5",
 			cardinality: "single"
 		},
-		{ identifier: "TEXT_ENTRY", cardinality: "single", baseType: "string", correct: "test" }
+		{ identifier: "RESPONSE_TEXT_ENTRY", cardinality: "single", baseType: "string", correct: "test" }
 	]
 }
 
@@ -4402,7 +4402,7 @@ export const reactantAmountsTempChangeTablePerseus: AssessmentItemInput = {
 							}
 						],
 						shuffle: false,
-						responseIdentifier: "dropdown_13"
+						responseIdentifier: "RESPONSE_DROPDOWN_13"
 					}
 				],
 				[
@@ -4418,7 +4418,7 @@ export const reactantAmountsTempChangeTablePerseus: AssessmentItemInput = {
 											"<mrow><mi>Na</mi><msub><mi>C</mi><mn>2</mn></msub><msub><mi>H</mi><mn>3</mn></msub><msub><mi>O</mi><mn>2</mn></msub></mrow>"
 									}
 								],
-								identifier: "NaC2H3O2"
+								identifier: "NAC2H3O2"
 							},
 							{ content: [{ type: "math", mathml: "<mrow><mi>K</mi><mi>O</mi><mi>H</mi></mrow>" }], identifier: "KOH" },
 							{
@@ -4429,11 +4429,11 @@ export const reactantAmountsTempChangeTablePerseus: AssessmentItemInput = {
 											"<mrow><mi>Ba</mi><msub><mrow><mo>(</mo><mi>OH</mi><mo>)</mo></mrow><mn>2</mn></msub></mrow>"
 									}
 								],
-								identifier: "BaOH2"
+								identifier: "BAOH2"
 							}
 						],
 						shuffle: false,
-						responseIdentifier: "dropdown_9"
+						responseIdentifier: "RESPONSE_DROPDOWN_9"
 					},
 					{
 						type: "inline",
@@ -4459,7 +4459,7 @@ export const reactantAmountsTempChangeTablePerseus: AssessmentItemInput = {
 							}
 						],
 						shuffle: false,
-						responseIdentifier: "dropdown_12"
+						responseIdentifier: "RESPONSE_DROPDOWN_12"
 					}
 				],
 				[
@@ -4475,7 +4475,7 @@ export const reactantAmountsTempChangeTablePerseus: AssessmentItemInput = {
 											"<mrow><mi>Na</mi><msub><mi>C</mi><mn>2</mn></msub><msub><mi>H</mi><mn>3</mn></msub><msub><mi>O</mi><mn>2</mn></msub></mrow>"
 									}
 								],
-								identifier: "NaC2H3O2"
+								identifier: "NAC2H3O2"
 							},
 							{ content: [{ type: "math", mathml: "<mrow><mi>K</mi><mi>O</mi><mi>H</mi></mrow>" }], identifier: "KOH" },
 							{
@@ -4486,11 +4486,11 @@ export const reactantAmountsTempChangeTablePerseus: AssessmentItemInput = {
 											"<mrow><mi>Ba</mi><msub><mrow><mo>(</mo><mi>OH</mi><mo>)</mo></mrow><mn>2</mn></msub></mrow>"
 									}
 								],
-								identifier: "BaOH2"
+								identifier: "BAOH2"
 							}
 						],
 						shuffle: false,
-						responseIdentifier: "dropdown_10"
+						responseIdentifier: "RESPONSE_DROPDOWN_10"
 					},
 					{
 						type: "inline",
@@ -4516,7 +4516,7 @@ export const reactantAmountsTempChangeTablePerseus: AssessmentItemInput = {
 							}
 						],
 						shuffle: false,
-						responseIdentifier: "dropdown_11"
+						responseIdentifier: "RESPONSE_DROPDOWN_11"
 					}
 				]
 			],
@@ -4585,15 +4585,15 @@ export const reactantAmountsTempChangeTablePerseus: AssessmentItemInput = {
 	],
 	identifier: "reactant-amounts-temp-change-table-perseus",
 	interactions: {
-		text_entry: { type: "textEntryInteraction", responseIdentifier: "TEXT_ENTRY", expectedLength: 10 }
+		text_entry: { type: "textEntryInteraction", responseIdentifier: "RESPONSE_TEXT_ENTRY", expectedLength: 10 }
 	},
 	responseDeclarations: [
-		{ correct: "NEG_3_2_C", baseType: "identifier", identifier: "dropdown_13", cardinality: "single" },
-		{ correct: "POS_4_2_C", baseType: "identifier", identifier: "dropdown_12", cardinality: "single" },
-		{ correct: "POS_2_0_C", baseType: "identifier", identifier: "dropdown_11", cardinality: "single" },
-		{ correct: "KOH", baseType: "identifier", identifier: "dropdown_9", cardinality: "single" },
-		{ correct: "BaOH2", baseType: "identifier", identifier: "dropdown_10", cardinality: "single" },
-		{ identifier: "TEXT_ENTRY", cardinality: "single", baseType: "string", correct: "done" }
+		{ correct: "NEG_3_2_C", baseType: "identifier", identifier: "RESPONSE_DROPDOWN_13", cardinality: "single" },
+		{ correct: "POS_4_2_C", baseType: "identifier", identifier: "RESPONSE_DROPDOWN_12", cardinality: "single" },
+		{ correct: "POS_2_0_C", baseType: "identifier", identifier: "RESPONSE_DROPDOWN_11", cardinality: "single" },
+		{ correct: "KOH", baseType: "identifier", identifier: "RESPONSE_DROPDOWN_9", cardinality: "single" },
+		{ correct: "BAOH2", baseType: "identifier", identifier: "RESPONSE_DROPDOWN_10", cardinality: "single" },
+		{ identifier: "RESPONSE_TEXT_ENTRY", cardinality: "single", baseType: "string", correct: "done" }
 	]
 }
 

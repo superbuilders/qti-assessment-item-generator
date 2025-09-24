@@ -1,7 +1,7 @@
 import { z } from "zod"
 import { renderInlineContent } from "../../compiler/content-renderer"
-// Import the SAFE_IDENTIFIER_REGEX for consistent enforcement
-import { SAFE_IDENTIFIER_REGEX } from "../../compiler/qti-constants"
+// Import the specific identifier regexes for consistent enforcement
+import { RESPONSE_IDENTIFIER_REGEX, CHOICE_IDENTIFIER_REGEX } from "../../compiler/qti-constants"
 import { MATHML_INNER_PATTERN } from "../../utils/mathml"
 import { theme } from "../../utils/theme"
 import { escapeXmlAttribute, sanitizeXmlAttributeValue } from "../../utils/xml-utils"
@@ -54,7 +54,7 @@ function createTableCellSchema() {
 				type: z.literal("input"),
 				responseIdentifier: z
 					.string()
-					.regex(SAFE_IDENTIFIER_REGEX, "invalid response identifier: must match [A-Za-z_][A-Za-z0-9_]*")
+					.regex(RESPONSE_IDENTIFIER_REGEX, "invalid response identifier: must start with RESPONSE")
 					.describe("The QTI response identifier for this input field."),
 				expectedLength: z
 					.number()
@@ -67,7 +67,7 @@ function createTableCellSchema() {
 				type: z.literal("dropdown"),
 				responseIdentifier: z
 					.string()
-					.regex(SAFE_IDENTIFIER_REGEX, "invalid response identifier: must match [A-Za-z_][A-Za-z0-9_]*")
+					.regex(RESPONSE_IDENTIFIER_REGEX, "invalid response identifier: must start with RESPONSE")
 					.describe("The QTI response identifier for this inline choice (dropdown) interaction."),
 				shuffle: z.boolean().describe("If true, the dropdown choices will be shuffled."),
 				choices: z
@@ -76,7 +76,7 @@ function createTableCellSchema() {
 							.object({
 								identifier: z
 									.string()
-									.regex(SAFE_IDENTIFIER_REGEX, "invalid identifier: must match [A-Za-z_][A-Za-z0-9_]*")
+									.regex(CHOICE_IDENTIFIER_REGEX, "invalid identifier: must be uppercase")
 									.describe("Unique identifier for this choice, used in the QTI identifier attribute."),
 								content: createInlineContentSchema().describe("Inline content to display for this choice.")
 							})
