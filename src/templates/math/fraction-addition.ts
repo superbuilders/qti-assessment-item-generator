@@ -5,7 +5,7 @@
 // -----------------------------------------------------------------------------
 import { z } from "zod";
 import { FractionSchema } from "../schemas";
-import { AssessmentItemSchema } from "../../compiler/schemas";
+import { AssessmentItemSchema, BlockContent } from "../../compiler/schemas";
 import { TemplateModule } from "../types";
 
 // -----------------------------------------------------------------------------
@@ -191,25 +191,10 @@ export function generateFractionAdditionQuestion(
         maxChoices: 1,
         prompt: [{ type: "text", content: "Select the correct sum." }],
         choices: finalChoices.map((choice, index) => {
-          let feedbackContent: { type: "text"; content: string; }[];
-          switch (choice.type) {
-            case 'CORRECT':
-              feedbackContent = [{ type: "text" as const, content: "This is the correct sum. Excellent work!" }];
-              break;
-            case 'ADD_ACROSS':
-              feedbackContent = [{ type: "text" as const, content: "This answer is found by adding the numerators and the denominators directly. Remember, to add fractions, you must first find a common denominator." }];
-              break;
-            case 'ADD_NUM_COMMON_DEN':
-              feedbackContent = [{ type: "text" as const, content: "It looks like you correctly added the numerators after finding a common denominator, but used one of the original denominators instead of the new common one." }];
-              break;
-            case 'CROSS_MULTIPLY':
-                feedbackContent = [{ type: "text" as const, content: "This answer often comes from a mistake in finding the common denominator or adding the numerators. Double-check your multiplication and addition steps." }];
-                break;
-          }
           return {
             identifier: `CHOICE_${index}`,
             content: [{ type: "paragraph" as const, content: [{ type: "math" as const, mathml: formatFractionMathML(choice.fraction) }] }],
-            feedback: feedbackContent,
+            // REMOVED: The `feedback` field is no longer supported on choices.
           };
         }),
       },
@@ -224,38 +209,55 @@ export function generateFractionAdditionQuestion(
       },
     ],
 
-    feedback: {
-      correct: [
-        {
-          type: "paragraph",
-          content: [
-            { type: "text", content: "Excellent! You correctly identified the sum." },
-          ],
-        },
-        {
-            type: "paragraph",
-            content: [
+    feedbackBlocks: finalChoices.map((choice, index) => {
+      let feedbackContent: BlockContent;
+      switch (choice.type) {
+        case 'CORRECT':
+          feedbackContent = [
+            {
+              type: "paragraph",
+              content: [{ type: "text", content: "Excellent! You correctly identified the sum." }]
+            },
+            {
+              type: "paragraph", 
+              content: [
                 { type: "text", content: "Here is the step-by-step solution: " },
-                { type: "math", mathml: `${formatFractionMathML(f1)}<mo>+</mo>${formatFractionMathML(f2)}<mo>=</mo><mfrac><mn>${Math.abs(f1.numerator) * f2.denominator}</mn><mn>${f1.denominator * f2.denominator}</mn></mfrac><mo>+</mo><mfrac><mn>${Math.abs(f2.numerator) * f1.denominator}</mn><mn>${f2.denominator * f1.denominator}</mn></mfrac><mo>=</mo>${formatFractionMathML(correctAnswer)}`},
-            ]
-        }
-      ],
-      incorrect: [
-        {
-          type: "paragraph",
-          content: [
-            { type: "text", content: "Not quite. To add fractions, first find a common denominator. Then, convert each fraction to an equivalent fraction with that denominator. Finally, add the new numerators." },
-          ],
-        },
-        {
-            type: "paragraph",
-            content: [
-                { type: "text", content: "For example: " },
-                { type: "math", mathml: `${formatFractionMathML(f1)}<mo>+</mo>${formatFractionMathML(f2)}<mo>=</mo>${formatFractionMathML(correctAnswer)}`},
-            ]
-        }
-      ],
-    },
+                { type: "math", mathml: `${formatFractionMathML(f1)}<mo>+</mo>${formatFractionMathML(f2)}<mo>=</mo><mfrac><mn>${Math.abs(f1.numerator) * f2.denominator}</mn><mn>${f1.denominator * f2.denominator}</mn></mfrac><mo>+</mo><mfrac><mn>${Math.abs(f2.numerator) * f1.denominator}</mn><mn>${f2.denominator * f1.denominator}</mn></mfrac><mo>=</mo>${formatFractionMathML(correctAnswer)}`}
+              ]
+            }
+          ];
+          break;
+        case 'ADD_ACROSS':
+          feedbackContent = [
+            {
+              type: "paragraph",
+              content: [{ type: "text", content: "This answer is found by adding the numerators and the denominators directly. Remember, to add fractions, you must first find a common denominator." }]
+            }
+          ];
+          break;
+        case 'ADD_NUM_COMMON_DEN':
+          feedbackContent = [
+            {
+              type: "paragraph", 
+              content: [{ type: "text", content: "It looks like you correctly added the numerators after finding a common denominator, but used one of the original denominators instead of the new common one." }]
+            }
+          ];
+          break;
+        case 'CROSS_MULTIPLY':
+          feedbackContent = [
+            {
+              type: "paragraph",
+              content: [{ type: "text", content: "This answer often comes from a mistake in finding the common denominator or adding the numerators. Double-check your multiplication and addition steps." }]
+            }
+          ];
+          break;
+      }
+      return {
+        identifier: `CHOICE_${index}`,
+        outcomeIdentifier: "FEEDBACK__RESPONSE",
+        content: feedbackContent
+      };
+    }) as any,
   };
 
   return assessmentItem

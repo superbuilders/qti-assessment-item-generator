@@ -430,8 +430,9 @@ export async function generateFromEnvelope(
 		}
 
 		walkBlock(shell.body)
-		walkBlock(shell.feedback.correct)
-		walkBlock(shell.feedback.incorrect)
+		for (const block of shell.feedbackBlocks) {
+			walkBlock(block.content)
+		}
 
 		if (shell.interactions) {
 			// Also check for slots inside interaction definitions passed in the shell if any
@@ -544,8 +545,9 @@ export async function generateFromEnvelope(
 		}
 		// Shell body and feedback
 		walkBlock(shell.body)
-		walkBlock(shell.feedback.correct)
-		walkBlock(shell.feedback.incorrect)
+		for (const block of shell.feedbackBlocks) {
+			walkBlock(block.content)
+		}
 		// Interaction choice content (where choice-level visuals are embedded)
 		for (const interaction of Object.values(interactions)) {
 			if (interaction.type === "choiceInteraction" || interaction.type === "orderInteraction") {

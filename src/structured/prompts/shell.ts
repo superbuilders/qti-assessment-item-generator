@@ -51,7 +51,7 @@ These are the ONLY interaction types we support. Any Perseus widget that maps to
 	const systemInstruction = `You are an expert in educational content conversion. Your task is to analyze a Perseus JSON object and create a structured assessment shell in JSON format. Your primary goal is to accurately represent all content using a strict, nested object model.
 
 **CRITICAL: STRUCTURED CONTENT MODEL**
-Your entire output for any rich text field (like 'body' or 'feedback') MUST be a JSON array of block-level items.
+Your entire output for any rich text field (like 'body' or 'feedbackBlocks') MUST be a JSON array of block-level items.
 - **Block Items**: Can be a paragraph \`{ "type": "paragraph", "content": [...] }\` or a slot \`{ "type": "blockSlot", "slotId": "..." }\`.
 - **Paragraph Content**: The 'content' array inside a paragraph consists of inline items.
 - **Inline Items**: Can be text \`{ "type": "text", "content": "..." }\`, math \`{ "type": "math", "mathml": "..." }\`, or an inline slot \`{ "type": "inlineSlot", "slotId": "..." }\`.
@@ -315,17 +315,24 @@ ${supportedInteractionTypes}
 	      ]
 	    }
 	  },
-	  "feedback": {
-	    "correct": [
-	      {
-	        "type": "paragraph",
-	        "content": [{ "type": "text", "content": "Correct! Well done." }]
-	      }
-	    ],
-	    "incorrect": [
-	      {
-	        "type": "table",
-	        "className": "feedback-table",
+  "feedbackBlocks": [
+    {
+      "identifier": "CORRECT",
+      "outcomeIdentifier": "FEEDBACK__GLOBAL",
+      "content": [
+        {
+          "type": "paragraph",
+          "content": [{ "type": "text", "content": "Correct! Well done." }]
+        }
+      ]
+    },
+    {
+      "identifier": "INCORRECT", 
+      "outcomeIdentifier": "FEEDBACK__GLOBAL",
+      "content": [
+        {
+          "type": "table",
+          "className": "feedback-table",
 	        "header": ["Sentence", "Word", "Explanation"],
 	        "rows": [
 	          [
@@ -347,7 +354,7 @@ ${supportedInteractionTypes}
 	      }
 	    ]
 	  }
-	}
+	]
 	\`\`\`
 
 	Expected shell (Shot 1) using gapMatchInteraction:
@@ -373,14 +380,22 @@ ${supportedInteractionTypes}
 	      ]
 	    }
 	  ],
-	  "feedback": {
-	    "correct": [
-	      { "type": "paragraph", "content": [{ "type": "text", "content": "Correct! Well done." }] }
-	    ],
-	    "incorrect": [
-	      { "type": "paragraph", "content": [{ "type": "text", "content": "Correct answers appear after submission." }] }
-	    ]
-	  }
+  "feedbackBlocks": [
+    {
+      "identifier": "CORRECT",
+      "outcomeIdentifier": "FEEDBACK__GLOBAL", 
+      "content": [
+        { "type": "paragraph", "content": [{ "type": "text", "content": "Correct! Well done." }] }
+      ]
+    },
+    {
+      "identifier": "INCORRECT",
+      "outcomeIdentifier": "FEEDBACK__GLOBAL",
+      "content": [
+        { "type": "paragraph", "content": [{ "type": "text", "content": "Correct answers appear after submission." }] }
+      ]
+    }
+  ]
 	}
 	\`\`\`
 
@@ -465,11 +480,10 @@ CRITICAL: Never embed images or SVGs directly. The body must contain ONLY text, 
 - Do NOT include hint-like lead-ins such as "Hint:", "Remember:", "Think about...", or statements that restate or imply the answer (e.g., "the constant is 7").
 - **ABSOLUTE RULE**: The ONLY places the correct answer may appear are:
   1. Response declarations (for validation)
-  2. Feedback fields - SPECIFICALLY:
-     - The 'feedback' object at the assessment level (correct/incorrect arrays)
-     - Individual choice 'feedback' within interactions
+  2. Feedback blocks - SPECIFICALLY:
+     - The 'feedbackBlocks' array at the assessment level
      - NO OTHER LOCATION
-- **HARD STOP. NO EXCEPTIONS.** Answers are FORBIDDEN in body, widgets, or interactions. They are ONLY allowed in the designated feedback fields above.
+- **HARD STOP. NO EXCEPTIONS.** Answers are FORBIDDEN in body, widgets, or interactions. They are ONLY allowed in the designated feedbackBlocks above.
 
   **CRITICAL: ALT/CAPTION/ATTRIBUTION HANDLING — BANNED IN 'BODY'**
   Any descriptive or source text associated with images MUST NOT appear in the 'body'. This includes:
@@ -478,7 +492,7 @@ CRITICAL: Never embed images or SVGs directly. The body must contain ONLY text, 
   - Attribution/credit/licensing strings (creator names, "Image credit:", source sites, licenses like "CC0 1.0", "CC BY-SA", Wikimedia/Unsplash references)
 
   Rules:
-  - Do NOT place alt/caption/attribution strings in 'body' paragraphs, prompts, or feedback.
+  - Do NOT place alt/caption/attribution strings in 'body' paragraphs, prompts, or feedbackBlocks.
   - Do NOT write figure captions or credits in the 'body'.
   - If Perseus includes any of these texts adjacent to an image, STRIP THEM from 'body'.
   - Examples of banned phrases in body: "Image credit:", "Photo by", "by <creator>", "Wikimedia", "CC0", "CC BY", "licensed under".
@@ -720,18 +734,62 @@ CORRECT shell structure:
 }
 \`\`\`
 
+**⚠️ CRITICAL: FEEDBACK BLOCKS (feedbackBlocks) ⚠️**
+
+You MUST provide a feedbackBlocks array that contains feedback for all possible responses.
+
+**For choice-based interactions** (e.g., choiceInteraction, inlineChoiceInteraction): Create one feedback block for each choice. The block's identifier MUST match the choice's identifier. The outcomeIdentifier MUST be FEEDBACK__<responseIdentifier>, where <responseIdentifier> is the ID from the interaction.
+
+**For other interactions** (e.g., textEntry, orderInteraction, gapMatch): Create two feedback blocks with identifier values of "CORRECT" and "INCORRECT". The outcomeIdentifier MUST be FEEDBACK__GLOBAL.
+
+The content field of each feedback block must contain rich, structured content using the same block content model as body content.
+
+**Examples:**
+
+**Per-choice feedback (choiceInteraction):**
+\`\`\`json
+"feedbackBlocks": [
+  {
+    "identifier": "A",
+    "outcomeIdentifier": "FEEDBACK__RESPONSE",
+    "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Correct! Here is why A is the right answer..." }] }]
+  },
+  {
+    "identifier": "B",
+    "outcomeIdentifier": "FEEDBACK__RESPONSE",
+    "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Incorrect. B is not the right answer because..." }] }]
+  }
+]
+\`\`\`
+
+**CORRECT/INCORRECT feedback (textEntry, orderInteraction, gapMatch):**
+\`\`\`json
+"feedbackBlocks": [
+  {
+    "identifier": "CORRECT",
+    "outcomeIdentifier": "FEEDBACK__GLOBAL",
+    "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Great! Your sequence is correct." }] }]
+  },
+  {
+    "identifier": "INCORRECT",
+    "outcomeIdentifier": "FEEDBACK__GLOBAL",
+    "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Not quite. The correct order should be..." }] }]
+  }
+]
+\`\`\`
+
 **⚠️ CRITICAL: CANONICAL ANSWER FORMATTING AND USER INSTRUCTIONS ⚠️**
 
 This is a mandatory step for all questions involving a \`textEntryInteraction\`.
 
-1.  **Identify the Canonical Answer Format from Feedback**: Your primary source of truth for the correct answer's format is the **feedback text** or **hints** in the Perseus JSON. This is a universal rule. If the feedback shows a specific format (e.g., "The answer is \`100/9\`", "The correct equation is \`y=3x+2\`"), you **MUST** use that exact format as the canonical answer.
+1.  **Identify the Canonical Answer Format from FeedbackBlocks**: Your primary source of truth for the correct answer's format is the **feedbackBlocks content** or **hints** in the Perseus JSON. This is a universal rule. If the feedbackBlocks show a specific format (e.g., "The answer is \`100/9\`", "The correct equation is \`y=3x+2\`"), you **MUST** use that exact format as the canonical answer.
 
 2.  **Determine the Correct \`baseType\`**:
-    *   **Use \`baseType="float"\`** only when the canonical answer is a plain decimal or integer and no strict formatting rules are implied by the feedback or prompt (e.g., \`11.24\`, \`42\`, \`-0.5\`). \`float\` allows for scoring flexibility (e.g., \`.5\` is equivalent to \`0.5\`). If any formatting rule is present, you must use \`string\`.
+    *   **Use \`baseType="float"\`** only when the canonical answer is a plain decimal or integer and no strict formatting rules are implied by the feedbackBlocks or prompt (e.g., \`11.24\`, \`42\`, \`-0.5\`). \`float\` allows for scoring flexibility (e.g., \`.5\` is equivalent to \`0.5\`). If any formatting rule is present, you must use \`string\`.
     *   **Use \`baseType="string"\`** when the format of the answer is critical or the value is not a plain number. This includes:
         *   **Fractions or Mixed Numbers**: e.g., \`"100/9"\`
         *   **Algebraic Equations or Expressions**: e.g., \`"y=3x+2"\`
-        *   **Strict Formatting Rules**: When the prompt or feedback implies a specific format, such as requiring a leading zero (\`"0.5"\`), a fixed number of decimal places (\`"1.20"\`), or a specific scientific notation format (\`"3.14 x 10^2"\`).
+        *   **Strict Formatting Rules**: When the prompt or feedbackBlocks imply a specific format, such as requiring a leading zero (\`"0.5"\`), a fixed number of decimal places (\`"1.20"\`), or a specific scientific notation format (\`"3.14 x 10^2"\`).
         *   **Any non-numeric characters**: If the answer includes units or symbols that are part of the required input.
 
     - **Note**: It is acceptable to use \`baseType="string"\` for plain numbers when strict formatting is explicitly required (fixed decimal places, significant figures, or scientific notation). Otherwise, prefer \`baseType="float"\`/\`"integer"\`.
@@ -779,18 +837,34 @@ This is a mandatory step for all questions involving a \`textEntryInteraction\`.
     // ❌ WRONG: Missing a paragraph with user instructions on how to format the answer.
   ],
   "title": "Square a negative mixed number",
-  "feedback": {
-    "correct": [
-      {
-        "type": "paragraph",
-        "content": [
-          { "type": "text", "content": "Correct! The value is " },
-          { "type": "math", "mathml": "<mfrac><mn>100</mn><mn>9</mn></mfrac>" }, // The feedback clearly shows the canonical format.
-          { "type": "text", "content": "." }
-        ]
-      }
-    ]
-  },
+  "feedbackBlocks": [
+    {
+      "identifier": "CORRECT",
+      "outcomeIdentifier": "FEEDBACK__GLOBAL",
+      "content": [
+        {
+          "type": "paragraph",
+          "content": [
+            { "type": "text", "content": "Correct! The value is " },
+            { "type": "math", "mathml": "<mfrac><mn>100</mn><mn>9</mn></mfrac>" }, // The feedbackBlocks clearly show the canonical format.
+            { "type": "text", "content": "." }
+          ]
+        }
+      ]
+    },
+    {
+      "identifier": "INCORRECT",
+      "outcomeIdentifier": "FEEDBACK__GLOBAL", 
+      "content": [
+        {
+          "type": "paragraph",
+          "content": [
+            { "type": "text", "content": "Not quite. Please check your calculation." }
+          ]
+        }
+      ]
+    }
+  ],
   "responseDeclarations": [
     {
       // ❌ WRONG: The 'correct' value is a float, but the feedback specifies a fraction.
@@ -821,21 +895,37 @@ This is a mandatory step for all questions involving a \`textEntryInteraction\`.
     }
   ],
   "title": "Square a negative mixed number",
-  "feedback": {
-    "correct": [
-      {
-        "type": "paragraph",
-        "content": [
-          { "type": "text", "content": "Correct! The value is " },
-          { "type": "math", "mathml": "<mfrac><mn>100</mn><mn>9</mn></mfrac>" },
-          { "type": "text", "content": "." }
-        ]
-      }
-    ]
-  },
+  "feedbackBlocks": [
+    {
+      "identifier": "CORRECT",
+      "outcomeIdentifier": "FEEDBACK__GLOBAL",
+      "content": [
+        {
+          "type": "paragraph",
+          "content": [
+            { "type": "text", "content": "Correct! The value is " },
+            { "type": "math", "mathml": "<mfrac><mn>100</mn><mn>9</mn></mfrac>" },
+            { "type": "text", "content": "." }
+          ]
+        }
+      ]
+    },
+    {
+      "identifier": "INCORRECT",
+      "outcomeIdentifier": "FEEDBACK__GLOBAL",
+      "content": [
+        {
+          "type": "paragraph", 
+          "content": [
+            { "type": "text", "content": "Not quite. Please check your calculation." }
+          ]
+        }
+      ]
+    }
+  ],
   "responseDeclarations": [
     {
-      // ✅ CORRECT: The 'correct' value is a string that matches the feedback's canonical format.
+      // ✅ CORRECT: The 'correct' value is a string that matches the feedbackBlocks' canonical format.
       "correct": "100/9",
       // ✅ CORRECT: The 'baseType' is "string" because the required format is a fraction.
       "baseType": "string",
@@ -1020,7 +1110,18 @@ ${JSON.stringify(exampleShells, null, 2)}
     ],
     "widgets": ["ke_quantities_table"],
     "interactions": ["dropdown_8", "dropdown_10", "dropdown_11", "dropdown_12"],
-    "feedback": { "correct": [], "incorrect": [] },
+    "feedbackBlocks": [
+      {
+        "identifier": "CORRECT",
+        "outcomeIdentifier": "FEEDBACK__GLOBAL",
+        "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Correct! Well done." }] }]
+      },
+      {
+        "identifier": "INCORRECT", 
+        "outcomeIdentifier": "FEEDBACK__GLOBAL",
+        "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Not quite. Please review your answers." }] }]
+      }
+    ],
     "responseDeclarations": [
       { "identifier": "dropdown_8",  "cardinality": "single", "baseType": "string", "correct": "yes" },
       { "identifier": "dropdown_10", "cardinality": "single", "baseType": "string", "correct": "no" },
@@ -1042,7 +1143,18 @@ ${JSON.stringify(exampleShells, null, 2)}
     ],
     "widgets": ["ke_quantities_table"],
     "interactions": [],
-    "feedback": { "correct": [], "incorrect": [] },
+    "feedbackBlocks": [
+      {
+        "identifier": "CORRECT",
+        "outcomeIdentifier": "FEEDBACK__GLOBAL",
+        "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Correct! Well done." }] }]
+      },
+      {
+        "identifier": "INCORRECT", 
+        "outcomeIdentifier": "FEEDBACK__GLOBAL",
+        "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Not quite. Please review your answers." }] }]
+      }
+    ],
     "responseDeclarations": [
       { "identifier": "dropdown_8",  "cardinality": "single", "baseType": "string", "correct": "yes" },
       { "identifier": "dropdown_10", "cardinality": "single", "baseType": "string", "correct": "no" },
@@ -1067,7 +1179,18 @@ ${JSON.stringify(exampleShells, null, 2)}
     ],
     "widgets": ["image_1", "react_temp_table"],
     "interactions": ["react_c", "amt_c", "react_d", "amt_d", "react_e", "amt_e"],
-    "feedback": { "correct": [], "incorrect": [] },
+    "feedbackBlocks": [
+      {
+        "identifier": "CORRECT",
+        "outcomeIdentifier": "FEEDBACK__GLOBAL",
+        "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Correct! Well done." }] }]
+      },
+      {
+        "identifier": "INCORRECT", 
+        "outcomeIdentifier": "FEEDBACK__GLOBAL",
+        "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Not quite. Please review your answers." }] }]
+      }
+    ],
     "responseDeclarations": [
       { "identifier": "react_c", "cardinality": "single", "baseType": "identifier", "correct": "MGSO4" },
       { "identifier": "amt_c",   "cardinality": "single", "baseType": "identifier", "correct": "AMT_2_5" },
@@ -1092,7 +1215,18 @@ ${JSON.stringify(exampleShells, null, 2)}
     ],
     "widgets": ["image_1", "react_temp_table"],
     "interactions": [],
-    "feedback": { "correct": [], "incorrect": [] },
+    "feedbackBlocks": [
+      {
+        "identifier": "CORRECT",
+        "outcomeIdentifier": "FEEDBACK__GLOBAL",
+        "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Correct! Well done." }] }]
+      },
+      {
+        "identifier": "INCORRECT", 
+        "outcomeIdentifier": "FEEDBACK__GLOBAL",
+        "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Not quite. Please review your answers." }] }]
+      }
+    ],
     "responseDeclarations": [
       { "identifier": "RESP_REACT_C", "cardinality": "single", "baseType": "identifier", "correct": "MGSO4" },
       { "identifier": "RESP_AMT_C",   "cardinality": "single", "baseType": "identifier", "correct": "AMT_2_5" },
@@ -1132,7 +1266,18 @@ ${JSON.stringify(exampleShells, null, 2)}
     ],
     "widgets": ["image_1"],
     "interactions": ["dropdown_1", "dropdown_2", "dropdown_3"],
-    "feedback": { "correct": [], "incorrect": [] },
+    "feedbackBlocks": [
+      {
+        "identifier": "CORRECT",
+        "outcomeIdentifier": "FEEDBACK__GLOBAL",
+        "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Correct! Well done." }] }]
+      },
+      {
+        "identifier": "INCORRECT", 
+        "outcomeIdentifier": "FEEDBACK__GLOBAL",
+        "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Not quite. Please review your answers." }] }]
+      }
+    ],
     "responseDeclarations": [
       { "identifier": "dropdown_1", "cardinality": "single", "baseType": "string", "correct": "sinks" },
       { "identifier": "dropdown_2", "cardinality": "single", "baseType": "string", "correct": "floats" },
@@ -1157,7 +1302,18 @@ ${JSON.stringify(exampleShells, null, 2)}
     ],
     "widgets": ["density_table", "image_1"],
     "interactions": ["dropdown_1", "dropdown_2", "dropdown_3"],
-    "feedback": { "correct": [], "incorrect": [] },
+    "feedbackBlocks": [
+      {
+        "identifier": "CORRECT",
+        "outcomeIdentifier": "FEEDBACK__GLOBAL",
+        "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Correct! Well done." }] }]
+      },
+      {
+        "identifier": "INCORRECT", 
+        "outcomeIdentifier": "FEEDBACK__GLOBAL",
+        "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Not quite. Please review your answers." }] }]
+      }
+    ],
     "responseDeclarations": [
       { "identifier": "dropdown_1", "cardinality": "single", "baseType": "string", "correct": "sinks" },
       { "identifier": "dropdown_2", "cardinality": "single", "baseType": "string", "correct": "floats" },
@@ -1183,7 +1339,18 @@ ${JSON.stringify(exampleShells, null, 2)}
     ],
     "widgets": [],
     "interactions": ["dropdown_1","dropdown_2","dropdown_3","dropdown_4","dropdown_5","dropdown_6","dropdown_7","dropdown_8","dropdown_9"],
-    "feedback": { "correct": [], "incorrect": [] },
+    "feedbackBlocks": [
+      {
+        "identifier": "CORRECT",
+        "outcomeIdentifier": "FEEDBACK__GLOBAL",
+        "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Correct! Well done." }] }]
+      },
+      {
+        "identifier": "INCORRECT", 
+        "outcomeIdentifier": "FEEDBACK__GLOBAL",
+        "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Not quite. Please review your answers." }] }]
+      }
+    ],
     "responseDeclarations": [
       { "identifier": "dropdown_1", "cardinality": "single", "baseType": "string", "correct": "fixed" },
       { "identifier": "dropdown_2", "cardinality": "single", "baseType": "string", "correct": "fixed" },
@@ -1209,7 +1376,18 @@ ${JSON.stringify(exampleShells, null, 2)}
     ],
     "widgets": ["states_table"],
     "interactions": [],
-    "feedback": { "correct": [], "incorrect": [] },
+    "feedbackBlocks": [
+      {
+        "identifier": "CORRECT",
+        "outcomeIdentifier": "FEEDBACK__GLOBAL",
+        "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Correct! Well done." }] }]
+      },
+      {
+        "identifier": "INCORRECT", 
+        "outcomeIdentifier": "FEEDBACK__GLOBAL",
+        "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Not quite. Please review your answers." }] }]
+      }
+    ],
     "responseDeclarations": [
       { "identifier": "dropdown_1", "cardinality": "single", "baseType": "string", "correct": "fixed" },
       { "identifier": "dropdown_2", "cardinality": "single", "baseType": "string", "correct": "fixed" },
@@ -2806,16 +2984,29 @@ Widgets MUST NEVER display, label, or visually indicate the correct answer. This
       "type": "choiceInteraction",
       "prompt": [{ "type": "text", "content": "How many solutions does the following equation have?" }],
       "choices": [
-        { "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "No solutions" }] }], "feedback": null, "identifier": "A" },
-        { "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Exactly one solution" }] }], "feedback": null, "identifier": "B" },
-        { "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Infinitely many solutions" }] }], "feedback": null, "identifier": "C" }
+        { "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "No solutions" }] }], "identifier": "A" },
+        { "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Exactly one solution" }] }], "identifier": "B" },
+        { "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Infinitely many solutions" }] }], "identifier": "C" }
       ]
     }
   },
-  "feedback": {
-    "correct": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Correct! Simplifying gives " }, { "type": "math", "mathml": "<mi>x</mi><mo>=</mo><mo>-</mo><mn>1</mn>" }, { "type": "text", "content": ", which is of the form " }, { "type": "math", "mathml": "<mi>x</mi><mo>=</mo><mi>a</mi>" }, { "type": "text", "content": " and therefore there is exactly one solution." }] }],
-    "incorrect": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Not quite. Distribute, then collect like terms on one side, and isolate " }, { "type": "math", "mathml": "<mi>x</mi>" }, { "type": "text", "content": ": " }, { "type": "math", "mathml": "<mn>3</mn><mrow><mo>(</mo><mi>x</mi><mo>+</mo><mn>5</mn><mo>)</mo></mrow><mo>=</mo><mo>-</mo><mn>4</mn><mi>x</mi><mo>+</mo><mn>8</mn><mo>⇒</mo><mn>3</mn><mi>x</mi><mo>+</mo><mn>15</mn><mo>=</mo><mo>-</mo><mn>4</mn><mi>x</mi><mo>+</mo><mn>8</mn><mo>⇒</mo><mn>7</mn><mi>x</mi><mo>=</mo><mo>-</mo><mn>7</mn><mo>⇒</mo><mi>x</mi><mo>=</mo><mo>-</mo><mn>1</mn>" }, { "type": "text", "content": ". Since this is of the form " }, { "type": "math", "mathml": "<mi>x</mi><mo>=</mo><mi>a</mi>" }, { "type": "text", "content": ", the equation has exactly one solution." }] }]
-  }
+  "feedbackBlocks": [
+    {
+      "identifier": "A",
+      "outcomeIdentifier": "FEEDBACK__CHOICE_INTERACTION",
+      "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Incorrect. This equation does have a solution." }] }]
+    },
+    {
+      "identifier": "B", 
+      "outcomeIdentifier": "FEEDBACK__CHOICE_INTERACTION",
+      "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Correct! Simplifying gives " }, { "type": "math", "mathml": "<mi>x</mi><mo>=</mo><mo>-</mo><mn>1</mn>" }, { "type": "text", "content": ", which is of the form " }, { "type": "math", "mathml": "<mi>x</mi><mo>=</mo><mi>a</mi>" }, { "type": "text", "content": " and therefore there is exactly one solution." }] }]
+    },
+    {
+      "identifier": "C",
+      "outcomeIdentifier": "FEEDBACK__CHOICE_INTERACTION", 
+      "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Incorrect. This equation has exactly one solution, not infinitely many." }] }]
+    }
+  ]
 }
 \`\`\`
 
@@ -2832,26 +3023,39 @@ Widgets MUST NEVER display, label, or visually indicate the correct answer. This
       "type": "choiceInteraction",
       "prompt": [{ "type": "text", "content": "How many solutions does the following equation have?" }],
       "choices": [
-        { "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "No solutions" }] }], "feedback": null, "identifier": "A" },
-        { "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Exactly one solution" }] }], "feedback": null, "identifier": "B" },
-        { "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Infinitely many solutions" }] }], "feedback": null, "identifier": "C" }
+        { "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "No solutions" }] }], "identifier": "A" },
+        { "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Exactly one solution" }] }], "identifier": "B" },
+        { "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Infinitely many solutions" }] }], "identifier": "C" }
       ]
     }
   },
-  "feedback": {
-    "correct": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Correct! Simplifying gives " }, { "type": "math", "mathml": "<mi>x</mi><mo>=</mo><mo>-</mo><mn>1</mn>" }, { "type": "text", "content": ", which is of the form " }, { "type": "math", "mathml": "<mi>x</mi><mo>=</mo><mi>a</mi>" }, { "type": "text", "content": " and therefore there is exactly one solution." }] }],
-    "incorrect": [
-      { "type": "paragraph", "content": [{ "type": "text", "content": "Strategy: Manipulate the equation to isolate x. Look for these patterns:" }] },
-      { "type": "paragraph", "content": [{ "type": "text", "content": "• x = a (exactly one solution)" }] },
-      { "type": "paragraph", "content": [{ "type": "text", "content": "• a = a (infinitely many solutions)" }] },
-      { "type": "paragraph", "content": [{ "type": "text", "content": "• a = b where a ≠ b (no solutions)" }] },
-      { "type": "paragraph", "content": [{ "type": "text", "content": "Solution: " }, { "type": "math", "mathml": "<mn>3</mn><mrow><mo>(</mo><mi>x</mi><mo>+</mo><mn>5</mn><mo>)</mo></mrow><mo>=</mo><mo>-</mo><mn>4</mn><mi>x</mi><mo>+</mo><mn>8</mn><mo>⇒</mo><mn>3</mn><mi>x</mi><mo>+</mo><mn>15</mn><mo>=</mo><mo>-</mo><mn>4</mn><mi>x</mi><mo>+</mo><mn>8</mn><mo>⇒</mo><mn>7</mn><mi>x</mi><mo>=</mo><mo>-</mo><mn>7</mn><mo>⇒</mo><mi>x</mi><mo>=</mo><mo>-</mo><mn>1</mn>" }, { "type": "text", "content": ". This gives exactly one solution." }] }
-    ]
-  }
+  "feedbackBlocks": [
+    {
+      "identifier": "A",
+      "outcomeIdentifier": "FEEDBACK__CHOICE_INTERACTION",
+      "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Incorrect. This equation does have a solution." }] }]
+    },
+    {
+      "identifier": "B",
+      "outcomeIdentifier": "FEEDBACK__CHOICE_INTERACTION", 
+      "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Correct! Simplifying gives " }, { "type": "math", "mathml": "<mi>x</mi><mo>=</mo><mo>-</mo><mn>1</mn>" }, { "type": "text", "content": ", which is of the form " }, { "type": "math", "mathml": "<mi>x</mi><mo>=</mo><mi>a</mi>" }, { "type": "text", "content": " and therefore there is exactly one solution." }] }]
+    },
+    {
+      "identifier": "C",
+      "outcomeIdentifier": "FEEDBACK__CHOICE_INTERACTION",
+      "content": [
+        { "type": "paragraph", "content": [{ "type": "text", "content": "Strategy: Manipulate the equation to isolate x. Look for these patterns:" }] },
+        { "type": "paragraph", "content": [{ "type": "text", "content": "• x = a (exactly one solution)" }] },
+        { "type": "paragraph", "content": [{ "type": "text", "content": "• a = a (infinitely many solutions)" }] },
+        { "type": "paragraph", "content": [{ "type": "text", "content": "• a = b where a ≠ b (no solutions)" }] },
+        { "type": "paragraph", "content": [{ "type": "text", "content": "Solution: " }, { "type": "math", "mathml": "<mn>3</mn><mrow><mo>(</mo><mi>x</mi><mo>+</mo><mn>5</mn><mo>)</mo></mrow><mo>=</mo><mo>-</mo><mn>4</mn><mi>x</mi><mo>+</mo><mn>8</mn><mo>⇒</mo><mn>3</mn><mi>x</mi><mo>+</mo><mn>15</mn><mo>=</mo><mo>-</mo><mn>4</mn><mi>x</mi><mo>+</mo><mn>8</mn><mo>⇒</mo><mn>7</mn><mi>x</mi><mo>=</mo><mo>-</mo><mn>7</mn><mo>⇒</mo><mi>x</mi><mo>=</mo><mo>-</mo><mn>1</mn>" }, { "type": "text", "content": ". This gives exactly one solution." }] }
+      ]
+    }
+  ]
 }
 \`\`\`
 
-**Explanation:** The wrong example turns the body into a complete lesson with strategy explanations, graphical interpretations, detailed worked solutions, and conclusions. The correct version keeps the body minimal (just the problem) and moves ALL teaching content to the feedback sections where it belongs.
+**Explanation:** The wrong example turns the body into a complete lesson with strategy explanations, graphical interpretations, detailed worked solutions, and conclusions. The correct version keeps the body minimal (just the problem) and moves ALL teaching content to the feedbackBlocks where it belongs.
 
 ⚠️ FINAL WARNING: Your output will be AUTOMATICALLY REJECTED if it contains:
 - ANY backslash character followed by letters (LaTeX commands)
@@ -2865,11 +3069,11 @@ Widgets MUST NEVER display, label, or visually indicate the correct answer. This
 - ANY widget that labels, highlights, or visually indicates the correct answer (e.g., angle diagrams with answer labels)
 - ANY duplicate text appearing in both the 'body' and interaction 'prompt' fields (eliminate redundancy by using empty body when interaction has clear prompt)
 - ANY cramped layouts where equations, answer prompts, and input fields are all in one paragraph (use separate paragraphs for visual clarity)
-- ANY explanations, strategies, worked solutions, or teaching content in the 'body' (these belong ONLY in 'feedback' sections)
+- ANY explanations, strategies, worked solutions, or teaching content in the 'body' (these belong ONLY in 'feedbackBlocks')
 - ANY widget or interaction that is NOT referenced in the Perseus content via \`[[☃ widget_name]]\` (unused widgets must be ignored) - EXCEPT for choice-level visuals and the 3 additional widgets created when converting unsupported interactive widgets
 - ANY unsupported interactive widget (plotter, interactive-graph, grapher) marked as an interaction instead of being converted to multiple choice
 
-**REMEMBER: Answers are ONLY allowed in feedback fields. HARD STOP. NO EXCEPTIONS.**
+**REMEMBER: Answers are ONLY allowed in feedbackBlocks. HARD STOP. NO EXCEPTIONS.**
 **REMEMBER: Unsupported interactive widgets MUST be converted to multiple choice questions. NEVER mark them as interactions.**
 Double-check your output before submitting. ZERO TOLERANCE for these violations.`
 

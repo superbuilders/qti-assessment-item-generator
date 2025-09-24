@@ -87,30 +87,38 @@ export const probabilityNotPurpleSpinner: AssessmentItemInput = {
 			expectedLength: 4
 		}
 	},
-	feedback: {
-		correct: [
-			{
-				type: "paragraph",
-				content: [
-					{ type: "text", content: "Correct! The probability of not landing on purple is " },
-					{ type: "math", mathml: "<mfrac><mn>3</mn><mn>4</mn></mfrac>" },
-					{ type: "text", content: " = " },
-					{ type: "math", mathml: "<mn>0.75</mn>" },
-					{ type: "text", content: " (or " },
-					{ type: "math", mathml: "<mn>75</mn><mo>%</mo>" },
-					{ type: "text", content: ")." }
-				]
-			}
-		],
-		incorrect: [
-			{
-				type: "paragraph",
-				content: [
-					{ type: "text", content: "Not quite. There are 3 favorable outcomes out of 4 equally likely outcomes." }
-				]
-			}
-		]
-	}
+	feedbackBlocks: [
+		{
+			identifier: "CORRECT",
+			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			content: [
+				{
+					type: "paragraph",
+					content: [
+						{ type: "text", content: "Correct! The probability of not landing on purple is " },
+						{ type: "math", mathml: "<mfrac><mn>3</mn><mn>4</mn></mfrac>" },
+						{ type: "text", content: " = " },
+						{ type: "math", mathml: "<mn>0.75</mn>" },
+						{ type: "text", content: " (or " },
+						{ type: "math", mathml: "<mn>75</mn><mo>%</mo>" },
+						{ type: "text", content: ")." }
+					]
+				}
+			]
+		},
+		{
+			identifier: "INCORRECT",
+			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			content: [
+				{
+					type: "paragraph",
+					content: [
+						{ type: "text", content: "Not quite. There are 3 favorable outcomes out of 4 equally likely outcomes." }
+					]
+				}
+			]
+		}
+	]
 }
 
 export const linearModelEquationPrediction: AssessmentItemInput = {
@@ -169,78 +177,130 @@ export const linearModelEquationPrediction: AssessmentItemInput = {
 			]
 		}
 	},
-	feedback: {
-		correct: [
-			{
-				type: "paragraph",
-				content: [
-					{ type: "text", content: "Correct! A reasonable linear model fits the points with a slope of " },
-					{ type: "math", mathml: "<mn>2</mn>" },
-					{ type: "text", content: " and a vertical intercept of " },
-					{ type: "math", mathml: "<mn>1.5</mn>" },
-					{ type: "text", content: ", so the equation is " },
-					{
-						type: "math",
-						mathml:
-							'<mrow><mover accent="true"><mi>y</mi><mo>^</mo></mover><mo>=</mo><mn>2</mn><mi>x</mi><mo>+</mo><mn>1.5</mn></mrow>'
-					},
-					{ type: "text", content: "." }
-				]
-			},
-			{
-				type: "paragraph",
-				content: [
-					{ type: "text", content: "Using this model for " },
-					{ type: "math", mathml: "<mi>x</mi><mo>=</mo><mn>6</mn>" },
-					{ type: "text", content: " hours gives " },
-					{
-						type: "math",
-						mathml:
-							'<mrow><mover accent="true"><mi>y</mi><mo>^</mo></mover><mo>=</mo><mn>2</mn><mo>(</mo><mn>6</mn><mo>)</mo><mo>+</mo><mn>1.5</mn><mo>=</mo><mn>12</mn><mo>+</mo><mn>1.5</mn><mo>=</mo><mn>13.5</mn></mrow>'
-					},
-					{ type: "text", content: " km." }
-				]
-			}
-		],
-		incorrect: [
-			{
-				type: "paragraph",
-				content: [
-					{
-						type: "text",
-						content:
-							"Not quite. Estimate the slope from two clear points on the fitted line, then read the vertical intercept."
-					}
-				]
-			},
-			{
-				type: "paragraph",
-				content: [
-					{ type: "text", content: "For example, using points " },
-					{ type: "math", mathml: "<mo>(</mo><mn>0</mn><mo>,</mo><mn>1.5</mn><mo>)</mo>" },
-					{ type: "text", content: " and " },
-					{ type: "math", mathml: "<mo>(</mo><mn>1</mn><mo>,</mo><mn>3.5</mn><mo>)</mo>" },
-					{ type: "text", content: " on the line, the slope is " },
-					{
-						type: "math",
-						mathml:
-							"<mrow><mfrac><mrow><mn>3.5</mn><mo>-</mo><mn>1.5</mn></mrow><mrow><mn>1</mn><mo>-</mo><mn>0</mn></mrow></mfrac><mo>=</mo><mn>2</mn></mrow>"
-					},
-					{ type: "text", content: " and the intercept is " },
-					{ type: "math", mathml: "<mn>1.5</mn>" },
-					{ type: "text", content: ", giving the model " },
-					{
-						type: "math",
-						mathml:
-							'<mrow><mover accent="true"><mi>y</mi><mo>^</mo></mover><mo>=</mo><mn>2</mn><mi>x</mi><mo>+</mo><mn>1.5</mn></mrow>'
-					},
-					{ type: "text", content: ". Then evaluate it at " },
-					{ type: "math", mathml: "<mi>x</mi><mo>=</mo><mn>6</mn>" },
-					{ type: "text", content: " to find the predicted distance." }
-				]
-			}
-		]
-	},
+	feedbackBlocks: [
+		// Feedback for choice_interaction (per-choice)
+		{
+			identifier: "A",
+			outcomeIdentifier: "FEEDBACK__choice_interaction",
+			content: [
+				{
+					type: "paragraph",
+					content: [
+						{ type: "text", content: "Correct! A reasonable linear model fits the points with a slope of " },
+						{ type: "math", mathml: "<mn>2</mn>" },
+						{ type: "text", content: " and a vertical intercept of " },
+						{ type: "math", mathml: "<mn>1.5</mn>" },
+						{ type: "text", content: ", so the equation is " },
+						{
+							type: "math",
+							mathml:
+								'<mrow><mover accent="true"><mi>y</mi><mo>^</mo></mover><mo>=</mo><mn>2</mn><mi>x</mi><mo>+</mo><mn>1.5</mn></mrow>'
+						},
+						{ type: "text", content: "." }
+					]
+				}
+			]
+		},
+		{
+			identifier: "B",
+			outcomeIdentifier: "FEEDBACK__choice_interaction",
+			content: [
+				{
+					type: "paragraph",
+					content: [
+						{ type: "text", content: "Incorrect. The slope is 2, not 1." }
+					]
+				}
+			]
+		},
+		{
+			identifier: "C",
+			outcomeIdentifier: "FEEDBACK__choice_interaction",
+			content: [
+				{
+					type: "paragraph",
+					content: [
+						{ type: "text", content: "Incorrect. The y-intercept should be positive 1.5, not negative." }
+					]
+				}
+			]
+		},
+		{
+			identifier: "D",
+			outcomeIdentifier: "FEEDBACK__choice_interaction",
+			content: [
+				{
+					type: "paragraph",
+					content: [
+						{ type: "text", content: "Incorrect. Both the slope and y-intercept are wrong." }
+					]
+				}
+			]
+		},
+		// Feedback for text_entry (CORRECT/INCORRECT)
+		{
+			identifier: "CORRECT",
+			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			content: [
+				{
+					type: "paragraph",
+					content: [
+						{ type: "text", content: "Using this model for " },
+						{ type: "math", mathml: "<mi>x</mi><mo>=</mo><mn>6</mn>" },
+						{ type: "text", content: " hours gives " },
+						{
+							type: "math",
+							mathml:
+								'<mrow><mover accent="true"><mi>y</mi><mo>^</mo></mover><mo>=</mo><mn>2</mn><mo>(</mo><mn>6</mn><mo>)</mo><mo>+</mo><mn>1.5</mn><mo>=</mo><mn>12</mn><mo>+</mo><mn>1.5</mn><mo>=</mo><mn>13.5</mn></mrow>'
+						},
+						{ type: "text", content: " km." }
+					]
+				}
+			]
+		},
+		{
+			identifier: "INCORRECT",
+			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			content: [
+				{
+					type: "paragraph",
+					content: [
+						{
+							type: "text",
+							content:
+								"Not quite. Estimate the slope from two clear points on the fitted line, then read the vertical intercept."
+						}
+					]
+				},
+				{
+					type: "paragraph",
+					content: [
+						{ type: "text", content: "For example, using points " },
+						{ type: "math", mathml: "<mo>(</mo><mn>0</mn><mo>,</mo><mn>1.5</mn><mo>)</mo>" },
+						{ type: "text", content: " and " },
+						{ type: "math", mathml: "<mo>(</mo><mn>1</mn><mo>,</mo><mn>3.5</mn><mo>)</mo>" },
+						{ type: "text", content: " on the line, the slope is " },
+						{
+							type: "math",
+							mathml:
+								"<mrow><mfrac><mrow><mn>3.5</mn><mo>-</mo><mn>1.5</mn></mrow><mrow><mn>1</mn><mo>-</mo><mn>0</mn></mrow></mfrac><mo>=</mo><mn>2</mn></mrow>"
+						},
+						{ type: "text", content: " and the intercept is " },
+						{ type: "math", mathml: "<mn>1.5</mn>" },
+						{ type: "text", content: ", giving the model " },
+						{
+							type: "math",
+							mathml:
+								'<mrow><mover accent="true"><mi>y</mi><mo>^</mo></mover><mo>=</mo><mn>2</mn><mi>x</mi><mo>+</mo><mn>1.5</mn></mrow>'
+						},
+						{ type: "text", content: ". Then evaluate it at " },
+						{ type: "math", mathml: "<mi>x</mi><mo>=</mo><mn>6</mn>" },
+						{ type: "text", content: " to find the predicted distance." }
+					]
+				}
+			]
+		}
+	],
 	identifier: "linear-model-equation-prediction",
 	interactions: {
 		text_entry: { type: "textEntryInteraction", expectedLength: null, responseIdentifier: "text_entry" },
@@ -261,7 +321,6 @@ export const linearModelEquationPrediction: AssessmentItemInput = {
 							]
 						}
 					],
-					feedback: null,
 					identifier: "A"
 				},
 				{
@@ -277,7 +336,6 @@ export const linearModelEquationPrediction: AssessmentItemInput = {
 							]
 						}
 					],
-					feedback: null,
 					identifier: "B"
 				},
 				{
@@ -293,7 +351,6 @@ export const linearModelEquationPrediction: AssessmentItemInput = {
 							]
 						}
 					],
-					feedback: null,
 					identifier: "C"
 				},
 				{
@@ -309,7 +366,6 @@ export const linearModelEquationPrediction: AssessmentItemInput = {
 							]
 						}
 					],
-					feedback: null,
 					identifier: "D"
 				}
 			],
@@ -392,56 +448,62 @@ export const doubleNumberLineRatio: AssessmentItemInput = {
 			choices: [
 				{
 					identifier: "A",
-					content: [{ type: "blockSlot", slotId: "choice_a_dnl" }],
-					feedback: null
+					content: [{ type: "blockSlot", slotId: "choice_a_dnl" }]
 				},
 				{
 					identifier: "B",
-					content: [{ type: "blockSlot", slotId: "choice_b_dnl" }],
-					feedback: null
+					content: [{ type: "blockSlot", slotId: "choice_b_dnl" }]
 				}
 			]
 		}
 	},
-	feedback: {
-		correct: [
-			{
-				type: "paragraph",
-				content: [
-					{ type: "text", content: "Correct! The ratio of distance to elevation is " },
-					{ type: "math", mathml: "<mn>3</mn><mo>:</mo><mn>120</mn>" },
-					{ type: "text", content: ", which simplifies to a unit rate of " },
-					{ type: "math", mathml: "<mn>1</mn><mo>:</mo><mn>40</mn>" },
-					{ type: "text", content: ". For every " },
-					{ type: "math", mathml: "<mn>1</mn><mtext> km</mtext>" },
-					{ type: "text", content: " hiked, the elevation increases by " },
-					{ type: "math", mathml: "<mn>40</mn><mtext> m</mtext>" },
-					{ type: "text", content: ". This matches the correct number line." }
-				]
-			}
-		],
-		incorrect: [
-			{
-				type: "paragraph",
-				content: [
-					{ type: "text", content: "Not quite. First, find the unit rate. If Cory's elevation is " },
-					{ type: "math", mathml: "<mn>120</mn><mtext> m</mtext>" },
-					{ type: "text", content: " after " },
-					{ type: "math", mathml: "<mn>3</mn><mtext> km</mtext>" },
-					{ type: "text", content: ", the rate is " },
-					{
-						type: "math",
-						mathml:
-							"<mfrac><mrow><mn>120</mn><mtext> m</mtext></mrow><mrow><mn>3</mn><mtext> km</mtext></mrow></mfrac><mo>=</mo><mn>40</mn>"
-					},
-					{
-						type: "text",
-						content: " meters per kilometer. Use this rate to fill in the other values on the number line."
-					}
-				]
-			}
-		]
-	}
+	feedbackBlocks: [
+		{
+			identifier: "A",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
+			content: [
+				{
+					type: "paragraph",
+					content: [
+						{ type: "text", content: "Correct! The ratio of distance to elevation is " },
+						{ type: "math", mathml: "<mn>3</mn><mo>:</mo><mn>120</mn>" },
+						{ type: "text", content: ", which simplifies to a unit rate of " },
+						{ type: "math", mathml: "<mn>1</mn><mo>:</mo><mn>40</mn>" },
+						{ type: "text", content: ". For every " },
+						{ type: "math", mathml: "<mn>1</mn><mtext> km</mtext>" },
+						{ type: "text", content: " hiked, the elevation increases by " },
+						{ type: "math", mathml: "<mn>40</mn><mtext> m</mtext>" },
+						{ type: "text", content: ". This matches the correct number line." }
+					]
+				}
+			]
+		},
+		{
+			identifier: "B",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
+			content: [
+				{
+					type: "paragraph",
+					content: [
+						{ type: "text", content: "Not quite. First, find the unit rate. If Cory's elevation is " },
+						{ type: "math", mathml: "<mn>120</mn><mtext> m</mtext>" },
+						{ type: "text", content: " after " },
+						{ type: "math", mathml: "<mn>3</mn><mtext> km</mtext>" },
+						{ type: "text", content: ", the rate is " },
+						{
+							type: "math",
+							mathml:
+								"<mfrac><mrow><mn>120</mn><mtext> m</mtext></mrow><mrow><mn>3</mn><mtext> km</mtext></mrow></mfrac><mo>=</mo><mn>40</mn>"
+						},
+						{
+							type: "text",
+							content: " meters per kilometer. Use this rate to fill in the other values on the number line."
+						}
+					]
+				}
+			]
+		}
+	]
 }
 
 export const evalFractionalExponents: AssessmentItemInput = {
@@ -478,68 +540,76 @@ export const evalFractionalExponents: AssessmentItemInput = {
 		}
 	},
 	widgets: null,
-	feedback: {
-		correct: [
-			{
-				type: "paragraph",
-				content: [
-					{ type: "text", content: "Correct! The answer is " },
-					{ type: "math", mathml: "<mn>81</mn>" },
-					{ type: "text", content: "." }
-				]
-			},
-			{
-				type: "paragraph",
-				content: [
-					{ type: "text", content: "You successfully applied the rule: " },
-					{
-						type: "math",
-						mathml:
-							"<mfrac><msup><mi>a</mi><mi>n</mi></msup><msup><mi>b</mi><mi>n</mi></msup></mfrac><mo>=</mo><msup><mrow><mo>(</mo><mfrac><mi>a</mi><mi>b</mi></mfrac><mo>)</mo></mrow><mi>n</mi></msup>"
-					}
-				]
-			}
-		],
-		incorrect: [
-			{
-				type: "paragraph",
-				content: [{ type: "text", content: "Not quite. Let me help you solve this step by step." }]
-			},
-			{
-				type: "paragraph",
-				content: [
-					{ type: "text", content: "First, use the rule: " },
-					{
-						type: "math",
-						mathml:
-							"<mfrac><msup><mi>a</mi><mi>n</mi></msup><msup><mi>b</mi><mi>n</mi></msup></mfrac><mo>=</mo><msup><mrow><mo>(</mo><mfrac><mi>a</mi><mi>b</mi></mfrac><mo>)</mo></mrow><mi>n</mi></msup>"
-					}
-				]
-			},
-			{
-				type: "paragraph",
-				content: [
-					{ type: "text", content: "So: " },
-					{
-						type: "math",
-						mathml:
-							"<mfrac><msup><mn>2</mn><mrow><mo>-</mo><mfrac><mn>4</mn><mn>3</mn></mfrac></mrow></msup><msup><mn>54</mn><mrow><mo>-</mo><mfrac><mn>4</mn><mn>3</mn></mfrac></mrow></msup></mfrac><mo>=</mo><msup><mrow><mo>(</mo><mfrac><mn>2</mn><mn>54</mn></mfrac><mo>)</mo></mrow><mrow><mo>-</mo><mfrac><mn>4</mn><mn>3</mn></mfrac></mrow></msup><mo>=</mo><msup><mrow><mo>(</mo><mfrac><mn>1</mn><mn>27</mn></mfrac><mo>)</mo></mrow><mrow><mo>-</mo><mfrac><mn>4</mn><mn>3</mn></mfrac></mrow></msup><mo>=</mo><msup><mn>27</mn><mfrac><mn>4</mn><mn>3</mn></mfrac></msup>"
-					}
-				]
-			},
-			{
-				type: "paragraph",
-				content: [
-					{ type: "text", content: "Then: " },
-					{
-						type: "math",
-						mathml:
-							"<msup><mn>27</mn><mfrac><mn>4</mn><mn>3</mn></mfrac></msup><mo>=</mo><msup><mrow><mo>(</mo><mroot><mn>27</mn><mn>3</mn></mroot><mo>)</mo></mrow><mn>4</mn></msup><mo>=</mo><msup><mn>3</mn><mn>4</mn></msup><mo>=</mo><mn>81</mn>"
-					}
-				]
-			}
-		]
-	}
+	feedbackBlocks: [
+		{
+			identifier: "CORRECT",
+			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			content: [
+				{
+					type: "paragraph",
+					content: [
+						{ type: "text", content: "Correct! The answer is " },
+						{ type: "math", mathml: "<mn>81</mn>" },
+						{ type: "text", content: "." }
+					]
+				},
+				{
+					type: "paragraph",
+					content: [
+						{ type: "text", content: "You successfully applied the rule: " },
+						{
+							type: "math",
+							mathml:
+								"<mfrac><msup><mi>a</mi><mi>n</mi></msup><msup><mi>b</mi><mi>n</mi></msup></mfrac><mo>=</mo><msup><mrow><mo>(</mo><mfrac><mi>a</mi><mi>b</mi></mfrac><mo>)</mo></mrow><mi>n</mi></msup>"
+						}
+					]
+				}
+			]
+		},
+		{
+			identifier: "INCORRECT",
+			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			content: [
+				{
+					type: "paragraph",
+					content: [{ type: "text", content: "Not quite. Let me help you solve this step by step." }]
+				},
+				{
+					type: "paragraph",
+					content: [
+						{ type: "text", content: "First, use the rule: " },
+						{
+							type: "math",
+							mathml:
+								"<mfrac><msup><mi>a</mi><mi>n</mi></msup><msup><mi>b</mi><mi>n</mi></msup></mfrac><mo>=</mo><msup><mrow><mo>(</mo><mfrac><mi>a</mi><mi>b</mi></mfrac><mo>)</mo></mrow><mi>n</mi></msup>"
+						}
+					]
+				},
+				{
+					type: "paragraph",
+					content: [
+						{ type: "text", content: "So: " },
+						{
+							type: "math",
+							mathml:
+								"<mfrac><msup><mn>2</mn><mrow><mo>-</mo><mfrac><mn>4</mn><mn>3</mn></mfrac></mrow></msup><msup><mn>54</mn><mrow><mo>-</mo><mfrac><mn>4</mn><mn>3</mn></mfrac></mrow></msup></mfrac><mo>=</mo><msup><mrow><mo>(</mo><mfrac><mn>2</mn><mn>54</mn></mfrac><mo>)</mo></mrow><mrow><mo>-</mo><mfrac><mn>4</mn><mn>3</mn></mfrac></mrow></msup><mo>=</mo><msup><mrow><mo>(</mo><mfrac><mn>1</mn><mn>27</mn></mfrac><mo>)</mo></mrow><mrow><mo>-</mo><mfrac><mn>4</mn><mn>3</mn></mfrac></mrow></msup><mo>=</mo><msup><mn>27</mn><mfrac><mn>4</mn><mn>3</mn></mfrac></msup>"
+						}
+					]
+				},
+				{
+					type: "paragraph",
+					content: [
+						{ type: "text", content: "Then: " },
+						{
+							type: "math",
+							mathml:
+								"<msup><mn>27</mn><mfrac><mn>4</mn><mn>3</mn></mfrac></msup><mo>=</mo><msup><mrow><mo>(</mo><mroot><mn>27</mn><mn>3</mn></mroot><mo>)</mo></mrow><mn>4</mn></msup><mo>=</mo><msup><mn>3</mn><mn>4</mn></msup><mo>=</mo><mn>81</mn>"
+						}
+					]
+				}
+			]
+		}
+	]
 }
 
 export const compare3DigitNumbers: AssessmentItemInput = {
@@ -569,11 +639,6 @@ export const compare3DigitNumbers: AssessmentItemInput = {
 							type: "paragraph",
 							content: [{ type: "math", mathml: "<mn>708</mn>" }]
 						}
-					],
-					feedback: [
-						{ type: "text", content: "Correct! " },
-						{ type: "math", mathml: "<mn>708</mn><mo>&gt;</mo><mn>79</mn>" },
-						{ type: "text", content: "." }
 					]
 				},
 				{
@@ -583,13 +648,6 @@ export const compare3DigitNumbers: AssessmentItemInput = {
 							type: "paragraph",
 							content: [{ type: "math", mathml: "<mo>&gt;</mo>" }]
 						}
-					],
-					feedback: [
-						{ type: "text", content: "That symbol belongs between " },
-						{ type: "math", mathml: "<mn>708</mn>" },
-						{ type: "text", content: " and " },
-						{ type: "math", mathml: "<mn>79</mn>" },
-						{ type: "text", content: " to make a true statement." }
 					]
 				},
 				{
@@ -599,40 +657,44 @@ export const compare3DigitNumbers: AssessmentItemInput = {
 							type: "paragraph",
 							content: [{ type: "math", mathml: "<mn>79</mn>" }]
 						}
-					],
-					feedback: [
-						{ type: "math", mathml: "<mn>79</mn>" },
-						{ type: "text", content: " is the smaller number on the right." }
 					]
 				}
 			]
 		}
 	},
 	widgets: null,
-	feedback: {
-		correct: [
-			{
-				type: "paragraph",
-				content: [
-					{ type: "text", content: "Correct! You have arranged the cards as " },
-					{ type: "math", mathml: "<mn>708</mn><mo>&gt;</mo><mn>79</mn>" },
-					{ type: "text", content: ", which is a true comparison." }
-				]
-			}
-		],
-		incorrect: [
-			{
-				type: "paragraph",
-				content: [
-					{
-						type: "text",
-						content:
-							"Not quite. Make sure the largest number is on the left and the symbol correctly represents the relationship."
-					}
-				]
-			}
-		]
-	}
+	feedbackBlocks: [
+		{
+			identifier: "CORRECT",
+			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			content: [
+				{
+					type: "paragraph",
+					content: [
+						{ type: "text", content: "Correct! You have arranged the cards as " },
+						{ type: "math", mathml: "<mn>708</mn><mo>&gt;</mo><mn>79</mn>" },
+						{ type: "text", content: ", which is a true comparison." }
+					]
+				}
+			]
+		},
+		{
+			identifier: "INCORRECT",
+			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			content: [
+				{
+					type: "paragraph",
+					content: [
+						{
+							type: "text",
+							content:
+								"Not quite. Make sure the largest number is on the left and the symbol correctly represents the relationship."
+						}
+					]
+				}
+			]
+		}
+	]
 }
 
 export const inequalityNumberLine: AssessmentItemInput = {
@@ -683,8 +745,7 @@ export const inequalityNumberLine: AssessmentItemInput = {
 							type: "paragraph",
 							content: [{ type: "math", mathml: "<mi>x</mi><mo>&lt;</mo><mn>0</mn>" }]
 						}
-					],
-					feedback: null
+					]
 				},
 				{
 					identifier: "B",
@@ -693,8 +754,7 @@ export const inequalityNumberLine: AssessmentItemInput = {
 							type: "paragraph",
 							content: [{ type: "math", mathml: "<mi>x</mi><mo>≤</mo><mn>0</mn>" }]
 						}
-					],
-					feedback: null
+					]
 				},
 				{
 					identifier: "C",
@@ -703,8 +763,7 @@ export const inequalityNumberLine: AssessmentItemInput = {
 							type: "paragraph",
 							content: [{ type: "math", mathml: "<mi>x</mi><mo>&gt;</mo><mn>0</mn>" }]
 						}
-					],
-					feedback: null
+					]
 				},
 				{
 					identifier: "D",
@@ -713,48 +772,70 @@ export const inequalityNumberLine: AssessmentItemInput = {
 							type: "paragraph",
 							content: [{ type: "math", mathml: "<mi>x</mi><mo>≥</mo><mn>0</mn>" }]
 						}
-					],
-					feedback: null
+					]
 				}
 			]
 		}
 	},
-	feedback: {
-		correct: [
-			{
-				type: "paragraph",
-				content: [
-					{
-						type: "text",
-						content: "Correct! The graph shows an open point at "
-					},
-					{ type: "math", mathml: "<mn>0</mn>" },
-					{ type: "text", content: " with an arrow to the right, representing all values strictly greater than " },
-					{ type: "math", mathml: "<mn>0</mn>" },
-					{ type: "text", content: ", so the inequality is " },
-					{ type: "math", mathml: "<mi>x</mi><mo>&gt;</mo><mn>0</mn>" },
-					{ type: "text", content: "." }
-				]
-			}
-		],
-		incorrect: [
-			{
-				type: "paragraph",
-				content: [
-					{ type: "text", content: "Not quite. The open point at " },
-					{ type: "math", mathml: "<mn>0</mn>" },
-					{ type: "text", content: " means " },
-					{ type: "math", mathml: "<mn>0</mn>" },
-					{
-						type: "text",
-						content: " itself is not included, and the arrow pointing right indicates values greater than "
-					},
-					{ type: "math", mathml: "<mn>0</mn>" },
-					{ type: "text", content: "." }
-				]
-			}
-		]
-	}
+	feedbackBlocks: [
+		{
+			identifier: "A",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
+			content: [
+				{
+					type: "paragraph",
+					content: [
+						{ type: "text", content: "Incorrect. This represents values less than 0, but the graph shows values greater than 0." }
+					]
+				}
+			]
+		},
+		{
+			identifier: "B",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
+			content: [
+				{
+					type: "paragraph",
+					content: [
+						{ type: "text", content: "Incorrect. This includes 0 (closed point), but the graph shows an open point at 0." }
+					]
+				}
+			]
+		},
+		{
+			identifier: "C",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
+			content: [
+				{
+					type: "paragraph",
+					content: [
+						{
+							type: "text",
+							content: "Correct! The graph shows an open point at "
+						},
+						{ type: "math", mathml: "<mn>0</mn>" },
+						{ type: "text", content: " with an arrow to the right, representing all values strictly greater than " },
+						{ type: "math", mathml: "<mn>0</mn>" },
+						{ type: "text", content: ", so the inequality is " },
+						{ type: "math", mathml: "<mi>x</mi><mo>&gt;</mo><mn>0</mn>" },
+						{ type: "text", content: "." }
+					]
+				}
+			]
+		},
+		{
+			identifier: "D",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
+			content: [
+				{
+					type: "paragraph",
+					content: [
+						{ type: "text", content: "Incorrect. This includes 0 (closed point), but the graph shows an open point at 0." }
+					]
+				}
+			]
+		}
+	]
 }
 
 export const verticalNumberLineComparison: AssessmentItemInput = {
@@ -849,40 +930,12 @@ export const verticalNumberLineComparison: AssessmentItemInput = {
 			]
 		}
 	},
-	feedback: {
-		correct: [
-			{
-				type: "paragraph",
-				content: [
-					{ type: "text", content: "Correct! On a vertical number line, numbers higher up are greater. Since " },
-					{ type: "math", mathml: "<mo>-</mo><mn>1.4</mn>" },
-					{ type: "text", content: " is above " },
-					{ type: "math", mathml: "<mo>-</mo><mn>6.4</mn>" },
-					{ type: "text", content: ", it is the greater number." }
-				]
-			}
-		],
-		incorrect: [
-			{
-				type: "paragraph",
-				content: [
-					{ type: "text", content: "Not quite. Look at the positions on the number line. " },
-					{ type: "math", mathml: "<mo>-</mo><mn>1.4</mn>" },
-					{ type: "text", content: " is located higher up than " },
-					{ type: "math", mathml: "<mo>-</mo><mn>6.4</mn>" },
-					{ type: "text", content: ". This means " },
-					{ type: "math", mathml: "<mo>-</mo><mn>1.4</mn>" },
-					{ type: "text", content: " is above " },
-					{ type: "math", mathml: "<mo>-</mo><mn>6.4</mn>" },
-					{ type: "text", content: ", and therefore " },
-					{ type: "math", mathml: "<mo>-</mo><mn>1.4</mn>" },
-					{ type: "text", content: " is greater than " },
-					{ type: "math", mathml: "<mo>-</mo><mn>6.4</mn>" },
-					{ type: "text", content: "." }
-				]
-			}
-		]
-	}
+	feedbackBlocks: [
+		{ identifier: "ABOVE", outcomeIdentifier: "FEEDBACK__RESPONSE_POS", content: [{ type: "paragraph", content: [{ type: "text", content: "Correct: -1.4 is above -6.4." }] }] },
+		{ identifier: "BELOW", outcomeIdentifier: "FEEDBACK__RESPONSE_POS", content: [{ type: "paragraph", content: [{ type: "text", content: "Not quite: -1.4 is above -6.4 on a vertical number line." }] }] },
+		{ identifier: "GT", outcomeIdentifier: "FEEDBACK__RESPONSE_COMP", content: [{ type: "paragraph", content: [{ type: "text", content: "Correct: a higher position means greater value." }] }] },
+		{ identifier: "LT", outcomeIdentifier: "FEEDBACK__RESPONSE_COMP", content: [{ type: "paragraph", content: [{ type: "text", content: "Not quite: since -1.4 is higher than -6.4, -1.4 is greater." }] }] }
+	]
 }
 
 export const twoWayFrequencyTable: AssessmentItemInput = {
@@ -955,26 +1008,34 @@ export const twoWayFrequencyTable: AssessmentItemInput = {
 		{ type: "blockSlot", slotId: "table_widget" }
 	],
 	interactions: {},
-	feedback: {
-		correct: [
-			{
-				type: "paragraph",
-				content: [{ type: "text", content: "Correct! The completed table is:" }]
-			}
-		],
-		incorrect: [
-			{
-				type: "paragraph",
-				content: [
-					{ type: "text", content: "Not quite. Use the numbers in the Venn diagram. The overlap (" },
-					{ type: "math", mathml: "<mn>23</mn>" },
-					{ type: "text", content: ') belongs in the "Received medicine" & "Cold ' },
-					{ type: "math", mathml: "<mo>≥</mo><mn>7</mn>" },
-					{ type: "text", content: ' days" cell. Then distribute the other counts accordingly.' }
-				]
-			}
-		]
-	}
+	feedbackBlocks: [
+		{
+			identifier: "CORRECT",
+			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			content: [
+				{
+					type: "paragraph",
+					content: [{ type: "text", content: "Correct! The completed table is:" }]
+				}
+			]
+		},
+		{
+			identifier: "INCORRECT",
+			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			content: [
+				{
+					type: "paragraph",
+					content: [
+						{ type: "text", content: "Not quite. Use the numbers in the Venn diagram. The overlap (" },
+						{ type: "math", mathml: "<mn>23</mn>" },
+						{ type: "text", content: ') belongs in the "Received medicine" & "Cold ' },
+						{ type: "math", mathml: "<mo>≥</mo><mn>7</mn>" },
+						{ type: "text", content: ' days" cell. Then distribute the other counts accordingly.' }
+					]
+				}
+			]
+		}
+	]
 }
 
 export const equivalentFractionImages: AssessmentItemInput = {
@@ -1096,8 +1157,27 @@ export const equivalentFractionImages: AssessmentItemInput = {
 			choices: [
 				{
 					identifier: "A",
-					content: [{ type: "blockSlot", slotId: "choice_a_shape" }],
-					feedback: [
+					content: [{ type: "blockSlot", slotId: "choice_a_shape" }]
+				},
+				{
+					identifier: "B",
+					content: [{ type: "blockSlot", slotId: "choice_b_shape" }]
+				},
+				{
+					identifier: "C",
+					content: [{ type: "blockSlot", slotId: "choice_c_shape" }]
+				}
+			]
+		}
+	},
+	feedbackBlocks: [
+		{
+			identifier: "A",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
+			content: [
+				{
+					type: "paragraph",
+					content: [
 						{ type: "text", content: "Correct! This rectangle has " },
 						{ type: "math", mathml: "<mn>4</mn>" },
 						{ type: "text", content: " out of " },
@@ -1110,11 +1190,16 @@ export const equivalentFractionImages: AssessmentItemInput = {
 						{ type: "math", mathml: "<mfrac><mn>3</mn><mn>6</mn></mfrac>" },
 						{ type: "text", content: "." }
 					]
-				},
+				}
+			]
+		},
+		{
+			identifier: "B",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
+			content: [
 				{
-					identifier: "B",
-					content: [{ type: "blockSlot", slotId: "choice_b_shape" }],
-					feedback: [
+					type: "paragraph",
+					content: [
 						{ type: "text", content: "Correct! This rectangle has " },
 						{ type: "math", mathml: "<mn>2</mn>" },
 						{ type: "text", content: " out of " },
@@ -1127,11 +1212,16 @@ export const equivalentFractionImages: AssessmentItemInput = {
 						{ type: "math", mathml: "<mfrac><mn>3</mn><mn>6</mn></mfrac>" },
 						{ type: "text", content: "." }
 					]
-				},
+				}
+			]
+		},
+		{
+			identifier: "C",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
+			content: [
 				{
-					identifier: "C",
-					content: [{ type: "blockSlot", slotId: "choice_c_shape" }],
-					feedback: [
+					type: "paragraph",
+					content: [
 						{ type: "text", content: "Not quite. This rectangle has " },
 						{ type: "math", mathml: "<mn>3</mn>" },
 						{ type: "text", content: " out of " },
@@ -1149,56 +1239,7 @@ export const equivalentFractionImages: AssessmentItemInput = {
 				}
 			]
 		}
-	},
-	feedback: {
-		correct: [
-			{
-				type: "paragraph",
-				content: [
-					{ type: "text", content: "Excellent! You correctly identified that " },
-					{ type: "math", mathml: "<mfrac><mn>3</mn><mn>6</mn></mfrac>" },
-					{ type: "text", content: " = " },
-					{ type: "math", mathml: "<mfrac><mn>1</mn><mn>2</mn></mfrac>" },
-					{ type: "text", content: ", and found both rectangles that have exactly half of their area shaded: " },
-					{ type: "math", mathml: "<mfrac><mn>4</mn><mn>8</mn></mfrac>" },
-					{ type: "text", content: " and " },
-					{ type: "math", mathml: "<mfrac><mn>2</mn><mn>4</mn></mfrac>" },
-					{ type: "text", content: " both equal " },
-					{ type: "math", mathml: "<mfrac><mn>1</mn><mn>2</mn></mfrac>" },
-					{ type: "text", content: "." }
-				]
-			}
-		],
-		incorrect: [
-			{
-				type: "paragraph",
-				content: [
-					{ type: "text", content: "Not quite. First, simplify " },
-					{ type: "math", mathml: "<mfrac><mn>3</mn><mn>6</mn></mfrac>" },
-					{ type: "text", content: " to " },
-					{ type: "math", mathml: "<mfrac><mn>1</mn><mn>2</mn></mfrac>" },
-					{
-						type: "text",
-						content: ". Then count the shaded parts in each rectangle and check if that fraction equals "
-					},
-					{ type: "math", mathml: "<mfrac><mn>1</mn><mn>2</mn></mfrac>" },
-					{ type: "text", content: ". Remember: " },
-					{ type: "math", mathml: "<mfrac><mn>4</mn><mn>8</mn></mfrac>" },
-					{ type: "text", content: " = " },
-					{ type: "math", mathml: "<mfrac><mn>1</mn><mn>2</mn></mfrac>" },
-					{ type: "text", content: ", " },
-					{ type: "math", mathml: "<mfrac><mn>2</mn><mn>4</mn></mfrac>" },
-					{ type: "text", content: " = " },
-					{ type: "math", mathml: "<mfrac><mn>1</mn><mn>2</mn></mfrac>" },
-					{ type: "text", content: ", but " },
-					{ type: "math", mathml: "<mfrac><mn>3</mn><mn>4</mn></mfrac>" },
-					{ type: "text", content: " ≠ " },
-					{ type: "math", mathml: "<mfrac><mn>1</mn><mn>2</mn></mfrac>" },
-					{ type: "text", content: "." }
-				]
-			}
-		]
-	}
+	]
 }
 
 export const calculateShadedArea: AssessmentItemInput = {
@@ -1286,21 +1327,6 @@ export const calculateShadedArea: AssessmentItemInput = {
 								{ type: "math", mathml: "<mrow><mn>4</mn><mo>×</mo><mfrac><mn>1</mn><mn>3</mn></mfrac></mrow>" }
 							]
 						}
-					],
-					feedback: [
-						{ type: "text", content: "Not quite. This would mean " },
-						{ type: "math", mathml: "<mn>4</mn>" },
-						{ type: "text", content: " groups of " },
-						{ type: "math", mathml: "<mfrac><mn>1</mn><mn>3</mn></mfrac>" },
-						{ type: "text", content: " each. But we have " },
-						{ type: "math", mathml: "<mn>3</mn>" },
-						{ type: "text", content: " circles, each with " },
-						{ type: "math", mathml: "<mfrac><mn>1</mn><mn>4</mn></mfrac>" },
-						{ type: "text", content: " shaded, not " },
-						{ type: "math", mathml: "<mn>4</mn>" },
-						{ type: "text", content: " groups of " },
-						{ type: "math", mathml: "<mfrac><mn>1</mn><mn>3</mn></mfrac>" },
-						{ type: "text", content: "." }
 					]
 				},
 				{
@@ -1312,15 +1338,6 @@ export const calculateShadedArea: AssessmentItemInput = {
 								{ type: "math", mathml: "<mrow><mn>3</mn><mo>×</mo><mfrac><mn>1</mn><mn>4</mn></mfrac></mrow>" }
 							]
 						}
-					],
-					feedback: [
-						{ type: "text", content: "Correct! There are " },
-						{ type: "math", mathml: "<mn>3</mn>" },
-						{ type: "text", content: " circles and " },
-						{ type: "math", mathml: "<mfrac><mn>1</mn><mn>4</mn></mfrac>" },
-						{ type: "text", content: " of each circle is shaded. We can multiply: " },
-						{ type: "math", mathml: "<mn>3</mn><mo>×</mo><mfrac><mn>1</mn><mn>4</mn></mfrac>" },
-						{ type: "text", content: "." }
 					]
 				},
 				{
@@ -1336,8 +1353,61 @@ export const calculateShadedArea: AssessmentItemInput = {
 								}
 							]
 						}
-					],
-					feedback: [
+					]
+				}
+			]
+		}
+	},
+	feedbackBlocks: [
+		{
+			identifier: "A",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
+			content: [
+				{
+					type: "paragraph",
+					content: [
+						{ type: "text", content: "Not quite. This would mean " },
+						{ type: "math", mathml: "<mn>4</mn>" },
+						{ type: "text", content: " groups of " },
+						{ type: "math", mathml: "<mfrac><mn>1</mn><mn>3</mn></mfrac>" },
+						{ type: "text", content: " each. But we have " },
+						{ type: "math", mathml: "<mn>3</mn>" },
+						{ type: "text", content: " circles, each with " },
+						{ type: "math", mathml: "<mfrac><mn>1</mn><mn>4</mn></mfrac>" },
+						{ type: "text", content: " shaded, not " },
+						{ type: "math", mathml: "<mn>4</mn>" },
+						{ type: "text", content: " groups of " },
+						{ type: "math", mathml: "<mfrac><mn>1</mn><mn>3</mn></mfrac>" },
+						{ type: "text", content: "." }
+					]
+				}
+			]
+		},
+		{
+			identifier: "B",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
+			content: [
+				{
+					type: "paragraph",
+					content: [
+						{ type: "text", content: "Correct! There are " },
+						{ type: "math", mathml: "<mn>3</mn>" },
+						{ type: "text", content: " circles and " },
+						{ type: "math", mathml: "<mfrac><mn>1</mn><mn>4</mn></mfrac>" },
+						{ type: "text", content: " of each circle is shaded. We can multiply: " },
+						{ type: "math", mathml: "<mn>3</mn><mo>×</mo><mfrac><mn>1</mn><mn>4</mn></mfrac>" },
+						{ type: "text", content: "." }
+					]
+				}
+			]
+		},
+		{
+			identifier: "C",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
+			content: [
+				{
+					type: "paragraph",
+					content: [
 						{ type: "text", content: "Correct! Since we have " },
 						{ type: "math", mathml: "<mn>3</mn>" },
 						{ type: "text", content: " circles and each has " },
@@ -1353,57 +1423,7 @@ export const calculateShadedArea: AssessmentItemInput = {
 				}
 			]
 		}
-	},
-	feedback: {
-		correct: [
-			{
-				type: "paragraph",
-				content: [
-					{
-						type: "text",
-						content: "Excellent! You found both correct ways to calculate the shaded area. Since we have "
-					},
-					{ type: "math", mathml: "<mn>3</mn>" },
-					{ type: "text", content: " circles with " },
-					{ type: "math", mathml: "<mfrac><mn>1</mn><mn>4</mn></mfrac>" },
-					{ type: "text", content: " shaded in each, we can either multiply " },
-					{ type: "math", mathml: "<mn>3</mn><mo>×</mo><mfrac><mn>1</mn><mn>4</mn></mfrac>" },
-					{ type: "text", content: " or add " },
-					{
-						type: "math",
-						mathml:
-							"<mfrac><mn>1</mn><mn>4</mn></mfrac><mo>+</mo><mfrac><mn>1</mn><mn>4</mn></mfrac><mo>+</mo><mfrac><mn>1</mn><mn>4</mn></mfrac>"
-					},
-					{ type: "text", content: ". Both give us " },
-					{ type: "math", mathml: "<mfrac><mn>3</mn><mn>4</mn></mfrac>" },
-					{ type: "text", content: " as the total shaded area." }
-				]
-			}
-		],
-		incorrect: [
-			{
-				type: "paragraph",
-				content: [
-					{ type: "text", content: "Not quite. Look carefully at the image. There are " },
-					{ type: "math", mathml: "<mn>3</mn>" },
-					{ type: "text", content: " circles, and " },
-					{ type: "math", mathml: "<mfrac><mn>1</mn><mn>4</mn></mfrac>" },
-					{
-						type: "text",
-						content: " of each circle is shaded. We can find the total shaded area by either: (1) multiplying "
-					},
-					{ type: "math", mathml: "<mn>3</mn><mo>×</mo><mfrac><mn>1</mn><mn>4</mn></mfrac>" },
-					{ type: "text", content: ", or (2) adding " },
-					{
-						type: "math",
-						mathml:
-							"<mfrac><mn>1</mn><mn>4</mn></mfrac><mo>+</mo><mfrac><mn>1</mn><mn>4</mn></mfrac><mo>+</mo><mfrac><mn>1</mn><mn>4</mn></mfrac>"
-					},
-					{ type: "text", content: "." }
-				]
-			}
-		]
-	}
+	]
 }
 
 export const circleEquationCenterRadius: AssessmentItemInput = {
@@ -1448,61 +1468,69 @@ export const circleEquationCenterRadius: AssessmentItemInput = {
 		r_entry: { type: "textEntryInteraction", responseIdentifier: "RESPONSE_R", expectedLength: 2 }
 	},
 	widgets: null,
-	feedback: {
-		correct: [
-			{
-				type: "paragraph",
-				content: [
-					{ type: "text", content: "Correct! You successfully found that the circle is centered at (" },
-					{ type: "math", mathml: "<mo>-</mo><mn>9</mn>" },
-					{ type: "text", content: ", " },
-					{ type: "math", mathml: "<mo>-</mo><mn>7</mn>" },
-					{ type: "text", content: ") with a radius of " },
-					{ type: "math", mathml: "<mn>5</mn>" },
-					{ type: "text", content: " units." }
-				]
-			},
-			{
-				type: "paragraph",
-				content: [
-					{ type: "text", content: "You correctly converted the equation to standard form: " },
-					{
-						type: "math",
-						mathml:
-							"<msup><mrow><mo>(</mo><mi>x</mi><mo>+</mo><mn>9</mn><mo>)</mo></mrow><mn>2</mn></msup><mo>+</mo><msup><mrow><mo>(</mo><mi>y</mi><mo>+</mo><mn>7</mn><mo>)</mo></mrow><mn>2</mn></msup><mo>=</mo><mn>25</mn>"
-					}
-				]
-			}
-		],
-		incorrect: [
-			{
-				type: "paragraph",
-				content: [{ type: "text", content: "Not quite. Let's complete the square to find the center and radius." }]
-			},
-			{
-				type: "paragraph",
-				content: [
-					{ type: "text", content: "Starting with: " },
-					{
-						type: "math",
-						mathml:
-							"<msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><msup><mi>y</mi><mn>2</mn></msup><mo>+</mo><mn>18</mn><mi>x</mi><mo>+</mo><mn>14</mn><mi>y</mi><mo>+</mo><mn>105</mn><mo>=</mo><mn>0</mn>"
-					}
-				]
-			},
-			{
-				type: "paragraph",
-				content: [
-					{ type: "text", content: "Therefore: center = (" },
-					{ type: "math", mathml: "<mo>-</mo><mn>9</mn>" },
-					{ type: "text", content: ", " },
-					{ type: "math", mathml: "<mo>-</mo><mn>7</mn>" },
-					{ type: "text", content: ") and radius = " },
-					{ type: "math", mathml: "<mn>5</mn>" }
-				]
-			}
-		]
-	}
+	feedbackBlocks: [
+		{
+			identifier: "CORRECT",
+			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			content: [
+				{
+					type: "paragraph",
+					content: [
+						{ type: "text", content: "Correct! You successfully found that the circle is centered at (" },
+						{ type: "math", mathml: "<mo>-</mo><mn>9</mn>" },
+						{ type: "text", content: ", " },
+						{ type: "math", mathml: "<mo>-</mo><mn>7</mn>" },
+						{ type: "text", content: ") with a radius of " },
+						{ type: "math", mathml: "<mn>5</mn>" },
+						{ type: "text", content: " units." }
+					]
+				},
+				{
+					type: "paragraph",
+					content: [
+						{ type: "text", content: "You correctly converted the equation to standard form: " },
+						{
+							type: "math",
+							mathml:
+								"<msup><mrow><mo>(</mo><mi>x</mi><mo>+</mo><mn>9</mn><mo>)</mo></mrow><mn>2</mn></msup><mo>+</mo><msup><mrow><mo>(</mo><mi>y</mi><mo>+</mo><mn>7</mn><mo>)</mo></mrow><mn>2</mn></msup><mo>=</mo><mn>25</mn>"
+						}
+					]
+				}
+			]
+		},
+		{
+			identifier: "INCORRECT",
+			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			content: [
+				{
+					type: "paragraph",
+					content: [{ type: "text", content: "Not quite. Let's complete the square to find the center and radius." }]
+				},
+				{
+					type: "paragraph",
+					content: [
+						{ type: "text", content: "Starting with: " },
+						{
+							type: "math",
+							mathml:
+								"<msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><msup><mi>y</mi><mn>2</mn></msup><mo>+</mo><mn>18</mn><mi>x</mi><mo>+</mo><mn>14</mn><mi>y</mi><mo>+</mo><mn>105</mn><mo>=</mo><mn>0</mn>"
+						}
+					]
+				},
+				{
+					type: "paragraph",
+					content: [
+						{ type: "text", content: "Therefore: center = (" },
+						{ type: "math", mathml: "<mo>-</mo><mn>9</mn>" },
+						{ type: "text", content: ", " },
+						{ type: "math", mathml: "<mo>-</mo><mn>7</mn>" },
+						{ type: "text", content: ") and radius = " },
+						{ type: "math", mathml: "<mn>5</mn>" }
+					]
+				}
+			]
+		}
+	]
 }
 
 export const harukaExamScore: AssessmentItemInput = {
@@ -1571,36 +1599,44 @@ export const harukaExamScore: AssessmentItemInput = {
 			expectedLength: 3
 		}
 	},
-	feedback: {
-		correct: [
-			{
-				type: "paragraph",
-				content: [
-					{ type: "text", content: "Correct! Haruka scored " },
-					{ type: "math", mathml: "<mn>87</mn>" },
-					{ type: "text", content: " points on her chemistry exam." }
-				]
-			}
-		],
-		incorrect: [
-			{
-				type: "paragraph",
-				content: [{ type: "text", content: "Not quite. To find the missing score, use the formula for mean:" }]
-			},
-			{
-				type: "paragraph",
-				content: [{ type: "text", content: "Mean = (Sum of all scores) ÷ (Number of scores)" }]
-			},
-			{
-				type: "paragraph",
-				content: [
-					{ type: "text", content: "Therefore, Haruka scored " },
-					{ type: "math", mathml: "<mn>87</mn>" },
-					{ type: "text", content: " points on her chemistry exam." }
-				]
-			}
-		]
-	}
+	feedbackBlocks: [
+		{
+			identifier: "CORRECT",
+			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			content: [
+				{
+					type: "paragraph",
+					content: [
+						{ type: "text", content: "Correct! Haruka scored " },
+						{ type: "math", mathml: "<mn>87</mn>" },
+						{ type: "text", content: " points on her chemistry exam." }
+					]
+				}
+			]
+		},
+		{
+			identifier: "INCORRECT",
+			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			content: [
+				{
+					type: "paragraph",
+					content: [{ type: "text", content: "Not quite. To find the missing score, use the formula for mean:" }]
+				},
+				{
+					type: "paragraph",
+					content: [{ type: "text", content: "Mean = (Sum of all scores) ÷ (Number of scores)" }]
+				},
+				{
+					type: "paragraph",
+					content: [
+						{ type: "text", content: "Therefore, Haruka scored " },
+						{ type: "math", mathml: "<mn>87</mn>" },
+						{ type: "text", content: " points on her chemistry exam." }
+					]
+				}
+			]
+		}
+	]
 }
 
 export const libertyvilleBusinessCycle: AssessmentItemInput = {
@@ -1698,52 +1734,99 @@ export const libertyvilleBusinessCycle: AssessmentItemInput = {
 							type: "paragraph",
 							content: [{ type: "text", content: "2014" }]
 						}
-					],
-					feedback: [
+					]
+				},
+				{
+					identifier: "B",
+					content: [{ type: "paragraph", content: [{ type: "text", content: "2015" }] }]
+				},
+				{
+					identifier: "C",
+					content: [{ type: "paragraph", content: [{ type: "text", content: "2016" }] }]
+				},
+				{
+					identifier: "D",
+					content: [{ type: "paragraph", content: [{ type: "text", content: "2017" }] }]
+				},
+				{
+					identifier: "E",
+					content: [{ type: "paragraph", content: [{ type: "text", content: "2018" }] }]
+				}
+			]
+		}
+	},
+	feedbackBlocks: [
+		{
+			identifier: "A",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
+			content: [
+				{
+					type: "paragraph",
+					content: [
 						{
 							type: "text",
 							content:
 								"GDP fell for the two years following 2014, indicating that Libertyville entered the recession phase of its business cycle in 2014. A trough is the turning point at which a recession ends and an expansion begins."
 						}
 					]
-				},
+				}
+			]
+		},
+		{
+			identifier: "B",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
+			content: [
 				{
-					identifier: "B",
-					content: [{ type: "paragraph", content: [{ type: "text", content: "2015" }] }],
-					feedback: [
+					type: "paragraph",
+					content: [
 						{
 							type: "text",
 							content:
 								"GDP fell in 2015, indicating that Libertyville was in the recession phase of its business cycle in 2015. However the economy still had further to fall before it started to turn around. A trough is the turning point at which a recession ends and an expansion begins."
 						}
 					]
-				},
+				}
+			]
+		},
+		{
+			identifier: "C",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
+			content: [
 				{
-					identifier: "C",
-					content: [{ type: "paragraph", content: [{ type: "text", content: "2016" }] }],
-					feedback: [
+					type: "paragraph",
+					content: [
 						{
 							type: "text",
 							content:
 								"GDP fell in 2016 but increased in 2017, indicating that 2016 was the turning point at which Libertyville's two year recession ended and the economy entered the recovery/expansion phase of its business cycle."
 						}
 					]
-				},
+				}
+			]
+		},
+		{
+			identifier: "D",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
+			content: [
 				{
-					identifier: "D",
-					content: [{ type: "paragraph", content: [{ type: "text", content: "2017" }] }],
-					feedback: [
+					type: "paragraph",
+					content: [
 						{
 							type: "text",
 							content:
 								"GDP increased in 2017, indicating that Libertyville was in the expansion phase of its business cycle. A trough is the turning point at which a recession ends and an expansion begins."
 						}
 					]
-				},
+				}
+			]
+		},
+		{
+			identifier: "E",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
+			content: [
 				{
-					identifier: "E",
-					content: [{ type: "paragraph", content: [{ type: "text", content: "2018" }] }],
-					feedback: [
+					type: "paragraph",
+					content: [
 						{
 							type: "text",
 							content:
@@ -1753,39 +1836,7 @@ export const libertyvilleBusinessCycle: AssessmentItemInput = {
 				}
 			]
 		}
-	},
-	feedback: {
-		correct: [
-			{
-				type: "paragraph",
-				content: [
-					{
-						type: "text",
-						content:
-							"Correct! 2016 was the trough year. The GDP had been declining for two years (2015 and 2016) but then began recovering in 2017. A trough marks the lowest point of a recession before recovery begins."
-					}
-				]
-			}
-		],
-		incorrect: [
-			{
-				type: "paragraph",
-				content: [
-					{
-						type: "text",
-						content:
-							"Not quite. A trough occurs at the bottom of a recession, when GDP stops falling and starts growing again. Notice that GDP fell in 2015 ("
-					},
-					{ type: "math", mathml: "<mo>-</mo><mn>1</mn><mo>%</mo>" },
-					{ type: "text", content: ") and 2016 (" },
-					{ type: "math", mathml: "<mo>-</mo><mn>2</mn><mo>%</mo>" },
-					{ type: "text", content: "), then rose in 2017 (" },
-					{ type: "math", mathml: "<mo>+</mo><mn>2</mn><mo>%</mo>" },
-					{ type: "text", content: "). This makes 2016 the trough year." }
-				]
-			}
-		]
-	}
+	]
 }
 
 export const continuityDifferentiabilityPiecewise: AssessmentItemInput = {
@@ -1827,8 +1878,34 @@ export const continuityDifferentiabilityPiecewise: AssessmentItemInput = {
 			choices: [
 				{
 					identifier: "A",
-					content: [{ type: "paragraph", content: [{ type: "text", content: "continuous, not differentiable" }] }],
-					feedback: [
+					content: [{ type: "paragraph", content: [{ type: "text", content: "continuous, not differentiable" }] }]
+				},
+				{
+					identifier: "B",
+					content: [{ type: "paragraph", content: [{ type: "text", content: "differentiable, not continuous" }] }]
+				},
+				{
+					identifier: "C",
+					content: [{ type: "paragraph", content: [{ type: "text", content: "both continuous and differentiable" }] }]
+				},
+				{
+					identifier: "D",
+					content: [
+						{ type: "paragraph", content: [{ type: "text", content: "neither continuous nor differentiable" }] }
+					]
+				}
+			]
+		}
+	},
+	widgets: null,
+	feedbackBlocks: [
+		{
+			identifier: "A",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
+			content: [
+				{
+					type: "paragraph",
+					content: [
 						{ type: "text", content: "This would be the case if the function values matched at " },
 						{ type: "math", mathml: "<mi>x</mi><mo>=</mo><mn>2</mn>" },
 						{
@@ -1837,21 +1914,31 @@ export const continuityDifferentiabilityPiecewise: AssessmentItemInput = {
 								" but the derivatives from left and right were different. Check both the limit values and the derivatives."
 						}
 					]
-				},
+				}
+			]
+		},
+		{
+			identifier: "B",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
+			content: [
 				{
-					identifier: "B",
-					content: [{ type: "paragraph", content: [{ type: "text", content: "differentiable, not continuous" }] }],
-					feedback: [
+					type: "paragraph",
+					content: [
 						{
 							type: "text",
 							content: "This is impossible! A function must be continuous at a point to be differentiable there."
 						}
 					]
-				},
+				}
+			]
+		},
+		{
+			identifier: "C",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
+			content: [
 				{
-					identifier: "C",
-					content: [{ type: "paragraph", content: [{ type: "text", content: "both continuous and differentiable" }] }],
-					feedback: [
+					type: "paragraph",
+					content: [
 						{ type: "text", content: "Correct! The function values match at " },
 						{ type: "math", mathml: "<mi>x</mi><mo>=</mo><mn>2</mn>" },
 						{ type: "text", content: " (both equal " },
@@ -1860,13 +1947,16 @@ export const continuityDifferentiabilityPiecewise: AssessmentItemInput = {
 						{ type: "math", mathml: "<mo>-</mo><mn>4</mn>" },
 						{ type: "text", content: ", so the function is both continuous and differentiable." }
 					]
-				},
+				}
+			]
+		},
+		{
+			identifier: "D",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
+			content: [
 				{
-					identifier: "D",
+					type: "paragraph",
 					content: [
-						{ type: "paragraph", content: [{ type: "text", content: "neither continuous nor differentiable" }] }
-					],
-					feedback: [
 						{ type: "text", content: "Not quite. The function doesn't have a jump discontinuity at " },
 						{ type: "math", mathml: "<mi>x</mi><mo>=</mo><mn>2</mn>" },
 						{ type: "text", content: ". Check if the left and right limits at " },
@@ -1876,30 +1966,7 @@ export const continuityDifferentiabilityPiecewise: AssessmentItemInput = {
 				}
 			]
 		}
-	},
-	widgets: null,
-	feedback: {
-		correct: [
-			{
-				type: "paragraph",
-				content: [
-					{ type: "text", content: "Correct! The function is both continuous and differentiable at " },
-					{ type: "math", mathml: "<mi>x</mi><mo>=</mo><mn>2</mn>" },
-					{ type: "text", content: "." }
-				]
-			}
-		],
-		incorrect: [
-			{
-				type: "paragraph",
-				content: [
-					{ type: "text", content: "Not quite. Let's check both continuity and differentiability at " },
-					{ type: "math", mathml: "<mi>x</mi><mo>=</mo><mn>2</mn>" },
-					{ type: "text", content: "." }
-				]
-			}
-		]
-	}
+	]
 }
 
 export const stokesTheoremRewrite: AssessmentItemInput = {
@@ -1930,20 +1997,28 @@ export const stokesTheoremRewrite: AssessmentItemInput = {
 		}
 	},
 	widgets: null,
-	feedback: {
-		correct: [
-			{
-				type: "paragraph",
-				content: [{ type: "text", content: "Correct!" }]
-			}
-		],
-		incorrect: [
-			{
-				type: "paragraph",
-				content: [{ type: "text", content: "Not quite. Let's use Stokes' theorem to solve this." }]
-			}
-		]
-	}
+	feedbackBlocks: [
+		{
+			identifier: "CORRECT",
+			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			content: [
+				{
+					type: "paragraph",
+					content: [{ type: "text", content: "Correct!" }]
+				}
+			]
+		},
+		{
+			identifier: "INCORRECT",
+			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			content: [
+				{
+					type: "paragraph",
+					content: [{ type: "text", content: "Not quite. Let's use Stokes' theorem to solve this." }]
+				}
+			]
+		}
+	]
 }
 
 export const estimateDerivativeFromTable: AssessmentItemInput = {
@@ -2024,39 +2099,77 @@ export const estimateDerivativeFromTable: AssessmentItemInput = {
 			choices: [
 				{
 					identifier: "A",
-					content: [{ type: "paragraph", content: [{ type: "math", mathml: "<mo>-</mo><mn>28</mn>" }] }],
-					feedback: [
+					content: [{ type: "paragraph", content: [{ type: "math", mathml: "<mo>-</mo><mn>28</mn>" }] }]
+				},
+				{
+					identifier: "B",
+					content: [{ type: "paragraph", content: [{ type: "math", mathml: "<mo>-</mo><mn>13.5</mn>" }] }]
+				},
+				{
+					identifier: "C",
+					content: [{ type: "paragraph", content: [{ type: "math", mathml: "<mo>-</mo><mn>2.125</mn>" }] }]
+				},
+				{
+					identifier: "D",
+					content: [{ type: "paragraph", content: [{ type: "math", mathml: "<mn>5.33</mn>" }] }]
+				}
+			]
+		}
+	},
+	feedbackBlocks: [
+		{
+			identifier: "A",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
+			content: [
+				{
+					type: "paragraph",
+					content: [
 						{ type: "text", content: "This can be an estimate for " },
 						{ type: "math", mathml: "<mi>h</mi><mo>(</mo><mo>-</mo><mn>4</mn><mo>)</mo>" },
 						{ type: "text", content: ", but we are looking for " },
 						{ type: "math", mathml: "<msup><mi>h</mi><mo>'</mo></msup><mo>(</mo><mo>-</mo><mn>4</mn><mo>)</mo>" },
 						{ type: "text", content: "." }
 					]
-				},
+				}
+			]
+		},
+		{
+			identifier: "B",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
+			content: [
 				{
-					identifier: "B",
-					content: [{ type: "paragraph", content: [{ type: "math", mathml: "<mo>-</mo><mn>13.5</mn>" }] }],
-					feedback: [
+					type: "paragraph",
+					content: [
 						{ type: "text", content: "We should pick an interval that includes " },
 						{ type: "math", mathml: "<mi>x</mi><mo>=</mo><mo>-</mo><mn>4</mn>" },
 						{ type: "text", content: "." }
 					]
-				},
+				}
+			]
+		},
+		{
+			identifier: "C",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
+			content: [
 				{
-					identifier: "C",
-					content: [{ type: "paragraph", content: [{ type: "math", mathml: "<mo>-</mo><mn>2.125</mn>" }] }],
-					feedback: [
+					type: "paragraph",
+					content: [
 						{ type: "text", content: "We can pick a closer interval to estimate " },
 						{ type: "math", mathml: "<msup><mi>h</mi><mo>'</mo></msup>" },
 						{ type: "text", content: " specifically at " },
 						{ type: "math", mathml: "<mi>x</mi><mo>=</mo><mo>-</mo><mn>4</mn>" },
 						{ type: "text", content: "." }
 					]
-				},
+				}
+			]
+		},
+		{
+			identifier: "D",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
+			content: [
 				{
-					identifier: "D",
-					content: [{ type: "paragraph", content: [{ type: "math", mathml: "<mn>5.33</mn>" }] }],
-					feedback: [
+					type: "paragraph",
+					content: [
 						{
 							type: "text",
 							content: "Correct! The best estimate uses the narrowest interval available that contains -4."
@@ -2065,36 +2178,7 @@ export const estimateDerivativeFromTable: AssessmentItemInput = {
 				}
 			]
 		}
-	},
-	feedback: {
-		correct: [
-			{
-				type: "paragraph",
-				content: [
-					{ type: "text", content: "Correct! The best estimate for " },
-					{ type: "math", mathml: "<msup><mi>h</mi><mo>'</mo></msup><mo>(</mo><mo>-</mo><mn>4</mn><mo>)</mo>" },
-					{ type: "text", content: " is approximately " },
-					{ type: "math", mathml: "<mn>5.33</mn>" },
-					{ type: "text", content: "." }
-				]
-			}
-		],
-		incorrect: [
-			{
-				type: "paragraph",
-				content: [
-					{
-						type: "text",
-						content: "Not quite. To estimate the derivative "
-					},
-					{ type: "math", mathml: "<msup><mi>h</mi><mo>'</mo></msup><mo>(</mo><mo>-</mo><mn>4</mn><mo>)</mo>" },
-					{ type: "text", content: ", calculate the average rate of change over the smallest interval containing " },
-					{ type: "math", mathml: "<mo>-</mo><mn>4</mn>" },
-					{ type: "text", content: "." }
-				]
-			}
-		]
-	}
+	]
 }
 
 export const countApplesEmoji: AssessmentItemInput = {
@@ -2155,42 +2239,70 @@ export const countApplesEmoji: AssessmentItemInput = {
 				{
 					identifier: "CHOICE_3",
 					content: [{ type: "blockSlot", slotId: "choice_3_apples" }],
-					feedback: null
 				},
 				{
 					identifier: "CHOICE_4",
 					content: [{ type: "blockSlot", slotId: "choice_4_apples" }],
-					feedback: null
 				},
 				{
 					identifier: "CHOICE_5",
 					content: [{ type: "blockSlot", slotId: "choice_5_apples" }],
-					feedback: null
 				},
 				{
 					identifier: "CHOICE_6",
 					content: [{ type: "blockSlot", slotId: "choice_6_apples" }],
-					feedback: null
 				}
 			]
 		}
 	},
-	feedback: {
-		correct: [
-			{
-				type: "paragraph",
-				content: [{ type: "text", content: "Great job! That box has exactly five apples." }]
-			}
-		],
-		incorrect: [
-			{
-				type: "paragraph",
-				content: [
-					{ type: "text", content: "Try again. Count the apples in each box to find the one with exactly five." }
-				]
-			}
-		]
-	}
+	feedbackBlocks: [
+		{
+			identifier: "CHOICE_3",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
+			content: [
+				{
+					type: "paragraph",
+					content: [
+						{ type: "text", content: "Not quite. Count the apples in each box to find the one with exactly five." }
+					]
+				}
+			]
+		},
+		{
+			identifier: "CHOICE_4",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
+			content: [
+				{
+					type: "paragraph",
+					content: [
+						{ type: "text", content: "Not quite. Count the apples in each box to find the one with exactly five." }
+					]
+				}
+			]
+		},
+		{
+			identifier: "CHOICE_5",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
+			content: [
+				{
+					type: "paragraph",
+					content: [{ type: "text", content: "Great job! That box has exactly five apples." }]
+				}
+			]
+		},
+		{
+			identifier: "CHOICE_6",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
+			content: [
+				{
+					type: "paragraph",
+					content: [
+						{ type: "text", content: "Not quite. Count the apples in each box to find the one with exactly five." }
+					]
+				}
+			]
+		}
+	]
 }
 
 export const reactantAmountsTemperatureTableWithDropdowns: AssessmentItemInput = {
@@ -2322,26 +2434,34 @@ export const reactantAmountsTemperatureTableWithDropdowns: AssessmentItemInput =
 		}
 	],
 	interactions: {},
-	feedback: {
-		correct: [
-			{
-				type: "paragraph",
-				content: [{ type: "text", content: "Great job! You matched reactants and amounts to the temperature changes." }]
-			}
-		],
-		incorrect: [
-			{
-				type: "paragraph",
-				content: [
-					{
-						type: "text",
-						content:
-							"Not quite. Identify whether the temperature increases (exothermic) or decreases (endothermic), then compare magnitudes to match amounts."
-					}
-				]
-			}
-		]
-	}
+	feedbackBlocks: [
+		{
+			identifier: "CORRECT",
+			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			content: [
+				{
+					type: "paragraph",
+					content: [{ type: "text", content: "Great job! You matched reactants and amounts to the temperature changes." }]
+				}
+			]
+		},
+		{
+			identifier: "INCORRECT",
+			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			content: [
+				{
+					type: "paragraph",
+					content: [
+						{
+							type: "text",
+							content:
+								"Not quite. Identify whether the temperature increases (exothermic) or decreases (endothermic), then compare magnitudes to match amounts."
+						}
+					]
+				}
+			]
+		}
+	]
 }
 
 export const attractRepelCompletionTable: AssessmentItemInput = {
@@ -2440,19 +2560,16 @@ export const attractRepelCompletionTable: AssessmentItemInput = {
 		{ type: "blockSlot", slotId: "attract_repel_table" }
 	],
 	interactions: {},
-	feedback: {
-		correct: [
-			{ type: "paragraph", content: [{ type: "text", content: "Correct! Likes repel and opposites attract." }] }
-		],
-		incorrect: [
-			{
-				type: "paragraph",
-				content: [
-					{ type: "text", content: "Not quite. Remember: like charges/poles repel; opposite charges/poles attract." }
-				]
-			}
-		]
-	}
+	feedbackBlocks: [
+		{ identifier: "ATTRACT", outcomeIdentifier: "FEEDBACK__RESP_R1", content: [{ type: "paragraph", content: [{ type: "text", content: "Opposite charges/poles attract." }] }] },
+		{ identifier: "REPEL", outcomeIdentifier: "FEEDBACK__RESP_R1", content: [{ type: "paragraph", content: [{ type: "text", content: "Like charges/poles repel." }] }] },
+		{ identifier: "ATTRACT", outcomeIdentifier: "FEEDBACK__RESP_R2", content: [{ type: "paragraph", content: [{ type: "text", content: "Opposite charges/poles attract." }] }] },
+		{ identifier: "REPEL", outcomeIdentifier: "FEEDBACK__RESP_R2", content: [{ type: "paragraph", content: [{ type: "text", content: "Like charges/poles repel." }] }] },
+		{ identifier: "ATTRACT", outcomeIdentifier: "FEEDBACK__RESP_R3", content: [{ type: "paragraph", content: [{ type: "text", content: "Opposite charges/poles attract." }] }] },
+		{ identifier: "REPEL", outcomeIdentifier: "FEEDBACK__RESP_R3", content: [{ type: "paragraph", content: [{ type: "text", content: "Like charges/poles repel." }] }] },
+		{ identifier: "ATTRACT", outcomeIdentifier: "FEEDBACK__RESP_R4", content: [{ type: "paragraph", content: [{ type: "text", content: "Opposite charges/poles attract." }] }] },
+		{ identifier: "REPEL", outcomeIdentifier: "FEEDBACK__RESP_R4", content: [{ type: "paragraph", content: [{ type: "text", content: "Like charges/poles repel." }] }] }
+	]
 }
 
 export const shapeBinBarChart: AssessmentItemInput = {
@@ -2576,48 +2693,84 @@ export const shapeBinBarChart: AssessmentItemInput = {
 				{
 					identifier: "A",
 					content: [{ type: "blockSlot", slotId: "chart_a" }],
-					feedback: null
 				},
 				{
 					identifier: "B",
 					content: [{ type: "blockSlot", slotId: "chart_b" }],
-					feedback: null
 				},
 				{
 					identifier: "C",
 					content: [{ type: "blockSlot", slotId: "chart_c" }],
-					feedback: null
 				},
 				{
 					identifier: "D",
 					content: [{ type: "blockSlot", slotId: "chart_d" }],
-					feedback: null
 				}
 			]
 		}
 	},
-	feedback: {
-		correct: [
-			{
-				type: "paragraph",
-				content: [
-					{ type: "text", content: "Correct! The chosen graph perfectly matches the data provided in the table." }
-				]
-			}
-		],
-		incorrect: [
-			{
-				type: "paragraph",
-				content: [
-					{
-						type: "text",
-						content:
-							"Not quite. Match the number of shapes from the table to the height of the bar for each shape type."
-					}
-				]
-			}
-		]
-	}
+	feedbackBlocks: [
+		{
+			identifier: "A",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
+			content: [
+				{
+					type: "paragraph",
+					content: [
+						{ type: "text", content: "Correct! The chosen graph perfectly matches the data provided in the table." }
+					]
+				}
+			]
+		},
+		{
+			identifier: "B",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
+			content: [
+				{
+					type: "paragraph",
+					content: [
+						{
+							type: "text",
+							content:
+								"Not quite. Match the number of shapes from the table to the height of the bar for each shape type."
+						}
+					]
+				}
+			]
+		},
+		{
+			identifier: "C",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
+			content: [
+				{
+					type: "paragraph",
+					content: [
+						{
+							type: "text",
+							content:
+								"Not quite. Match the number of shapes from the table to the height of the bar for each shape type."
+						}
+					]
+				}
+			]
+		},
+		{
+			identifier: "D",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
+			content: [
+				{
+					type: "paragraph",
+					content: [
+						{
+							type: "text",
+							content:
+								"Not quite. Match the number of shapes from the table to the height of the bar for each shape type."
+						}
+					]
+				}
+			]
+		}
+	]
 }
 
 export const pencilLengthLinePlot: AssessmentItemInput = {
@@ -2709,18 +2862,43 @@ export const pencilLengthLinePlot: AssessmentItemInput = {
 			choices: [
 				{
 					identifier: "A",
-					content: [{ type: "blockSlot", slotId: "plot_a" }],
-					feedback: [
-						{
-							type: "text",
-							content: "This plot correctly shows a dot for each of the 4 pencils at its measured length."
-						}
-					]
+					content: [{ type: "blockSlot", slotId: "plot_a" }]
 				},
 				{
 					identifier: "B",
-					content: [{ type: "blockSlot", slotId: "plot_b" }],
-					feedback: [
+					content: [{ type: "blockSlot", slotId: "plot_b" }]
+				},
+				{
+					identifier: "C",
+					content: [{ type: "blockSlot", slotId: "plot_c" }]
+				},
+				{
+					identifier: "D",
+					content: [{ type: "blockSlot", slotId: "plot_d" }]
+				}
+			]
+		}
+	},
+	feedbackBlocks: [
+		{
+			identifier: "A",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
+			content: [
+				{
+					type: "paragraph",
+					content: [
+						{ type: "text", content: "This plot correctly shows a dot for each of the 4 pencils at its measured length." }
+					]
+				}
+			]
+		},
+		{
+			identifier: "B",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
+			content: [
+				{
+					type: "paragraph",
+					content: [
 						{
 							type: "text",
 							content: "This plot only shows one dot for the length of "
@@ -2728,11 +2906,16 @@ export const pencilLengthLinePlot: AssessmentItemInput = {
 						{ type: "math", mathml: "<mn>8</mn><mtext> cm</mtext>" },
 						{ type: "text", content: ". Remember, there were two pencils with this length." }
 					]
-				},
+				}
+			]
+		},
+		{
+			identifier: "C",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
+			content: [
 				{
-					identifier: "C",
-					content: [{ type: "blockSlot", slotId: "plot_c" }],
-					feedback: [
+					type: "paragraph",
+					content: [
 						{
 							type: "text",
 							content: "This plot shows four dots above the number "
@@ -2740,11 +2923,16 @@ export const pencilLengthLinePlot: AssessmentItemInput = {
 						{ type: "math", mathml: "<mn>4</mn>" },
 						{ type: "text", content: ". This represents the total number of pencils, not their individual lengths." }
 					]
-				},
+				}
+			]
+		},
+		{
+			identifier: "D",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
+			content: [
 				{
-					identifier: "D",
-					content: [{ type: "blockSlot", slotId: "plot_d" }],
-					feedback: [
+					type: "paragraph",
+					content: [
 						{
 							type: "text",
 							content: "Check the data again carefully to make sure the dots are placed above the correct numbers."
@@ -2753,29 +2941,7 @@ export const pencilLengthLinePlot: AssessmentItemInput = {
 				}
 			]
 		}
-	},
-	feedback: {
-		correct: [
-			{
-				type: "paragraph",
-				content: [
-					{ type: "text", content: "Correct! The chosen plot correctly displays a dot for each of these measurements." }
-				]
-			}
-		],
-		incorrect: [
-			{
-				type: "paragraph",
-				content: [
-					{
-						type: "text",
-						content:
-							"Not quite. To create the line plot, place one dot above the correct number on the line for each pencil measured."
-					}
-				]
-			}
-		]
-	}
+	]
 }
 
 export const gamesWonBarChart: AssessmentItemInput = {
@@ -2835,26 +3001,34 @@ export const gamesWonBarChart: AssessmentItemInput = {
 			expectedLength: 3
 		}
 	},
-	feedback: {
-		correct: [
-			{
-				type: "paragraph",
-				content: [
-					{ type: "text", content: "Correct! The Lions won " },
-					{ type: "math", mathml: "<mn>14</mn>" },
-					{ type: "text", content: " games." }
-				]
-			}
-		],
-		incorrect: [
-			{
-				type: "paragraph",
-				content: [
-					{ type: "text", content: "Not quite. Find the Lions bar and see where it reaches on the vertical axis." }
-				]
-			}
-		]
-	}
+	feedbackBlocks: [
+		{
+			identifier: "CORRECT",
+			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			content: [
+				{
+					type: "paragraph",
+					content: [
+						{ type: "text", content: "Correct! The Lions won " },
+						{ type: "math", mathml: "<mn>14</mn>" },
+						{ type: "text", content: " games." }
+					]
+				}
+			]
+		},
+		{
+			identifier: "INCORRECT",
+			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			content: [
+				{
+					type: "paragraph",
+					content: [
+						{ type: "text", content: "Not quite. Find the Lions bar and see where it reaches on the vertical axis." }
+					]
+				}
+			]
+		}
+	]
 }
 
 export const dollHeightLinePlot: AssessmentItemInput = {
@@ -2912,30 +3086,38 @@ export const dollHeightLinePlot: AssessmentItemInput = {
 			expectedLength: 3
 		}
 	},
-	feedback: {
-		correct: [
-			{
-				type: "paragraph",
-				content: [
-					{ type: "text", content: "Correct! " },
-					{ type: "math", mathml: "<mn>5</mn>" },
-					{ type: "text", content: " dolls are taller than " },
-					{ type: "math", mathml: "<mn>22</mn><mtext> cm</mtext>" },
-					{ type: "text", content: "." }
-				]
-			}
-		],
-		incorrect: [
-			{
-				type: "paragraph",
-				content: [
-					{ type: "text", content: "Not quite. Count all the dots that are to the right of " },
-					{ type: "math", mathml: "<mn>22</mn>" },
-					{ type: "text", content: " on the line plot." }
-				]
-			}
-		]
-	}
+	feedbackBlocks: [
+		{
+			identifier: "CORRECT",
+			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			content: [
+				{
+					type: "paragraph",
+					content: [
+						{ type: "text", content: "Correct! " },
+						{ type: "math", mathml: "<mn>5</mn>" },
+						{ type: "text", content: " dolls are taller than " },
+						{ type: "math", mathml: "<mn>22</mn><mtext> cm</mtext>" },
+						{ type: "text", content: "." }
+					]
+				}
+			]
+		},
+		{
+			identifier: "INCORRECT",
+			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			content: [
+				{
+					type: "paragraph",
+					content: [
+						{ type: "text", content: "Not quite. Count all the dots that are to the right of " },
+						{ type: "math", mathml: "<mn>22</mn>" },
+						{ type: "text", content: " on the line plot." }
+					]
+				}
+			]
+		}
+	]
 }
 
 export const timeOnNumberLine: AssessmentItemInput = {
@@ -2981,25 +3163,33 @@ export const timeOnNumberLine: AssessmentItemInput = {
 		hour_entry: { type: "textEntryInteraction", responseIdentifier: "RESPONSE_HR", expectedLength: 2 },
 		minute_entry: { type: "textEntryInteraction", responseIdentifier: "RESPONSE_MIN", expectedLength: 2 }
 	},
-	feedback: {
-		correct: [
-			{
-				type: "paragraph",
-				content: [{ type: "text", content: "Correct! The time shown is 12:55." }]
-			}
-		],
-		incorrect: [
-			{
-				type: "paragraph",
-				content: [
-					{
-						type: "text",
-						content: "Not quite. Point A is located after the 12:00 mark but before the 1:00 mark. The time is 12:55."
-					}
-				]
-			}
-		]
-	}
+	feedbackBlocks: [
+		{
+			identifier: "CORRECT",
+			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			content: [
+				{
+					type: "paragraph",
+					content: [{ type: "text", content: "Correct! The time shown is 12:55." }]
+				}
+			]
+		},
+		{
+			identifier: "INCORRECT",
+			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			content: [
+				{
+					type: "paragraph",
+					content: [
+						{
+							type: "text",
+							content: "Not quite. Point A is located after the 12:00 mark but before the 1:00 mark. The time is 12:55."
+						}
+					]
+				}
+			]
+		}
+	]
 }
 
 export const compare2DigitNumbers: AssessmentItemInput = {
@@ -3051,36 +3241,62 @@ export const compare2DigitNumbers: AssessmentItemInput = {
 		}
 	},
 	widgets: null,
-	feedback: {
-		correct: [
-			{
-				type: "paragraph",
-				content: [
-					{ type: "text", content: "Correct! " },
-					{ type: "math", mathml: "<mn>83</mn>" },
-					{ type: "text", content: " is greater than " },
-					{ type: "math", mathml: "<mn>58</mn>" },
-					{ type: "text", content: ", so the correct symbol is " },
-					{ type: "math", mathml: "<mo>&gt;</mo>" },
-					{ type: "text", content: "." }
-				]
-			}
-		],
-		incorrect: [
-			{
-				type: "paragraph",
-				content: [
-					{ type: "text", content: "Not quite. Since " },
-					{ type: "math", mathml: "<mn>83</mn>" },
-					{ type: "text", content: " is larger than " },
-					{ type: "math", mathml: "<mn>58</mn>" },
-					{ type: "text", content: ", the correct comparison is " },
-					{ type: "math", mathml: "<mn>83</mn><mo>&gt;</mo><mn>58</mn>" },
-					{ type: "text", content: "." }
-				]
-			}
-		]
-	}
+	feedbackBlocks: [
+		{
+			identifier: "GT",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
+			content: [
+				{
+					type: "paragraph",
+					content: [
+						{ type: "text", content: "Correct! " },
+						{ type: "math", mathml: "<mn>83</mn>" },
+						{ type: "text", content: " is greater than " },
+						{ type: "math", mathml: "<mn>58</mn>" },
+						{ type: "text", content: ", so the correct symbol is " },
+						{ type: "math", mathml: "<mo>&gt;</mo>" },
+						{ type: "text", content: "." }
+					]
+				}
+			]
+		},
+		{
+			identifier: "LT",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
+			content: [
+				{
+					type: "paragraph",
+					content: [
+						{ type: "text", content: "Not quite. Since " },
+						{ type: "math", mathml: "<mn>83</mn>" },
+						{ type: "text", content: " is larger than " },
+						{ type: "math", mathml: "<mn>58</mn>" },
+						{ type: "text", content: ", the correct comparison is " },
+						{ type: "math", mathml: "<mn>83</mn><mo>&gt;</mo><mn>58</mn>" },
+						{ type: "text", content: "." }
+					]
+				}
+			]
+		},
+		{
+			identifier: "EQ",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
+			content: [
+				{
+					type: "paragraph",
+					content: [
+						{ type: "text", content: "Not quite. Since " },
+						{ type: "math", mathml: "<mn>83</mn>" },
+						{ type: "text", content: " is larger than " },
+						{ type: "math", mathml: "<mn>58</mn>" },
+						{ type: "text", content: ", the correct comparison is " },
+						{ type: "math", mathml: "<mn>83</mn><mo>&gt;</mo><mn>58</mn>" },
+						{ type: "text", content: "." }
+					]
+				}
+			]
+		}
+	]
 }
 
 export const greatestCommonFactor: AssessmentItemInput = {
@@ -3115,52 +3331,60 @@ export const greatestCommonFactor: AssessmentItemInput = {
 		}
 	},
 	widgets: null,
-	feedback: {
-		correct: [
-			{
-				type: "paragraph",
-				content: [
-					{ type: "text", content: "Correct! The greatest common factor of " },
-					{ type: "math", mathml: "<mn>30</mn>" },
-					{ type: "text", content: " and " },
-					{ type: "math", mathml: "<mn>75</mn>" },
-					{ type: "text", content: " is " },
-					{ type: "math", mathml: "<mn>15</mn>" },
-					{ type: "text", content: "." }
-				]
-			}
-		],
-		incorrect: [
-			{
-				type: "paragraph",
-				content: [
-					{
-						type: "text",
-						content: "Not quite. Remember to find the largest number that divides both "
-					},
-					{ type: "math", mathml: "<mn>30</mn>" },
-					{ type: "text", content: " and " },
-					{ type: "math", mathml: "<mn>75</mn>" },
-					{
-						type: "text",
-						content:
-							" without a remainder. The factors of 30 are 1, 2, 3, 5, 6, 10, 15, 30. The factors of 75 are 1, 3, 5, 15, 25, 75. The greatest common factor is "
-					},
-					{ type: "math", mathml: "<mn>15</mn>" },
-					{ type: "text", content: "." }
-				]
-			}
-		]
-	}
+	feedbackBlocks: [
+		{
+			identifier: "CORRECT",
+			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			content: [
+				{
+					type: "paragraph",
+					content: [
+						{ type: "text", content: "Correct! The greatest common factor of " },
+						{ type: "math", mathml: "<mn>30</mn>" },
+						{ type: "text", content: " and " },
+						{ type: "math", mathml: "<mn>75</mn>" },
+						{ type: "text", content: " is " },
+						{ type: "math", mathml: "<mn>15</mn>" },
+						{ type: "text", content: "." }
+					]
+				}
+			]
+		},
+		{
+			identifier: "INCORRECT",
+			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			content: [
+				{
+					type: "paragraph",
+					content: [
+						{
+							type: "text",
+							content: "Not quite. Remember to find the largest number that divides both "
+						},
+						{ type: "math", mathml: "<mn>30</mn>" },
+						{ type: "text", content: " and " },
+						{ type: "math", mathml: "<mn>75</mn>" },
+						{
+							type: "text",
+							content:
+								" without a remainder. The factors of 30 are 1, 2, 3, 5, 6, 10, 15, 30. The factors of 75 are 1, 3, 5, 15, 25, 75. The greatest common factor is "
+						},
+						{ type: "math", mathml: "<mn>15</mn>" },
+						{ type: "text", content: "." }
+					]
+				}
+			]
+		}
+	]
 }
 
 export const threeDataTablesMultipleChoice: AssessmentItemInput = {
 	identifier: "three-data-tables-mc",
 	title: "Read three different tables and answer three questions",
 	responseDeclarations: [
-		{ identifier: "RESP_Q1", cardinality: "single", baseType: "identifier", correct: "A" },
-		{ identifier: "RESP_Q2", cardinality: "single", baseType: "identifier", correct: "B" },
-		{ identifier: "RESP_Q3", cardinality: "single", baseType: "identifier", correct: "B" }
+		{ identifier: "RESP_Q1", cardinality: "single", baseType: "identifier", correct: "B" },
+		{ identifier: "RESP_Q2", cardinality: "single", baseType: "identifier", correct: "C" },
+		{ identifier: "RESP_Q3", cardinality: "single", baseType: "identifier", correct: "C" }
 	],
 	widgets: {
 		table_q1: {
@@ -3260,17 +3484,14 @@ export const threeDataTablesMultipleChoice: AssessmentItemInput = {
 				{
 					identifier: "A",
 					content: [{ type: "paragraph", content: [{ type: "text", content: "Apples" }] }],
-					feedback: null
 				},
 				{
 					identifier: "B",
 					content: [{ type: "paragraph", content: [{ type: "text", content: "Bananas" }] }],
-					feedback: null
 				},
 				{
 					identifier: "C",
 					content: [{ type: "paragraph", content: [{ type: "text", content: "Cherries" }] }],
-					feedback: null
 				}
 			]
 		},
@@ -3285,17 +3506,14 @@ export const threeDataTablesMultipleChoice: AssessmentItemInput = {
 				{
 					identifier: "A",
 					content: [{ type: "paragraph", content: [{ type: "text", content: "Springfield" }] }],
-					feedback: null
 				},
 				{
 					identifier: "B",
 					content: [{ type: "paragraph", content: [{ type: "text", content: "Riverton" }] }],
-					feedback: null
 				},
 				{
 					identifier: "C",
 					content: [{ type: "paragraph", content: [{ type: "text", content: "Lakeside" }] }],
-					feedback: null
 				}
 			]
 		},
@@ -3310,30 +3528,31 @@ export const threeDataTablesMultipleChoice: AssessmentItemInput = {
 				{
 					identifier: "A",
 					content: [{ type: "paragraph", content: [{ type: "text", content: "Math" }] }],
-					feedback: null
 				},
 				{
 					identifier: "B",
 					content: [{ type: "paragraph", content: [{ type: "text", content: "Science" }] }],
-					feedback: null
 				},
 				{
 					identifier: "C",
 					content: [{ type: "paragraph", content: [{ type: "text", content: "History" }] }],
-					feedback: null
 				}
 			]
 		}
 	},
-	feedback: {
-		correct: [
-			{
-				type: "paragraph",
-				content: [{ type: "text", content: "Great work! You answered all three questions correctly." }]
-			}
-		],
-		incorrect: [{ type: "paragraph", content: [{ type: "text", content: "Review the tables and try again." }] }]
-	}
+	feedbackBlocks: [
+		{ identifier: "A", outcomeIdentifier: "FEEDBACK__RESP_Q1", content: [{ type: "paragraph", content: [{ type: "text", content: "Check the fruit counts carefully." }] }] },
+		{ identifier: "B", outcomeIdentifier: "FEEDBACK__RESP_Q1", content: [{ type: "paragraph", content: [{ type: "text", content: "Correct for Q1." }] }] },
+		{ identifier: "C", outcomeIdentifier: "FEEDBACK__RESP_Q1", content: [{ type: "paragraph", content: [{ type: "text", content: "Check the fruit counts carefully." }] }] },
+
+		{ identifier: "A", outcomeIdentifier: "FEEDBACK__RESP_Q2", content: [{ type: "paragraph", content: [{ type: "text", content: "Compare all three city readings." }] }] },
+		{ identifier: "B", outcomeIdentifier: "FEEDBACK__RESP_Q2", content: [{ type: "paragraph", content: [{ type: "text", content: "Compare all three city readings." }] }] },
+		{ identifier: "C", outcomeIdentifier: "FEEDBACK__RESP_Q2", content: [{ type: "paragraph", content: [{ type: "text", content: "Correct for Q2." }] }] },
+
+		{ identifier: "A", outcomeIdentifier: "FEEDBACK__RESP_Q3", content: [{ type: "paragraph", content: [{ type: "text", content: "Look at the minutes column." }] }] },
+		{ identifier: "B", outcomeIdentifier: "FEEDBACK__RESP_Q3", content: [{ type: "paragraph", content: [{ type: "text", content: "Look at the minutes column." }] }] },
+		{ identifier: "C", outcomeIdentifier: "FEEDBACK__RESP_Q3", content: [{ type: "paragraph", content: [{ type: "text", content: "Correct for Q3." }] }] }
+	]
 }
 
 export const gustaveStepsPerMile: AssessmentItemInput = {
@@ -3378,50 +3597,58 @@ export const gustaveStepsPerMile: AssessmentItemInput = {
 		equation_entry: { type: "textEntryInteraction", responseIdentifier: "RESP_EQN", expectedLength: 7 },
 		steps_entry: { type: "textEntryInteraction", responseIdentifier: "RESP_STEPS", expectedLength: 4 }
 	},
-	feedback: {
-		correct: [
-			{
-				type: "paragraph",
-				content: [
-					{ type: "text", content: "Correct! A valid equation is " },
-					{ type: "math", mathml: "<mn>3</mn><mi>s</mi><mo>=</mo><mn>6300</mn>" },
-					{ type: "text", content: "." }
-				]
-			},
-			{
-				type: "paragraph",
-				content: [
-					{ type: "text", content: "There are " },
-					{ type: "math", mathml: "<mn>2100</mn>" },
-					{ type: "text", content: " steps in one mile for Gustave." }
-				]
-			}
-		],
-		incorrect: [
-			{
-				type: "paragraph",
-				content: [
-					{ type: "text", content: "Not quite. Let " },
-					{ type: "math", mathml: "<mi>s</mi>" },
-					{ type: "text", content: " be the number of steps in one mile. Since " },
-					{ type: "math", mathml: "<mn>3</mn>" },
-					{ type: "text", content: " miles corresponds to " },
-					{ type: "math", mathml: "<mn>6300</mn>" },
-					{ type: "text", content: " steps, the equation is " },
-					{ type: "math", mathml: "<mn>3</mn><mi>s</mi><mo>=</mo><mn>6300</mn>" },
-					{ type: "text", content: "." }
-				]
-			},
-			{
-				type: "paragraph",
-				content: [
-					{ type: "text", content: "Solving gives " },
-					{ type: "math", mathml: "<mi>s</mi><mo>=</mo><mn>2100</mn>" },
-					{ type: "text", content: ", so there are 2100 steps in one mile." }
-				]
-			}
-		]
-	}
+	feedbackBlocks: [
+		{
+			identifier: "CORRECT",
+			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			content: [
+				{
+					type: "paragraph",
+					content: [
+						{ type: "text", content: "Correct! A valid equation is " },
+						{ type: "math", mathml: "<mn>3</mn><mi>s</mi><mo>=</mo><mn>6300</mn>" },
+						{ type: "text", content: "." }
+					]
+				},
+				{
+					type: "paragraph",
+					content: [
+						{ type: "text", content: "There are " },
+						{ type: "math", mathml: "<mn>2100</mn>" },
+						{ type: "text", content: " steps in one mile for Gustave." }
+					]
+				}
+			]
+		},
+		{
+			identifier: "INCORRECT",
+			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			content: [
+				{
+					type: "paragraph",
+					content: [
+						{ type: "text", content: "Not quite. Let " },
+						{ type: "math", mathml: "<mi>s</mi>" },
+						{ type: "text", content: " be the number of steps in one mile. Since " },
+						{ type: "math", mathml: "<mn>3</mn>" },
+						{ type: "text", content: " miles corresponds to " },
+						{ type: "math", mathml: "<mn>6300</mn>" },
+						{ type: "text", content: " steps, the equation is " },
+						{ type: "math", mathml: "<mn>3</mn><mi>s</mi><mo>=</mo><mn>6300</mn>" },
+						{ type: "text", content: "." }
+					]
+				},
+				{
+					type: "paragraph",
+					content: [
+						{ type: "text", content: "Solving gives " },
+						{ type: "math", mathml: "<mi>s</mi><mo>=</mo><mn>2100</mn>" },
+						{ type: "text", content: ", so there are 2100 steps in one mile." }
+					]
+				}
+			]
+		}
+	]
 }
 
 export const compareNegativeDecimalVsRootInlineChoice: AssessmentItemInput = {
@@ -3440,30 +3667,11 @@ export const compareNegativeDecimalVsRootInlineChoice: AssessmentItemInput = {
 	],
 	title: "Compare a decimal and a square root",
 	widgets: {},
-	feedback: {
-		correct: [
-			{
-				type: "paragraph",
-				content: [
-					{ type: "text", content: "Correct! " },
-					{ type: "math", mathml: "<mo>-</mo><mn>4.1</mn><mo>&gt;</mo><mo>-</mo><msqrt><mn>20</mn></msqrt>" },
-					{ type: "text", content: "." }
-				]
-			}
-		],
-		incorrect: [
-			{
-				type: "paragraph",
-				content: [
-					{ type: "text", content: "Not quite. Note that " },
-					{ type: "math", mathml: "<msqrt><mn>20</mn></msqrt><mo>≈</mo><mn>4.47</mn>" },
-					{ type: "text", content: ", so " },
-					{ type: "math", mathml: "<mo>-</mo><mn>4.1</mn><mo>&gt;</mo><mo>-</mo><msqrt><mn>20</mn></msqrt>" },
-					{ type: "text", content: "." }
-				]
-			}
-		]
-	},
+	feedbackBlocks: [
+		{ identifier: "GT", outcomeIdentifier: "FEEDBACK__RESPONSE", content: [{ type: "paragraph", content: [{ type: "text", content: "Correct! -4.1 is greater than -√20." }] }] },
+		{ identifier: "LT", outcomeIdentifier: "FEEDBACK__RESPONSE", content: [{ type: "paragraph", content: [{ type: "text", content: "Not quite. √20≈4.47, so -4.1 is greater (less negative)." }] }] },
+		{ identifier: "EQ", outcomeIdentifier: "FEEDBACK__RESPONSE", content: [{ type: "paragraph", content: [{ type: "text", content: "Not equal; compare the magnitudes carefully." }] }] }
+	],
 	identifier: "compare-negative-decimal-vs-root-inline-choice",
 	interactions: {
 		comparison_dropdown: {
@@ -3657,32 +3865,18 @@ export const reactionRateChangesTable: AssessmentItemInput = {
 			rowHeaderKey: "change"
 		}
 	},
-	feedback: {
-		correct: [
-			{
-				type: "paragraph",
-				content: [
-					{
-						type: "text",
-						content:
-							"Correct! Stirring and heating increase the frequency of effective collisions, so they increase the reaction rate. Decreasing concentration reduces collisions and decreases the rate."
-					}
-				]
-			}
-		],
-		incorrect: [
-			{
-				type: "paragraph",
-				content: [
-					{
-						type: "text",
-						content:
-							"Not quite. Stirring and heating bring reactant particles into contact more often, which increases collisions and speeds up the reaction. Lowering the concentration leads to fewer collisions, which slows the reaction."
-					}
-				]
-			}
-		]
-	},
+	feedbackBlocks: [
+		{ identifier: "INCREASE", outcomeIdentifier: "FEEDBACK__dropdown_1", content: [{ type: "paragraph", content: [{ type: "text", content: "Correct: stirring increases collision frequency." }] }] },
+		{ identifier: "DECREASE", outcomeIdentifier: "FEEDBACK__dropdown_1", content: [{ type: "paragraph", content: [{ type: "text", content: "Not quite: stirring increases collision frequency." }] }] },
+		{ identifier: "INCREASE", outcomeIdentifier: "FEEDBACK__dropdown_3", content: [{ type: "paragraph", content: [{ type: "text", content: "Correct: heating increases reaction rate." }] }] },
+		{ identifier: "DECREASE", outcomeIdentifier: "FEEDBACK__dropdown_3", content: [{ type: "paragraph", content: [{ type: "text", content: "Not quite: heating increases reaction rate." }] }] },
+		{ identifier: "INCREASE", outcomeIdentifier: "FEEDBACK__dropdown_4", content: [{ type: "paragraph", content: [{ type: "text", content: "Not quite: decreasing concentration lowers rate." }] }] },
+		{ identifier: "DECREASE", outcomeIdentifier: "FEEDBACK__dropdown_4", content: [{ type: "paragraph", content: [{ type: "text", content: "Correct: fewer particles means fewer effective collisions." }] }] },
+		{ identifier: "linear", outcomeIdentifier: "FEEDBACK__dropdown_2", content: [{ type: "paragraph", content: [{ type: "text", content: "Correct: KE is linear in mass at constant speed." }] }] },
+		{ identifier: "quadratic", outcomeIdentifier: "FEEDBACK__dropdown_2", content: [{ type: "paragraph", content: [{ type: "text", content: "Not quite: with constant speed, mass scales KE linearly." }] }] },
+		{ identifier: "two_times", outcomeIdentifier: "FEEDBACK__dropdown_5", content: [{ type: "paragraph", content: [{ type: "text", content: "Not quite: halving speed reduces KE to a quarter." }] }] },
+		{ identifier: "four_times", outcomeIdentifier: "FEEDBACK__dropdown_5", content: [{ type: "paragraph", content: [{ type: "text", content: "Correct: KE ∝ v²; halving v gives quarter KE." }] }] }
+	],
 	identifier: "reaction-rate-changes-table",
 	interactions: {},
 	responseDeclarations: [
@@ -3843,52 +4037,60 @@ export const kineticEnergyMassSpeedRelationships: AssessmentItemInput = {
 			highlightPointRadius: 4
 		}
 	},
-	feedback: {
-		correct: [
-			{
-				type: "paragraph",
-				content: [
-					{
-						type: "text",
-						content:
-							"Correct! The mass–kinetic energy relationship is linear, so halving the mass (at constant speed) halves the kinetic energy."
-					}
-				]
-			},
-			{
-				type: "paragraph",
-				content: [
-					{
-						type: "text",
-						content:
-							"The speed–kinetic energy relationship is nonlinear (quadratic), so halving the speed (at constant mass) reduces the kinetic energy to one-fourth of its original value."
-					}
-				]
-			}
-		],
-		incorrect: [
-			{
-				type: "paragraph",
-				content: [
-					{
-						type: "text",
-						content:
-							"Not quite. On the first graph, the straight line shows a linear pattern: when mass is scaled by a factor, kinetic energy scales by the same factor at constant speed."
-					}
-				]
-			},
-			{
-				type: "paragraph",
-				content: [
-					{
-						type: "text",
-						content:
-							"On the second graph, the curved shape indicates a nonlinear (quadratic) pattern: when speed is halved, kinetic energy becomes one-fourth of its original value at constant mass."
-					}
-				]
-			}
-		]
-	},
+	feedbackBlocks: [
+		{
+			identifier: "CORRECT",
+			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			content: [
+				{
+					type: "paragraph",
+					content: [
+						{
+							type: "text",
+							content:
+								"Correct! The mass–kinetic energy relationship is linear, so halving the mass (at constant speed) halves the kinetic energy."
+						}
+					]
+				},
+				{
+					type: "paragraph",
+					content: [
+						{
+							type: "text",
+							content:
+								"The speed–kinetic energy relationship is nonlinear (quadratic), so halving the speed (at constant mass) reduces the kinetic energy to one-fourth of its original value."
+						}
+					]
+				}
+			]
+		},
+		{
+			identifier: "INCORRECT",
+			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			content: [
+				{
+					type: "paragraph",
+					content: [
+						{
+							type: "text",
+							content:
+								"Not quite. On the first graph, the straight line shows a linear pattern: when mass is scaled by a factor, kinetic energy scales by the same factor at constant speed."
+						}
+					]
+				},
+				{
+					type: "paragraph",
+					content: [
+						{
+							type: "text",
+							content:
+								"On the second graph, the curved shape indicates a nonlinear (quadratic) pattern: when speed is halved, kinetic energy becomes one-fourth of its original value at constant mass."
+						}
+					]
+				}
+			]
+		}
+	],
 	identifier: "ke-mass-speed-relationships",
 	interactions: {
 		dropdown_1: {
@@ -4322,49 +4524,57 @@ export const reactantAmountsTempChangeTablePerseus: AssessmentItemInput = {
 			rowHeaderKey: "experiment"
 		}
 	},
-	feedback: {
-		correct: [
-			{
-				type: "paragraph",
-				content: [{ type: "text", content: "Correct! You used the patterns in the data to match each unknown entry." }]
-			},
-			{
-				type: "paragraph",
-				content: [
-					{
-						type: "text",
-						content:
-							"Experiment C has twice the amount of sodium acetate as experiment A, so its temperature change is twice as large and negative: "
-					},
-					{ type: "math", mathml: "<mo>-</mo><mn>3.2</mn><mo>°</mo><mi>C</mi>" },
-					{ type: "text", content: ". Experiment D corresponds to " },
-					{ type: "math", mathml: "<mrow><mi>K</mi><mi>O</mi><mi>H</mi></mrow>" },
-					{ type: "text", content: " with a temperature increase of " },
-					{ type: "math", mathml: "<mo>+</mo><mn>4.2</mn><mo>°</mo><mi>C</mi>" },
-					{ type: "text", content: ", and experiment E corresponds to " },
-					{
-						type: "math",
-						mathml: "<mrow><mi>Ba</mi><msub><mrow><mo>(</mo><mi>OH</mi><mo>)</mo></mrow><mn>2</mn></msub></mrow>"
-					},
-					{ type: "text", content: " with a temperature increase of " },
-					{ type: "math", mathml: "<mo>+</mo><mn>2.0</mn><mo>°</mo><mi>C</mi>" },
-					{ type: "text", content: "." }
-				]
-			}
-		],
-		incorrect: [
-			{
-				type: "paragraph",
-				content: [
-					{
-						type: "text",
-						content:
-							"Not quite. First, decide which reactions are endothermic (temperature decreases) and which are exothermic (temperature increases). Then use how the amount changes (for example, twice as much) to match proportional changes in temperature."
-					}
-				]
-			}
-		]
-	},
+	feedbackBlocks: [
+		{
+			identifier: "CORRECT",
+			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			content: [
+				{
+					type: "paragraph",
+					content: [{ type: "text", content: "Correct! You used the patterns in the data to match each unknown entry." }]
+				},
+				{
+					type: "paragraph",
+					content: [
+						{
+							type: "text",
+							content:
+								"Experiment C has twice the amount of sodium acetate as experiment A, so its temperature change is twice as large and negative: "
+						},
+						{ type: "math", mathml: "<mo>-</mo><mn>3.2</mn><mo>°</mo><mi>C</mi>" },
+						{ type: "text", content: ". Experiment D corresponds to " },
+						{ type: "math", mathml: "<mrow><mi>K</mi><mi>O</mi><mi>H</mi></mrow>" },
+						{ type: "text", content: " with a temperature increase of " },
+						{ type: "math", mathml: "<mo>+</mo><mn>4.2</mn><mo>°</mo><mi>C</mi>" },
+						{ type: "text", content: ", and experiment E corresponds to " },
+						{
+							type: "math",
+							mathml: "<mrow><mi>Ba</mi><msub><mrow><mo>(</mo><mi>OH</mi><mo>)</mo></mrow><mn>2</mn></msub></mrow>"
+						},
+						{ type: "text", content: " with a temperature increase of " },
+						{ type: "math", mathml: "<mo>+</mo><mn>2.0</mn><mo>°</mo><mi>C</mi>" },
+						{ type: "text", content: "." }
+					]
+				}
+			]
+		},
+		{
+			identifier: "INCORRECT",
+			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			content: [
+				{
+					type: "paragraph",
+					content: [
+						{
+							type: "text",
+							content:
+								"Not quite. First, decide which reactions are endothermic (temperature decreases) and which are exothermic (temperature increases). Then use how the amount changes (for example, twice as much) to match proportional changes in temperature."
+						}
+					]
+				}
+			]
+		}
+	],
 	identifier: "reactant-amounts-temp-change-table-perseus",
 	interactions: {},
 	responseDeclarations: [
@@ -4410,3 +4620,4 @@ export const allExamples: AssessmentItemInput[] = [
 	kineticEnergyMassSpeedRelationships,
 	reactantAmountsTempChangeTablePerseus
 ]
+

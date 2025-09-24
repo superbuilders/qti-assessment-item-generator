@@ -1,7 +1,9 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { escapeXmlAttribute } from "../utils/xml-utils"
-import type { AssessmentItem } from "./schemas"
+import type { AssessmentItem, AnyInteraction } from "./schemas"
+
+type ResponseDeclaration = AssessmentItem["responseDeclarations"][0]
 
 export function compileResponseDeclarations(decls: AssessmentItem["responseDeclarations"]): string {
 	return decls
@@ -105,84 +107,87 @@ export function compileResponseDeclarations(decls: AssessmentItem["responseDecla
 		.join("")
 }
 
-export function compileResponseProcessing(decls: AssessmentItem["responseDeclarations"]): string {
-	// Prefer mapping-based response processing only for the specific, safe case of a
-	// single string/single response. This avoids regressions for other interaction types.
-	const onlyDecl = decls.length === 1 ? decls[0] : undefined
-	if (onlyDecl && onlyDecl.cardinality === "single" && onlyDecl.baseType === "string") {
-		const responseId = escapeXmlAttribute(onlyDecl.identifier)
-		return `\n    <qti-response-processing>\n        <!-- Map the candidate response to SCORE using the declaration's qti-mapping -->\n        <qti-set-outcome-value identifier="SCORE"><qti-map-response identifier="${responseId}"/></qti-set-outcome-value>\n\n        <!-- Derive FEEDBACK from SCORE without altering other semantics -->\n        <qti-response-condition>\n            <qti-response-if>\n                <qti-gt>\n                    <qti-variable identifier="SCORE"/>\n                    <qti-base-value base-type="float">0</qti-base-value>\n                </qti-gt>\n                <qti-set-outcome-value identifier="FEEDBACK"><qti-base-value base-type="identifier">CORRECT</qti-base-value></qti-set-outcome-value>\n            </qti-response-if>\n            <qti-response-else>\n                <qti-set-outcome-value identifier="FEEDBACK"><qti-base-value base-type="identifier">INCORRECT</qti-base-value></qti-set-outcome-value>\n            </qti-response-else>\n        </qti-response-condition>\n    </qti-response-processing>`
-	}
+function generateProcessingForInteraction(decl: ResponseDeclaration, interaction?: AnyInteraction): string {
+	const responseId = escapeXmlAttribute(decl.identifier)
+	const isEnumerated = interaction && (interaction.type === 'choiceInteraction' || interaction.type === 'inlineChoiceInteraction')
 
-	// Special handling for gap match with empty response allowed
-	if (onlyDecl && onlyDecl.baseType === "directedPair") {
-		const responseId = escapeXmlAttribute(onlyDecl.identifier)
-		// Check if empty response is allowed (for cases like "no commas needed")
-		// Use property checking instead of type assertion
-		const allowEmpty = "allowEmpty" in onlyDecl && onlyDecl.allowEmpty === true
-
-		if (allowEmpty) {
-			return `\n    <qti-response-processing>
-        <qti-response-condition>
-            <qti-response-if>
-                <!-- Check if response is empty (null) -->
-                <qti-is-null>
-                    <qti-variable identifier="${responseId}"/>
-                </qti-is-null>
-                <qti-set-outcome-value identifier="SCORE">
-                    <qti-base-value base-type="float">1</qti-base-value>
-                </qti-set-outcome-value>
-                <qti-set-outcome-value identifier="FEEDBACK">
-                    <qti-base-value base-type="identifier">CORRECT</qti-base-value>
-                </qti-set-outcome-value>
-            </qti-response-if>
-            <qti-response-else>
-                <!-- Response not empty, so it's incorrect -->
-                <qti-set-outcome-value identifier="SCORE">
-                    <qti-base-value base-type="float">0</qti-base-value>
-                </qti-set-outcome-value>
-                <qti-set-outcome-value identifier="FEEDBACK">
-                    <qti-base-value base-type="identifier">INCORRECT</qti-base-value>
-                </qti-set-outcome-value>
-            </qti-response-else>
-        </qti-response-condition>
-    </qti-response-processing>`
+	if (isEnumerated) {
+		const outcomeId = `FEEDBACK__${responseId}`
+		if (decl.cardinality === 'multiple') {
+			return `
+    <qti-set-outcome-value identifier="${outcomeId}">
+        <qti-variable identifier="${responseId}"/>
+    </qti-set-outcome-value>`
 		}
+		const conditions = interaction.choices.map((choice, index) => {
+			const tag = index === 0 ? 'qti-response-if' : 'qti-response-else-if'
+			const choiceId = escapeXmlAttribute(choice.identifier)
+			return `
+        <${tag}>
+            <qti-match>
+                <qti-variable identifier="${responseId}"/>
+                <qti-base-value base-type="identifier">${choiceId}</qti-base-value>
+            </qti-match>
+            <qti-set-outcome-value identifier="${outcomeId}">
+                <qti-base-value base-type="identifier">${choiceId}</qti-base-value>
+            </qti-set-outcome-value>
+        </${tag}>`
+		}).join('')
+		return `<qti-response-condition>${conditions}</qti-response-condition>`
+	}
+	
+	const outcomeId = `FEEDBACK__GLOBAL`
+	return `
+    <qti-response-condition>
+        <qti-response-if>
+            <qti-match>
+                <qti-variable identifier="${responseId}"/>
+                <qti-correct identifier="${responseId}"/>
+            </qti-match>
+            <qti-set-outcome-value identifier="${outcomeId}">
+                <qti-base-value base-type="identifier">CORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-if>
+        <qti-response-else>
+            <qti-set-outcome-value identifier="${outcomeId}">
+                <qti-base-value base-type="identifier">INCORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-else>
+    </qti-response-condition>`
+}
 
-		// Standard gap match processing using mapping
-		return `\n    <qti-response-processing>\n        <!-- Map the candidate response to SCORE using the declaration's qti-mapping -->\n        <qti-set-outcome-value identifier="SCORE">\n            <qti-map-response identifier="${responseId}"/>\n        </qti-set-outcome-value>\n        \n        <!-- Set feedback based on score -->\n        <qti-response-condition>\n            <qti-response-if>\n                <!-- Check if all associations are correct (full score) -->\n                <qti-equal tolerance-mode="exact">\n                    <qti-variable identifier="SCORE"/>\n                    <qti-base-value base-type="float">${Array.isArray(onlyDecl.correct) ? onlyDecl.correct.length : 0}.0</qti-base-value>\n                </qti-equal>\n                <qti-set-outcome-value identifier="FEEDBACK">\n                    <qti-base-value base-type="identifier">CORRECT</qti-base-value>\n                </qti-set-outcome-value>\n            </qti-response-if>\n            <qti-response-else>\n                <qti-set-outcome-value identifier="FEEDBACK">\n                    <qti-base-value base-type="identifier">INCORRECT</qti-base-value>\n                </qti-set-outcome-value>\n            </qti-response-else>\n        </qti-response-condition>\n    </qti-response-processing>`
+export function compileResponseProcessing(item: AssessmentItem): string {
+	const processingRules: string[] = []
+
+	// 1. Generate feedback outcome logic for each interaction.
+	for (const decl of item.responseDeclarations) {
+		const interaction = Object.values(item.interactions ?? {}).find(
+			(inter) => inter.responseIdentifier === decl.identifier
+		)
+		processingRules.push(generateProcessingForInteraction(decl, interaction))
 	}
 
-	const conditions = decls
-		.map((decl) => {
-			// For single/string responses, prefer mapping-based validation even in multi-declaration items.
-			if (decl.cardinality === "single" && decl.baseType === "string") {
-				const id = escapeXmlAttribute(decl.identifier)
-				// Check that mapped score > 0 using the declaration's qti-mapping
-				return `<qti-gt><qti-map-response identifier="${id}"/><qti-base-value base-type="float">0</qti-base-value></qti-gt>`
-			}
+	// 2. Generate scoring logic based on the correctness of all interactions.
+	const scoreConditions = item.responseDeclarations.map(decl => {
+		const responseId = escapeXmlAttribute(decl.identifier)
+		return `<qti-match><qti-variable identifier="${responseId}"/><qti-correct identifier="${responseId}"/></qti-match>`
+	}).join('\n                        ')
 
-			// Otherwise, fall back to strict match against the declared correct value(s)
-			const variable = `<qti-variable identifier="${escapeXmlAttribute(decl.identifier)}"/>`
-			const correct = `<qti-correct identifier="${escapeXmlAttribute(decl.identifier)}"/>`
-			return `<qti-match>${variable}${correct}</qti-match>`
-		})
-		.join("\n                    ")
-
+	processingRules.push(`
+    <qti-response-condition>
+        <qti-response-if>
+            <qti-and>
+                ${scoreConditions}
+            </qti-and>
+            <qti-set-outcome-value identifier="SCORE"><qti-base-value base-type="float">1.0</qti-base-value></qti-set-outcome-value>
+        </qti-response-if>
+        <qti-response-else>
+            <qti-set-outcome-value identifier="SCORE"><qti-base-value base-type="float">0.0</qti-base-value></qti-set-outcome-value>
+        </qti-response-else>
+    </qti-response-condition>`)
+	
 	return `
     <qti-response-processing>
-        <qti-response-condition>
-            <qti-response-if>
-                <qti-and>
-                    ${conditions}
-                </qti-and>
-                <qti-set-outcome-value identifier="SCORE"><qti-base-value base-type="float">1</qti-base-value></qti-set-outcome-value>
-                <qti-set-outcome-value identifier="FEEDBACK"><qti-base-value base-type="identifier">CORRECT</qti-base-value></qti-set-outcome-value>
-            </qti-response-if>
-            <qti-response-else>
-                <qti-set-outcome-value identifier="SCORE"><qti-base-value base-type="float">0</qti-base-value></qti-set-outcome-value>
-                <qti-set-outcome-value identifier="FEEDBACK"><qti-base-value base-type="identifier">INCORRECT</qti-base-value></qti-set-outcome-value>
-            </qti-response-else>
-        </qti-response-condition>
+        ${processingRules.join("\n")}
     </qti-response-processing>`
 }

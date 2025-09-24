@@ -13,12 +13,8 @@ export function compileInteraction(interaction: AnyInteraction, slots: Map<strin
 			const choicesXml = interaction.choices
 				.map((c) => {
 					const contentXml = renderBlockContent(c.content, slots)
-					let choice = `<qti-simple-choice identifier="${escapeXmlAttribute(c.identifier)}">${contentXml}`
-					if (c.feedback) {
-						choice += `<qti-feedback-inline outcome-identifier="FEEDBACK-INLINE" identifier="${escapeXmlAttribute(c.identifier)}">${renderInlineContent(c.feedback, slots)}</qti-feedback-inline>`
-					}
-					choice += "</qti-simple-choice>"
-					return choice
+					// MODIFIED: The logic for appending qti-feedback-inline has been removed.
+					return `<qti-simple-choice identifier="${escapeXmlAttribute(c.identifier)}">${contentXml}</qti-simple-choice>`
 				})
 				.join("\n            ")
 
@@ -33,12 +29,8 @@ export function compileInteraction(interaction: AnyInteraction, slots: Map<strin
 			const choicesXml = interaction.choices
 				.map((c) => {
 					const contentXml = renderBlockContent(c.content, slots)
-					let choice = `<qti-simple-choice identifier="${escapeXmlAttribute(c.identifier)}">${contentXml}`
-					if (c.feedback) {
-						choice += `<qti-feedback-inline outcome-identifier="FEEDBACK-INLINE" identifier="${escapeXmlAttribute(c.identifier)}">${renderInlineContent(c.feedback, slots)}</qti-feedback-inline>`
-					}
-					choice += "</qti-simple-choice>"
-					return choice
+					// MODIFIED: The logic for appending qti-feedback-inline has been removed.
+					return `<qti-simple-choice identifier="${escapeXmlAttribute(c.identifier)}">${contentXml}</qti-simple-choice>`
 				})
 				.join("\n            ")
 

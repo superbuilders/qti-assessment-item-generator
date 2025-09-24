@@ -26,6 +26,34 @@ export const ErrDuplicateChoiceIdentifier = errors.new("duplicate choice identif
 // NEW: Custom error for invalid rowHeaderKey in dataTable
 export const ErrInvalidRowHeaderKey = errors.new("invalid dataTable rowHeaderKey")
 
+// Type-safe helper to check for legacy properties on the raw, unknown input object.
+function hasLegacyFeedback(data: unknown): boolean {
+	if (typeof data !== 'object' || data === null) {
+		return false
+	}
+	if ('feedback' in data) {
+		return true
+	}
+	if ('interactions' in data) {
+		const interactions = (data as { interactions: unknown }).interactions
+		if (typeof interactions === 'object' && interactions !== null) {
+			for (const interaction of Object.values(interactions)) {
+				if (typeof interaction === 'object' && interaction !== null && 'choices' in interaction) {
+					const choices = (interaction as { choices: unknown }).choices
+					if (Array.isArray(choices)) {
+						for (const choice of choices) {
+							if (typeof choice === 'object' && choice !== null && 'feedback' in choice) {
+								return true
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return false
+}
+
 // Type guard to check if a string is a valid widget type
 function isValidWidgetType(type: string): type is keyof typeof typedSchemas {
 	return Object.keys(typedSchemas).includes(type)
@@ -493,21 +521,7 @@ function enforceNoPipesInChoiceInteraction(item: AssessmentItem): void {
 				}
 			}
 
-			// Scan optional per-choice feedback (inline content)
-			if (choice.feedback) {
-				for (let fIdx = 0; fIdx < choice.feedback.length; fIdx++) {
-					const part = choice.feedback[fIdx]
-					if (!part || part.type !== "text") continue
-					if (part.content.includes("|")) {
-						logger.error("pipe characters in choice feedback", {
-							interactionId,
-							choiceIndex: cIdx,
-							snippet: part.content
-						})
-						throw errors.new("pipe characters banned in choice feedback")
-					}
-				}
-			}
+			// REMOVED: choice feedback validation no longer needed
 		}
 	}
 }
@@ -556,21 +570,7 @@ function enforceNoCaretsInChoiceInteraction(item: AssessmentItem): void {
 				}
 			}
 
-			// Scan optional per-choice feedback (inline content)
-			if (choice.feedback) {
-				for (let fIdx = 0; fIdx < choice.feedback.length; fIdx++) {
-					const part = choice.feedback[fIdx]
-					if (!part || part.type !== "text") continue
-					if (part.content.includes("^")) {
-						logger.error("caret characters in choice feedback", {
-							interactionId,
-							choiceIndex: cIdx,
-							snippet: part.content
-						})
-						throw errors.new("caret characters banned in choice feedback")
-					}
-				}
-			}
+			// REMOVED: choice feedback validation no longer needed
 		}
 	}
 }
@@ -601,28 +601,7 @@ function enforceNoCaretsInInlineChoiceInteraction(item: AssessmentItem): void {
 	}
 }
 
-function enforceNoCaretsInTopLevelFeedback(item: AssessmentItem): void {
-	const checkBlocks = (blocks: NonNullable<AssessmentItem["feedback"]>["correct"]): void => {
-		for (let i = 0; i < blocks.length; i++) {
-			const block = blocks[i]
-			if (!block || block.type !== "paragraph") continue
-			const inline = block.content
-			for (let j = 0; j < inline.length; j++) {
-				const part = inline[j]
-				if (!part || part.type !== "text") continue
-				if (part.content.includes("^")) {
-					logger.error("caret characters in top-level feedback", {
-						index: i,
-						snippet: part.content
-					})
-					throw errors.new("caret characters banned in top-level feedback")
-				}
-			}
-		}
-	}
-	if (item.feedback?.correct) checkBlocks(item.feedback.correct)
-	if (item.feedback?.incorrect) checkBlocks(item.feedback.incorrect)
-}
+// REMOVED: enforceNoCaretsInTopLevelFeedback function no longer needed
 
 function enforceNoPipesInInlineChoiceInteraction(item: AssessmentItem): void {
 	if (!item.interactions) return
@@ -650,28 +629,7 @@ function enforceNoPipesInInlineChoiceInteraction(item: AssessmentItem): void {
 	}
 }
 
-function enforceNoPipesInTopLevelFeedback(item: AssessmentItem): void {
-	const checkBlocks = (blocks: NonNullable<AssessmentItem["feedback"]>["correct"]): void => {
-		for (let i = 0; i < blocks.length; i++) {
-			const block = blocks[i]
-			if (!block || block.type !== "paragraph") continue
-			const inline = block.content
-			for (let j = 0; j < inline.length; j++) {
-				const part = inline[j]
-				if (!part || part.type !== "text") continue
-				if (part.content.includes("|")) {
-					logger.error("pipe characters in top-level feedback", {
-						index: i,
-						snippet: part.content
-					})
-					throw errors.new("pipe characters banned in top-level feedback")
-				}
-			}
-		}
-	}
-	if (item.feedback?.correct) checkBlocks(item.feedback.correct)
-	if (item.feedback?.incorrect) checkBlocks(item.feedback.incorrect)
-}
+// REMOVED: enforceNoPipesInTopLevelFeedback function no longer needed
 
 function enforceIdentifierOnlyMatching(item: AssessmentItem): void {
 	// Build allowed identifiers per responseIdentifier from interactions and dataTable dropdowns
@@ -831,6 +789,12 @@ function enforceIdentifierOnlyMatching(item: AssessmentItem): void {
 }
 
 export async function compile(itemData: AssessmentItemInput): Promise<string> {
+	// NEW: Add strict, type-safe legacy field detection.
+	if (hasLegacyFeedback(itemData)) {
+		logger.error("legacy feedback fields detected", { identifier: (itemData as any).identifier })
+		throw errors.new("Legacy 'feedback' or 'choice.feedback' fields are banned. Migrate to 'feedbackBlocks'.")
+	}
+	
 	// Step 0: Build widget mapping prior to schema enforcement
 	const widgetMapping: Record<string, string> = {}
 	if (itemData.widgets) {
@@ -893,8 +857,7 @@ export async function compile(itemData: AssessmentItemInput): Promise<string> {
 	enforceNoCaretsInChoiceInteraction(enforcedItem)
 	enforceNoPipesInInlineChoiceInteraction(enforcedItem)
 	enforceNoCaretsInInlineChoiceInteraction(enforcedItem)
-	enforceNoPipesInTopLevelFeedback(enforcedItem)
-	enforceNoCaretsInTopLevelFeedback(enforcedItem)
+	// REMOVED: Top-level feedback validation functions no longer needed
 
 	// Enforce identifier-only matching; no ad-hoc rewriting
 	// This function now includes checks for duplicate responseIdentifiers and choice Identifiers,
@@ -922,13 +885,49 @@ export async function compile(itemData: AssessmentItemInput): Promise<string> {
 	}
 
 	const filledBody = enforcedItem.body ? renderBlockContent(enforcedItem.body, slots) : ""
-	const correctFeedback = renderBlockContent(enforcedItem.feedback.correct, slots)
-	const incorrectFeedback = renderBlockContent(enforcedItem.feedback.incorrect, slots)
+	
+	// NEW: Dynamically determine outcome declarations from feedbackBlocks
+	const outcomeDeclarations = new Map<string, 'single' | 'multiple'>()
+	const responseCardinalityMap = new Map<string, 'single' | 'multiple' | 'ordered'>(
+		enforcedItem.responseDeclarations.map(rd => [rd.identifier, rd.cardinality])
+	)
+
+	for (const block of enforcedItem.feedbackBlocks) {
+		const match = /^FEEDBACK__([A-Za-z0-9_]+)$/.exec(block.outcomeIdentifier)
+		const responseId = match?.[1]
+
+		let cardinality: 'single' | 'multiple' = 'single'
+		if (responseId && responseId !== 'GLOBAL') {
+			const responseCardinality = responseCardinalityMap.get(responseId)
+			if (responseCardinality === 'multiple') {
+				cardinality = 'multiple'
+			}
+		}
+		outcomeDeclarations.set(block.outcomeIdentifier, cardinality)
+	}
+	
+	const outcomeDeclarationsXml = Array.from(outcomeDeclarations.entries()).map(([identifier, cardinality]) => 
+		`    <qti-outcome-declaration identifier="${escapeXmlAttribute(identifier)}" cardinality="${cardinality}" base-type="identifier"/>`
+	).join('\n')
+	
+	// NEW: Generate feedbackBlocks XML with interactive widget validation
+	const feedbackBlocksXml = enforcedItem.feedbackBlocks.map(block => {
+		// Validate against interactive widgets - strict allowlist for dataTable cells
+		const contentStr = JSON.stringify(block.content)
+		if (contentStr.includes('"type":"input"') || contentStr.includes('"type":"dropdown"')) {
+			logger.error("interactive widget found in feedback content", { identifier: enforcedItem.identifier, blockId: block.identifier })
+			throw errors.new("Interactive widgets are banned in feedback content.")
+		}
+		const contentXml = renderBlockContent(block.content, slots)
+		return `        <qti-feedback-block outcome-identifier="${escapeXmlAttribute(block.outcomeIdentifier)}" identifier="${escapeXmlAttribute(block.identifier)}" show-hide="show">
+            <qti-content-body>${contentXml}</qti-content-body>
+        </qti-feedback-block>`
+	}).join('\n')
 
 	const responseDeclarations = compileResponseDeclarations(enforcedItem.responseDeclarations)
-	const responseProcessing = compileResponseProcessing(enforcedItem.responseDeclarations)
+	const responseProcessing = compileResponseProcessing(enforcedItem)
 
-	// Assemble the final XML document
+	// MODIFIED: Assemble the final XML with dynamic declarations and blocks.
 	let finalXml = `<?xml version="1.0" encoding="UTF-8"?>
 <qti-assessment-item
     xmlns="http://www.imsglobal.org/xsd/imsqtiasi_v3p0"
@@ -942,16 +941,10 @@ ${responseDeclarations}
     <qti-outcome-declaration identifier="SCORE" cardinality="single" base-type="float">
         <qti-default-value><qti-value>0</qti-value></qti-default-value>
     </qti-outcome-declaration>
-    <qti-outcome-declaration identifier="FEEDBACK" cardinality="single" base-type="identifier"/>
-    <qti-outcome-declaration identifier="FEEDBACK-INLINE" cardinality="multiple" base-type="identifier"/>
+${outcomeDeclarationsXml}
     <qti-item-body>
         ${filledBody}
-        <qti-feedback-block outcome-identifier="FEEDBACK" identifier="CORRECT" show-hide="show">
-            <qti-content-body>${correctFeedback}</qti-content-body>
-        </qti-feedback-block>
-        <qti-feedback-block outcome-identifier="FEEDBACK" identifier="INCORRECT" show-hide="show">
-            <qti-content-body>${incorrectFeedback}</qti-content-body>
-        </qti-feedback-block>
+${feedbackBlocksXml}
     </qti-item-body>
 ${responseProcessing}
 </qti-assessment-item>`

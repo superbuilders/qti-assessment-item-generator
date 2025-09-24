@@ -280,20 +280,17 @@ export function validateAssessmentItemInput(item: AssessmentItemInput, logger: l
 		}
 		validateBlockContent(item.body, "item.body", logger)
 	}
-	if (!Array.isArray(item.feedback?.correct)) {
-		logger.error("feedback.correct is not an array", {
+	if (!Array.isArray(item.feedbackBlocks)) {
+		logger.error("feedbackBlocks is not an array", {
 			identifier: item.identifier
 		})
-		throw errors.new("item.feedback.correct must be an array of block items")
+		throw errors.new("item.feedbackBlocks must be an array of feedback blocks")
 	}
-	if (!Array.isArray(item.feedback?.incorrect)) {
-		logger.error("feedback.incorrect is not an array", {
-			identifier: item.identifier
-		})
-		throw errors.new("item.feedback.incorrect must be an array of block items")
+	for (let i = 0; i < item.feedbackBlocks.length; i++) {
+		const block = item.feedbackBlocks[i]
+		if (!block) continue
+		validateBlockContent(block.content, `item.feedbackBlocks[${i}].content`, logger)
 	}
-	validateBlockContent(item.feedback.correct, "item.feedback.correct", logger)
-	validateBlockContent(item.feedback.incorrect, "item.feedback.incorrect", logger)
 
 	if (item.interactions) {
 		for (const [key, interaction] of Object.entries(item.interactions)) {
@@ -329,13 +326,7 @@ export function validateAssessmentItemInput(item: AssessmentItemInput, logger: l
 					}
 					for (const choice of interaction.choices) {
 						validateBlockContent(choice.content, `interaction[${key}].choice[${choice.identifier}]`, logger)
-						if (choice.feedback) {
-							validateInlineContent(
-								choice.feedback,
-								`interaction[${key}].choice[${choice.identifier}].feedback`,
-								logger
-							)
-						}
+						// REMOVED: choice.feedback validation no longer needed
 					}
 					const decl = item.responseDeclarations.find((d) => d.identifier === interaction.responseIdentifier)
 					if (!decl) {
@@ -387,13 +378,7 @@ export function validateAssessmentItemInput(item: AssessmentItemInput, logger: l
 					}
 					for (const choice of interaction.choices) {
 						validateBlockContent(choice.content, `interaction[${key}].choice[${choice.identifier}]`, logger)
-						if (choice.feedback) {
-							validateInlineContent(
-								choice.feedback,
-								`interaction[${key}].choice[${choice.identifier}].feedback`,
-								logger
-							)
-						}
+						// REMOVED: choice.feedback validation no longer needed
 					}
 					break
 				}

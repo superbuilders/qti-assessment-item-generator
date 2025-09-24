@@ -65,8 +65,9 @@ export function validateAndSanitizeHtmlFields(item: AssessmentItemInput, logger:
 
 	// Apply processing to all structured content fields
 	processBlockContent(sanitizedItem.body, logger)
-	processBlockContent(sanitizedItem.feedback.correct, logger)
-	processBlockContent(sanitizedItem.feedback.incorrect, logger)
+	for (const block of sanitizedItem.feedbackBlocks) {
+		processBlockContent(block.content, logger)
+	}
 
 	if (sanitizedItem.interactions) {
 		for (const key in sanitizedItem.interactions) {
@@ -100,9 +101,7 @@ export function validateAndSanitizeHtmlFields(item: AssessmentItemInput, logger:
 					// Now TypeScript knows this is a choice/order interaction
 					for (const choice of interaction.choices) {
 						processBlockContent(choice.content, logger)
-						if (choice.feedback) {
-							processInlineContent(choice.feedback, logger)
-						}
+						// REMOVED: choice.feedback validation no longer needed
 					}
 				}
 			}
