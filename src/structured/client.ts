@@ -49,13 +49,8 @@ async function resolveRasterImages(envelope: AiContextEnvelope): Promise<ImageCo
 	}
 
 	for (const payload of envelope.multimodalImagePayloads) {
-		const bytesResult = await errors.try(payload.data.arrayBuffer())
-		if (bytesResult.error) {
-			logger.error("failed to read blob data from payload", { error: bytesResult.error })
-			throw errors.wrap(bytesResult.error, "blob read failed")
-		}
-		totalPayloadBytes += bytesResult.data.byteLength
-		const base64 = Buffer.from(bytesResult.data).toString("base64")
+		totalPayloadBytes += payload.data.byteLength
+		const base64 = Buffer.from(payload.data).toString("base64")
 		const dataUrl = `data:${payload.mimeType};base64,${base64}`
 		finalImageUrls.push(dataUrl)
 	}
@@ -336,6 +331,44 @@ async function generateWidgetContent(
 
 	const WidgetCollectionSchema = createWidgetCollectionSchema(widgetMapping)
 	const responseFormat = zodResponseFormat(WidgetCollectionSchema, "widget_content_generator")
+
+	// ANALYTICS: Detect and log any $ref nodes that also include description/default
+	function collectRefConflicts(node: unknown, path: string, out: Array<{ pointer: string; keys: string[] }>): void {
+		if (Array.isArray(node)) {
+			for (let i = 0; i < node.length; i++) collectRefConflicts(node[i], `${path}/${i}`, out)
+			return
+		}
+		if (node && typeof node === "object") {
+			const obj = node as Record<string, unknown>
+			const hasRef = Object.prototype.hasOwnProperty.call(obj, "$ref")
+			const hasDescription = Object.prototype.hasOwnProperty.call(obj, "description")
+			const hasDefault = Object.prototype.hasOwnProperty.call(obj, "default")
+			if (hasRef && (hasDescription || hasDefault)) {
+				const present: string[] = []
+				if (hasDescription) present.push("description")
+				if (hasDefault) present.push("default")
+				out.push({ pointer: path || "/", keys: present })
+			}
+			for (const [k, v] of Object.entries(obj)) {
+				const next = `${path}/${k.replaceAll("~", "~0").replaceAll("/", "~1")}`
+				collectRefConflicts(v, next, out)
+			}
+		}
+	}
+
+	const schemaRoot = responseFormat.json_schema?.schema
+	if (schemaRoot) {
+		const conflicts: Array<{ pointer: string; keys: string[] }> = []
+		collectRefConflicts(schemaRoot, "", conflicts)
+		if (conflicts.length > 0) {
+			logger.error("json schema contains $ref with conflicting keywords", {
+				functionName: "generateWidgetContent",
+				widgetSlotNames,
+				conflictCount: conflicts.length,
+				sample: conflicts.slice(0, 20)
+			})
+		}
+	}
 
 	logger.debug("generated json schema for openai", {
 		functionName: "generateWidgetContent",

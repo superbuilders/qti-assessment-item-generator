@@ -10,21 +10,20 @@ export const SimpleArrowPropsSchema = z.object({
 	type: z.literal("simpleArrow"),
 	width: createWidthSchema(),
 	height: createHeightSchema(),
-	orientation: z.enum(["vertical", "horizontal"]).default("vertical"),
-	direction: z.enum(["forward", "backward", "bidirectional"]).default("forward"),
-	color: z.string().default("#333333"),
-	strokeWidth: z.number().positive().default(2),
-	arrowSize: z.number().positive().default(6),
+	orientation: z.enum(["vertical", "horizontal"]),
+	direction: z.enum(["forward", "backward", "bidirectional"]),
+	color: z.string(),
+	strokeWidth: z.number().positive(),
+	arrowSize: z.number().positive(),
 	// Optional circles along the arrow
 	circles: z
 		.array(
 			z.object({
 				position: z.number().min(0).max(1), // 0 = start, 1 = end
-				radius: z.number().positive().default(4),
-				fill: z.string().default("#000000")
+				radius: z.number().positive(),
+				fill: z.string()
 			})
 		)
-		.default([])
 })
 
 export type SimpleArrowProps = z.infer<typeof SimpleArrowPropsSchema>

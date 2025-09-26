@@ -60,15 +60,18 @@ export const VectorDiagramPropsSchema = z
 		type: z.literal("vectorDiagram").describe("Identifies this as a vector diagram widget"),
 		width: createWidthSchema(),
 		height: createHeightSchema(),
-		gridSpacing: z.number().positive().default(20).describe("Spacing between grid lines in pixels"),
-		showGrid: z.boolean().default(true).describe("Whether to show the background grid"),
+		gridSpacing: z.number().positive().describe("Spacing between grid lines in pixels"),
+		showGrid: z.boolean().describe("Whether to show the background grid"),
 		gridColor: z
 			.string()
 			.regex(CSS_COLOR_PATTERN, "invalid css color")
-			.default("#e0e0e0")
+			
 			.describe("Color of the grid lines"),
 		vectors: z.array(createVectorSchema()).describe("Array of vectors to draw"),
-		markers: z.array(createMarkerSchema()).default([]).describe("Array of markers to place on the diagram")
+		// NOTE: Avoid setting a default here because OpenAI's JSON Schema parser
+		// rejects $ref nodes that also include keywords like `default`/`description`.
+		// Keeping only the description ensures compatibility.
+		markers: z.array(createMarkerSchema()).describe("Array of markers to place on the diagram")
 	})
 	.strict()
 	.describe(

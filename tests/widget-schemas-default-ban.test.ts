@@ -22,46 +22,36 @@ function hasZodDef(obj: unknown): obj is { _def: unknown } {
 	return isRecord(obj) && hasKey(obj, "_def") && isRecord(obj._def)
 }
 
-function containsDefault(schema: z.ZodType): boolean {
-	if (!hasZodDef(schema)) return false
-	const defUnknown: unknown = (schema satisfies { _def: unknown })._def
-	if (isRecord(defUnknown) && hasKey(defUnknown, "typeName") && defUnknown.typeName === "ZodDefault") return true
+function containsDefault(schema: z.ZodType, visited = new Set<z.ZodType>()): boolean {
+    if (!hasZodDef(schema)) return false
+    if (visited.has(schema)) return false
+    visited.add(schema)
 
-	if (isRecord(defUnknown) && hasKey(defUnknown, "shape") && isRecord(defUnknown.shape)) {
-		for (const value of Object.values(defUnknown.shape)) {
-			if (isZodSchema(value) && containsDefault(value)) return true
-		}
-	}
+    const defUnknown: unknown = (schema satisfies { _def: unknown })._def
+    if (isRecord(defUnknown) && hasKey(defUnknown, "typeName") && defUnknown.typeName === "ZodDefault") return true
 
-	if (isRecord(defUnknown) && hasKey(defUnknown, "type") && isZodSchema(defUnknown.type)) {
-		if (containsDefault(defUnknown.type)) return true
-	}
+    // Generic deep traversal over all enumerable properties on _def
+    if (isRecord(defUnknown)) {
+        for (const value of Object.values(defUnknown)) {
+            if (isZodSchema(value)) {
+                if (containsDefault(value, visited)) return true
+                continue
+            }
+            if (Array.isArray(value)) {
+                for (const v of value) {
+                    if (isZodSchema(v) && containsDefault(v, visited)) return true
+                }
+                continue
+            }
+            if (isRecord(value)) {
+                for (const v of Object.values(value)) {
+                    if (isZodSchema(v) && containsDefault(v, visited)) return true
+                }
+            }
+        }
+    }
 
-	if (isRecord(defUnknown) && hasKey(defUnknown, "options") && Array.isArray(defUnknown.options)) {
-		for (const option of defUnknown.options) {
-			if (isZodSchema(option) && containsDefault(option)) return true
-		}
-	}
-
-	if (isRecord(defUnknown) && hasKey(defUnknown, "innerType") && isZodSchema(defUnknown.innerType)) {
-		if (containsDefault(defUnknown.innerType)) return true
-	}
-
-	if (isRecord(defUnknown) && hasKey(defUnknown, "schema") && isZodSchema(defUnknown.schema)) {
-		if (containsDefault(defUnknown.schema)) return true
-	}
-
-	if (
-		isRecord(defUnknown) &&
-		hasKey(defUnknown, "left") &&
-		hasKey(defUnknown, "right") &&
-		isZodSchema(defUnknown.left) &&
-		isZodSchema(defUnknown.right)
-	) {
-		if (containsDefault(defUnknown.left) || containsDefault(defUnknown.right)) return true
-	}
-
-	return false
+    return false
 }
 
 describe("Zod Schema Default Ban", () => {

@@ -6,7 +6,7 @@ export interface AiContextEnvelope {
 }
 
 export interface RasterImagePayload {
-	data: Blob
+	data: ArrayBuffer
 	mimeType: "image/png" | "image/jpeg" | "image/webp" | "image/gif"
 }
 
