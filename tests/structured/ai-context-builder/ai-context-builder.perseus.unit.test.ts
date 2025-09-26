@@ -2,8 +2,8 @@ import { afterAll, beforeAll, describe, expect, test } from "bun:test"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { buildPerseusEnvelope } from "../../../src/structured/ai-context-builder"
-import { createAlwaysFailFetch, createPrdMockFetch } from "./helpers/mock-fetch"
 import { expectSortedUrls, expectSupplementaryContentCount } from "./helpers/assertions"
+import { createAlwaysFailFetch, createPrdMockFetch } from "./helpers/mock-fetch"
 
 describe("buildPerseusEnvelope (unit)", () => {
 	let previousFetch: typeof fetch
@@ -22,7 +22,7 @@ describe("buildPerseusEnvelope (unit)", () => {
 			logger.error("test failed", { error: result.error })
 			throw result.error
 		}
-		expect(result.data.primaryContent).toEqual("{}") 
+		expect(result.data.primaryContent).toEqual("{}")
 		expect(result.data.supplementaryContent).toEqual([])
 		expect(result.data.rasterImageUrls).toEqual([])
 	})
@@ -46,7 +46,9 @@ describe("buildPerseusEnvelope (unit)", () => {
 		const envelope = result.data
 		expect(envelope.primaryContent).toBeTruthy()
 		expectSupplementaryContentCount(envelope, 1)
-		expect(envelope.supplementaryContent[0]).toBe('<!-- URL: https://cdn.kastatic.org/ka-perseus-graphie/resolves-to.svg -->\n<svg width="10" height="10"></svg>')
+		expect(envelope.supplementaryContent[0]).toBe(
+			'<!-- URL: https://cdn.kastatic.org/ka-perseus-graphie/resolves-to.svg -->\n<svg width="10" height="10"></svg>'
+		)
 		expect(envelope.rasterImageUrls).toEqual([])
 	})
 
@@ -55,7 +57,9 @@ describe("buildPerseusEnvelope (unit)", () => {
 			widgets: {
 				"image 1": {
 					type: "image",
-					options: { backgroundImage: { url: "web+graphie://cdn.kastatic.org/ka-perseus-graphie/svg-head-ok-get-fail" } }
+					options: {
+						backgroundImage: { url: "web+graphie://cdn.kastatic.org/ka-perseus-graphie/svg-head-ok-get-fail" }
+					}
 				}
 			}
 		}
@@ -64,9 +68,7 @@ describe("buildPerseusEnvelope (unit)", () => {
 		if (result.error) throw result.error
 		const envelope = result.data
 		// Since SVG GET fails, and png/jpg heads succeed in our mock, it should be raster
-		expect(envelope.rasterImageUrls).toEqual([
-			"https://cdn.kastatic.org/ka-perseus-graphie/svg-head-ok-get-fail.png"
-		])
+		expect(envelope.rasterImageUrls).toEqual(["https://cdn.kastatic.org/ka-perseus-graphie/svg-head-ok-get-fail.png"])
 	})
 
 	test("ignores markdown links that do not point to supported images", async () => {
@@ -88,7 +90,13 @@ describe("buildPerseusEnvelope (unit)", () => {
 	})
 
 	test("handles failing web+graphie URLs gracefully", async () => {
-		const perseusJson = { widgets: { "image 1": { options: { backgroundImage: { url: "web+graphie://cdn.kastatic.org/ka-perseus-graphie/fails-to-resolve" } } } } }
+		const perseusJson = {
+			widgets: {
+				"image 1": {
+					options: { backgroundImage: { url: "web+graphie://cdn.kastatic.org/ka-perseus-graphie/fails-to-resolve" } }
+				}
+			}
+		}
 		const result = await errors.try(buildPerseusEnvelope(perseusJson))
 		expect(result.error).toBeFalsy()
 		if (result.error) {
@@ -121,7 +129,10 @@ describe("buildPerseusEnvelope (unit)", () => {
 		const perseusJson = {
 			content: "https://example.com/diagram.svg https://example.com/diagram.svg",
 			widgets: {
-				"image 1": { type: "image", options: { backgroundImage: { url: "web+graphie://cdn.kastatic.org/ka-perseus-graphie/resolves-to" } } }
+				"image 1": {
+					type: "image",
+					options: { backgroundImage: { url: "web+graphie://cdn.kastatic.org/ka-perseus-graphie/resolves-to" } }
+				}
 			}
 		}
 		const result = await errors.try(buildPerseusEnvelope(perseusJson))
@@ -179,97 +190,91 @@ describe("buildPerseusEnvelope (unit)", () => {
 
 	test("builds envelope for marble probability item", async () => {
 		const perseusJson = {
-			"hints": [
+			hints: [
 				{
-					"images": {},
-					"content": "$\\text{Probability} = \\\dfrac{\\text{Number of favorable outcomes}}{\\text{Number of possible outcomes}}$",
-					"replace": false,
-					"widgets": {}
+					images: {},
+					content:
+						"$\\text{Probability} = \\\dfrac{\\text{Number of favorable outcomes}}{\\text{Number of possible outcomes}}$",
+					replace: false,
+					widgets: {}
 				},
 				{
-					"images": {},
-					"content": "There are $16$ favorable outcomes (the $8 + 8 = 16$ marbles that are either blue or red).\n\nThere are $21$ possible outcomes (the $8 + 5 + 8 = 21$ total marbles).",
-					"replace": false,
-					"widgets": {}
+					images: {},
+					content:
+						"There are $16$ favorable outcomes (the $8 + 8 = 16$ marbles that are either blue or red).\n\nThere are $21$ possible outcomes (the $8 + 5 + 8 = 21$ total marbles).",
+					replace: false,
+					widgets: {}
 				},
 				{
-					"images": {},
-					"content": "$\\qquad \\text{P(draw a blue or red marble}) = \\\dfrac{16}{21}\\approx0.76$",
-					"replace": false,
-					"widgets": {}
+					images: {},
+					content: "$\\qquad \\text{P(draw a blue or red marble}) = \\\dfrac{16}{21}\\approx0.76$",
+					replace: false,
+					widgets: {}
 				}
 			],
-			"question": {
-				"images": {},
-				"content": "You randomly draw a marble from a bag of marbles that contains $8$ blue marbles, $5$ green marbles, and $8$ red marbles.\n\n**What is $\\text{P(draw a blue or red marble})$?**  \n*If necessary, round your answer to $2$ decimal places.*  \n[[☃ input-number 1]]\n\n[[☃ image 1]]\n\n",
-				"widgets": {
+			question: {
+				images: {},
+				content:
+					"You randomly draw a marble from a bag of marbles that contains $8$ blue marbles, $5$ green marbles, and $8$ red marbles.\n\n**What is $\\text{P(draw a blue or red marble})$?**  \n*If necessary, round your answer to $2$ decimal places.*  \n[[☃ input-number 1]]\n\n[[☃ image 1]]\n\n",
+				widgets: {
 					"image 1": {
-						"type": "image",
-						"graded": true,
-						"static": false,
-						"options": {
-							"alt": "An image of 8 red marbles, 5 green marbles, and 8 blue marbles mixed up.",
-							"box": [
-								480,
-								160
+						type: "image",
+						graded: true,
+						static: false,
+						options: {
+							alt: "An image of 8 red marbles, 5 green marbles, and 8 blue marbles mixed up.",
+							box: [480, 160],
+							range: [
+								[0, 10],
+								[0, 10]
 							],
-							"range": [
-								[
-									0,
-									10
-								],
-								[
-									0,
-									10
-								]
-							],
-							"title": "",
-							"labels": [],
-							"static": false,
-							"caption": "",
-							"backgroundImage": {
-								"url": "https://cdn.kastatic.org/ka-perseus-graphie/64430f539a7bd1d4c56f957779c43a4a184c09bd.png",
-								"width": 480,
-								"height": 160
+							title: "",
+							labels: [],
+							static: false,
+							caption: "",
+							backgroundImage: {
+								url: "https://cdn.kastatic.org/ka-perseus-graphie/64430f539a7bd1d4c56f957779c43a4a184c09bd.png",
+								width: 480,
+								height: 160
 							}
 						},
-						"version": {
-							"major": 0,
-							"minor": 0
+						version: {
+							major: 0,
+							minor: 0
 						},
-						"alignment": "block"
+						alignment: "block"
 					},
 					"input-number 1": {
-						"type": "input-number",
-						"graded": true,
-						"static": false,
-						"options": {
-							"size": "normal",
-							"value": 0.7619047619047619,
-							"inexact": true,
-							"maxError": 0.005,
-							"simplify": "optional",
-							"answerType": "percent",
-							"rightAlign": false
+						type: "input-number",
+						graded: true,
+						static: false,
+						options: {
+							size: "normal",
+							value: 0.7619047619047619,
+							inexact: true,
+							maxError: 0.005,
+							simplify: "optional",
+							answerType: "percent",
+							rightAlign: false
 						},
-						"version": {
-							"major": 0,
-							"minor": 0
+						version: {
+							major: 0,
+							minor: 0
 						},
-						"alignment": "default"
+						alignment: "default"
 					}
 				}
 			},
-			"answerArea": {
-				"tTable": false,
-				"zTable": false,
-				"chi2Table": false,
-				"calculator": true,
-				"periodicTable": false
+			answerArea: {
+				tTable: false,
+				zTable: false,
+				chi2Table: false,
+				calculator: true,
+				periodicTable: false
 			},
-			"itemDataVersion": {
-				"major": 0,
-				"minor": 1
+			itemDataVersion: {
+				major: 0,
+				minor: 1
 			}
 		}
 
@@ -289,7 +294,9 @@ describe("buildPerseusEnvelope (unit)", () => {
 
 	test("extracts multiple markdown links without adding to context", async () => {
 		const perseusJsonWithMultipleLinks = {
-			question: { content: "Check [source A](https://example.com/a) and [source B](https://example.com/b) for more information." }
+			question: {
+				content: "Check [source A](https://example.com/a) and [source B](https://example.com/b) for more information."
+			}
 		}
 		const result = await errors.try(buildPerseusEnvelope(perseusJsonWithMultipleLinks))
 		expect(result.error).toBeFalsy()
@@ -311,7 +318,10 @@ describe("buildPerseusEnvelope (unit)", () => {
 						type: "radio",
 						options: {
 							choices: [
-								{ content: "Choice with [embedded link](https://example.com/choice1)", clue: "This references [another source](https://example.com/clue1)" },
+								{
+									content: "Choice with [embedded link](https://example.com/choice1)",
+									clue: "This references [another source](https://example.com/clue1)"
+								},
 								{ content: "Regular choice", clue: "Regular clue" }
 							]
 						}
@@ -321,7 +331,12 @@ describe("buildPerseusEnvelope (unit)", () => {
 			hints: [
 				{
 					content: "Hint with [helpful link](https://example.com/hint1)",
-					widgets: { "image 1": { type: "image", options: { backgroundImage: { url: "web+graphie://cdn.kastatic.org/ka-perseus-graphie/hint-image" } } } }
+					widgets: {
+						"image 1": {
+							type: "image",
+							options: { backgroundImage: { url: "web+graphie://cdn.kastatic.org/ka-perseus-graphie/hint-image" } }
+						}
+					}
 				}
 			]
 		}
@@ -350,5 +365,3 @@ describe("buildPerseusEnvelope (unit)", () => {
 		expectSupplementaryContentCount(envelope, 0)
 	})
 })
-
-

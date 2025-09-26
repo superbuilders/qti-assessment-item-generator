@@ -1,6 +1,7 @@
 // tests/perseus-e2e.test.ts
 import { describe, expect, test } from "bun:test"
 import * as errors from "@superbuilders/errors"
+import * as logger from "@superbuilders/slog"
 import { buildPerseusEnvelope } from "../../src/structured/ai-context-builder"
 import {
 	interactiveGraphPlotting,
@@ -11,7 +12,7 @@ import {
 import { PERSEUS_SVG_CACHE } from "../fixtures/perseus-svgs/cache"
 
 // Mock fetch function that returns cached Perseus SVGs
-const mockFetch: typeof fetch = (async (url: string | Request | URL, init?: RequestInit): Promise<Response> => {
+const mockFetch = async (url: string | Request | URL, init?: RequestInit): Promise<Response> => {
 	const urlString = url.toString()
 
 	// Handle HEAD requests - check if we have the SVG in cache
@@ -36,7 +37,7 @@ const mockFetch: typeof fetch = (async (url: string | Request | URL, init?: Requ
 	}
 
 	return new Response(null, { status: 404, statusText: "Not Found" })
-}) as any as typeof fetch
+}
 
 describe("Perseus E2E Regression Suite", () => {
 	// Test Case 1: Direct HTTPS URL for an SVG
@@ -47,6 +48,7 @@ describe("Perseus E2E Regression Suite", () => {
 
 		expect(result.error).toBeFalsy()
 		if (result.error) {
+			logger.error("test failed", { error: result.error })
 			throw result.error
 		}
 		const envelope = result.data
@@ -65,6 +67,7 @@ describe("Perseus E2E Regression Suite", () => {
 
 		expect(result.error).toBeFalsy()
 		if (result.error) {
+			logger.error("test failed", { error: result.error })
 			throw result.error
 		}
 		const envelope = result.data
@@ -91,6 +94,7 @@ describe("Perseus E2E Regression Suite", () => {
 
 		expect(result.error).toBeFalsy()
 		if (result.error) {
+			logger.error("test failed", { error: result.error })
 			throw result.error
 		}
 		const envelope = result.data
@@ -114,6 +118,7 @@ describe("Perseus E2E Regression Suite", () => {
 
 		expect(result.error).toBeFalsy()
 		if (result.error) {
+			logger.error("test failed", { error: result.error })
 			throw result.error
 		}
 		const envelope = result.data

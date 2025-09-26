@@ -2,8 +2,8 @@ import { afterAll, beforeAll, describe, expect, test } from "bun:test"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { buildHtmlEnvelope } from "../../../src/structured/ai-context-builder"
-import { createPrdMockFetch } from "./helpers/mock-fetch"
 import { expectSortedUrls, expectSupplementaryContentCount } from "./helpers/assertions"
+import { createPrdMockFetch } from "./helpers/mock-fetch"
 
 describe("buildHtmlEnvelope (unit)", () => {
 	let previousFetch: typeof fetch
@@ -53,7 +53,9 @@ describe("buildHtmlEnvelope (unit)", () => {
 		const envelope = result.data
 		expect(envelope.primaryContent).toBeTruthy()
 		expectSupplementaryContentCount(envelope, 1)
-		expect(envelope.supplementaryContent[0]).toBe('<!-- URL: https://example.com/diagram.svg -->\n<svg width="20" height="20"></svg>')
+		expect(envelope.supplementaryContent[0]).toBe(
+			'<!-- URL: https://example.com/diagram.svg -->\n<svg width="20" height="20"></svg>'
+		)
 	})
 
 	test("handles mixed-case SVG extensions and querystrings", async () => {
@@ -127,5 +129,3 @@ describe("buildHtmlEnvelope (unit)", () => {
 		expectSupplementaryContentCount(envelope, 0)
 	})
 })
-
-

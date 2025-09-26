@@ -1,6 +1,7 @@
 import type { NumberLineProps } from "../src/widgets/generators/number-line"
 
-type NumberLineWithoutNulls = Omit<NumberLineProps, "segments" | "model"> & Partial<Pick<NumberLineProps, "segments" | "model">>
+type NumberLineWithoutNulls = Omit<NumberLineProps, "segments" | "model"> &
+	Partial<Pick<NumberLineProps, "segments" | "model">>
 
 const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 	{
@@ -32,8 +33,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 				denominator: 2,
 				sign: "+"
 			}
-		],
-		
+		]
 	},
 	{
 		type: "numberLine",
@@ -62,8 +62,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 				value: 4,
 				sign: "+"
 			}
-		],
-		
+		]
 	},
 	// Example mirroring the provided diagram: two blue dots and an unknown box, label 125 on right dot
 	{
@@ -99,8 +98,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 			{ type: "mathml", position: -8.5, color: "#5B8FF9", style: "dot", mathml: "<mi>s</mi>" },
 			{ type: "mathml", position: -6.5, color: "#5B8FF9", style: "dot", mathml: "<mi>t</mi>" },
 			{ type: "mathml", position: -5, color: "#5B8FF9", style: "dot", mathml: "<mi>u</mi>" }
-		],
-		
+		]
 	},
 	// Example: single variable a to the left of 0 (variant 1)
 	{
@@ -113,10 +111,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 		tickInterval: { type: "whole", interval: 1 },
 		secondaryTickInterval: null,
 		showTickLabels: true,
-		highlightedPoints: [
-			{ type: "mathml", position: -3, color: "#5B8FF9", style: "dot", mathml: "<mi>a</mi>" }
-		],
-		
+		highlightedPoints: [{ type: "mathml", position: -3, color: "#5B8FF9", style: "dot", mathml: "<mi>a</mi>" }]
 	},
 	// Example: single variable a to the left of 0 (variant 2)
 	{
@@ -129,9 +124,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 		tickInterval: { type: "whole", interval: 1 },
 		secondaryTickInterval: null,
 		showTickLabels: true,
-		highlightedPoints: [
-			{ type: "mathml", position: -2, color: "#5B8FF9", style: "dot", mathml: "<mi>a</mi>" }
-		],
+		highlightedPoints: [{ type: "mathml", position: -2, color: "#5B8FF9", style: "dot", mathml: "<mi>a</mi>" }],
 		segments: null,
 		model: null
 	},
@@ -148,7 +141,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 		showTickLabels: true,
 		highlightedPoints: [
 			{ type: "fraction", position: -2.5, color: "#D946EF", style: "dot", numerator: 5, denominator: 2, sign: "-" },
-			{ type: "fraction", position: -2/3, color: "#7C3AED", style: "dot", numerator: 2, denominator: 3, sign: "+" }
+			{ type: "fraction", position: -2 / 3, color: "#7C3AED", style: "dot", numerator: 2, denominator: 3, sign: "+" }
 		],
 		segments: null,
 		model: null
@@ -159,8 +152,8 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 		width: 500,
 		height: 300,
 		orientation: "horizontal",
-		min: -2/3,
-		max: 1/3,
+		min: -2 / 3,
+		max: 1 / 3,
 		tickInterval: { type: "fraction", denominator: 3 },
 		secondaryTickInterval: null,
 		showTickLabels: true,
@@ -179,19 +172,15 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 		height: 300,
 		orientation: "horizontal",
 		min: 0,
-		max: 5/3,
+		max: 5 / 3,
 		tickInterval: { type: "fraction", denominator: 3 },
 		secondaryTickInterval: null,
 		showTickLabels: true,
 		highlightedPoints: null,
-		segments: [
-			{ start: 0, end: 1, color: "#6EC6FF" }
-		],
+		segments: [{ start: 0, end: 1, color: "#6EC6FF" }],
 		model: {
 			totalCells: 5,
-			cellGroups: [
-				{ count: 3, color: "#A7D8EB" }
-			],
+			cellGroups: [{ count: 3, color: "#A7D8EB" }],
 			bracketLabel: ""
 		}
 	},
@@ -207,14 +196,10 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 		secondaryTickInterval: null,
 		showTickLabels: true,
 		highlightedPoints: null,
-		segments: [
-			{ start: 0, end: 1, color: "#6EC6FF" }
-		],
+		segments: [{ start: 0, end: 1, color: "#6EC6FF" }],
 		model: {
 			totalCells: 10,
-			cellGroups: [
-				{ count: 3, color: "#A7D8EB" }
-			],
+			cellGroups: [{ count: 3, color: "#A7D8EB" }],
 			bracketLabel: ""
 		}
 	},
@@ -230,14 +215,10 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 		secondaryTickInterval: null,
 		showTickLabels: true,
 		highlightedPoints: null,
-		segments: [
-			{ start: 0, end: 1, color: "#6EC6FF" }
-		],
+		segments: [{ start: 0, end: 1, color: "#6EC6FF" }],
 		model: {
 			totalCells: 10,
-			cellGroups: [
-				{ count: 6, color: "#A7D8EB" }
-			],
+			cellGroups: [{ count: 6, color: "#A7D8EB" }],
 			bracketLabel: ""
 		}
 	},
@@ -254,11 +235,41 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 		tickInterval: { type: "whole", interval: 5 },
 		showTickLabels: true,
 		highlightedPoints: [
-			{ type: "mathml", color: "#0c7f99", style: "dot", mathml: "<mrow><mtext>Friday</mtext><mo>:</mo><mo>-</mo><mn>18</mn><mo>°</mo><mi>C</mi></mrow>", position: -18 },
-			{ type: "mathml", color: "#0c7f99", style: "dot", mathml: "<mrow><mtext>Wednesday</mtext><mo>:</mo><mo>-</mo><mn>13</mn><mo>°</mo><mi>C</mi></mrow>", position: -13 },
-			{ type: "mathml", color: "#0c7f99", style: "dot", mathml: "<mrow><mtext>Tuesday</mtext><mo>:</mo><mo>-</mo><mn>11</mn><mo>°</mo><mi>C</mi></mrow>", position: -11 },
-			{ type: "mathml", color: "#0c7f99", style: "dot", mathml: "<mrow><mtext>Thursday</mtext><mo>:</mo><mo>-</mo><mn>8</mn><mo>°</mo><mi>C</mi></mrow>", position: -8 },
-			{ type: "mathml", color: "#0c7f99", style: "dot", mathml: "<mrow><mtext>Monday</mtext><mo>:</mo><mo>-</mo><mn>4</mn><mo>°</mo><mi>C</mi></mrow>", position: -4 }
+			{
+				type: "mathml",
+				color: "#0c7f99",
+				style: "dot",
+				mathml: "<mrow><mtext>Friday</mtext><mo>:</mo><mo>-</mo><mn>18</mn><mo>°</mo><mi>C</mi></mrow>",
+				position: -18
+			},
+			{
+				type: "mathml",
+				color: "#0c7f99",
+				style: "dot",
+				mathml: "<mrow><mtext>Wednesday</mtext><mo>:</mo><mo>-</mo><mn>13</mn><mo>°</mo><mi>C</mi></mrow>",
+				position: -13
+			},
+			{
+				type: "mathml",
+				color: "#0c7f99",
+				style: "dot",
+				mathml: "<mrow><mtext>Tuesday</mtext><mo>:</mo><mo>-</mo><mn>11</mn><mo>°</mo><mi>C</mi></mrow>",
+				position: -11
+			},
+			{
+				type: "mathml",
+				color: "#0c7f99",
+				style: "dot",
+				mathml: "<mrow><mtext>Thursday</mtext><mo>:</mo><mo>-</mo><mn>8</mn><mo>°</mo><mi>C</mi></mrow>",
+				position: -8
+			},
+			{
+				type: "mathml",
+				color: "#0c7f99",
+				style: "dot",
+				mathml: "<mrow><mtext>Monday</mtext><mo>:</mo><mo>-</mo><mn>4</mn><mo>°</mo><mi>C</mi></mrow>",
+				position: -4
+			}
 		],
 		secondaryTickInterval: null
 	},
@@ -275,11 +286,41 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 		tickInterval: { type: "whole", interval: 5 },
 		showTickLabels: true,
 		highlightedPoints: [
-			{ type: "mathml", color: "#0c7f99", style: "dot", mathml: "<mtext>Bowman: </mtext><mo>-</mo><mn>47</mn><mo>°</mo><mi>C</mi>", position: -47 },
-			{ type: "mathml", color: "#0c7f99", style: "dot", mathml: "<mtext>Williston: </mtext><mo>-</mo><mn>44</mn><mo>°</mo><mi>C</mi>", position: -44 },
-			{ type: "mathml", color: "#0c7f99", style: "dot", mathml: "<mtext>Minot: </mtext><mo>-</mo><mn>42</mn><mo>°</mo><mi>C</mi>", position: -42 },
-			{ type: "mathml", color: "#0c7f99", style: "dot", mathml: "<mtext>Bismarck: </mtext><mo>-</mo><mn>41</mn><mo>°</mo><mi>C</mi>", position: -41 },
-			{ type: "mathml", color: "#0c7f99", style: "dot", mathml: "<mtext>Jamestown: </mtext><mo>-</mo><mn>40</mn><mo>°</mo><mi>C</mi>", position: -40 }
+			{
+				type: "mathml",
+				color: "#0c7f99",
+				style: "dot",
+				mathml: "<mtext>Bowman: </mtext><mo>-</mo><mn>47</mn><mo>°</mo><mi>C</mi>",
+				position: -47
+			},
+			{
+				type: "mathml",
+				color: "#0c7f99",
+				style: "dot",
+				mathml: "<mtext>Williston: </mtext><mo>-</mo><mn>44</mn><mo>°</mo><mi>C</mi>",
+				position: -44
+			},
+			{
+				type: "mathml",
+				color: "#0c7f99",
+				style: "dot",
+				mathml: "<mtext>Minot: </mtext><mo>-</mo><mn>42</mn><mo>°</mo><mi>C</mi>",
+				position: -42
+			},
+			{
+				type: "mathml",
+				color: "#0c7f99",
+				style: "dot",
+				mathml: "<mtext>Bismarck: </mtext><mo>-</mo><mn>41</mn><mo>°</mo><mi>C</mi>",
+				position: -41
+			},
+			{
+				type: "mathml",
+				color: "#0c7f99",
+				style: "dot",
+				mathml: "<mtext>Jamestown: </mtext><mo>-</mo><mn>40</mn><mo>°</mo><mi>C</mi>",
+				position: -40
+			}
 		],
 		secondaryTickInterval: null
 	},
@@ -296,11 +337,41 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 		tickInterval: { type: "whole", interval: 1 },
 		showTickLabels: true,
 		highlightedPoints: [
-			{ type: "mathml", color: "#0c7f99", style: "dot", mathml: "<mrow><mtext>Bowman: </mtext><mo>-</mo><mn>47</mn><mo>°</mo><mi>C</mi></mrow>", position: -47 },
-			{ type: "mathml", color: "#0c7f99", style: "dot", mathml: "<mrow><mtext>Williston: </mtext><mo>-</mo><mn>44</mn><mo>°</mo><mi>C</mi></mrow>", position: -44 },
-			{ type: "mathml", color: "#0c7f99", style: "dot", mathml: "<mrow><mtext>Minot: </mtext><mo>-</mo><mn>42</mn><mo>°</mo><mi>C</mi></mrow>", position: -42 },
-			{ type: "mathml", color: "#0c7f99", style: "dot", mathml: "<mrow><mtext>Bismarck: </mtext><mo>-</mo><mn>41</mn><mo>°</mo><mi>C</mi></mrow>", position: -41 },
-			{ type: "mathml", color: "#0c7f99", style: "dot", mathml: "<mrow><mtext>Jamestown: </mtext><mo>-</mo><mn>40</mn><mo>°</mo><mi>C</mi></mrow>", position: -40 }
+			{
+				type: "mathml",
+				color: "#0c7f99",
+				style: "dot",
+				mathml: "<mrow><mtext>Bowman: </mtext><mo>-</mo><mn>47</mn><mo>°</mo><mi>C</mi></mrow>",
+				position: -47
+			},
+			{
+				type: "mathml",
+				color: "#0c7f99",
+				style: "dot",
+				mathml: "<mrow><mtext>Williston: </mtext><mo>-</mo><mn>44</mn><mo>°</mo><mi>C</mi></mrow>",
+				position: -44
+			},
+			{
+				type: "mathml",
+				color: "#0c7f99",
+				style: "dot",
+				mathml: "<mrow><mtext>Minot: </mtext><mo>-</mo><mn>42</mn><mo>°</mo><mi>C</mi></mrow>",
+				position: -42
+			},
+			{
+				type: "mathml",
+				color: "#0c7f99",
+				style: "dot",
+				mathml: "<mrow><mtext>Bismarck: </mtext><mo>-</mo><mn>41</mn><mo>°</mo><mi>C</mi></mrow>",
+				position: -41
+			},
+			{
+				type: "mathml",
+				color: "#0c7f99",
+				style: "dot",
+				mathml: "<mrow><mtext>Jamestown: </mtext><mo>-</mo><mn>40</mn><mo>°</mo><mi>C</mi></mrow>",
+				position: -40
+			}
 		],
 		secondaryTickInterval: null
 	},
@@ -317,11 +388,41 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 		tickInterval: { type: "whole", interval: 5 },
 		showTickLabels: true,
 		highlightedPoints: [
-			{ type: "mathml", color: "#0c7f99", style: "dot", mathml: "<mtext>Friday: negative 18 degrees Celsius</mtext>", position: -18 },
-			{ type: "mathml", color: "#0c7f99", style: "dot", mathml: "<mtext>Wednesday: negative 13 degrees Celsius</mtext>", position: -13 },
-			{ type: "mathml", color: "#0c7f99", style: "dot", mathml: "<mtext>Tuesday: negative 11 degrees Celsius</mtext>", position: -11 },
-			{ type: "mathml", color: "#0c7f99", style: "dot", mathml: "<mtext>Thursday: negative 8 degrees Celsius</mtext>", position: -8 },
-			{ type: "mathml", color: "#0c7f99", style: "dot", mathml: "<mtext>Monday: negative 4 degrees Celsius</mtext>", position: -4 }
+			{
+				type: "mathml",
+				color: "#0c7f99",
+				style: "dot",
+				mathml: "<mtext>Friday: negative 18 degrees Celsius</mtext>",
+				position: -18
+			},
+			{
+				type: "mathml",
+				color: "#0c7f99",
+				style: "dot",
+				mathml: "<mtext>Wednesday: negative 13 degrees Celsius</mtext>",
+				position: -13
+			},
+			{
+				type: "mathml",
+				color: "#0c7f99",
+				style: "dot",
+				mathml: "<mtext>Tuesday: negative 11 degrees Celsius</mtext>",
+				position: -11
+			},
+			{
+				type: "mathml",
+				color: "#0c7f99",
+				style: "dot",
+				mathml: "<mtext>Thursday: negative 8 degrees Celsius</mtext>",
+				position: -8
+			},
+			{
+				type: "mathml",
+				color: "#0c7f99",
+				style: "dot",
+				mathml: "<mtext>Monday: negative 4 degrees Celsius</mtext>",
+				position: -4
+			}
 		],
 		secondaryTickInterval: null
 	},
@@ -338,12 +439,48 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 		tickInterval: { type: "whole", interval: 10 },
 		showTickLabels: true,
 		highlightedPoints: [
-			{ type: "mathml", color: "#0c7f99", style: "dot", mathml: "<mrow><mtext>krill: negative </mtext><mn>86</mn><mtext> meters</mtext></mrow>", position: -86 },
-			{ type: "mathml", color: "#0c7f99", style: "dot", mathml: "<mrow><mtext>adult penguin: negative </mtext><mn>59</mn><mtext> meters</mtext></mrow>", position: -59 },
-			{ type: "mathml", color: "#0c7f99", style: "dot", mathml: "<mrow><mtext>sardine: negative </mtext><mn>32</mn><mtext> meters</mtext></mrow>", position: -32 },
-			{ type: "mathml", color: "#0c7f99", style: "dot", mathml: "<mrow><mtext>anchovy: negative </mtext><mn>22</mn><mtext> meters</mtext></mrow>", position: -22 },
-			{ type: "mathml", color: "#0c7f99", style: "dot", mathml: "<mrow><mtext>surface of water: </mtext><mn>0</mn><mtext> meters</mtext></mrow>", position: 0 },
-			{ type: "mathml", color: "#0c7f99", style: "dot", mathml: "<mrow><mtext>penguin chick: </mtext><mn>5</mn><mtext> meters</mtext></mrow>", position: 5 }
+			{
+				type: "mathml",
+				color: "#0c7f99",
+				style: "dot",
+				mathml: "<mrow><mtext>krill: negative </mtext><mn>86</mn><mtext> meters</mtext></mrow>",
+				position: -86
+			},
+			{
+				type: "mathml",
+				color: "#0c7f99",
+				style: "dot",
+				mathml: "<mrow><mtext>adult penguin: negative </mtext><mn>59</mn><mtext> meters</mtext></mrow>",
+				position: -59
+			},
+			{
+				type: "mathml",
+				color: "#0c7f99",
+				style: "dot",
+				mathml: "<mrow><mtext>sardine: negative </mtext><mn>32</mn><mtext> meters</mtext></mrow>",
+				position: -32
+			},
+			{
+				type: "mathml",
+				color: "#0c7f99",
+				style: "dot",
+				mathml: "<mrow><mtext>anchovy: negative </mtext><mn>22</mn><mtext> meters</mtext></mrow>",
+				position: -22
+			},
+			{
+				type: "mathml",
+				color: "#0c7f99",
+				style: "dot",
+				mathml: "<mrow><mtext>surface of water: </mtext><mn>0</mn><mtext> meters</mtext></mrow>",
+				position: 0
+			},
+			{
+				type: "mathml",
+				color: "#0c7f99",
+				style: "dot",
+				mathml: "<mrow><mtext>penguin chick: </mtext><mn>5</mn><mtext> meters</mtext></mrow>",
+				position: 5
+			}
 		],
 		secondaryTickInterval: null
 	},
@@ -360,11 +497,41 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 		tickInterval: { type: "whole", interval: 10 },
 		showTickLabels: false,
 		highlightedPoints: [
-			{ type: "mathml", color: "#0c7f99", style: "dot", mathml: "<mtext>krill: negative 86 meters</mtext>", position: -86 },
-			{ type: "mathml", color: "#0c7f99", style: "dot", mathml: "<mtext>adult penguin: negative 59 meters</mtext>", position: -59 },
-			{ type: "mathml", color: "#0c7f99", style: "dot", mathml: "<mtext>sardine: negative 32 meters</mtext>", position: -32 },
-			{ type: "mathml", color: "#0c7f99", style: "dot", mathml: "<mtext>anchovy: negative 22 meters</mtext>", position: -22 },
-			{ type: "mathml", color: "#0c7f99", style: "dot", mathml: "<mtext>surface of water: 0 meters</mtext>", position: 0 },
+			{
+				type: "mathml",
+				color: "#0c7f99",
+				style: "dot",
+				mathml: "<mtext>krill: negative 86 meters</mtext>",
+				position: -86
+			},
+			{
+				type: "mathml",
+				color: "#0c7f99",
+				style: "dot",
+				mathml: "<mtext>adult penguin: negative 59 meters</mtext>",
+				position: -59
+			},
+			{
+				type: "mathml",
+				color: "#0c7f99",
+				style: "dot",
+				mathml: "<mtext>sardine: negative 32 meters</mtext>",
+				position: -32
+			},
+			{
+				type: "mathml",
+				color: "#0c7f99",
+				style: "dot",
+				mathml: "<mtext>anchovy: negative 22 meters</mtext>",
+				position: -22
+			},
+			{
+				type: "mathml",
+				color: "#0c7f99",
+				style: "dot",
+				mathml: "<mtext>surface of water: 0 meters</mtext>",
+				position: 0
+			},
 			{ type: "mathml", color: "#0c7f99", style: "dot", mathml: "<mtext>penguin chick: 5 meters</mtext>", position: 5 }
 		],
 		secondaryTickInterval: null
@@ -434,9 +601,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 		max: 400,
 		tickInterval: { type: "whole", interval: 100 },
 		showTickLabels: false,
-		highlightedPoints: [
-			{ type: "whole", sign: "-", color: "#a75a05", style: "dot", value: 250, position: -250 }
-		],
+		highlightedPoints: [{ type: "whole", sign: "-", color: "#a75a05", style: "dot", value: 250, position: -250 }],
 		secondaryTickInterval: null
 	},
 	// Extracted from question: x78e22152b5909760
@@ -468,9 +633,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 		max: 4,
 		tickInterval: { type: "whole", interval: 2 },
 		showTickLabels: true,
-		highlightedPoints: [
-			{ type: "whole", sign: "-", color: "#a75a05", style: "dot", value: 8, position: -8 }
-		],
+		highlightedPoints: [{ type: "whole", sign: "-", color: "#a75a05", style: "dot", value: 8, position: -8 }],
 		secondaryTickInterval: null
 	},
 	// Extracted from question: x8b9e8ddc0e6e073b
@@ -539,9 +702,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 		max: 1000,
 		tickInterval: { type: "whole", interval: 200 },
 		showTickLabels: false,
-		highlightedPoints: [
-			{ type: "whole", sign: "+", color: "#a75a05", style: "dot", value: 600, position: 600 }
-		],
+		highlightedPoints: [{ type: "whole", sign: "+", color: "#a75a05", style: "dot", value: 600, position: 600 }],
 		secondaryTickInterval: null
 	},
 	// Extracted from question: x0ddc47203b87395f
@@ -592,9 +753,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 		max: 5,
 		tickInterval: { type: "whole", interval: 1 },
 		showTickLabels: true,
-		highlightedPoints: [
-			{ type: "whole", sign: "-", color: "#7854AB", style: "dot", value: 2, position: -2 }
-		],
+		highlightedPoints: [{ type: "whole", sign: "-", color: "#7854AB", style: "dot", value: 2, position: -2 }],
 		secondaryTickInterval: null
 	},
 	// Extracted from question: x0ea6ddf2623b5753
@@ -609,9 +768,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 		max: 5,
 		tickInterval: { type: "whole", interval: 1 },
 		showTickLabels: true,
-		highlightedPoints: [
-			{ type: "whole", sign: "-", color: "#000000", style: "dot", value: 4, position: -4 }
-		],
+		highlightedPoints: [{ type: "whole", sign: "-", color: "#000000", style: "dot", value: 4, position: -4 }],
 		secondaryTickInterval: null
 	},
 	// Extracted from question: xac4daf3ec3b769cb
@@ -626,9 +783,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 		max: 5,
 		tickInterval: { type: "whole", interval: 1 },
 		showTickLabels: false,
-		highlightedPoints: [
-			{ type: "whole", sign: "+", color: "#29abca", style: "dot", value: 2, position: 2 }
-		],
+		highlightedPoints: [{ type: "whole", sign: "+", color: "#29abca", style: "dot", value: 2, position: 2 }],
 		secondaryTickInterval: null
 	},
 	// Extracted from question: x6d35fcf1b7fa9959
@@ -694,9 +849,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 		max: 4,
 		tickInterval: { type: "whole", interval: 1 },
 		showTickLabels: true,
-		highlightedPoints: [
-			{ type: "mathml", color: "#1f77b4", style: "dot", mathml: "<mi>C</mi>", position: 0 }
-		],
+		highlightedPoints: [{ type: "mathml", color: "#1f77b4", style: "dot", mathml: "<mi>C</mi>", position: 0 }],
 		secondaryTickInterval: { type: "fraction", denominator: 2 }
 	},
 	// Extracted from question: x6260dd813b89d59e
@@ -711,9 +864,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 		max: 8,
 		tickInterval: { type: "whole", interval: 2 },
 		showTickLabels: true,
-		highlightedPoints: [
-			{ type: "mathml", color: "#6495ed", style: "dot", mathml: "<mi>A</mi>", position: 3 }
-		],
+		highlightedPoints: [{ type: "mathml", color: "#6495ed", style: "dot", mathml: "<mi>A</mi>", position: 3 }],
 		secondaryTickInterval: null
 	},
 	// Extracted from question: x6260dd813b89d59e
@@ -835,9 +986,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 		max: 2,
 		tickInterval: { type: "fraction", denominator: 2 },
 		showTickLabels: true,
-		highlightedPoints: [
-			{ type: "mathml", color: "#6495ed", style: "dot", mathml: "<mi>D</mi>", position: -1.5 }
-		],
+		highlightedPoints: [{ type: "mathml", color: "#6495ed", style: "dot", mathml: "<mi>D</mi>", position: -1.5 }],
 		secondaryTickInterval: null
 	},
 	// Extracted from question: xc527646af4c9351b
@@ -852,9 +1001,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 		max: 0.6,
 		tickInterval: { type: "whole", interval: 0.2 },
 		showTickLabels: true,
-		highlightedPoints: [
-			{ type: "mathml", color: "#6495ed", style: "dot", mathml: "<mi>F</mi>", position: -0.4 }
-		],
+		highlightedPoints: [{ type: "mathml", color: "#6495ed", style: "dot", mathml: "<mi>F</mi>", position: -0.4 }],
 		secondaryTickInterval: null
 	},
 	// Extracted from question: x4258e7f78f578111
@@ -870,7 +1017,13 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 		tickInterval: { type: "whole", interval: 2 },
 		showTickLabels: true,
 		highlightedPoints: [
-			{ type: "mathml", color: "#F39C12", style: "dot", mathml: "<mo>-</mo><mrow><mo>(</mo><mo>-</mo><mi>B</mi><mo>)</mo></mrow>", position: 3 }
+			{
+				type: "mathml",
+				color: "#F39C12",
+				style: "dot",
+				mathml: "<mo>-</mo><mrow><mo>(</mo><mo>-</mo><mi>B</mi><mo>)</mo></mrow>",
+				position: 3
+			}
 		],
 		secondaryTickInterval: { type: "whole", interval: 1 }
 	},
@@ -887,7 +1040,13 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 		tickInterval: { type: "whole", interval: 2 },
 		showTickLabels: true,
 		highlightedPoints: [
-			{ type: "mathml", color: "#F39C12", style: "dot", mathml: "<mo>-</mo><mrow><mo>(</mo><mo>-</mo><mi>B</mi><mo>)</mo></mrow>", position: -3 }
+			{
+				type: "mathml",
+				color: "#F39C12",
+				style: "dot",
+				mathml: "<mo>-</mo><mrow><mo>(</mo><mo>-</mo><mi>B</mi><mo>)</mo></mrow>",
+				position: -3
+			}
 		],
 		secondaryTickInterval: { type: "whole", interval: 1 }
 	},
@@ -904,7 +1063,13 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 		tickInterval: { type: "whole", interval: 2 },
 		showTickLabels: true,
 		highlightedPoints: [
-			{ type: "mathml", color: "#F39C12", style: "dot", mathml: "<mo>-</mo><mrow><mo>(</mo><mo>-</mo><mi>B</mi><mo>)</mo></mrow>", position: 0 }
+			{
+				type: "mathml",
+				color: "#F39C12",
+				style: "dot",
+				mathml: "<mo>-</mo><mrow><mo>(</mo><mo>-</mo><mi>B</mi><mo>)</mo></mrow>",
+				position: 0
+			}
 		],
 		secondaryTickInterval: { type: "whole", interval: 1 }
 	},
@@ -920,9 +1085,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 		max: 8,
 		tickInterval: { type: "whole", interval: 1 },
 		showTickLabels: true,
-		highlightedPoints: [
-			{ type: "mathml", color: "#6495ed", style: "dot", mathml: "<mi>A</mi>", position: 5 }
-		],
+		highlightedPoints: [{ type: "mathml", color: "#6495ed", style: "dot", mathml: "<mi>A</mi>", position: 5 }],
 		secondaryTickInterval: null
 	},
 	// Extracted from question: xb258023ca47a4510
@@ -937,9 +1100,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 		max: 2,
 		tickInterval: { type: "fraction", denominator: 2 },
 		showTickLabels: true,
-		highlightedPoints: [
-			{ type: "mathml", color: "#6495ed", style: "dot", mathml: "<mi>D</mi>", position: -1.5 }
-		],
+		highlightedPoints: [{ type: "mathml", color: "#6495ed", style: "dot", mathml: "<mi>D</mi>", position: -1.5 }],
 		secondaryTickInterval: null
 	},
 	// Extracted from question: xc1ac295ed6fa5fa1
@@ -971,9 +1132,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 		max: 8,
 		tickInterval: { type: "whole", interval: 1 },
 		showTickLabels: true,
-		highlightedPoints: [
-			{ type: "mathml", color: "#0066CC", style: "dot", mathml: "<mi>A</mi>", position: 0 }
-		],
+		highlightedPoints: [{ type: "mathml", color: "#0066CC", style: "dot", mathml: "<mi>A</mi>", position: 0 }],
 		secondaryTickInterval: null
 	},
 	// Extracted from question: xc1ac295ed6fa5fa1
@@ -1057,7 +1216,13 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 		tickInterval: { type: "fraction", denominator: 2 },
 		showTickLabels: true,
 		highlightedPoints: [
-			{ type: "mathml", color: "#E67E22", style: "dot", mathml: "<mo>-</mo><mrow><mo>(</mo><mo>-</mo><mi>B</mi><mo>)</mo></mrow>", position: 0 }
+			{
+				type: "mathml",
+				color: "#E67E22",
+				style: "dot",
+				mathml: "<mo>-</mo><mrow><mo>(</mo><mo>-</mo><mi>B</mi><mo>)</mo></mrow>",
+				position: 0
+			}
 		],
 		secondaryTickInterval: null
 	},
@@ -1074,7 +1239,13 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 		tickInterval: { type: "fraction", denominator: 2 },
 		showTickLabels: true,
 		highlightedPoints: [
-			{ type: "mathml", color: "#E67E22", style: "dot", mathml: "<mo>-</mo><mrow><mo>(</mo><mo>-</mo><mi>B</mi><mo>)</mo></mrow>", position: 1 }
+			{
+				type: "mathml",
+				color: "#E67E22",
+				style: "dot",
+				mathml: "<mo>-</mo><mrow><mo>(</mo><mo>-</mo><mi>B</mi><mo>)</mo></mrow>",
+				position: 1
+			}
 		],
 		secondaryTickInterval: null
 	},
@@ -1091,7 +1262,13 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 		tickInterval: { type: "fraction", denominator: 2 },
 		showTickLabels: true,
 		highlightedPoints: [
-			{ type: "mathml", color: "#E67E22", style: "dot", mathml: "<mo>-</mo><mrow><mo>(</mo><mo>-</mo><mi>B</mi><mo>)</mo></mrow>", position: -1 }
+			{
+				type: "mathml",
+				color: "#E67E22",
+				style: "dot",
+				mathml: "<mo>-</mo><mrow><mo>(</mo><mo>-</mo><mi>B</mi><mo>)</mo></mrow>",
+				position: -1
+			}
 		],
 		secondaryTickInterval: null
 	},
@@ -1107,9 +1284,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 		max: 0.6,
 		tickInterval: { type: "whole", interval: 0.2 },
 		showTickLabels: true,
-		highlightedPoints: [
-			{ type: "mathml", color: "#6495ed", style: "dot", mathml: "<mi>E</mi>", position: 0.2 }
-		],
+		highlightedPoints: [{ type: "mathml", color: "#6495ed", style: "dot", mathml: "<mi>E</mi>", position: 0.2 }],
 		secondaryTickInterval: null
 	},
 	// Extracted from question: xf70235524a56eeb0
@@ -1125,7 +1300,13 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 		tickInterval: { type: "fraction", denominator: 2 },
 		showTickLabels: true,
 		highlightedPoints: [
-			{ type: "mathml", color: "#E67E22", style: "dot", mathml: "<mo>-</mo><mo>(</mo><mo>-</mo><mi>D</mi><mo>)</mo>", position: -0.5 }
+			{
+				type: "mathml",
+				color: "#E67E22",
+				style: "dot",
+				mathml: "<mo>-</mo><mo>(</mo><mo>-</mo><mi>D</mi><mo>)</mo>",
+				position: -0.5
+			}
 		],
 		secondaryTickInterval: null
 	},
@@ -1142,7 +1323,13 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 		tickInterval: { type: "fraction", denominator: 2 },
 		showTickLabels: true,
 		highlightedPoints: [
-			{ type: "mathml", color: "#E67E22", style: "dot", mathml: "<mo>-</mo><mo>(</mo><mo>-</mo><mi>D</mi><mo>)</mo>", position: 0.5 }
+			{
+				type: "mathml",
+				color: "#E67E22",
+				style: "dot",
+				mathml: "<mo>-</mo><mo>(</mo><mo>-</mo><mi>D</mi><mo>)</mo>",
+				position: 0.5
+			}
 		],
 		secondaryTickInterval: null
 	},
@@ -1159,7 +1346,13 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 		tickInterval: { type: "fraction", denominator: 2 },
 		showTickLabels: true,
 		highlightedPoints: [
-			{ type: "mathml", color: "#E67E22", style: "dot", mathml: "<mo>-</mo><mo>(</mo><mo>-</mo><mi>D</mi><mo>)</mo>", position: 1 }
+			{
+				type: "mathml",
+				color: "#E67E22",
+				style: "dot",
+				mathml: "<mo>-</mo><mo>(</mo><mo>-</mo><mi>D</mi><mo>)</mo>",
+				position: 1
+			}
 		],
 		secondaryTickInterval: null
 	},
@@ -1196,9 +1389,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 		max: 4,
 		tickInterval: { type: "whole", interval: 1 },
 		showTickLabels: true,
-		highlightedPoints: [
-			{ type: "mathml", color: "#E67E22", style: "dot", mathml: "<mo>•</mo>", position: -3.5 }
-		],
+		highlightedPoints: [{ type: "mathml", color: "#E67E22", style: "dot", mathml: "<mo>•</mo>", position: -3.5 }],
 		secondaryTickInterval: { type: "fraction", denominator: 2 }
 	},
 	// Extracted from question: x8aa5a97c4a23bc52
@@ -1213,9 +1404,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 		max: 4,
 		tickInterval: { type: "whole", interval: 1 },
 		showTickLabels: true,
-		highlightedPoints: [
-			{ type: "mathml", color: "#E67E22", style: "dot", mathml: "<mo>•</mo>", position: 3.5 }
-		],
+		highlightedPoints: [{ type: "mathml", color: "#E67E22", style: "dot", mathml: "<mo>•</mo>", position: 3.5 }],
 		secondaryTickInterval: { type: "fraction", denominator: 2 }
 	},
 	// Extracted from question: x8aa5a97c4a23bc52
@@ -1230,9 +1419,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 		max: 4,
 		tickInterval: { type: "whole", interval: 1 },
 		showTickLabels: true,
-		highlightedPoints: [
-			{ type: "mathml", color: "#E67E22", style: "dot", mathml: "<mo>•</mo>", position: 2.5 }
-		],
+		highlightedPoints: [{ type: "mathml", color: "#E67E22", style: "dot", mathml: "<mo>•</mo>", position: 2.5 }],
 		secondaryTickInterval: { type: "fraction", denominator: 2 }
 	},
 	// Extracted from question: x48c1bee527871e57
@@ -1298,9 +1485,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 		max: 2,
 		tickInterval: { type: "fraction", denominator: 2 },
 		showTickLabels: true,
-		highlightedPoints: [
-			{ type: "mathml", color: "#6495ed", style: "dot", mathml: "<mi>C</mi>", position: 0.5 }
-		],
+		highlightedPoints: [{ type: "mathml", color: "#6495ed", style: "dot", mathml: "<mi>C</mi>", position: 0.5 }],
 		secondaryTickInterval: null
 	},
 	// Extracted from question: x8fa3e41ee11413a6
@@ -1316,7 +1501,13 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 		tickInterval: { type: "whole", interval: 2 },
 		showTickLabels: true,
 		highlightedPoints: [
-			{ type: "mathml", color: "#E67E22", style: "dot", mathml: "<mo>-</mo><mo>(</mo><mo>-</mo><mi>A</mi><mo>)</mo>", position: 5 }
+			{
+				type: "mathml",
+				color: "#E67E22",
+				style: "dot",
+				mathml: "<mo>-</mo><mo>(</mo><mo>-</mo><mi>A</mi><mo>)</mo>",
+				position: 5
+			}
 		],
 		secondaryTickInterval: { type: "whole", interval: 1 }
 	},
@@ -1333,7 +1524,13 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 		tickInterval: { type: "whole", interval: 2 },
 		showTickLabels: true,
 		highlightedPoints: [
-			{ type: "mathml", color: "#E67E22", style: "dot", mathml: "<mo>-</mo><mo>(</mo><mo>-</mo><mi>A</mi><mo>)</mo>", position: -5 }
+			{
+				type: "mathml",
+				color: "#E67E22",
+				style: "dot",
+				mathml: "<mo>-</mo><mo>(</mo><mo>-</mo><mi>A</mi><mo>)</mo>",
+				position: -5
+			}
 		],
 		secondaryTickInterval: { type: "whole", interval: 1 }
 	},
@@ -1350,7 +1547,13 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 		tickInterval: { type: "whole", interval: 2 },
 		showTickLabels: true,
 		highlightedPoints: [
-			{ type: "mathml", color: "#E67E22", style: "dot", mathml: "<mo>-</mo><mo>(</mo><mo>-</mo><mi>A</mi><mo>)</mo>", position: 0 }
+			{
+				type: "mathml",
+				color: "#E67E22",
+				style: "dot",
+				mathml: "<mo>-</mo><mo>(</mo><mo>-</mo><mi>A</mi><mo>)</mo>",
+				position: 0
+			}
 		],
 		secondaryTickInterval: { type: "whole", interval: 1 }
 	},
@@ -1367,7 +1570,13 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 		tickInterval: { type: "fraction", denominator: 2 },
 		showTickLabels: true,
 		highlightedPoints: [
-			{ type: "mathml", color: "#E67E22", style: "dot", mathml: "<mo>-</mo><mo>(</mo><mo>-</mo><mi>C</mi><mo>)</mo>", position: 1.5 }
+			{
+				type: "mathml",
+				color: "#E67E22",
+				style: "dot",
+				mathml: "<mo>-</mo><mo>(</mo><mo>-</mo><mi>C</mi><mo>)</mo>",
+				position: 1.5
+			}
 		],
 		secondaryTickInterval: null
 	},
@@ -1384,7 +1593,13 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 		tickInterval: { type: "fraction", denominator: 2 },
 		showTickLabels: true,
 		highlightedPoints: [
-			{ type: "mathml", color: "#E67E22", style: "dot", mathml: "<mo>-</mo><mo>(</mo><mo>-</mo><mi>C</mi><mo>)</mo>", position: -1.5 }
+			{
+				type: "mathml",
+				color: "#E67E22",
+				style: "dot",
+				mathml: "<mo>-</mo><mo>(</mo><mo>-</mo><mi>C</mi><mo>)</mo>",
+				position: -1.5
+			}
 		],
 		secondaryTickInterval: null
 	},
@@ -1401,7 +1616,13 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 		tickInterval: { type: "fraction", denominator: 2 },
 		showTickLabels: true,
 		highlightedPoints: [
-			{ type: "mathml", color: "#E67E22", style: "dot", mathml: "<mo>-</mo><mo>(</mo><mo>-</mo><mi>C</mi><mo>)</mo>", position: 0.5 }
+			{
+				type: "mathml",
+				color: "#E67E22",
+				style: "dot",
+				mathml: "<mo>-</mo><mo>(</mo><mo>-</mo><mi>C</mi><mo>)</mo>",
+				position: 0.5
+			}
 		],
 		secondaryTickInterval: null
 	},
@@ -1417,9 +1638,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 		max: 8,
 		tickInterval: { type: "whole", interval: 1 },
 		showTickLabels: true,
-		highlightedPoints: [
-			{ type: "mathml", color: "#6495ed", style: "dot", mathml: "<mi>A</mi>", position: 6 }
-		],
+		highlightedPoints: [{ type: "mathml", color: "#6495ed", style: "dot", mathml: "<mi>A</mi>", position: 6 }],
 		secondaryTickInterval: null
 	},
 	// Extracted from question: x86b2a3e066427391
@@ -1434,9 +1653,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 		max: 2,
 		tickInterval: { type: "fraction", denominator: 2 },
 		showTickLabels: true,
-		highlightedPoints: [
-			{ type: "mathml", color: "#6495ed", style: "dot", mathml: "<mi>C</mi>", position: 1.5 }
-		],
+		highlightedPoints: [{ type: "mathml", color: "#6495ed", style: "dot", mathml: "<mi>C</mi>", position: 1.5 }],
 		secondaryTickInterval: null
 	},
 	// Extracted from question: x62c748d6
@@ -1472,9 +1689,7 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 		max: 0.6,
 		tickInterval: { type: "whole", interval: 0.2 },
 		showTickLabels: true,
-		highlightedPoints: [
-			{ type: "mathml", color: "#6495ed", style: "dot", mathml: "<mi>E</mi>", position: 0.6 }
-		],
+		highlightedPoints: [{ type: "mathml", color: "#6495ed", style: "dot", mathml: "<mi>E</mi>", position: 0.6 }],
 		secondaryTickInterval: null
 	},
 	// Extracted from question: x2d9a73dec8936789
@@ -1490,7 +1705,13 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 		tickInterval: { type: "fraction", denominator: 2 },
 		showTickLabels: true,
 		highlightedPoints: [
-			{ type: "mathml", color: "#E67E22", style: "dot", mathml: "<mo>-</mo><mrow><mo>(</mo><mo>-</mo><mi>F</mi><mo>)</mo></mrow>", position: -1.5 }
+			{
+				type: "mathml",
+				color: "#E67E22",
+				style: "dot",
+				mathml: "<mo>-</mo><mrow><mo>(</mo><mo>-</mo><mi>F</mi><mo>)</mo></mrow>",
+				position: -1.5
+			}
 		],
 		secondaryTickInterval: null
 	},
@@ -1507,7 +1728,13 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 		tickInterval: { type: "fraction", denominator: 2 },
 		showTickLabels: true,
 		highlightedPoints: [
-			{ type: "mathml", color: "#E67E22", style: "dot", mathml: "<mo>-</mo><mrow><mo>(</mo><mo>-</mo><mi>F</mi><mo>)</mo></mrow>", position: 1.5 }
+			{
+				type: "mathml",
+				color: "#E67E22",
+				style: "dot",
+				mathml: "<mo>-</mo><mrow><mo>(</mo><mo>-</mo><mi>F</mi><mo>)</mo></mrow>",
+				position: 1.5
+			}
 		],
 		secondaryTickInterval: null
 	},
@@ -1524,7 +1751,13 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 		tickInterval: { type: "fraction", denominator: 2 },
 		showTickLabels: true,
 		highlightedPoints: [
-			{ type: "mathml", color: "#E67E22", style: "dot", mathml: "<mo>-</mo><mrow><mo>(</mo><mo>-</mo><mi>F</mi><mo>)</mo></mrow>", position: -0.5 }
+			{
+				type: "mathml",
+				color: "#E67E22",
+				style: "dot",
+				mathml: "<mo>-</mo><mrow><mo>(</mo><mo>-</mo><mi>F</mi><mo>)</mo></mrow>",
+				position: -0.5
+			}
 		],
 		secondaryTickInterval: null
 	},
@@ -1549,7 +1782,6 @@ const RAW_NUMBER_LINE_EXAMPLES: NumberLineWithoutNulls[] = [
 		],
 		secondaryTickInterval: null
 	}
-
 ]
 
 export const numberLineExamples: NumberLineProps[] = RAW_NUMBER_LINE_EXAMPLES.map((ex) => ({

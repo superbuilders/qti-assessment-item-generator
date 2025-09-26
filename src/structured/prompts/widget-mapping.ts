@@ -41,7 +41,7 @@ export function createWidgetMappingPrompt(
 				if (schemaEntry) {
 					const [, schema] = schemaEntry
 					let description = schema?._def.description ?? "No description available."
-					
+
 					// Enhanced guidance for discreteObjectRatioDiagram
 					if (typeName === "discreteObjectRatioDiagram") {
 						description += `
@@ -88,7 +88,7 @@ If both pictograph/bar-like interpretations and this widget seem plausible, PREF
 - Input: Many whales and one shark, some overlap, water spouts drawn
   → objects: [{emoji:"🐋",count:8},{emoji:"🦈",count:1}]`
 					}
-					
+
 					// Enhanced guidance for marbleDiagram
 					if (typeName === "marbleDiagram") {
 						description += `
@@ -122,7 +122,7 @@ Choose this widget whenever the problem context involves counting marbles by col
 **SELECTION GUIDANCE FOR video:**
 Choose this widget ONLY when the Perseus source contains a widget of type \`video\`. This widget is used to embed video content from a URL.`
 					}
-					
+
 					return `- ${typeName}: ${description}`
 				}
 				return `- ${typeName}: No description available.`
@@ -300,8 +300,8 @@ When the checklist score ≥ 3, you MUST select discreteObjectRatioDiagram and r
 - pictograph widgets are LOWER PRIORITY than discreteObjectRatioDiagram for counting scenarios
 - Default to discreteObjectRatioDiagram for multiple repeated pictures/icons/objects`
 
-		// Marble-specific hard selection priority
-		systemInstruction += `
+	// Marble-specific hard selection priority
+	systemInstruction += `
 
 **CRITICAL SELECTION ENFORCEMENT FOR marbleDiagram (marble problems):**
 

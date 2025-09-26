@@ -19,5 +19,3 @@ describe("Widget: discrete-object-ratio-diagram", () => {
 		})
 	})
 })
-
-

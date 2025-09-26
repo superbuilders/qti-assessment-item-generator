@@ -1,4 +1,3 @@
-import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import {
@@ -10,6 +9,7 @@ import {
 } from "../../utils/canvas-utils"
 import { AXIS_VIEWBOX_PADDING } from "../../utils/constants"
 import { setupCoordinatePlaneV2 } from "../../utils/coordinate-plane-v2"
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { theme } from "../../utils/theme"
 import type { WidgetGenerator } from "../types"
 
@@ -94,4 +94,3 @@ export const generatePolygonGraph: WidgetGenerator<typeof PolygonGraphPropsSchem
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.base}">${svgBody}</svg>`
 }
-

@@ -1,4 +1,3 @@
-import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
@@ -6,6 +5,7 @@ import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
 import { CSS_COLOR_PATTERN } from "../../utils/css-color"
 import { Path2D } from "../../utils/path-builder"
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { estimateWrappedTextDimensions } from "../../utils/text"
 import { theme } from "../../utils/theme"
 import type { WidgetGenerator } from "../types"
@@ -390,44 +390,46 @@ export const generateCircleDiagram: WidgetGenerator<typeof CircleDiagramPropsSch
 	): { x: number; y: number } | null {
 		const halfW = labelWidth / 2
 		const halfH = labelHeight / 2
-		
+
 		// Normal direction (outward from arc center)
 		const normalX = Math.cos(angleRad)
 		const normalY = Math.sin(angleRad)
-		
+
 		// For certain shapes, we might want to try inward positioning first
 		// (e.g., for semicircles where the arc is on the curved part)
 		const directions = [1, -0.7] // Try outward first, then inward with less distance
-		
+
 		for (const dirMultiplier of directions) {
 			let currentDistance = minPadding
 			const maxDistance = Math.min(width, height) / 2 - PADDING
 			const step = 8
-			
+
 			while (currentDistance <= maxDistance) {
 				// Position along the normal at current distance
 				const testX = centerX + (radius + currentDistance * dirMultiplier) * normalX
 				const testY = centerY + (radius + currentDistance * dirMultiplier) * normalY
-				
-				const testRect = { 
-					x: testX - halfW, 
-					y: testY - halfH, 
-					width: labelWidth, 
-					height: labelHeight, 
+
+				const testRect = {
+					x: testX - halfW,
+					y: testY - halfH,
+					width: labelWidth,
+					height: labelHeight,
 					pad: 4 // Extra padding to ensure clearance
 				}
-				
+
 				// Check if position is valid
-				if (withinBounds(testRect) && 
-					!rectIntersectsAnySegment(testRect) && 
-					!placedLabels.some(label => rectIntersectsRect(testRect, label))) {
+				if (
+					withinBounds(testRect) &&
+					!rectIntersectsAnySegment(testRect) &&
+					!placedLabels.some((label) => rectIntersectsRect(testRect, label))
+				) {
 					return { x: testX, y: testY }
 				}
-				
+
 				currentDistance += step
 			}
 		}
-		
+
 		return null
 	}
 
@@ -441,24 +443,24 @@ export const generateCircleDiagram: WidgetGenerator<typeof CircleDiagramPropsSch
 	): { x: number; y: number } | null {
 		const halfW = labelWidth / 2
 		const halfH = labelHeight / 2
-		
+
 		// Radial direction (from center outward)
 		const dirX = Math.cos(angleRad)
 		const dirY = Math.sin(angleRad)
-		
+
 		// Tangential direction (perpendicular to radial)
 		const tanX = -dirY
 		const tanY = dirX
-		
+
 		// Start at the ideal position along the arc
 		const baseX = centerX + radius * dirX
 		const baseY = centerY + radius * dirY
-		
+
 		// Nudge slightly away from the arc to prevent grazing intersections
 		const radialNudge = 4
 		const startX = baseX + radialNudge * dirX
 		const startY = baseY + radialNudge * dirY
-		
+
 		// Try both tangential directions
 		function tryTangential(multiplier: number): { x: number; y: number; iterations: number } {
 			let px = startX
@@ -466,35 +468,37 @@ export const generateCircleDiagram: WidgetGenerator<typeof CircleDiagramPropsSch
 			let iterations = 0
 			const maxIterations = 60
 			const step = 3
-			
+
 			while (iterations < maxIterations) {
 				const testRect = { x: px - halfW, y: py - halfH, width: labelWidth, height: labelHeight, pad: 1 }
-				
-				if (withinBounds(testRect) && 
-					!rectIntersectsAnySegment(testRect) && 
-					!placedLabels.some(label => rectIntersectsRect(testRect, label))) {
+
+				if (
+					withinBounds(testRect) &&
+					!rectIntersectsAnySegment(testRect) &&
+					!placedLabels.some((label) => rectIntersectsRect(testRect, label))
+				) {
 					return { x: px, y: py, iterations }
 				}
-				
+
 				px += multiplier * step * tanX
 				py += multiplier * step * tanY
 				iterations++
 			}
-			
+
 			return { x: px, y: py, iterations: maxIterations }
 		}
-		
+
 		const clockwise = tryTangential(1)
 		const counterclockwise = tryTangential(-1)
-		
+
 		// Choose the direction that required fewer iterations (found a good spot faster)
 		const chosen = counterclockwise.iterations < clockwise.iterations ? counterclockwise : clockwise
-		
+
 		// Only return if we found a valid position (not at max iterations)
 		if (chosen.iterations < 60) {
 			return { x: chosen.x, y: chosen.y }
 		}
-		
+
 		return null
 	}
 
@@ -561,7 +565,7 @@ export const generateCircleDiagram: WidgetGenerator<typeof CircleDiagramPropsSch
 				stroke: strokeColor,
 				strokeWidth: theme.stroke.width.thick
 			})
-			
+
 			// Add semicircle arc segments to avoid list for collision detection
 			const arcAngleSpan = 180
 			const numSegments = Math.max(6, Math.ceil(arcAngleSpan / 30))
@@ -592,7 +596,7 @@ export const generateCircleDiagram: WidgetGenerator<typeof CircleDiagramPropsSch
 				stroke: strokeColor,
 				strokeWidth: theme.stroke.width.thick
 			})
-			
+
 			// Add quarter-circle segments to avoid list for collision detection
 			const arcAngleSpan = 90
 			const numSegments = Math.max(3, Math.ceil(arcAngleSpan / 30))
@@ -614,7 +618,7 @@ export const generateCircleDiagram: WidgetGenerator<typeof CircleDiagramPropsSch
 				stroke: strokeColor,
 				strokeWidth: theme.stroke.width.thick
 			})
-			
+
 			// Add full circle segments to avoid list for collision detection
 			const numSegments = 24 // Full circle needs more segments
 			for (let i = 0; i < numSegments; i++) {
@@ -636,7 +640,7 @@ export const generateCircleDiagram: WidgetGenerator<typeof CircleDiagramPropsSch
 			stroke: theme.colors.black,
 			strokeWidth: theme.stroke.width.thick
 		})
-		
+
 		// Add inner circle segments to avoid list for collision detection
 		const numSegments = 20
 		for (let i = 0; i < numSegments; i++) {
@@ -687,14 +691,14 @@ export const generateCircleDiagram: WidgetGenerator<typeof CircleDiagramPropsSch
 
 				// Try normal-based positioning first (best for avoiding line intersections)
 				const normalPos = findNormalBasedLabelPosition(cx, cy, midAngleRad, r, labelWidth, labelHeight)
-				
+
 				let finalPos: { x: number; y: number } | null = normalPos
-				
+
 				// If normal positioning failed, try tangential positioning
 				if (!finalPos) {
 					finalPos = findTangentialLabelPosition(cx, cy, midAngleRad, r + PADDING, labelWidth, labelHeight)
 				}
-				
+
 				// If both failed, try radial positioning as last resort
 				if (!finalPos) {
 					const labelPos = pointOnCircle(midAngle, r + PADDING)
@@ -802,14 +806,14 @@ export const generateCircleDiagram: WidgetGenerator<typeof CircleDiagramPropsSch
 
 				// Calculate rotation angle to make text parallel to the segment line
 				let rotationAngle = seg.angle
-				
+
 				// For diameter, the line direction is the segment angle
 				// For radius/innerRadius, we want the text to align with the radial direction
 				if (seg.type !== "diameter") {
 					// For radius segments, align with the radial direction from center
 					rotationAngle = seg.angle
 				}
-				
+
 				// Ensure text is readable (not upside down) by flipping if needed
 				if (rotationAngle > 90 && rotationAngle <= 270) {
 					rotationAngle += 180
@@ -941,4 +945,3 @@ export const generateCircleDiagram: WidgetGenerator<typeof CircleDiagramPropsSch
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.base}">${svgBody}</svg>`
 }
-

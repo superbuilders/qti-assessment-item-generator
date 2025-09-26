@@ -1,11 +1,11 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
 import { CSS_COLOR_PATTERN } from "../../utils/css-color"
 import { Path2D } from "../../utils/path-builder"
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { estimateWrappedTextDimensions } from "../../utils/text"
 import { theme } from "../../utils/theme"
 import type { WidgetGenerator } from "../types"
@@ -202,7 +202,7 @@ export type AngleDiagramProps = z.infer<typeof AngleDiagramPropsSchema>
 export const generateAngleDiagram: WidgetGenerator<typeof AngleDiagramPropsSchema> = async (props) => {
 	const { width, height, points, rays, angles } = props
 
-    // Validate that every point is connected to at least one ray
+	// Validate that every point is connected to at least one ray
 	const connectedPointIds = new Set<string>()
 	for (const ray of rays) {
 		connectedPointIds.add(ray.from)
@@ -219,84 +219,89 @@ export const generateAngleDiagram: WidgetGenerator<typeof AngleDiagramPropsSchem
 		throw errors.new("points not connected to any rays - incomplete line definitions")
 	}
 
-    const canvas = new CanvasImpl({
+	const canvas = new CanvasImpl({
 		chartArea: { left: 0, top: 0, width, height },
 		fontPxDefault: 12,
 		lineHeightDefault: 1.2
 	})
 	const pointMap = new Map(points.map((p) => [p.id, p]))
 
-    // Build screen-space segments for collision checks (rays only)
-    const screenSegments: Array<{ a: { x: number; y: number }; b: { x: number; y: number } }> = []
-    for (const ray of rays) {
-        const from = pointMap.get(ray.from)
-        const to = pointMap.get(ray.to)
-        if (!from || !to) continue
-        screenSegments.push({ a: { x: from.x, y: from.y }, b: { x: to.x, y: to.y } })
-    }
+	// Build screen-space segments for collision checks (rays only)
+	const screenSegments: Array<{ a: { x: number; y: number }; b: { x: number; y: number } }> = []
+	for (const ray of rays) {
+		const from = pointMap.get(ray.from)
+		const to = pointMap.get(ray.to)
+		if (!from || !to) continue
+		screenSegments.push({ a: { x: from.x, y: from.y }, b: { x: to.x, y: to.y } })
+	}
 
-    // Collision helpers (ported from other widgets)
-    function segmentIntersectsRect(
-        A: { x: number; y: number },
-        B: { x: number; y: number },
-        rect: { x: number; y: number; width: number; height: number; pad?: number }
-    ): boolean {
-        const pad = rect.pad ?? 0
-        const rx = rect.x - pad
-        const ry = rect.y - pad
-        const rw = rect.width + 2 * pad
-        const rh = rect.height + 2 * pad
+	// Collision helpers (ported from other widgets)
+	function segmentIntersectsRect(
+		A: { x: number; y: number },
+		B: { x: number; y: number },
+		rect: { x: number; y: number; width: number; height: number; pad?: number }
+	): boolean {
+		const pad = rect.pad ?? 0
+		const rx = rect.x - pad
+		const ry = rect.y - pad
+		const rw = rect.width + 2 * pad
+		const rh = rect.height + 2 * pad
 
-        // Fast reject: if either segment endpoint lies inside the rectangle, we have a collision
-        const pointInsideRect = (p: { x: number; y: number }) =>
-            p.x >= rx && p.x <= rx + rw && p.y >= ry && p.y <= ry + rh
-        if (pointInsideRect(A) || pointInsideRect(B)) return true
+		// Fast reject: if either segment endpoint lies inside the rectangle, we have a collision
+		const pointInsideRect = (p: { x: number; y: number }) => p.x >= rx && p.x <= rx + rw && p.y >= ry && p.y <= ry + rh
+		if (pointInsideRect(A) || pointInsideRect(B)) return true
 
-        const minX = Math.min(A.x, B.x)
-        const maxX = Math.max(A.x, B.x)
-        const minY = Math.min(A.y, B.y)
-        const maxY = Math.max(A.y, B.y)
-        if (maxX < rx || minX > rx + rw || maxY < ry || minY > ry + rh) return false
+		const minX = Math.min(A.x, B.x)
+		const maxX = Math.max(A.x, B.x)
+		const minY = Math.min(A.y, B.y)
+		const maxY = Math.max(A.y, B.y)
+		if (maxX < rx || minX > rx + rw || maxY < ry || minY > ry + rh) return false
 
-        const r1 = { x: rx, y: ry }
-        const r2 = { x: rx + rw, y: ry }
-        const r3 = { x: rx + rw, y: ry + rh }
-        const r4 = { x: rx, y: ry + rh }
-        const orient = (p: { x: number; y: number }, q: { x: number; y: number }, r: { x: number; y: number }) => {
-            const val = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y)
-            if (val > 1e-9) return 1
-            if (val < -1e-9) return -1
-            return 0
-        }
-        const segmentsIntersect = (
-            p1: { x: number; y: number },
-            p2: { x: number; y: number },
-            p3: { x: number; y: number },
-            p4: { x: number; y: number }
-        ) => {
-            const o1 = orient(p1, p2, p3)
-            const o2 = orient(p1, p2, p4)
-            const o3 = orient(p3, p4, p1)
-            const o4 = orient(p3, p4, p2)
-            return o1 !== o2 && o3 !== o4
-        }
-        return (
-            segmentsIntersect(A, B, r1, r2) ||
-            segmentsIntersect(A, B, r2, r3) ||
-            segmentsIntersect(A, B, r3, r4) ||
-            segmentsIntersect(A, B, r4, r1)
-        )
-    }
+		const r1 = { x: rx, y: ry }
+		const r2 = { x: rx + rw, y: ry }
+		const r3 = { x: rx + rw, y: ry + rh }
+		const r4 = { x: rx, y: ry + rh }
+		const orient = (p: { x: number; y: number }, q: { x: number; y: number }, r: { x: number; y: number }) => {
+			const val = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y)
+			if (val > 1e-9) return 1
+			if (val < -1e-9) return -1
+			return 0
+		}
+		const segmentsIntersect = (
+			p1: { x: number; y: number },
+			p2: { x: number; y: number },
+			p3: { x: number; y: number },
+			p4: { x: number; y: number }
+		) => {
+			const o1 = orient(p1, p2, p3)
+			const o2 = orient(p1, p2, p4)
+			const o3 = orient(p3, p4, p1)
+			const o4 = orient(p3, p4, p2)
+			return o1 !== o2 && o3 !== o4
+		}
+		return (
+			segmentsIntersect(A, B, r1, r2) ||
+			segmentsIntersect(A, B, r2, r3) ||
+			segmentsIntersect(A, B, r3, r4) ||
+			segmentsIntersect(A, B, r4, r1)
+		)
+	}
 
-    function rectIntersectsAnySegment(rect: { x: number; y: number; width: number; height: number; pad?: number }): boolean {
-        for (const seg of screenSegments) {
-            if (segmentIntersectsRect(seg.a, seg.b, rect)) return true
-        }
-        return false
-    }
+	function rectIntersectsAnySegment(rect: {
+		x: number
+		y: number
+		width: number
+		height: number
+		pad?: number
+	}): boolean {
+		for (const seg of screenSegments) {
+			if (segmentIntersectsRect(seg.a, seg.b, rect)) return true
+		}
+		return false
+	}
 
-    // Draw angles FIRST so lines appear above arcs/markers
-    for (const angle of angles) {
+	// Draw angles FIRST so lines appear above arcs/markers
+	for (const angle of angles) {
 		const p1 = pointMap.get(angle.pointOnFirstRay)
 		const vertex = pointMap.get(angle.vertex)
 		const p2 = pointMap.get(angle.pointOnSecondRay)
@@ -333,7 +338,7 @@ export const generateAngleDiagram: WidgetGenerator<typeof AngleDiagramPropsSchem
 			})
 		}
 
-        if (angle.type === "arc") {
+		if (angle.type === "arc") {
 			const startAngle = Math.atan2(p1.y - vertex.y, p1.x - vertex.x)
 			const endAngle = Math.atan2(p2.y - vertex.y, p2.x - vertex.x)
 
@@ -362,110 +367,122 @@ export const generateAngleDiagram: WidgetGenerator<typeof AngleDiagramPropsSchem
 		}
 	}
 
-    // Then draw rays ON TOP of arcs
-    for (const ray of rays) {
-        const from = pointMap.get(ray.from)
-        const to = pointMap.get(ray.to)
-        if (!from || !to) continue
+	// Then draw rays ON TOP of arcs
+	for (const ray of rays) {
+		const from = pointMap.get(ray.from)
+		const to = pointMap.get(ray.to)
+		if (!from || !to) continue
 
-        canvas.drawLine(from.x, from.y, to.x, to.y, {
-            stroke: theme.colors.axis,
-            strokeWidth: theme.stroke.width.thick
-        })
-    }
+		canvas.drawLine(from.x, from.y, to.x, to.y, {
+			stroke: theme.colors.axis,
+			strokeWidth: theme.stroke.width.thick
+		})
+	}
 
-    // Prepare to place labels with collision avoidance (over rays)
-    const placedLabelRects: Array<{ x: number; y: number; width: number; height: number }> = []
+	// Prepare to place labels with collision avoidance (over rays)
+	const placedLabelRects: Array<{ x: number; y: number; width: number; height: number }> = []
 
-    // Angle labels: compute smart positions and slide tangentially to avoid ray overlap
-    for (const angle of angles) {
-        if (angle.label === null) continue
+	// Angle labels: compute smart positions and slide tangentially to avoid ray overlap
+	for (const angle of angles) {
+		if (angle.label === null) continue
 
-        const p1 = pointMap.get(angle.pointOnFirstRay)
-        const vertex = pointMap.get(angle.vertex)
-        const p2 = pointMap.get(angle.pointOnSecondRay)
-        if (!p1 || !vertex || !p2) continue
+		const p1 = pointMap.get(angle.pointOnFirstRay)
+		const vertex = pointMap.get(angle.vertex)
+		const p2 = pointMap.get(angle.pointOnSecondRay)
+		if (!p1 || !vertex || !p2) continue
 
-        const vtx = vertex
-        const startAngle = Math.atan2(p1.y - vtx.y, p1.x - vtx.x)
-        const endAngle = Math.atan2(p2.y - vtx.y, p2.x - vtx.x)
-        let angleDiff = endAngle - startAngle
-        while (angleDiff > Math.PI) angleDiff -= 2 * Math.PI
-        while (angleDiff < -Math.PI) angleDiff += 2 * Math.PI
-        const midAngle = startAngle + angleDiff / 2
-        const angleSize = Math.abs(angleDiff)
+		const vtx = vertex
+		const startAngle = Math.atan2(p1.y - vtx.y, p1.x - vtx.x)
+		const endAngle = Math.atan2(p2.y - vtx.y, p2.x - vtx.x)
+		let angleDiff = endAngle - startAngle
+		while (angleDiff > Math.PI) angleDiff -= 2 * Math.PI
+		while (angleDiff < -Math.PI) angleDiff += 2 * Math.PI
+		const midAngle = startAngle + angleDiff / 2
+		const angleSize = Math.abs(angleDiff)
 
-        let labelRadius: number
-        if (angle.type === "right") {
-            labelRadius = 26
-        } else {
-            const ARC_OFFSET = 6
-            const FONT_SIZE_ESTIMATE = 14
-            const MIN_LABEL_CLEARANCE = FONT_SIZE_ESTIMATE * 1.6
-            const baseLabelRadius = angle.radius + ARC_OFFSET + MIN_LABEL_CLEARANCE
-            const CLEARANCE_PX = FONT_SIZE_ESTIMATE * 0.8
-            if (Math.sin(angleSize / 2) > 0.01) {
-                const minRadiusForClearance = CLEARANCE_PX / Math.sin(angleSize / 2)
-                labelRadius = Math.max(baseLabelRadius, minRadiusForClearance)
-            } else {
-                labelRadius = baseLabelRadius
-            }
-            if (angle.label.length > 3) {
-                const extraSpacing = angle.label.length > 4 ? (angle.label.length - 4) * 4 : 0
-                labelRadius += 18 + extraSpacing
-            }
-        }
+		let labelRadius: number
+		if (angle.type === "right") {
+			labelRadius = 26
+		} else {
+			const ARC_OFFSET = 6
+			const FONT_SIZE_ESTIMATE = 14
+			const MIN_LABEL_CLEARANCE = FONT_SIZE_ESTIMATE * 1.6
+			const baseLabelRadius = angle.radius + ARC_OFFSET + MIN_LABEL_CLEARANCE
+			const CLEARANCE_PX = FONT_SIZE_ESTIMATE * 0.8
+			if (Math.sin(angleSize / 2) > 0.01) {
+				const minRadiusForClearance = CLEARANCE_PX / Math.sin(angleSize / 2)
+				labelRadius = Math.max(baseLabelRadius, minRadiusForClearance)
+			} else {
+				labelRadius = baseLabelRadius
+			}
+			if (angle.label.length > 3) {
+				const extraSpacing = angle.label.length > 4 ? (angle.label.length - 4) * 4 : 0
+				labelRadius += 18 + extraSpacing
+			}
+		}
 
-        const fontPx = theme.font.size.medium
-        const dims = estimateWrappedTextDimensions(angle.label, Number.POSITIVE_INFINITY, fontPx, 1.2)
-        const halfW = dims.maxWidth / 2
-        const halfH = dims.height / 2
+		const fontPx = theme.font.size.medium
+		const dims = estimateWrappedTextDimensions(angle.label, Number.POSITIVE_INFINITY, fontPx, 1.2)
+		const halfW = dims.maxWidth / 2
+		const halfH = dims.height / 2
 
-        const dirX = Math.cos(midAngle)
-        const dirY = Math.sin(midAngle)
-        const tanX = -dirY
-        const tanY = dirX
+		const dirX = Math.cos(midAngle)
+		const dirY = Math.sin(midAngle)
+		const tanX = -dirY
+		const tanY = dirX
 
-        function placeTangential(mult: number) {
-            let px = vtx.x + labelRadius * dirX
-            let py = vtx.y + labelRadius * dirY
-            let it = 0
-            const maxIt = 90
-            const step = 3
-            while (
-                (rectIntersectsAnySegment({ x: px - halfW, y: py - halfH, width: dims.maxWidth, height: dims.height, pad: 1 }) ||
-                    placedLabelRects.some((r) =>
-                        !(px - halfW + dims.maxWidth < r.x || r.x + r.width < px - halfW || py - halfH + dims.height < r.y || r.y + r.height < py - halfH)
-                    )) &&
-                it < maxIt
-            ) {
-                px += mult * step * tanX
-                py += mult * step * tanY
-                it++
-            }
-            return { x: px, y: py, it }
-        }
+		function placeTangential(mult: number) {
+			let px = vtx.x + labelRadius * dirX
+			let py = vtx.y + labelRadius * dirY
+			let it = 0
+			const maxIt = 90
+			const step = 3
+			while (
+				(rectIntersectsAnySegment({
+					x: px - halfW,
+					y: py - halfH,
+					width: dims.maxWidth,
+					height: dims.height,
+					pad: 1
+				}) ||
+					placedLabelRects.some(
+						(r) =>
+							!(
+								px - halfW + dims.maxWidth < r.x ||
+								r.x + r.width < px - halfW ||
+								py - halfH + dims.height < r.y ||
+								r.y + r.height < py - halfH
+							)
+					)) &&
+				it < maxIt
+			) {
+				px += mult * step * tanX
+				py += mult * step * tanY
+				it++
+			}
+			return { x: px, y: py, it }
+		}
 
-        const cw = placeTangential(1)
-        const ccw = placeTangential(-1)
-        const chosen = ccw.it < cw.it ? ccw : cw
+		const cw = placeTangential(1)
+		const ccw = placeTangential(-1)
+		const chosen = ccw.it < cw.it ? ccw : cw
 
-        canvas.drawText({
-            x: chosen.x,
-            y: chosen.y,
-            text: angle.label,
-            fill: theme.colors.text,
-            stroke: theme.colors.white,
-            strokeWidth: 0.3,
-            paintOrder: "stroke fill",
-            anchor: "middle",
-            dominantBaseline: "middle",
-            fontPx,
-            fontWeight: "500"
-        })
+		canvas.drawText({
+			x: chosen.x,
+			y: chosen.y,
+			text: angle.label,
+			fill: theme.colors.text,
+			stroke: theme.colors.white,
+			strokeWidth: 0.3,
+			paintOrder: "stroke fill",
+			anchor: "middle",
+			dominantBaseline: "middle",
+			fontPx,
+			fontWeight: "500"
+		})
 
-        placedLabelRects.push({ x: chosen.x - halfW, y: chosen.y - halfH, width: dims.maxWidth, height: dims.height })
-    }
+		placedLabelRects.push({ x: chosen.x - halfW, y: chosen.y - halfH, width: dims.maxWidth, height: dims.height })
+	}
 
 	// Draw points and their labels (drawn last to be on top)
 	for (const point of points) {
@@ -480,86 +497,98 @@ export const generateAngleDiagram: WidgetGenerator<typeof AngleDiagramPropsSchem
 				fill: theme.colors.black
 			})
 		}
-        if (point.label !== null) {
-            // Consider ALL rays that touch this point, whether the point is the source or target
-            const connectedAngles: number[] = []
-            for (const ray of rays) {
-                if (ray.from === point.id) {
-                    const toPoint = pointMap.get(ray.to)
-                    if (toPoint) connectedAngles.push(Math.atan2(toPoint.y - point.y, toPoint.x - point.x))
-                } else if (ray.to === point.id) {
-                    const fromPoint = pointMap.get(ray.from)
-                    if (fromPoint) connectedAngles.push(Math.atan2(fromPoint.y - point.y, fromPoint.x - point.x))
-                }
-            }
+		if (point.label !== null) {
+			// Consider ALL rays that touch this point, whether the point is the source or target
+			const connectedAngles: number[] = []
+			for (const ray of rays) {
+				if (ray.from === point.id) {
+					const toPoint = pointMap.get(ray.to)
+					if (toPoint) connectedAngles.push(Math.atan2(toPoint.y - point.y, toPoint.x - point.x))
+				} else if (ray.to === point.id) {
+					const fromPoint = pointMap.get(ray.from)
+					if (fromPoint) connectedAngles.push(Math.atan2(fromPoint.y - point.y, fromPoint.x - point.x))
+				}
+			}
 
-            // Determine preferred direction using largest angular gap among all connected rays
-            let bestAngle = Math.PI / 2
-            if (connectedAngles.length === 1) {
-                // Place roughly perpendicular to the lone ray
-                bestAngle = connectedAngles[0] + Math.PI / 2
-            } else if (connectedAngles.length >= 2) {
-                const rayAngles = connectedAngles.sort((a, b) => a - b)
-                let maxGap = -1
-                for (let i = 0; i < rayAngles.length; i++) {
-                    const a1 = rayAngles[i]
-                    const a2 = rayAngles[(i + 1) % rayAngles.length]
-                    let gap = a2 - a1
-                    if (gap < 0) gap += 2 * Math.PI
-                    if (i === rayAngles.length - 1) gap = (rayAngles[0] + 2 * Math.PI) - a1
-                    if (gap > maxGap) {
-                        maxGap = gap
-                        bestAngle = a1 + gap / 2
-                    }
-                }
-            }
+			// Determine preferred direction using largest angular gap among all connected rays
+			let bestAngle = Math.PI / 2
+			if (connectedAngles.length === 1) {
+				// Place roughly perpendicular to the lone ray
+				bestAngle = connectedAngles[0] + Math.PI / 2
+			} else if (connectedAngles.length >= 2) {
+				const rayAngles = connectedAngles.sort((a, b) => a - b)
+				let maxGap = -1
+				for (let i = 0; i < rayAngles.length; i++) {
+					const a1 = rayAngles[i]
+					const a2 = rayAngles[(i + 1) % rayAngles.length]
+					let gap = a2 - a1
+					if (gap < 0) gap += 2 * Math.PI
+					if (i === rayAngles.length - 1) gap = rayAngles[0] + 2 * Math.PI - a1
+					if (gap > maxGap) {
+						maxGap = gap
+						bestAngle = a1 + gap / 2
+					}
+				}
+			}
 
-            const baseDist = 18 // more breathing room than before
-            const fontPx = theme.font.size.large
-            const dims = estimateWrappedTextDimensions(point.label, Number.POSITIVE_INFINITY, fontPx, 1.2)
-            const halfW = dims.maxWidth / 2
-            const halfH = dims.height / 2
+			const baseDist = 18 // more breathing room than before
+			const fontPx = theme.font.size.large
+			const dims = estimateWrappedTextDimensions(point.label, Number.POSITIVE_INFINITY, fontPx, 1.2)
+			const halfW = dims.maxWidth / 2
+			const halfH = dims.height / 2
 
-            const dirX = Math.cos(bestAngle)
-            const dirY = Math.sin(bestAngle)
-            const tanX = -dirY
-            const tanY = dirX
+			const dirX = Math.cos(bestAngle)
+			const dirY = Math.sin(bestAngle)
+			const tanX = -dirY
+			const tanY = dirX
 
-            function placeTangential(mult: number) {
-                let px = point.x + baseDist * dirX
-                let py = point.y + baseDist * dirY
-                let it = 0
-                const maxIt = 90
-                const step = 3
-                while (
-                    (rectIntersectsAnySegment({ x: px - halfW, y: py - halfH, width: dims.maxWidth, height: dims.height, pad: 1 }) ||
-                        placedLabelRects.some((r) =>
-                            !(px - halfW + dims.maxWidth < r.x || r.x + r.width < px - halfW || py - halfH + dims.height < r.y || r.y + r.height < py - halfH)
-                        )) &&
-                    it < maxIt
-                ) {
-                    px += mult * step * tanX
-                    py += mult * step * tanY
-                    it++
-                }
-                return { x: px, y: py, it }
-            }
+			function placeTangential(mult: number) {
+				let px = point.x + baseDist * dirX
+				let py = point.y + baseDist * dirY
+				let it = 0
+				const maxIt = 90
+				const step = 3
+				while (
+					(rectIntersectsAnySegment({
+						x: px - halfW,
+						y: py - halfH,
+						width: dims.maxWidth,
+						height: dims.height,
+						pad: 1
+					}) ||
+						placedLabelRects.some(
+							(r) =>
+								!(
+									px - halfW + dims.maxWidth < r.x ||
+									r.x + r.width < px - halfW ||
+									py - halfH + dims.height < r.y ||
+									r.y + r.height < py - halfH
+								)
+						)) &&
+					it < maxIt
+				) {
+					px += mult * step * tanX
+					py += mult * step * tanY
+					it++
+				}
+				return { x: px, y: py, it }
+			}
 
-            const cw = placeTangential(1)
-            const ccw = placeTangential(-1)
-            const chosen = ccw.it < cw.it ? ccw : cw
+			const cw = placeTangential(1)
+			const ccw = placeTangential(-1)
+			const chosen = ccw.it < cw.it ? ccw : cw
 
-            canvas.drawText({
-                x: chosen.x,
-                y: chosen.y,
-                text: point.label,
-                fill: theme.colors.text,
-                fontPx,
-                fontWeight: theme.font.weight.bold
-            })
+			canvas.drawText({
+				x: chosen.x,
+				y: chosen.y,
+				text: point.label,
+				fill: theme.colors.text,
+				fontPx,
+				fontWeight: theme.font.weight.bold
+			})
 
-            placedLabelRects.push({ x: chosen.x - halfW, y: chosen.y - halfH, width: dims.maxWidth, height: dims.height })
-        }
+			placedLabelRects.push({ x: chosen.x - halfW, y: chosen.y - halfH, width: dims.maxWidth, height: dims.height })
+		}
 	}
 
 	// NEW: Finalize the canvas and construct the root SVG element
@@ -567,4 +596,3 @@ export const generateAngleDiagram: WidgetGenerator<typeof AngleDiagramPropsSchem
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.base}">${svgBody}</svg>`
 }
-

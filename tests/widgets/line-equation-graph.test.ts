@@ -19,5 +19,3 @@ describe("Widget: line-equation-graph", () => {
 		})
 	})
 })
-
-

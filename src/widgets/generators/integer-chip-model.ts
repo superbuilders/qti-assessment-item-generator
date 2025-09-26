@@ -1,5 +1,5 @@
-import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { z } from "zod"
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { theme } from "../../utils/theme"
 import type { WidgetGenerator } from "../types"
 
@@ -105,4 +105,3 @@ export const generateIntegerChipModel: WidgetGenerator<typeof IntegerChipModelPr
   ${svgBody}
 </svg>`
 }
-

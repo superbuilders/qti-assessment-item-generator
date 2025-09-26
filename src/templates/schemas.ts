@@ -88,7 +88,9 @@ export const RationalValueSchema = z
 export type RationalValue = z.infer<typeof RationalValueSchema>
 
 // Utility converters
-export function numericValueToRational(v: NumericValue): { numerator: number; denominator: number; sign: "+" | "-" } | null {
+export function numericValueToRational(
+	v: NumericValue
+): { numerator: number; denominator: number; sign: "+" | "-" } | null {
 	if (v.type === "integer") {
 		const sign: "+" | "-" = v.value < 0 ? "-" : "+"
 		return { numerator: Math.abs(v.value), denominator: 1, sign }
@@ -106,5 +108,3 @@ export function numericValueToRational(v: NumericValue): { numerator: number; de
 	// For decimal and piNumber, return null to force template-specific handling
 	return null
 }
-
-

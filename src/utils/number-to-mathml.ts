@@ -40,11 +40,6 @@ export function numberContentToInnerMathML(value: NumberContent): string {
 	const whole = value.whole > 0 ? `<mn>${value.whole}</mn>` : ""
 	// Use a very small non-breaking space between whole and fraction for tighter layout
 	const space = value.whole > 0 && value.numerator > 0 ? `<mspace width="0.15em"/>` : ""
-	const frac =
-		value.numerator > 0
-			? `<mfrac><mn>${value.numerator}</mn><mn>${value.denominator}</mn></mfrac>`
-			: ""
+	const frac = value.numerator > 0 ? `<mfrac><mn>${value.numerator}</mn><mn>${value.denominator}</mn></mfrac>` : ""
 	return `${sign}${whole}${space}${frac}`
 }
-
-

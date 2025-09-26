@@ -1,9 +1,9 @@
-import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
 import { CSS_COLOR_PATTERN } from "../../utils/css-color"
 import { abbreviateMonth } from "../../utils/labels"
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { estimateWrappedTextDimensions } from "../../utils/text"
 import { theme } from "../../utils/theme"
 import type { WidgetGenerator } from "../types"
@@ -454,7 +454,7 @@ export const generateFigureComparisonDiagram: WidgetGenerator<typeof FigureCompa
 			let iter = 0
 			const maxIter = 60
 			const step = 2
-			
+
 			// Check collision against both polygon edges and placed side labels
 			function hasCollision(x: number, y: number): boolean {
 				const figureRect = {
@@ -463,22 +463,22 @@ export const generateFigureComparisonDiagram: WidgetGenerator<typeof FigureCompa
 					width: figTextW,
 					height: figTextH
 				}
-				
+
 				// Check collision with polygon edges
 				if (polygonIntersectsRect(transformedVertices, { ...figureRect, pad: 1 })) {
 					return true
 				}
-				
+
 				// Check collision with placed side labels
 				for (const placedRect of placedLabelRects) {
 					if (rectanglesOverlap(figureRect, placedRect)) {
 						return true
 					}
 				}
-				
+
 				return false
 			}
-			
+
 			while (hasCollision(flX, flY) && iter < maxIter) {
 				flX += dirX * step
 				flY += dirY * step
@@ -805,4 +805,3 @@ function rectanglesOverlap(
 		rect2.y + rect2.height <= rect1.y
 	)
 }
-

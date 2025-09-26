@@ -1,7 +1,7 @@
 import { z } from "zod"
 import { renderInlineContent } from "../../compiler/content-renderer"
 // Import the specific identifier regexes for consistent enforcement
-import { RESPONSE_IDENTIFIER_REGEX, CHOICE_IDENTIFIER_REGEX } from "../../compiler/qti-constants"
+import { CHOICE_IDENTIFIER_REGEX, RESPONSE_IDENTIFIER_REGEX } from "../../compiler/qti-constants"
 import { MATHML_INNER_PATTERN } from "../../utils/mathml"
 import { theme } from "../../utils/theme"
 import { escapeXmlAttribute, sanitizeXmlAttributeValue } from "../../utils/xml-utils"

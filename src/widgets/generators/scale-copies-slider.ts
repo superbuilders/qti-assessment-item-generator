@@ -1,8 +1,8 @@
-import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
 import { CSS_COLOR_PATTERN } from "../../utils/css-color"
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { theme } from "../../utils/theme"
 import type { WidgetGenerator } from "../types"
 
@@ -117,7 +117,6 @@ export const generateScaleCopiesSlider: WidgetGenerator<typeof ScaleCopiesSlider
 	 * the "Before" shape, an arrow, and the "After" shape.
 	 */
 	const drawShapeGroup = (shape: ScaleCopiesSliderProps["shapeA"], yOffset: number): void => {
-
 		// --- Before Shape ---
 		const beforeW = shape.before.width * scale
 		const beforeH = shape.before.height * scale
@@ -194,4 +193,3 @@ export const generateScaleCopiesSlider: WidgetGenerator<typeof ScaleCopiesSlider
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.base}">${svgBody}</svg>`
 }
-

@@ -388,7 +388,7 @@ export async function generateFromEnvelope(
 		rasterUrlCount: envelope.rasterImageUrls.length,
 		vectorUrlCount: envelope.supplementaryContent.length
 	})
-	
+
 	// MODIFIED: Use the new, unified image context builder.
 	const imageContext = buildImageContext(envelope)
 

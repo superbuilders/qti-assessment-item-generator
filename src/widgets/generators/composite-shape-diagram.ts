@@ -1,4 +1,3 @@
-import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
@@ -6,6 +5,7 @@ import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
 import { CSS_COLOR_PATTERN } from "../../utils/css-color"
 import { Path2D } from "../../utils/path-builder"
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { estimateWrappedTextDimensions } from "../../utils/text"
 import { theme } from "../../utils/theme"
 import type { WidgetGenerator } from "../types"
@@ -216,23 +216,23 @@ function createShadedPathRegionSchema() {
  * during OpenAI JSON Schema conversion.
  */
 function createCompositeShapeSchema() {
-    return z.discriminatedUnion("type", [
-        z
-            .object({
-                id: z.string(),
-                type: z.literal("polygon"),
-                vertexIds: z.array(z.string()).min(3)
-            })
-            .strict(),
-        z
-            .object({
-                id: z.string(),
-                type: z.literal("circle"),
-                centerId: z.string(),
-                radius: z.number().positive()
-            })
-            .strict()
-    ])
+	return z.discriminatedUnion("type", [
+		z
+			.object({
+				id: z.string(),
+				type: z.literal("polygon"),
+				vertexIds: z.array(z.string()).min(3)
+			})
+			.strict(),
+		z
+			.object({
+				id: z.string(),
+				type: z.literal("circle"),
+				centerId: z.string(),
+				radius: z.number().positive()
+			})
+			.strict()
+	])
 }
 
 /**
@@ -1428,4 +1428,3 @@ function pointInPolygon(point: { x: number; y: number }, polygon: Array<{ x: num
 	}
 	return inside
 }
-

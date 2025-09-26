@@ -12,5 +12,3 @@ export const quadrantDiagramExamples: QuadrantDiagramProps[] = [
 		height: 300
 	}
 ]
-
-

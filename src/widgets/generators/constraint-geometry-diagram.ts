@@ -1,4 +1,3 @@
-import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { init as initZ3 } from "z3-solver"
@@ -7,6 +6,7 @@ import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
 import { CSS_COLOR_PATTERN } from "../../utils/css-color"
 import { Path2D } from "../../utils/path-builder"
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { theme } from "../../utils/theme"
 
 // --- START: Zod Schema Definitions (Unchanged) ---
@@ -232,11 +232,11 @@ const ConstraintSchema = z
 					),
 				line1: z.string().regex(lineIdRegex).describe("The ID of the first intersecting line."),
 				line2: z.string().regex(lineIdRegex).describe("The ID of the second intersecting line."),
-                label: z
-                    .string()
-                    .nullable()
-                    .transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
-                    .describe("An optional display label for the new intersection vertex.")
+				label: z
+					.string()
+					.nullable()
+					.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
+					.describe("An optional display label for the new intersection vertex.")
 			})
 			.strict()
 			.describe(
@@ -252,11 +252,11 @@ const ConstraintSchema = z
 						"A new, unique ID for the virtual vertex that will be created at the midpoint, prefixed with 'vertex_'."
 					),
 				line: z.string().regex(lineIdRegex).describe("The ID of the line on which to create the midpoint."),
-                label: z
-                    .string()
-                    .nullable()
-                    .transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
-                    .describe("An optional display label for the new midpoint vertex.")
+				label: z
+					.string()
+					.nullable()
+					.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
+					.describe("An optional display label for the new midpoint vertex.")
 			})
 			.strict()
 			.describe("Creates a 'virtual' vertex at the midpoint of a specified line."),
@@ -1282,4 +1282,3 @@ export const generateConstraintGeometryDiagram = async (
 	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.base}">${svgBody}</svg>`
 }
-

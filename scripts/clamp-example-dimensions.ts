@@ -1,9 +1,9 @@
 #!/usr/bin/env bun
 
+import { readdirSync, readFileSync, writeFileSync } from "node:fs"
+import { join } from "node:path"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import { readdirSync, readFileSync, writeFileSync } from "fs"
-import { join } from "path"
 import {
 	SVG_DIAGRAM_HEIGHT_MAX,
 	SVG_DIAGRAM_HEIGHT_MIN,
@@ -34,7 +34,7 @@ function processExampleFile(filePath: string): void {
 
 	// Match width: <number> patterns (both with and without quotes)
 	const widthRegex = /(\s+(?:")?width(?:")?\s*:\s*)(\d+(?:\.\d+)?)([,\s])/g
-	content = content.replace(widthRegex, (match, prefix, widthStr, suffix) => {
+	content = content.replace(widthRegex, (_match, prefix, widthStr, suffix) => {
 		const originalWidth = Number.parseFloat(widthStr)
 		const clampedWidth = clampValue(originalWidth, SVG_DIAGRAM_WIDTH_MIN, SVG_DIAGRAM_WIDTH_MAX)
 
@@ -52,7 +52,7 @@ function processExampleFile(filePath: string): void {
 
 	// Match height: <number> patterns (both with and without quotes)
 	const heightRegex = /(\s+(?:")?height(?:")?\s*:\s*)(\d+(?:\.\d+)?)([,\s])/g
-	content = content.replace(heightRegex, (match, prefix, heightStr, suffix) => {
+	content = content.replace(heightRegex, (_match, prefix, heightStr, suffix) => {
 		const originalHeight = Number.parseFloat(heightStr)
 		const clampedHeight = clampValue(originalHeight, SVG_DIAGRAM_HEIGHT_MIN, SVG_DIAGRAM_HEIGHT_MAX)
 
@@ -90,14 +90,14 @@ function main(): void {
 
 	// Process examples directory
 	const examplesDir = join(process.cwd(), "examples")
-	
+
 	const readExamplesDirResult = errors.trySync(() => readdirSync(examplesDir))
 	if (readExamplesDirResult.error) {
 		logger.error("failed to read examples directory", { error: readExamplesDirResult.error })
 		throw errors.wrap(readExamplesDirResult.error, "directory read")
 	}
 
-	const exampleFiles = readExamplesDirResult.data.filter(file => file.endsWith(".ts"))
+	const exampleFiles = readExamplesDirResult.data.filter((file) => file.endsWith(".ts"))
 	logger.info("found example files", { count: exampleFiles.length })
 
 	let processedCount = 0
@@ -109,14 +109,14 @@ function main(): void {
 
 	// Process test files
 	const testWidgetsDir = join(process.cwd(), "tests", "widgets")
-	
+
 	const readTestDirResult = errors.trySync(() => readdirSync(testWidgetsDir))
 	if (readTestDirResult.error) {
 		logger.error("failed to read test widgets directory", { error: readTestDirResult.error })
 		throw errors.wrap(readTestDirResult.error, "directory read")
 	}
 
-	const testFiles = readTestDirResult.data.filter(file => file.endsWith(".test.ts"))
+	const testFiles = readTestDirResult.data.filter((file) => file.endsWith(".test.ts"))
 	logger.info("found test files", { count: testFiles.length })
 
 	for (const file of testFiles) {

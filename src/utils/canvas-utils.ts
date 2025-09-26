@@ -506,10 +506,10 @@ export function renderLines(
 						const fallbackAnchor = anchors[anchors.length - 1]
 						chosen = { x: fallbackAnchor.x + nx * normalOffset, y: fallbackAnchor.y + ny * normalOffset, i: 0 }
 					} else {
-				// ultimate fallback: use line midpoint
-				const midX = (x1Svg + x2Svg) / 2
-				const midY = (y1Svg + y2Svg) / 2
-				chosen = { x: midX + nx * normalOffset, y: midY + ny * normalOffset, i: 0 }
+						// ultimate fallback: use line midpoint
+						const midX = (x1Svg + x2Svg) / 2
+						const midY = (y1Svg + y2Svg) / 2
+						chosen = { x: midX + nx * normalOffset, y: midY + ny * normalOffset, i: 0 }
 					}
 				}
 
@@ -866,21 +866,20 @@ export function renderPolylines(
 							chosen = pos1 ?? pos2
 						}
 						if (!chosen) {
-					// fallback: use the midpoint of the polyline
-					logger.warn("no optimal label placement found, using fallback", { type: "polyline", id: polyline.id })
-					if (polyline.type === "points" && polyline.points.length > 0) {
-						const midIdx = Math.floor(polyline.points.length / 2)
-						const midPoint = polyline.points[midIdx]
-						const midX = toSvgX(midPoint.x)
-						const midY = toSvgY(midPoint.y)
-						chosen = { x: midX, y: midY - 20, i: 0 } // offset above the line
-					} else {
-						// for function polylines, use the first point with offset
-						const firstPoint = polyline.type === "function" && polyline.xRange 
-							? { x: polyline.xRange.min, y: 0 } 
-							: { x: 0, y: 0 }
-						chosen = { x: toSvgX(firstPoint.x), y: toSvgY(firstPoint.y) - 20, i: 0 }
-					}
+							// fallback: use the midpoint of the polyline
+							logger.warn("no optimal label placement found, using fallback", { type: "polyline", id: polyline.id })
+							if (polyline.type === "points" && polyline.points.length > 0) {
+								const midIdx = Math.floor(polyline.points.length / 2)
+								const midPoint = polyline.points[midIdx]
+								const midX = toSvgX(midPoint.x)
+								const midY = toSvgY(midPoint.y)
+								chosen = { x: midX, y: midY - 20, i: 0 } // offset above the line
+							} else {
+								// for function polylines, use the first point with offset
+								const firstPoint =
+									polyline.type === "function" && polyline.xRange ? { x: polyline.xRange.min, y: 0 } : { x: 0, y: 0 }
+								chosen = { x: toSvgX(firstPoint.x), y: toSvgY(firstPoint.y) - 20, i: 0 }
+							}
 						}
 
 						clippedCanvas.drawText({

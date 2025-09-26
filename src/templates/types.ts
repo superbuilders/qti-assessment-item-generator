@@ -17,24 +17,22 @@ type RationalValueSchemaT = typeof import("./schemas").RationalValueSchema
 type PartitionedShapePropsSchemaT = typeof import("../widgets/registry").PartitionedShapePropsSchema
 
 export type TemplateContext = {
-  assessment: {
-    AssessmentItemSchema: AssessmentSchemaT
-  }
-  valueSchemas: {
-    FractionSchema: FractionSchemaT
-    NumericValueSchema: NumericValueSchemaT
-    RationalValueSchema: RationalValueSchemaT
-  }
-  widgetSchemas: {
-    partitionedShape: PartitionedShapePropsSchemaT
-  }
+	assessment: {
+		AssessmentItemSchema: AssessmentSchemaT
+	}
+	valueSchemas: {
+		FractionSchema: FractionSchemaT
+		NumericValueSchema: NumericValueSchemaT
+		RationalValueSchema: RationalValueSchemaT
+	}
+	widgetSchemas: {
+		partitionedShape: PartitionedShapePropsSchemaT
+	}
 }
 
 export type TemplateModule<Schema extends z.ZodType<unknown> = z.ZodType<unknown>> = {
-  readonly templateId: string
-  readonly version: string
-  readonly propsSchema: Schema
-  readonly generate: (props: z.input<Schema>) => AssessmentItemInput
+	readonly templateId: string
+	readonly version: string
+	readonly propsSchema: Schema
+	readonly generate: (props: z.input<Schema>) => AssessmentItemInput
 }
-
-

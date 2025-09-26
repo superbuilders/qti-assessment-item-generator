@@ -7,5 +7,3 @@ export function expectSortedUrls(envelope: { rasterImageUrls: string[] }): void 
 export function expectSupplementaryContentCount(envelope: { supplementaryContent: string[] }, count: number): void {
 	expect(envelope.supplementaryContent).toHaveLength(count)
 }
-
-

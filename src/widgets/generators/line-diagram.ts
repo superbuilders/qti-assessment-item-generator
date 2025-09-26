@@ -1,12 +1,11 @@
-import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
-
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
 import { CSS_COLOR_PATTERN } from "../../utils/css-color"
 import { Path2D } from "../../utils/path-builder"
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { estimateWrappedTextDimensions } from "../../utils/text"
 import { theme } from "../../utils/theme"
 import type { WidgetGenerator } from "../types"
@@ -23,42 +22,85 @@ const LineSchema = z
 		id: z
 			.string()
 			.regex(lineIdRegex)
-			.describe("Unique identifier for this line with required 'line_' prefix. Examples: 'line_r', 'line_AB', 'line_perpendicular'. Used for referencing in perpendicular indicators."),
+			.describe(
+				"Unique identifier for this line with required 'line_' prefix. Examples: 'line_r', 'line_AB', 'line_perpendicular'. Used for referencing in perpendicular indicators."
+			),
 		from: z
 			.object({ x: z.number(), y: z.number() })
 			.strict()
-			.describe("First point defining the infinite line in grid coordinates. The line extends infinitely in both directions through this point and the 'to' point."),
+			.describe(
+				"First point defining the infinite line in grid coordinates. The line extends infinitely in both directions through this point and the 'to' point."
+			),
 		to: z
 			.object({ x: z.number(), y: z.number() })
 			.strict()
-			.describe("Second point defining the infinite line in grid coordinates. Combined with 'from' point, determines the line's direction and slope."),
-		style: z.enum(["solid", "dotted"]).describe("Visual style of the line. 'solid' for standard lines, 'dotted' for auxiliary or construction lines that appear dashed."),
+			.describe(
+				"Second point defining the infinite line in grid coordinates. Combined with 'from' point, determines the line's direction and slope."
+			),
+		style: z
+			.enum(["solid", "dotted"])
+			.describe(
+				"Visual style of the line. 'solid' for standard lines, 'dotted' for auxiliary or construction lines that appear dashed."
+			),
 		label: z
 			.string()
 			.nullable()
 			.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
-			.describe("Optional text label for the line. Examples: 'r', 's', 'm', 'AB', 'perpendicular'. Set to null for unlabeled lines."),
+			.describe(
+				"Optional text label for the line. Examples: 'r', 's', 'm', 'AB', 'perpendicular'. Set to null for unlabeled lines."
+			),
 		labelPosition: z
 			.enum(["start", "middle", "end"])
-			.describe("Position of the label along the visible portion of the line. 'start' places near beginning, 'middle' at center, 'end' near the end of the visible line segment."),
-		color: z.string().regex(CSS_COLOR_PATTERN, "invalid css color").describe("CSS color for both the line and its label. Examples: '#FF0000' (red), '#0066CC' (blue), '#00AA00' (green). Use distinct colors for different lines.")
+			.describe(
+				"Position of the label along the visible portion of the line. 'start' places near beginning, 'middle' at center, 'end' near the end of the visible line segment."
+			),
+		color: z
+			.string()
+			.regex(CSS_COLOR_PATTERN, "invalid css color")
+			.describe(
+				"CSS color for both the line and its label. Examples: '#FF0000' (red), '#0066CC' (blue), '#00AA00' (green). Use distinct colors for different lines."
+			)
 	})
 	.strict()
 
 // Schema for a perpendicular indicator
 const PerpendicularIndicatorSchema = z
 	.object({
-		line1Id: z.string().regex(lineIdRegex).describe("ID of the first line forming the perpendicular relationship. Must match an existing line's ID from the lines array."),
-		line2Id: z.string().regex(lineIdRegex).describe("ID of the second line forming the perpendicular relationship. Must match an existing line's ID from the lines array. The two lines must be geometrically perpendicular."),
-		size: z.number().positive().describe("Size of the right angle square marker in pixels. Typical values: 15-25px. Larger values are more visible but may overlap with other elements."),
-		color: z.string().regex(CSS_COLOR_PATTERN, "invalid css color").describe("CSS color for the perpendicular square indicator. Examples: '#000000' (black), '#666666' (gray). Should contrast with background and lines.")
+		line1Id: z
+			.string()
+			.regex(lineIdRegex)
+			.describe(
+				"ID of the first line forming the perpendicular relationship. Must match an existing line's ID from the lines array."
+			),
+		line2Id: z
+			.string()
+			.regex(lineIdRegex)
+			.describe(
+				"ID of the second line forming the perpendicular relationship. Must match an existing line's ID from the lines array. The two lines must be geometrically perpendicular."
+			),
+		size: z
+			.number()
+			.positive()
+			.describe(
+				"Size of the right angle square marker in pixels. Typical values: 15-25px. Larger values are more visible but may overlap with other elements."
+			),
+		color: z
+			.string()
+			.regex(CSS_COLOR_PATTERN, "invalid css color")
+			.describe(
+				"CSS color for the perpendicular square indicator. Examples: '#000000' (black), '#666666' (gray). Should contrast with background and lines."
+			)
 	})
 	.strict()
 
 // Main schema for the LineDiagram widget
 export const LineDiagramPropsSchema = z
 	.object({
-		type: z.literal("lineDiagram").describe("Widget type identifier for line geometry diagrams with infinite lines and perpendicular relationships."),
+		type: z
+			.literal("lineDiagram")
+			.describe(
+				"Widget type identifier for line geometry diagrams with infinite lines and perpendicular relationships."
+			),
 		width: createWidthSchema(),
 		height: createHeightSchema(),
 		gridBounds: z
@@ -69,11 +111,19 @@ export const LineDiagramPropsSchema = z
 				maxY: z.number()
 			})
 			.strict()
-			.describe("Logical coordinate boundaries for the grid system. Examples: {minX: -5, maxX: 5, minY: -5, maxY: 5} creates an 11×11 grid. Lines extend to these boundaries and are clipped at the edges."),
-		lines: z.array(LineSchema).describe("Array of infinite lines to display. Each line is defined by two points but extends infinitely in both directions within the grid bounds. Lines can intersect and have perpendicular relationships."),
+			.describe(
+				"Logical coordinate boundaries for the grid system. Examples: {minX: -5, maxX: 5, minY: -5, maxY: 5} creates an 11×11 grid. Lines extend to these boundaries and are clipped at the edges."
+			),
+		lines: z
+			.array(LineSchema)
+			.describe(
+				"Array of infinite lines to display. Each line is defined by two points but extends infinitely in both directions within the grid bounds. Lines can intersect and have perpendicular relationships."
+			),
 		perpendicularIndicators: z
 			.array(PerpendicularIndicatorSchema)
-			.describe("Array of right angle markers to show perpendicular relationships between lines. Each indicator draws a small square at the intersection point of two perpendicular lines.")
+			.describe(
+				"Array of right angle markers to show perpendicular relationships between lines. Each indicator draws a small square at the intersection point of two perpendicular lines."
+			)
 	})
 	.strict()
 	.describe(
@@ -411,4 +461,3 @@ export const generateLineDiagram: WidgetGenerator<typeof LineDiagramPropsSchema>
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}">${svgBody}</svg>`
 }
-

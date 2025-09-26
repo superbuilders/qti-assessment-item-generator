@@ -1,10 +1,10 @@
-import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { createAxisOptionsSchema, createPlotPointSchema, renderPoints } from "../../utils/canvas-utils"
 import { PADDING, TICK_LABEL_FONT_PX, X_AXIS_MIN_LABEL_PADDING_PX } from "../../utils/constants"
 import { CSS_COLOR_PATTERN } from "../../utils/css-color"
 import { selectAxisLabels } from "../../utils/layout"
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { theme } from "../../utils/theme"
 import { buildTicks } from "../../utils/ticks"
 import type { WidgetGenerator } from "../types"
@@ -167,7 +167,7 @@ function setupTrigCoordinatePlane(
 		minGapPx: X_AXIS_MIN_LABEL_PADDING_PX
 	})
 
-		xValues.forEach((t, i) => {
+	xValues.forEach((t, i) => {
 		if (Math.abs(t) < 1e-9) return // Skip origin
 		const x = toSvgX(t)
 		canvas.drawLine(x, zeroY - 4, x, zeroY + 4, {
@@ -178,7 +178,7 @@ function setupTrigCoordinatePlane(
 			canvas.drawText({
 				x: x,
 				y: zeroY + 15,
-					text: xPiLabels[i],
+				text: xPiLabels[i],
 				fill: theme.colors.axisLabel,
 				anchor: "middle",
 				fontPx: TICK_LABEL_FONT_PX
@@ -199,7 +199,7 @@ function setupTrigCoordinatePlane(
 		minGapPx: 12
 	})
 
-		yValues.forEach((t, i) => {
+	yValues.forEach((t, i) => {
 		if (Math.abs(t) < 1e-9) return // Skip origin
 		const y = toSvgY(t)
 		canvas.drawLine(zeroX - 4, y, zeroX + 4, y, {
@@ -210,7 +210,7 @@ function setupTrigCoordinatePlane(
 			canvas.drawText({
 				x: zeroX - 10,
 				y: y + 4,
-					text: yLabels[i],
+				text: yLabels[i],
 				fill: theme.colors.axisLabel,
 				anchor: "end",
 				fontPx: TICK_LABEL_FONT_PX
@@ -255,12 +255,12 @@ export const generateSinCosineWidget: WidgetGenerator<typeof SinCosineWidgetProp
 	})
 
 	// Setup the coordinate plane with π formatting
-    const { toSvgX, toSvgY } = setupTrigCoordinatePlane(
+	const { toSvgX, toSvgY } = setupTrigCoordinatePlane(
 		{
 			width,
 			height,
-            xAxis,
-            yAxis
+			xAxis,
+			yAxis
 		},
 		canvas
 	)
@@ -295,4 +295,3 @@ export const generateSinCosineWidget: WidgetGenerator<typeof SinCosineWidgetProp
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}">${svgBody}</svg>`
 }
-

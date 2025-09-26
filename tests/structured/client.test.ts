@@ -261,8 +261,16 @@ describe("Structured AI Pipeline", () => {
 												widgets: [], // <-- INTENTIONALLY EMPTY
 												interactions: [],
 												feedbackBlocks: [
-													{ identifier: "CORRECT", outcomeIdentifier: "FEEDBACK__GLOBAL", content: [{ type: "paragraph", content: [{ type: "text", content: "Correct" }] }] },
-													{ identifier: "INCORRECT", outcomeIdentifier: "FEEDBACK__GLOBAL", content: [{ type: "paragraph", content: [{ type: "text", content: "Incorrect" }] }] }
+													{
+														identifier: "CORRECT",
+														outcomeIdentifier: "FEEDBACK__GLOBAL",
+														content: [{ type: "paragraph", content: [{ type: "text", content: "Correct" }] }]
+													},
+													{
+														identifier: "INCORRECT",
+														outcomeIdentifier: "FEEDBACK__GLOBAL",
+														content: [{ type: "paragraph", content: [{ type: "text", content: "Incorrect" }] }]
+													}
 												]
 											} satisfies AssessmentItemShell,
 											refusal: null

@@ -1,5 +1,5 @@
-import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { z } from "zod"
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import type { WidgetGenerator } from "../types"
 
 function createEmojiSchema() {
@@ -106,4 +106,3 @@ export const generateStackedItemsDiagram: WidgetGenerator<typeof StackedItemsDia
 	html += "</div>"
 	return html
 }
-

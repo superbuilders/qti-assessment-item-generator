@@ -1039,10 +1039,10 @@ ALL mathematical content MUST be converted to valid, modern MathML. NO EXCEPTION
 
 Any discrepancy will cause your output to be rejected. Review your work carefully to ensure the body's slots and the declaration arrays are perfectly synchronized.`
 
-	const validExamples = allExamples.filter(example => {
+	const validExamples = allExamples.filter((example) => {
 		// Filter out examples with invalid feedback block identifiers that break shell validation
-		const invalidIdentifiers = ['linear', 'quadratic', 'two_times', 'four_times']
-		return !example.feedbackBlocks.some(block => invalidIdentifiers.includes(block.identifier))
+		const invalidIdentifiers = ["linear", "quadratic", "two_times", "four_times"]
+		return !example.feedbackBlocks.some((block) => invalidIdentifiers.includes(block.identifier))
 	})
 	const exampleShells = validExamples.map(createShellFromExample)
 

@@ -4,10 +4,10 @@ import { z } from "zod"
 import { MATHML_INNER_PATTERN } from "../utils/mathml"
 import { typedSchemas } from "../widgets/registry"
 import {
-	RESPONSE_IDENTIFIER_REGEX,
-	OUTCOME_IDENTIFIER_REGEX,
-	FEEDBACK_BLOCK_IDENTIFIER_REGEX,
 	CHOICE_IDENTIFIER_REGEX,
+	FEEDBACK_BLOCK_IDENTIFIER_REGEX,
+	OUTCOME_IDENTIFIER_REGEX,
+	RESPONSE_IDENTIFIER_REGEX,
 	SLOT_IDENTIFIER_REGEX
 } from "./qti-constants"
 
@@ -38,7 +38,10 @@ function createInlineContentItemSchema() {
 					type: z
 						.literal("inlineSlot")
 						.describe("Identifies this as an inline placeholder for widgets or interactions"),
-					slotId: z.string().regex(SLOT_IDENTIFIER_REGEX, "invalid slot identifier: must be lowercase with underscores").describe("Unique identifier that matches a widget or interaction key")
+					slotId: z
+						.string()
+						.regex(SLOT_IDENTIFIER_REGEX, "invalid slot identifier: must be lowercase with underscores")
+						.describe("Unique identifier that matches a widget or interaction key")
 				})
 				.strict()
 				.describe("Placeholder for inline content that will be filled with a widget or interaction"),
@@ -103,7 +106,10 @@ function createBlockContentItemSchema() {
 			z
 				.object({
 					type: z.literal("blockSlot").describe("Identifies this as a block-level placeholder"),
-					slotId: z.string().regex(SLOT_IDENTIFIER_REGEX, "invalid slot identifier: must be lowercase with underscores").describe("Unique identifier that matches a widget or interaction key")
+					slotId: z
+						.string()
+						.regex(SLOT_IDENTIFIER_REGEX, "invalid slot identifier: must be lowercase with underscores")
+						.describe("Unique identifier that matches a widget or interaction key")
 				})
 				.strict()
 				.describe("Placeholder for block-level content that will be filled with a widget or interaction")
@@ -169,8 +175,8 @@ export function createDynamicAssessmentItemSchema(widgetMapping: Record<string, 
 								.describe("Unique identifier for this choice option, used for response matching."),
 							content: createBlockContentSchema().describe(
 								"Rich content for this choice option, supporting text, math, and embedded widgets."
-							),
-								// REMOVED: The `feedback` field is no longer supported on choices.
+							)
+							// REMOVED: The `feedback` field is no longer supported on choices.
 						})
 						.strict()
 						.describe("A single choice option with content and optional feedback")
@@ -227,8 +233,8 @@ export function createDynamicAssessmentItemSchema(widgetMapping: Record<string, 
 								.string()
 								.regex(CHOICE_IDENTIFIER_REGEX, "invalid identifier: must be uppercase")
 								.describe("Unique identifier for this choice option, used for response matching."),
-							content: createBlockContentSchema().describe("Rich content for this orderable item."),
-								// REMOVED: The `feedback` field is no longer supported on choices.
+							content: createBlockContentSchema().describe("Rich content for this orderable item.")
+							// REMOVED: The `feedback` field is no longer supported on choices.
 						})
 						.strict()
 						.describe("An orderable item with content and optional feedback")
@@ -451,7 +457,7 @@ export function createDynamicAssessmentItemSchema(widgetMapping: Record<string, 
 						path: ["feedbackBlocks", i, "outcomeIdentifier"]
 					})
 				}
-				
+
 				if (fb.outcomeIdentifier === "FEEDBACK__GLOBAL") {
 					if (!/^(CORRECT|INCORRECT)$/.test(fb.identifier)) {
 						ctx.addIssue({
@@ -464,7 +470,7 @@ export function createDynamicAssessmentItemSchema(widgetMapping: Record<string, 
 				}
 
 				const match = /^FEEDBACK__([A-Za-z0-9_]+)$/.exec(fb.outcomeIdentifier)
-				if (match && match[1]) {
+				if (match?.[1]) {
 					const respId = match[1]
 					const allowedChoices = responseIdToChoices.get(respId)
 					if (!allowedChoices || !allowedChoices.has(fb.identifier)) {
@@ -503,7 +509,11 @@ export function createDynamicAssessmentItemSchema(widgetMapping: Record<string, 
 			// 2) Outcome-to-response linkage: FEEDBACK__<respId> must have a responseDeclaration with baseType 'identifier'
 			const declCardinality = new Map<string, { baseType: string; cardinality: string }>()
 			for (const decl of data.responseDeclarations) {
-				declCardinality.set(decl.identifier, { baseType: (decl as any).baseType, cardinality: (decl as any).cardinality })
+				// All response declarations have baseType and cardinality due to the discriminated union
+				declCardinality.set(decl.identifier, {
+					baseType: decl.baseType,
+					cardinality: decl.cardinality
+				})
 			}
 			for (let i = 0; i < data.feedbackBlocks.length; i++) {
 				const fb = data.feedbackBlocks[i]
@@ -530,7 +540,7 @@ export function createDynamicAssessmentItemSchema(widgetMapping: Record<string, 
 			// 3) FEEDBACK__GLOBAL presence requires at least one non-enumerated response (string|integer|float|directedPair)
 			const hasGlobal = data.feedbackBlocks.some((b) => b.outcomeIdentifier === "FEEDBACK__GLOBAL")
 			if (hasGlobal) {
-				const hasNonEnumerated = data.responseDeclarations.some((d) => (d as any).baseType !== "identifier")
+				const hasNonEnumerated = data.responseDeclarations.some((d) => d.baseType !== "identifier")
 				if (!hasNonEnumerated) {
 					ctx.addIssue({
 						code: z.ZodIssueCode.custom,

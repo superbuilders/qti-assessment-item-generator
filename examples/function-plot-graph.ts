@@ -169,7 +169,7 @@ export const functionPlotGraphExamples: FunctionPlotGraphProps[] = [
 				label: "y = x³ - 4x"
 			},
 			{
-				type: "function", 
+				type: "function",
 				id: "polyline_quadratic",
 				coefficients: [1, 0, 0], // x²
 				xRange: { min: -2.5, max: 2.5 },

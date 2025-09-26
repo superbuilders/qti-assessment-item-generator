@@ -23,6 +23,15 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 	return typeof value === "object" && value !== null && !Array.isArray(value)
 }
 
+// Type guard to verify an object is a ContentPlan
+function isContentPlan(value: unknown): value is ContentPlan {
+	if (!isRecord(value)) return false
+	// ContentPlan must not have widgets or identifier
+	if ("widgets" in value || "identifier" in value) return false
+	// We trust that zodResponseFormat has validated the rest of the structure
+	return true
+}
+
 // intentionally unused currently; keep for future guard expansions
 // function hasKey<K extends string>(obj: Record<string, unknown>, key: K): obj is Record<string, unknown> & { [P in K]: unknown } {
 // 	return key in obj
@@ -41,10 +50,7 @@ function isWidgetTypeName(value: unknown): value is keyof typeof allWidgetSchema
  * Builds an informational section for Shot 1 that lists the fixed widget mapping (slot → type)
  * used in Shot 2. This is purely contextual so the planner avoids generating incompatible content.
  */
-function buildShot1WidgetInfoSection(
-	assessmentItem: AssessmentItemInput,
-	logger: logger.Logger
-): string {
+function buildShot1WidgetInfoSection(assessmentItem: AssessmentItemInput, logger: logger.Logger): string {
 	const widgets = assessmentItem.widgets
 	if (!widgets || typeof widgets !== "object") {
 		return ""
@@ -102,9 +108,7 @@ function buildShot1WidgetInfoSection(
 			throw errors.new("widget json schema missing required")
 		}
 		const digest = { properties, required }
-		digestSections.push(
-			`#### ${typeName} \n\n\`\`\`json\n${JSON.stringify(digest, null, 2)}\n\`\`\``
-		)
+		digestSections.push(`#### ${typeName} \n\n\`\`\`json\n${JSON.stringify(digest, null, 2)}\n\`\`\``)
 	}
 
 	return [
@@ -194,46 +198,46 @@ async function planContentDifferentiation(
 		"- If any check fails, REWRITE the plan before returning.",
 		"",
 		"### Positive example (GOOD — reworded, same concept/difficulty)",
-		"Source concept: comparing centers in two box plots; correct idea = \"final distances higher on average.\"",
+		'Source concept: comparing centers in two box plots; correct idea = "final distances higher on average."',
 		"",
 		"```json",
 		"{",
-		"  \"title\": \"Compare box plots for throw distances\",",
-		"  \"body\": [",
-		"    { \"type\": \"paragraph\", \"content\": [",
-		"      { \"type\": \"text\", \"content\": \"Before selecting athletes for an international meet, a national program runs a qualifying event.\" }",
+		'  "title": "Compare box plots for throw distances",',
+		'  "body": [',
+		'    { "type": "paragraph", "content": [',
+		'      { "type": "text", "content": "Before selecting athletes for an international meet, a national program runs a qualifying event." }',
 		"    ]},",
-		"    { \"type\": \"paragraph\", \"content\": [",
-		"      { \"type\": \"text\", \"content\": \"The box plots below show the final-round distances (in meters) for the top \" },",
-		"      { \"type\": \"math\", \"mathml\": \"<mn>11</mn>\" },",
-		"      { \"type\": \"text\", \"content\": \" competitors at the Championship Final and the top \" },",
-		"      { \"type\": \"math\", \"mathml\": \"<mn>12</mn>\" },",
-		"      { \"type\": \"text\", \"content\": \" competitors at the National Qualifier.\" }",
+		'    { "type": "paragraph", "content": [',
+		'      { "type": "text", "content": "The box plots below show the final-round distances (in meters) for the top " },',
+		'      { "type": "math", "mathml": "<mn>11</mn>" },',
+		'      { "type": "text", "content": " competitors at the Championship Final and the top " },',
+		'      { "type": "math", "mathml": "<mn>12</mn>" },',
+		'      { "type": "text", "content": " competitors at the National Qualifier." }',
 		"    ]},",
-		"    { \"type\": \"blockSlot\", \"slotId\": \"image_1\" },",
-		"    { \"type\": \"paragraph\", \"content\": [",
-		"      { \"type\": \"text\", \"content\": \"Which statement best matches these box plots?\" }",
+		'    { "type": "blockSlot", "slotId": "image_1" },',
+		'    { "type": "paragraph", "content": [',
+		'      { "type": "text", "content": "Which statement best matches these box plots?" }',
 		"    ]},",
-		"    { \"type\": \"blockSlot\", \"slotId\": \"choice_interaction\" }",
+		'    { "type": "blockSlot", "slotId": "choice_interaction" }',
 		"  ],",
-		"  \"interactions\": {",
-		"    \"choice_interaction\": {",
-		"      \"type\": \"choiceInteraction\",",
-		"      \"prompt\": [{ \"type\": \"text\", \"content\": \"Select one answer.\" }],",
-		"      \"choices\": [",
-		"        { \"identifier\": \"A\", \"content\": [{ \"type\": \"paragraph\", \"content\": [{ \"type\": \"text\", \"content\": \"On average, the Championship Final throws were longer.\" }]}]},",
-		"        { \"identifier\": \"B\", \"content\": [{ \"type\": \"paragraph\", \"content\": [{ \"type\": \"text\", \"content\": \"Every Championship Final throw exceeded every Qualifier throw.\" }]}]},",
-		"        { \"identifier\": \"C\", \"content\": [{ \"type\": \"paragraph\", \"content\": [{ \"type\": \"text\", \"content\": \"The Championship Final shows much greater variability.\" }]}]},",
-		"        { \"identifier\": \"D\", \"content\": [{ \"type\": \"paragraph\", \"content\": [{ \"type\": \"text\", \"content\": \"None of the above.\" }]}]}",
+		'  "interactions": {',
+		'    "choice_interaction": {',
+		'      "type": "choiceInteraction",',
+		'      "prompt": [{ "type": "text", "content": "Select one answer." }],',
+		'      "choices": [',
+		'        { "identifier": "A", "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "On average, the Championship Final throws were longer." }]}]},',
+		'        { "identifier": "B", "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Every Championship Final throw exceeded every Qualifier throw." }]}]},',
+		'        { "identifier": "C", "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "The Championship Final shows much greater variability." }]}]},',
+		'        { "identifier": "D", "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "None of the above." }]}]}',
 		"      ],",
-		"      \"maxChoices\": 1,",
-		"      \"minChoices\": 1,",
-		"      \"shuffle\": true,",
-		"      \"responseIdentifier\": \"choice_interaction\"",
+		'      "maxChoices": 1,',
+		'      "minChoices": 1,',
+		'      "shuffle": true,',
+		'      "responseIdentifier": "choice_interaction"',
 		"    }",
 		"  },",
-		"  \"responseDeclarations\": [",
-		"    { \"identifier\": \"choice_interaction\", \"cardinality\": \"single\", \"baseType\": \"identifier\", \"correct\": \"A\" }",
+		'  "responseDeclarations": [',
+		'    { "identifier": "choice_interaction", "cardinality": "single", "baseType": "identifier", "correct": "A" }',
 		"  ]",
 		"}",
 		"```",
@@ -243,29 +247,29 @@ async function planContentDifferentiation(
 		"1) **BAD: Identical wording copied**",
 		"```json",
 		"{",
-		"  \"body\": [",
-		"    { \"type\": \"paragraph\", \"content\": [{ \"type\": \"text\", \"content\": \"Before sending track and field athletes to the Olympics, the U.S. holds a qualifying meet.\" }] }",
+		'  "body": [',
+		'    { "type": "paragraph", "content": [{ "type": "text", "content": "Before sending track and field athletes to the Olympics, the U.S. holds a qualifying meet." }] }',
 		"  ],",
-		"  \"interactions\": {",
-		"    \"choice_interaction\": {",
-		"      \"choices\": [",
-		"        { \"identifier\": \"A\", \"content\": [{ \"type\": \"paragraph\", \"content\": [{ \"type\": \"text\", \"content\": \"The distances in the Olympic final were farther on average.\" }]}]}",
+		'  "interactions": {',
+		'    "choice_interaction": {',
+		'      "choices": [',
+		'        { "identifier": "A", "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "The distances in the Olympic final were farther on average." }]}]}',
 		"      ]",
 		"    }",
 		"  }",
 		"}",
 		"```",
 		"",
-		"2) **BAD: Only trivial synonym changes** (still \"Olympic final\", choices nearly identical)",
+		'2) **BAD: Only trivial synonym changes** (still "Olympic final", choices nearly identical)',
 		"```json",
 		"{",
-		"  \"body\": [",
-		"    { \"type\": \"paragraph\", \"content\": [{ \"type\": \"text\", \"content\": \"Before sending athletes to the Olympics, the U.S. has a qualifying meet.\" }] }",
+		'  "body": [',
+		'    { "type": "paragraph", "content": [{ "type": "text", "content": "Before sending athletes to the Olympics, the U.S. has a qualifying meet." }] }',
 		"  ],",
-		"  \"interactions\": {",
-		"    \"choice_interaction\": {",
-		"      \"choices\": [",
-		"        { \"identifier\": \"A\", \"content\": [{ \"type\": \"paragraph\", \"content\": [{ \"type\": \"text\", \"content\": \"The distances in the Olympic final were longer on average.\" }]}]}",
+		'  "interactions": {',
+		'    "choice_interaction": {',
+		'      "choices": [',
+		'        { "identifier": "A", "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "The distances in the Olympic final were longer on average." }]}]}',
 		"      ]",
 		"    }",
 		"  }",
@@ -275,8 +279,8 @@ async function planContentDifferentiation(
 		"3) **BAD: Difficulty drift — adds hint/explanation (makes it EASIER)**",
 		"```json",
 		"{",
-		"  \"body\": [",
-		"    { \"type\": \"paragraph\", \"content\": [{ \"type\": \"text\", \"content\": \"The median of the Olympic box plot is clearly higher, so choose the option about averages.\" }] }",
+		'  "body": [',
+		'    { "type": "paragraph", "content": [{ "type": "text", "content": "The median of the Olympic box plot is clearly higher, so choose the option about averages." }] }',
 		"  ]",
 		"}",
 		"```",
@@ -284,8 +288,8 @@ async function planContentDifferentiation(
 		"4) **BAD: Difficulty drift — requires additional calculation (makes it HARDER)**",
 		"```json",
 		"{",
-		"  \"body\": [",
-		"    { \"type\": \"paragraph\", \"content\": [{ \"type\": \"text\", \"content\": \"Calculate the exact difference between the medians and determine which dataset has higher average values.\" }] }",
+		'  "body": [',
+		'    { "type": "paragraph", "content": [{ "type": "text", "content": "Calculate the exact difference between the medians and determine which dataset has higher average values." }] }',
 		"  ]",
 		"}",
 		"```",
@@ -293,10 +297,10 @@ async function planContentDifferentiation(
 		"5) **BAD: Changed response type** (was multiple choice, now text entry)",
 		"```json",
 		"{",
-		"  \"interactions\": {",
-		"    \"choice_interaction\": {",
-		"      \"type\": \"textEntryInteraction\",",
-		"      \"prompt\": [{ \"type\": \"text\", \"content\": \"Enter the name of the dataset with higher average values.\" }]",
+		'  "interactions": {',
+		'    "choice_interaction": {',
+		'      "type": "textEntryInteraction",',
+		'      "prompt": [{ "type": "text", "content": "Enter the name of the dataset with higher average values." }]',
 		"    }",
 		"  }",
 		"}",
@@ -305,8 +309,8 @@ async function planContentDifferentiation(
 		"6) **BAD: Changed diagram type** (was box plots, now bar chart)",
 		"```json",
 		"{",
-		"  \"body\": [",
-		"    { \"type\": \"paragraph\", \"content\": [{ \"type\": \"text\", \"content\": \"The bar chart below shows average distances...\" }] }",
+		'  "body": [',
+		'    { "type": "paragraph", "content": [{ "type": "text", "content": "The bar chart below shows average distances..." }] }',
 		"  ]",
 		"}",
 		"```",
@@ -314,11 +318,11 @@ async function planContentDifferentiation(
 		"7) **BAD: Changed statistical concept** (was comparing centers, now comparing spreads)",
 		"```json",
 		"{",
-		"  \"body\": [",
-		"    { \"type\": \"paragraph\", \"content\": [{ \"type\": \"text\", \"content\": \"Which dataset has the larger interquartile range?\" }] }",
+		'  "body": [',
+		'    { "type": "paragraph", "content": [{ "type": "text", "content": "Which dataset has the larger interquartile range?" }] }',
 		"  ],",
-		"  \"responseDeclarations\": [",
-		"    { \"identifier\": \"choice_interaction\", \"correct\": \"C\" }",
+		'  "responseDeclarations": [',
+		'    { "identifier": "choice_interaction", "correct": "C" }',
 		"  ]",
 		"}",
 		"```",
@@ -326,10 +330,10 @@ async function planContentDifferentiation(
 		"8) **BAD: Removed critical context** (makes question ambiguous)",
 		"```json",
 		"{",
-		"  \"body\": [",
-		"    { \"type\": \"paragraph\", \"content\": [{ \"type\": \"text\", \"content\": \"Look at the box plots below.\" }] },",
-		"    { \"type\": \"blockSlot\", \"slotId\": \"image_1\" },",
-		"    { \"type\": \"paragraph\", \"content\": [{ \"type\": \"text\", \"content\": \"Which is true?\" }] }",
+		'  "body": [',
+		'    { "type": "paragraph", "content": [{ "type": "text", "content": "Look at the box plots below." }] },',
+		'    { "type": "blockSlot", "slotId": "image_1" },',
+		'    { "type": "paragraph", "content": [{ "type": "text", "content": "Which is true?" }] }',
 		"  ]",
 		"}",
 		"```"
@@ -379,15 +383,17 @@ async function planContentDifferentiation(
 	}
 
 	// Convert the object-based structures from the AI back into our standard array-based format.
+	// The plans are already validated by zodResponseFormat, so we know they match the structure
+	// We'll validate and properly type the results
 	const transformedPlans = choice.message.parsed.plans.map((plan: unknown) => transformObjectsToArrays(plan))
-	// Narrowed by zodResponseFormat schema; treat as ContentPlan[]
-	const finalPlans = transformedPlans as unknown as ContentPlan[]
+	const finalPlans: ContentPlan[] = []
 
 	// Post-validation: Ensure structural integrity of the generated plans.
-	for (const plan of finalPlans) {
-		if ("widgets" in plan || "identifier" in plan) {
-			logger.error("plan contains forbidden keys", { keys: Object.keys(plan) })
-			throw errors.new("structural validation failed: plan contains forbidden keys")
+	for (const plan of transformedPlans) {
+		// Use type guard to verify plan is a ContentPlan
+		if (!isContentPlan(plan)) {
+			logger.error("plan failed content plan type guard", { plan })
+			throw errors.new("plan is not a valid ContentPlan")
 		}
 
 		// 1) Interaction keys must match exactly
@@ -395,8 +401,7 @@ async function planContentDifferentiation(
 		const planInteractionsUnknown = getProp(plan, "interactions")
 		const planInteractions = planInteractionsUnknown
 		const sourceKeys = sourceInteractions ? Object.keys(sourceInteractions).sort() : []
-		const planKeys =
-			isRecord(planInteractions) ? Object.keys(planInteractions).sort() : []
+		const planKeys = isRecord(planInteractions) ? Object.keys(planInteractions).sort() : []
 		if (JSON.stringify(sourceKeys) !== JSON.stringify(planKeys)) {
 			logger.error("plan interaction keys do not match source", { sourceKeys, planKeys })
 			throw errors.new("structural validation failed: interaction keys mismatch")
@@ -423,7 +428,7 @@ async function planContentDifferentiation(
 		for (const key of sourceKeys) {
 			const srcInteraction = isRecord(sourceInteractions) ? sourceInteractions[key] : undefined
 			const planInteraction = isRecord(planInteractions) ? planInteractions[key] : undefined
-		const srcChoicesLen = arrayLengthOfKey(srcInteraction, "choices")
+			const srcChoicesLen = arrayLengthOfKey(srcInteraction, "choices")
 			const planChoicesLen = arrayLengthOfKey(planInteraction, "choices")
 			if (srcChoicesLen !== -1 || planChoicesLen !== -1) {
 				if (srcChoicesLen !== planChoicesLen) {
@@ -432,6 +437,9 @@ async function planContentDifferentiation(
 				}
 			}
 		}
+
+		// Plan has passed all validation checks and type guard
+		finalPlans.push(plan)
 	}
 
 	logger.info("successfully generated and validated differentiation plans", {
@@ -447,12 +455,14 @@ async function planContentDifferentiation(
  * Each key maps to the authoritative schema for its widget type.
  */
 function buildWidgetsResponseSchema(
+	logger: logger.Logger,
 	widgetTypes: Record<string, keyof typeof allWidgetSchemas>
 ): z.ZodObject<Record<string, z.ZodTypeAny>> {
 	const shape: Record<string, z.ZodTypeAny> = {}
 	for (const [key, typeName] of Object.entries(widgetTypes)) {
 		const schema = allWidgetSchemas[typeName]
 		if (!schema) {
+			logger.error("unknown widget type in mapping", { key, typeName })
 			throw errors.new("unknown widget type in mapping")
 		}
 		shape[key] = schema
@@ -471,11 +481,9 @@ async function regenerateWidgetsViaLLM(
 	plan: ContentPlan,
 	widgetTypes: Record<string, keyof typeof allWidgetSchemas>
 ): Promise<Record<string, unknown>> {
-    const widgetKeys = Object.keys(widgetTypes)
-    logger.info("shot 2 widget generation starting", { widgetKeysCount: widgetKeys.length })
-	const WidgetsEnvelopeSchema = z
-		.object({ widgets: buildWidgetsResponseSchema(widgetTypes) })
-		.strict()
+	const widgetKeys = Object.keys(widgetTypes)
+	logger.info("shot 2 widget generation starting", { widgetKeysCount: widgetKeys.length })
+	const WidgetsEnvelopeSchema = z.object({ widgets: buildWidgetsResponseSchema(logger, widgetTypes) }).strict()
 
 	const systemInstruction = [
 		"You are an expert in generating QTI widget objects that strictly conform to their Zod schemas.",
@@ -508,17 +516,17 @@ async function regenerateWidgetsViaLLM(
 		"Return ONLY a JSON object with a single key 'widgets' whose value is an object mapping keys to fully-formed widget objects."
 	].join("\n")
 
-    const responseFormat = zodResponseFormat(WidgetsEnvelopeSchema, "widgets_generator")
+	const responseFormat = zodResponseFormat(WidgetsEnvelopeSchema, "widgets_generator")
 
-    // Log prompt meta (avoid logging full prompt to keep logs readable)
-    const systemLen = systemInstruction.length
-    const userLen = userContent.length
-    logger.debug("calling openai for widget generation", {
-        model: OPENAI_MODEL,
-        widgetKeysCount: widgetKeys.length,
-        systemChars: systemLen,
-        userChars: userLen
-    })
+	// Log prompt meta (avoid logging full prompt to keep logs readable)
+	const systemLen = systemInstruction.length
+	const userLen = userContent.length
+	logger.debug("calling openai for widget generation", {
+		model: OPENAI_MODEL,
+		widgetKeysCount: widgetKeys.length,
+		systemChars: systemLen,
+		userChars: userLen
+	})
 
 	const llmResult = await errors.try(
 		openai.chat.completions.parse({
@@ -530,11 +538,11 @@ async function regenerateWidgetsViaLLM(
 			response_format: responseFormat
 		})
 	)
-    if (llmResult.error) {
-	logger.error("openai widget generation call failed", { error: llmResult.error })
-	throw errors.wrap(llmResult.error, "ai widget generation")
-}
-    logger.info("openai widget generation completed")
+	if (llmResult.error) {
+		logger.error("openai widget generation call failed", { error: llmResult.error })
+		throw errors.wrap(llmResult.error, "ai widget generation")
+	}
+	logger.info("openai widget generation completed")
 	const choice = llmResult.data.choices[0]
 	if (!choice?.message?.parsed) {
 		logger.error("openai widget generation returned no parsed content")
@@ -594,15 +602,13 @@ export async function differentiateAssessmentItem(
 			continue
 		}
 
-        logger.info("shot 2 generating widgets for variation", {
-            index: i + 1,
-            identifier,
-            widgetKeys: Object.keys(widgetTypes)
-        })
+		logger.info("shot 2 generating widgets for variation", {
+			index: i + 1,
+			identifier,
+			widgetKeys: Object.keys(widgetTypes)
+		})
 
-        const widgetsResult = await errors.try(
-            regenerateWidgetsViaLLM(openai, logger, sourceItem, plan, widgetTypes)
-        )
+		const widgetsResult = await errors.try(regenerateWidgetsViaLLM(openai, logger, sourceItem, plan, widgetTypes))
 		if (widgetsResult.error) {
 			logger.error("shot 2 widget generation failed", { error: widgetsResult.error, itemIdentifier: identifier })
 			throw errors.wrap(widgetsResult.error, "widget generation")

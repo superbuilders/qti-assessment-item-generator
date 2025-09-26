@@ -1,7 +1,7 @@
-import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { theme } from "../../utils/theme"
 import type { WidgetGenerator } from "../types"
 
@@ -12,9 +12,7 @@ export const QuadrantDiagramPropsSchema = z
 		height: createHeightSchema()
 	})
 	.strict()
-	.describe(
-		"Generates a basic quadrant diagram with labeled axes (x and y) and labeled quadrants (I, II, III, IV)."
-	)
+	.describe("Generates a basic quadrant diagram with labeled axes (x and y) and labeled quadrants (I, II, III, IV).")
 
 export type QuadrantDiagramProps = z.infer<typeof QuadrantDiagramPropsSchema>
 

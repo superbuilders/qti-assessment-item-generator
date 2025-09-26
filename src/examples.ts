@@ -207,9 +207,7 @@ export const linearModelEquationPrediction: AssessmentItemInput = {
 			content: [
 				{
 					type: "paragraph",
-					content: [
-						{ type: "text", content: "Incorrect. The slope is 2, not 1." }
-					]
+					content: [{ type: "text", content: "Incorrect. The slope is 2, not 1." }]
 				}
 			]
 		},
@@ -219,9 +217,7 @@ export const linearModelEquationPrediction: AssessmentItemInput = {
 			content: [
 				{
 					type: "paragraph",
-					content: [
-						{ type: "text", content: "Incorrect. The y-intercept should be positive 1.5, not negative." }
-					]
+					content: [{ type: "text", content: "Incorrect. The y-intercept should be positive 1.5, not negative." }]
 				}
 			]
 		},
@@ -231,9 +227,7 @@ export const linearModelEquationPrediction: AssessmentItemInput = {
 			content: [
 				{
 					type: "paragraph",
-					content: [
-						{ type: "text", content: "Incorrect. Both the slope and y-intercept are wrong." }
-					]
+					content: [{ type: "text", content: "Incorrect. Both the slope and y-intercept are wrong." }]
 				}
 			]
 		},
@@ -796,7 +790,10 @@ export const inequalityNumberLine: AssessmentItemInput = {
 				{
 					type: "paragraph",
 					content: [
-						{ type: "text", content: "Incorrect. This represents values less than 0, but the graph shows values greater than 0." }
+						{
+							type: "text",
+							content: "Incorrect. This represents values less than 0, but the graph shows values greater than 0."
+						}
 					]
 				}
 			]
@@ -808,7 +805,10 @@ export const inequalityNumberLine: AssessmentItemInput = {
 				{
 					type: "paragraph",
 					content: [
-						{ type: "text", content: "Incorrect. This includes 0 (closed point), but the graph shows an open point at 0." }
+						{
+							type: "text",
+							content: "Incorrect. This includes 0 (closed point), but the graph shows an open point at 0."
+						}
 					]
 				}
 			]
@@ -841,7 +841,10 @@ export const inequalityNumberLine: AssessmentItemInput = {
 				{
 					type: "paragraph",
 					content: [
-						{ type: "text", content: "Incorrect. This includes 0 (closed point), but the graph shows an open point at 0." }
+						{
+							type: "text",
+							content: "Incorrect. This includes 0 (closed point), but the graph shows an open point at 0."
+						}
 					]
 				}
 			]
@@ -942,10 +945,38 @@ export const verticalNumberLineComparison: AssessmentItemInput = {
 		}
 	},
 	feedbackBlocks: [
-		{ identifier: "ABOVE", outcomeIdentifier: "FEEDBACK__RESPONSE_POS", content: [{ type: "paragraph", content: [{ type: "text", content: "Correct: -1.4 is above -6.4." }] }] },
-		{ identifier: "BELOW", outcomeIdentifier: "FEEDBACK__RESPONSE_POS", content: [{ type: "paragraph", content: [{ type: "text", content: "Not quite: -1.4 is above -6.4 on a vertical number line." }] }] },
-		{ identifier: "GT", outcomeIdentifier: "FEEDBACK__RESPONSE_COMP", content: [{ type: "paragraph", content: [{ type: "text", content: "Correct: a higher position means greater value." }] }] },
-		{ identifier: "LT", outcomeIdentifier: "FEEDBACK__RESPONSE_COMP", content: [{ type: "paragraph", content: [{ type: "text", content: "Not quite: since -1.4 is higher than -6.4, -1.4 is greater." }] }] }
+		{
+			identifier: "ABOVE",
+			outcomeIdentifier: "FEEDBACK__RESPONSE_POS",
+			content: [{ type: "paragraph", content: [{ type: "text", content: "Correct: -1.4 is above -6.4." }] }]
+		},
+		{
+			identifier: "BELOW",
+			outcomeIdentifier: "FEEDBACK__RESPONSE_POS",
+			content: [
+				{
+					type: "paragraph",
+					content: [{ type: "text", content: "Not quite: -1.4 is above -6.4 on a vertical number line." }]
+				}
+			]
+		},
+		{
+			identifier: "GT",
+			outcomeIdentifier: "FEEDBACK__RESPONSE_COMP",
+			content: [
+				{ type: "paragraph", content: [{ type: "text", content: "Correct: a higher position means greater value." }] }
+			]
+		},
+		{
+			identifier: "LT",
+			outcomeIdentifier: "FEEDBACK__RESPONSE_COMP",
+			content: [
+				{
+					type: "paragraph",
+					content: [{ type: "text", content: "Not quite: since -1.4 is higher than -6.4, -1.4 is greater." }]
+				}
+			]
+		}
 	]
 }
 
@@ -2249,19 +2280,19 @@ export const countApplesEmoji: AssessmentItemInput = {
 			choices: [
 				{
 					identifier: "CHOICE_3",
-					content: [{ type: "blockSlot", slotId: "choice_3_apples" }],
+					content: [{ type: "blockSlot", slotId: "choice_3_apples" }]
 				},
 				{
 					identifier: "CHOICE_4",
-					content: [{ type: "blockSlot", slotId: "choice_4_apples" }],
+					content: [{ type: "blockSlot", slotId: "choice_4_apples" }]
 				},
 				{
 					identifier: "CHOICE_5",
-					content: [{ type: "blockSlot", slotId: "choice_5_apples" }],
+					content: [{ type: "blockSlot", slotId: "choice_5_apples" }]
 				},
 				{
 					identifier: "CHOICE_6",
-					content: [{ type: "blockSlot", slotId: "choice_6_apples" }],
+					content: [{ type: "blockSlot", slotId: "choice_6_apples" }]
 				}
 			]
 		}
@@ -2455,7 +2486,9 @@ export const reactantAmountsTemperatureTableWithDropdowns: AssessmentItemInput =
 			content: [
 				{
 					type: "paragraph",
-					content: [{ type: "text", content: "Great job! You matched reactants and amounts to the temperature changes." }]
+					content: [
+						{ type: "text", content: "Great job! You matched reactants and amounts to the temperature changes." }
+					]
 				}
 			]
 		},
@@ -2578,8 +2611,25 @@ export const attractRepelCompletionTable: AssessmentItemInput = {
 		text_entry: { type: "textEntryInteraction", responseIdentifier: "RESPONSE_TEXT_ENTRY", expectedLength: 10 }
 	},
 	feedbackBlocks: [
-		{ identifier: "CORRECT", outcomeIdentifier: "FEEDBACK__GLOBAL", content: [{ type: "paragraph", content: [{ type: "text", content: "Correct! Likes repel and opposites attract." }] }] },
-		{ identifier: "INCORRECT", outcomeIdentifier: "FEEDBACK__GLOBAL", content: [{ type: "paragraph", content: [{ type: "text", content: "Not quite. Remember: like charges/poles repel; opposite charges/poles attract." }] }] }
+		{
+			identifier: "CORRECT",
+			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			content: [
+				{ type: "paragraph", content: [{ type: "text", content: "Correct! Likes repel and opposites attract." }] }
+			]
+		},
+		{
+			identifier: "INCORRECT",
+			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			content: [
+				{
+					type: "paragraph",
+					content: [
+						{ type: "text", content: "Not quite. Remember: like charges/poles repel; opposite charges/poles attract." }
+					]
+				}
+			]
+		}
 	]
 }
 
@@ -2703,19 +2753,19 @@ export const shapeBinBarChart: AssessmentItemInput = {
 			choices: [
 				{
 					identifier: "A",
-					content: [{ type: "blockSlot", slotId: "chart_a" }],
+					content: [{ type: "blockSlot", slotId: "chart_a" }]
 				},
 				{
 					identifier: "B",
-					content: [{ type: "blockSlot", slotId: "chart_b" }],
+					content: [{ type: "blockSlot", slotId: "chart_b" }]
 				},
 				{
 					identifier: "C",
-					content: [{ type: "blockSlot", slotId: "chart_c" }],
+					content: [{ type: "blockSlot", slotId: "chart_c" }]
 				},
 				{
 					identifier: "D",
-					content: [{ type: "blockSlot", slotId: "chart_d" }],
+					content: [{ type: "blockSlot", slotId: "chart_d" }]
 				}
 			]
 		}
@@ -2898,7 +2948,10 @@ export const pencilLengthLinePlot: AssessmentItemInput = {
 				{
 					type: "paragraph",
 					content: [
-						{ type: "text", content: "This plot correctly shows a dot for each of the 4 pencils at its measured length." }
+						{
+							type: "text",
+							content: "This plot correctly shows a dot for each of the 4 pencils at its measured length."
+						}
 					]
 				}
 			]
@@ -3494,15 +3547,15 @@ export const threeDataTablesMultipleChoice: AssessmentItemInput = {
 			choices: [
 				{
 					identifier: "A",
-					content: [{ type: "paragraph", content: [{ type: "text", content: "Apples" }] }],
+					content: [{ type: "paragraph", content: [{ type: "text", content: "Apples" }] }]
 				},
 				{
 					identifier: "B",
-					content: [{ type: "paragraph", content: [{ type: "text", content: "Bananas" }] }],
+					content: [{ type: "paragraph", content: [{ type: "text", content: "Bananas" }] }]
 				},
 				{
 					identifier: "C",
-					content: [{ type: "paragraph", content: [{ type: "text", content: "Cherries" }] }],
+					content: [{ type: "paragraph", content: [{ type: "text", content: "Cherries" }] }]
 				}
 			]
 		},
@@ -3516,15 +3569,15 @@ export const threeDataTablesMultipleChoice: AssessmentItemInput = {
 			choices: [
 				{
 					identifier: "A",
-					content: [{ type: "paragraph", content: [{ type: "text", content: "Springfield" }] }],
+					content: [{ type: "paragraph", content: [{ type: "text", content: "Springfield" }] }]
 				},
 				{
 					identifier: "B",
-					content: [{ type: "paragraph", content: [{ type: "text", content: "Riverton" }] }],
+					content: [{ type: "paragraph", content: [{ type: "text", content: "Riverton" }] }]
 				},
 				{
 					identifier: "C",
-					content: [{ type: "paragraph", content: [{ type: "text", content: "Lakeside" }] }],
+					content: [{ type: "paragraph", content: [{ type: "text", content: "Lakeside" }] }]
 				}
 			]
 		},
@@ -3538,31 +3591,67 @@ export const threeDataTablesMultipleChoice: AssessmentItemInput = {
 			choices: [
 				{
 					identifier: "A",
-					content: [{ type: "paragraph", content: [{ type: "text", content: "Math" }] }],
+					content: [{ type: "paragraph", content: [{ type: "text", content: "Math" }] }]
 				},
 				{
 					identifier: "B",
-					content: [{ type: "paragraph", content: [{ type: "text", content: "Science" }] }],
+					content: [{ type: "paragraph", content: [{ type: "text", content: "Science" }] }]
 				},
 				{
 					identifier: "C",
-					content: [{ type: "paragraph", content: [{ type: "text", content: "History" }] }],
+					content: [{ type: "paragraph", content: [{ type: "text", content: "History" }] }]
 				}
 			]
 		}
 	},
 	feedbackBlocks: [
-		{ identifier: "A", outcomeIdentifier: "FEEDBACK__RESPONSE_Q1", content: [{ type: "paragraph", content: [{ type: "text", content: "Check the fruit counts carefully." }] }] },
-		{ identifier: "B", outcomeIdentifier: "FEEDBACK__RESPONSE_Q1", content: [{ type: "paragraph", content: [{ type: "text", content: "Correct for Q1." }] }] },
-		{ identifier: "C", outcomeIdentifier: "FEEDBACK__RESPONSE_Q1", content: [{ type: "paragraph", content: [{ type: "text", content: "Check the fruit counts carefully." }] }] },
+		{
+			identifier: "A",
+			outcomeIdentifier: "FEEDBACK__RESPONSE_Q1",
+			content: [{ type: "paragraph", content: [{ type: "text", content: "Check the fruit counts carefully." }] }]
+		},
+		{
+			identifier: "B",
+			outcomeIdentifier: "FEEDBACK__RESPONSE_Q1",
+			content: [{ type: "paragraph", content: [{ type: "text", content: "Correct for Q1." }] }]
+		},
+		{
+			identifier: "C",
+			outcomeIdentifier: "FEEDBACK__RESPONSE_Q1",
+			content: [{ type: "paragraph", content: [{ type: "text", content: "Check the fruit counts carefully." }] }]
+		},
 
-		{ identifier: "A", outcomeIdentifier: "FEEDBACK__RESPONSE_Q2", content: [{ type: "paragraph", content: [{ type: "text", content: "Compare all three city readings." }] }] },
-		{ identifier: "B", outcomeIdentifier: "FEEDBACK__RESPONSE_Q2", content: [{ type: "paragraph", content: [{ type: "text", content: "Compare all three city readings." }] }] },
-		{ identifier: "C", outcomeIdentifier: "FEEDBACK__RESPONSE_Q2", content: [{ type: "paragraph", content: [{ type: "text", content: "Correct for Q2." }] }] },
+		{
+			identifier: "A",
+			outcomeIdentifier: "FEEDBACK__RESPONSE_Q2",
+			content: [{ type: "paragraph", content: [{ type: "text", content: "Compare all three city readings." }] }]
+		},
+		{
+			identifier: "B",
+			outcomeIdentifier: "FEEDBACK__RESPONSE_Q2",
+			content: [{ type: "paragraph", content: [{ type: "text", content: "Compare all three city readings." }] }]
+		},
+		{
+			identifier: "C",
+			outcomeIdentifier: "FEEDBACK__RESPONSE_Q2",
+			content: [{ type: "paragraph", content: [{ type: "text", content: "Correct for Q2." }] }]
+		},
 
-		{ identifier: "A", outcomeIdentifier: "FEEDBACK__RESPONSE_Q3", content: [{ type: "paragraph", content: [{ type: "text", content: "Look at the minutes column." }] }] },
-		{ identifier: "B", outcomeIdentifier: "FEEDBACK__RESPONSE_Q3", content: [{ type: "paragraph", content: [{ type: "text", content: "Look at the minutes column." }] }] },
-		{ identifier: "C", outcomeIdentifier: "FEEDBACK__RESPONSE_Q3", content: [{ type: "paragraph", content: [{ type: "text", content: "Correct for Q3." }] }] }
+		{
+			identifier: "A",
+			outcomeIdentifier: "FEEDBACK__RESPONSE_Q3",
+			content: [{ type: "paragraph", content: [{ type: "text", content: "Look at the minutes column." }] }]
+		},
+		{
+			identifier: "B",
+			outcomeIdentifier: "FEEDBACK__RESPONSE_Q3",
+			content: [{ type: "paragraph", content: [{ type: "text", content: "Look at the minutes column." }] }]
+		},
+		{
+			identifier: "C",
+			outcomeIdentifier: "FEEDBACK__RESPONSE_Q3",
+			content: [{ type: "paragraph", content: [{ type: "text", content: "Correct for Q3." }] }]
+		}
 	]
 }
 
@@ -3679,9 +3768,28 @@ export const compareNegativeDecimalVsRootInlineChoice: AssessmentItemInput = {
 	title: "Compare a decimal and a square root",
 	widgets: {},
 	feedbackBlocks: [
-		{ identifier: "GT", outcomeIdentifier: "FEEDBACK__RESPONSE", content: [{ type: "paragraph", content: [{ type: "text", content: "Correct! -4.1 is greater than -√20." }] }] },
-		{ identifier: "LT", outcomeIdentifier: "FEEDBACK__RESPONSE", content: [{ type: "paragraph", content: [{ type: "text", content: "Not quite. √20≈4.47, so -4.1 is greater (less negative)." }] }] },
-		{ identifier: "EQ", outcomeIdentifier: "FEEDBACK__RESPONSE", content: [{ type: "paragraph", content: [{ type: "text", content: "Not equal; compare the magnitudes carefully." }] }] }
+		{
+			identifier: "GT",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
+			content: [{ type: "paragraph", content: [{ type: "text", content: "Correct! -4.1 is greater than -√20." }] }]
+		},
+		{
+			identifier: "LT",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
+			content: [
+				{
+					type: "paragraph",
+					content: [{ type: "text", content: "Not quite. √20≈4.47, so -4.1 is greater (less negative)." }]
+				}
+			]
+		},
+		{
+			identifier: "EQ",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
+			content: [
+				{ type: "paragraph", content: [{ type: "text", content: "Not equal; compare the magnitudes carefully." }] }
+			]
+		}
 	],
 	identifier: "compare-negative-decimal-vs-root-inline-choice",
 	interactions: {
@@ -3877,8 +3985,38 @@ export const reactionRateChangesTable: AssessmentItemInput = {
 		}
 	},
 	feedbackBlocks: [
-		{ identifier: "CORRECT", outcomeIdentifier: "FEEDBACK__GLOBAL", content: [{ type: "paragraph", content: [{ type: "text", content: "Correct! Stirring and heating increase the frequency of effective collisions, so they increase the reaction rate. Decreasing concentration reduces collisions and decreases the rate." }] }] },
-		{ identifier: "INCORRECT", outcomeIdentifier: "FEEDBACK__GLOBAL", content: [{ type: "paragraph", content: [{ type: "text", content: "Not quite. Stirring and heating bring reactant particles into contact more often, which increases collisions and speeds up the reaction. Lowering the concentration leads to fewer collisions, which slows the reaction." }] }] }
+		{
+			identifier: "CORRECT",
+			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			content: [
+				{
+					type: "paragraph",
+					content: [
+						{
+							type: "text",
+							content:
+								"Correct! Stirring and heating increase the frequency of effective collisions, so they increase the reaction rate. Decreasing concentration reduces collisions and decreases the rate."
+						}
+					]
+				}
+			]
+		},
+		{
+			identifier: "INCORRECT",
+			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			content: [
+				{
+					type: "paragraph",
+					content: [
+						{
+							type: "text",
+							content:
+								"Not quite. Stirring and heating bring reactant particles into contact more often, which increases collisions and speeds up the reaction. Lowering the concentration leads to fewer collisions, which slows the reaction."
+						}
+					]
+				}
+			]
+		}
 	],
 	identifier: "reaction-rate-changes-table",
 	interactions: {
@@ -4539,7 +4677,9 @@ export const reactantAmountsTempChangeTablePerseus: AssessmentItemInput = {
 			content: [
 				{
 					type: "paragraph",
-					content: [{ type: "text", content: "Correct! You used the patterns in the data to match each unknown entry." }]
+					content: [
+						{ type: "text", content: "Correct! You used the patterns in the data to match each unknown entry." }
+					]
 				},
 				{
 					type: "paragraph",
@@ -4631,4 +4771,3 @@ export const allExamples: AssessmentItemInput[] = [
 	kineticEnergyMassSpeedRelationships,
 	reactantAmountsTempChangeTablePerseus
 ]
-

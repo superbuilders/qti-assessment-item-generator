@@ -1,68 +1,71 @@
-import * as errors from "@superbuilders/errors";
-import * as logger from "@superbuilders/slog";
-import { z } from "zod";
-import { compile } from "../src/compiler/compiler";
-import fractionAddition from "../src/templates/math/fraction-addition";
-import { AssessmentItemSchema } from "../src/compiler/schemas";
+import * as errors from "@superbuilders/errors"
+import * as logger from "@superbuilders/slog"
+import type { z } from "zod"
+import { compile } from "../src/compiler/compiler"
+import { AssessmentItemSchema } from "../src/compiler/schemas"
+import fractionAddition from "../src/templates/math/fraction-addition"
 
 async function main() {
-	logger.info("starting template poc test", { templateId: fractionAddition.templateId, version: fractionAddition.version });
+	logger.info("starting template poc test", {
+		templateId: fractionAddition.templateId,
+		version: fractionAddition.version
+	})
 
 	// 1. Define the input data for the template.
 	// This data object conforms to FractionAdditionTemplateInput.
 	const questionProps = {
 		addend1: { type: "fraction", numerator: 1, denominator: 2, sign: "+" },
-		addend2: { type: "fraction", numerator: 1, denominator: 3, sign: "+" },
-	};
-	logger.debug("defined question props", { props: questionProps });
+		addend2: { type: "fraction", numerator: 1, denominator: 3, sign: "+" }
+	}
+	logger.debug("defined question props", { props: questionProps })
 
-// 2. Validate input props against the template's schema.
+	// 2. Validate input props against the template's schema.
 
 	// 3. Validate input props against the template's schema.
-	const validationResult = fractionAddition.propsSchema.safeParse(questionProps);
+	const validationResult = fractionAddition.propsSchema.safeParse(questionProps)
 	if (!validationResult.success) {
-		logger.error("template input validation failed", { error: validationResult.error });
-		throw errors.wrap(validationResult.error, "template input validation");
+		logger.error("template input validation failed", { error: validationResult.error })
+		throw errors.wrap(validationResult.error, "template input validation")
 	}
 
 	// 4. Call the template's generate() to produce AssessmentItemInput.
 	// This is a synchronous, deterministic call.
-	const itemInputResult = errors.trySync(() => fractionAddition.generate(validationResult.data));
+	const itemInputResult = errors.trySync(() => fractionAddition.generate(validationResult.data))
 	if (itemInputResult.error) {
-		logger.error("template function failed", { error: itemInputResult.error });
-		throw errors.wrap(itemInputResult.error, "template generation");
+		logger.error("template function failed", { error: itemInputResult.error })
+		throw errors.wrap(itemInputResult.error, "template generation")
 	}
-	const assessmentItemInputRaw = itemInputResult.data;
+	const assessmentItemInputRaw = itemInputResult.data
 
 	// Validate and strongly type against AssessmentItem schema
-	const aiValidation = AssessmentItemSchema.safeParse(assessmentItemInputRaw);
+	const aiValidation = AssessmentItemSchema.safeParse(assessmentItemInputRaw)
 	if (!aiValidation.success) {
-		logger.error("generated assessmentiteminput failed schema validation", { error: aiValidation.error });
-		throw errors.wrap(aiValidation.error, "assessment item validation");
+		logger.error("generated assessmentiteminput failed schema validation", { error: aiValidation.error })
+		throw errors.wrap(aiValidation.error, "assessment item validation")
 	}
-	const assessmentItemInput: z.input<typeof AssessmentItemSchema> = aiValidation.data;
-	logger.info("successfully generated assessmentiteminput from template");
+	const assessmentItemInput: z.input<typeof AssessmentItemSchema> = aiValidation.data
+	logger.info("successfully generated assessmentiteminput from template")
 
 	// 5. Pass the generated data structure to the compiler.
-	const compileResult = await errors.try(compile(assessmentItemInput));
+	const compileResult = await errors.try(compile(assessmentItemInput))
 	if (compileResult.error) {
-		logger.error("qti compilation failed", { error: compileResult.error });
-		throw errors.wrap(compileResult.error, "compilation");
+		logger.error("qti compilation failed", { error: compileResult.error })
+		throw errors.wrap(compileResult.error, "compilation")
 	}
-	const qtiXml = compileResult.data;
-	logger.info("successfully compiled qti xml");
+	const qtiXml = compileResult.data
+	logger.info("successfully compiled qti xml")
 
 	// 6. Log the final output.
-	console.log("\n✅ Template POC Succeeded!");
-	console.log("✨ Generated QTI 3.0 XML ✨\n");
-	console.log("========================================");
-	console.log(qtiXml);
-	console.log("========================================");
+	logger.info("template poc succeeded")
+	logger.info("generated qti xml", {
+		xml: qtiXml,
+		separator: "========================================"
+	})
 }
 
 // Execute the main function and handle potential errors at the top level.
-const result = await errors.try(main());
+const result = await errors.try(main())
 if (result.error) {
-	logger.error("template poc script failed", { error: result.error });
-	process.exit(1);
+	logger.error("template poc script failed", { error: result.error })
+	process.exit(1)
 }

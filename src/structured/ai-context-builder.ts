@@ -51,9 +51,9 @@ export async function buildPerseusEnvelope(
 				const urlWithExt = `${baseUrl}.${ext}`
 
 				const headResult = await errors.try(
-					fetchFn(urlWithExt, { 
-						method: "HEAD", 
-						signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) 
+					fetchFn(urlWithExt, {
+						method: "HEAD",
+						signal: AbortSignal.timeout(FETCH_TIMEOUT_MS)
 					})
 				)
 				if (headResult.error || !headResult.data.ok) continue
@@ -68,12 +68,12 @@ export async function buildPerseusEnvelope(
 				return { type: "raster", url: urlWithExt }
 			}
 		} else {
-			try {
-				const u = new URL(url)
-				if (u.protocol !== "http:" && u.protocol !== "https:") return null
-			} catch {
+			const urlResult = errors.trySync(() => new URL(url))
+			if (urlResult.error) {
 				return null
 			}
+			const u = urlResult.data
+			if (u.protocol !== "http:" && u.protocol !== "https:") return null
 
 			if (url.endsWith(".svg")) {
 				const dl = await errors.try(fetchFn(url, { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) }))
@@ -109,7 +109,7 @@ export async function buildPerseusEnvelope(
 	}
 
 	// Return URLs in deterministic order (sorted)
-	return { 
+	return {
 		primaryContent,
 		supplementaryContent,
 		rasterImageUrls: Array.from(rasterImageUrls).sort()
@@ -141,18 +141,25 @@ export async function buildHtmlEnvelope(
 	}
 
 	const imgTagRegex = /<img\s[^>]*src\s*=\s*(?:"([^"]*)"|'([^']*)')[^>]*>/gi
-	let match: RegExpExecArray | null
-	while ((match = imgTagRegex.exec(html)) !== null) {
+	let match: RegExpExecArray | null = imgTagRegex.exec(html)
+	while (match !== null) {
 		const rawSrc = match[1] ?? match[2]
-		if (!rawSrc) continue
-		
+		if (!rawSrc) {
+			match = imgTagRegex.exec(html)
+			continue
+		}
+
 		const urlResult = errors.trySync(() => new URL(rawSrc))
 		if (urlResult.error) {
 			logger.warn("skipping invalid image src in html", { src: rawSrc, error: urlResult.error })
+			match = imgTagRegex.exec(html)
 			continue
 		}
 		const urlObj = urlResult.data
-		if (urlObj.protocol !== "http:" && urlObj.protocol !== "https:") continue
+		if (urlObj.protocol !== "http:" && urlObj.protocol !== "https:") {
+			match = imgTagRegex.exec(html)
+			continue
+		}
 		const url = urlObj.toString()
 		const isSvg = urlObj.pathname.toLowerCase().endsWith(".svg")
 		if (isSvg) {
@@ -160,10 +167,11 @@ export async function buildHtmlEnvelope(
 		} else {
 			rasterImageUrls.add(url)
 		}
+		match = imgTagRegex.exec(html)
 	}
 
-    // NOTE: Inline <svg> content remains inside the primary HTML (context[0]).
-    // We do not extract or duplicate it as separate context entries.
+	// NOTE: Inline <svg> content remains inside the primary HTML (context[0]).
+	// We do not extract or duplicate it as separate context entries.
 
 	// Fetch external SVGs (no concurrency limiting)
 	if (svgUrlsToFetch.size > 0) {

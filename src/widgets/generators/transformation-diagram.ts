@@ -1,13 +1,13 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
 import { CSS_COLOR_PATTERN } from "../../utils/css-color"
 import { Path2D } from "../../utils/path-builder"
-import { theme } from "../../utils/theme"
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { estimateWrappedTextDimensions } from "../../utils/text"
+import { theme } from "../../utils/theme"
 import type { WidgetGenerator } from "../types"
 
 function createShapeSchema() {
@@ -410,19 +410,28 @@ export const generateTransformationDiagram: WidgetGenerator<typeof Transformatio
 		)
 	}
 
-	function rectIntersectsAnySegment(rect: { x: number; y: number; width: number; height: number; pad?: number }): boolean {
+	function rectIntersectsAnySegment(rect: {
+		x: number
+		y: number
+		width: number
+		height: number
+		pad?: number
+	}): boolean {
 		for (const seg of screenSegments) {
 			if (segmentIntersectsRect(seg.a, seg.b, rect)) return true
 		}
 		return false
 	}
 
-	function rectsOverlap(a: { x: number; y: number; width: number; height: number }, b: {
-		x: number
-		y: number
-		width: number
-		height: number
-	}): boolean {
+	function rectsOverlap(
+		a: { x: number; y: number; width: number; height: number },
+		b: {
+			x: number
+			y: number
+			width: number
+			height: number
+		}
+	): boolean {
 		return !(a.x + a.width < b.x || b.x + b.width < a.x || a.y + a.height < b.y || b.y + b.height < a.y)
 	}
 
@@ -810,7 +819,7 @@ export const generateTransformationDiagram: WidgetGenerator<typeof Transformatio
 	}
 
 	// Draw shape labels with collision avoidance against edges and other labels
-	const drawShapeLabel = (shape: TransformationDiagramProps["preImage"], preferBelow: boolean = false) => {
+	const drawShapeLabel = (shape: TransformationDiagramProps["preImage"], preferBelow = false) => {
 		if (!shape.label) return
 
 		// Compute screen-space bbox of the shape
@@ -852,26 +861,43 @@ export const generateTransformationDiagram: WidgetGenerator<typeof Transformatio
 			const maxX = width - PADDING - halfW
 			while (!fitsAt(left.x, left.y) && left.it < maxIt) {
 				left.x -= step
-				if (left.x < minX) { left.x = minX; break }
+				if (left.x < minX) {
+					left.x = minX
+					break
+				}
 				left.it++
 			}
 			while (!fitsAt(right.x, right.y) && right.it < maxIt) {
 				right.x += step
-				if (right.x > maxX) { right.x = maxX; break }
+				if (right.x > maxX) {
+					right.x = maxX
+					break
+				}
 				right.it++
 			}
 			return left.it <= right.it ? left : right
 		}
-
 
 		// Prefer location based on caller; try preferred first then fallback
 		const above = slideHoriz(centerX, aboveY)
 		const below = slideHoriz(centerX, belowY)
 		let chosen
 		if (preferBelow) {
-			chosen = fitsAt(below.x, below.y) ? below : fitsAt(above.x, above.y) ? above : (below.it <= above.it ? below : above)
+			chosen = fitsAt(below.x, below.y)
+				? below
+				: fitsAt(above.x, above.y)
+					? above
+					: below.it <= above.it
+						? below
+						: above
 		} else {
-			chosen = fitsAt(above.x, above.y) ? above : fitsAt(below.x, below.y) ? below : (above.it <= below.it ? above : below)
+			chosen = fitsAt(above.x, above.y)
+				? above
+				: fitsAt(below.x, below.y)
+					? below
+					: above.it <= below.it
+						? above
+						: below
 		}
 
 		canvas.drawText({

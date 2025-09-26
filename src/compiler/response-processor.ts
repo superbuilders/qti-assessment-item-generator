@@ -1,7 +1,7 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { escapeXmlAttribute } from "../utils/xml-utils"
-import type { AssessmentItem, AnyInteraction } from "./schemas"
+import type { AnyInteraction, AssessmentItem } from "./schemas"
 
 type ResponseDeclaration = AssessmentItem["responseDeclarations"][0]
 
@@ -109,20 +109,22 @@ export function compileResponseDeclarations(decls: AssessmentItem["responseDecla
 
 function generateProcessingForInteraction(decl: ResponseDeclaration, interaction?: AnyInteraction): string {
 	const responseId = escapeXmlAttribute(decl.identifier)
-	const isEnumerated = interaction && (interaction.type === 'choiceInteraction' || interaction.type === 'inlineChoiceInteraction')
+	const isEnumerated =
+		interaction && (interaction.type === "choiceInteraction" || interaction.type === "inlineChoiceInteraction")
 
 	if (isEnumerated) {
 		const outcomeId = `FEEDBACK__${responseId}`
-		if (decl.cardinality === 'multiple') {
+		if (decl.cardinality === "multiple") {
 			return `
     <qti-set-outcome-value identifier="${outcomeId}">
         <qti-variable identifier="${responseId}"/>
     </qti-set-outcome-value>`
 		}
-		const conditions = interaction.choices.map((choice, index) => {
-			const tag = index === 0 ? 'qti-response-if' : 'qti-response-else-if'
-			const choiceId = escapeXmlAttribute(choice.identifier)
-			return `
+		const conditions = interaction.choices
+			.map((choice, index) => {
+				const tag = index === 0 ? "qti-response-if" : "qti-response-else-if"
+				const choiceId = escapeXmlAttribute(choice.identifier)
+				return `
         <${tag}>
             <qti-match>
                 <qti-variable identifier="${responseId}"/>
@@ -132,11 +134,12 @@ function generateProcessingForInteraction(decl: ResponseDeclaration, interaction
                 <qti-base-value base-type="identifier">${choiceId}</qti-base-value>
             </qti-set-outcome-value>
         </${tag}>`
-		}).join('')
+			})
+			.join("")
 		return `<qti-response-condition>${conditions}</qti-response-condition>`
 	}
-	
-	const outcomeId = `FEEDBACK__GLOBAL`
+
+	const outcomeId = "FEEDBACK__GLOBAL"
 	return `
     <qti-response-condition>
         <qti-response-if>
@@ -168,10 +171,12 @@ export function compileResponseProcessing(item: AssessmentItem): string {
 	}
 
 	// 2. Generate scoring logic based on the correctness of all interactions.
-	const scoreConditions = item.responseDeclarations.map(decl => {
-		const responseId = escapeXmlAttribute(decl.identifier)
-		return `<qti-match><qti-variable identifier="${responseId}"/><qti-correct identifier="${responseId}"/></qti-match>`
-	}).join('\n                        ')
+	const scoreConditions = item.responseDeclarations
+		.map((decl) => {
+			const responseId = escapeXmlAttribute(decl.identifier)
+			return `<qti-match><qti-variable identifier="${responseId}"/><qti-correct identifier="${responseId}"/></qti-match>`
+		})
+		.join("\n                        ")
 
 	processingRules.push(`
     <qti-response-condition>
@@ -185,7 +190,7 @@ export function compileResponseProcessing(item: AssessmentItem): string {
             <qti-set-outcome-value identifier="SCORE"><qti-base-value base-type="float">0.0</qti-base-value></qti-set-outcome-value>
         </qti-response-else>
     </qti-response-condition>`)
-	
+
 	return `
     <qti-response-processing>
         ${processingRules.join("\n")}

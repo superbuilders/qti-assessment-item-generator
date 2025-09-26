@@ -25,13 +25,32 @@ async function runWithSeed<T>(seed: number, fn: () => Promise<T>): Promise<T> {
 }
 
 describe("Widget: marble-diagram", () => {
-    const examples: WidgetInput[] = [
-        { type: "marbleDiagram", groups: [ { color: "#5B8DEF", count: 2 }, { color: "#D0021B", count: 3 } ] },
-        { type: "marbleDiagram", groups: [ { color: "#5B8DEF", count: 5 } ] },
-        { type: "marbleDiagram", groups: [ { color: "#D0021B", count: 5 } ] },
-        { type: "marbleDiagram", groups: [ { color: "#5B8DEF", count: 3 }, { color: "#D0021B", count: 4 } ] },
-        { type: "marbleDiagram", groups: [ { color: "#5B8DEF", count: 1 }, { color: "#D0021B", count: 1 }, { color: "#00AA00", count: 2 } ] }
-    ]
+	const examples: WidgetInput[] = [
+		{
+			type: "marbleDiagram",
+			groups: [
+				{ color: "#5B8DEF", count: 2 },
+				{ color: "#D0021B", count: 3 }
+			]
+		},
+		{ type: "marbleDiagram", groups: [{ color: "#5B8DEF", count: 5 }] },
+		{ type: "marbleDiagram", groups: [{ color: "#D0021B", count: 5 }] },
+		{
+			type: "marbleDiagram",
+			groups: [
+				{ color: "#5B8DEF", count: 3 },
+				{ color: "#D0021B", count: 4 }
+			]
+		},
+		{
+			type: "marbleDiagram",
+			groups: [
+				{ color: "#5B8DEF", count: 1 },
+				{ color: "#D0021B", count: 1 },
+				{ color: "#00AA00", count: 2 }
+			]
+		}
+	]
 
 	examples.forEach((props, index) => {
 		test(`should produce consistent output for example #${index + 1}`, async () => {

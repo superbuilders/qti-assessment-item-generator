@@ -72,5 +72,3 @@ export function createAlwaysFailFetch(): typeof fetch {
 	wrapped.preconnect = base.preconnect
 	return wrapped
 }
-
-

@@ -1,4 +1,3 @@
-import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
@@ -6,8 +5,9 @@ import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
 import { CSS_COLOR_PATTERN } from "../../utils/css-color"
 import { MATHML_INNER_PATTERN } from "../../utils/mathml"
-import { theme } from "../../utils/theme"
 import { numberContentToInnerMathML } from "../../utils/number-to-mathml"
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
+import { theme } from "../../utils/theme"
 import type { WidgetGenerator } from "../types"
 
 // Defines the content and styling for a single cell in the grid.
@@ -114,7 +114,11 @@ export const generateBoxGrid: WidgetGenerator<typeof BoxGridPropsSchema> = async
 		const row = data[r]
 		const rowCols = row ? row.length : -1
 		if (rowCols !== expectedNumCols) {
-			logger.error("box grid rows have inconsistent column counts", { rowIndex: r, expected: expectedNumCols, actual: rowCols })
+			logger.error("box grid rows have inconsistent column counts", {
+				rowIndex: r,
+				expected: expectedNumCols,
+				actual: rowCols
+			})
 			throw errors.new("box grid: ragged rows")
 		}
 	}
@@ -160,10 +164,7 @@ export const generateBoxGrid: WidgetGenerator<typeof BoxGridPropsSchema> = async
 				cell.content.type === "fraction" ||
 				cell.content.type === "mixed"
 			) {
-				const inner =
-					cell.content.type === "math"
-						? cell.content.mathml
-						: numberContentToInnerMathML(cell.content)
+				const inner = cell.content.type === "math" ? cell.content.mathml : numberContentToInnerMathML(cell.content)
 
 				const fontPx = 14
 				// Increase font size for better legibility in grid cells
@@ -200,4 +201,3 @@ export const generateBoxGrid: WidgetGenerator<typeof BoxGridPropsSchema> = async
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}">${svgBody}</svg>`
 }
-

@@ -26,34 +26,6 @@ export const ErrDuplicateChoiceIdentifier = errors.new("duplicate choice identif
 // NEW: Custom error for invalid rowHeaderKey in dataTable
 export const ErrInvalidRowHeaderKey = errors.new("invalid dataTable rowHeaderKey")
 
-// Type-safe helper to check for legacy properties on the raw, unknown input object.
-function hasLegacyFeedback(data: unknown): boolean {
-	if (typeof data !== 'object' || data === null) {
-		return false
-	}
-	if ('feedback' in data) {
-		return true
-	}
-	if ('interactions' in data) {
-		const interactions = (data as { interactions: unknown }).interactions
-		if (typeof interactions === 'object' && interactions !== null) {
-			for (const interaction of Object.values(interactions)) {
-				if (typeof interaction === 'object' && interaction !== null && 'choices' in interaction) {
-					const choices = (interaction as { choices: unknown }).choices
-					if (Array.isArray(choices)) {
-						for (const choice of choices) {
-							if (typeof choice === 'object' && choice !== null && 'feedback' in choice) {
-								return true
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-	return false
-}
-
 // Type guard to check if a string is a valid widget type
 function isValidWidgetType(type: string): type is keyof typeof typedSchemas {
 	return Object.keys(typedSchemas).includes(type)
@@ -789,12 +761,6 @@ function enforceIdentifierOnlyMatching(item: AssessmentItem): void {
 }
 
 export async function compile(itemData: AssessmentItemInput): Promise<string> {
-	// NEW: Add strict, type-safe legacy field detection.
-	if (hasLegacyFeedback(itemData)) {
-		logger.error("legacy feedback fields detected", { identifier: (itemData as any).identifier })
-		throw errors.new("Legacy 'feedback' or 'choice.feedback' fields are banned. Migrate to 'feedbackBlocks'.")
-	}
-	
 	// Step 0: Build widget mapping prior to schema enforcement
 	const widgetMapping: Record<string, string> = {}
 	if (itemData.widgets) {
@@ -885,44 +851,52 @@ export async function compile(itemData: AssessmentItemInput): Promise<string> {
 	}
 
 	const filledBody = enforcedItem.body ? renderBlockContent(enforcedItem.body, slots) : ""
-	
+
 	// NEW: Dynamically determine outcome declarations from feedbackBlocks
-	const outcomeDeclarations = new Map<string, 'single' | 'multiple'>()
-	const responseCardinalityMap = new Map<string, 'single' | 'multiple' | 'ordered'>(
-		enforcedItem.responseDeclarations.map(rd => [rd.identifier, rd.cardinality])
+	const outcomeDeclarations = new Map<string, "single" | "multiple">()
+	const responseCardinalityMap = new Map<string, "single" | "multiple" | "ordered">(
+		enforcedItem.responseDeclarations.map((rd) => [rd.identifier, rd.cardinality])
 	)
 
 	for (const block of enforcedItem.feedbackBlocks) {
 		const match = /^FEEDBACK__([A-Za-z0-9_]+)$/.exec(block.outcomeIdentifier)
 		const responseId = match?.[1]
 
-		let cardinality: 'single' | 'multiple' = 'single'
-		if (responseId && responseId !== 'GLOBAL') {
+		let cardinality: "single" | "multiple" = "single"
+		if (responseId && responseId !== "GLOBAL") {
 			const responseCardinality = responseCardinalityMap.get(responseId)
-			if (responseCardinality === 'multiple') {
-				cardinality = 'multiple'
+			if (responseCardinality === "multiple") {
+				cardinality = "multiple"
 			}
 		}
 		outcomeDeclarations.set(block.outcomeIdentifier, cardinality)
 	}
-	
-	const outcomeDeclarationsXml = Array.from(outcomeDeclarations.entries()).map(([identifier, cardinality]) => 
-		`    <qti-outcome-declaration identifier="${escapeXmlAttribute(identifier)}" cardinality="${cardinality}" base-type="identifier"/>`
-	).join('\n')
-	
+
+	const outcomeDeclarationsXml = Array.from(outcomeDeclarations.entries())
+		.map(
+			([identifier, cardinality]) =>
+				`    <qti-outcome-declaration identifier="${escapeXmlAttribute(identifier)}" cardinality="${cardinality}" base-type="identifier"/>`
+		)
+		.join("\n")
+
 	// NEW: Generate feedbackBlocks XML with interactive widget validation
-	const feedbackBlocksXml = enforcedItem.feedbackBlocks.map(block => {
-		// Validate against interactive widgets - strict allowlist for dataTable cells
-		const contentStr = JSON.stringify(block.content)
-		if (contentStr.includes('"type":"input"') || contentStr.includes('"type":"dropdown"')) {
-			logger.error("interactive widget found in feedback content", { identifier: enforcedItem.identifier, blockId: block.identifier })
-			throw errors.new("Interactive widgets are banned in feedback content.")
-		}
-		const contentXml = renderBlockContent(block.content, slots)
-		return `        <qti-feedback-block outcome-identifier="${escapeXmlAttribute(block.outcomeIdentifier)}" identifier="${escapeXmlAttribute(block.identifier)}" show-hide="show">
+	const feedbackBlocksXml = enforcedItem.feedbackBlocks
+		.map((block) => {
+			// Validate against interactive widgets - strict allowlist for dataTable cells
+			const contentStr = JSON.stringify(block.content)
+			if (contentStr.includes('"type":"input"') || contentStr.includes('"type":"dropdown"')) {
+				logger.error("interactive widget found in feedback content", {
+					identifier: enforcedItem.identifier,
+					blockId: block.identifier
+				})
+				throw errors.new("Interactive widgets are banned in feedback content.")
+			}
+			const contentXml = renderBlockContent(block.content, slots)
+			return `        <qti-feedback-block outcome-identifier="${escapeXmlAttribute(block.outcomeIdentifier)}" identifier="${escapeXmlAttribute(block.identifier)}" show-hide="show">
             <qti-content-body>${contentXml}</qti-content-body>
         </qti-feedback-block>`
-	}).join('\n')
+		})
+		.join("\n")
 
 	const responseDeclarations = compileResponseDeclarations(enforcedItem.responseDeclarations)
 	const responseProcessing = compileResponseProcessing(enforcedItem)

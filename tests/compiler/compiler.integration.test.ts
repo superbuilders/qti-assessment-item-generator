@@ -16,8 +16,16 @@ describe("Compiler Identifier Validation Integration Tests", () => {
 			title: "Test Duplicate Response",
 			body: [],
 			feedbackBlocks: [
-				{ identifier: "CORRECT", outcomeIdentifier: "FEEDBACK__GLOBAL", content: [{ type: "paragraph", content: [{ type: "text", content: "Correct" }] }] },
-				{ identifier: "INCORRECT", outcomeIdentifier: "FEEDBACK__GLOBAL", content: [{ type: "paragraph", content: [{ type: "text", content: "Incorrect" }] }] }
+				{
+					identifier: "CORRECT",
+					outcomeIdentifier: "FEEDBACK__GLOBAL",
+					content: [{ type: "paragraph", content: [{ type: "text", content: "Correct" }] }]
+				},
+				{
+					identifier: "INCORRECT",
+					outcomeIdentifier: "FEEDBACK__GLOBAL",
+					content: [{ type: "paragraph", content: [{ type: "text", content: "Incorrect" }] }]
+				}
 			],
 			interactions: {
 				interaction_1: {
@@ -58,8 +66,16 @@ describe("Compiler Identifier Validation Integration Tests", () => {
 			title: "Test Interaction Widget Duplicate",
 			body: [],
 			feedbackBlocks: [
-				{ identifier: "CORRECT", outcomeIdentifier: "FEEDBACK__GLOBAL", content: [{ type: "paragraph", content: [{ type: "text", content: "Correct" }] }] },
-				{ identifier: "INCORRECT", outcomeIdentifier: "FEEDBACK__GLOBAL", content: [{ type: "paragraph", content: [{ type: "text", content: "Incorrect" }] }] }
+				{
+					identifier: "CORRECT",
+					outcomeIdentifier: "FEEDBACK__GLOBAL",
+					content: [{ type: "paragraph", content: [{ type: "text", content: "Correct" }] }]
+				},
+				{
+					identifier: "INCORRECT",
+					outcomeIdentifier: "FEEDBACK__GLOBAL",
+					content: [{ type: "paragraph", content: [{ type: "text", content: "Incorrect" }] }]
+				}
 			],
 			interactions: {
 				interaction_1: {
@@ -112,7 +128,11 @@ describe("Compiler Identifier Validation Integration Tests", () => {
 			title: "Test Choice Duplicate",
 			body: [],
 			feedbackBlocks: [
-				{ identifier: "A", outcomeIdentifier: "FEEDBACK__RESPONSE_1", content: [{ type: "paragraph", content: [{ type: "text", content: "Choice A" }] }] }
+				{
+					identifier: "A",
+					outcomeIdentifier: "FEEDBACK__RESPONSE_1",
+					content: [{ type: "paragraph", content: [{ type: "text", content: "Choice A" }] }]
+				}
 			],
 			interactions: {
 				interaction_1: {
@@ -129,9 +149,7 @@ describe("Compiler Identifier Validation Integration Tests", () => {
 				}
 			},
 			widgets: {},
-			responseDeclarations: [
-				{ identifier: "RESPONSE_1", cardinality: "single", baseType: "identifier", correct: "A" }
-			]
+			responseDeclarations: [{ identifier: "RESPONSE_1", cardinality: "single", baseType: "identifier", correct: "A" }]
 		}
 		return expect(compile(itemWithDuplicate)).rejects.toThrow(ErrDuplicateChoiceIdentifier)
 	})
@@ -142,8 +160,16 @@ describe("Compiler Identifier Validation Integration Tests", () => {
 			title: "Test DataTable Duplicate",
 			body: [],
 			feedbackBlocks: [
-				{ identifier: "CORRECT", outcomeIdentifier: "FEEDBACK__GLOBAL", content: [{ type: "paragraph", content: [{ type: "text", content: "Correct" }] }] },
-				{ identifier: "INCORRECT", outcomeIdentifier: "FEEDBACK__GLOBAL", content: [{ type: "paragraph", content: [{ type: "text", content: "Incorrect" }] }] }
+				{
+					identifier: "CORRECT",
+					outcomeIdentifier: "FEEDBACK__GLOBAL",
+					content: [{ type: "paragraph", content: [{ type: "text", content: "Correct" }] }]
+				},
+				{
+					identifier: "INCORRECT",
+					outcomeIdentifier: "FEEDBACK__GLOBAL",
+					content: [{ type: "paragraph", content: [{ type: "text", content: "Incorrect" }] }]
+				}
 			],
 			interactions: {
 				text_entry: { type: "textEntryInteraction", responseIdentifier: "RESPONSE_TEXT", expectedLength: 10 }
@@ -184,8 +210,16 @@ describe("Compiler Identifier Validation Integration Tests", () => {
 			title: "Test Invalid RowHeader",
 			body: [],
 			feedbackBlocks: [
-				{ identifier: "CORRECT", outcomeIdentifier: "FEEDBACK__GLOBAL", content: [{ type: "paragraph", content: [{ type: "text", content: "Correct" }] }] },
-				{ identifier: "INCORRECT", outcomeIdentifier: "FEEDBACK__GLOBAL", content: [{ type: "paragraph", content: [{ type: "text", content: "Incorrect" }] }] }
+				{
+					identifier: "CORRECT",
+					outcomeIdentifier: "FEEDBACK__GLOBAL",
+					content: [{ type: "paragraph", content: [{ type: "text", content: "Correct" }] }]
+				},
+				{
+					identifier: "INCORRECT",
+					outcomeIdentifier: "FEEDBACK__GLOBAL",
+					content: [{ type: "paragraph", content: [{ type: "text", content: "Incorrect" }] }]
+				}
 			],
 			interactions: {
 				interaction_1: {
@@ -234,8 +268,16 @@ describe("Compiler Identifier Validation Integration Tests", () => {
 			title: "Test Valid Complex",
 			body: [],
 			feedbackBlocks: [
-				{ identifier: "CORRECT", outcomeIdentifier: "FEEDBACK__GLOBAL", content: [{ type: "paragraph", content: [{ type: "text", content: "Correct" }] }] },
-				{ identifier: "INCORRECT", outcomeIdentifier: "FEEDBACK__GLOBAL", content: [{ type: "paragraph", content: [{ type: "text", content: "Incorrect" }] }] }
+				{
+					identifier: "CORRECT",
+					outcomeIdentifier: "FEEDBACK__GLOBAL",
+					content: [{ type: "paragraph", content: [{ type: "text", content: "Correct" }] }]
+				},
+				{
+					identifier: "INCORRECT",
+					outcomeIdentifier: "FEEDBACK__GLOBAL",
+					content: [{ type: "paragraph", content: [{ type: "text", content: "Incorrect" }] }]
+				}
 			],
 			interactions: {
 				interaction_1: {

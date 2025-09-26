@@ -1,7 +1,7 @@
-import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { stripMarkdownToPlaintext } from "../../utils/text"
 import { theme } from "../../utils/theme"
 import { escapeXmlAttribute, sanitizeXmlAttributeValue } from "../../utils/xml-utils"
@@ -107,4 +107,3 @@ export const generateUrlImage: WidgetGenerator<typeof UrlImageWidgetPropsSchema>
 
 	return `<div style="${containerStyles}">${imgTag}${captionTag}</div>`
 }
-

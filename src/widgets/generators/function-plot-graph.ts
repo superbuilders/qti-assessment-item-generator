@@ -1,9 +1,15 @@
-import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
-import { createAxisOptionsSchema, createPlotPointSchema, createPolylineSchema, renderPoints, renderPolylines } from "../../utils/canvas-utils"
+import {
+	createAxisOptionsSchema,
+	createPlotPointSchema,
+	createPolylineSchema,
+	renderPoints,
+	renderPolylines
+} from "../../utils/canvas-utils"
 import { AXIS_VIEWBOX_PADDING } from "../../utils/constants"
 import { setupCoordinatePlaneV2 } from "../../utils/coordinate-plane-v2"
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { theme } from "../../utils/theme"
 import type { WidgetGenerator } from "../types"
 
@@ -60,14 +66,14 @@ export const generateFunctionPlotGraph: WidgetGenerator<typeof FunctionPlotGraph
 			width,
 			height,
 			xAxis: {
-                label: xAxis.label,
+				label: xAxis.label,
 				min: xAxis.min,
 				max: xAxis.max,
 				tickInterval: xAxis.tickInterval,
 				showGridLines: xAxis.showGridLines
 			},
 			yAxis: {
-                label: yAxis.label,
+				label: yAxis.label,
 				min: yAxis.min,
 				max: yAxis.max,
 				tickInterval: yAxis.tickInterval,
@@ -92,10 +98,9 @@ export const generateFunctionPlotGraph: WidgetGenerator<typeof FunctionPlotGraph
 				return p
 			})
 			return { ...pl, points: pts }
-		} else {
-			// function-based polylines don't need endpoint extension - they're evaluated dynamically
-			return pl
 		}
+		// function-based polylines don't need endpoint extension - they're evaluated dynamically
+		return pl
 	})
 
 	renderPolylines(extendedPolylines, baseInfo.toSvgX, baseInfo.toSvgY, canvas)
@@ -108,4 +113,3 @@ export const generateFunctionPlotGraph: WidgetGenerator<typeof FunctionPlotGraph
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.base}">${svgBody}</svg>`
 }
-

@@ -206,7 +206,7 @@ export class CanvasImpl implements Canvas {
 	// Implementation of the scoped clipping method.
 	drawInClippedRegion(renderFn: (clippedCanvas: Canvas) => void): void {
 		const originalBody = this.svgBody
-	// Save extents so off-clip drawings do not expand the final viewBox
+		// Save extents so off-clip drawings do not expand the final viewBox
 		const savedExtents = { ...this.extents }
 		const clippedCanvas = new ClippedCanvas(this)
 
@@ -481,9 +481,7 @@ export class CanvasImpl implements Canvas {
 		// by offsetting the first line upward by half the block height in em units.
 		const totalLines = lines.length
 		const firstLineDyEm =
-			opts.dominantBaseline === "middle" && totalLines > 1
-				? -((totalLines - 1) * lineHeight) / 2
-				: 0
+			opts.dominantBaseline === "middle" && totalLines > 1 ? -((totalLines - 1) * lineHeight) / 2 : 0
 		const tspans = lines
 			.map((line, i) => {
 				const dy = i === 0 ? `${firstLineDyEm}em` : `${lineHeight}em`
@@ -931,7 +929,14 @@ export class CanvasImpl implements Canvas {
 		this.svgBody += `<polyline ${attrs} fill="none"/>`
 	}
 
-	drawForeignObject(opts: { x: number; y: number; width: number; height: number; content: string; transform?: string }): void {
+	drawForeignObject(opts: {
+		x: number
+		y: number
+		width: number
+		height: number
+		content: string
+		transform?: string
+	}): void {
 		// Validate content has proper XHTML wrapper
 		if (!opts.content.includes('xmlns="http://www.w3.org/1999/xhtml"')) {
 			logger.error("invalid XHTML content", { content: opts.content.substring(0, 100) })

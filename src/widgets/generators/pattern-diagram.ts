@@ -1,7 +1,7 @@
-import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { CSS_COLOR_PATTERN } from "../../utils/css-color"
+import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { theme } from "../../utils/theme"
 import type { WidgetGenerator } from "../types"
 
@@ -188,4 +188,3 @@ export const generatePatternDiagram: WidgetGenerator<typeof PatternDiagramPropsS
 	html += "</div>"
 	return html
 }
-
