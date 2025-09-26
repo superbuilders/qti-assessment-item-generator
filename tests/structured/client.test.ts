@@ -202,7 +202,8 @@ describe("Structured AI Pipeline", () => {
 		const emptyEnvelope = {
 			primaryContent: "",
 			supplementaryContent: [],
-			multimodalImageUrls: []
+			multimodalImageUrls: [],
+			multimodalImagePayloads: []
 		}
 
 		const result = await errors.try(generateFromEnvelope(mockOpenAI, logger, emptyEnvelope, "math-core"))
@@ -218,7 +219,8 @@ describe("Structured AI Pipeline", () => {
 		const envelope = {
 			primaryContent: "test content",
 			supplementaryContent: [],
-			multimodalImageUrls: []
+			multimodalImageUrls: [],
+			multimodalImagePayloads: []
 		}
 
 		// This should fail at TypeScript level, but let's test runtime behavior

@@ -1,3 +1,7 @@
+Of course. Here is the revised `README.md` that removes the documentation for the helper builders and focuses exclusively on the direct `AiContextEnvelope` workflow, as requested.
+
+---
+
 # @superbuilders/qti-assessment-item-generator
 
 A robust toolkit for generating and compiling QTI 3.0 assessment items from various sources using a structured AI pipeline.
@@ -13,72 +17,11 @@ bun add @superbuilders/qti-assessment-item-generator
 
 ## Core Functionality
 
-### Full Pipeline: Perseus JSON to QTI XML
+### Full Pipeline: Generating QTI from an AI Context Envelope
 
-This example demonstrates the primary workflow: converting a Perseus JSON object into a QTI 3.0 XML string. The `buildPerseusEnvelope` helper automatically resolves `web+graphie://` and standard `https://` image URLs, fetches external SVG content, and embeds it for the AI.
+The primary workflow involves creating an `AiContextEnvelope` object and passing it to the `generateFromEnvelope` function. This envelope is a self-contained representation of the source content, including primary HTML or JSON, supplementary vector graphics, and any raster images.
 
-```ts
-import OpenAI from "openai";
-import * as logger from "@superbuilders/slog";
-import { generateFromEnvelope } from "@superbuilders/qti-assessment-item-generator/structured";
-import { compile } from "@superbuilders/qti-assessment-item-generator/compiler";
-import { buildPerseusEnvelope } from "@superbuilders/qti-assessment-item-generator/structured/ai-context-builder";
-
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
-
-// Your Perseus-like JSON data
-const perseusData = { /* ... your perseus item JSON ... */ };
-
-// 1. Build the AI context envelope from the source data.
-const envelope = await buildPerseusEnvelope(perseusData);
-
-// 2. Generate the structured AssessmentItemInput object.
-//    The `widgetCollectionName` tells the AI which set of visual widgets to use.
-const structuredItem = await generateFromEnvelope(openai, logger, envelope, "math-core");
-
-// 3. Compile the structured item to QTI XML.
-const xml = await compile(structuredItem);
-
-console.log(xml);
-```
-
-### Full Pipeline: HTML to QTI XML (Network-Enabled)
-
-This example converts raw HTML into a QTI 3.0 XML string. The `buildMathacademyEnvelope` helper is async and fetches SVG content from external image URLs. Inline `<svg>` embedded in the HTML remains as-is inside the primary HTML context and is not duplicated. `<img>` `src` URLs and the optional `screenshotUrl` are validated: only absolute `http`/`https` URLs are accepted. Invalid `<img>` `src` values are skipped; an invalid `screenshotUrl` will throw. Fetch timeout is 30 seconds.
-
-```ts
-import OpenAI from "openai";
-import * as logger from "@superbuilders/slog";
-import { generateFromEnvelope } from "@superbuilders/qti-assessment-item-generator/structured";
-import { compile } from "@superbuilders/qti-assessment-item-generator/compiler";
-import { buildMathacademyEnvelope } from "@superbuilders/qti-assessment-item-generator/structured/ai-context-builder";
-
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
-
-const html = `
-  <div>
-    <p>Which of these is a prime number?</p>
-    <img src="https://example.com/some-diagram.png" alt="Diagram" />
-  </div>
-`;
-// Optional: provide a full screenshot for broader context.
-const screenshotUrl = "https://example.com/item-screenshot.png";
-
-// 1. Build the AI context envelope. This builder performs network requests.
-const envelope = await buildMathacademyEnvelope(html, screenshotUrl);
-
-// 2. Generate the structured AssessmentItemInput object.
-const structuredItem = await generateFromEnvelope(openai, logger, envelope, "fourth-grade-math");
-
-// 3. Compile the structured item to QTI XML.
-const xml = await compile(structuredItem);
-
-console.log(xml);
-```
-
-### Full Pipeline: Offline HTML to QTI XML (No Network)
-
-For use cases where network requests are forbidden, you can construct the `AiContextEnvelope` manually. This approach allows you to provide raster images as in-memory binary payloads or `data:` URLs, ensuring a completely offline workflow.
+This approach gives you full control and supports completely offline generation by allowing you to provide raster images as in-memory binary payloads or `data:` URLs, eliminating all network dependencies.
 
 ```ts
 import fs from "fs/promises";
@@ -89,7 +32,7 @@ import { compile } from "@superbuilders/qti-assessment-item-generator/compiler";
 import type { AiContextEnvelope, RasterImagePayload } from "@superbuilders/qti-assessment-item-generator/structured/types";
 
 // ---
-// In an offline pipeline (e.g., TEKS STAAR), you load all assets from a local source.
+// In an offline pipeline, you load all assets from a local, trusted source.
 // ---
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
@@ -101,16 +44,20 @@ const svgText = await fs.readFile("/abs/path/to/diagram.svg", "utf8");
 // 2. Load a raster image (e.g., a screenshot) and create a payload.
 const screenshotBytes = await fs.readFile("/abs/path/to/screenshot.png");
 const screenshotPayload: RasterImagePayload = {
-  data: new Blob([screenshotBytes]),
+  data: new Blob([screenshotBytes]), // Bun and Node provide Blob globally
   mimeType: "image/png",
 };
 
-// 3. Manually build the offline envelope. No network calls will be made.
+// You can also include images as data URLs.
+const extraImageBytes = await fs.readFile("/path/to/figure.png");
+const extraImageDataUrl = `data:image/png;base64,${extraImageBytes.toString("base64")}`;
+
+// 3. Manually build the offline envelope. No network calls will be made by the library.
 const envelope: AiContextEnvelope = {
   primaryContent: html,
-  supplementaryContent: [svgText],
-  multimodalImageUrls: [], // Can also include data: URLs here
-  multimodalImagePayloads: [screenshotPayload],
+  supplementaryContent: [svgText], // Vector graphics go here as raw text
+  multimodalImageUrls: [extraImageDataUrl], // Raster images can be data: URLs
+  multimodalImagePayloads: [screenshotPayload], // Or raw binary payloads
 };
 
 // 4. Generate the structured item.
@@ -194,13 +141,6 @@ console.log(svgString);
     -   The main entry point for the AI pipeline. Converts an `AiContextEnvelope` into a structured `AssessmentItemInput` object.
     -   `widgetCollectionName` is **required** and specifies which set of widgets the AI can use.
 
-### `structured/ai-context-builder`
-
--   `buildPerseusEnvelope(perseusJson: unknown) => Promise<AiContextEnvelope>`
-    -   Creates an envelope from Perseus JSON. Returns an object with `primaryContent`, `supplementaryContent`, `multimodalImageUrls`, and an empty `multimodalImagePayloads`.
--   `buildMathacademyEnvelope(html: string, screenshotUrl?: string) => Promise<AiContextEnvelope>`
-    -   Creates an envelope from raw HTML. Fetches external `.svg` files and collects raster image URLs. Returns an object with `primaryContent`, `supplementaryContent`, `multimodalImageUrls`, and an empty `multimodalImagePayloads`. Only absolute `http`/`https` URLs are accepted.
-
 ### `structured/differentiator`
 
 -   `differentiateAssessmentItem(openai, logger, item, n) => Promise<AssessmentItemInput[]>`
@@ -261,11 +201,14 @@ if (!validationResult.success) {
 const svg = await generateWidget(validationResult.data as unknown as Widget);
 ```
 
-## Image URL and Payload Policy
+## Image and Content Policy
 
--   **`buildMathacademyEnvelope`** (Network-Enabled): Accepts only absolute `http`/`https` image URLs. `<img>` elements with invalid `src` values are skipped. An invalid `screenshotUrl` will throw.
--   **Offline Manual Construction**: The `multimodalImageUrls` array accepts both `http`/`https` URLs and `data:` URLs. The `multimodalImagePayloads` array accepts raw binary image data as `Blob` objects with a specified MIME type.
--   Vector graphics (`.svg`) must be provided as raw string content in the `supplementaryContent` array.
+The `AiContextEnvelope` object separates content by type to ensure proper processing:
+
+-   **`primaryContent`**: The main HTML or Perseus JSON content for the assessment item.
+-   **`supplementaryContent`**: An array of strings, where each string is the full text content of a vector graphic (e.g., an entire `.svg` or `.xml` file).
+-   **`multimodalImageUrls`**: An array of strings for raster images. Each URL must be an absolute `http`/`https` URL or a `data:` URL.
+-   **`multimodalImagePayloads`**: An array of `RasterImagePayload` objects for providing raster images as in-memory binary data. This is the recommended approach for fully offline workflows. Each payload must contain the raw `Blob` data and its corresponding MIME type (e.g., `image/png`, `image/jpeg`).
 
 ## Configuration
 

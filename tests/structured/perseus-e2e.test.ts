@@ -44,7 +44,7 @@ describe("Perseus E2E Regression Suite", () => {
 	// This test confirms that the envelope builder attempts to resolve direct https SVG URLs,
 	// but when the fetch fails (404), they are not added to the envelope.
 	test("should attempt to resolve direct https SVG URLs but handle failures gracefully", async () => {
-		const result = await errors.try(buildPerseusEnvelope(soupVolumeEstimation, mockFetch))
+		const result = await errors.try(buildPerseusEnvelope(soupVolumeEstimation, mockFetch as typeof fetch))
 
 		expect(result.error).toBeFalsy()
 		if (result.error) {
@@ -63,7 +63,7 @@ describe("Perseus E2E Regression Suite", () => {
 	// Test Case 2: web+graphie URLs that resolve to SVGs, found in hints
 	// This test performs live network requests to ensure the probing and SVG fetching works.
 	test("should resolve web+graphie URLs to SVGs and embed their content", async () => {
-		const result = await errors.try(buildPerseusEnvelope(rectangularPrismVolume, mockFetch))
+		const result = await errors.try(buildPerseusEnvelope(rectangularPrismVolume, mockFetch as typeof fetch))
 
 		expect(result.error).toBeFalsy()
 		if (result.error) {
@@ -90,7 +90,7 @@ describe("Perseus E2E Regression Suite", () => {
 
 	// Test Case 3: More web+graphie URLs resolving to SVGs
 	test("should correctly resolve and embed multiple unique SVGs", async () => {
-		const result = await errors.try(buildPerseusEnvelope(numberLineMatcher, mockFetch))
+		const result = await errors.try(buildPerseusEnvelope(numberLineMatcher, mockFetch as typeof fetch))
 
 		expect(result.error).toBeFalsy()
 		if (result.error) {
@@ -114,7 +114,7 @@ describe("Perseus E2E Regression Suite", () => {
 	// This tests that the context builder still correctly processes any associated
 	// `web+graphie` images from the hints, even if the main widget is unsupported by the AI.
 	test("should resolve hint images even for an unsupported widget type", async () => {
-		const result = await errors.try(buildPerseusEnvelope(interactiveGraphPlotting, mockFetch))
+		const result = await errors.try(buildPerseusEnvelope(interactiveGraphPlotting, mockFetch as typeof fetch))
 
 		expect(result.error).toBeFalsy()
 		if (result.error) {

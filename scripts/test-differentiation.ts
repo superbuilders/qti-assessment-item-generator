@@ -50,9 +50,12 @@ const sourceItem: AssessmentItemInput = {
 			medianColor: "#FF6B6B"
 		}
 	},
-	feedback: {
-		correct: [
-			{
+	feedbackBlocks: [
+		{
+			identifier: "CORRECT",
+			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			content: [
+				{
 				type: "paragraph",
 				content: [
 					{
@@ -62,20 +65,25 @@ const sourceItem: AssessmentItemInput = {
 					}
 				]
 			}
-		],
-		incorrect: [
-			{
-				type: "paragraph",
-				content: [
-					{
-						type: "text",
-						content:
-							"Not quite. The distributions overlap, so not all Olympic final distances are greater than all U.S. qualifier distances. Also, the spreads appear similar, and the U.S. qualifier box has a larger interquartile range."
-					}
-				]
-			}
 		]
-	},
+		},
+		{
+			identifier: "INCORRECT",
+			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			content: [
+				{
+					type: "paragraph",
+					content: [
+						{
+							type: "text",
+							content:
+								"Not quite. The distributions overlap, so not all Olympic final distances are greater than all U.S. qualifier distances. Also, the spreads appear similar, and the U.S. qualifier box has a larger interquartile range."
+						}
+					]
+				}
+			]
+		}
+	],
 	identifier: "olympic-discus-boxplots-interpretation",
 	interactions: {
 		choice_interaction: {
@@ -89,7 +97,6 @@ const sourceItem: AssessmentItemInput = {
 							content: [{ type: "text", content: "The distances in the Olympic final were farther on average." }]
 						}
 					],
-					feedback: null,
 					identifier: "A"
 				},
 				{
@@ -105,7 +112,6 @@ const sourceItem: AssessmentItemInput = {
 							]
 						}
 					],
-					feedback: null,
 					identifier: "B"
 				},
 				{
@@ -121,12 +127,10 @@ const sourceItem: AssessmentItemInput = {
 							]
 						}
 					],
-					feedback: null,
 					identifier: "C"
 				},
 				{
 					content: [{ type: "paragraph", content: [{ type: "text", content: "None of the above." }] }],
-					feedback: null,
 					identifier: "D"
 				}
 			],

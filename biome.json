@@ -26,9 +26,7 @@
 			"!**/.expo",
 			"!**/dist",
 			"!**/out",
-			"!**/src/components/ui",
-			"!**/src/db/index.ts",
-			"!**/src/hooks"
+			"!**/src/components/ui"
 		],
 		"maxSize": 5000000
 	},

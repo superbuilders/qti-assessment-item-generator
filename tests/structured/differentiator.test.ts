@@ -95,10 +95,18 @@ describe("Differentiation Pipeline", () => {
 			],
 			widgets: null,
 			interactions: null,
-			feedback: {
-				correct: [{ type: "paragraph", content: [{ type: "text", content: "Correct" }] }],
-				incorrect: [{ type: "paragraph", content: [{ type: "text", content: "Incorrect" }] }]
-			}
+			feedbackBlocks: [
+				{
+					identifier: "CORRECT",
+					outcomeIdentifier: "FEEDBACK__GLOBAL",
+					content: [{ type: "paragraph", content: [{ type: "text", content: "Correct" }] }]
+				},
+				{
+					identifier: "INCORRECT",
+					outcomeIdentifier: "FEEDBACK__GLOBAL",
+					content: [{ type: "paragraph", content: [{ type: "text", content: "Incorrect" }] }]
+				}
+			]
 		}
 
 		const result = await errors.try(differentiateAssessmentItem(mockOpenAI, logger, originalItem, 1))
@@ -106,9 +114,9 @@ describe("Differentiation Pipeline", () => {
 
 		const differentiated = result.data
 		expect(Array.isArray(differentiated)).toBe(true)
-		expect(differentiated.length).toBe(1)
+		expect(differentiated?.length).toBe(1)
 
-		const item = differentiated[0]
+		const item = differentiated?.[0]
 		if (!item) {
 			logger.error("differentiated item is undefined", { differentiated })
 			throw errors.new("differentiated item is undefined")
@@ -116,12 +124,14 @@ describe("Differentiation Pipeline", () => {
 
 		// Verify that nested structures are correctly transformed back to arrays
 		expect(Array.isArray(item.body)).toBe(true)
-		expect(item.body.length).toBe(1)
-		const firstBodyBlock = item.body[0]
-		if (firstBodyBlock?.type === "paragraph") {
-			expect(Array.isArray(firstBodyBlock.content)).toBe(true)
-		} else {
-			test.fail("First body block is not a paragraph")
+		if (item.body) {
+			expect(item.body.length).toBe(1)
+			const firstBodyBlock = item.body[0]
+			if (firstBodyBlock?.type === "paragraph") {
+				expect(Array.isArray(firstBodyBlock.content)).toBe(true)
+			} else {
+				throw errors.new("First body block is not a paragraph")
+			}
 		}
 		expect(Array.isArray(item.responseDeclarations)).toBe(true)
 		expect(item.responseDeclarations.length).toBe(1)

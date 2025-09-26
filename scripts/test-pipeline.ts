@@ -78,10 +78,10 @@ const perseusData = {
 async function runTestPipeline() {
 	logger.info("starting perseus to qti pipeline test")
 
-	const result = await errors.try(async () => {
+	const result = await errors.try((async () => {
 		// 1. Build the AI context envelope from the source data.
 		logger.info("Step 1: Building AI context envelope from Perseus JSON.")
-		const envelope = await buildPerseusEnvelope(logger, perseusData)
+		const envelope = await buildPerseusEnvelope(perseusData)
 		logger.info("Envelope created successfully.")
 
 		// 2. Generate the structured AssessmentItemInput object.
@@ -91,7 +91,7 @@ async function runTestPipeline() {
 
 		// 3. Compile the structured item to QTI XML.
 		logger.info("Step 3: Compiling structured item to QTI XML.")
-		const xml = await compile(logger, structuredItem)
+		const xml = await compile(structuredItem)
 		logger.info("Compilation successful.")
 
 		// 4. Print the final result.
@@ -100,7 +100,7 @@ async function runTestPipeline() {
 			xml: xml,
 			separator: "========================================"
 		})
-	})
+	})())
 	if (result.error) {
 		logger.error("pipeline test failed")
 		logger.error("An error occurred during the pipeline test", {
