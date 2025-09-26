@@ -1,5 +1,4 @@
-import type { ImageContext } from "../ai-context-builder"
-import type { AiContextEnvelope } from "../types"
+import type { AiContextEnvelope, ImageContext } from "../types"
 
 export function formatUnifiedContextSections(envelope: AiContextEnvelope, imageContext: ImageContext): string {
 	const primary = `## Primary Source (Perseus JSON | HTML)\n\`\`\`json\n${envelope.primaryContent}\n\`\`\``
@@ -10,7 +9,7 @@ export function formatUnifiedContextSections(envelope: AiContextEnvelope, imageC
 
 	const supplementary = `## Supplementary Content\n${supplementarySectionEntries.length > 0 ? supplementarySectionEntries.join("\n\n") : "No supplementary content provided."}`
 
-	const rasterList = imageContext.rasterImageUrls.map((url) => `- ${url}`).join("\n") || "No raster images provided."
+	const rasterList = imageContext.imageUrls.map((url: string) => `- ${url}`).join("\n") || "No raster images provided."
 	const raster = `## Associated Raster Images (Vision Input)\nThe following URLs correspond to raster images available to your vision model:\n${rasterList}`
 
 	return `${primary}\n\n${supplementary}\n\n${raster}`

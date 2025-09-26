@@ -881,23 +881,27 @@ export const generateTransformationDiagram: WidgetGenerator<typeof Transformatio
 		// Prefer location based on caller; try preferred first then fallback
 		const above = slideHoriz(centerX, aboveY)
 		const below = slideHoriz(centerX, belowY)
-		let chosen
+		let chosen: { x: number; y: number; it: number }
 		if (preferBelow) {
-			chosen = fitsAt(below.x, below.y)
-				? below
-				: fitsAt(above.x, above.y)
-					? above
-					: below.it <= above.it
-						? below
-						: above
+			if (fitsAt(below.x, below.y)) {
+				chosen = below
+			} else if (fitsAt(above.x, above.y)) {
+				chosen = above
+			} else if (below.it <= above.it) {
+				chosen = below
+			} else {
+				chosen = above
+			}
 		} else {
-			chosen = fitsAt(above.x, above.y)
-				? above
-				: fitsAt(below.x, below.y)
-					? below
-					: above.it <= below.it
-						? above
-						: below
+			if (fitsAt(above.x, above.y)) {
+				chosen = above
+			} else if (fitsAt(below.x, below.y)) {
+				chosen = below
+			} else if (above.it <= below.it) {
+				chosen = above
+			} else {
+				chosen = below
+			}
 		}
 
 		canvas.drawText({

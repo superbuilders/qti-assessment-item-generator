@@ -1,8 +1,7 @@
 import { z } from "zod"
 import { type WidgetCollectionName, widgetCollections } from "../../widgets/collections"
 import { allWidgetSchemas } from "../../widgets/registry"
-import type { ImageContext } from "../ai-context-builder"
-import type { AiContextEnvelope } from "../types"
+import type { AiContextEnvelope, ImageContext } from "../types"
 import { formatUnifiedContextSections } from "./shared"
 
 function createWidgetMappingSchema(slotNames: string[], allowedWidgetKeys: readonly string[]) {

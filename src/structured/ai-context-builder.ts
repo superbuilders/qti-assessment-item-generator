@@ -5,22 +5,14 @@ import type { AiContextEnvelope } from "./types"
 const SUPPORTED_EXTENSIONS = ["svg", "png", "jpeg", "jpg", "gif"] as const
 const IMAGE_URL_REGEX = /https?:\/\/[^\s"'()<>]+?\.(svg|png|jpeg|jpg|gif)/gi
 
-// Network timeout only (no concurrency limits or size caps)
 const FETCH_TIMEOUT_MS = 30000
-
-// MODIFIED: ImageContext now holds only raster URLs for prompts.
-export interface ImageContext {
-	rasterImageUrls: string[]
-}
-
-// MODIFIED: Complete refactor for unified URL discovery and processing.
 export async function buildPerseusEnvelope(
 	perseusJson: unknown,
 	fetchFn: typeof fetch = fetch
 ): Promise<AiContextEnvelope> {
 	const primaryContent = JSON.stringify(perseusJson, null, 2)
 	const supplementaryContent: string[] = []
-	const rasterImageUrls = new Set<string>()
+	const multimodalImageUrls = new Set<string>()
 	const foundUrls = new Set<string>()
 
 	const findAllUrls = (obj: unknown): void => {
@@ -98,32 +90,31 @@ export async function buildPerseusEnvelope(
 				return
 			}
 			if (result.data.type === "svg" && result.data.content) {
-				// Prepend URL comment to help AI link content to source
 				const contentWithComment = `<!-- URL: ${result.data.url} -->\n${result.data.content}`
 				supplementaryContent.push(contentWithComment)
 			} else {
-				rasterImageUrls.add(result.data.url)
+				multimodalImageUrls.add(result.data.url)
 			}
 		})
 		await Promise.all(promises)
 	}
 
-	// Return URLs in deterministic order (sorted)
 	return {
 		primaryContent,
 		supplementaryContent,
-		rasterImageUrls: Array.from(rasterImageUrls).sort()
+		multimodalImageUrls: Array.from(multimodalImageUrls).sort(),
+		multimodalImagePayloads: []
 	}
 }
 
-export async function buildHtmlEnvelope(
+export async function buildMathacademyEnvelope(
 	html: string,
 	screenshotUrl?: string,
 	fetchFn: typeof fetch = fetch
 ): Promise<AiContextEnvelope> {
 	const primaryContent = html
 	const supplementaryContent: string[] = []
-	const rasterImageUrls = new Set<string>()
+	const multimodalImageUrls = new Set<string>()
 	const svgUrlsToFetch = new Set<string>()
 
 	if (screenshotUrl) {
@@ -137,7 +128,7 @@ export async function buildHtmlEnvelope(
 			logger.error("unsupported screenshot url scheme", { screenshotUrl, protocol: normalized.protocol })
 			throw errors.new("unsupported screenshot url scheme")
 		}
-		rasterImageUrls.add(normalized.toString())
+		multimodalImageUrls.add(normalized.toString())
 	}
 
 	const imgTagRegex = /<img\s[^>]*src\s*=\s*(?:"([^"]*)"|'([^']*)')[^>]*>/gi
@@ -165,15 +156,11 @@ export async function buildHtmlEnvelope(
 		if (isSvg) {
 			svgUrlsToFetch.add(url)
 		} else {
-			rasterImageUrls.add(url)
+			multimodalImageUrls.add(url)
 		}
 		match = imgTagRegex.exec(html)
 	}
 
-	// NOTE: Inline <svg> content remains inside the primary HTML (context[0]).
-	// We do not extract or duplicate it as separate context entries.
-
-	// Fetch external SVGs (no concurrency limiting)
 	if (svgUrlsToFetch.size > 0) {
 		logger.debug("fetching svg urls from html", { count: svgUrlsToFetch.size })
 		const promises = Array.from(svgUrlsToFetch).map(async (url) => {
@@ -187,35 +174,16 @@ export async function buildHtmlEnvelope(
 				logger.warn("failed to read svg text from html", { url, error: textResult.error })
 				return
 			}
-			// Prepend URL comment to help AI link content to source
 			const contentWithComment = `<!-- URL: ${url} -->\n${textResult.data}`
 			supplementaryContent.push(contentWithComment)
 		})
 		await Promise.all(promises)
 	}
 
-	// Return URLs in deterministic order (sorted)
 	return {
 		primaryContent,
 		supplementaryContent,
-		rasterImageUrls: Array.from(rasterImageUrls).sort()
+		multimodalImageUrls: Array.from(multimodalImageUrls).sort(),
+		multimodalImagePayloads: []
 	}
-}
-
-// MODIFIED: Renamed and updated to build a complete image context.
-export function buildImageContext(envelope: AiContextEnvelope): ImageContext {
-	const context: ImageContext = {
-		rasterImageUrls: []
-	}
-
-	for (const url of envelope.rasterImageUrls) {
-		const result = errors.trySync(() => new URL(url))
-		if (result.error) {
-			logger.error("invalid raster image url in envelope", { url, error: result.error })
-			throw errors.wrap(result.error, "invalid raster image url")
-		}
-		context.rasterImageUrls.push(result.data.toString())
-	}
-
-	return context
 }

@@ -1,6 +1,5 @@
 import type { allWidgetSchemas } from "../../widgets/registry"
-import type { ImageContext } from "../ai-context-builder"
-import type { AiContextEnvelope } from "../types"
+import type { AiContextEnvelope, ImageContext } from "../types"
 import { caretBanPromptSection } from "./caret"
 import { formatUnifiedContextSections } from "./shared"
 

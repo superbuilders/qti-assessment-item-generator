@@ -1,11 +1,11 @@
 import { afterAll, beforeAll, describe, expect, test } from "bun:test"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import { buildHtmlEnvelope } from "../../../src/structured/ai-context-builder"
-import { expectSortedUrls, expectSupplementaryContentCount } from "./helpers/assertions"
+import { buildMathacademyEnvelope } from "../../../src/structured/ai-context-builder"
+import { expectEmptyPayloads, expectSortedUrls, expectSupplementaryContentCount } from "./helpers/assertions"
 import { createPrdMockFetch } from "./helpers/mock-fetch"
 
-describe("buildHtmlEnvelope (unit)", () => {
+describe("buildMathacademyEnvelope (unit)", () => {
 	let previousFetch: typeof fetch
 	beforeAll(() => {
 		previousFetch = global.fetch
@@ -17,34 +17,35 @@ describe("buildHtmlEnvelope (unit)", () => {
 
 	test("creates envelope with only HTML content", async () => {
 		const html = "<h1>Hello World</h1><p>This is a test.</p>"
-		const envelope = await buildHtmlEnvelope(html)
+		const envelope = await buildMathacademyEnvelope(html)
 		expect(envelope.primaryContent).toEqual(html)
 		expect(envelope.supplementaryContent).toEqual([])
-		expect(envelope.rasterImageUrls).toEqual([])
+		expect(envelope.multimodalImageUrls).toEqual([])
+		expectEmptyPayloads(envelope)
 	})
 
 	test("adds valid screenshot URL", async () => {
 		const html = "<div>...</div>"
 		const screenshotUrl = "https://example.com/screenshot.png"
-		const envelope = await buildHtmlEnvelope(html, screenshotUrl)
+		const envelope = await buildMathacademyEnvelope(html, screenshotUrl)
 		expect(envelope.primaryContent).toEqual(html)
 		expect(envelope.supplementaryContent).toEqual([])
-		expect(envelope.rasterImageUrls).toEqual([screenshotUrl])
+		expect(envelope.multimodalImageUrls).toEqual([screenshotUrl])
 	})
 
 	test("throws for invalid screenshot URL", async () => {
-		const result = await errors.try(buildHtmlEnvelope("<div>...</div>", "not-a-valid-url"))
+		const result = await errors.try(buildMathacademyEnvelope("<div>...</div>", "not-a-valid-url"))
 		expect(result.error).toBeTruthy()
 	})
 
 	test("throws for unsupported screenshot scheme", async () => {
-		const result = await errors.try(buildHtmlEnvelope("<div>...</div>", "ftp://example.com/file.png"))
+		const result = await errors.try(buildMathacademyEnvelope("<div>...</div>", "ftp://example.com/file.png"))
 		expect(result.error).toBeTruthy()
 	})
 
 	test("extracts, fetches, and embeds external SVGs", async () => {
 		const html = '<img src="https://example.com/diagram.svg" alt="diagram">'
-		const result = await errors.try(buildHtmlEnvelope(html))
+		const result = await errors.try(buildMathacademyEnvelope(html))
 		expect(result.error).toBeFalsy()
 		if (result.error) {
 			logger.error("test failed", { error: result.error })
@@ -60,9 +61,12 @@ describe("buildHtmlEnvelope (unit)", () => {
 
 	test("handles mixed-case SVG extensions and querystrings", async () => {
 		const html = '<img src="https://example.com/Vector.SVG?cache=1" alt="diagram">'
-		const result = await errors.try(buildHtmlEnvelope(html))
+		const result = await errors.try(buildMathacademyEnvelope(html))
 		expect(result.error).toBeFalsy()
-		if (result.error) throw result.error
+		if (result.error) {
+			logger.error("test failed", { error: result.error })
+			throw result.error
+		}
 		const envelope = result.data
 		expect(envelope.primaryContent).toBeTruthy()
 		expectSupplementaryContentCount(envelope, 1)
@@ -75,7 +79,7 @@ describe("buildHtmlEnvelope (unit)", () => {
 				<img src="https://example.com/broken.svg">
 				<img src="/relative/path.jpg">
 			`
-		const result = await errors.try(buildHtmlEnvelope(html, "https://example.com/screen.jpg"))
+		const result = await errors.try(buildMathacademyEnvelope(html, "https://example.com/screen.jpg"))
 		expect(result.error).toBeFalsy()
 		if (result.error) {
 			logger.error("test failed", { error: result.error })
@@ -84,13 +88,13 @@ describe("buildHtmlEnvelope (unit)", () => {
 		const envelope = result.data
 		expect(envelope.primaryContent).toBeTruthy()
 		expectSupplementaryContentCount(envelope, 1)
-		expect(envelope.rasterImageUrls).toEqual(["https://example.com/photo.png", "https://example.com/screen.jpg"])
+		expect(envelope.multimodalImageUrls).toEqual(["https://example.com/photo.png", "https://example.com/screen.jpg"])
 		expectSortedUrls(envelope)
 	})
 
 	test("does not extract inline SVG content", async () => {
 		const html = '<p>Inline SVG: <svg><circle cx="10" cy="10" r="5" /></svg></p>'
-		const result = await errors.try(buildHtmlEnvelope(html))
+		const result = await errors.try(buildMathacademyEnvelope(html))
 		expect(result.error).toBeFalsy()
 		if (result.error) {
 			logger.error("test failed", { error: result.error })
@@ -108,21 +112,27 @@ describe("buildHtmlEnvelope (unit)", () => {
 			<img src="https://example.com/diagram.svg">
 			<img src="https://example.com/diagram.svg">
 		`
-		const result = await errors.try(buildHtmlEnvelope(html))
+		const result = await errors.try(buildMathacademyEnvelope(html))
 		expect(result.error).toBeFalsy()
-		if (result.error) throw result.error
+		if (result.error) {
+			logger.error("test failed", { error: result.error })
+			throw result.error
+		}
 		const envelope = result.data
 		// One HTML + one fetched SVG content
 		expect(envelope.primaryContent).toBeTruthy()
 		expectSupplementaryContentCount(envelope, 1)
-		expect(envelope.rasterImageUrls).toEqual(["https://example.com/photo.png"])
+		expect(envelope.multimodalImageUrls).toEqual(["https://example.com/photo.png"])
 	})
 
 	test("skips external SVG that times out/fails", async () => {
 		const html = '<img src="https://example.com/times-out.svg" alt="diagram">'
-		const result = await errors.try(buildHtmlEnvelope(html))
+		const result = await errors.try(buildMathacademyEnvelope(html))
 		expect(result.error).toBeFalsy()
-		if (result.error) throw result.error
+		if (result.error) {
+			logger.error("test failed", { error: result.error })
+			throw result.error
+		}
 		const envelope = result.data
 		// No SVG embedded, only original HTML
 		expect(envelope.primaryContent).toBeTruthy()

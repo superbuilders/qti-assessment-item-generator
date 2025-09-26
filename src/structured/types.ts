@@ -1,7 +1,15 @@
-// Defines TypeScript-only types for core library contracts. No runtime parsing.
-
 export interface AiContextEnvelope {
-	primaryContent: string // Primary source (Perseus JSON or HTML)
-	supplementaryContent: string[] // SVG texts and other supplementary content
-	rasterImageUrls: string[] // http/https URLs for raster images (png/jpeg/gif)
+	primaryContent: string
+	supplementaryContent: string[]
+	multimodalImageUrls: string[]
+	multimodalImagePayloads: RasterImagePayload[]
+}
+
+export interface RasterImagePayload {
+	data: Blob
+	mimeType: "image/png" | "image/jpeg" | "image/webp" | "image/gif"
+}
+
+export interface ImageContext {
+	imageUrls: string[]
 }

@@ -128,7 +128,9 @@ const makeColorTransparent = (color: string, opacity: number): string => {
 	// Handle hex colors
 	if (color.startsWith("#")) {
 		const hex = color.slice(1)
-		let r: number, g: number, b: number
+		let r: number
+		let g: number
+		let b: number
 
 		if (hex.length === 3) {
 			// Short hex format #RGB
@@ -542,7 +544,8 @@ export const generateThreeDIntersectionDiagram: WidgetGenerator<typeof ThreeDInt
 
 		if (startVertex && endVertex) {
 			// Determine if edge is mostly behind or in front of plane
-			let startZ, endZ
+			let startZ: number
+			let endZ: number
 			if (plane.orientation === "vertical") {
 				startZ = startVertex.z
 				endZ = endVertex.z

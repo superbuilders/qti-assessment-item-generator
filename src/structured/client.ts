@@ -14,35 +14,74 @@ import {
 } from "../compiler/schemas"
 import type { WidgetCollectionName } from "../widgets/collections"
 import { allWidgetSchemas, type WidgetInput } from "../widgets/registry"
-import { buildImageContext, type ImageContext } from "./ai-context-builder"
 import { createInteractionContentPrompt } from "./prompts/interactions"
 import { createAssessmentShellPrompt } from "./prompts/shell"
 import { createWidgetMappingPrompt } from "./prompts/widget-mapping"
 import { createWidgetContentPrompt } from "./prompts/widgets"
-import type { AiContextEnvelope } from "./types"
+import type { AiContextEnvelope, ImageContext } from "./types"
 
 const OPENAI_MODEL = "gpt-5"
-
-// Simplified API: just pass OpenAI client directly to functions
-
-// MODIFIED: Add back the specific error for the widget mapping bail condition.
+const MAX_IMAGES_PER_REQUEST = 500
+const MAX_IMAGE_PAYLOAD_BYTES_PER_REQUEST = 50 * 1024 * 1024
 export const ErrWidgetNotFound = errors.new("widget could not be mapped to a known type")
 
 export const ErrUnsupportedInteraction = errors.new("unsupported interaction type found")
 
-// Use the AssessmentItemShellSchema from schemas.ts
+async function resolveRasterImages(envelope: AiContextEnvelope): Promise<ImageContext> {
+	const finalImageUrls: string[] = []
+	let totalPayloadBytes = 0
 
-/**
- * Dynamically creates a Zod schema for a collection of widgets based on a mapping.
- * @param widgetMapping A map of slot names to widget type names.
- * @returns A Zod object schema for the widget collection.
- */
+	for (const url of envelope.multimodalImageUrls) {
+		const urlResult = errors.trySync(() => new URL(url))
+		if (urlResult.error) {
+			logger.error("invalid url in multimodalImageUrls", { url, error: urlResult.error })
+			throw errors.wrap(urlResult.error, "invalid image url")
+		}
+		const scheme = urlResult.data.protocol
+		if (scheme !== "http:" && scheme !== "https:" && scheme !== "data:") {
+			logger.error("unsupported url scheme in multimodalImageUrls", { url, scheme })
+			throw errors.new("unsupported url scheme")
+		}
+		if (scheme === "data:") {
+			totalPayloadBytes += url.length
+		}
+		finalImageUrls.push(url)
+	}
+
+	for (const payload of envelope.multimodalImagePayloads) {
+		const bytesResult = await errors.try(payload.data.arrayBuffer())
+		if (bytesResult.error) {
+			logger.error("failed to read blob data from payload", { error: bytesResult.error })
+			throw errors.wrap(bytesResult.error, "blob read failed")
+		}
+		totalPayloadBytes += bytesResult.data.byteLength
+		const base64 = Buffer.from(bytesResult.data).toString("base64")
+		const dataUrl = `data:${payload.mimeType};base64,${base64}`
+		finalImageUrls.push(dataUrl)
+	}
+
+	if (finalImageUrls.length > MAX_IMAGES_PER_REQUEST) {
+		logger.error("too many image inputs for request", {
+			count: finalImageUrls.length,
+			max: MAX_IMAGES_PER_REQUEST
+		})
+		throw errors.new("too many image inputs for request")
+	}
+	if (totalPayloadBytes > MAX_IMAGE_PAYLOAD_BYTES_PER_REQUEST) {
+		logger.error("image payload size over per-request cap", {
+			bytes: totalPayloadBytes,
+			cap: MAX_IMAGE_PAYLOAD_BYTES_PER_REQUEST
+		})
+		throw errors.new("image payload size over per-request cap")
+	}
+
+	return { imageUrls: finalImageUrls }
+}
 function createWidgetCollectionSchema(widgetMapping: Record<string, keyof typeof allWidgetSchemas>) {
 	const shape: Record<string, z.ZodType> = {}
 	for (const [slotName, widgetType] of Object.entries(widgetMapping)) {
 		const schema = allWidgetSchemas[widgetType]
 		if (!schema) {
-			// This check ensures we don't proceed with an invalid type from the mapping.
 			logger.error("unknown widget type in structured client mapping", {
 				slotName,
 				widgetType
@@ -51,46 +90,35 @@ function createWidgetCollectionSchema(widgetMapping: Record<string, keyof typeof
 		}
 		shape[slotName] = schema
 	}
-	// Ensure the schema is properly structured to avoid OpenAI API interpretation issues
 	return z
 		.object(shape)
 		.strict()
 		.describe("A collection of fully-defined widget objects corresponding to the provided slots.")
 }
 
-/**
- * NEW: Dynamically creates a Zod schema for a collection of interactions.
- * @param interactionSlotNames A list of interaction slot names from the shell.
- * @returns A Zod object schema for the interaction collection.
- */
 function createInteractionCollectionSchema(interactionSlotNames: string[]) {
 	const shape: Record<string, z.ZodType> = {}
 	for (const slotName of interactionSlotNames) {
-		// All interactions must conform to the AnyInteractionSchema.
 		shape[slotName] = AnyInteractionSchema
 	}
 	return z.object(shape).describe("A collection of fully-defined QTI interaction objects.")
 }
 
-/**
- * ✅ REFACTORED: This is the new Shot 2 function.
- */
 async function mapSlotsToWidgets(
 	openai: OpenAI,
 	logger: logger.Logger,
 	envelope: AiContextEnvelope,
 	assessmentBody: string,
-	slotNames: string[], // ✅ Takes the parsed slot names to generate the prompt.
+	slotNames: string[],
 	widgetCollectionName: WidgetCollectionName,
-	imageContext: ImageContext // ADD this parameter
+	imageContext: ImageContext
 ): Promise<Record<string, keyof typeof allWidgetSchemas>> {
-	// ✅ The prompt and the schema are now generated together dynamically.
 	const { systemInstruction, userContent, WidgetMappingSchema } = createWidgetMappingPrompt(
 		envelope,
 		assessmentBody,
 		slotNames,
 		widgetCollectionName,
-		imageContext // PASS this parameter
+		imageContext
 	)
 
 	const responseFormat = zodResponseFormat(WidgetMappingSchema, "widget_mapper")
@@ -100,10 +128,9 @@ async function mapSlotsToWidgets(
 		schema: JSON.stringify(responseFormat.json_schema?.schema, null, 2)
 	})
 
-	// NEW: Build multimodal message content, same as other shots
 	const messageContent: OpenAI.ChatCompletionContentPart[] = [{ type: "text", text: userContent }]
-	for (const imageUrl of imageContext.rasterImageUrls) {
-		messageContent.push({ type: "image_url", image_url: { url: imageUrl } })
+	for (const imageUrl of imageContext.imageUrls) {
+		messageContent.push({ type: "image_url", image_url: { url: imageUrl, detail: "high" } })
 	}
 
 	logger.debug("calling openai for slot-to-widget mapping with multimodal input", { slotNames })
@@ -112,9 +139,8 @@ async function mapSlotsToWidgets(
 			model: OPENAI_MODEL,
 			messages: [
 				{ role: "system", content: systemInstruction },
-				{ role: "user", content: messageContent } // MODIFIED to use multimodal content
+				{ role: "user", content: messageContent }
 			],
-			// ✅ The dynamically generated, constrained schema is used here.
 			response_format: responseFormat
 		})
 	)
@@ -139,19 +165,14 @@ async function mapSlotsToWidgets(
 
 	const rawMapping = choice.message.parsed.widget_mapping
 
-	// Type guard to check if a value is a valid widget type
 	const isValidWidgetType = (val: unknown): val is keyof typeof allWidgetSchemas => {
 		return typeof val === "string" && val in allWidgetSchemas
 	}
 
-	// Validate and build the properly typed mapping
 	const mapping: Record<string, keyof typeof allWidgetSchemas> = {}
 	for (const [key, value] of Object.entries(rawMapping)) {
-		// ADDED: Check for the WIDGET_NOT_FOUND bail string.
-		// If found, throw a specific error to be caught upstream.
 		if (value === "WIDGET_NOT_FOUND") {
 			logger.error("widget slot could not be mapped by AI", { slot: key })
-			// Throw the specific error, which will be wrapped in a NonRetriableError by the Inngest function.
 			throw errors.wrap(ErrWidgetNotFound, `AI bailed on widget mapping for slot: "${key}"`)
 		}
 
@@ -173,16 +194,12 @@ async function mapSlotsToWidgets(
 	return mapping
 }
 
-/**
- * NEW - Shot 1: Generate Content Shell & Plan.
- */
 async function generateAssessmentShell(
 	openai: OpenAI,
 	logger: logger.Logger,
 	envelope: AiContextEnvelope,
 	imageContext: ImageContext
 ): Promise<AssessmentItemShell> {
-	// Assumes a new prompt function is created for this shot.
 	const { systemInstruction, userContent } = createAssessmentShellPrompt(envelope, imageContext)
 
 	const responseFormat = zodResponseFormat(AssessmentItemShellSchema, "assessment_shell_generator")
@@ -193,8 +210,8 @@ async function generateAssessmentShell(
 	})
 
 	const messageContent: OpenAI.ChatCompletionContentPart[] = [{ type: "text", text: userContent }]
-	for (const imageUrl of imageContext.rasterImageUrls) {
-		messageContent.push({ type: "image_url", image_url: { url: imageUrl } })
+	for (const imageUrl of imageContext.imageUrls) {
+		messageContent.push({ type: "image_url", image_url: { url: imageUrl, detail: "high" } })
 	}
 
 	logger.debug("calling openai for assessment shell with multimodal input")
@@ -230,9 +247,6 @@ async function generateAssessmentShell(
 	return message.parsed
 }
 
-/**
- * ✅ NEW: This is Shot 3. It generates ONLY the interaction content.
- */
 async function generateInteractionContent(
 	openai: OpenAI,
 	logger: logger.Logger,
@@ -247,7 +261,6 @@ async function generateInteractionContent(
 		return {}
 	}
 
-	// This new prompt function instructs the AI to generate the interaction objects.
 	const { systemInstruction, userContent } = createInteractionContentPrompt(
 		envelope,
 		assessmentShell,
@@ -255,7 +268,6 @@ async function generateInteractionContent(
 		widgetMapping
 	)
 
-	// Create a precise schema asking ONLY for the interactions.
 	const InteractionCollectionSchema = createInteractionCollectionSchema(interactionSlotNames)
 	const responseFormat = zodResponseFormat(InteractionCollectionSchema, "interaction_content_generator")
 
@@ -266,8 +278,8 @@ async function generateInteractionContent(
 	})
 
 	const messageContent: OpenAI.ChatCompletionContentPart[] = [{ type: "text", text: userContent }]
-	for (const imageUrl of imageContext.rasterImageUrls) {
-		messageContent.push({ type: "image_url", image_url: { url: imageUrl } })
+	for (const imageUrl of imageContext.imageUrls) {
+		messageContent.push({ type: "image_url", image_url: { url: imageUrl, detail: "high" } })
 	}
 
 	logger.debug("calling openai for interaction content generation with multimodal input", { interactionSlotNames })
@@ -297,9 +309,6 @@ async function generateInteractionContent(
 	return choice.message.parsed
 }
 
-/**
- * NEW - Shot 4: Generate ONLY the widget objects.
- */
 async function generateWidgetContent(
 	openai: OpenAI,
 	logger: logger.Logger,
@@ -316,7 +325,6 @@ async function generateWidgetContent(
 		return {}
 	}
 
-	// This new prompt function instructs the AI to generate the widget objects.
 	const { systemInstruction, userContent } = createWidgetContentPrompt(
 		envelope,
 		assessmentShell,
@@ -326,7 +334,6 @@ async function generateWidgetContent(
 		imageContext
 	)
 
-	// Create a precise schema asking ONLY for the widgets.
 	const WidgetCollectionSchema = createWidgetCollectionSchema(widgetMapping)
 	const responseFormat = zodResponseFormat(WidgetCollectionSchema, "widget_content_generator")
 
@@ -337,8 +344,8 @@ async function generateWidgetContent(
 	})
 
 	const messageContent: OpenAI.ChatCompletionContentPart[] = [{ type: "text", text: userContent }]
-	for (const imageUrl of imageContext.rasterImageUrls) {
-		messageContent.push({ type: "image_url", image_url: { url: imageUrl } })
+	for (const imageUrl of imageContext.imageUrls) {
+		messageContent.push({ type: "image_url", image_url: { url: imageUrl, detail: "high" } })
 	}
 
 	logger.debug("calling openai for widget content generation with multimodal input", { widgetSlotNames })
@@ -368,14 +375,12 @@ async function generateWidgetContent(
 	return choice.message.parsed
 }
 
-// ADD the new single public entry point that accepts a normalized envelope.
 export async function generateFromEnvelope(
 	openai: OpenAI,
 	logger: logger.Logger,
 	envelope: AiContextEnvelope,
 	widgetCollectionName: WidgetCollectionName
 ): Promise<AssessmentItemInput> {
-	// Validate envelope at the boundary. No defaults or fallbacks.
 	if (!envelope.primaryContent || envelope.primaryContent.trim() === "") {
 		logger.error("envelope validation failed", { reason: "primaryContent is empty" })
 		throw errors.new("primaryContent cannot be empty")
@@ -385,17 +390,17 @@ export async function generateFromEnvelope(
 		widgetCollection: widgetCollectionName,
 		primaryContentLength: envelope.primaryContent.length,
 		supplementaryContentCount: envelope.supplementaryContent.length,
-		rasterUrlCount: envelope.rasterImageUrls.length,
-		vectorUrlCount: envelope.supplementaryContent.length
+		multimodalUrlCount: envelope.multimodalImageUrls.length,
+		multimodalPayloadCount: envelope.multimodalImagePayloads.length
 	})
 
-	// MODIFIED: Use the new, unified image context builder.
-	const imageContext = buildImageContext(envelope)
+	const resolvedImagesResult = await errors.try(resolveRasterImages(envelope))
+	if (resolvedImagesResult.error) {
+		logger.error("failed to resolve raster images from envelope", { error: resolvedImagesResult.error })
+		throw errors.wrap(resolvedImagesResult.error, "raster image resolution")
+	}
+	const imageContext = resolvedImagesResult.data
 
-	// --- AI Pipeline Shots ---
-	// All subsequent "shot" functions MUST be updated to accept the `envelope` object.
-
-	// Shot 1: Generate Shell
 	const shellResult = await errors.try(generateAssessmentShell(openai, logger, envelope, imageContext))
 	if (shellResult.error) {
 		logger.error("generate assessment shell", { error: shellResult.error })
@@ -408,12 +413,10 @@ export async function generateFromEnvelope(
 		interactionSlots: assessmentShell.interactions
 	})
 
-	// FIX: Replace the incomplete slot checker with a comprehensive one.
 	logger.debug("validating consistency between declared slots and body content")
 
 	function collectAllSlotIds(shell: AssessmentItemShell): Set<string> {
 		const ids = new Set<string>()
-		// Track seen interactions if needed for future validations (currently unused)
 
 		function walkInline(items: InlineContent | null | undefined) {
 			if (!items) return
@@ -436,9 +439,6 @@ export async function generateFromEnvelope(
 		}
 
 		if (shell.interactions) {
-			// Also check for slots inside interaction definitions passed in the shell if any
-			// Although the shell's interactions is just string[], this ensures future-proofing
-			// if the shell becomes more complex. We check the final generated interactions.
 		}
 
 		return ids
@@ -447,9 +447,6 @@ export async function generateFromEnvelope(
 	const allDeclaredSlots = new Set([...assessmentShell.widgets, ...assessmentShell.interactions])
 	const slotsUsedInContent = collectAllSlotIds(assessmentShell)
 
-	// Compute explicit differences so we can enforce missing declarations strictly
-	// Note: We no longer prune declared-but-unused slots here to preserve
-	// choice-level widget slots that are intentionally not present in the body.
 	const undeclaredSlots = [...slotsUsedInContent].filter((slot) => !allDeclaredSlots.has(slot))
 	const unusedSlots = [...allDeclaredSlots].filter((slot) => !slotsUsedInContent.has(slot))
 
@@ -464,8 +461,6 @@ export async function generateFromEnvelope(
 		throw errors.new(errorMessage)
 	}
 
-	// Intentionally retain declared-but-unused slots; some slots (e.g., choice-level visuals)
-	// are not referenced in the top-level body/feedback and are filled later.
 	if (unusedSlots.length > 0) {
 		logger.debug("retaining declared-but-unused slots for later stages", {
 			unusedSlots
@@ -474,7 +469,6 @@ export async function generateFromEnvelope(
 
 	logger.debug("slot consistency validation successful")
 
-	// Step 2: Map widget slot names to widget types.
 	const widgetSlotNames = assessmentShell.widgets
 	logger.debug("shot 2: mapping slots to widgets", {
 		count: widgetSlotNames.length
@@ -483,14 +477,10 @@ export async function generateFromEnvelope(
 	const performWidgetMapping = async () => {
 		if (widgetSlotNames.length === 0) {
 			logger.info("no widget slots found, skipping ai widget mapping call")
-			// Return a successful result with empty data, mimicking the `errors.try` output
 			const emptyMapping: Record<string, keyof typeof allWidgetSchemas> = {}
 			return { data: emptyMapping, error: null }
 		}
-		// Only make the AI call if there are widgets to map
-		// Convert structured body to string representation for widget mapping prompt
 		const bodyString = assessmentShell.body ? JSON.stringify(assessmentShell.body) : ""
-		// MODIFIED: Pass the full imageContext to the mapSlotsToWidgets call
 		const mappingResult = await errors.try(
 			mapSlotsToWidgets(openai, logger, envelope, bodyString, widgetSlotNames, widgetCollectionName, imageContext)
 		)
@@ -509,7 +499,6 @@ export async function generateFromEnvelope(
 	}
 	let widgetMapping = widgetMappingResult.data
 
-	// Shot 3: Generate Interactions
 	const interactionContentResult = await errors.try(
 		generateInteractionContent(openai, logger, envelope, assessmentShell, imageContext, widgetMapping)
 	)
@@ -522,9 +511,6 @@ export async function generateFromEnvelope(
 		generatedInteractionKeys: Object.keys(generatedInteractions)
 	})
 
-	// After interactions are generated, we can safely prune widgets that are truly unused
-	// across body, feedback, and interaction choice content. This ensures we never prune
-	// before interaction compilation, preserving choice-level visuals.
 	logger.debug("post-shot-3: computing used slot ids for safe pruning of widgets")
 	function collectUsedSlotIdsAfterInteractions(
 		shell: AssessmentItemShell,
@@ -544,19 +530,16 @@ export async function generateFromEnvelope(
 				else if (item.type === "paragraph") walkInline(item.content)
 			}
 		}
-		// Shell body and feedback
 		walkBlock(shell.body)
 		for (const block of shell.feedbackBlocks) {
 			walkBlock(block.content)
 		}
-		// Interaction choice content (where choice-level visuals are embedded)
 		for (const interaction of Object.values(interactions)) {
 			if (interaction.type === "choiceInteraction" || interaction.type === "orderInteraction") {
 				for (const choice of interaction.choices) {
 					walkBlock(choice.content)
 				}
 			}
-			// inlineChoiceInteraction uses inline content (no blockSlot expected)
 		}
 		return ids
 	}
@@ -569,14 +552,11 @@ export async function generateFromEnvelope(
 			unused: prunedWidgetSlots
 		})
 	}
-	// Update shell widgets now that interactions are known
 	assessmentShell.widgets = usedWidgetSlots
-	// Also filter the mapping to only generate needed widgets in Shot 4
 	widgetMapping = Object.fromEntries(
 		Object.entries(widgetMapping).filter(([slot]) => originalWidgetSlots.has(slot) && usedAfterShot3.has(slot))
 	)
 
-	// Shot 4: Generate Widgets
 	const widgetContentResult = await errors.try(
 		generateWidgetContent(
 			openai,
@@ -598,7 +578,6 @@ export async function generateFromEnvelope(
 		generatedWidgetKeys: Object.keys(generatedWidgets)
 	})
 
-	// Final Assembly
 	const finalAssessmentItem: AssessmentItemInput = {
 		...assessmentShell,
 		interactions: generatedInteractions,
@@ -606,9 +585,3 @@ export async function generateFromEnvelope(
 	}
 	return finalAssessmentItem
 }
-
-// All internal "shot" functions MUST be updated to accept the `envelope`.
-// async function generateAssessmentShell(openai: OpenAI, logger: logger.Logger, envelope: AiContextEnvelope, imageContext: ImageContext): Promise<AssessmentItemShell> { /* ... */ }
-// async function mapSlotsToWidgets(openai: OpenAI, logger: logger.Logger, envelope: AiContextEnvelope, assessmentBody: string, slotNames: string[], widgetCollectionName: WidgetCollectionName): Promise<Record<string, keyof typeof allWidgetSchemas>> { /* ... */ }
-// async function generateInteractionContent(openai: OpenAI, logger: logger.Logger, envelope: AiContextEnvelope, assessmentShell: AssessmentItemShell, imageContext: ImageContext, widgetMapping?: Record<string, keyof typeof allWidgetSchemas>): Promise<Record<string, AnyInteraction>> { /* ... */ }
-// async function generateWidgetContent(openai: OpenAI, logger: logger.Logger, envelope: AiContextEnvelope, assessmentShell: AssessmentItemShell, widgetMapping: Record<string, keyof typeof allWidgetSchemas>, generatedInteractions: Record<string, AnyInteraction>, widgetCollectionName: WidgetCollectionName, imageContext: ImageContext): Promise<Record<string, WidgetInput>> { /* ... */ }

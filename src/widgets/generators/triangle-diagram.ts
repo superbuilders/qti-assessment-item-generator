@@ -545,13 +545,21 @@ export const generateTriangleDiagram: WidgetGenerator<typeof TriangleDiagramProp
 	// If all three provided angle marks are numeric (after interior conversion),
 	// validate that the interior angles sum to 180°.
 	function numericInteriorFromInput(vertex: string): number | null {
-		const others = vertex === idA ? [idB, idC] : vertex === idB ? [idA, idC] : [idA, idB]
+		let others: string[]
+		if (vertex === idA) {
+			others = [idB, idC]
+		} else if (vertex === idB) {
+			others = [idA, idC]
+		} else {
+			others = [idA, idB]
+		}
 		const arcs = angleMarks.filter((a) => a.vertex === vertex && a.value.type === "numeric")
 		let v: number | null = null
 		for (const a of arcs) {
 			const f = a.from
 			const t = a.to
-			const val = (a.value as { type: "numeric"; value: number }).value
+			if (a.value.type !== "numeric") continue
+			const val = a.value.value
 			if ((f === others[0] && t === others[1]) || (f === others[1] && t === others[0])) {
 				v = val
 				break
@@ -573,8 +581,8 @@ export const generateTriangleDiagram: WidgetGenerator<typeof TriangleDiagramProp
 	const BinProvided = numericInteriorFromInput(idB)
 	const CinProvided = numericInteriorFromInput(idC)
 	const providedCount = [AinProvided, BinProvided, CinProvided].filter((x): x is number => x != null).length
-	if (providedCount === 3) {
-		const sumProvided = (AinProvided as number) + (BinProvided as number) + (CinProvided as number)
+	if (providedCount === 3 && AinProvided != null && BinProvided != null && CinProvided != null) {
+		const sumProvided = AinProvided + BinProvided + CinProvided
 		if (Math.abs(sumProvided - 180) > 1e-6) {
 			logger.error("interior angles do not sum to 180", {
 				A: AinProvided,
@@ -587,13 +595,21 @@ export const generateTriangleDiagram: WidgetGenerator<typeof TriangleDiagramProp
 	}
 
 	function tryInteriorDegFor(vertex: string): number | null {
-		const others = vertex === idA ? [idB, idC] : vertex === idB ? [idA, idC] : [idA, idB]
+		let others: string[]
+		if (vertex === idA) {
+			others = [idB, idC]
+		} else if (vertex === idB) {
+			others = [idA, idC]
+		} else {
+			others = [idA, idB]
+		}
 		const arcs = angleMarks.filter((a) => a.vertex === vertex && a.value.type === "numeric")
 		let fromArcs: number | null = null
 		for (const a of arcs) {
 			const f = a.from
 			const t = a.to
-			const val = (a.value as { type: "numeric"; value: number }).value
+			if (a.value.type !== "numeric") continue
+			const val = a.value.value
 			if ((f === others[0] && t === others[1]) || (f === others[1] && t === others[0])) {
 				fromArcs = val
 				break
@@ -641,10 +657,10 @@ export const generateTriangleDiagram: WidgetGenerator<typeof TriangleDiagramProp
 		throw errors.new("invalid derived triangle angles")
 	}
 
-	// From here, non-null assertion via local copies guarantees type safety
-	const AdegVal = Adeg as number
-	const BdegVal = Bdeg as number
-	// const CdegVal = Cdeg as number
+	// TypeScript now knows these are numbers after the null check above
+	const AdegVal = Adeg
+	const BdegVal = Bdeg
+	// const CdegVal = Cdeg
 
 	// --- Data space geometry (unit base), then fit to box ---
 	const A_data: Vec = { x: 0, y: 0 }
@@ -719,8 +735,9 @@ export const generateTriangleDiagram: WidgetGenerator<typeof TriangleDiagramProp
 			const knownIdx: number[] = []
 			for (let i = 0; i < line.length; i++) if (idToPoint.has(line[i])) knownIdx.push(i)
 			if (knownIdx.length < 2) continue
-			const p1 = idToPoint.get(line[knownIdx[0]])!
-			const p2 = idToPoint.get(line[knownIdx[1]])!
+			const p1 = idToPoint.get(line[knownIdx[0]])
+			const p2 = idToPoint.get(line[knownIdx[1]])
+			if (!p1 || !p2) continue
 			const dir = { x: p2.x - p1.x, y: p2.y - p1.y }
 			const baseLen = Math.hypot(dir.x, dir.y) || 1
 			const ux = dir.x / baseLen
@@ -764,7 +781,14 @@ export const generateTriangleDiagram: WidgetGenerator<typeof TriangleDiagramProp
 				.map((pid: string) => idToPoint.get(pid))
 				.filter((p: Vec | undefined): p is Vec => p != null)
 			if (pts.length >= 2) {
-				const dash = line.style === "dashed" ? "4 3" : line.style === "dotted" ? "2 4" : undefined
+				let dash: string | undefined
+				if (line.style === "dashed") {
+					dash = "4 3"
+				} else if (line.style === "dotted") {
+					dash = "2 4"
+				} else {
+					dash = undefined
+				}
 				for (let i = 1; i < pts.length; i++) {
 					const p1 = pts[i - 1]
 					const p2 = pts[i]

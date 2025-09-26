@@ -2,7 +2,7 @@
 import { beforeAll, describe, expect, mock, test } from "bun:test"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import { buildHtmlEnvelope, buildPerseusEnvelope } from "../../src/structured/ai-context-builder"
+import { buildMathacademyEnvelope, buildPerseusEnvelope } from "../../src/structured/ai-context-builder"
 
 // NOTE: Additional comprehensive tests have been split into:
 // - tests/structured/ai-context-builder/ai-context-builder.perseus.unit.test.ts
@@ -10,30 +10,30 @@ import { buildHtmlEnvelope, buildPerseusEnvelope } from "../../src/structured/ai
 // - tests/structured/ai-context-builder/ai-context-builder.perseus-regressions.test.ts
 
 describe("AI Context Builders", () => {
-	describe("buildHtmlEnvelope", () => {
+	describe("buildMathacademyEnvelope", () => {
 		test("should create an envelope with only HTML content", async () => {
 			const html = "<h1>Hello World</h1><p>This is a test.</p>"
-			const envelope = await buildHtmlEnvelope(html)
+			const envelope = await buildMathacademyEnvelope(html)
 
 			expect(envelope.primaryContent).toEqual(html)
 			expect(envelope.supplementaryContent).toEqual([])
-			expect(envelope.rasterImageUrls).toEqual([])
+			expect(envelope.multimodalImageUrls).toEqual([])
 		})
 
 		test("should create an envelope with HTML content and a screenshot URL", async () => {
 			const html = "<div>...</div>"
 			const screenshotUrl = "https://example.com/screenshot.png"
-			const envelope = await buildHtmlEnvelope(html, screenshotUrl)
+			const envelope = await buildMathacademyEnvelope(html, screenshotUrl)
 
 			expect(envelope.primaryContent).toEqual(html)
 			expect(envelope.supplementaryContent).toEqual([])
-			expect(envelope.rasterImageUrls).toEqual([screenshotUrl])
+			expect(envelope.multimodalImageUrls).toEqual([screenshotUrl])
 		})
 
 		test("should throw an error for an invalid screenshot URL", async () => {
 			const html = "<div>...</div>"
 			const invalidUrl = "not-a-valid-url"
-			return expect(buildHtmlEnvelope(html, invalidUrl)).rejects.toThrow()
+			return expect(buildMathacademyEnvelope(html, invalidUrl)).rejects.toThrow()
 		})
 	})
 
@@ -82,7 +82,7 @@ describe("AI Context Builders", () => {
 			const envelope = result.data
 
 			// No image URLs should be found
-			expect(envelope.rasterImageUrls).toHaveLength(0)
+			expect(envelope.multimodalImageUrls).toHaveLength(0)
 			// The primaryContent should contain the original JSON, and supplementaryContent should be empty.
 			expect(envelope.primaryContent).toBeTruthy()
 			expect(envelope.supplementaryContent).toHaveLength(0)

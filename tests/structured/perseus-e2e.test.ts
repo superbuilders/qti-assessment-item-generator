@@ -54,7 +54,7 @@ describe("Perseus E2E Regression Suite", () => {
 		const envelope = result.data
 
 		// Direct https SVG URLs are attempted but fail with mock fetch (404)
-		expect(envelope.rasterImageUrls).toHaveLength(0)
+		expect(envelope.multimodalImageUrls).toHaveLength(0)
 		// Failed SVG fetches means no supplementary content
 		expect(envelope.primaryContent).toBeTruthy()
 		expect(envelope.supplementaryContent).toHaveLength(0) // No SVG content since fetch failed
@@ -72,8 +72,8 @@ describe("Perseus E2E Regression Suite", () => {
 		}
 		const envelope = result.data
 
-		// These `web+graphie` URLs resolve to SVGs, so they should not be in `rasterImageUrls`.
-		expect(envelope.rasterImageUrls).toHaveLength(0)
+		// These `web+graphie` URLs resolve to SVGs, so they should not be in `multimodalImageUrls`.
+		expect(envelope.multimodalImageUrls).toHaveLength(0)
 		// SVG content should be in supplementaryContent when successfully fetched
 
 		// primaryContent should contain the main JSON string, supplementaryContent should have 4 SVG contents.
@@ -99,7 +99,7 @@ describe("Perseus E2E Regression Suite", () => {
 		}
 		const envelope = result.data
 
-		expect(envelope.rasterImageUrls).toHaveLength(0)
+		expect(envelope.multimodalImageUrls).toHaveLength(0)
 		// SVG content should be in supplementaryContent when successfully fetched
 
 		// primaryContent should contain the main JSON string, supplementaryContent should have 3 SVG contents.
@@ -123,7 +123,7 @@ describe("Perseus E2E Regression Suite", () => {
 		}
 		const envelope = result.data
 
-		expect(envelope.rasterImageUrls).toHaveLength(0)
+		expect(envelope.multimodalImageUrls).toHaveLength(0)
 		// SVG content should be in supplementaryContent when successfully fetched
 
 		// primaryContent should contain the main JSON, supplementaryContent should have 2 SVG contents from the hints.

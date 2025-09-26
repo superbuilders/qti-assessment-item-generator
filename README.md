@@ -42,16 +42,16 @@ const xml = await compile(structuredItem);
 console.log(xml);
 ```
 
-### Full Pipeline: HTML to QTI XML
+### Full Pipeline: HTML to QTI XML (Network-Enabled)
 
-This example converts raw HTML into a QTI 3.0 XML string. The `buildHtmlEnvelope` helper is now async and fetches SVG content from external image URLs. Inline `<svg>` embedded in the HTML remains as-is inside the primary HTML context and is not duplicated. `<img>` `src` URLs and the optional `screenshotUrl` are validated: only absolute `http`/`https` URLs are accepted. Invalid `<img>` `src` values are skipped; an invalid `screenshotUrl` will throw. Fetch timeout is 30 seconds.
+This example converts raw HTML into a QTI 3.0 XML string. The `buildMathacademyEnvelope` helper is async and fetches SVG content from external image URLs. Inline `<svg>` embedded in the HTML remains as-is inside the primary HTML context and is not duplicated. `<img>` `src` URLs and the optional `screenshotUrl` are validated: only absolute `http`/`https` URLs are accepted. Invalid `<img>` `src` values are skipped; an invalid `screenshotUrl` will throw. Fetch timeout is 30 seconds.
 
 ```ts
 import OpenAI from "openai";
 import * as logger from "@superbuilders/slog";
 import { generateFromEnvelope } from "@superbuilders/qti-assessment-item-generator/structured";
 import { compile } from "@superbuilders/qti-assessment-item-generator/compiler";
-import { buildHtmlEnvelope } from "@superbuilders/qti-assessment-item-generator/structured/ai-context-builder";
+import { buildMathacademyEnvelope } from "@superbuilders/qti-assessment-item-generator/structured/ai-context-builder";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 
@@ -64,13 +64,59 @@ const html = `
 // Optional: provide a full screenshot for broader context.
 const screenshotUrl = "https://example.com/item-screenshot.png";
 
-// 1. Build the AI context envelope.
-const envelope = await buildHtmlEnvelope(html, screenshotUrl);
+// 1. Build the AI context envelope. This builder performs network requests.
+const envelope = await buildMathacademyEnvelope(html, screenshotUrl);
 
 // 2. Generate the structured AssessmentItemInput object.
 const structuredItem = await generateFromEnvelope(openai, logger, envelope, "fourth-grade-math");
 
 // 3. Compile the structured item to QTI XML.
+const xml = await compile(structuredItem);
+
+console.log(xml);
+```
+
+### Full Pipeline: Offline HTML to QTI XML (No Network)
+
+For use cases where network requests are forbidden, you can construct the `AiContextEnvelope` manually. This approach allows you to provide raster images as in-memory binary payloads or `data:` URLs, ensuring a completely offline workflow.
+
+```ts
+import fs from "fs/promises";
+import OpenAI from "openai";
+import * as logger from "@superbuilders/slog";
+import { generateFromEnvelope } from "@superbuilders/qti-assessment-item-generator/structured";
+import { compile } from "@superbuilders/qti-assessment-item-generator/compiler";
+import type { AiContextEnvelope, RasterImagePayload } from "@superbuilders/qti-assessment-item-generator/structured/types";
+
+// ---
+// In an offline pipeline (e.g., TEKS STAAR), you load all assets from a local source.
+// ---
+
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
+
+// 1. Load primary HTML and supplementary SVG content from disk.
+const html = await fs.readFile("/abs/path/to/item.html", "utf8");
+const svgText = await fs.readFile("/abs/path/to/diagram.svg", "utf8");
+
+// 2. Load a raster image (e.g., a screenshot) and create a payload.
+const screenshotBytes = await fs.readFile("/abs/path/to/screenshot.png");
+const screenshotPayload: RasterImagePayload = {
+  data: new Blob([screenshotBytes]),
+  mimeType: "image/png",
+};
+
+// 3. Manually build the offline envelope. No network calls will be made.
+const envelope: AiContextEnvelope = {
+  primaryContent: html,
+  supplementaryContent: [svgText],
+  multimodalImageUrls: [], // Can also include data: URLs here
+  multimodalImagePayloads: [screenshotPayload],
+};
+
+// 4. Generate the structured item.
+const structuredItem = await generateFromEnvelope(openai, logger, envelope, "fourth-grade-math");
+
+// 5. Compile to QTI XML.
 const xml = await compile(structuredItem);
 
 console.log(xml);
@@ -151,9 +197,9 @@ console.log(svgString);
 ### `structured/ai-context-builder`
 
 -   `buildPerseusEnvelope(perseusJson: unknown) => Promise<AiContextEnvelope>`
-    -   Creates an envelope from Perseus JSON. Returns an object with `primaryContent` (the JSON string), `supplementaryContent` (any fetched SVG text), and `rasterImageUrls`.
--   `buildHtmlEnvelope(html: string, screenshotUrl?: string) => Promise<AiContextEnvelope>`
-    -   Creates an envelope from raw HTML. Returns an object with `primaryContent` (the HTML string), `supplementaryContent` (any fetched SVG text), and `rasterImageUrls`. Fetches SVG content from external image URLs. Only absolute `http`/`https` URLs are accepted.
+    -   Creates an envelope from Perseus JSON. Returns an object with `primaryContent`, `supplementaryContent`, `multimodalImageUrls`, and an empty `multimodalImagePayloads`.
+-   `buildMathacademyEnvelope(html: string, screenshotUrl?: string) => Promise<AiContextEnvelope>`
+    -   Creates an envelope from raw HTML. Fetches external `.svg` files and collects raster image URLs. Returns an object with `primaryContent`, `supplementaryContent`, `multimodalImageUrls`, and an empty `multimodalImagePayloads`. Only absolute `http`/`https` URLs are accepted.
 
 ### `structured/differentiator`
 
@@ -215,12 +261,11 @@ if (!validationResult.success) {
 const svg = await generateWidget(validationResult.data as unknown as Widget);
 ```
 
-## Image URL Policy
+## Image URL and Payload Policy
 
--   `buildHtmlEnvelope` accepts only absolute `http`/`https` image URLs.
--   `<img>` elements with invalid/unsupported `src` values are skipped (not thrown).
--   If an optional `screenshotUrl` is provided but invalid or unsupported, it will throw.
--   Inline `<svg>` content embedded in HTML is left as-is inside the primary HTML context; only external `.svg` image URLs are fetched and embedded as supplementary content.
+-   **`buildMathacademyEnvelope`** (Network-Enabled): Accepts only absolute `http`/`https` image URLs. `<img>` elements with invalid `src` values are skipped. An invalid `screenshotUrl` will throw.
+-   **Offline Manual Construction**: The `multimodalImageUrls` array accepts both `http`/`https` URLs and `data:` URLs. The `multimodalImagePayloads` array accepts raw binary image data as `Blob` objects with a specified MIME type.
+-   Vector graphics (`.svg`) must be provided as raw string content in the `supplementaryContent` array.
 
 ## Configuration
 

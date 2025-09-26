@@ -464,7 +464,7 @@ export const generateTapeDiagram: WidgetGenerator<typeof TapeDiagramPropsSchema>
 		let endFrac = 1
 		if (extentSpan != null) {
 			const denom = referenceUnitsTotal != null ? referenceUnitsTotal : tape.unitsTotal
-			const f = spanToFraction(extentSpan as z.infer<ReturnType<typeof createAddressSpanSchema>>, denom)
+			const f = spanToFraction(extentSpan, denom)
 			startFrac = clamp01(f.start)
 			endFrac = clamp01(f.end)
 			if (endFrac < startFrac) {
@@ -515,10 +515,7 @@ export const generateTapeDiagram: WidgetGenerator<typeof TapeDiagramPropsSchema>
 		topBracketRanges: BracketRange[],
 		bottomBracketRanges: BracketRange[]
 	): void {
-		const { start, end } = spanToFraction(
-			fill.span as z.infer<ReturnType<typeof createAddressSpanSchema>>,
-			tape.unitsTotal
-		)
+		const { start, end } = spanToFraction(fill.span, tape.unitsTotal)
 		const s = clamp01(start)
 		const e = clamp01(end)
 		const x = geom.leftX + s * geom.width
@@ -560,12 +557,14 @@ export const generateTapeDiagram: WidgetGenerator<typeof TapeDiagramPropsSchema>
 		if (fill.label) {
 			const cx = x + w / 2
 			// Ensure fill labels clear bracket lines by adding more margin above/below
-			let cy =
-				fill.label.placement === "inside"
-					? geom.y + tapeHeight / 2
-					: fill.label.placement === "above"
-						? geom.y - 16
-						: geom.y + tapeHeight + 24
+			let cy: number
+			if (fill.label.placement === "inside") {
+				cy = geom.y + tapeHeight / 2
+			} else if (fill.label.placement === "above") {
+				cy = geom.y - 16
+			} else {
+				cy = geom.y + tapeHeight + 24
+			}
 			// Collision avoidance with bracket labels: if a bracket label exists on the same side and overlaps in X, push further away
 			const overlaps = (ranges: BracketRange[]): boolean => {
 				const x1 = x
@@ -632,10 +631,7 @@ export const generateTapeDiagram: WidgetGenerator<typeof TapeDiagramPropsSchema>
 		const tape = b.tape === "top" ? topTape : bottomTape || null
 		const geom = b.tape === "top" ? topGeom : bottomGeom
 		if (!tape || !geom) continue
-		const { start, end } = spanToFraction(
-			b.span as z.infer<ReturnType<typeof createAddressSpanSchema>>,
-			tape.unitsTotal
-		)
+		const { start, end } = spanToFraction(b.span, tape.unitsTotal)
 		const fx = geom.leftX + clamp01(start) * geom.width
 		const tx = geom.leftX + clamp01(end) * geom.width
 		const x1 = Math.min(fx, tx)
@@ -684,10 +680,7 @@ export const generateTapeDiagram: WidgetGenerator<typeof TapeDiagramPropsSchema>
 		const tape = b.tape === "top" ? topTape : bottomTape || null
 		const geom = b.tape === "top" ? topGeom : bottomGeom
 		if (!tape || !geom) continue
-		const { start, end } = spanToFraction(
-			b.span as z.infer<ReturnType<typeof createAddressSpanSchema>>,
-			tape.unitsTotal
-		)
+		const { start, end } = spanToFraction(b.span, tape.unitsTotal)
 		const fx = geom.leftX + clamp01(start) * geom.width
 		const tx = geom.leftX + clamp01(end) * geom.width
 		const x1 = Math.min(fx, tx)

@@ -33,7 +33,7 @@ describe("buildPerseusEnvelope (regressions)", () => {
 			}
 			expect(typeof result.data.primaryContent).toBe("string")
 			expect(Array.isArray(result.data.supplementaryContent)).toBeTruthy()
-			expect(Array.isArray(result.data.rasterImageUrls)).toBeTruthy()
+			expect(Array.isArray(result.data.multimodalImageUrls)).toBeTruthy()
 			expectSortedUrls(result.data)
 		})
 	}

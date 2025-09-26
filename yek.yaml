@@ -9,6 +9,8 @@ ignore_patterns:
   - "**/__snapshots__/**"
   - "src/widgets/generators/**"
   - "examples/**"
+  - "teks-staar-scrape/**"
+  - "docs/**"
 priority_rules:
   - score: 99
     pattern: "^rules/"
