@@ -31,9 +31,9 @@ describe("buildPerseusEnvelope (regressions)", () => {
 				logger.error("test failed", { error: result.error })
 				throw result.error
 			}
-			expect(Array.isArray(result.data.context)).toBeTruthy()
+			expect(typeof result.data.primaryContent).toBe("string")
+			expect(Array.isArray(result.data.supplementaryContent)).toBeTruthy()
 			expect(Array.isArray(result.data.rasterImageUrls)).toBeTruthy()
-			expect(Array.isArray(result.data.vectorImageUrls)).toBeTruthy()
 			expectSortedUrls(result.data)
 		})
 	}

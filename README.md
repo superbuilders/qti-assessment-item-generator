@@ -151,9 +151,9 @@ console.log(svgString);
 ### `structured/ai-context-builder`
 
 -   `buildPerseusEnvelope(perseusJson: unknown) => Promise<AiContextEnvelope>`
-    -   Creates an envelope from Perseus JSON. Resolves both `web+graphie://` and standard `https://` image URLs, fetches external SVG content, and separates raster/vector URLs for the AI.
+    -   Creates an envelope from Perseus JSON. Returns an object with `primaryContent` (the JSON string), `supplementaryContent` (any fetched SVG text), and `rasterImageUrls`.
 -   `buildHtmlEnvelope(html: string, screenshotUrl?: string) => Promise<AiContextEnvelope>`
-    -   Creates an envelope from raw HTML. **Breaking change: now async.** Fetches SVG content from external image URLs. Inline `<svg>` remains only in the primary HTML context (not extracted). Only absolute `http`/`https` URLs are accepted; invalid `<img>` `src` values are skipped, while an invalid `screenshotUrl` will throw. Fetch timeout is 30 seconds.
+    -   Creates an envelope from raw HTML. Returns an object with `primaryContent` (the HTML string), `supplementaryContent` (any fetched SVG text), and `rasterImageUrls`. Fetches SVG content from external image URLs. Only absolute `http`/`https` URLs are accepted.
 
 ### `structured/differentiator`
 
@@ -220,42 +220,7 @@ const svg = await generateWidget(validationResult.data as unknown as Widget);
 -   `buildHtmlEnvelope` accepts only absolute `http`/`https` image URLs.
 -   `<img>` elements with invalid/unsupported `src` values are skipped (not thrown).
 -   If an optional `screenshotUrl` is provided but invalid or unsupported, it will throw.
--   Inline `<svg>` content embedded in HTML is left as-is inside the primary HTML context; only external `.svg` image URLs are fetched and embedded as text.
-
-## Breaking Changes (v2.0.0)
-
-This version includes breaking changes to the AI context pipeline:
-
--   **`AiContextEnvelope` interface**: The `imageUrls` field has been renamed to `rasterImageUrls`, and a new `vectorImageUrls` field has been added.
--   **`buildHtmlEnvelope` function**: Now async and performs network fetches for SVG content from `<img>` sources.
--   **Enhanced context**: Both builders now provide richer context with explicit separation of raster and vector images, improving AI accuracy especially for widget mapping.
-
-### Migration Guide
-
-1.  Update `AiContextEnvelope` usage:
-    ```ts
-    // Before
-    const envelope: AiContextEnvelope = {
-      context: [...],
-      imageUrls: [...]
-    }
-    
-    // After
-    const envelope: AiContextEnvelope = {
-      context: [...],
-      rasterImageUrls: [...],
-      vectorImageUrls: [...]
-    }
-    ```
-
-2.  Make `buildHtmlEnvelope` calls async:
-    ```ts
-    // Before
-    const envelope = buildHtmlEnvelope(html, screenshotUrl);
-    
-    // After
-    const envelope = await buildHtmlEnvelope(html, screenshotUrl);
-    ```
+-   Inline `<svg>` content embedded in HTML is left as-is inside the primary HTML context; only external `.svg` image URLs are fetched and embedded as supplementary content.
 
 ## Configuration
 
@@ -263,7 +228,7 @@ This version includes breaking changes to the AI context pipeline:
 
 ## Troubleshooting
 
--   **`Error: envelope context cannot be empty`**: You called `generateFromEnvelope` with an `AiContextEnvelope` that had no content. Ensure the `context` array is not empty.
+-   **`Error: primaryContent cannot be empty`**: You called `generateFromEnvelope` with an `AiContextEnvelope` that had no primary content. Ensure the `primaryContent` string is not empty.
 -   **`Error: Model returned no parsed content`**: The OpenAI API call succeeded but returned an empty or unparsable response. Check your API key, model access, and inspect the logs for more details.
 -   **`Error: Slot declaration mismatch detected...`**: This is an internal AI error where the generated plan is inconsistent with the generated content. This error is typically non-retriable for the given input.
 -   **`Error: ...must have at least 2 choices...`**: An interaction like a multiple-choice or ordering question was generated with fewer than two choices, which is invalid.

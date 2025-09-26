@@ -3,7 +3,7 @@ import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { buildHtmlEnvelope } from "../../../src/structured/ai-context-builder"
 import { createPrdMockFetch } from "./helpers/mock-fetch"
-import { expectSortedUrls } from "./helpers/assertions"
+import { expectSortedUrls, expectSupplementaryContentCount } from "./helpers/assertions"
 
 describe("buildHtmlEnvelope (unit)", () => {
 	let previousFetch: typeof fetch
@@ -18,18 +18,18 @@ describe("buildHtmlEnvelope (unit)", () => {
 	test("creates envelope with only HTML content", async () => {
 		const html = "<h1>Hello World</h1><p>This is a test.</p>"
 		const envelope = await buildHtmlEnvelope(html)
-		expect(envelope.context).toEqual([html])
+		expect(envelope.primaryContent).toEqual(html)
+		expect(envelope.supplementaryContent).toEqual([])
 		expect(envelope.rasterImageUrls).toEqual([])
-		expect(envelope.vectorImageUrls).toEqual([])
 	})
 
 	test("adds valid screenshot URL", async () => {
 		const html = "<div>...</div>"
 		const screenshotUrl = "https://example.com/screenshot.png"
 		const envelope = await buildHtmlEnvelope(html, screenshotUrl)
-		expect(envelope.context).toEqual([html])
+		expect(envelope.primaryContent).toEqual(html)
+		expect(envelope.supplementaryContent).toEqual([])
 		expect(envelope.rasterImageUrls).toEqual([screenshotUrl])
-		expect(envelope.vectorImageUrls).toEqual([])
 	})
 
 	test("throws for invalid screenshot URL", async () => {
@@ -51,9 +51,9 @@ describe("buildHtmlEnvelope (unit)", () => {
 			throw result.error
 		}
 		const envelope = result.data
-		expect(envelope.context).toHaveLength(2)
-		expect(envelope.context[1]).toBe('<svg width="20" height="20"></svg>')
-		expect(envelope.vectorImageUrls).toEqual(["https://example.com/diagram.svg"])
+		expect(envelope.primaryContent).toBeTruthy()
+		expectSupplementaryContentCount(envelope, 1)
+		expect(envelope.supplementaryContent[0]).toBe('<!-- URL: https://example.com/diagram.svg -->\n<svg width="20" height="20"></svg>')
 	})
 
 	test("handles mixed-case SVG extensions and querystrings", async () => {
@@ -62,8 +62,8 @@ describe("buildHtmlEnvelope (unit)", () => {
 		expect(result.error).toBeFalsy()
 		if (result.error) throw result.error
 		const envelope = result.data
-		expect(envelope.context).toHaveLength(2)
-		expect(envelope.vectorImageUrls).toEqual(["https://example.com/Vector.SVG?cache=1"])
+		expect(envelope.primaryContent).toBeTruthy()
+		expectSupplementaryContentCount(envelope, 1)
 	})
 
 	test("handles mix of raster, vector, and broken links", async () => {
@@ -80,9 +80,9 @@ describe("buildHtmlEnvelope (unit)", () => {
 			throw result.error
 		}
 		const envelope = result.data
-		expect(envelope.context).toHaveLength(2)
+		expect(envelope.primaryContent).toBeTruthy()
+		expectSupplementaryContentCount(envelope, 1)
 		expect(envelope.rasterImageUrls).toEqual(["https://example.com/photo.png", "https://example.com/screen.jpg"])
-		expect(envelope.vectorImageUrls).toEqual(["https://example.com/diagram.svg"])
 		expectSortedUrls(envelope)
 	})
 
@@ -95,9 +95,8 @@ describe("buildHtmlEnvelope (unit)", () => {
 			throw result.error
 		}
 		const envelope = result.data
-		expect(envelope.context).toHaveLength(1)
-		expect(envelope.context[0]).toBe(html)
-		expect(envelope.vectorImageUrls).toEqual([])
+		expect(envelope.primaryContent).toBe(html)
+		expectSupplementaryContentCount(envelope, 0)
 	})
 
 	test("deduplicates duplicate image URLs (raster and vector)", async () => {
@@ -112,9 +111,9 @@ describe("buildHtmlEnvelope (unit)", () => {
 		if (result.error) throw result.error
 		const envelope = result.data
 		// One HTML + one fetched SVG content
-		expect(envelope.context).toHaveLength(2)
+		expect(envelope.primaryContent).toBeTruthy()
+		expectSupplementaryContentCount(envelope, 1)
 		expect(envelope.rasterImageUrls).toEqual(["https://example.com/photo.png"])
-		expect(envelope.vectorImageUrls).toEqual(["https://example.com/diagram.svg"])
 	})
 
 	test("skips external SVG that times out/fails", async () => {
@@ -124,8 +123,8 @@ describe("buildHtmlEnvelope (unit)", () => {
 		if (result.error) throw result.error
 		const envelope = result.data
 		// No SVG embedded, only original HTML
-		expect(envelope.context).toHaveLength(1)
-		expect(envelope.vectorImageUrls).toEqual([])
+		expect(envelope.primaryContent).toBeTruthy()
+		expectSupplementaryContentCount(envelope, 0)
 	})
 })
 

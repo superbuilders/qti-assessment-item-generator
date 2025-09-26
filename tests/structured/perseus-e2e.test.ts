@@ -11,7 +11,7 @@ import {
 import { PERSEUS_SVG_CACHE } from "../fixtures/perseus-svgs/cache"
 
 // Mock fetch function that returns cached Perseus SVGs
-const mockFetch: typeof fetch = async (url: string | Request | URL, init?: RequestInit) => {
+const mockFetch: typeof fetch = (async (url: string | Request | URL, init?: RequestInit): Promise<Response> => {
 	const urlString = url.toString()
 
 	// Handle HEAD requests - check if we have the SVG in cache
@@ -36,7 +36,7 @@ const mockFetch: typeof fetch = async (url: string | Request | URL, init?: Reque
 	}
 
 	return new Response(null, { status: 404, statusText: "Not Found" })
-}
+}) as any as typeof fetch
 
 describe("Perseus E2E Regression Suite", () => {
 	// Test Case 1: Direct HTTPS URL for an SVG
@@ -46,13 +46,16 @@ describe("Perseus E2E Regression Suite", () => {
 		const result = await errors.try(buildPerseusEnvelope(soupVolumeEstimation, mockFetch))
 
 		expect(result.error).toBeFalsy()
+		if (result.error) {
+			throw result.error
+		}
 		const envelope = result.data
 
 		// Direct https SVG URLs are attempted but fail with mock fetch (404)
 		expect(envelope.rasterImageUrls).toHaveLength(0)
-		// Failed SVG fetches are not added to vectorImageUrls
-		expect(envelope.vectorImageUrls).toHaveLength(0)
-		expect(envelope.context).toHaveLength(1) // Contains only main JSON since SVG fetch failed
+		// Failed SVG fetches means no supplementary content
+		expect(envelope.primaryContent).toBeTruthy()
+		expect(envelope.supplementaryContent).toHaveLength(0) // No SVG content since fetch failed
 	})
 
 	// Test Case 2: web+graphie URLs that resolve to SVGs, found in hints
@@ -61,20 +64,25 @@ describe("Perseus E2E Regression Suite", () => {
 		const result = await errors.try(buildPerseusEnvelope(rectangularPrismVolume, mockFetch))
 
 		expect(result.error).toBeFalsy()
+		if (result.error) {
+			throw result.error
+		}
 		const envelope = result.data
 
 		// These `web+graphie` URLs resolve to SVGs, so they should not be in `rasterImageUrls`.
 		expect(envelope.rasterImageUrls).toHaveLength(0)
-		// SVG URLs should be in vectorImageUrls when successfully fetched
-		expect(envelope.vectorImageUrls).toHaveLength(4)
+		// SVG content should be in supplementaryContent when successfully fetched
 
-		// Context should contain the main JSON string PLUS the 4 unique SVG contents.
-		expect(envelope.context).toHaveLength(5)
-		expect(envelope.context[0]).toStartWith("{") // The main JSON
-		expect(envelope.context[1]).toStartWith("<svg") // The first resolved SVG
-		expect(envelope.context[2]).toStartWith("<svg")
-		expect(envelope.context[3]).toStartWith("<svg")
-		expect(envelope.context[4]).toStartWith("<svg")
+		// primaryContent should contain the main JSON string, supplementaryContent should have 4 SVG contents.
+		expect(envelope.primaryContent).toStartWith("{") // The main JSON
+		expect(envelope.supplementaryContent).toHaveLength(4)
+		expect(envelope.supplementaryContent[0]).toStartWith("<!-- URL:") // The first resolved SVG with URL comment
+		expect(envelope.supplementaryContent[1]).toStartWith("<!-- URL:")
+		expect(envelope.supplementaryContent[2]).toStartWith("<!-- URL:")
+		expect(envelope.supplementaryContent[3]).toStartWith("<!-- URL:")
+		// Verify the SVG content follows the comment
+		expect(envelope.supplementaryContent[0]).toContain("<!-- URL:")
+		expect(envelope.supplementaryContent[0]).toContain("<svg")
 	})
 
 	// Test Case 3: More web+graphie URLs resolving to SVGs
@@ -82,17 +90,20 @@ describe("Perseus E2E Regression Suite", () => {
 		const result = await errors.try(buildPerseusEnvelope(numberLineMatcher, mockFetch))
 
 		expect(result.error).toBeFalsy()
+		if (result.error) {
+			throw result.error
+		}
 		const envelope = result.data
 
 		expect(envelope.rasterImageUrls).toHaveLength(0)
-		// SVG URLs should be in vectorImageUrls when successfully fetched  
-		expect(envelope.vectorImageUrls).toHaveLength(3)
+		// SVG content should be in supplementaryContent when successfully fetched
 
-		// Context should contain the main JSON string PLUS the 3 unique SVG contents.
-		expect(envelope.context).toHaveLength(4)
-		expect(envelope.context[1]).toStartWith("<svg")
-		expect(envelope.context[2]).toStartWith("<svg")
-		expect(envelope.context[3]).toStartWith("<svg")
+		// primaryContent should contain the main JSON string, supplementaryContent should have 3 SVG contents.
+		expect(envelope.primaryContent).toBeTruthy()
+		expect(envelope.supplementaryContent).toHaveLength(3)
+		expect(envelope.supplementaryContent[0]).toStartWith("<!-- URL:")
+		expect(envelope.supplementaryContent[1]).toStartWith("<!-- URL:")
+		expect(envelope.supplementaryContent[2]).toStartWith("<!-- URL:")
 	})
 
 	// Test Case 4: Unsupported interactive widget ('grapher')
@@ -102,15 +113,18 @@ describe("Perseus E2E Regression Suite", () => {
 		const result = await errors.try(buildPerseusEnvelope(interactiveGraphPlotting, mockFetch))
 
 		expect(result.error).toBeFalsy()
+		if (result.error) {
+			throw result.error
+		}
 		const envelope = result.data
 
 		expect(envelope.rasterImageUrls).toHaveLength(0)
-		// SVG URLs should be in vectorImageUrls when successfully fetched  
-		expect(envelope.vectorImageUrls).toHaveLength(2)
+		// SVG content should be in supplementaryContent when successfully fetched
 
-		// Context should contain the main JSON and the 2 unique SVGs from the hints.
-		expect(envelope.context).toHaveLength(3)
-		expect(envelope.context[1]).toStartWith("<svg")
-		expect(envelope.context[2]).toStartWith("<svg")
+		// primaryContent should contain the main JSON, supplementaryContent should have 2 SVG contents from the hints.
+		expect(envelope.primaryContent).toBeTruthy()
+		expect(envelope.supplementaryContent).toHaveLength(2)
+		expect(envelope.supplementaryContent[0]).toStartWith("<!-- URL:")
+		expect(envelope.supplementaryContent[1]).toStartWith("<!-- URL:")
 	})
 })

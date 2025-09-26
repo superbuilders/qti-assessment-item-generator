@@ -3,7 +3,7 @@ import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { buildPerseusEnvelope } from "../../../src/structured/ai-context-builder"
 import { createAlwaysFailFetch, createPrdMockFetch } from "./helpers/mock-fetch"
-import { expectSortedUrls } from "./helpers/assertions"
+import { expectSortedUrls, expectSupplementaryContentCount } from "./helpers/assertions"
 
 describe("buildPerseusEnvelope (unit)", () => {
 	let previousFetch: typeof fetch
@@ -22,9 +22,9 @@ describe("buildPerseusEnvelope (unit)", () => {
 			logger.error("test failed", { error: result.error })
 			throw result.error
 		}
-		expect(result.data.context).toEqual(["{}"])
+		expect(result.data.primaryContent).toEqual("{}") 
+		expect(result.data.supplementaryContent).toEqual([])
 		expect(result.data.rasterImageUrls).toEqual([])
-		expect(result.data.vectorImageUrls).toEqual([])
 	})
 
 	test("resolves web+graphie SVG URLs and embeds content", async () => {
@@ -44,9 +44,9 @@ describe("buildPerseusEnvelope (unit)", () => {
 			throw result.error
 		}
 		const envelope = result.data
-		expect(envelope.context).toHaveLength(2)
-		expect(envelope.context[1]).toBe('<svg width="10" height="10"></svg>')
-		expect(envelope.vectorImageUrls).toEqual(["https://cdn.kastatic.org/ka-perseus-graphie/resolves-to.svg"])
+		expect(envelope.primaryContent).toBeTruthy()
+		expectSupplementaryContentCount(envelope, 1)
+		expect(envelope.supplementaryContent[0]).toBe('<!-- URL: https://cdn.kastatic.org/ka-perseus-graphie/resolves-to.svg -->\n<svg width="10" height="10"></svg>')
 		expect(envelope.rasterImageUrls).toEqual([])
 	})
 
@@ -64,7 +64,6 @@ describe("buildPerseusEnvelope (unit)", () => {
 		if (result.error) throw result.error
 		const envelope = result.data
 		// Since SVG GET fails, and png/jpg heads succeed in our mock, it should be raster
-		expect(envelope.vectorImageUrls).toEqual([])
 		expect(envelope.rasterImageUrls).toEqual([
 			"https://cdn.kastatic.org/ka-perseus-graphie/svg-head-ok-get-fail.png"
 		])
@@ -84,10 +83,8 @@ describe("buildPerseusEnvelope (unit)", () => {
 			throw result.error
 		}
 		const envelope = result.data
-		expect(envelope.context).toHaveLength(2)
-		expect(envelope.vectorImageUrls).toEqual([
-			"https://cdn.kastatic.org/ka-perseus-images/082e6068e0c842e2b09e2a8520bd22817d55a134.svg"
-		])
+		expect(envelope.primaryContent).toBeTruthy()
+		expectSupplementaryContentCount(envelope, 1)
 	})
 
 	test("handles failing web+graphie URLs gracefully", async () => {
@@ -98,9 +95,9 @@ describe("buildPerseusEnvelope (unit)", () => {
 			logger.error("test failed", { error: result.error })
 			throw result.error
 		}
-		expect(result.data.context).toHaveLength(1)
+		expect(result.data.primaryContent).toBeTruthy()
+		expectSupplementaryContentCount(result.data, 0)
 		expect(result.data.rasterImageUrls).toEqual([])
-		expect(result.data.vectorImageUrls).toEqual([])
 	})
 
 	test("extracts direct https raster and vector URLs", async () => {
@@ -114,9 +111,9 @@ describe("buildPerseusEnvelope (unit)", () => {
 			throw result.error
 		}
 		const envelope = result.data
-		expect(envelope.context).toHaveLength(2)
+		expect(envelope.primaryContent).toBeTruthy()
+		expectSupplementaryContentCount(envelope, 1)
 		expect(envelope.rasterImageUrls).toEqual(["https://example.com/foo.png"])
-		expect(envelope.vectorImageUrls).toEqual(["https://example.com/diagram.svg"])
 		expectSortedUrls(envelope)
 	})
 
@@ -132,10 +129,6 @@ describe("buildPerseusEnvelope (unit)", () => {
 		if (result.error) throw result.error
 		const envelope = result.data
 		// one from KA resolves-to + one external
-		expect(envelope.vectorImageUrls).toEqual([
-			"https://cdn.kastatic.org/ka-perseus-graphie/resolves-to.svg",
-			"https://example.com/diagram.svg"
-		])
 		expectSortedUrls(envelope)
 	})
 
@@ -160,9 +153,9 @@ describe("buildPerseusEnvelope (unit)", () => {
 			throw result.error
 		}
 		const envelope = result.data
-		expect(envelope.context).toHaveLength(1)
+		expect(envelope.primaryContent).toBeTruthy()
+		expectSupplementaryContentCount(envelope, 0)
 		expect(envelope.rasterImageUrls).toEqual(["https://cdn.example.com/chart.png"])
-		expect(envelope.vectorImageUrls).toHaveLength(0)
 	})
 
 	test("handles Perseus JSON with no URLs gracefully", async () => {
@@ -179,9 +172,9 @@ describe("buildPerseusEnvelope (unit)", () => {
 			throw result.error
 		}
 		const envelope = result.data
-		expect(envelope.context).toHaveLength(1)
+		expect(envelope.primaryContent).toBeTruthy()
+		expectSupplementaryContentCount(envelope, 0)
 		expect(envelope.rasterImageUrls).toHaveLength(0)
-		expect(envelope.vectorImageUrls).toHaveLength(0)
 	})
 
 	test("builds envelope for marble probability item", async () => {
@@ -287,8 +280,8 @@ describe("buildPerseusEnvelope (unit)", () => {
 			throw result.error
 		}
 		const envelope = result.data
-		expect(envelope.context).toHaveLength(1)
-		expect(envelope.vectorImageUrls).toEqual([])
+		expect(envelope.primaryContent).toBeTruthy()
+		expectSupplementaryContentCount(envelope, 0)
 		expect(envelope.rasterImageUrls).toEqual([
 			"https://cdn.kastatic.org/ka-perseus-graphie/64430f539a7bd1d4c56f957779c43a4a184c09bd.png"
 		])
@@ -305,7 +298,8 @@ describe("buildPerseusEnvelope (unit)", () => {
 			throw result.error
 		}
 		const envelope = result.data
-		expect(envelope.context).toHaveLength(1)
+		expect(envelope.primaryContent).toBeTruthy()
+		expectSupplementaryContentCount(envelope, 0)
 	})
 
 	test("handles deeply nested Perseus JSON structures", async () => {
@@ -338,7 +332,8 @@ describe("buildPerseusEnvelope (unit)", () => {
 			throw result.error
 		}
 		const envelope = result.data
-		expect(envelope.context).toHaveLength(1)
+		expect(envelope.primaryContent).toBeTruthy()
+		expectSupplementaryContentCount(envelope, 0)
 	})
 
 	test("uses failing fetch mock when provided", async () => {
@@ -351,8 +346,8 @@ describe("buildPerseusEnvelope (unit)", () => {
 			throw result.error
 		}
 		const envelope = result.data
-		expect(envelope.context).toHaveLength(1)
-		expect(envelope.vectorImageUrls).toEqual([])
+		expect(envelope.primaryContent).toBeTruthy()
+		expectSupplementaryContentCount(envelope, 0)
 	})
 })
 

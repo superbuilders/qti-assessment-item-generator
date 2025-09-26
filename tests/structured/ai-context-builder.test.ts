@@ -15,9 +15,9 @@ describe("AI Context Builders", () => {
 			const html = "<h1>Hello World</h1><p>This is a test.</p>"
 			const envelope = await buildHtmlEnvelope(html)
 
-			expect(envelope.context).toEqual([html])
+			expect(envelope.primaryContent).toEqual(html)
+			expect(envelope.supplementaryContent).toEqual([])
 			expect(envelope.rasterImageUrls).toEqual([])
-			expect(envelope.vectorImageUrls).toEqual([])
 		})
 
 		test("should create an envelope with HTML content and a screenshot URL", async () => {
@@ -25,9 +25,9 @@ describe("AI Context Builders", () => {
 			const screenshotUrl = "https://example.com/screenshot.png"
 			const envelope = await buildHtmlEnvelope(html, screenshotUrl)
 
-			expect(envelope.context).toEqual([html])
+			expect(envelope.primaryContent).toEqual(html)
+			expect(envelope.supplementaryContent).toEqual([])
 			expect(envelope.rasterImageUrls).toEqual([screenshotUrl])
-			expect(envelope.vectorImageUrls).toEqual([])
 		})
 
 		test("should throw an error for an invalid screenshot URL", async () => {
@@ -83,9 +83,9 @@ describe("AI Context Builders", () => {
 
 			// No image URLs should be found
 			expect(envelope.rasterImageUrls).toHaveLength(0)
-			expect(envelope.vectorImageUrls).toHaveLength(0)
-			// The context should only contain the original JSON, not any fetched content.
-			expect(envelope.context).toHaveLength(1)
+			// The primaryContent should contain the original JSON, and supplementaryContent should be empty.
+			expect(envelope.primaryContent).toBeTruthy()
+			expect(envelope.supplementaryContent).toHaveLength(0)
 		})
 	})
 })

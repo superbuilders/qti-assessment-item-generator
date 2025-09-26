@@ -200,15 +200,15 @@ describe("Structured AI Pipeline", () => {
 		const mockOpenAI = new OpenAI()
 
 		const emptyEnvelope = {
-			context: [],
-			rasterImageUrls: [],
-			vectorImageUrls: []
+			primaryContent: "",
+			supplementaryContent: [],
+			rasterImageUrls: []
 		}
 
 		const result = await errors.try(generateFromEnvelope(mockOpenAI, logger, emptyEnvelope, "math-core"))
 
 		expect(result.error).toBeTruthy()
-		expect(result.error?.message).toContain("envelope context cannot be empty")
+		expect(result.error?.message).toContain("primaryContent cannot be empty")
 	})
 
 	test("should fail when widgetCollectionName is invalid - no fallbacks", async () => {
@@ -216,9 +216,9 @@ describe("Structured AI Pipeline", () => {
 		const mockOpenAI = new OpenAI()
 
 		const envelope = {
-			context: ["test content"],
-			rasterImageUrls: [],
-			vectorImageUrls: []
+			primaryContent: "test content",
+			supplementaryContent: [],
+			rasterImageUrls: []
 		}
 
 		// This should fail at TypeScript level, but let's test runtime behavior
@@ -289,7 +289,7 @@ describe("Structured AI Pipeline", () => {
 
 		const mockOpenAI = new MockOpenAIInconsistent()
 
-		const envelope = { context: ["test content"], rasterImageUrls: [], vectorImageUrls: [] }
+		const envelope = { primaryContent: "test content", supplementaryContent: [], rasterImageUrls: [] }
 
 		// biome-ignore lint: Mock for testing purposes
 		const result = await errors.try(generateFromEnvelope(mockOpenAI as any, logger, envelope, "math-core"))

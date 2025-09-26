@@ -376,16 +376,17 @@ export async function generateFromEnvelope(
 	widgetCollectionName: WidgetCollectionName
 ): Promise<AssessmentItemInput> {
 	// Validate envelope at the boundary. No defaults or fallbacks.
-	if (!envelope.context || envelope.context.length === 0) {
-		logger.error("envelope validation failed", { reason: "context array is empty" })
-		throw errors.new("envelope context cannot be empty")
+	if (!envelope.primaryContent || envelope.primaryContent.trim() === "") {
+		logger.error("envelope validation failed", { reason: "primaryContent is empty" })
+		throw errors.new("primaryContent cannot be empty")
 	}
 
 	logger.info("starting structured qti generation from envelope", {
 		widgetCollection: widgetCollectionName,
-		contextBlockCount: envelope.context.length,
-		rasterUrlCount: envelope.rasterImageUrls.length, // MODIFIED log field
-		vectorUrlCount: envelope.vectorImageUrls.length // NEW log field
+		primaryContentLength: envelope.primaryContent.length,
+		supplementaryContentCount: envelope.supplementaryContent.length,
+		rasterUrlCount: envelope.rasterImageUrls.length,
+		vectorUrlCount: envelope.supplementaryContent.length
 	})
 	
 	// MODIFIED: Use the new, unified image context builder.

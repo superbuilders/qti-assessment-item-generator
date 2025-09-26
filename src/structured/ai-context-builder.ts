@@ -8,10 +8,9 @@ const IMAGE_URL_REGEX = /https?:\/\/[^\s"'()<>]+?\.(svg|png|jpeg|jpg|gif)/gi
 // Network timeout only (no concurrency limits or size caps)
 const FETCH_TIMEOUT_MS = 30000
 
-// MODIFIED: ImageContext now holds both raster and vector URLs for prompts.
+// MODIFIED: ImageContext now holds only raster URLs for prompts.
 export interface ImageContext {
 	rasterImageUrls: string[]
-	vectorImageUrls: string[]
 }
 
 // MODIFIED: Complete refactor for unified URL discovery and processing.
@@ -19,10 +18,9 @@ export async function buildPerseusEnvelope(
 	perseusJson: unknown,
 	fetchFn: typeof fetch = fetch
 ): Promise<AiContextEnvelope> {
-	const jsonString = JSON.stringify(perseusJson, null, 2)
-	const context: string[] = [jsonString]
+	const primaryContent = JSON.stringify(perseusJson, null, 2)
+	const supplementaryContent: string[] = []
 	const rasterImageUrls = new Set<string>()
-	const vectorImageUrls = new Set<string>()
 	const foundUrls = new Set<string>()
 
 	const findAllUrls = (obj: unknown): void => {
@@ -100,8 +98,9 @@ export async function buildPerseusEnvelope(
 				return
 			}
 			if (result.data.type === "svg" && result.data.content) {
-				context.push(result.data.content)
-				vectorImageUrls.add(result.data.url)
+				// Prepend URL comment to help AI link content to source
+				const contentWithComment = `<!-- URL: ${result.data.url} -->\n${result.data.content}`
+				supplementaryContent.push(contentWithComment)
 			} else {
 				rasterImageUrls.add(result.data.url)
 			}
@@ -111,9 +110,9 @@ export async function buildPerseusEnvelope(
 
 	// Return URLs in deterministic order (sorted)
 	return { 
-		context, 
-		rasterImageUrls: Array.from(rasterImageUrls).sort(), 
-		vectorImageUrls: Array.from(vectorImageUrls).sort() 
+		primaryContent,
+		supplementaryContent,
+		rasterImageUrls: Array.from(rasterImageUrls).sort()
 	}
 }
 
@@ -122,9 +121,9 @@ export async function buildHtmlEnvelope(
 	screenshotUrl?: string,
 	fetchFn: typeof fetch = fetch
 ): Promise<AiContextEnvelope> {
-	const context: string[] = [html]
+	const primaryContent = html
+	const supplementaryContent: string[] = []
 	const rasterImageUrls = new Set<string>()
-	const vectorImageUrls = new Set<string>()
 	const svgUrlsToFetch = new Set<string>()
 
 	if (screenshotUrl) {
@@ -180,25 +179,25 @@ export async function buildHtmlEnvelope(
 				logger.warn("failed to read svg text from html", { url, error: textResult.error })
 				return
 			}
-			context.push(textResult.data)
-			vectorImageUrls.add(url)
+			// Prepend URL comment to help AI link content to source
+			const contentWithComment = `<!-- URL: ${url} -->\n${textResult.data}`
+			supplementaryContent.push(contentWithComment)
 		})
 		await Promise.all(promises)
 	}
 
 	// Return URLs in deterministic order (sorted)
 	return {
-		context,
-		rasterImageUrls: Array.from(rasterImageUrls).sort(),
-		vectorImageUrls: Array.from(vectorImageUrls).sort()
+		primaryContent,
+		supplementaryContent,
+		rasterImageUrls: Array.from(rasterImageUrls).sort()
 	}
 }
 
 // MODIFIED: Renamed and updated to build a complete image context.
 export function buildImageContext(envelope: AiContextEnvelope): ImageContext {
 	const context: ImageContext = {
-		rasterImageUrls: [],
-		vectorImageUrls: []
+		rasterImageUrls: []
 	}
 
 	for (const url of envelope.rasterImageUrls) {
@@ -208,15 +207,6 @@ export function buildImageContext(envelope: AiContextEnvelope): ImageContext {
 			throw errors.wrap(result.error, "invalid raster image url")
 		}
 		context.rasterImageUrls.push(result.data.toString())
-	}
-
-	for (const url of envelope.vectorImageUrls) {
-		const result = errors.trySync(() => new URL(url))
-		if (result.error) {
-			logger.error("invalid vector image url in envelope", { url, error: result.error })
-			throw errors.wrap(result.error, "invalid vector image url")
-		}
-		context.vectorImageUrls.push(result.data.toString())
 	}
 
 	return context
