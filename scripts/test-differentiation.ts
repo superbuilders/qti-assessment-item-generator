@@ -34,9 +34,9 @@ const sourceItem: AssessmentItemInput = {
 				{ type: "text", content: " women's discus throwers at the U.S. qualifying meet." }
 			]
 		},
-		{ type: "blockSlot", slotId: "image_1" },
+		{ type: "widgetRef", widgetId: "image_1" },
 		{ type: "paragraph", content: [{ type: "text", content: "Which conclusion is supported by these box plots?" }] },
-		{ type: "blockSlot", slotId: "choice_interaction" }
+		{ type: "interactionRef", interactionId: "choice_interaction" }
 	],
 	title: "Interpret box plots for discus throw distances",
 	widgets: {

@@ -179,7 +179,7 @@ export function generateFractionAdditionQuestion(
 				]
 			},
 			// removed sum_visual slot to avoid missing widget error in compiler-only POC
-			{ type: "blockSlot", slotId: "choice_interaction" }
+			{ type: "interactionRef", interactionId: "choice_interaction" }
 		],
 
 		widgets: {

@@ -13,7 +13,7 @@ Negative example (DO NOT OUTPUT):
       { "type": "text", "content": "If the mass is increased to " },
       { "type": "math", "mathml": "<mn>8</mn><mtext> kg</mtext>" },
       { "type": "text", "content": ", the acceleration will be " },
-      { "type": "inlineSlot", "slotId": "numeric_input_1" },
+      { "type": "inlineInteractionRef", "interactionId": "numeric_input_1" },
       { "type": "text", "content": " m/s^2." }
     ]}
   ]
@@ -26,7 +26,7 @@ Positive examples — CORRECT MathML usage for squared seconds:
 \\\`\\\`\\\`json
 [
   { "type": "text", "content": " the acceleration will be " },
-  { "type": "inlineSlot", "slotId": "numeric_input_1" },
+  { "type": "inlineInteractionRef", "interactionId": "numeric_input_1" },
   { "type": "text", "content": " " },
   { "type": "math", "mathml": "<mfrac><mi>m</mi><msup><mi>s</mi><mn>2</mn></msup></mfrac>" },
   { "type": "text", "content": "." }
@@ -37,7 +37,7 @@ Positive examples — CORRECT MathML usage for squared seconds:
 \\\`\\\`\\\`json
 [
   { "type": "text", "content": " the acceleration will be " },
-  { "type": "inlineSlot", "slotId": "numeric_input_1" },
+  { "type": "inlineInteractionRef", "interactionId": "numeric_input_1" },
   { "type": "text", "content": " " },
   { "type": "math", "mathml": "<mi>m</mi><mo>/</mo><msup><mi>s</mi><mn>2</mn></msup>" },
   { "type": "text", "content": "." }

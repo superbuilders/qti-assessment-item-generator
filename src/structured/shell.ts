@@ -49,9 +49,9 @@ These are the ONLY interaction types we support. Any Perseus widget that maps to
 
 **CRITICAL: STRUCTURED CONTENT MODEL**
 Your entire output for any rich text field (like 'body' or 'feedback') MUST be a JSON array of block-level items.
-- **Block Items**: Can be a paragraph \`{ "type": "paragraph", "content": [...] }\` or a slot \`{ "type": "blockSlot", "slotId": "..." }\`.
+- **Block Items**: Can be a paragraph \`{ "type": "paragraph", "content": [...] }\` or a slot \`{ "type": "widgetRef", "widgetId": "..." }\`.
 - **Paragraph Content**: The 'content' array inside a paragraph consists of inline items.
-- **Inline Items**: Can be text \`{ "type": "text", "content": "..." }\`, math \`{ "type": "math", "mathml": "..." }\`, or an inline slot \`{ "type": "inlineSlot", "slotId": "..." }\`.
+- **Inline Items**: Can be text \`{ "type": "text", "content": "..." }\`, math \`{ "type": "math", "mathml": "..." }\`, or an inline slot \`{ "type": "inlineInteractionRef", "interactionId": "..." }\`.
 
 This structure is non-negotiable. You are FORBIDDEN from outputting raw HTML strings for content fields.
 
@@ -127,10 +127,10 @@ The shell should:
     "content": [
       { "type": "text", "content": "Evaluate " },
       { "type": "math", "mathml": "msup><mi>x</mi><mn>2</mn></msup>" },
-      { "type": "inlineSlot", "slotId": "text_entry_1" }
+      { "type": "inlineInteractionRef", "interactionId": "text_entry_1" }
     ]
   },
-  { "type": "blockSlot", "slotId": "some_graph_widget" }
+  { "type": "widgetRef", "widgetId": "some_graph_widget" }
 ]
 \`\`\`
 
@@ -153,7 +153,7 @@ ${supportedInteractionTypes}
 
 ### CRITICAL: Matcher Conversion to Table + Dropdowns
 - When the original Perseus uses a \`matcher\` interaction, you MUST:
-  1) Create exactly one widget slot named \`data_table\` and include a \`{ "type": "blockSlot", "slotId": "data_table" }\` in the body where the interaction belongs.
+  1) Create exactly one widget slot named \`data_table\` and include a \`{ "type": "widgetRef", "widgetId": "data_table" }\` in the body where the interaction belongs.
   2) Do NOT generate any multiple-choice interactions for matching. The \`interactions\` array MUST NOT include a \`choiceInteraction\` for matching.
   3) Do NOT create per-choice tables or slots like \`choice_a_table\`, \`choice_b_table\`, \`match_*\`, or \`matching_*\`.
   4) The left column lists the left-side items (e.g., formulas, values). The right column uses inline dropdowns (rendered as inline choice interactions) with choices taken from the right-side set.
@@ -164,10 +164,8 @@ Example shell for matcher conversion:
 {
   "body": [
     { "type": "paragraph", "content": [{ "type": "text", "content": "Match each item to its correct pair." }] },
-    { "type": "blockSlot", "slotId": "data_table" }
+    { "type": "widgetRef", "widgetId": "data_table" }
   ],
-  "widgets": ["data_table"],
-  "interactions": []
 }
 \`\`\`
 
@@ -247,9 +245,9 @@ CRITICAL: Never embed images or SVGs directly. The body must contain ONLY text, 
     "body": [
       { "type": "paragraph", "content": [{ "type": "text", "content": "Consider the following passage." }] },
       { "type": "paragraph", "content": [{ "type": "text", "content": "Skeletal muscle is a type of tissue that helps move the bones of the skeleton. Skeletal muscles produce movement by contracting (shortening) in response to signals from the nervous system. These muscles require a large supply of energy in order to maintain their function. Each skeletal muscle is made up of specialized cells called myocytes." }] },
-      { "type": "blockSlot", "slotId": "image_1" },
+      { "type": "widgetRef", "widgetId": "image_1" },
       { "type": "paragraph", "content": [{ "type": "text", "content": "Which claim is best supported by the passage above?" }] },
-      { "type": "blockSlot", "slotId": "choice_interaction" },
+      { "type": "interactionRef", "interactionId": "choice_interaction" },
       { "type": "paragraph", "content": [{ "type": "text", "content": ""Muscle Tissue Skeletal Muscle Fibers" by Berkshire Community College Bioscience Image Library, CC0 1.0." }] }
     ]
   }
@@ -263,13 +261,11 @@ CRITICAL: Never embed images or SVGs directly. The body must contain ONLY text, 
     "body": [
       { "type": "paragraph", "content": [{ "type": "text", "content": "Complete the table to describe the reactants and products for each stage of cellular respiration." }] },
       { "type": "paragraph", "content": [{ "type": "text", "content": "Stage | Substance | Reactant or product" }] },
-      { "type": "paragraph", "content": [ { "type": "text", "content": "glycolysis | glucose | " }, { "type": "inlineSlot", "slotId": "dropdown_1" } ] },
-      { "type": "paragraph", "content": [ { "type": "text", "content": "citric acid cycle | " }, { "type": "inlineSlot", "slotId": "dropdown_2" }, { "type": "text", "content": " | product" } ] },
-      { "type": "paragraph", "content": [ { "type": "text", "content": "electron transport chain | " }, { "type": "inlineSlot", "slotId": "dropdown_3" }, { "type": "text", "content": " | reactant" } ] },
-      { "type": "paragraph", "content": [ { "type": "text", "content": "electron transport chain | water | " }, { "type": "inlineSlot", "slotId": "dropdown_4" } ] }
+      { "type": "paragraph", "content": [ { "type": "text", "content": "glycolysis | glucose | " }, { "type": "inlineInteractionRef", "interactionId": "dropdown_1" } ] },
+      { "type": "paragraph", "content": [ { "type": "text", "content": "citric acid cycle | " }, { "type": "inlineInteractionRef", "interactionId": "dropdown_2" }, { "type": "text", "content": " | product" } ] },
+      { "type": "paragraph", "content": [ { "type": "text", "content": "electron transport chain | " }, { "type": "inlineInteractionRef", "interactionId": "dropdown_3" }, { "type": "text", "content": " | reactant" } ] },
+      { "type": "paragraph", "content": [ { "type": "text", "content": "electron transport chain | water | " }, { "type": "inlineInteractionRef", "interactionId": "dropdown_4" } ] }
     ],
-    "widgets": [],
-    "interactions": ["dropdown_1", "dropdown_2", "dropdown_3", "dropdown_4"],
     "responseDeclarations": [
       { "identifier": "dropdown_1", "cardinality": "single", "baseType": "string", "correct": "reactant" },
       { "identifier": "dropdown_2", "cardinality": "single", "baseType": "string", "correct": "carbon dioxide" },
@@ -285,10 +281,10 @@ CRITICAL: Never embed images or SVGs directly. The body must contain ONLY text, 
   {
     "body": [
       { "type": "paragraph", "content": [{ "type": "text", "content": "Examine the image and answer the question below." }] },
-      { "type": "blockSlot", "slotId": "image_1" },
+      { "type": "widgetRef", "widgetId": "image_1" },
       { "type": "paragraph", "content": [{ "type": "text", "content": "Cartoon showing Columbia stirring a bowl labeled "Citizenship" with a spoon labeled "Equal Rights." Figures representing many nations are in the bowl; a caricature of an Irishman jumps up, yelling and waving a knife and a green flag." }] },
       { "type": "paragraph", "content": [{ "type": "text", "content": "Which change most directly contributed to the development depicted?" }] },
-      { "type": "blockSlot", "slotId": "choice_interaction" }
+      { "type": "interactionRef", "interactionId": "choice_interaction" }
     ]
   }
   \`\`\`
@@ -298,9 +294,9 @@ CRITICAL: Never embed images or SVGs directly. The body must contain ONLY text, 
   {
     "body": [
       { "type": "paragraph", "content": [{ "type": "text", "content": "Examine the image and answer the question below." }] },
-      { "type": "blockSlot", "slotId": "image_1" },
+      { "type": "widgetRef", "widgetId": "image_1" },
       { "type": "paragraph", "content": [{ "type": "text", "content": "Which change most directly contributed to the development depicted?" }] },
-      { "type": "blockSlot", "slotId": "choice_interaction" }
+      { "type": "interactionRef", "interactionId": "choice_interaction" }
     ]
   }
   \`\`\`
@@ -310,9 +306,9 @@ CRITICAL: Never embed images or SVGs directly. The body must contain ONLY text, 
     "body": [
       { "type": "paragraph", "content": [{ "type": "text", "content": "Consider the following passage." }] },
       { "type": "paragraph", "content": [{ "type": "text", "content": "Skeletal muscle is a type of tissue that helps move the bones of the skeleton. Skeletal muscles produce movement by contracting (shortening) in response to signals from the nervous system. These muscles require a large supply of energy in order to maintain their function. Each skeletal muscle is made up of specialized cells called myocytes." }] },
-      { "type": "blockSlot", "slotId": "image_1" },
+      { "type": "widgetRef", "widgetId": "image_1" },
       { "type": "paragraph", "content": [{ "type": "text", "content": "Which claim is best supported by the passage above?" }] },
-      { "type": "blockSlot", "slotId": "choice_interaction" }
+      { "type": "interactionRef", "interactionId": "choice_interaction" }
     ]
   }
   \`\`\`
@@ -322,11 +318,11 @@ CRITICAL: Never embed images or SVGs directly. The body must contain ONLY text, 
   {
     "body": [
       { "type": "paragraph", "content": [{ "type": "text", "content": "The following diagram shows Earth's lines of latitude." }] },
-      { "type": "blockSlot", "slotId": "image_1" },
+      { "type": "widgetRef", "widgetId": "image_1" },
       { "type": "paragraph", "content": [{ "type": "text", "content": "Complete the statement." }] },
       { "type": "paragraph", "content": [
         { "type": "text", "content": "As latitude decreases, species richness tends to " },
-        { "type": "inlineSlot", "slotId": "dropdown_1" },
+        { "type": "inlineInteractionRef", "interactionId": "dropdown_1" },
         { "type": "text", "content": "." }
       ]},
       { "type": "paragraph", "content": [{ "type": "text", "content": "Diagram credit: "Latitude of the Earth" by Djexplo, CC0 1.0." }] }
@@ -339,11 +335,11 @@ CRITICAL: Never embed images or SVGs directly. The body must contain ONLY text, 
   {
     "body": [
       { "type": "paragraph", "content": [{ "type": "text", "content": "The following diagram shows Earth's lines of latitude." }] },
-      { "type": "blockSlot", "slotId": "image_1" },
+      { "type": "widgetRef", "widgetId": "image_1" },
       { "type": "paragraph", "content": [{ "type": "text", "content": "Complete the statement." }] },
       { "type": "paragraph", "content": [
         { "type": "text", "content": "As latitude decreases, species richness tends to " },
-        { "type": "inlineSlot", "slotId": "dropdown_1" },
+        { "type": "inlineInteractionRef", "interactionId": "dropdown_1" },
         { "type": "text", "content": "." }
       ]}
     ]
@@ -393,12 +389,12 @@ CORRECT shell structure:
       { "type": "math", "mathml": "<mi>p</mi>" },
       { "type": "text", "content": ")." }
     ]},
-    { "type": "blockSlot", "slotId": "equation_choice" },
+    { "type": "widgetRef", "widgetId": "equation_choice" },
     { "type": "paragraph", "content": [
       { "type": "text", "content": "Find the original price per pound." }
     ]},
     { "type": "paragraph", "content": [
-      { "type": "inlineSlot", "slotId": "price_entry" }
+      { "type": "inlineInteractionRef", "interactionId": "price_entry" }
     ]}
   ],
   "interactions": [
@@ -433,15 +429,11 @@ CORRECT shell structure:
     { "type": "paragraph", "content": [
       { "type": "text", "content": "The hanger image below represents a balanced equation." }
     ]},
-    { "type": "blockSlot", "slotId": "hanger_image" },
+    { "type": "widgetRef", "widgetId": "hanger_image" },
     { "type": "paragraph", "content": [
       { "type": "text", "content": "Write an equation to represent the image." }
     ]},
-    { "type": "blockSlot", "slotId": "equation_choice" }
-  ],
-  "widgets": ["hanger_image"],
-  "interactions": [
-    "equation_choice"
+    { "type": "widgetRef", "widgetId": "equation_choice" }
   ],
   "responseDeclarations": [
     {
@@ -585,10 +577,10 @@ ${perseusJson}
     - **Exception 2 - Unsupported interactive widgets converted to multiple choice**: When converting unsupported widgets (plotter, interactive-graph, etc.), you MUST create THREE additional widget slots for the choice options (e.g., \`dot_plot_choice_a\`, \`dot_plot_choice_b\`, \`dot_plot_choice_c\`).
     - Do NOT render these per-choice visuals in the shell body. Simply reserve their widget slot identifiers in the \`widgets\` array for later use by the interaction content shot.
   - **Placeholders**:
-  - For ALL Perseus widgets (including 'image' widgets), create a { "type": "blockSlot", "slotId": "..." } placeholder in the 'body' and add its identifier to the 'widgets' string array.
-  - For Perseus resources (reference materials such as periodic tables or formula sheets), when the current widget collection includes a matching widget type (e.g., 'periodicTable' in 'simple-visual'), you MUST create a dedicated widget slot for the resource, include its identifier in the 'widgets' array, and place a { "type": "blockSlot", "slotId": "..." } at the correct position in the body.
-  - For inline interactions (e.g., 'text-input', 'inline-choice'), create { "type": "inlineSlot", "slotId": "..." } inside paragraph content.
-  - For block interactions (e.g., 'radio', 'order'), create { "type": "blockSlot", "slotId": "..." } in the body array.
+  - For ALL Perseus widgets (including 'image' widgets), create a { "type": "widgetRef", "widgetId": "..." } placeholder in the 'body' and add its identifier to the 'widgets' string array.
+  - For Perseus resources (reference materials such as periodic tables or formula sheets), when the current widget collection includes a matching widget type (e.g., 'periodicTable' in 'simple-visual'), you MUST create a dedicated widget slot for the resource, include its identifier in the 'widgets' array, and place a { "type": "widgetRef", "widgetId": "..." } at the correct position in the body.
+  - For inline interactions (e.g., 'text-input', 'inline-choice'), create { "type": "inlineInteractionRef", "interactionId": "..." } inside paragraph content.
+  - For block interactions (e.g., 'radio', 'order'), create { "type": "widgetRef", "widgetId": "..." } in the body array.
   - **NEVER EMBED IMAGES OR SVGs**: You MUST NOT generate \`<img>\` tags, \`<svg>\` tags, or data URIs in the 'body' string. This is a critical requirement. ALL images and visual elements must be handled as widgets referenced by slots. If you see an image in Perseus, create a widget slot for it, never embed it directly.
   - **NO ANSWERS OR HINTS IN 'BODY'**: Do NOT reveal or restate the correct answer anywhere in the 'body'. Remove ALL Perseus 'hints' content entirely and NEVER include hint-like guidance (e.g., lines starting with "Hint:" or text that gives away the answer). Only the prompt and neutral problem context belong in the 'body'; answers live solely in response declarations.
 - **MathML Conversion (MANDATORY)**:
@@ -626,14 +618,12 @@ ${perseusJson}
     "body": [
       { "type": "paragraph", "content": [{ "type": "text", "content": "A moving object's kinetic energy is determined by two factors." }] },
       { "type": "paragraph", "content": [{ "type": "text", "content": "Select whether each quantity determines an object's kinetic energy." }] },
-      { "type": "blockSlot", "slotId": "ke_quantities_table" },
-      { "type": "paragraph", "content": [{ "type": "text", "content": "Mass: " }, { "type": "inlineSlot", "slotId": "dropdown_8" }] },
-      { "type": "paragraph", "content": [{ "type": "text", "content": "Volume: " }, { "type": "inlineSlot", "slotId": "dropdown_10" }] },
-      { "type": "paragraph", "content": [{ "type": "text", "content": "Height: " }, { "type": "inlineSlot", "slotId": "dropdown_11" }] },
-      { "type": "paragraph", "content": [{ "type": "text", "content": "Speed: " }, { "type": "inlineSlot", "slotId": "dropdown_12" }] }
+      { "type": "widgetRef", "widgetId": "ke_quantities_table" },
+      { "type": "paragraph", "content": [{ "type": "text", "content": "Mass: " }, { "type": "inlineInteractionRef", "interactionId": "dropdown_8" }] },
+      { "type": "paragraph", "content": [{ "type": "text", "content": "Volume: " }, { "type": "inlineInteractionRef", "interactionId": "dropdown_10" }] },
+      { "type": "paragraph", "content": [{ "type": "text", "content": "Height: " }, { "type": "inlineInteractionRef", "interactionId": "dropdown_11" }] },
+      { "type": "paragraph", "content": [{ "type": "text", "content": "Speed: " }, { "type": "inlineInteractionRef", "interactionId": "dropdown_12" }] }
     ],
-    "widgets": ["ke_quantities_table"],
-    "interactions": ["dropdown_8", "dropdown_10", "dropdown_11", "dropdown_12"],
     "feedback": { "correct": [], "incorrect": [] },
     "responseDeclarations": [
       { "identifier": "dropdown_8",  "cardinality": "single", "baseType": "string", "correct": "yes" },
@@ -652,10 +642,8 @@ ${perseusJson}
     "body": [
       { "type": "paragraph", "content": [{ "type": "text", "content": "A moving object's kinetic energy is determined by two factors." }] },
       { "type": "paragraph", "content": [{ "type": "text", "content": "Select whether each quantity determines an object's kinetic energy." }] },
-      { "type": "blockSlot", "slotId": "ke_quantities_table" }
+      { "type": "widgetRef", "widgetId": "ke_quantities_table" }
     ],
-    "widgets": ["ke_quantities_table"],
-    "interactions": [],
     "feedback": { "correct": [], "incorrect": [] },
     "responseDeclarations": [
       { "identifier": "dropdown_8",  "cardinality": "single", "baseType": "string", "correct": "yes" },
@@ -674,10 +662,10 @@ ${perseusJson}
     "body": [
       { "type": "paragraph", "content": [{ "type": "text", "content": "Several students tested how the temperature changed when dissolving different solids in the same amount of water. The substances they tested were NH4Cl, MgSO4, and CaCl2." }] },
       { "type": "paragraph", "content": [{ "type": "text", "content": "Only one student kept track of everyone's data. Unfortunately, their lab notebook got wet, and some of the labels were damaged." }] },
-      { "type": "blockSlot", "slotId": "image_1" },
+      { "type": "widgetRef", "widgetId": "image_1" },
       { "type": "paragraph", "content": [{ "type": "text", "content": "Use the data provided to identify the reactant and the amount that caused each temperature change. Each option is only used once." }] },
-      { "type": "blockSlot", "slotId": "react_temp_table" },
-      { "type": "paragraph", "content": [{ "type": "text", "content": "Experiment C: Reactant " }, { "type": "inlineSlot", "slotId": "react_c" }, { "type": "text", "content": ", Amount " }, { "type": "inlineSlot", "slotId": "amt_c" }] }
+      { "type": "widgetRef", "widgetId": "react_temp_table" },
+      { "type": "paragraph", "content": [{ "type": "text", "content": "Experiment C: Reactant " }, { "type": "inlineInteractionRef", "interactionId": "react_c" }, { "type": "text", "content": ", Amount " }, { "type": "inlineInteractionRef", "interactionId": "amt_c" }] }
     ],
     "widgets": ["image_1", "react_temp_table"],
     "interactions": ["react_c", "amt_c", "react_d", "amt_d", "react_e", "amt_e"],
@@ -700,9 +688,9 @@ ${perseusJson}
     "title": "Temperature table owns inputs (positive)",
     "body": [
       { "type": "paragraph", "content": [{ "type": "text", "content": "Several students tested how the temperature changed when dissolving different solids in the same amount of water." }] },
-      { "type": "blockSlot", "slotId": "image_1" },
+      { "type": "widgetRef", "widgetId": "image_1" },
       { "type": "paragraph", "content": [{ "type": "text", "content": "Use the data provided to identify the reactant and the amount that caused each temperature change. Each option is only used once." }] },
-      { "type": "blockSlot", "slotId": "react_temp_table" }
+      { "type": "widgetRef", "widgetId": "react_temp_table" }
     ],
     "widgets": ["image_1", "react_temp_table"],
     "interactions": [],
@@ -738,11 +726,11 @@ ${perseusJson}
       { "type": "paragraph", "content": [ { "type": "text", "content": "Aluminum | " }, { "type": "math", "mathml": "<mn>2.7</mn>" } ] },
       { "type": "paragraph", "content": [ { "type": "text", "content": "Cork | " }, { "type": "math", "mathml": "<mn>0.24</mn>" } ] },
       { "type": "paragraph", "content": [ { "type": "text", "content": "Rosewood | " }, { "type": "math", "mathml": "<mn>0.83</mn>" } ] },
-      { "type": "blockSlot", "slotId": "image_1" },
+      { "type": "widgetRef", "widgetId": "image_1" },
       { "type": "paragraph", "content": [{ "type": "text", "content": "Complete the statements." }] },
-      { "type": "paragraph", "content": [ { "type": "text", "content": "Aluminum " }, { "type": "inlineSlot", "slotId": "dropdown_1" }, { "type": "text", "content": " in ethanol." } ] },
-      { "type": "paragraph", "content": [ { "type": "text", "content": "Cork " }, { "type": "inlineSlot", "slotId": "dropdown_2" }, { "type": "text", "content": " in ethanol." } ] },
-      { "type": "paragraph", "content": [ { "type": "text", "content": "Rosewood " }, { "type": "inlineSlot", "slotId": "dropdown_3" }, { "type": "text", "content": " in ethanol." } ] }
+      { "type": "paragraph", "content": [ { "type": "text", "content": "Aluminum " }, { "type": "inlineInteractionRef", "interactionId": "dropdown_1" }, { "type": "text", "content": " in ethanol." } ] },
+      { "type": "paragraph", "content": [ { "type": "text", "content": "Cork " }, { "type": "inlineInteractionRef", "interactionId": "dropdown_2" }, { "type": "text", "content": " in ethanol." } ] },
+      { "type": "paragraph", "content": [ { "type": "text", "content": "Rosewood " }, { "type": "inlineInteractionRef", "interactionId": "dropdown_3" }, { "type": "text", "content": " in ethanol." } ] }
     ],
     "widgets": ["image_1"],
     "interactions": ["dropdown_1", "dropdown_2", "dropdown_3"],
@@ -762,12 +750,12 @@ ${perseusJson}
     "title": "Replace pseudo-table with widget (positive)",
     "body": [
       { "type": "paragraph", "content": [{ "type": "text", "content": "A chemistry teacher fills a jar with liquid ethanol under a fume hood. She places three substances into the jar to see whether they will sink or float. The densities of the substances are listed below." }] },
-      { "type": "blockSlot", "slotId": "density_table" },
-      { "type": "blockSlot", "slotId": "image_1" },
+      { "type": "widgetRef", "widgetId": "density_table" },
+      { "type": "widgetRef", "widgetId": "image_1" },
       { "type": "paragraph", "content": [{ "type": "text", "content": "Complete the statements." }] },
-      { "type": "paragraph", "content": [ { "type": "text", "content": "Aluminum " }, { "type": "inlineSlot", "slotId": "dropdown_1" }, { "type": "text", "content": " in ethanol." } ] },
-      { "type": "paragraph", "content": [ { "type": "text", "content": "Cork " }, { "type": "inlineSlot", "slotId": "dropdown_2" }, { "type": "text", "content": " in ethanol." } ] },
-      { "type": "paragraph", "content": [ { "type": "text", "content": "Rosewood " }, { "type": "inlineSlot", "slotId": "dropdown_3" }, { "type": "text", "content": " in ethanol." } ] }
+      { "type": "paragraph", "content": [ { "type": "text", "content": "Aluminum " }, { "type": "inlineInteractionRef", "interactionId": "dropdown_1" }, { "type": "text", "content": " in ethanol." } ] },
+      { "type": "paragraph", "content": [ { "type": "text", "content": "Cork " }, { "type": "inlineInteractionRef", "interactionId": "dropdown_2" }, { "type": "text", "content": " in ethanol." } ] },
+      { "type": "paragraph", "content": [ { "type": "text", "content": "Rosewood " }, { "type": "inlineInteractionRef", "interactionId": "dropdown_3" }, { "type": "text", "content": " in ethanol." } ] }
     ],
     "widgets": ["density_table", "image_1"],
     "interactions": ["dropdown_1", "dropdown_2", "dropdown_3"],
@@ -791,9 +779,9 @@ ${perseusJson}
     "title": "States of matter sentences (negative)",
     "body": [
       { "type": "paragraph", "content": [{ "type": "text", "content": "Complete each row to describe the differences among solids, liquids, and gases." }] },
-      { "type": "paragraph", "content": [ { "type": "text", "content": "Solid — Shape: " }, { "type": "inlineSlot", "slotId": "dropdown_1" }, { "type": "text", "content": "; Volume: " }, { "type": "inlineSlot", "slotId": "dropdown_2" }, { "type": "text", "content": "; Compressible: " }, { "type": "inlineSlot", "slotId": "dropdown_3" }, { "type": "text", "content": "." } ] },
-      { "type": "paragraph", "content": [ { "type": "text", "content": "Liquid — Shape: " }, { "type": "inlineSlot", "slotId": "dropdown_4" }, { "type": "text", "content": "; Volume: " }, { "type": "inlineSlot", "slotId": "dropdown_5" }, { "type": "text", "content": "; Compressible: " }, { "type": "inlineSlot", "slotId": "dropdown_6" }, { "type": "text", "content": "." } ] },
-      { "type": "paragraph", "content": [ { "type": "text", "content": "Gas — Shape: " }, { "type": "inlineSlot", "slotId": "dropdown_7" }, { "type": "text", "content": "; Volume: " }, { "type": "inlineSlot", "slotId": "dropdown_8" }, { "type": "text", "content": "; Compressible: " }, { "type": "inlineSlot", "slotId": "dropdown_9" }, { "type": "text", "content": "." } ] }
+      { "type": "paragraph", "content": [ { "type": "text", "content": "Solid — Shape: " }, { "type": "inlineInteractionRef", "interactionId": "dropdown_1" }, { "type": "text", "content": "; Volume: " }, { "type": "inlineInteractionRef", "interactionId": "dropdown_2" }, { "type": "text", "content": "; Compressible: " }, { "type": "inlineInteractionRef", "interactionId": "dropdown_3" }, { "type": "text", "content": "." } ] },
+      { "type": "paragraph", "content": [ { "type": "text", "content": "Liquid — Shape: " }, { "type": "inlineInteractionRef", "interactionId": "dropdown_4" }, { "type": "text", "content": "; Volume: " }, { "type": "inlineInteractionRef", "interactionId": "dropdown_5" }, { "type": "text", "content": "; Compressible: " }, { "type": "inlineInteractionRef", "interactionId": "dropdown_6" }, { "type": "text", "content": "." } ] },
+      { "type": "paragraph", "content": [ { "type": "text", "content": "Gas — Shape: " }, { "type": "inlineInteractionRef", "interactionId": "dropdown_7" }, { "type": "text", "content": "; Volume: " }, { "type": "inlineInteractionRef", "interactionId": "dropdown_8" }, { "type": "text", "content": "; Compressible: " }, { "type": "inlineInteractionRef", "interactionId": "dropdown_9" }, { "type": "text", "content": "." } ] }
     ],
     "widgets": [],
     "interactions": ["dropdown_1","dropdown_2","dropdown_3","dropdown_4","dropdown_5","dropdown_6","dropdown_7","dropdown_8","dropdown_9"],
@@ -819,7 +807,7 @@ ${perseusJson}
     "title": "States of matter table (positive)",
     "body": [
       { "type": "paragraph", "content": [{ "type": "text", "content": "Complete each row to describe the differences among solids, liquids, and gases." }] },
-      { "type": "blockSlot", "slotId": "states_table" }
+      { "type": "widgetRef", "widgetId": "states_table" }
     ],
     "widgets": ["states_table"],
     "interactions": [],
@@ -845,7 +833,7 @@ ${perseusJson}
     "title": "Cellular respiration table (positive)",
     "body": [
       { "type": "paragraph", "content": [{ "type": "text", "content": "Complete the table to describe the reactants and products for each stage of cellular respiration." }] },
-      { "type": "blockSlot", "slotId": "respiration_table" }
+      { "type": "widgetRef", "widgetId": "respiration_table" }
     ],
     "widgets": ["respiration_table"],
     "interactions": [],
@@ -1065,7 +1053,7 @@ Return ONLY the JSON object for the assessment shell.
 \`\`\`json
 "body": [
   { "type": "paragraph", "content": [{ "type": "text", "content": "Enter your answer: " }] },
-  { "type": "inlineSlot", "slotId": "text_entry_1" }
+  { "type": "inlineInteractionRef", "interactionId": "text_entry_1" }
 ]
 \`\`\`
 **CORRECT (Inline slot is INSIDE a paragraph's content):**
@@ -1075,7 +1063,7 @@ Return ONLY the JSON object for the assessment shell.
     "type": "paragraph",
     "content": [
       { "type": "text", "content": "Enter your answer: " },
-      { "type": "inlineSlot", "slotId": "text_entry_1" }
+      { "type": "inlineInteractionRef", "interactionId": "text_entry_1" }
     ]
   }
 ]
@@ -1088,7 +1076,7 @@ Return ONLY the JSON object for the assessment shell.
     "type": "paragraph",
     "content": [
       { "type": "text", "content": "Here is a graph: " },
-      { "type": "blockSlot", "slotId": "graph_widget_1" }
+      { "type": "widgetRef", "widgetId": "graph_widget_1" }
     ]
   }
 ]
@@ -1097,7 +1085,7 @@ Return ONLY the JSON object for the assessment shell.
 \`\`\`json
 "body": [
   { "type": "paragraph", "content": [{ "type": "text", "content": "Here is a graph: " }] },
-  { "type": "blockSlot", "slotId": "graph_widget_1" }
+  { "type": "widgetRef", "widgetId": "graph_widget_1" }
 ]
 \`\`\`
 
@@ -1110,7 +1098,7 @@ Return ONLY the JSON object for the assessment shell.
     "type": "paragraph",
     "content": [
       { "type": "text", "content": "The price is " },
-      { "type": "inlineSlot", "slotId": "currency7" }
+      { "type": "inlineInteractionRef", "interactionId": "currency7" }
     ]
   }
 ],
@@ -1126,7 +1114,7 @@ Return ONLY the JSON object for the assessment shell.
       "type": "paragraph",
       "content": [
         { "type": "text", "content": "You saved " },
-        { "type": "inlineSlot", "slotId": "currency7_feedback" }
+        { "type": "inlineInteractionRef", "interactionId": "currency7_feedback" }
       ]
     }
   ],
@@ -1328,7 +1316,7 @@ When Perseus contains interactive widgets that require drawing, plotting, or man
 {
   "body": [
     { "type": "paragraph", "content": [{ "type": "text", "content": "The dot plot below shows the number of pictures Kai had published in newspapers." }] },
-    { "type": "blockSlot", "slotId": "plotter_1" },
+    { "type": "widgetRef", "widgetId": "plotter_1" },
     { "type": "paragraph", "content": [{ "type": "text", "content": "Complete the dot plot by adding the missing dots." }] }
   ],
   "widgets": [],
@@ -1341,9 +1329,9 @@ When Perseus contains interactive widgets that require drawing, plotting, or man
 {
   "body": [
     { "type": "paragraph", "content": [{ "type": "text", "content": "The dot plot below shows the number of pictures Kai had published in newspapers." }] },
-    { "type": "blockSlot", "slotId": "dot_plot_initial" },
+    { "type": "widgetRef", "widgetId": "dot_plot_initial" },
     { "type": "paragraph", "content": [{ "type": "text", "content": "Which dot plot correctly shows the complete data?" }] },
-    { "type": "blockSlot", "slotId": "dot_plot_choice" }
+    { "type": "widgetRef", "widgetId": "dot_plot_choice" }
   ],
   "widgets": [
     "dot_plot_initial",      // Shows the incomplete dot plot (only the 3,1 dot)
@@ -1389,9 +1377,9 @@ When Perseus contains interactive widgets that require drawing, plotting, or man
 {
   "body": [
     { "type": "paragraph", "content": [{ "type": "text", "content": "Plot the line " }, { "type": "math", "mathml": "<mi>y</mi><mo>=</mo><mn>2</mn><mi>x</mi><mo>+</mo><mn>1</mn>" }, { "type": "text", "content": " on the coordinate plane." }] },
-    { "type": "blockSlot", "slotId": "coordinate_plane_empty" },
+    { "type": "widgetRef", "widgetId": "coordinate_plane_empty" },
     { "type": "paragraph", "content": [{ "type": "text", "content": "Which graph correctly shows the line " }, { "type": "math", "mathml": "<mi>y</mi><mo>=</mo><mn>2</mn><mi>x</mi><mo>+</mo><mn>1</mn>" }, { "type": "text", "content": "?" }] },
-    { "type": "blockSlot", "slotId": "graph_choice" }
+    { "type": "widgetRef", "widgetId": "graph_choice" }
   ],
   "widgets": [
     "coordinate_plane_empty",  // Shows empty coordinate plane
@@ -1426,7 +1414,7 @@ When Perseus contains interactive widgets that require drawing, plotting, or man
     { "type": "paragraph", "content": [{ "type": "text", "content": "A birdhouse hangs from a branch. The birdhouse is at rest." }] },
     
     { "type": "paragraph", "content": [{ "type": "text", "content": "Which free-body diagram correctly labels the forces?" }] },
-    { "type": "blockSlot", "slotId": "fbd_choice" }
+    { "type": "widgetRef", "widgetId": "fbd_choice" }
   ],
   "widgets": [
     "fbd_choice_a",    // Incorrect labeling
@@ -1462,11 +1450,11 @@ When Perseus contains interactive widgets that require drawing, plotting, or man
   "body": [
     { "type": "paragraph", "content": [{ "type": "text", "content": "Three groups of students carried out an experiment about photosynthesis." }] },
     { "type": "paragraph", "content": [{ "type": "text", "content": "First, the students submerged Elodea plants in a beaker of water mixed with baking soda (Figure 1). Then, they placed the beaker directly under a lamp." }] },
-    { "type": "blockSlot", "slotId": "image_1" },
+    { "type": "widgetRef", "widgetId": "image_1" },
     { "type": "paragraph", "content": [{ "type": "text", "content": "With the lamp off, the students counted how many bubbles rose from the plants. After a three-minute observation period, each group recorded its results." }] },
     { "type": "paragraph", "content": [{ "type": "text", "content": "Next, the students turned on the lamp. For three minutes, they again counted and recorded the number of bubbles they saw rise from the plants." }] },
     { "type": "paragraph", "content": [{ "type": "text", "content": "Based on your knowledge of photosynthesis, which data table shows the most likely results?" }] },
-    { "type": "blockSlot", "slotId": "choice_interaction" }
+    { "type": "widgetRef", "widgetId": "choice_interaction" }
   ],
   "widgets": ["image_1"],
   "interactions": ["choice_interaction"]
@@ -1479,11 +1467,11 @@ When Perseus contains interactive widgets that require drawing, plotting, or man
   "body": [
     { "type": "paragraph", "content": [{ "type": "text", "content": "Three groups of students carried out an experiment about photosynthesis." }] },
     { "type": "paragraph", "content": [{ "type": "text", "content": "First, the students submerged Elodea plants in a beaker of water mixed with baking soda (Figure 1). Then, they placed the beaker directly under a lamp." }] },
-    { "type": "blockSlot", "slotId": "image_1" },
+    { "type": "widgetRef", "widgetId": "image_1" },
     { "type": "paragraph", "content": [{ "type": "text", "content": "With the lamp off, the students counted how many bubbles rose from the plants. After a three-minute observation period, each group recorded its results." }] },
     { "type": "paragraph", "content": [{ "type": "text", "content": "Next, the students turned on the lamp. For three minutes, they again counted and recorded the number of bubbles they saw rise from the plants." }] },
     { "type": "paragraph", "content": [{ "type": "text", "content": "Based on your knowledge of photosynthesis, which data table shows the most likely results?" }] },
-    { "type": "blockSlot", "slotId": "choice_interaction" }
+    { "type": "widgetRef", "widgetId": "choice_interaction" }
   ],
   "widgets": [
     "image_1",
@@ -1519,7 +1507,7 @@ Perseus 'explanation' or 'definition' widgets MUST be inlined as text, not turne
 **WRONG:**
 \`\`\`json
 {
-  "body": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Some text... " }, { "type": "blockSlot", "slotId": "explanation_1" }] }],
+  "body": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Some text... " }, { "type": "widgetRef", "widgetId": "explanation_1" }] }],
   "widgets": ["explanation_1"],
   ...
 }
@@ -1565,7 +1553,7 @@ Perseus often calls interactive elements "widgets". You MUST correctly reclassif
 **WRONG Shell Output (Automatic Rejection):**
 \`\`\`json
 {
-  "body": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Solve for x. " }, { "type": "blockSlot", "slotId": "numeric-input-1" }] }],
+  "body": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Solve for x. " }, { "type": "widgetRef", "widgetId": "numeric-input-1" }] }],
   "widgets": ["numeric-input-1"],
   "interactions": []
 }
@@ -1574,7 +1562,7 @@ Perseus often calls interactive elements "widgets". You MUST correctly reclassif
 **CORRECT Shell Output:**
 \`\`\`json
 {
-  "body": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Solve for x. " }, { "type": "inlineSlot", "slotId": "text_entry_interaction_1" }] }],
+  "body": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Solve for x. " }, { "type": "inlineInteractionRef", "interactionId": "text_entry_interaction_1" }] }],
   "widgets": [],
   "interactions": ["text_entry_interaction_1"]
 }
@@ -1593,7 +1581,7 @@ Perseus often calls interactive elements "widgets". You MUST correctly reclassif
 **WRONG Shell Output (Automatic Rejection):**
 \`\`\`json
 {
-  "body": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Write an equation. " }, { "type": "blockSlot", "slotId": "expression_1" }] }],
+  "body": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Write an equation. " }, { "type": "widgetRef", "widgetId": "expression_1" }] }],
   "widgets": ["expression_1"],
   "interactions": []
 }
@@ -1601,7 +1589,7 @@ Perseus often calls interactive elements "widgets". You MUST correctly reclassif
 **CORRECT Shell Output:**
 \`\`\`json
 {
-  "body": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Write an equation. " }, { "type": "inlineSlot", "slotId": "text_entry_interaction_1" }] }],
+  "body": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Write an equation. " }, { "type": "inlineInteractionRef", "interactionId": "text_entry_interaction_1" }] }],
   "widgets": [],
   "interactions": ["text_entry_interaction_1"]
 }
@@ -1619,7 +1607,7 @@ Perseus often calls interactive elements "widgets". You MUST correctly reclassif
 **WRONG Shell Output (Automatic Rejection):**
 \`\`\`json
 {
-  "body": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Choose the best answer." }] }, { "type": "blockSlot", "slotId": "radio_1" }],
+  "body": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Choose the best answer." }] }, { "type": "widgetRef", "widgetId": "radio_1" }],
   "widgets": ["radio_1"],
   "interactions": []
 }
@@ -1627,7 +1615,7 @@ Perseus often calls interactive elements "widgets". You MUST correctly reclassif
 **CORRECT Shell Output:**
 \`\`\`json
 {
-  "body": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Choose the best answer." }] }, { "type": "blockSlot", "slotId": "choice_interaction_1" }],
+  "body": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Choose the best answer." }] }, { "type": "widgetRef", "widgetId": "choice_interaction_1" }],
   "widgets": [],
   "interactions": ["choice_interaction_1"]
 }
@@ -1686,8 +1674,8 @@ Perseus JSON may contain widget definitions that are NOT actually used in the co
 \`\`\`json
 {
   "body": [
-    { "type": "paragraph", "content": [{ "type": "text", "content": "Compare. " }, { "type": "math", "mathml": "<msqrt><mn>13</mn></msqrt>" }, { "type": "text", "content": " " }, { "type": "inlineSlot", "slotId": "comparison_dropdown" }, { "type": "text", "content": " " }, { "type": "math", "mathml": "<mfrac><mn>15</mn><mn>4</mn></mfrac>" }] },
-    { "type": "blockSlot", "slotId": "choice_interaction_1" }  // ❌ BANNED: This radio widget was never referenced!
+    { "type": "paragraph", "content": [{ "type": "text", "content": "Compare. " }, { "type": "math", "mathml": "<msqrt><mn>13</mn></msqrt>" }, { "type": "text", "content": " " }, { "type": "inlineInteractionRef", "interactionId": "comparison_dropdown" }, { "type": "text", "content": " " }, { "type": "math", "mathml": "<mfrac><mn>15</mn><mn>4</mn></mfrac>" }] },
+    { "type": "widgetRef", "widgetId": "choice_interaction_1" }  // ❌ BANNED: This radio widget was never referenced!
   ],
   "widgets": [],
   "interactions": ["comparison_dropdown", "choice_interaction_1"]  // ❌ WRONG: Extra interaction
@@ -1699,7 +1687,7 @@ Perseus JSON may contain widget definitions that are NOT actually used in the co
 {
   "body": [
     { "type": "paragraph", "content": [{ "type": "text", "content": "Compare." }] },
-    { "type": "paragraph", "content": [{ "type": "math", "mathml": "<msqrt><mn>13</mn></msqrt>" }, { "type": "text", "content": " " }, { "type": "inlineSlot", "slotId": "comparison_dropdown" }, { "type": "text", "content": " " }, { "type": "math", "mathml": "<mfrac><mn>15</mn><mn>4</mn></mfrac>" }] }
+    { "type": "paragraph", "content": [{ "type": "math", "mathml": "<msqrt><mn>13</mn></msqrt>" }, { "type": "text", "content": " " }, { "type": "inlineInteractionRef", "interactionId": "comparison_dropdown" }, { "type": "text", "content": " " }, { "type": "math", "mathml": "<mfrac><mn>15</mn><mn>4</mn></mfrac>" }] }
   ],
   "widgets": [],
   "interactions": ["comparison_dropdown"]  // ✅ CORRECT: Only the dropdown that's actually used
@@ -1727,7 +1715,7 @@ Perseus JSON may contain widget definitions that are NOT actually used in the co
 {
   "body": [
     { "type": "paragraph", "content": [{ "type": "text", "content": "Fill in the table." }] },
-    { "type": "blockSlot", "slotId": "table_1" }
+    { "type": "widgetRef", "widgetId": "table_1" }
   ],
   "widgets": ["table_1"],
   "interactions": []
@@ -1738,22 +1726,22 @@ Perseus JSON may contain widget definitions that are NOT actually used in the co
 **Structured Content Model Requirements:**
 **Body Content Must Use Structured JSON Arrays:**
 WRONG: \`body: '<p>This table gives select values...</p><slot name="h_table" />'\` (HTML string)
-CORRECT: \`body: [{ "type": "paragraph", "content": [{ "type": "text", "content": "This table gives select values..." }] }, { "type": "blockSlot", "slotId": "h_table" }]\`
+CORRECT: \`body: [{ "type": "paragraph", "content": [{ "type": "text", "content": "This table gives select values..." }] }, { "type": "widgetRef", "widgetId": "h_table" }]\`
 
 WRONG: \`body: 'The lengths of 4 pencils were measured...'\` (raw text)
 CORRECT: \`body: [{ "type": "paragraph", "content": [{ "type": "text", "content": "The lengths of 4 pencils were measured. The lengths are " }, { "type": "math", "mathml": "<mn>11</mn>" }, { "type": "text", "content": " cm..." }] }]\`
 
 **CRITICAL: Inline Interaction Placement:**
-WRONG: \`body: [{ "type": "paragraph", "content": [{ "type": "text", "content": "Evaluate." }] }, { "type": "blockSlot", "slotId": "text_entry" }]\` (text entry as block)
-CORRECT: \`body: [{ "type": "paragraph", "content": [{ "type": "text", "content": "Evaluate. " }, { "type": "math", "mathml": "..." }, { "type": "text", "content": " " }, { "type": "inlineSlot", "slotId": "text_entry" }] }]\`
+WRONG: \`body: [{ "type": "paragraph", "content": [{ "type": "text", "content": "Evaluate." }] }, { "type": "widgetRef", "widgetId": "text_entry" }]\` (text entry as block)
+CORRECT: \`body: [{ "type": "paragraph", "content": [{ "type": "text", "content": "Evaluate. " }, { "type": "math", "mathml": "..." }, { "type": "text", "content": " " }, { "type": "inlineInteractionRef", "interactionId": "text_entry" }] }]\`
 
-WRONG: \`body: [{ "type": "paragraph", "content": [{ "type": "text", "content": "The answer is" }] }, { "type": "inlineSlot", "slotId": "text_entry" }]\` (inline slot outside paragraph)
-CORRECT: \`body: [{ "type": "paragraph", "content": [{ "type": "text", "content": "The answer is " }, { "type": "inlineSlot", "slotId": "text_entry" }] }]\`
+WRONG: \`body: [{ "type": "paragraph", "content": [{ "type": "text", "content": "The answer is" }] }, { "type": "inlineInteractionRef", "interactionId": "text_entry" }]\` (inline slot outside paragraph)
+CORRECT: \`body: [{ "type": "paragraph", "content": [{ "type": "text", "content": "The answer is " }, { "type": "inlineInteractionRef", "interactionId": "text_entry" }] }]\`
 
 **Inline vs Block Slots Rule:**
-- Text entry and inline choice interactions use \`{ "type": "inlineSlot", "slotId": "..." }\` INSIDE paragraph content arrays
-- Choice and order interactions use \`{ "type": "blockSlot", "slotId": "..." }\` in the main body array
-- Widgets always use \`{ "type": "blockSlot", "slotId": "..." }\` in the main body array
+- Text entry and inline choice interactions use \`{ "type": "inlineInteractionRef", "interactionId": "..." }\` INSIDE paragraph content arrays
+- Choice and order interactions use \`{ "type": "widgetRef", "widgetId": "..." }\` in the main body array
+- Widgets always use \`{ "type": "widgetRef", "widgetId": "..." }\` in the main body array
 
 **6. Hints and Answer Leakage in Body - BANNED:**
 Hints and answer-revealing content must NEVER appear in the 'body' field.
@@ -1774,7 +1762,7 @@ Hints and answer-revealing content must NEVER appear in the 'body' field.
       "type": "paragraph",
       "content": [
         { "type": "text", "content": "constant of proportionality = " },
-        { "type": "inlineSlot", "slotId": "text_entry" }
+        { "type": "inlineInteractionRef", "interactionId": "text_entry" }
       ]
     },
     {
@@ -1829,7 +1817,7 @@ Hints and answer-revealing content must NEVER appear in the 'body' field.
       "type": "paragraph",
       "content": [
         { "type": "text", "content": "constant of proportionality = " },
-        { "type": "inlineSlot", "slotId": "text_entry" }
+        { "type": "inlineInteractionRef", "interactionId": "text_entry" }
       ]
     }
   ]
@@ -1853,7 +1841,7 @@ Never duplicate the same instructional text in both the body and interaction pro
         { "type": "text", "content": "Order the following numbers from least to greatest. Put the lowest number on the left." }
       ]
     },
-    { "type": "blockSlot", "slotId": "order_interaction" }
+    { "type": "widgetRef", "widgetId": "order_interaction" }
   ],
   "interactions": {
     "order_interaction": {
@@ -1871,7 +1859,7 @@ Never duplicate the same instructional text in both the body and interaction pro
 \`\`\`json
 {
   "body": [
-    { "type": "blockSlot", "slotId": "order_interaction" }
+    { "type": "widgetRef", "widgetId": "order_interaction" }
   ],
   "interactions": {
     "order_interaction": {
@@ -1905,7 +1893,7 @@ WRONG (instruction placed in body instead of deferring to the interaction prompt
         { "type": "text", "content": "Rank the pairs from strongest to weakest by the strength of the gravitational forces the objects exert on each other." }
       ]
     },
-    { "type": "blockSlot", "slotId": "order_interaction" }
+    { "type": "widgetRef", "widgetId": "order_interaction" }
   ],
   "title": "Rank gravitational force strengths",
   "widgets": [
@@ -1952,7 +1940,7 @@ CORRECT (instruction deferred to the interaction step; body contains only neutra
         { "type": "text", "content": "Four different pairs of objects are shown. All of the objects are spheres made of the same solid material." }
       ]
     },
-    { "type": "blockSlot", "slotId": "order_interaction" }
+    { "type": "widgetRef", "widgetId": "order_interaction" }
   ],
   "title": "Rank gravitational force strengths",
   "widgets": [
@@ -2001,14 +1989,14 @@ WRONG (instruction placed in body instead of deferring to the interaction prompt
         { "type": "text", "content": "Three trucks start at rest, side by side. The trucks carry loads of different masses. The three drivers press their accelerators at the same time, and the trucks experience net forces of equal strength. The positions of the three trucks before starting and a short time later are shown below." }
       ]
     },
-    { "type": "blockSlot", "slotId": "image_1" },
+    { "type": "widgetRef", "widgetId": "image_1" },
     {
       "type": "paragraph",
       "content": [
         { "type": "text", "content": "Rank the mass of each truck (including its load) from greatest to least." }
       ]
     },
-    { "type": "blockSlot", "slotId": "order_interaction" }
+    { "type": "widgetRef", "widgetId": "order_interaction" }
   ],
   "title": "Rank the truck masses from greatest to least",
   "widgets": ["image_1"],
@@ -2055,7 +2043,7 @@ WRONG (instruction placed in body instead of deferring to the interaction prompt
          { "type": "text", "content": "Order the parts from least to most complex." }
        ]
      },
-     { "type": "blockSlot", "slotId": "order_interaction" }
+     { "type": "widgetRef", "widgetId": "order_interaction" }
    ],
    "title": "Order body parts by complexity",
    "widgets": [],
@@ -2106,7 +2094,7 @@ WRONG (instruction placed in body instead of deferring to the interaction prompt
          { "type": "text", "content": "The parts of the body listed below are involved in breaking down and absorbing nutrients from food." }
        ]
      },
-     { "type": "blockSlot", "slotId": "order_interaction" }
+     { "type": "widgetRef", "widgetId": "order_interaction" }
    ],
    "title": "Order body parts by complexity",
    "widgets": [],
@@ -2151,8 +2139,8 @@ CORRECT (instruction deferred to the interaction step; body contains only neutra
         { "type": "text", "content": "Three trucks start at rest, side by side. The trucks carry loads of different masses. The three drivers press their accelerators at the same time, and the trucks experience net forces of equal strength. The positions of the three trucks before starting and a short time later are shown below." }
       ]
     },
-    { "type": "blockSlot", "slotId": "image_1" },
-    { "type": "blockSlot", "slotId": "order_interaction" }
+    { "type": "widgetRef", "widgetId": "image_1" },
+    { "type": "widgetRef", "widgetId": "order_interaction" }
   ],
   "title": "Rank the truck masses from greatest to least",
   "widgets": ["image_1"],
@@ -2189,7 +2177,7 @@ CORRECT (instruction deferred to the interaction step; body contains only neutra
   "body": [
     { "type": "paragraph", "content": [{ "type": "text", "content": "Choose the best phrase to fill in the blank." }] },
     { "type": "paragraph", "content": [{ "type": "text", "content": "A diploid organism has _____ in each cell." }] },
-    { "type": "blockSlot", "slotId": "choice_interaction" }
+    { "type": "widgetRef", "widgetId": "choice_interaction" }
   ],
   "interactions": {
     "choice_interaction": {
@@ -2208,7 +2196,7 @@ CORRECT (instruction deferred to the interaction step; body contains only neutra
 \`\`\`
 {
   "body": [
-    { "type": "blockSlot", "slotId": "choice_interaction" }
+    { "type": "widgetRef", "widgetId": "choice_interaction" }
   ],
   "interactions": {
     "choice_interaction": {
@@ -2239,7 +2227,7 @@ Do not place endpoint or axis labels as separate body paragraphs around an order
 
 - BANNED endpoint/axis labels in body (examples, not exhaustive): "Longest", "Shortest", "Highest", "Lowest", "Smallest", "Largest", "Earliest", "Latest", "First", "Last", "Top", "Bottom", "Left", "Right", and domain-specific variants like "Longest wavelength" / "Shortest wavelength".
 - The ordering direction and axis MUST appear only in the interaction prompt (e.g., "from longest to shortest (top to bottom)" for vertical orientation), never as standalone body paragraphs.
-- The body should be empty or include only neutral context plus the JSON block slot entry: { "type": "blockSlot", "slotId": "order_interaction" }.
+- The body should be empty or include only neutral context plus the JSON block slot entry: { "type": "widgetRef", "widgetId": "order_interaction" }.
 
 WRONG (endpoint labels in body around the ordering slot):
 \`\`\`json
@@ -2247,7 +2235,7 @@ WRONG (endpoint labels in body around the ordering slot):
   "body": [
     { "type": "paragraph", "content": [{ "type": "text", "content": "Rank the waves from longest wavelength to shortest wavelength." }] },
     { "type": "paragraph", "content": [{ "type": "text", "content": "Longest wavelength" }] },
-    { "type": "blockSlot", "slotId": "order_interaction" },
+    { "type": "widgetRef", "widgetId": "order_interaction" },
     { "type": "paragraph", "content": [{ "type": "text", "content": "Shortest wavelength" }] }
   ],
   "interactions": {
@@ -2270,7 +2258,7 @@ CORRECT (no endpoint labels in body; prompt carries direction and axis):
 {
   "body": [
     { "type": "paragraph", "content": [{ "type": "text", "content": "Snapshots of four periodic waves are shown below. Each wave is drawn on the same grid." }] },
-    { "type": "blockSlot", "slotId": "order_interaction" }
+    { "type": "widgetRef", "widgetId": "order_interaction" }
   ],
   "interactions": {
     "order_interaction": {
@@ -2300,7 +2288,7 @@ Never place equations, answer prompts, and input fields all in the same paragrap
         { "type": "text", "content": "Solve the equation. " },
         { "type": "math", "mathml": "<mn>20</mn><mo>=</mo><mi>r</mi><mo>+</mo><mn>11</mn>" },
         { "type": "text", "content": " r = " },
-        { "type": "inlineSlot", "slotId": "text_entry" }
+        { "type": "inlineInteractionRef", "interactionId": "text_entry" }
       ]
     }
   ]
@@ -2327,7 +2315,7 @@ Never place equations, answer prompts, and input fields all in the same paragrap
       "type": "paragraph",
       "content": [
         { "type": "text", "content": "r = " },
-        { "type": "inlineSlot", "slotId": "text_entry" }
+        { "type": "inlineInteractionRef", "interactionId": "text_entry" }
       ]
     }
   ]
@@ -2347,8 +2335,8 @@ Widgets MUST NEVER display, label, or visually indicate the correct answer. This
 {
   "body": [
     { "type": "paragraph", "content": [{ "type": "text", "content": "What is a name for the marked angle?" }] },
-    { "type": "blockSlot", "slotId": "angle_diagram" },
-    { "type": "blockSlot", "slotId": "choice_interaction" }
+    { "type": "widgetRef", "widgetId": "angle_diagram" },
+    { "type": "widgetRef", "widgetId": "choice_interaction" }
   ],
   "widgets": {
     "angle_diagram": {
@@ -2375,8 +2363,8 @@ Widgets MUST NEVER display, label, or visually indicate the correct answer. This
 {
   "body": [
     { "type": "paragraph", "content": [{ "type": "text", "content": "What is a name for the marked angle?" }] },
-    { "type": "blockSlot", "slotId": "angle_diagram" },
-    { "type": "blockSlot", "slotId": "choice_interaction" }
+    { "type": "widgetRef", "widgetId": "angle_diagram" },
+    { "type": "widgetRef", "widgetId": "choice_interaction" }
   ],
   "widgets": {
     "angle_diagram": {
@@ -2399,7 +2387,7 @@ Widgets MUST NEVER display, label, or visually indicate the correct answer. This
   "body": [
     { "type": "paragraph", "content": [{ "type": "text", "content": "How many solutions does the following equation have?" }] },
     { "type": "paragraph", "content": [{ "type": "math", "mathml": "<mn>3</mn><mrow><mo>(</mo><mi>x</mi><mo>+</mo><mn>5</mn><mo>)</mo></mrow><mo>=</mo><mo>-</mo><mn>4</mn><mi>x</mi><mo>+</mo><mn>8</mn>" }] },
-    { "type": "blockSlot", "slotId": "choice_interaction" },
+    { "type": "widgetRef", "widgetId": "choice_interaction" },
     { "type": "paragraph", "content": [{ "type": "text", "content": "The strategy" }] },
     { "type": "paragraph", "content": [{ "type": "text", "content": "Let's manipulate the equation to simplify it and isolate " }, { "type": "math", "mathml": "<mi>x</mi>" }, { "type": "text", "content": ". We should end with one of the following cases:" }] },
     { "type": "paragraph", "content": [{ "type": "text", "content": "- An equation of the form " }, { "type": "math", "mathml": "<mi>x</mi><mo>=</mo><mi>a</mi>" }, { "type": "text", "content": " (where " }, { "type": "math", "mathml": "<mi>a</mi>" }, { "type": "text", "content": " is any number). In this case, the equation has exactly one solution." }] },
@@ -2439,7 +2427,7 @@ Widgets MUST NEVER display, label, or visually indicate the correct answer. This
   "body": [
     { "type": "paragraph", "content": [{ "type": "text", "content": "How many solutions does the following equation have?" }] },
     { "type": "paragraph", "content": [{ "type": "math", "mathml": "<mn>3</mn><mrow><mo>(</mo><mi>x</mi><mo>+</mo><mn>5</mn><mo>)</mo></mrow><mo>=</mo><mo>-</mo><mn>4</mn><mi>x</mi><mo>+</mo><mn>8</mn>" }] },
-    { "type": "blockSlot", "slotId": "choice_interaction" }
+    { "type": "widgetRef", "widgetId": "choice_interaction" }
   ],
   "interactions": {
     "choice_interaction": {

@@ -325,7 +325,7 @@ CORRECT (embed the declared table widget slot):
   "choices": [
     {
       "identifier": "A",
-      "content": [ { "type": "blockSlot", "slotId": "choice_a_table" } ]
+      "content": [ { "type": "widgetRef", "widgetId": "choice_a_table" } ]
     }
   ]
 }
@@ -366,7 +366,7 @@ Negative example (DO NOT OUTPUT) – singular prompt with multi-correct declarat
 \`\`\`json
 {
   "body": [
-    { "type": "blockSlot", "slotId": "choice_interaction" }
+    { "type": "interactionRef", "interactionId": "choice_interaction" }
   ],
   "interactions": {
     "choice_interaction": {
@@ -397,7 +397,7 @@ Corrected version – explicitly signal multi-select and use plural grammar:
 \`\`\`json
 {
   "body": [
-    { "type": "blockSlot", "slotId": "choice_interaction" }
+    { "type": "interactionRef", "interactionId": "choice_interaction" }
   ],
   "interactions": {
     "choice_interaction": {
@@ -558,14 +558,14 @@ CORRECT: \`content: [{ "type": "paragraph", "content": [{ "type": "text", "conte
       {
         "identifier": "A",
         "content": [
-          { "type": "blockSlot", "slotId": "RESPONSE__A__v1" }
+          { "type": "widgetRef", "widgetId": "RESPONSE__A__v1" }
         ],
         "feedback": null
       },
       {
         "identifier": "B",
         "content": [
-          { "type": "blockSlot", "slotId": "RESPONSE__B__v1" }
+          { "type": "widgetRef", "widgetId": "RESPONSE__B__v1" }
         ],
         "feedback": null
       }
@@ -589,10 +589,9 @@ When the assessment shell declares widget slots (especially those following patt
 **Assessment Shell (showing declared but unused widget slots):**
 \`\`\`json
 {
-  "widgets": ["stimulus_dnl", "choice_a_table", "choice_b_table"],
   "body": [
-    { "type": "blockSlot", "slotId": "stimulus_dnl" },
-    { "type": "blockSlot", "slotId": "choice_interaction" }
+    { "type": "widgetRef", "widgetId": "stimulus_dnl" },
+    { "type": "interactionRef", "interactionId": "choice_interaction" }
   ]
 }
 \`\`\`
@@ -634,13 +633,13 @@ When the assessment shell declares widget slots (especially those following patt
       {
         "identifier": "A",
         "content": [
-          { "type": "blockSlot", "slotId": "choice_a_table" }
+          { "type": "widgetRef", "widgetId": "choice_a_table" }
         ]
       },
       {
         "identifier": "B",
         "content": [
-          { "type": "blockSlot", "slotId": "choice_b_table" }
+          { "type": "widgetRef", "widgetId": "choice_b_table" }
         ]
       }
     ]
@@ -668,8 +667,6 @@ When the assessment shell declares widget slots (especially those following patt
 **Assessment Shell:**
 \`\`\`json
 {
-  "widgets": ["image_1", "choice_a_dnl", "choice_b_dnl"],
-  "interactions": ["choice_interaction"],
   "body": [
     {
       "type": "paragraph",
@@ -681,14 +678,14 @@ When the assessment shell declares widget slots (especially those following patt
         { "type": "text", "content": " pencils." }
       ]
     },
-    { "type": "blockSlot", "slotId": "image_1" },
+    { "type": "widgetRef", "widgetId": "image_1" },
     {
       "type": "paragraph",
       "content": [
         { "type": "text", "content": "Select the double number line that shows the other values of packages and pencils." }
       ]
     },
-    { "type": "blockSlot", "slotId": "choice_interaction" }
+    { "type": "interactionRef", "interactionId": "choice_interaction" }
   ]
 }
 \`\`\`
@@ -706,14 +703,14 @@ When the assessment shell declares widget slots (especially those following patt
       {
         "identifier": "A",
         "content": [
-          { "type": "blockSlot", "slotId": "choice_a_dnl" }
+          { "type": "widgetRef", "widgetId": "choice_a_dnl" }
         ],
         "feedback": null
       },
       {
         "identifier": "B",
         "content": [
-          { "type": "blockSlot", "slotId": "choice_b_dnl" }
+          { "type": "widgetRef", "widgetId": "choice_b_dnl" }
         ],
         "feedback": null
       }

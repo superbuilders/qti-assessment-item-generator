@@ -61,13 +61,11 @@ mock.module("openai", () => {
 													type: "paragraph",
 													content: [
 														{ type: "text", content: "What is the answer? " },
-														{ type: "inlineSlot", slotId: "text_entry" }
+														{ type: "inlineInteractionRef", interactionId: "text_entry" }
 													]
 												},
-												{ type: "blockSlot", slotId: "image_widget" }
+												{ type: "widgetRef", widgetId: "image_widget" }
 											],
-											widgets: ["image_widget"],
-											interactions: ["text_entry"],
 											feedbackBlocks: [
 												{
 													identifier: "CORRECT",
@@ -259,9 +257,7 @@ describe("Structured AI Pipeline", () => {
 												identifier: "mock-item-invalid",
 												title: "Mock Item Invalid",
 												responseDeclarations: [],
-												body: [{ type: "blockSlot", slotId: "image_widget" }],
-												widgets: [], // <-- INTENTIONALLY EMPTY
-												interactions: [],
+												body: [{ type: "widgetRef", widgetId: "image_widget" }],
 												feedbackBlocks: [
 													{
 														identifier: "CORRECT",

@@ -46,7 +46,7 @@ export const probabilityNotPurpleSpinner: AssessmentItemInput = {
 			type: "discreteObjectRatioDiagram",
 			title: "Probability Visualization",
 			width: 400,
-			height: 200,
+			height: 300,
 			objects: [
 				{ count: 3, emoji: "✅" },
 				{ count: 1, emoji: "❌" }
@@ -82,12 +82,12 @@ export const probabilityNotPurpleSpinner: AssessmentItemInput = {
 			type: "paragraph",
 			content: [
 				{ type: "text", content: "Answer: " },
-				{ type: "inlineSlot", slotId: "text_entry" }
+				{ type: "inlineInteractionRef", interactionId: "text_entry" }
 			]
 		},
 		{
-			type: "blockSlot",
-			slotId: "image_1"
+			type: "widgetRef",
+			widgetId: "image_1"
 		}
 	],
 	interactions: {
@@ -183,7 +183,7 @@ export const probabilityNotPurpleSpinner: AssessmentItemInput = {
 						{ type: "math", mathml: "<mfrac><mn>3</mn><mn>4</mn></mfrac>" }
 					]
 				},
-				{ type: "blockSlot", slotId: "probability_visual_explanation" },
+				{ type: "widgetRef", widgetId: "probability_visual_explanation" },
 				{
 					type: "paragraph",
 					content: [
@@ -207,12 +207,12 @@ export const linearModelEquationPrediction: AssessmentItemInput = {
 				}
 			]
 		},
-		{ type: "blockSlot", slotId: "image_1" },
+		{ type: "widgetRef", widgetId: "image_1" },
 		{
 			type: "paragraph",
 			content: [{ type: "text", content: "Which of these linear equations best describes the given model?" }]
 		},
-		{ type: "blockSlot", slotId: "choice_interaction" },
+		{ type: "interactionRef", interactionId: "choice_interaction" },
 		{
 			type: "paragraph",
 			content: [
@@ -225,7 +225,7 @@ export const linearModelEquationPrediction: AssessmentItemInput = {
 		{
 			type: "paragraph",
 			content: [
-				{ type: "inlineSlot", slotId: "text_entry" },
+				{ type: "inlineInteractionRef", interactionId: "text_entry" },
 				{ type: "text", content: " km" }
 			]
 		}
@@ -252,20 +252,33 @@ export const linearModelEquationPrediction: AssessmentItemInput = {
 		},
 		slope_interpretation_visual: {
 			type: "tapeDiagram",
-			title: "Understanding Slope",
 			width: 400,
-			height: 150,
-			segments: [
-				{ label: "2 km/hour", value: 2, color: "#4285F4" }
-			],
-			total: null,
-			showTotal: false,
-			orientation: "horizontal"
+			height: 300,
+			referenceUnitsTotal: null,
+			topTape: {
+				label: "Understanding Slope",
+				unitsTotal: 10,
+				extent: null,
+				grid: { show: true },
+				roundedCaps: null,
+				fills: [
+					{ 
+						span: { by: "units", startUnit: 0, endUnit: 2 },
+						style: { kind: "solid", fill: "#4285F4", fillOpacity: null },
+						label: {
+							text: "2 km/hour",
+							placement: "inside"
+						}
+					}
+				]
+			},
+			bottomTape: null,
+			brackets: []
 		},
 		linear_prediction_visual: {
 			type: "numberLine",
 			width: 500,
-			height: 200,
+			height: 300,
 			orientation: "horizontal",
 			min: 0,
 			max: 15,
@@ -273,7 +286,7 @@ export const linearModelEquationPrediction: AssessmentItemInput = {
 			secondaryTickInterval: null,
 			showTickLabels: true,
 			highlightedPoints: [
-				{ type: "whole", position: 13.5, value: 13.5, sign: "+", color: "#4285F4", style: "dot" }
+				{ type: "whole", position: 14, value: 14, sign: "+", color: "#4285F4", style: "dot" }
 			],
 			segments: null,
 			model: null
@@ -313,7 +326,7 @@ export const linearModelEquationPrediction: AssessmentItemInput = {
 						{ type: "text", content: " suggests he covers some initial distance even at time zero." }
 					]
 				},
-				{ type: "blockSlot", slotId: "slope_interpretation_visual" },
+				{ type: "widgetRef", widgetId: "slope_interpretation_visual" },
 				{
 					type: "paragraph",
 					content: [
@@ -585,7 +598,7 @@ export const linearModelEquationPrediction: AssessmentItemInput = {
 						}
 					]
 				},
-				{ type: "blockSlot", slotId: "linear_prediction_visual" },
+				{ type: "widgetRef", widgetId: "linear_prediction_visual" },
 				{
 					type: "paragraph",
 					content: [
@@ -714,20 +727,33 @@ export const doubleNumberLineRatio: AssessmentItemInput = {
 		},
 		ratio_relationship_visual: {
 			type: "tapeDiagram",
-			title: "Ratio Visualization",
 			width: 400,
-			height: 150,
-			segments: [
-				{ label: "40m per 1km", value: 40, color: "#FF6B6B" }
-			],
-			total: null,
-			showTotal: false,
-			orientation: "horizontal"
+			height: 300,
+			referenceUnitsTotal: null,
+			topTape: {
+				label: "Ratio Visualization",
+				unitsTotal: 40,
+				extent: null,
+				grid: { show: true },
+				roundedCaps: null,
+				fills: [
+					{ 
+						span: { by: "units", startUnit: 0, endUnit: 40 },
+						style: { kind: "solid", fill: "#FF6B6B", fillOpacity: null },
+						label: {
+							text: "40m per 1km",
+							placement: "inside"
+						}
+					}
+				]
+			},
+			bottomTape: null,
+			brackets: []
 		},
 		double_number_line_explanation: {
 			type: "doubleNumberLine",
 			width: 400,
-			height: 200,
+			height: 300,
 			topLine: { label: "Distance (km)", ticks: [0, 1, 2, 3, 4] },
 			bottomLine: { label: "Elevation (m)", ticks: [0, 40, 80, 120, 160] }
 		}
@@ -746,8 +772,8 @@ export const doubleNumberLineRatio: AssessmentItemInput = {
 				{ type: "text", content: "." }
 			]
 		},
-		{ type: "blockSlot", slotId: "stimulus_dnl" },
-		{ type: "blockSlot", slotId: "choice_interaction" }
+		{ type: "widgetRef", widgetId: "stimulus_dnl" },
+		{ type: "interactionRef", interactionId: "choice_interaction" }
 	],
 	interactions: {
 		choice_interaction: {
@@ -765,11 +791,11 @@ export const doubleNumberLineRatio: AssessmentItemInput = {
 			choices: [
 				{
 					identifier: "A",
-					content: [{ type: "blockSlot", slotId: "choice_a_dnl" }]
+					content: [{ type: "widgetRef", widgetId: "choice_a_dnl" }]
 				},
 				{
 					identifier: "B",
-					content: [{ type: "blockSlot", slotId: "choice_b_dnl" }]
+					content: [{ type: "widgetRef", widgetId: "choice_b_dnl" }]
 				}
 			]
 		}
@@ -805,7 +831,7 @@ export const doubleNumberLineRatio: AssessmentItemInput = {
 						{ type: "text", content: "Double number lines are perfect for showing these proportional relationships. Each tick mark maintains the same ratio, making it easy to find equivalent values." }
 					]
 				},
-				{ type: "blockSlot", slotId: "ratio_relationship_visual" },
+				{ type: "widgetRef", widgetId: "ratio_relationship_visual" },
 				{
 					type: "paragraph",
 					content: [
@@ -886,7 +912,7 @@ export const doubleNumberLineRatio: AssessmentItemInput = {
 						{ type: "math", mathml: "<mn>160</mn><mtext> m</mtext>" }
 					]
 				},
-				{ type: "blockSlot", slotId: "double_number_line_explanation" },
+				{ type: "widgetRef", widgetId: "double_number_line_explanation" },
 				{
 					type: "paragraph",
 					content: [
@@ -920,7 +946,7 @@ export const evalFractionalExponents: AssessmentItemInput = {
 						"<mrow><mfrac><msup><mn>2</mn><mrow><mo>-</mo><mfrac><mn>4</mn><mn>3</mn></mfrac></mrow></msup><msup><mn>54</mn><mrow><mo>-</mo><mfrac><mn>4</mn><mn>3</mn></mfrac></mrow></msup></mfrac><mo>=</mo></mrow>"
 				},
 				{ type: "text", content: " " },
-				{ type: "inlineSlot", slotId: "text_entry" }
+				{ type: "inlineInteractionRef", interactionId: "text_entry" }
 			]
 		}
 	],
@@ -958,18 +984,52 @@ export const evalFractionalExponents: AssessmentItemInput = {
 		},
 		fractional_exponent_steps_visual: {
 			type: "tapeDiagram",
-			title: "Step-by-Step Process",
 			width: 500,
-			height: 200,
-			segments: [
-				{ label: "Apply quotient rule", value: 1, color: "#FF6B6B" },
-				{ label: "Simplify fraction", value: 1, color: "#4285F4" },
-				{ label: "Negative exponent", value: 1, color: "#34A853" },
-				{ label: "Evaluate", value: 1, color: "#FBBC04" }
-			],
-			total: null,
-			showTotal: false,
-			orientation: "horizontal"
+			height: 300,
+			referenceUnitsTotal: null,
+			topTape: {
+				label: "Step-by-Step Process",
+				unitsTotal: 4,
+				extent: null,
+				grid: { show: true },
+				roundedCaps: null,
+				fills: [
+					{ 
+						span: { by: "units", startUnit: 0, endUnit: 1 },
+						style: { kind: "solid", fill: "#FF6B6B", fillOpacity: null },
+						label: {
+							text: "Apply quotient rule",
+							placement: "inside"
+						}
+					},
+					{ 
+						span: { by: "units", startUnit: 1, endUnit: 2 },
+						style: { kind: "solid", fill: "#4285F4", fillOpacity: null },
+						label: {
+							text: "Simplify fraction",
+							placement: "inside"
+						}
+					},
+					{ 
+						span: { by: "units", startUnit: 2, endUnit: 3 },
+						style: { kind: "solid", fill: "#34A853", fillOpacity: null },
+						label: {
+							text: "Negative exponent",
+							placement: "inside"
+						}
+					},
+					{ 
+						span: { by: "units", startUnit: 3, endUnit: 4 },
+						style: { kind: "solid", fill: "#FBBC04", fillOpacity: null },
+						label: {
+							text: "Evaluate",
+							placement: "inside"
+						}
+					}
+				]
+			},
+			bottomTape: null,
+			brackets: []
 		}
 	},
 	feedbackBlocks: [
@@ -1008,7 +1068,7 @@ export const evalFractionalExponents: AssessmentItemInput = {
 						{ type: "text", content: "Your understanding of negative fractional exponents shows advanced algebraic thinking. These concepts are essential for calculus, physics, and engineering!" }
 					]
 				},
-				{ type: "blockSlot", slotId: "exponent_rules_visual" }
+				{ type: "widgetRef", widgetId: "exponent_rules_visual" }
 			]
 		},
 		{
@@ -1076,7 +1136,7 @@ export const evalFractionalExponents: AssessmentItemInput = {
 						}
 					]
 				},
-				{ type: "blockSlot", slotId: "fractional_exponent_steps_visual" },
+				{ type: "widgetRef", widgetId: "fractional_exponent_steps_visual" },
 				{
 					type: "paragraph",
 					content: [
@@ -1105,7 +1165,7 @@ export const compare3DigitNumbers: AssessmentItemInput = {
 			correct: "correct"
 		}
 	],
-	body: [{ type: "blockSlot", slotId: "order_interaction" }],
+	body: [{ type: "interactionRef", interactionId: "order_interaction" }],
 	interactions: {
 		order_interaction: {
 			type: "orderInteraction",
@@ -1212,7 +1272,7 @@ export const compare3DigitNumbers: AssessmentItemInput = {
 						{ type: "text", content: "The greater than symbol (>) always \"eats\" the smaller number - it opens toward the larger number!" }
 					]
 				},
-				{ type: "blockSlot", slotId: "place_value_comparison_visual" },
+				{ type: "widgetRef", widgetId: "place_value_comparison_visual" },
 				{
 					type: "paragraph",
 					content: [
@@ -1319,7 +1379,7 @@ export const inequalityNumberLine: AssessmentItemInput = {
 		inequality_direction_visual: {
 			type: "numberLine",
 			width: 400,
-			height: 150,
+			height: 300,
 			orientation: "horizontal",
 			min: -2,
 			max: 2,
@@ -1357,8 +1417,8 @@ export const inequalityNumberLine: AssessmentItemInput = {
 		}
 	},
 	body: [
-		{ type: "blockSlot", slotId: "inequality_widget" },
-		{ type: "blockSlot", slotId: "choice_interaction" }
+		{ type: "widgetRef", widgetId: "inequality_widget" },
+		{ type: "interactionRef", interactionId: "choice_interaction" }
 	],
 	interactions: {
 		choice_interaction: {
@@ -1431,7 +1491,7 @@ export const inequalityNumberLine: AssessmentItemInput = {
 						{ type: "text", content: " (toward positive numbers)." }
 					]
 				},
-				{ type: "blockSlot", slotId: "inequality_direction_visual" },
+				{ type: "widgetRef", widgetId: "inequality_direction_visual" },
 				{
 					type: "paragraph",
 					content: [
@@ -1538,7 +1598,7 @@ export const inequalityNumberLine: AssessmentItemInput = {
 						{ type: "text", content: " - all values strictly greater than zero." }
 					]
 				},
-				{ type: "blockSlot", slotId: "inequality_notation_visual" },
+				{ type: "widgetRef", widgetId: "inequality_notation_visual" },
 				{
 					type: "paragraph",
 					content: [
@@ -1643,19 +1703,19 @@ export const verticalNumberLineComparison: AssessmentItemInput = {
 			type: "paragraph",
 			content: [{ type: "text", content: "Use the number line to compare the numbers." }]
 		},
-		{ type: "blockSlot", slotId: "vertical_nl" },
+		{ type: "widgetRef", widgetId: "vertical_nl" },
 		{
 			type: "paragraph",
 			content: [
 				{ type: "math", mathml: "<mo>-</mo><mn>1.4</mn>" },
 				{ type: "text", content: " is " },
-				{ type: "inlineSlot", slotId: "pos_choice" },
+				{ type: "inlineInteractionRef", interactionId: "pos_choice" },
 				{ type: "text", content: " " },
 				{ type: "math", mathml: "<mo>-</mo><mn>6.4</mn>" },
 				{ type: "text", content: ", so " },
 				{ type: "math", mathml: "<mo>-</mo><mn>1.4</mn>" },
 				{ type: "text", content: " is " },
-				{ type: "inlineSlot", slotId: "comp_choice" },
+				{ type: "inlineInteractionRef", interactionId: "comp_choice" },
 				{ type: "text", content: " " },
 				{ type: "math", mathml: "<mo>-</mo><mn>6.4</mn>" },
 				{ type: "text", content: "." }
@@ -1907,7 +1967,7 @@ export const twoWayFrequencyTable: AssessmentItemInput = {
 		venn_diagram_breakdown: {
 			type: "vennDiagram",
 			width: 350,
-			height: 250,
+			height: 300,
 			circleA: { label: "Medicine", count: 27, color: "#4285F499" },
 			circleB: { label: "Long Cold", count: 20, color: "#FF6B6B99" },
 			intersectionCount: 23,
@@ -1929,12 +1989,12 @@ export const twoWayFrequencyTable: AssessmentItemInput = {
 				{ type: "text", content: " days or longer." }
 			]
 		},
-		{ type: "blockSlot", slotId: "venn_widget" },
+		{ type: "widgetRef", widgetId: "venn_widget" },
 		{
 			type: "paragraph",
 			content: [{ type: "text", content: "Complete the following two-way frequency table." }]
 		},
-		{ type: "blockSlot", slotId: "table_widget" }
+		{ type: "widgetRef", widgetId: "table_widget" }
 	],
 	interactions: {},
 	feedbackBlocks: [
@@ -1964,7 +2024,7 @@ export const twoWayFrequencyTable: AssessmentItemInput = {
 						{ type: "text", content: "This skill of converting between different data representations (Venn diagrams ↔ two-way tables) is crucial for analyzing real-world studies and surveys!" }
 					]
 				},
-				{ type: "blockSlot", slotId: "venn_to_table_visual" },
+				{ type: "widgetRef", widgetId: "venn_to_table_visual" },
 				{
 					type: "paragraph",
 					content: [
@@ -2024,7 +2084,7 @@ export const twoWayFrequencyTable: AssessmentItemInput = {
 						{ type: "text", content: "... wait, that's negative! This means we need to recalculate." }
 					]
 				},
-				{ type: "blockSlot", slotId: "venn_diagram_breakdown" },
+				{ type: "widgetRef", widgetId: "venn_diagram_breakdown" },
 				{
 					type: "paragraph",
 					content: [
@@ -2159,7 +2219,7 @@ export const equivalentFractionImages: AssessmentItemInput = {
 		fraction_comparison_visual: {
 			type: "fractionModelDiagram",
 			width: 300,
-			height: 200,
+			height: 300,
 			numerator: 3,
 			denominator: 4,
 			shadeColor: "#FF6B6B",
@@ -2174,8 +2234,8 @@ export const equivalentFractionImages: AssessmentItemInput = {
 				{ type: "text", content: " of the following rectangle is shaded." }
 			]
 		},
-		{ type: "blockSlot", slotId: "stimulus_shape" },
-		{ type: "blockSlot", slotId: "choice_interaction" }
+		{ type: "widgetRef", widgetId: "stimulus_shape" },
+		{ type: "interactionRef", interactionId: "choice_interaction" }
 	],
 	interactions: {
 		choice_interaction: {
@@ -2192,15 +2252,15 @@ export const equivalentFractionImages: AssessmentItemInput = {
 			choices: [
 				{
 					identifier: "A",
-					content: [{ type: "blockSlot", slotId: "choice_a_shape" }]
+					content: [{ type: "widgetRef", widgetId: "choice_a_shape" }]
 				},
 				{
 					identifier: "B",
-					content: [{ type: "blockSlot", slotId: "choice_b_shape" }]
+					content: [{ type: "widgetRef", widgetId: "choice_b_shape" }]
 				},
 				{
 					identifier: "C",
-					content: [{ type: "blockSlot", slotId: "choice_c_shape" }]
+					content: [{ type: "widgetRef", widgetId: "choice_c_shape" }]
 				}
 			]
 		}
@@ -2240,7 +2300,7 @@ export const equivalentFractionImages: AssessmentItemInput = {
 						{ type: "text", content: " because we can multiply or divide both numerator and denominator by the same number!" }
 					]
 				},
-				{ type: "blockSlot", slotId: "equivalent_fractions_visual" },
+				{ type: "widgetRef", widgetId: "equivalent_fractions_visual" },
 				{
 					type: "paragraph",
 					content: [
@@ -2339,7 +2399,7 @@ export const equivalentFractionImages: AssessmentItemInput = {
 						{ type: "math", mathml: "<mfrac><mn>1</mn><mn>2</mn></mfrac>" }
 					]
 				},
-				{ type: "blockSlot", slotId: "fraction_comparison_visual" },
+				{ type: "widgetRef", widgetId: "fraction_comparison_visual" },
 				{
 					type: "paragraph",
 					content: [
@@ -2417,7 +2477,7 @@ export const calculateShadedArea: AssessmentItemInput = {
 			type: "tapeDiagram",
 			title: "Multiplying Fractions Visualization",
 			width: 400,
-			height: 150,
+			height: 300,
 			segments: [
 				{ label: "1/4 + 1/4 + 1/4", value: 3, color: "#4285F4" }
 			],
@@ -2427,8 +2487,8 @@ export const calculateShadedArea: AssessmentItemInput = {
 		}
 	},
 	body: [
-		{ type: "blockSlot", slotId: "multi_shape" },
-		{ type: "blockSlot", slotId: "choice_interaction" }
+		{ type: "widgetRef", widgetId: "multi_shape" },
+		{ type: "interactionRef", interactionId: "choice_interaction" }
 	],
 	interactions: {
 		choice_interaction: {
@@ -2561,7 +2621,7 @@ export const calculateShadedArea: AssessmentItemInput = {
 						{ type: "text", content: "This demonstrates excellent understanding of how multiplication works with fractions! When you have multiple identical fractional parts, multiplication is often the most efficient approach." }
 					]
 				},
-				{ type: "blockSlot", slotId: "fraction_multiplication_visual" },
+				{ type: "widgetRef", widgetId: "fraction_multiplication_visual" },
 				{
 					type: "paragraph",
 					content: [
@@ -2649,11 +2709,11 @@ export const circleEquationCenterRadius: AssessmentItemInput = {
 			type: "paragraph",
 			content: [
 				{ type: "text", content: "What is the center of this circle? (" },
-				{ type: "inlineSlot", slotId: "x_entry" },
+				{ type: "inlineInteractionRef", interactionId: "x_entry" },
 				{ type: "text", content: ", " },
-				{ type: "inlineSlot", slotId: "y_entry" },
+				{ type: "inlineInteractionRef", interactionId: "y_entry" },
 				{ type: "text", content: ") and radius " },
-				{ type: "inlineSlot", slotId: "r_entry" },
+				{ type: "inlineInteractionRef", interactionId: "r_entry" },
 				{ type: "text", content: "?" }
 			]
 		}
@@ -2812,7 +2872,7 @@ export const circleEquationCenterRadius: AssessmentItemInput = {
 						}
 					]
 				},
-				{ type: "blockSlot", slotId: "completing_square_visual" },
+				{ type: "widgetRef", widgetId: "completing_square_visual" },
 				{
 					type: "paragraph",
 					content: [
@@ -2905,14 +2965,14 @@ export const harukaExamScore: AssessmentItemInput = {
 				{ type: "text", content: "The following table shows each of Haruka's final exam scores last semester." }
 			]
 		},
-		{ type: "blockSlot", slotId: "score_table" },
+		{ type: "widgetRef", widgetId: "score_table" },
 		{
 			type: "paragraph",
 			content: [
 				{ type: "text", content: "If the mean of the data set is " },
 				{ type: "math", mathml: "<mn>84</mn>" },
 				{ type: "text", content: " points, find Haruka's final exam score in chemistry. " },
-				{ type: "inlineSlot", slotId: "text_entry" }
+				{ type: "inlineInteractionRef", interactionId: "text_entry" }
 			]
 		}
 	],
@@ -3016,7 +3076,7 @@ export const harukaExamScore: AssessmentItemInput = {
 						{ type: "math", mathml: "<mn>336</mn><mo>-</mo><mn>72</mn><mo>-</mo><mn>85</mn><mo>-</mo><mn>92</mn><mo>=</mo><mn>87</mn>" }
 					]
 				},
-				{ type: "blockSlot", slotId: "mean_calculation_visual" },
+				{ type: "widgetRef", widgetId: "mean_calculation_visual" },
 				{
 					type: "paragraph",
 					content: [
@@ -3101,8 +3161,8 @@ export const libertyvilleBusinessCycle: AssessmentItemInput = {
 				}
 			]
 		},
-		{ type: "blockSlot", slotId: "gdp_table" },
-		{ type: "blockSlot", slotId: "choice_interaction" }
+		{ type: "widgetRef", widgetId: "gdp_table" },
+		{ type: "interactionRef", interactionId: "choice_interaction" }
 	],
 	interactions: {
 		choice_interaction: {
@@ -3252,7 +3312,7 @@ export const continuityDifferentiabilityPiecewise: AssessmentItemInput = {
 				}
 			]
 		},
-		{ type: "blockSlot", slotId: "choice_interaction" }
+		{ type: "interactionRef", interactionId: "choice_interaction" }
 	],
 	interactions: {
 		choice_interaction: {
@@ -3376,7 +3436,7 @@ export const stokesTheoremRewrite: AssessmentItemInput = {
 			type: "paragraph",
 			content: [
 				{ type: "text", content: "Use Stokes' theorem to rewrite the surface integral as a line integral. " },
-				{ type: "inlineSlot", slotId: "text_entry" }
+				{ type: "inlineInteractionRef", interactionId: "text_entry" }
 			]
 		}
 	],
@@ -3469,8 +3529,8 @@ export const estimateDerivativeFromTable: AssessmentItemInput = {
 				{ type: "text", content: "." }
 			]
 		},
-		{ type: "blockSlot", slotId: "h_table" },
-		{ type: "blockSlot", slotId: "choice_interaction" }
+		{ type: "widgetRef", widgetId: "h_table" },
+		{ type: "interactionRef", interactionId: "choice_interaction" }
 	],
 	interactions: {
 		choice_interaction: {
@@ -3613,7 +3673,7 @@ export const countApplesEmoji: AssessmentItemInput = {
 			objects: [{ count: 6, emoji: "🍎" }]
 		}
 	},
-	body: [{ type: "blockSlot", slotId: "choice_interaction" }],
+	body: [{ type: "widgetRef", widgetId: "choice_interaction" }],
 	interactions: {
 		choice_interaction: {
 			type: "choiceInteraction",
@@ -3629,19 +3689,19 @@ export const countApplesEmoji: AssessmentItemInput = {
 			choices: [
 				{
 					identifier: "CHOICE_3",
-					content: [{ type: "blockSlot", slotId: "choice_3_apples" }]
+					content: [{ type: "widgetRef", widgetId: "choice_3_apples" }]
 				},
 				{
 					identifier: "CHOICE_4",
-					content: [{ type: "blockSlot", slotId: "choice_4_apples" }]
+					content: [{ type: "widgetRef", widgetId: "choice_4_apples" }]
 				},
 				{
 					identifier: "CHOICE_5",
-					content: [{ type: "blockSlot", slotId: "choice_5_apples" }]
+					content: [{ type: "widgetRef", widgetId: "choice_5_apples" }]
 				},
 				{
 					identifier: "CHOICE_6",
-					content: [{ type: "blockSlot", slotId: "choice_6_apples" }]
+					content: [{ type: "widgetRef", widgetId: "choice_6_apples" }]
 				}
 			]
 		}
@@ -3883,7 +3943,7 @@ export const reactantAmountsTemperatureTableWithDropdowns: AssessmentItemInput =
 				}
 			]
 		},
-		{ type: "blockSlot", slotId: "react_temp_table" },
+		{ type: "widgetRef", widgetId: "react_temp_table" },
 		{
 			type: "paragraph",
 			content: [{ type: "text", content: "Select the reactant and amount for rows C, D, and E directly in the table." }]
@@ -3969,7 +4029,7 @@ export const reactantAmountsTemperatureTableWithDropdowns: AssessmentItemInput =
 						{ type: "text", content: ": Match compounds to their characteristic effects and scale by amount." }
 					]
 				},
-				{ type: "blockSlot", slotId: "temperature_analysis_visual" }
+				{ type: "widgetRef", widgetId: "temperature_analysis_visual" }
 			]
 		}
 	]
@@ -4120,7 +4180,7 @@ export const attractRepelCompletionTable: AssessmentItemInput = {
 	},
 	body: [
 		{ type: "paragraph", content: [{ type: "text", content: "Complete the table for each pair of objects." }] },
-		{ type: "blockSlot", slotId: "attract_repel_table" }
+		{ type: "widgetRef", widgetId: "attract_repel_table" }
 	],
 	interactions: {
 		text_entry: { type: "textEntryInteraction", responseIdentifier: "RESPONSE_TEXT_ENTRY", expectedLength: 10 }
@@ -4242,7 +4302,7 @@ export const attractRepelCompletionTable: AssessmentItemInput = {
 						{ type: "text", content: "• North + South = attract" }
 					]
 				},
-				{ type: "blockSlot", slotId: "force_rules_visual" }
+				{ type: "widgetRef", widgetId: "force_rules_visual" }
 			]
 		}
 	]
@@ -4354,8 +4414,8 @@ export const shapeBinBarChart: AssessmentItemInput = {
 			type: "paragraph",
 			content: [{ type: "text", content: "A second grade classroom has a bin of shapes." }]
 		},
-		{ type: "blockSlot", slotId: "shapes_table" },
-		{ type: "blockSlot", slotId: "choice_interaction" }
+		{ type: "widgetRef", widgetId: "shapes_table" },
+		{ type: "interactionRef", interactionId: "choice_interaction" }
 	],
 	interactions: {
 		choice_interaction: {
@@ -4368,19 +4428,19 @@ export const shapeBinBarChart: AssessmentItemInput = {
 			choices: [
 				{
 					identifier: "A",
-					content: [{ type: "blockSlot", slotId: "chart_a" }]
+					content: [{ type: "widgetRef", widgetId: "chart_a" }]
 				},
 				{
 					identifier: "B",
-					content: [{ type: "blockSlot", slotId: "chart_b" }]
+					content: [{ type: "widgetRef", widgetId: "chart_b" }]
 				},
 				{
 					identifier: "C",
-					content: [{ type: "blockSlot", slotId: "chart_c" }]
+					content: [{ type: "widgetRef", widgetId: "chart_c" }]
 				},
 				{
 					identifier: "D",
-					content: [{ type: "blockSlot", slotId: "chart_d" }]
+					content: [{ type: "widgetRef", widgetId: "chart_d" }]
 				}
 			]
 		}
@@ -4525,7 +4585,7 @@ export const pencilLengthLinePlot: AssessmentItemInput = {
 				{ type: "text", content: "." }
 			]
 		},
-		{ type: "blockSlot", slotId: "choice_interaction" }
+		{ type: "interactionRef", interactionId: "choice_interaction" }
 	],
 	interactions: {
 		choice_interaction: {
@@ -4538,19 +4598,19 @@ export const pencilLengthLinePlot: AssessmentItemInput = {
 			choices: [
 				{
 					identifier: "A",
-					content: [{ type: "blockSlot", slotId: "plot_a" }]
+					content: [{ type: "widgetRef", widgetId: "plot_a" }]
 				},
 				{
 					identifier: "B",
-					content: [{ type: "blockSlot", slotId: "plot_b" }]
+					content: [{ type: "widgetRef", widgetId: "plot_b" }]
 				},
 				{
 					identifier: "C",
-					content: [{ type: "blockSlot", slotId: "plot_c" }]
+					content: [{ type: "widgetRef", widgetId: "plot_c" }]
 				},
 				{
 					identifier: "D",
-					content: [{ type: "blockSlot", slotId: "plot_d" }]
+					content: [{ type: "widgetRef", widgetId: "plot_d" }]
 				}
 			]
 		}
@@ -4692,12 +4752,12 @@ export const gamesWonBarChart: AssessmentItemInput = {
 			type: "paragraph",
 			content: [{ type: "text", content: "This bar graph shows how many games each team won." }]
 		},
-		{ type: "blockSlot", slotId: "games_chart" },
+		{ type: "widgetRef", widgetId: "games_chart" },
 		{
 			type: "paragraph",
 			content: [
 				{ type: "text", content: "How many games did the Lions win? " },
-				{ type: "inlineSlot", slotId: "text_entry" }
+				{ type: "inlineInteractionRef", interactionId: "text_entry" }
 			]
 		}
 	],
@@ -4783,7 +4843,7 @@ export const gamesWonBarChart: AssessmentItemInput = {
 						{ type: "text", content: "." }
 					]
 				},
-				{ type: "blockSlot", slotId: "bar_chart_reading_visual" },
+				{ type: "widgetRef", widgetId: "bar_chart_reading_visual" },
 				{
 					type: "paragraph",
 					content: [
@@ -4865,14 +4925,14 @@ export const dollHeightLinePlot: AssessmentItemInput = {
 			type: "paragraph",
 			content: [{ type: "text", content: "The heights of Sabrina's dolls are shown below." }]
 		},
-		{ type: "blockSlot", slotId: "doll_plot" },
+		{ type: "widgetRef", widgetId: "doll_plot" },
 		{
 			type: "paragraph",
 			content: [
 				{ type: "text", content: "How many dolls are taller than " },
 				{ type: "math", mathml: "<mn>22</mn>" },
 				{ type: "text", content: " centimeters? " },
-				{ type: "inlineSlot", slotId: "text_entry" }
+				{ type: "inlineInteractionRef", interactionId: "text_entry" }
 			]
 		}
 	],
@@ -5000,7 +5060,7 @@ export const dollHeightLinePlot: AssessmentItemInput = {
 						{ type: "text", content: " cm." }
 					]
 				},
-				{ type: "blockSlot", slotId: "dot_plot_reading_visual" }
+				{ type: "widgetRef", widgetId: "dot_plot_reading_visual" }
 			]
 		}
 	]
@@ -5031,7 +5091,7 @@ export const timeOnNumberLine: AssessmentItemInput = {
 		time_number_line_visual: {
 			type: "numberLine",
 			width: 400,
-			height: 150,
+			height: 300,
 			orientation: "horizontal",
 			min: 0,
 			max: 60,
@@ -5050,14 +5110,14 @@ export const timeOnNumberLine: AssessmentItemInput = {
 			type: "paragraph",
 			content: [{ type: "text", content: "Look at the following number line." }]
 		},
-		{ type: "blockSlot", slotId: "time_line" },
+		{ type: "widgetRef", widgetId: "time_line" },
 		{
 			type: "paragraph",
 			content: [
 				{ type: "text", content: "What time is shown on the number line? " },
-				{ type: "inlineSlot", slotId: "hour_entry" },
+				{ type: "inlineInteractionRef", interactionId: "hour_entry" },
 				{ type: "text", content: ":" },
-				{ type: "inlineSlot", slotId: "minute_entry" }
+				{ type: "inlineInteractionRef", interactionId: "minute_entry" }
 			]
 		}
 	],
@@ -5164,7 +5224,7 @@ export const timeOnNumberLine: AssessmentItemInput = {
 						{ type: "text", content: "." }
 					]
 				},
-				{ type: "blockSlot", slotId: "time_number_line_visual" }
+				{ type: "widgetRef", widgetId: "time_number_line_visual" }
 			]
 		}
 	]
@@ -5191,7 +5251,7 @@ export const compare2DigitNumbers: AssessmentItemInput = {
 			content: [
 				{ type: "math", mathml: "<mn>83</mn>" },
 				{ type: "text", content: " " },
-				{ type: "inlineSlot", slotId: "comparison" },
+				{ type: "inlineInteractionRef", interactionId: "comparison" },
 				{ type: "text", content: " " },
 				{ type: "math", mathml: "<mn>58</mn>" }
 			]
@@ -5391,7 +5451,7 @@ export const greatestCommonFactor: AssessmentItemInput = {
 				{ type: "text", content: "." }
 			]
 		},
-		{ type: "blockSlot", slotId: "text_entry_interaction_1" }
+		{ type: "widgetRef", widgetId: "text_entry_interaction_1" }
 	],
 	interactions: {
 		text_entry_interaction_1: {
@@ -5404,7 +5464,7 @@ export const greatestCommonFactor: AssessmentItemInput = {
 		gcf_application_visual: {
 			type: "fractionModelDiagram",
 			width: 400,
-			height: 200,
+			height: 300,
 			numerator: 2,
 			denominator: 5,
 			shadeColor: "#4285F4",
@@ -5474,7 +5534,7 @@ export const greatestCommonFactor: AssessmentItemInput = {
 						{ type: "text", content: "." }
 					]
 				},
-				{ type: "blockSlot", slotId: "gcf_application_visual" }
+				{ type: "widgetRef", widgetId: "gcf_application_visual" }
 			]
 		},
 		{
@@ -5572,7 +5632,7 @@ export const greatestCommonFactor: AssessmentItemInput = {
 						{ type: "text", content: "!" }
 					]
 				},
-				{ type: "blockSlot", slotId: "factor_listing_visual" }
+				{ type: "widgetRef", widgetId: "factor_listing_visual" }
 			]
 		}
 	]
@@ -5665,12 +5725,12 @@ export const threeDataTablesMultipleChoice: AssessmentItemInput = {
 			type: "paragraph",
 			content: [{ type: "text", content: "For each table, answer the multiple choice question that follows." }]
 		},
-		{ type: "blockSlot", slotId: "table_q1" },
-		{ type: "blockSlot", slotId: "choice_q1" },
-		{ type: "blockSlot", slotId: "table_q2" },
-		{ type: "blockSlot", slotId: "choice_q2" },
-		{ type: "blockSlot", slotId: "table_q3" },
-		{ type: "blockSlot", slotId: "choice_q3" }
+		{ type: "widgetRef", widgetId: "table_q1" },
+		{ type: "widgetRef", widgetId: "choice_q1" },
+		{ type: "widgetRef", widgetId: "table_q2" },
+		{ type: "widgetRef", widgetId: "choice_q2" },
+		{ type: "widgetRef", widgetId: "table_q3" },
+		{ type: "widgetRef", widgetId: "choice_q3" }
 	],
 	interactions: {
 		choice_q1: {
@@ -6001,7 +6061,7 @@ export const gustaveStepsPerMile: AssessmentItemInput = {
 			type: "tapeDiagram",
 			title: "Unit Rate Visualization",
 			width: 500,
-			height: 200,
+			height: 300,
 			segments: [
 				{ label: "2100 steps", value: 2100, color: "#4285F4" }
 			],
@@ -6011,7 +6071,7 @@ export const gustaveStepsPerMile: AssessmentItemInput = {
 		}
 	},
 	body: [
-		{ type: "blockSlot", slotId: "gustave_shoe_image" },
+		{ type: "widgetRef", widgetId: "gustave_shoe_image" },
 		{
 			type: "paragraph",
 			content: [
@@ -6025,12 +6085,12 @@ export const gustaveStepsPerMile: AssessmentItemInput = {
 			]
 		},
 		{ type: "paragraph", content: [{ type: "text", content: "Write an equation to describe this situation." }] },
-		{ type: "paragraph", content: [{ type: "inlineSlot", slotId: "equation_entry" }] },
+		{ type: "paragraph", content: [{ type: "inlineInteractionRef", interactionId: "equation_entry" }] },
 		{
 			type: "paragraph",
 			content: [
 				{ type: "text", content: "How many steps are in one mile for Gustave? " },
-				{ type: "inlineSlot", slotId: "steps_entry" }
+				{ type: "inlineInteractionRef", interactionId: "steps_entry" }
 			]
 		}
 	],
@@ -6080,7 +6140,7 @@ export const gustaveStepsPerMile: AssessmentItemInput = {
 						{ type: "text", content: "This type of problem-solving is used everywhere: calculating unit rates, converting measurements, and analyzing proportional relationships in science and economics!" }
 					]
 				},
-				{ type: "blockSlot", slotId: "unit_rate_visual" }
+				{ type: "widgetRef", widgetId: "unit_rate_visual" }
 			]
 		},
 		{
@@ -6165,7 +6225,7 @@ export const compareNegativeDecimalVsRootInlineChoice: AssessmentItemInput = {
 			content: [
 				{ type: "math", mathml: "<mo>-</mo><mn>4.1</mn>" },
 				{ type: "text", content: " " },
-				{ type: "inlineSlot", slotId: "comparison_dropdown" },
+				{ type: "inlineInteractionRef", interactionId: "comparison_dropdown" },
 				{ type: "text", content: " " },
 				{ type: "math", mathml: "<mo>-</mo><msqrt><mn>20</mn></msqrt>" }
 			]
@@ -6362,8 +6422,8 @@ export const reactionRateChangesTable: AssessmentItemInput = {
 			]
 		},
 		{
-			type: "blockSlot",
-			slotId: "reaction_rate_table"
+			type: "widgetRef",
+			widgetId: "reaction_rate_table"
 		}
 	],
 	title: "How changes affect the reaction rate",
@@ -6590,8 +6650,8 @@ export const kineticEnergyMassSpeedRelationships: AssessmentItemInput = {
 			]
 		},
 		{
-			type: "blockSlot",
-			slotId: "image_2"
+			type: "widgetRef",
+			widgetId: "image_2"
 		},
 		{
 			type: "paragraph",
@@ -6604,8 +6664,8 @@ export const kineticEnergyMassSpeedRelationships: AssessmentItemInput = {
 			]
 		},
 		{
-			type: "blockSlot",
-			slotId: "image_3"
+			type: "widgetRef",
+			widgetId: "image_3"
 		},
 		{
 			type: "paragraph",
@@ -6624,16 +6684,16 @@ export const kineticEnergyMassSpeedRelationships: AssessmentItemInput = {
 					content: "• The relationship between kinetic energy and mass is "
 				},
 				{
-					type: "inlineSlot",
-					slotId: "dropdown_1"
+					type: "inlineInteractionRef",
+					interactionId: "dropdown_1"
 				},
 				{
 					type: "text",
 					content: ". If an object's mass is cut in half while its speed stays the same, its kinetic energy becomes "
 				},
 				{
-					type: "inlineSlot",
-					slotId: "dropdown_3"
+					type: "inlineInteractionRef",
+					interactionId: "dropdown_3"
 				},
 				{
 					type: "text",
@@ -6649,16 +6709,16 @@ export const kineticEnergyMassSpeedRelationships: AssessmentItemInput = {
 					content: "• The relationship between kinetic energy and speed is "
 				},
 				{
-					type: "inlineSlot",
-					slotId: "dropdown_2"
+					type: "inlineInteractionRef",
+					interactionId: "dropdown_2"
 				},
 				{
 					type: "text",
 					content: ". If an object's speed is cut in half while its mass stays the same, its kinetic energy becomes "
 				},
 				{
-					type: "inlineSlot",
-					slotId: "dropdown_5"
+					type: "inlineInteractionRef",
+					interactionId: "dropdown_5"
 				},
 				{
 					type: "text",
@@ -6963,8 +7023,8 @@ export const reactantAmountsTempChangeTablePerseus: AssessmentItemInput = {
 			]
 		},
 		{
-			type: "blockSlot",
-			slotId: "image_1"
+			type: "widgetRef",
+			widgetId: "image_1"
 		},
 		{
 			type: "paragraph",
@@ -6977,8 +7037,8 @@ export const reactantAmountsTempChangeTablePerseus: AssessmentItemInput = {
 			]
 		},
 		{
-			type: "blockSlot",
-			slotId: "react_temp_table"
+			type: "widgetRef",
+			widgetId: "react_temp_table"
 		}
 	],
 	title: "Identify reactants and amounts from temperature changes",
@@ -7325,7 +7385,7 @@ export const reactantAmountsTempChangeTablePerseus: AssessmentItemInput = {
 						{ type: "math", mathml: "<mn>2</mn><mo>×</mo><mo>(</mo><mo>-</mo><mn>1.6</mn><mo>)</mo><mo>=</mo><mo>-</mo><mn>3.2</mn><mo>°</mo><mi>C</mi>" }
 					]
 				},
-				{ type: "blockSlot", slotId: "reaction_pattern_visual" },
+				{ type: "widgetRef", widgetId: "reaction_pattern_visual" },
 				{
 					type: "paragraph",
 					content: [
