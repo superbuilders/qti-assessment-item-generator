@@ -330,37 +330,16 @@ function createTapeSchema() {
 						.describe(
 							"Whether to display grid lines separating each unit. True shows unit boundaries making discrete units visible. False creates a continuous bar without internal divisions."
 						),
-					strokeWidth: z
-						.number()
-						.min(0)
-						.nullable()
-						.describe(
-							"Width of grid lines in pixels. Null uses default width. Typically 1-2 pixels, matching defaultStrokeWidth. Grid line color is fixed to black for clarity and consistency."
-						)
 				})
 				.strict()
 				.describe(
-					"Controls the appearance of unit separation lines within the tape. Grid lines are always rendered in black to ensure contrast; only thickness can be configured. The grid makes individual units visible, essential for counting problems, unit fractions, or when you need to emphasize the discrete nature of the quantities. Hide the grid for continuous quantities or when units are purely conceptual."
+					"Controls the appearance of unit separation lines within the tape. Grid lines are always rendered in black at the theme default thickness to ensure contrast and consistency. The grid makes individual units visible, essential for counting problems, unit fractions, or when you need to emphasize the discrete nature of the quantities. Hide the grid for continuous quantities or when units are purely conceptual."
 				),
 			roundedCaps: z
 				.boolean()
 				.nullable()
 				.describe(
 					"Whether to render the tape with rounded ends (capsule shape) instead of rectangular. Null or false uses rectangular shape. Rounded caps provide a softer, more modern appearance but may not align with traditional textbook styles."
-				),
-			defaultStroke: z
-				.string()
-				.regex(CSS_COLOR_PATTERN, "invalid css color")
-				.default("#000000")
-				.describe(
-					"Default color for tape borders and any fills that don't specify their own stroke. Typically black for clear definition."
-				),
-			defaultStrokeWidth: z
-				.number()
-				.min(0)
-				.default(1.5)
-				.describe(
-					"Default width in pixels for tape borders and any fills that don't specify their own stroke width. 1.5 provides good visibility without being too heavy."
 				),
 			fills: z
 				.array(createFillSpanSchema())
@@ -487,15 +466,15 @@ export const generateTapeDiagram: WidgetGenerator<typeof TapeDiagramPropsSchema>
 		canvas.drawRect(geom.leftX, geom.y, geom.width, tapeHeight, {
 			fill: theme.colors.black,
 			fillOpacity: 0,
-			stroke: tape.defaultStroke,
-			strokeWidth: tape.defaultStrokeWidth
+			stroke: theme.colors.black,
+			strokeWidth: theme.stroke.width.base
 		})
 		// Unit separators (black only for maximum clarity)
 		for (let i = 1; i < tape.unitsTotal; i++) {
 			const x = geom.leftX + i * geom.cellWidth
 			canvas.drawLine(x, geom.y, x, geom.y + tapeHeight, {
 				stroke: theme.colors.black,
-				strokeWidth: tape.grid.strokeWidth == null ? theme.stroke.width.base : tape.grid.strokeWidth
+				strokeWidth: theme.stroke.width.base
 			})
 		}
 	}
@@ -527,8 +506,8 @@ export const generateTapeDiagram: WidgetGenerator<typeof TapeDiagramPropsSchema>
 			canvas.drawRect(x, geom.y, w, tapeHeight, {
 				fill: fill.style.fill,
 				fillOpacity: fill.style.fillOpacity == null ? undefined : fill.style.fillOpacity,
-				stroke: tape.defaultStroke,
-				strokeWidth: tape.defaultStrokeWidth
+				stroke: theme.colors.black,
+				strokeWidth: theme.stroke.width.base
 			})
 		} else if (fill.style.kind === "outline") {
 			canvas.drawRect(x, geom.y, w, tapeHeight, {
@@ -549,8 +528,8 @@ export const generateTapeDiagram: WidgetGenerator<typeof TapeDiagramPropsSchema>
 			})
 			canvas.drawRect(x, geom.y, w, tapeHeight, {
 				fillPatternId: id,
-				stroke: tape.defaultStroke,
-				strokeWidth: tape.defaultStrokeWidth
+				stroke: theme.colors.black,
+				strokeWidth: theme.stroke.width.base
 			})
 		}
 

@@ -5,7 +5,8 @@ import {
     NumberLineWithActionPropsSchema,
     ProtractorAngleDiagramPropsSchema,
     QuantityFractionalDiagramPropsSchema,
-    TapeDiagramPropsSchema
+    TapeDiagramPropsSchema,
+    DotPlotPropsSchema
 } from "../registry"
 
 export const teksMath4Collection = {
@@ -14,6 +15,7 @@ export const teksMath4Collection = {
         protractorAngleDiagram: ProtractorAngleDiagramPropsSchema,
         nPolygon: NPolygonPropsSchema,
         dataTable: DataTablePropsSchema,
+        dotPlot: DotPlotPropsSchema,
         tapeDiagram: TapeDiagramPropsSchema,
         numberLineWithAction: NumberLineWithActionPropsSchema,
         fractionModelDiagram: FractionModelDiagramPropsSchema,
@@ -23,6 +25,7 @@ export const teksMath4Collection = {
         "protractorAngleDiagram",
         "nPolygon",
         "dataTable",
+        "dotPlot",
         "tapeDiagram",
         "numberLineWithAction",
         "fractionModelDiagram",

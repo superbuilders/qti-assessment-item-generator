@@ -11,10 +11,8 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: "Total",
 			unitsTotal: 35,
 			extent: null,
-			grid: { show: false, strokeWidth: null },
+			grid: { show: false },
 			roundedCaps: null,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 1.5,
 			fills: [
 				{
 					span: { by: "units", startUnit: 0, endUnit: 15 },
@@ -37,10 +35,8 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: "Parts",
 			unitsTotal: 35,
 			extent: null,
-			grid: { show: false, strokeWidth: null },
+			grid: { show: false },
 			roundedCaps: null,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 1.5,
 			fills: [
 				{
 					span: { by: "units", startUnit: 0, endUnit: 15 },
@@ -79,10 +75,8 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: "Value",
 			unitsTotal: 10,
 			extent: null,
-			grid: { show: true, strokeWidth: 1 },
+			grid: { show: true },
 			roundedCaps: null,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2,
 			fills: [
 				{
 					span: { by: "units", startUnit: 0, endUnit: 7 },
@@ -112,10 +106,8 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: "Sarah's Money",
 			unitsTotal: 7,
 			extent: { by: "units", startUnit: 0, endUnit: 7 },
-			grid: { show: false, strokeWidth: null },
+			grid: { show: false },
 			roundedCaps: null,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 1.5,
 			fills: [
 				{
 					span: { by: "units", startUnit: 0, endUnit: 4 },
@@ -133,10 +125,8 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: "Tom's Money",
 			unitsTotal: 2,
 			extent: { by: "units", startUnit: 0, endUnit: 2 },
-			grid: { show: false, strokeWidth: null },
+			grid: { show: false },
 			roundedCaps: null,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 1.5,
 			fills: [
 				{
 					span: { by: "units", startUnit: 0, endUnit: 2 },
@@ -157,10 +147,8 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: "Container",
 			unitsTotal: 12,
 			extent: null,
-			grid: { show: true, strokeWidth: 1 },
+			grid: { show: true },
 			roundedCaps: true,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2,
 			fills: [
 				{
 					span: { by: "units", startUnit: 0, endUnit: 8 },
@@ -195,10 +183,8 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: null,
 			unitsTotal: 10,
 			extent: null,
-			grid: { show: true, strokeWidth: 1 },
+			grid: { show: true },
 			roundedCaps: true,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2,
 			fills: [
 				{
 					span: { by: "units", startUnit: 0, endUnit: 7 },
@@ -223,10 +209,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 		width: 320,
 		height: 300,
 		topTape: {
-			grid: {
-				show: true,
-				strokeWidth: 2
-			},
+			grid: { show: true },
 			fills: [
 				{
 					span: {
@@ -246,8 +229,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			extent: null,
 			unitsTotal: 4,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		brackets: [
 			{
@@ -274,10 +255,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 		width: 320,
 		height: 300,
 		topTape: {
-			grid: {
-				show: true,
-				strokeWidth: 2
-			},
+			grid: { show: true },
 			fills: [
 				{
 					span: {
@@ -297,8 +275,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			extent: null,
 			unitsTotal: 6,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		brackets: [
 			{
@@ -325,10 +301,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 		width: 320,
 		height: 300,
 		topTape: {
-			grid: {
-				show: true,
-				strokeWidth: 1
-			},
+			grid: { show: true },
 			fills: [
 				{
 					span: {
@@ -348,8 +321,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			extent: null,
 			unitsTotal: 5,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		brackets: [
 			{
@@ -376,10 +347,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 		width: 320,
 		height: 300,
 		topTape: {
-			grid: {
-				show: true,
-				strokeWidth: 2
-			},
+			grid: { show: true },
 			fills: [
 				{
 					span: {
@@ -399,8 +367,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			extent: null,
 			unitsTotal: 5,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		brackets: [
 			{
@@ -427,10 +393,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 		width: 320,
 		height: 300,
 		topTape: {
-			grid: {
-				show: true,
-				strokeWidth: 1
-			},
+			grid: { show: true },
 			fills: [
 				{
 					span: {
@@ -450,8 +413,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			extent: null,
 			unitsTotal: 11,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 1.5
 		},
 		brackets: [
 			{
@@ -478,10 +439,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 		width: 320,
 		height: 300,
 		topTape: {
-			grid: {
-				show: true,
-				strokeWidth: 1
-			},
+			grid: { show: true },
 			fills: [
 				{
 					span: {
@@ -501,8 +459,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			extent: null,
 			unitsTotal: 10,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 1.5
 		},
 		brackets: [
 			{
@@ -544,10 +500,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 		width: 320,
 		height: 300,
 		topTape: {
-			grid: {
-				show: true,
-				strokeWidth: 2
-			},
+			grid: { show: true },
 			fills: [
 				{
 					span: {
@@ -567,8 +520,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			extent: null,
 			unitsTotal: 6,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		brackets: [
 			{
@@ -595,10 +546,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 		width: 320,
 		height: 300,
 		topTape: {
-			grid: {
-				show: true,
-				strokeWidth: 2
-			},
+			grid: { show: true },
 			fills: [
 				{
 					span: {
@@ -618,8 +566,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			extent: null,
 			unitsTotal: 10,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		brackets: [
 			{
@@ -646,10 +592,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 		width: 320,
 		height: 300,
 		topTape: {
-			grid: {
-				show: true,
-				strokeWidth: 1
-			},
+			grid: { show: true },
 			fills: [
 				{
 					span: {
@@ -669,8 +612,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			extent: null,
 			unitsTotal: 10,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 1.5
 		},
 		brackets: [
 			{
@@ -697,10 +638,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 		width: 320,
 		height: 300,
 		topTape: {
-			grid: {
-				show: true,
-				strokeWidth: 2
-			},
+			grid: { show: true },
 			fills: [
 				{
 					span: {
@@ -720,8 +658,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			extent: null,
 			unitsTotal: 7,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		brackets: [
 			{
@@ -748,10 +684,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 		width: 320,
 		height: 300,
 		topTape: {
-			grid: {
-				show: true,
-				strokeWidth: 1
-			},
+			grid: { show: true },
 			fills: [],
 			label: null,
 			extent: {
@@ -761,8 +694,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			},
 			unitsTotal: 7,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 1.5
 		},
 		brackets: [
 			{
@@ -797,10 +728,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			}
 		],
 		bottomTape: {
-			grid: {
-				show: true,
-				strokeWidth: 1
-			},
+			grid: { show: true },
 			fills: [],
 			label: null,
 			extent: {
@@ -810,8 +738,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			},
 			unitsTotal: 5,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 1.5
 		},
 		referenceUnitsTotal: 7
 	},
@@ -820,10 +746,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 		width: 320,
 		height: 300,
 		topTape: {
-			grid: {
-				show: true,
-				strokeWidth: 1
-			},
+			grid: { show: true },
 			fills: [],
 			label: "Winning spaces",
 			extent: {
@@ -833,8 +756,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			},
 			unitsTotal: 5,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 1.5
 		},
 		brackets: [
 			{
@@ -869,17 +790,12 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			}
 		],
 		bottomTape: {
-			grid: {
-				show: true,
-				strokeWidth: 1
-			},
+			grid: { show: true },
 			fills: [],
 			label: "Non-winning spaces",
 			extent: null,
 			unitsTotal: 6,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 1.5
 		},
 		referenceUnitsTotal: 6
 	},
@@ -888,10 +804,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 		width: 320,
 		height: 300,
 		topTape: {
-			grid: {
-				show: true,
-				strokeWidth: 1
-			},
+			grid: { show: true },
 			fills: [
 				{
 					span: {
@@ -915,8 +828,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			},
 			unitsTotal: 4,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		brackets: [
 			{
@@ -951,10 +862,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			}
 		],
 		bottomTape: {
-			grid: {
-				show: true,
-				strokeWidth: 1
-			},
+			grid: { show: true },
 			fills: [
 				{
 					span: {
@@ -978,8 +886,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			},
 			unitsTotal: 1,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		referenceUnitsTotal: 5
 	},
@@ -988,10 +894,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 		width: 320,
 		height: 300,
 		topTape: {
-			grid: {
-				show: true,
-				strokeWidth: 2
-			},
+			grid: { show: true },
 			fills: [
 				{
 					span: {
@@ -1015,8 +918,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			},
 			unitsTotal: 4,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		brackets: [
 			{
@@ -1051,10 +952,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			}
 		],
 		bottomTape: {
-			grid: {
-				show: true,
-				strokeWidth: 2
-			},
+			grid: { show: true },
 			fills: [
 				{
 					span: {
@@ -1078,8 +976,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			},
 			unitsTotal: 5,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		referenceUnitsTotal: 5
 	},
@@ -1088,10 +984,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 		width: 320,
 		height: 300,
 		topTape: {
-			grid: {
-				show: true,
-				strokeWidth: 2
-			},
+			grid: { show: true },
 			fills: [
 				{
 					span: {
@@ -1115,8 +1008,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			},
 			unitsTotal: 3,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 1.5
 		},
 		brackets: [
 			{
@@ -1151,10 +1042,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			}
 		],
 		bottomTape: {
-			grid: {
-				show: true,
-				strokeWidth: 2
-			},
+			grid: { show: true },
 			fills: [
 				{
 					span: {
@@ -1178,8 +1066,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			},
 			unitsTotal: 5,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 1.5
 		},
 		referenceUnitsTotal: null
 	},
@@ -1188,10 +1074,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 		width: 320,
 		height: 300,
 		topTape: {
-			grid: {
-				show: true,
-				strokeWidth: 2
-			},
+			grid: { show: true },
 			fills: [
 				{
 					span: {
@@ -1215,8 +1098,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			},
 			unitsTotal: 3,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		brackets: [
 			{
@@ -1251,10 +1132,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			}
 		],
 		bottomTape: {
-			grid: {
-				show: true,
-				strokeWidth: 2
-			},
+			grid: { show: true },
 			fills: [
 				{
 					span: {
@@ -1278,8 +1156,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			},
 			unitsTotal: 1,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		referenceUnitsTotal: 3
 	},
@@ -1288,10 +1164,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 		width: 320,
 		height: 300,
 		topTape: {
-			grid: {
-				show: true,
-				strokeWidth: 1
-			},
+			grid: { show: true },
 			fills: [
 				{
 					span: {
@@ -1315,8 +1188,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			},
 			unitsTotal: 6,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 1.5
 		},
 		brackets: [
 			{
@@ -1351,10 +1222,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			}
 		],
 		bottomTape: {
-			grid: {
-				show: true,
-				strokeWidth: 1
-			},
+			grid: { show: true },
 			fills: [
 				{
 					span: {
@@ -1378,8 +1246,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			},
 			unitsTotal: 1,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 1.5
 		},
 		referenceUnitsTotal: 6
 	},
@@ -1388,17 +1254,12 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 		width: 300,
 		height: 300,
 		topTape: {
-			grid: {
-				show: true,
-				strokeWidth: 1
-			},
+			grid: { show: true },
 			fills: [],
 			label: null,
 			extent: null,
 			unitsTotal: 3,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 1.5
 		},
 		brackets: [
 			{
@@ -1433,17 +1294,12 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			}
 		],
 		bottomTape: {
-			grid: {
-				show: true,
-				strokeWidth: 1
-			},
+			grid: { show: true },
 			fills: [],
 			label: null,
 			extent: null,
 			unitsTotal: 7,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 1.5
 		},
 		referenceUnitsTotal: null
 	},
@@ -1452,10 +1308,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 		width: 320,
 		height: 300,
 		topTape: {
-			grid: {
-				show: true,
-				strokeWidth: 2
-			},
+			grid: { show: true },
 			fills: [
 				{
 					span: {
@@ -1479,8 +1332,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			},
 			unitsTotal: 3,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		brackets: [
 			{
@@ -1515,10 +1366,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			}
 		],
 		bottomTape: {
-			grid: {
-				show: true,
-				strokeWidth: 2
-			},
+			grid: { show: true },
 			fills: [
 				{
 					span: {
@@ -1542,8 +1390,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			},
 			unitsTotal: 2,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		referenceUnitsTotal: 3
 	},
@@ -1552,10 +1398,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 		width: 320,
 		height: 300,
 		topTape: {
-			grid: {
-				show: true,
-				strokeWidth: 2
-			},
+			grid: { show: true },
 			fills: [],
 			label: '"',
 			extent: {
@@ -1565,8 +1408,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			},
 			unitsTotal: 5,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		brackets: [
 			{
@@ -1601,10 +1442,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			}
 		],
 		bottomTape: {
-			grid: {
-				show: true,
-				strokeWidth: 2
-			},
+			grid: { show: true },
 			fills: [],
 			label: '"',
 			extent: {
@@ -1614,8 +1452,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			},
 			unitsTotal: 3,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		referenceUnitsTotal: 5
 	},
@@ -1624,10 +1460,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 		width: 320,
 		height: 300,
 		topTape: {
-			grid: {
-				show: true,
-				strokeWidth: 1
-			},
+			grid: { show: true },
 			fills: [],
 			label: null,
 			extent: {
@@ -1637,8 +1470,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			},
 			unitsTotal: 3,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 1.5
 		},
 		brackets: [
 			{
@@ -1673,17 +1504,12 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			}
 		],
 		bottomTape: {
-			grid: {
-				show: true,
-				strokeWidth: 1
-			},
+			grid: { show: true },
 			fills: [],
 			label: null,
 			extent: null,
 			unitsTotal: 5,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 1.5
 		},
 		referenceUnitsTotal: 5
 	},
@@ -1692,10 +1518,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 		width: 320,
 		height: 300,
 		topTape: {
-			grid: {
-				show: true,
-				strokeWidth: 2
-			},
+			grid: { show: true },
 			fills: [
 				{
 					span: {
@@ -1715,8 +1538,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			extent: null,
 			unitsTotal: 5,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		brackets: [
 			{
@@ -1751,10 +1572,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			}
 		],
 		bottomTape: {
-			grid: {
-				show: true,
-				strokeWidth: 2
-			},
+			grid: { show: true },
 			fills: [
 				{
 					span: {
@@ -1778,8 +1596,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			},
 			unitsTotal: 5,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		referenceUnitsTotal: null
 	},
@@ -1788,10 +1604,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 		width: 320,
 		height: 300,
 		topTape: {
-			grid: {
-				show: true,
-				strokeWidth: 1
-			},
+			grid: { show: true },
 			fills: [
 				{
 					span: {
@@ -1815,8 +1628,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			},
 			unitsTotal: 4,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 1.5
 		},
 		brackets: [
 			{
@@ -1851,10 +1662,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			}
 		],
 		bottomTape: {
-			grid: {
-				show: true,
-				strokeWidth: 1
-			},
+			grid: { show: true },
 			fills: [
 				{
 					span: {
@@ -1878,8 +1686,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			},
 			unitsTotal: 3,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 1.5
 		},
 		referenceUnitsTotal: 4
 	},
@@ -1888,10 +1694,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 		width: 320,
 		height: 300,
 		topTape: {
-			grid: {
-				show: true,
-				strokeWidth: 2
-			},
+			grid: { show: true },
 			fills: [
 				{
 					span: {
@@ -1915,8 +1718,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			},
 			unitsTotal: 3,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		brackets: [
 			{
@@ -1951,10 +1752,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			}
 		],
 		bottomTape: {
-			grid: {
-				show: true,
-				strokeWidth: 2
-			},
+			grid: { show: true },
 			fills: [
 				{
 					span: {
@@ -1978,8 +1776,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			},
 			unitsTotal: 2,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		referenceUnitsTotal: 3
 	},
@@ -1988,10 +1784,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 		width: 320,
 		height: 300,
 		topTape: {
-			grid: {
-				show: true,
-				strokeWidth: null
-			},
+			grid: { show: true },
 			fills: [],
 			label: " ",
 			extent: {
@@ -2001,8 +1794,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			},
 			unitsTotal: 2,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 1.5
 		},
 		brackets: [
 			{
@@ -2037,10 +1828,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			}
 		],
 		bottomTape: {
-			grid: {
-				show: true,
-				strokeWidth: null
-			},
+			grid: { show: true },
 			fills: [],
 			label: " ",
 			extent: {
@@ -2050,8 +1838,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			},
 			unitsTotal: 2,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 1.5
 		},
 		referenceUnitsTotal: 2
 	},
@@ -2060,10 +1846,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 		width: 300,
 		height: 300,
 		topTape: {
-			grid: {
-				show: true,
-				strokeWidth: 1
-			},
+			grid: { show: true },
 			fills: [
 				{
 					span: {
@@ -2087,8 +1870,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			},
 			unitsTotal: 4,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 1.5
 		},
 		brackets: [
 			{
@@ -2123,10 +1904,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			}
 		],
 		bottomTape: {
-			grid: {
-				show: true,
-				strokeWidth: 1
-			},
+			grid: { show: true },
 			fills: [
 				{
 					span: {
@@ -2150,8 +1928,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			},
 			unitsTotal: 6,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 1.5
 		},
 		referenceUnitsTotal: 6
 	},
@@ -2160,10 +1936,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 		width: 500,
 		height: 300,
 		topTape: {
-			grid: {
-				show: true,
-				strokeWidth: 2
-			},
+			grid: { show: true },
 			fills: [
 				{
 					span: {
@@ -2187,8 +1960,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			},
 			unitsTotal: 4,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		brackets: [
 			{
@@ -2223,10 +1994,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			}
 		],
 		bottomTape: {
-			grid: {
-				show: true,
-				strokeWidth: 2
-			},
+			grid: { show: true },
 			fills: [
 				{
 					span: {
@@ -2246,8 +2014,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			extent: null,
 			unitsTotal: 12,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		referenceUnitsTotal: 12
 	},
@@ -2256,10 +2022,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 		width: 300,
 		height: 300,
 		topTape: {
-			grid: {
-				show: true,
-				strokeWidth: 2
-			},
+			grid: { show: true },
 			fills: [
 				{
 					span: {
@@ -2279,8 +2042,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			extent: null,
 			unitsTotal: 10,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		brackets: [
 			{
@@ -2315,10 +2076,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			}
 		],
 		bottomTape: {
-			grid: {
-				show: true,
-				strokeWidth: 2
-			},
+			grid: { show: true },
 			fills: [
 				{
 					span: {
@@ -2342,8 +2100,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			},
 			unitsTotal: 6,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		referenceUnitsTotal: 10
 	},
@@ -2352,10 +2108,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 		width: 320,
 		height: 300,
 		topTape: {
-			grid: {
-				show: true,
-				strokeWidth: 2
-			},
+			grid: { show: true },
 			fills: [
 				{
 					span: {
@@ -2379,8 +2132,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			},
 			unitsTotal: 8,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		brackets: [
 			{
@@ -2415,10 +2166,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			}
 		],
 		bottomTape: {
-			grid: {
-				show: true,
-				strokeWidth: 2
-			},
+			grid: { show: true },
 			fills: [
 				{
 					span: {
@@ -2442,8 +2190,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			},
 			unitsTotal: 6,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		referenceUnitsTotal: 8
 	},
@@ -2452,10 +2198,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 		width: 300,
 		height: 300,
 		topTape: {
-			grid: {
-				show: true,
-				strokeWidth: 2
-			},
+			grid: { show: true },
 			fills: [
 				{
 					span: {
@@ -2479,8 +2222,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			},
 			unitsTotal: 6,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		brackets: [
 			{
@@ -2515,10 +2256,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			}
 		],
 		bottomTape: {
-			grid: {
-				show: true,
-				strokeWidth: 2
-			},
+			grid: { show: true },
 			fills: [
 				{
 					span: {
@@ -2542,8 +2280,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			},
 			unitsTotal: 9,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		referenceUnitsTotal: 9
 	},
@@ -2552,10 +2288,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 		width: 300,
 		height: 300,
 		topTape: {
-			grid: {
-				show: true,
-				strokeWidth: 2
-			},
+			grid: { show: true },
 			fills: [
 				{
 					span: {
@@ -2579,8 +2312,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			},
 			unitsTotal: 3,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		brackets: [
 			{
@@ -2615,10 +2346,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			}
 		],
 		bottomTape: {
-			grid: {
-				show: true,
-				strokeWidth: 2
-			},
+			grid: { show: true },
 			fills: [
 				{
 					span: {
@@ -2642,8 +2370,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			},
 			unitsTotal: 9,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		referenceUnitsTotal: 9
 	},
@@ -2652,10 +2378,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 		width: 320,
 		height: 300,
 		topTape: {
-			grid: {
-				show: false,
-				strokeWidth: null
-			},
+			grid: { show: false },
 			fills: [
 				{
 					span: {
@@ -2678,15 +2401,10 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			extent: null,
 			unitsTotal: 19,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		brackets: [],
 		bottomTape: {
-			grid: {
-				show: false,
-				strokeWidth: null
-			},
+			grid: { show: false },
 			fills: [
 				{
 					span: {
@@ -2725,8 +2443,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			extent: null,
 			unitsTotal: 19,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		referenceUnitsTotal: null
 	},
@@ -2735,10 +2451,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 		width: 320,
 		height: 300,
 		topTape: {
-			grid: {
-				show: false,
-				strokeWidth: null
-			},
+			grid: { show: false },
 			fills: [
 				{
 					span: {
@@ -2777,15 +2490,10 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			extent: null,
 			unitsTotal: 100,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		brackets: [],
 		bottomTape: {
-			grid: {
-				show: false,
-				strokeWidth: null
-			},
+			grid: { show: false },
 			fills: [
 				{
 					span: {
@@ -2808,8 +2516,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			extent: null,
 			unitsTotal: 100,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		referenceUnitsTotal: null
 	},
@@ -2818,10 +2524,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 		width: 320,
 		height: 300,
 		topTape: {
-			grid: {
-				show: false,
-				strokeWidth: null
-			},
+			grid: { show: false },
 			fills: [
 				{
 					span: {
@@ -2860,15 +2563,10 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			extent: null,
 			unitsTotal: 12,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		brackets: [],
 		bottomTape: {
-			grid: {
-				show: false,
-				strokeWidth: null
-			},
+			grid: { show: false },
 			fills: [
 				{
 					span: {
@@ -2891,8 +2589,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			extent: null,
 			unitsTotal: 12,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		referenceUnitsTotal: 12
 	},
@@ -2901,10 +2597,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 		width: 320,
 		height: 300,
 		topTape: {
-			grid: {
-				show: false,
-				strokeWidth: null
-			},
+			grid: { show: false },
 			fills: [
 				{
 					span: {
@@ -2943,15 +2636,10 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			extent: null,
 			unitsTotal: 42,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		brackets: [],
 		bottomTape: {
-			grid: {
-				show: false,
-				strokeWidth: null
-			},
+			grid: { show: false },
 			fills: [
 				{
 					span: {
@@ -2974,8 +2662,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			extent: null,
 			unitsTotal: 42,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		referenceUnitsTotal: null
 	},
@@ -2984,10 +2670,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 		width: 320,
 		height: 300,
 		topTape: {
-			grid: {
-				show: true,
-				strokeWidth: 1
-			},
+			grid: { show: true },
 			fills: [
 				{
 					span: {
@@ -3010,15 +2693,10 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			extent: null,
 			unitsTotal: 17,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		brackets: [],
 		bottomTape: {
-			grid: {
-				show: true,
-				strokeWidth: 1
-			},
+			grid: { show: true },
 			fills: [
 				{
 					span: {
@@ -3057,8 +2735,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			extent: null,
 			unitsTotal: 17,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		referenceUnitsTotal: null
 	},
@@ -3067,10 +2743,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 		width: 320,
 		height: 300,
 		topTape: {
-			grid: {
-				show: true,
-				strokeWidth: 2
-			},
+			grid: { show: true },
 			fills: [
 				{
 					span: {
@@ -3129,15 +2802,10 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			},
 			unitsTotal: 3,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		brackets: [],
 		bottomTape: {
-			grid: {
-				show: false,
-				strokeWidth: null
-			},
+			grid: { show: false },
 			fills: [
 				{
 					span: {
@@ -3164,8 +2832,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			},
 			unitsTotal: 1,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		referenceUnitsTotal: 3
 	},
@@ -3174,17 +2840,12 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 		width: 320,
 		height: 300,
 		topTape: {
-			grid: {
-				show: false,
-				strokeWidth: null
-			},
+			grid: { show: false },
 			fills: [],
 			label: " ",
 			extent: null,
 			unitsTotal: 25,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		brackets: [
 			{
@@ -3204,10 +2865,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			}
 		],
 		bottomTape: {
-			grid: {
-				show: false,
-				strokeWidth: null
-			},
+			grid: { show: false },
 			fills: [
 				{
 					span: {
@@ -3246,8 +2904,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			extent: null,
 			unitsTotal: 25,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		referenceUnitsTotal: null
 	},
@@ -3256,17 +2912,12 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 		width: 320,
 		height: 300,
 		topTape: {
-			grid: {
-				show: false,
-				strokeWidth: 1.5
-			},
+			grid: { show: false },
 			fills: [],
 			label: " ",
 			extent: null,
 			unitsTotal: 5,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		brackets: [
 			{
@@ -3286,10 +2937,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			}
 		],
 		bottomTape: {
-			grid: {
-				show: true,
-				strokeWidth: 2
-			},
+			grid: { show: true },
 			fills: [
 				{
 					span: {
@@ -3376,8 +3024,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			extent: null,
 			unitsTotal: 5,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		referenceUnitsTotal: null
 	},
@@ -3386,10 +3032,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 		width: 320,
 		height: 300,
 		topTape: {
-			grid: {
-				show: true,
-				strokeWidth: 2
-			},
+			grid: { show: true },
 			fills: [
 				{
 					span: {
@@ -3492,15 +3135,10 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			extent: null,
 			unitsTotal: 6,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		brackets: [],
 		bottomTape: {
-			grid: {
-				show: false,
-				strokeWidth: null
-			},
+			grid: { show: false },
 			fills: [
 				{
 					span: {
@@ -3523,8 +3161,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			extent: null,
 			unitsTotal: 1,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		referenceUnitsTotal: null
 	},
@@ -3533,10 +3169,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 		width: 320,
 		height: 300,
 		topTape: {
-			grid: {
-				show: false,
-				strokeWidth: null
-			},
+			grid: { show: false },
 			fills: [
 				{
 					span: {
@@ -3559,15 +3192,10 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			extent: null,
 			unitsTotal: 8,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		brackets: [],
 		bottomTape: {
-			grid: {
-				show: true,
-				strokeWidth: 2
-			},
+			grid: { show: true },
 			fills: [
 				{
 					span: {
@@ -3702,8 +3330,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			extent: null,
 			unitsTotal: 8,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		referenceUnitsTotal: null
 	},
@@ -3712,10 +3338,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 		width: 320,
 		height: 300,
 		topTape: {
-			grid: {
-				show: true,
-				strokeWidth: 2
-			},
+			grid: { show: true },
 			fills: [
 				{
 					span: {
@@ -3786,15 +3409,10 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			extent: null,
 			unitsTotal: 4,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		brackets: [],
 		bottomTape: {
-			grid: {
-				show: false,
-				strokeWidth: null
-			},
+			grid: { show: false },
 			fills: [
 				{
 					span: {
@@ -3817,8 +3435,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			extent: null,
 			unitsTotal: 1,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		referenceUnitsTotal: null
 	},
@@ -3827,17 +3443,12 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 		width: 320,
 		height: 300,
 		topTape: {
-			grid: {
-				show: false,
-				strokeWidth: 2
-			},
+			grid: { show: false },
 			fills: [],
 			label: " ",
 			extent: null,
 			unitsTotal: 7,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		brackets: [
 			{
@@ -3857,10 +3468,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			}
 		],
 		bottomTape: {
-			grid: {
-				show: true,
-				strokeWidth: 2
-			},
+			grid: { show: true },
 			fills: [
 				{
 					span: {
@@ -3979,8 +3587,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			extent: null,
 			unitsTotal: 7,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		referenceUnitsTotal: null
 	},
@@ -3989,10 +3595,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 		width: 320,
 		height: 300,
 		topTape: {
-			grid: {
-				show: false,
-				strokeWidth: null
-			},
+			grid: { show: false },
 			fills: [
 				{
 					span: {
@@ -4015,15 +3618,10 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			extent: null,
 			unitsTotal: 16,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		brackets: [],
 		bottomTape: {
-			grid: {
-				show: true,
-				strokeWidth: 2
-			},
+			grid: { show: true },
 			fills: [
 				{
 					span: {
@@ -4094,8 +3692,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			extent: null,
 			unitsTotal: 4,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		referenceUnitsTotal: null
 	},
@@ -4104,10 +3700,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 		width: 480,
 		height: 300,
 		topTape: {
-			grid: {
-				show: true,
-				strokeWidth: 2
-			},
+			grid: { show: true },
 			fills: [
 				{
 					span: {
@@ -4146,15 +3739,10 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			extent: null,
 			unitsTotal: 2,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		brackets: [],
 		bottomTape: {
-			grid: {
-				show: false,
-				strokeWidth: 2
-			},
+			grid: { show: false },
 			fills: [
 				{
 					span: {
@@ -4177,8 +3765,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			extent: null,
 			unitsTotal: 2,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		referenceUnitsTotal: 2
 	},
@@ -4187,10 +3773,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 		width: 320,
 		height: 300,
 		topTape: {
-			grid: {
-				show: false,
-				strokeWidth: null
-			},
+			grid: { show: false },
 			fills: [
 				{
 					span: {
@@ -4229,15 +3812,10 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			extent: null,
 			unitsTotal: 10,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 1.5
 		},
 		brackets: [],
 		bottomTape: {
-			grid: {
-				show: false,
-				strokeWidth: null
-			},
+			grid: { show: false },
 			fills: [
 				{
 					span: {
@@ -4260,8 +3838,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			extent: null,
 			unitsTotal: 10,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 1.5
 		},
 		referenceUnitsTotal: null
 	},
@@ -4270,10 +3846,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 		width: 320,
 		height: 300,
 		topTape: {
-			grid: {
-				show: false,
-				strokeWidth: null
-			},
+			grid: { show: false },
 			fills: [
 				{
 					span: {
@@ -4296,15 +3869,10 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			extent: null,
 			unitsTotal: 10,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 1.5
 		},
 		brackets: [],
 		bottomTape: {
-			grid: {
-				show: false,
-				strokeWidth: null
-			},
+			grid: { show: false },
 			fills: [
 				{
 					span: {
@@ -4343,8 +3911,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			extent: null,
 			unitsTotal: 10,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 1.5
 		},
 		referenceUnitsTotal: null
 	},
@@ -4353,10 +3919,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 		width: 320,
 		height: 300,
 		topTape: {
-			grid: {
-				show: false,
-				strokeWidth: null
-			},
+			grid: { show: false },
 			fills: [
 				{
 					span: {
@@ -4395,15 +3958,10 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			extent: null,
 			unitsTotal: 100,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 1.5
 		},
 		brackets: [],
 		bottomTape: {
-			grid: {
-				show: false,
-				strokeWidth: null
-			},
+			grid: { show: false },
 			fills: [
 				{
 					span: {
@@ -4426,8 +3984,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			extent: null,
 			unitsTotal: 100,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 1.5
 		},
 		referenceUnitsTotal: null
 	},
@@ -4436,10 +3992,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 		width: 320,
 		height: 300,
 		topTape: {
-			grid: {
-				show: false,
-				strokeWidth: null
-			},
+			grid: { show: false },
 			fills: [
 				{
 					span: {
@@ -4462,15 +4015,10 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			extent: null,
 			unitsTotal: 1,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		brackets: [],
 		bottomTape: {
-			grid: {
-				show: true,
-				strokeWidth: null
-			},
+			grid: { show: true },
 			fills: [
 				{
 					span: {
@@ -4509,8 +4057,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			extent: null,
 			unitsTotal: 2,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		referenceUnitsTotal: null
 	},
@@ -4519,10 +4065,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 		width: 320,
 		height: 300,
 		topTape: {
-			grid: {
-				show: false,
-				strokeWidth: null
-			},
+			grid: { show: false },
 			fills: [
 				{
 					span: {
@@ -4561,15 +4104,10 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			extent: null,
 			unitsTotal: 17,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 1.5
 		},
 		brackets: [],
 		bottomTape: {
-			grid: {
-				show: false,
-				strokeWidth: null
-			},
+			grid: { show: false },
 			fills: [
 				{
 					span: {
@@ -4592,8 +4130,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			extent: null,
 			unitsTotal: 17,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 1.5
 		},
 		referenceUnitsTotal: 17
 	},
@@ -4602,10 +4138,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 		width: 320,
 		height: 300,
 		topTape: {
-			grid: {
-				show: true,
-				strokeWidth: 2
-			},
+			grid: { show: true },
 			fills: [
 				{
 					span: {
@@ -4708,15 +4241,10 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			extent: null,
 			unitsTotal: 6,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		brackets: [],
 		bottomTape: {
-			grid: {
-				show: false,
-				strokeWidth: null
-			},
+			grid: { show: false },
 			fills: [
 				{
 					span: {
@@ -4739,8 +4267,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			extent: null,
 			unitsTotal: 1,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		referenceUnitsTotal: null
 	},
@@ -4749,10 +4275,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 		width: 320,
 		height: 300,
 		topTape: {
-			grid: {
-				show: true,
-				strokeWidth: 2
-			},
+			grid: { show: true },
 			fills: [
 				{
 					span: {
@@ -4855,15 +4378,10 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			extent: null,
 			unitsTotal: 6,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		brackets: [],
 		bottomTape: {
-			grid: {
-				show: false,
-				strokeWidth: null
-			},
+			grid: { show: false },
 			fills: [
 				{
 					span: {
@@ -4886,8 +4404,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			extent: null,
 			unitsTotal: 1,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		referenceUnitsTotal: null
 	},
@@ -4896,10 +4412,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 		width: 320,
 		height: 300,
 		topTape: {
-			grid: {
-				show: false,
-				strokeWidth: null
-			},
+			grid: { show: false },
 			fills: [
 				{
 					span: {
@@ -4922,15 +4435,10 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			extent: null,
 			unitsTotal: 1,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		brackets: [],
 		bottomTape: {
-			grid: {
-				show: true,
-				strokeWidth: 2
-			},
+			grid: { show: true },
 			fills: [
 				{
 					span: {
@@ -5017,8 +4525,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			extent: null,
 			unitsTotal: 5,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 2
 		},
 		referenceUnitsTotal: null
 	},
@@ -5027,10 +4533,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 		width: 480,
 		height: 300,
 		topTape: {
-			grid: {
-				show: false,
-				strokeWidth: null
-			},
+			grid: { show: false },
 			fills: [
 				{
 					span: {
@@ -5069,15 +4572,10 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			extent: null,
 			unitsTotal: 10,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 1.5
 		},
 		brackets: [],
 		bottomTape: {
-			grid: {
-				show: false,
-				strokeWidth: null
-			},
+			grid: { show: false },
 			fills: [
 				{
 					span: {
@@ -5100,8 +4598,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			extent: null,
 			unitsTotal: 10,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 1.5
 		},
 		referenceUnitsTotal: null
 	},
@@ -5110,10 +4606,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 		width: 320,
 		height: 300,
 		topTape: {
-			grid: {
-				show: true,
-				strokeWidth: 1
-			},
+			grid: { show: true },
 			fills: [
 				{
 					span: {
@@ -5140,15 +4633,10 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			},
 			unitsTotal: 11,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 1.5
 		},
 		brackets: [],
 		bottomTape: {
-			grid: {
-				show: true,
-				strokeWidth: 1
-			},
+			grid: { show: true },
 			fills: [
 				{
 					span: {
@@ -5193,8 +4681,6 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			},
 			unitsTotal: 11,
 			roundedCaps: false,
-			defaultStroke: "#000000",
-			defaultStrokeWidth: 1.5
 		},
 		referenceUnitsTotal: 11
 	}

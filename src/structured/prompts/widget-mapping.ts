@@ -330,7 +330,9 @@ ${buildWidgetTypeDescriptions()}
 Your response must be a JSON object with a single key "widget_mapping", mapping every slot name from the list below to its type. If no suitable type is found, you MUST use the string "WIDGET_NOT_FOUND". However, for FBD slots (names starting with \`fbd_\`), you MUST map to \`freeBodyDiagram\` and MUST NOT use \`WIDGET_NOT_FOUND\`.
 
 Slot Names to Map:
-${slotNames.join("\n")}`
+${slotNames.join("\n")}
+
+Note: These slot names may come from the assessment body or feedbackBlocks. Map all provided slots regardless of where they will be used.`
 
 	const WidgetMappingSchema = createWidgetMappingSchema(slotNames, collection.widgetTypeKeys)
 	// Resource mapping guidance (collection-aware): When Perseus includes reference resources

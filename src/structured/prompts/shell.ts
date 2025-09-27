@@ -121,6 +121,440 @@ The shell should:
 3. Faithfully translate all mathematical content from LaTeX to MathML within the structured content.
 4. NEVER generate <img> or <svg> tags in the body - all visual elements must be widget slots.
 
+**⚠️ CRITICAL: MATH-ONLY IMAGES (SVG) ARE NOT WIDGETS ⚠️**
+If an <img> or inline SVG depicts ONLY mathematical notation (e.g., equations, expanded notation, numeric expressions) with no interactive UI or non-math diagrammatic content, do NOT create a widget slot. Convert the math to inline MathML within paragraph content instead.
+
+Negative example (DO NOT OUTPUT) — incorrectly turning a math SVG into a widget:
+\`\`\`json
+{
+  "body": [
+    { "type": "paragraph", "content": [
+      { "type": "text", "content": "The expanded notation of a number is shown." }
+    ] },
+    { "type": "blockSlot", "slotId": "math_image" }
+  ],
+  "widgets": ["math_image"],
+  "interactions": []
+}
+\`\`\`
+Why this is wrong:
+- The image contains only mathematical symbols/text; it is not a diagram widget or UI.
+- Treating math-only SVGs as widgets harms accessibility and prevents proper MathML processing.
+
+Positive example — correctly representing the same math as inline MathML (inner MathML only):
+\`\`\`json
+{
+  "body": [
+    { "type": "paragraph", "content": [
+      { "type": "text", "content": "The expanded notation of a number is shown:" }
+    ] },
+    { "type": "paragraph", "content": [
+      { "type": "math", "mathml": "<mn>1</mn><mo>,</mo><mn>800</mn><mo>+</mo><mn>40</mn><mo>+</mo><mn>0.29</mn>" }
+    ] }
+  ],
+  "widgets": [],
+  "interactions": []
+}
+\`\`\`
+Guideline:
+- If the visual is purely math, extract/represent it as inline MathML items in paragraphs. Only use widget slots for non-math visuals (charts, diagrams, tables, graphs) that are not expressible as text/MathML.
+
+**CRITICAL: EQUATIONS IN CHOICES ARE NOT WIDGETS**
+If a choice option shows only an equation or expression, represent it with inline MathML inside the choice — never as a widget slot like "choice_a_equation".
+
+Negative example (DO NOT OUTPUT) — equation in choice as a widget slot:
+\`\`\`json
+{
+  "interactions": {
+    "choice_interaction": {
+      "type": "choiceInteraction",
+      "prompt": [ { "type": "text", "content": "Which equation is true?" } ],
+      "choices": [
+        { "identifier": "A", "content": [ { "type": "blockSlot", "slotId": "choice_a_equation" } ] }
+      ]
+    }
+  },
+  "widgets": ["choice_a_equation"]
+}
+\`\`\`
+Positive example — equation choice as inline MathML:
+\`\`\`json
+{
+  "interactions": {
+    "choice_interaction": {
+      "type": "choiceInteraction",
+      "prompt": [ { "type": "text", "content": "Which equation is true?" } ],
+      "choices": [
+        { "identifier": "A", "content": [ { "type": "paragraph", "content": [ { "type": "math", "mathml": "<mi>x</mi><mo>+</mo><mn>3</mn><mo>=</mo><mn>7</mn>" } ] } ] }
+      ]
+    }
+  },
+  "widgets": []
+}
+\`\`\`
+
+**⚠️ CRITICAL: HIGH-QUALITY FEEDBACK IS MANDATORY — NEVER OMIT ⚠️**
+
+Educational feedback is the MOST IMPORTANT pedagogical element in any assessment. You MUST provide comprehensive, detailed feedback for EVERY possible response. Omitting feedback is an unacceptable educational failure that abandons the learner at their moment of greatest need.
+
+**ABSOLUTE RULE: NEVER COPY SOURCE FEEDBACK VERBATIM**
+The Perseus JSON may contain hints or feedback, but you MUST NOT copy it word-for-word. Instead:
+- Extract only the mathematical facts (correct answers, key concepts)
+- COMPLETELY REWRITE all explanations with superior pedagogical structure
+- Transform basic hints into rich, multi-layered teaching moments
+- Replace terse corrections with encouraging, detailed guidance
+- If the source says "Correct! 3 × 4 = 12", you must create an entirely new explanation that teaches WHY and HOW this works
+
+**FUNDAMENTAL PRINCIPLE**: Every student interaction deserves thoughtful, constructive feedback that:
+1. **Validates or corrects** their response immediately
+2. **Explains** the reasoning behind why an answer is correct or incorrect
+3. **Teaches** the concept through the feedback itself
+4. **Guides** the student toward understanding with remedial steps
+5. **Encourages** continued learning with specific next steps
+
+**Feedback Structure Requirements**:
+Each feedback block MUST contain these four pedagogical elements:
+
+1. **Immediate Response**: Quick acknowledgment (e.g., "That's correct!" or "Not quite right")
+2. **Conceptual Explanation**: WHY the answer is correct/incorrect with mathematical reasoning
+3. **Remedial Guidance**: Step-by-step correction of misconceptions
+4. **Learning Path**: What to study or practice next
+
+Negative example (DO NOT OUTPUT) — inadequate, lazy feedback:
+\`\`\`json
+{
+  "feedbackBlocks": [
+    {
+      "identifier": "A",
+      "outcomeIdentifier": "FEEDBACK__RESPONSE",
+      "content": [
+        { "type": "paragraph", "content": [{ "type": "text", "content": "Correct!" }] }
+      ]
+    },
+    {
+      "identifier": "B",
+      "outcomeIdentifier": "FEEDBACK__RESPONSE",
+      "content": [
+        { "type": "paragraph", "content": [{ "type": "text", "content": "Incorrect." }] }
+      ]
+    }
+  ]
+}
+\`\`\`
+Why this is pedagogically harmful:
+- Provides no learning value
+- Misses teaching opportunity
+- Leaves students confused about their errors
+- Fails to reinforce correct reasoning
+
+Positive example — comprehensive, educationally valuable feedback:
+\`\`\`json
+{
+  "feedbackBlocks": [
+    {
+      "identifier": "A",
+      "outcomeIdentifier": "FEEDBACK__RESPONSE",
+      "content": [
+        { "type": "paragraph", "content": [
+          { "type": "text", "content": "Excellent work! You correctly found that " },
+          { "type": "math", "mathml": "<mn>3</mn><mo>×</mo><mn>4</mn><mo>=</mo><mn>12</mn>" },
+          { "type": "text", "content": "." }
+        ] },
+        { "type": "paragraph", "content": [
+          { "type": "text", "content": "You demonstrated deep understanding of multiplication as repeated addition. Let's explore why this works:" }
+        ] },
+        { "type": "paragraph", "content": [
+          { "type": "text", "content": "• " },
+          { "type": "math", "mathml": "<mn>3</mn><mo>×</mo><mn>4</mn>" },
+          { "type": "text", "content": " means \"" },
+          { "type": "math", "mathml": "<mn>3</mn>" },
+          { "type": "text", "content": " groups of " },
+          { "type": "math", "mathml": "<mn>4</mn>" },
+          { "type": "text", "content": "\"" }
+        ] },
+        { "type": "paragraph", "content": [
+          { "type": "text", "content": "• We can write this as: " },
+          { "type": "math", "mathml": "<mn>4</mn><mo>+</mo><mn>4</mn><mo>+</mo><mn>4</mn><mo>=</mo><mn>12</mn>" }
+        ] },
+        { "type": "paragraph", "content": [
+          { "type": "text", "content": "• Or think of it as an array: " },
+          { "type": "math", "mathml": "<mn>3</mn>" },
+          { "type": "text", "content": " rows with " },
+          { "type": "math", "mathml": "<mn>4</mn>" },
+          { "type": "text", "content": " items in each row" }
+        ] },
+        { "type": "blockSlot", "slotId": "multiplication_array_visual" },
+        { "type": "paragraph", "content": [
+          { "type": "text", "content": "This multiplication fact is essential because it appears everywhere: calculating area (" },
+          { "type": "math", "mathml": "<mn>3</mn>" },
+          { "type": "text", "content": " by " },
+          { "type": "math", "mathml": "<mn>4</mn>" },
+          { "type": "text", "content": " rectangle = " },
+          { "type": "math", "mathml": "<mn>12</mn>" },
+          { "type": "text", "content": " square units), organizing items (" },
+          { "type": "math", "mathml": "<mn>3</mn>" },
+          { "type": "text", "content": " shelves with " },
+          { "type": "math", "mathml": "<mn>4</mn>" },
+          { "type": "text", "content": " books each), and even in music (" },
+          { "type": "math", "mathml": "<mn>3</mn>" },
+          { "type": "text", "content": " measures with " },
+          { "type": "math", "mathml": "<mn>4</mn>" },
+          { "type": "text", "content": " beats each = " },
+          { "type": "math", "mathml": "<mn>12</mn>" },
+          { "type": "text", "content": " beats total)." }
+        ] },
+        { "type": "paragraph", "content": [
+          { "type": "text", "content": "Challenge: Can you think of another real-world example where " },
+          { "type": "math", "mathml": "<mn>3</mn><mo>×</mo><mn>4</mn><mo>=</mo><mn>12</mn>" },
+          { "type": "text", "content": " would be useful?" }
+        ] }
+      ]
+    },
+    {
+      "identifier": "B",
+      "outcomeIdentifier": "FEEDBACK__RESPONSE",
+      "content": [
+        { "type": "paragraph", "content": [
+          { "type": "text", "content": "I see what happened! You selected " },
+          { "type": "math", "mathml": "<mn>7</mn>" },
+          { "type": "text", "content": ", which tells me you added " },
+          { "type": "math", "mathml": "<mn>3</mn><mo>+</mo><mn>4</mn>" },
+          { "type": "text", "content": " instead of multiplying. This is a very common mix-up, and understanding the difference will really help you!" }
+        ] },
+        { "type": "paragraph", "content": [
+          { "type": "text", "content": "Let's see the difference between addition and multiplication:" }
+        ] },
+        { "type": "paragraph", "content": [
+          { "type": "text", "content": "• Addition (" },
+          { "type": "math", "mathml": "<mn>3</mn><mo>+</mo><mn>4</mn>" },
+          { "type": "text", "content": "): Start with " },
+          { "type": "math", "mathml": "<mn>3</mn>" },
+          { "type": "text", "content": ", then add " },
+          { "type": "math", "mathml": "<mn>4</mn>" },
+          { "type": "text", "content": " more → Total: " },
+          { "type": "math", "mathml": "<mn>7</mn>" }
+        ] },
+        { "type": "paragraph", "content": [
+          { "type": "text", "content": "• Multiplication (" },
+          { "type": "math", "mathml": "<mn>3</mn><mo>×</mo><mn>4</mn>" },
+          { "type": "text", "content": "): Take " },
+          { "type": "math", "mathml": "<mn>3</mn>" },
+          { "type": "text", "content": " groups of " },
+          { "type": "math", "mathml": "<mn>4</mn>" },
+          { "type": "text", "content": " → " },
+          { "type": "math", "mathml": "<mn>4</mn><mo>+</mo><mn>4</mn><mo>+</mo><mn>4</mn><mo>=</mo><mn>12</mn>" }
+        ] },
+        { "type": "paragraph", "content": [
+          { "type": "text", "content": "Here's a helpful visual to understand the difference:" }
+        ] },
+        { "type": "blockSlot", "slotId": "addition_vs_multiplication_visual" },
+        { "type": "paragraph", "content": [
+          { "type": "text", "content": "Practice tip: Try skip counting by " },
+          { "type": "math", "mathml": "<mn>4</mn>" },
+          { "type": "text", "content": "s three times: \"" },
+          { "type": "math", "mathml": "<mn>4</mn>" },
+          { "type": "text", "content": ", " },
+          { "type": "math", "mathml": "<mn>8</mn>" },
+          { "type": "text", "content": ", " },
+          { "type": "math", "mathml": "<mn>12</mn>" },
+          { "type": "text", "content": "\" - that's " },
+          { "type": "math", "mathml": "<mn>3</mn><mo>×</mo><mn>4</mn>" },
+          { "type": "text", "content": "!" }
+        ] }
+      ]
+    },
+    {
+      "identifier": "C",
+      "outcomeIdentifier": "FEEDBACK__RESPONSE",
+      "content": [
+        { "type": "paragraph", "content": [
+          { "type": "text", "content": "Interesting choice! You selected " },
+          { "type": "math", "mathml": "<mn>16</mn>" },
+          { "type": "text", "content": ", which suggests you might have multiplied " },
+          { "type": "math", "mathml": "<mn>4</mn><mo>×</mo><mn>4</mn>" },
+          { "type": "text", "content": " instead of " },
+          { "type": "math", "mathml": "<mn>3</mn><mo>×</mo><mn>4</mn>" },
+          { "type": "text", "content": ". Let's explore what happened." }
+        ] },
+        { "type": "paragraph", "content": [
+          { "type": "text", "content": "You may have seen the number " },
+          { "type": "math", "mathml": "<mn>4</mn>" },
+          { "type": "text", "content": " twice and multiplied them together. Here's how to read multiplication problems carefully:" }
+        ] },
+        { "type": "paragraph", "content": [
+          { "type": "text", "content": "• " },
+          { "type": "math", "mathml": "<mn>3</mn><mo>×</mo><mn>4</mn>" },
+          { "type": "text", "content": " means \"" },
+          { "type": "math", "mathml": "<mn>3</mn>" },
+          { "type": "text", "content": " times " },
+          { "type": "math", "mathml": "<mn>4</mn>" },
+          { "type": "text", "content": "\" or \"" },
+          { "type": "math", "mathml": "<mn>3</mn>" },
+          { "type": "text", "content": " groups of " },
+          { "type": "math", "mathml": "<mn>4</mn>" },
+          { "type": "text", "content": "\"" }
+        ] },
+        { "type": "paragraph", "content": [
+          { "type": "text", "content": "• The first number (" },
+          { "type": "math", "mathml": "<mn>3</mn>" },
+          { "type": "text", "content": ") tells us HOW MANY groups" }
+        ] },
+        { "type": "paragraph", "content": [
+          { "type": "text", "content": "• The second number (" },
+          { "type": "math", "mathml": "<mn>4</mn>" },
+          { "type": "text", "content": ") tells us HOW MANY in each group" }
+        ] },
+        { "type": "paragraph", "content": [
+          { "type": "text", "content": "Think of it like this: If you have " },
+          { "type": "math", "mathml": "<mn>3</mn>" },
+          { "type": "text", "content": " bags with " },
+          { "type": "math", "mathml": "<mn>4</mn>" },
+          { "type": "text", "content": " apples in each bag, you have " },
+          { "type": "math", "mathml": "<mn>3</mn><mo>×</mo><mn>4</mn><mo>=</mo><mn>12</mn>" },
+          { "type": "text", "content": " apples total, not " },
+          { "type": "math", "mathml": "<mn>16</mn>" },
+          { "type": "text", "content": "." }
+        ] },
+        { "type": "paragraph", "content": [
+          { "type": "text", "content": "Memory tip: Always read multiplication from left to right, just like reading a book!" }
+        ] }
+      ]
+    }
+  ]
+}
+\`\`\`
+
+**For gap match and complex interactions**, provide detailed feedback tables:
+\`\`\`json
+{
+  "feedbackBlocks": [
+    {
+      "identifier": "CORRECT",
+      "outcomeIdentifier": "FEEDBACK__GLOBAL",
+      "content": [
+        { "type": "paragraph", "content": [
+          { "type": "text", "content": "Perfect! You matched all the vocabulary words correctly. You're becoming a space vocabulary expert!" }
+        ] },
+        { "type": "paragraph", "content": [
+          { "type": "text", "content": "Your understanding of these scientific terms will help you read and understand more complex science texts. Keep up the excellent work!" }
+        ] }
+      ]
+    },
+    {
+      "identifier": "INCORRECT",
+      "outcomeIdentifier": "FEEDBACK__GLOBAL",
+      "content": [
+        { "type": "paragraph", "content": [
+          { "type": "text", "content": "Good effort! Let's explore these space vocabulary words together. Understanding these terms will unlock many exciting science concepts!" }
+        ] },
+        {
+          "type": "table",
+          "className": "feedback-table",
+          "header": ["Sentence", "Correct Word", "Deep Dive Explanation"],
+          "rows": [
+            [
+              "The ___ system includes planets orbiting the sun",
+              "solar",
+              "SOLAR comes from 'Sol,' the Latin word for sun. Just like 'lunar' relates to the moon, 'solar' relates to the sun. Our solar system is named after our sun because it's the center that holds everything together with its gravity!"
+            ],
+            [
+              "Earth follows an ___ around the sun",
+              "orbit",
+              "An ORBIT is like an invisible racetrack in space! Earth takes three hundred sixty-five days to complete one full orbit around the sun - that's why we have years. The word comes from Latin 'orbita' meaning 'wheel track.'"
+            ],
+            [
+              "The universe is ___",
+              "immense",
+              "IMMENSE means so incredibly huge that our minds can barely imagine it! The universe contains billions of galaxies, each with billions of stars. If Earth were a grain of sand, the universe would be larger than Earth itself!"
+            ]
+          ]
+        },
+        { "type": "paragraph", "content": [
+          { "type": "text", "content": "Word Detective Strategy: When matching vocabulary words, become a detective!" }
+        ] },
+        { "type": "paragraph", "content": [
+          { "type": "text", "content": "" },
+          { "type": "math", "mathml": "<mn>1</mn>" },
+          { "type": "text", "content": ". Look for root words (solar → sol → sun)" }
+        ] },
+        { "type": "paragraph", "content": [
+          { "type": "text", "content": "" },
+          { "type": "math", "mathml": "<mn>2</mn>" },
+          { "type": "text", "content": ". Find context clues (\"around the sun\" suggests circular movement → orbit)" }
+        ] },
+        { "type": "paragraph", "content": [
+          { "type": "text", "content": "" },
+          { "type": "math", "mathml": "<mn>3</mn>" },
+          { "type": "text", "content": ". Consider word intensity (immense is stronger than just \"big\")" }
+        ] },
+        { "type": "blockSlot", "slotId": "vocabulary_strategy_visual" },
+        { "type": "paragraph", "content": [
+          { "type": "text", "content": "Next Learning Adventure: Try creating your own sentences using these words. Can you write a short story about space travel using all " },
+          { "type": "math", "mathml": "<mn>3</mn>" },
+          { "type": "text", "content": " vocabulary words?" }
+        ] }
+      ]
+    }
+  ]
+}
+\`\`\`
+
+**MANDATORY FEEDBACK RULES**:
+1. NEVER provide empty or minimal feedback
+2. ALWAYS explain the mathematical or conceptual reasoning
+3. ALWAYS address the specific error or misconception
+4. ALWAYS provide actionable next steps
+5. ALWAYS maintain an encouraging, educational tone
+6. ALWAYS use proper mathematical notation in feedback explanations (ALL numbers must be in MathML)
+7. NEVER copy feedback verbatim from the source - create ORIGINAL, SUPERIOR explanations
+8. You MAY use widgets in feedback blocks to enhance understanding (but NEVER interactions)
+9. Any widget slots referenced in feedbackBlocks MUST be declared in the 'widgets' array
+
+**Creating Pedagogically Superior Feedback**:
+Transform basic source feedback into rich teaching moments:
+- If source says: "Correct! The answer is 12."
+- You create: Multi-paragraph explanation with visual representations, real-world connections, mathematical reasoning, and extension challenges
+- If source says: "Wrong. Try again."  
+- You create: Empathetic acknowledgment, specific misconception identification, step-by-step remediation, visual aids, memory tricks, and encouraging next steps
+
+**Feedback Writing Guidelines**:
+- Start with emotional validation ("Excellent thinking!" or "Let's explore this together!")
+- Use clear, grade-appropriate language
+- Include visual or conceptual aids (arrays, number lines, diagrams - use widget slots when helpful)
+- Connect to real-world applications students care about
+- Suggest specific practice problems or concepts to review
+- For correct answers, reinforce WHY the reasoning was sound and extend learning
+- For incorrect answers, celebrate the attempt, pinpoint the exact misconception, and provide multiple ways to understand
+- Use analogies, stories, and memory devices to make concepts stick
+- Break complex explanations into digestible chunks with bullet points
+- Always end with encouragement and a concrete next step
+- Remember: ALL numbers should be rendered in MathML for beautiful presentation
+
+Remember: Feedback is your PRIMARY teaching tool. Every feedback block is an opportunity to transform a simple answer check into a memorable learning experience. Your feedback should be so engaging and helpful that students actually WANT to read it, whether they got the answer right or wrong.
+
+**Example of feedback with widget slot (note how the widget is declared in the widgets array):**
+\`\`\`json
+{
+  "body": [
+    { "type": "paragraph", "content": [{ "type": "text", "content": "What is " }, { "type": "math", "mathml": "<mn>3</mn><mo>×</mo><mn>4</mn>" }, { "type": "text", "content": "?" }] },
+    { "type": "blockSlot", "slotId": "choice_interaction" }
+  ],
+  "widgets": ["multiplication_array_visual"],  // ✅ Widget used in feedback MUST be declared here
+  "interactions": ["choice_interaction"],
+  "feedbackBlocks": [
+    {
+      "identifier": "A",
+      "outcomeIdentifier": "FEEDBACK__RESPONSE",
+      "content": [
+        { "type": "paragraph", "content": [{ "type": "text", "content": "Excellent! You correctly found that " }, { "type": "math", "mathml": "<mn>3</mn><mo>×</mo><mn>4</mn><mo>=</mo><mn>12</mn>" }, { "type": "text", "content": "." }] },
+        { "type": "paragraph", "content": [{ "type": "text", "content": "Let's visualize this with an array model:" }] },
+        { "type": "blockSlot", "slotId": "multiplication_array_visual" }  // ✅ Widget slot in feedback
+      ]
+    }
+  ]
+}
+\`\`\`
+
 **Example of a structured body:**
 \`\`\`json
 "body": [
@@ -321,7 +755,15 @@ ${supportedInteractionTypes}
       "content": [
         {
           "type": "paragraph",
-          "content": [{ "type": "text", "content": "Correct! Well done." }]
+          "content": [
+            { "type": "text", "content": "Outstanding! You successfully matched all the vocabulary words to their correct sentences." }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            { "type": "text", "content": "You demonstrated excellent understanding of context clues and word meanings. This vocabulary knowledge will help you understand more complex science and literature texts!" }
+          ]
         }
       ]
     },
@@ -330,27 +772,39 @@ ${supportedInteractionTypes}
       "outcomeIdentifier": "FEEDBACK__GLOBAL",
       "content": [
         {
+          "type": "paragraph",
+          "content": [
+            { "type": "text", "content": "Let's explore these fascinating space vocabulary words together! Understanding these terms will unlock many exciting science concepts." }
+          ]
+        },
+        {
           "type": "table",
           "className": "feedback-table",
-	        "header": ["Sentence", "Word", "Explanation"],
+	        "header": ["Sentence", "Correct Word", "Deep Explanation"],
 	        "rows": [
 	          [
-	            "The scientists hoped they would be able to build a solar-powered rocket...",
+	            "The scientists hoped they would be able to build a ___-powered rocket...",
 	            "solar",
-	            "Solar means \\"having to do with the sun.\\""
+	            "SOLAR comes from 'Sol,' the Latin word for sun. Just like 'lunar' relates to the moon, 'solar' relates to the sun. Our solar system is named after our sun because it's the center that holds everything together with its gravity!"
 	          ],
 	          [
-	            "If the moon ever left its orbit around Earth...",
+	            "If the moon ever left its ___ around Earth...",
 	            "orbit",
-	            "Orbit means \\"the rounded path of one object in space around a larger object.\\""
+	            "An ORBIT is like an invisible racetrack in space! Earth takes three hundred sixty-five days to complete one full orbit around the sun - that's why we have years. The word comes from Latin 'orbita' meaning 'wheel track.'"
 	          ],
 	          [
-	            "\\"The universe is so immense,\\" said Reggie...",
+	            "The universe is so ___...",
 	            "immense",
-	            "Immense means \\"very large.\\""
+	            "IMMENSE means so incredibly huge that our minds can barely imagine it! The universe contains billions of galaxies, each with billions of stars. If Earth were a grain of sand, the universe would be larger than Earth itself!"
 	          ]
 	        ]
-	      }
+	      },
+        {
+          "type": "paragraph",
+          "content": [
+            { "type": "text", "content": "Word Detective Strategy: Look for context clues in each sentence. Words like 'sun' and 'around' help identify which vocabulary word fits best!" }
+          ]
+        }
 	    ]
 	  }
 	]
@@ -384,19 +838,113 @@ ${supportedInteractionTypes}
       "identifier": "CORRECT",
       "outcomeIdentifier": "FEEDBACK__GLOBAL", 
       "content": [
-        { "type": "paragraph", "content": [{ "type": "text", "content": "Correct! Well done." }] }
+        { 
+          "type": "paragraph", 
+          "content": [
+            { "type": "text", "content": "Excellent work! You successfully matched all the vocabulary words to their correct sentences, demonstrating strong understanding of context clues and word meanings." }
+          ] 
+        },
+        { 
+          "type": "paragraph", 
+          "content": [
+            { "type": "text", "content": "This vocabulary knowledge will help you understand more complex science and literature texts!" }
+          ] 
+        }
       ]
     },
     {
       "identifier": "INCORRECT",
       "outcomeIdentifier": "FEEDBACK__GLOBAL",
       "content": [
-        { "type": "paragraph", "content": [{ "type": "text", "content": "Correct answers appear after submission." }] }
+        { 
+          "type": "paragraph", 
+          "content": [
+            { "type": "text", "content": "Let's review the correct answers and learn about these fascinating space vocabulary words together!" }
+          ] 
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            { "type": "text", "content": "Understanding these terms will unlock many exciting science concepts and help you become a better reader of scientific texts." }
+          ]
+        }
       ]
     }
   ]
 	}
 	\`\`\`
+
+	**CRITICAL EXAMPLE - Mixed Number Representation with gapMatchInteraction:**
+	
+	**WRONG - Ambiguous presentation without clear labels:**
+	\`\`\`json
+	{
+	  "identifier": "mixed-number-ambiguous",
+	  "title": "Create a mixed number to represent 84.9",
+	  "interactions": {
+	    "gap_match_interaction": {
+	      "type": "gapMatchInteraction",
+	      "content": [
+	        { "type": "paragraph", "content": [
+	          { "type": "math", "mathml": "<mn>84.9</mn>" },
+	          { "type": "text", "content": " = " },
+	          { "type": "gap", "gapId": "GAP_WHOLE" },
+	          { "type": "text", "content": " (" },  // ❌ TERRIBLE: Ambiguous parentheses!
+	          { "type": "gap", "gapId": "GAP_NUM" },
+	          { "type": "text", "content": " / " },  // ❌ BAD: Unclear this is a fraction
+	          { "type": "gap", "gapId": "GAP_DEN" },
+	          { "type": "text", "content": ")" }
+	        ]}
+	      ]
+	    }
+	  }
+	}
+	\`\`\`
+	
+	**CORRECT - Clean presentation with clear separation:**
+	\`\`\`json
+	{
+	  "identifier": "mixed-number-clear",
+	  "title": "Create a mixed number to represent 84.9",
+	  "body": [
+	    { "type": "paragraph", "content": [
+	      { "type": "text", "content": "Create a mixed number that represents " },
+	      { "type": "math", "mathml": "<mn>84.9</mn>" },
+	      { "type": "text", "content": "." }
+	    ]},
+	    { "type": "paragraph", "content": [
+	      { "type": "text", "content": "Drag each number to create the whole number and fraction parts of your mixed number." }
+	    ]},
+	    { "type": "blockSlot", "slotId": "gap_match_interaction" }
+	  ],
+	  "widgets": {},
+	  "interactions": {
+	    "gap_match_interaction": {
+	      "type": "gapMatchInteraction",
+	      "content": [
+	        { "type": "paragraph", "content": [
+	          { "type": "math", "mathml": "<mn>84.9</mn>" },
+	          { "type": "text", "content": " = " },
+	          { "type": "gap", "gapId": "GAP_WHOLE" },  // ✅ Whole number part
+	          { "type": "text", "content": " + " },      // ✅ Plus sign makes it clear!
+	          { "type": "gap", "gapId": "GAP_NUM" },    // ✅ Numerator
+	          { "type": "text", "content": "/" },         // ✅ Vertical fraction bar in display
+	          { "type": "gap", "gapId": "GAP_DEN" }     // ✅ Denominator
+	        ]}
+	      ]
+	    }
+	  }
+	}
+	\`\`\`
+	
+	**Why this is better than the ambiguous version:**
+	- The plus sign (+) clearly shows this is addition, not multiplication
+	- Clean visual separation between whole number and fraction
+	- The prompt text reinforces that there are "whole number and fraction parts"
+	- No distracting labels cluttering the interface
+	- The forward slash will render as a proper vertical fraction in the display
+	
+	**Remember:** gapMatchInteraction is excellent for structured input, but the presentation must be crystal clear about what each gap represents. Always provide explicit labels and visual cues to guide students.
 
 	Reference QTI outcome (result of compilation):
 	\`\`\`xml
@@ -462,7 +1010,7 @@ Example mapping for the provided sample:
 - Correct mapping: per row, the right choice matching the left formula's compound name
 
 ABSOLUTE REQUIREMENT: SLOT CONSISTENCY.
-This is the most critical rule. Any slot you include in the 'body' MUST have its slotId listed in either the 'widgets' array or the 'interactions' array. 
+This is the most critical rule. Any slot you include in the 'body' MUST have its slotId listed in either the 'widgets' array or the 'interactions' array. Additionally, any widget slot (blockSlot) used inside 'feedbackBlocks' MUST also have its slotId listed in the 'widgets' array (feedback never contains interactions). 
 
 **EXCEPTION for Choice-Level Visuals:** Widget slots declared for use in interaction choices (following patterns like \`choice_a_visual\`, \`graph_choice_b\`, etc.) are declared in the \`widgets\` array but NOT placed in the body. This includes:
 - Widgets for multiple choice options when converting unsupported interactive widgets
@@ -751,12 +1299,35 @@ The content field of each feedback block must contain rich, structured content u
   {
     "identifier": "A",
     "outcomeIdentifier": "FEEDBACK__RESPONSE",
-    "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Correct! Here is why A is the right answer..." }] }]
+    "content": [
+      { "type": "paragraph", "content": [
+        { "type": "text", "content": "Excellent work! You correctly identified that " },
+        { "type": "math", "mathml": "<mfrac><mn>3</mn><mn>4</mn></mfrac>" },
+        { "type": "text", "content": " of the circle is shaded." }
+      ] },
+      { "type": "paragraph", "content": [
+        { "type": "text", "content": "You recognized that the circle is divided into 4 equal parts and 3 parts are shaded. This visual understanding of fractions will help you solve more complex fraction problems." }
+      ] }
+    ]
   },
   {
     "identifier": "B",
     "outcomeIdentifier": "FEEDBACK__RESPONSE",
-    "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Incorrect. B is not the right answer because..." }] }]
+    "content": [
+      { "type": "paragraph", "content": [
+        { "type": "text", "content": "Not quite right. You selected " },
+        { "type": "math", "mathml": "<mfrac><mn>1</mn><mn>4</mn></mfrac>" },
+        { "type": "text", "content": ", but let's count together." }
+      ] },
+      { "type": "paragraph", "content": [
+        { "type": "text", "content": "Look at the circle: it's divided into 4 equal parts. Count how many parts are shaded (the colored sections). You should see 3 shaded parts out of 4 total parts, which means " },
+        { "type": "math", "mathml": "<mfrac><mn>3</mn><mn>4</mn></mfrac>" },
+        { "type": "text", "content": " is shaded." }
+      ] },
+      { "type": "paragraph", "content": [
+        { "type": "text", "content": "Remember: The top number (numerator) tells us how many parts are selected, and the bottom number (denominator) tells us the total number of equal parts." }
+      ] }
+    ]
   }
 ]
 \`\`\`
@@ -767,12 +1338,78 @@ The content field of each feedback block must contain rich, structured content u
   {
     "identifier": "CORRECT",
     "outcomeIdentifier": "FEEDBACK__GLOBAL",
-    "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Great! Your sequence is correct." }] }]
+    "content": [
+      { "type": "paragraph", "content": [
+        { "type": "text", "content": "Outstanding! Your sequence is perfectly correct." }
+      ] },
+      { "type": "paragraph", "content": [
+        { "type": "text", "content": "You demonstrated excellent understanding of the pattern: each number increases by " },
+        { "type": "math", "mathml": "<mn>5</mn>" },
+        { "type": "text", "content": ". This is called an arithmetic sequence, where we add the same amount each time." }
+      ] },
+      { "type": "paragraph", "content": [
+        { "type": "text", "content": "Challenge yourself: Can you continue this pattern for three more numbers? What would they be?" }
+      ] }
+    ]
   },
   {
     "identifier": "INCORRECT",
     "outcomeIdentifier": "FEEDBACK__GLOBAL",
-    "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Not quite. The correct order should be..." }] }]
+    "content": [
+      { "type": "paragraph", "content": [
+        { "type": "text", "content": "Let's work through this together. The correct order is: " },
+        { "type": "math", "mathml": "<mn>5</mn>" },
+        { "type": "text", "content": ", " },
+        { "type": "math", "mathml": "<mn>10</mn>" },
+        { "type": "text", "content": ", " },
+        { "type": "math", "mathml": "<mn>15</mn>" },
+        { "type": "text", "content": ", " },
+        { "type": "math", "mathml": "<mn>20</mn>" },
+        { "type": "text", "content": ", " },
+        { "type": "math", "mathml": "<mn>25</mn>" },
+        { "type": "text", "content": "." }
+      ] },
+      { "type": "paragraph", "content": [
+        { "type": "text", "content": "Notice the pattern: we start at " },
+        { "type": "math", "mathml": "<mn>5</mn>" },
+        { "type": "text", "content": " and add " },
+        { "type": "math", "mathml": "<mn>5</mn>" },
+        { "type": "text", "content": " each time:" }
+      ] },
+      { "type": "paragraph", "content": [
+        { "type": "text", "content": "• " },
+        { "type": "math", "mathml": "<mn>5</mn><mo>+</mo><mn>5</mn><mo>=</mo><mn>10</mn>" }
+      ] },
+      { "type": "paragraph", "content": [
+        { "type": "text", "content": "• " },
+        { "type": "math", "mathml": "<mn>10</mn><mo>+</mo><mn>5</mn><mo>=</mo><mn>15</mn>" }
+      ] },
+      { "type": "paragraph", "content": [
+        { "type": "text", "content": "• " },
+        { "type": "math", "mathml": "<mn>15</mn><mo>+</mo><mn>5</mn><mo>=</mo><mn>20</mn>" }
+      ] },
+      { "type": "paragraph", "content": [
+        { "type": "text", "content": "• " },
+        { "type": "math", "mathml": "<mn>20</mn><mo>+</mo><mn>5</mn><mo>=</mo><mn>25</mn>" }
+      ] },
+      { "type": "paragraph", "content": [
+        { "type": "text", "content": "This is counting by " },
+        { "type": "math", "mathml": "<mn>5</mn>" },
+        { "type": "text", "content": "s! Practice skip counting by " },
+        { "type": "math", "mathml": "<mn>5</mn>" },
+        { "type": "text", "content": "s using your fingers: " },
+        { "type": "math", "mathml": "<mn>5</mn>" },
+        { "type": "text", "content": ", " },
+        { "type": "math", "mathml": "<mn>10</mn>" },
+        { "type": "text", "content": ", " },
+        { "type": "math", "mathml": "<mn>15</mn>" },
+        { "type": "text", "content": ", " },
+        { "type": "math", "mathml": "<mn>20</mn>" },
+        { "type": "text", "content": ", " },
+        { "type": "math", "mathml": "<mn>25</mn>" },
+        { "type": "text", "content": "..." }
+      ] }
+    ]
   }
 ]
 \`\`\`
