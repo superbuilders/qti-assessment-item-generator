@@ -9,7 +9,7 @@ import { encodeDataUri } from "./helpers"
 import { compileInteraction } from "./interaction-compiler"
 import { validateAssessmentItemInput } from "./pre-validator"
 import { compileResponseDeclarations, compileResponseProcessing } from "./response-processor"
-import type { AssessmentItem, AssessmentItemInput, InlineContent } from "./schemas"
+import type { AssessmentItem, AssessmentItemInput, InlineContent, BlockContent } from "./schemas"
 import { createDynamicAssessmentItemSchema } from "./schemas"
 import {
 	convertHtmlEntities,
@@ -19,11 +19,8 @@ import {
 	stripXmlComments
 } from "./xml-fixes"
 
-// NEW: Custom error for duplicate response identifiers
 export const ErrDuplicateResponseIdentifier = errors.new("duplicate response identifier")
-// NEW: Custom error for duplicate choice identifiers within a single interaction/dropdown
 export const ErrDuplicateChoiceIdentifier = errors.new("duplicate choice identifiers")
-// NEW: Custom error for invalid rowHeaderKey in dataTable
 export const ErrInvalidRowHeaderKey = errors.new("invalid dataTable rowHeaderKey")
 
 // Type guard to check if a string is a valid widget type
@@ -171,8 +168,11 @@ function dedupePromptTextFromBody(item: AssessmentItem): void {
 				out += ` ${normalizeMath(part.mathml)}`
 				continue
 			}
-			if (part.type === "inlineSlot") {
-				out += ` {slot:${part.slotId}}`
+			if (part.type === "inlineWidgetRef") {
+				out += ` {widget:${part.widgetId}}`
+			}
+			if (part.type === "inlineInteractionRef") {
+				out += ` {interaction:${part.interactionId}}`
 			}
 		}
 		return collapseWhitespace(out)
@@ -214,12 +214,12 @@ function dedupePromptTextFromBody(item: AssessmentItem): void {
 	// Precompute normalized strings for all paragraph blocks
 	const paragraphNorms: string[] = body.map((b) => (b.type === "paragraph" ? normalizeInline(b.content) : ""))
 
-	// Identify all indices in the body which are interaction blockSlots we care about
+	// Identify all indices in the body which are interaction refs we care about
 	const slotIndices: Array<{ index: number; interactionId: string }> = []
 	for (let i = 0; i < body.length; i++) {
 		const block = body[i]
-		if (block?.type === "blockSlot" && supportedInteractionIds.has(block.slotId)) {
-			slotIndices.push({ index: i, interactionId: block.slotId })
+		if (block?.type === "interactionRef" && supportedInteractionIds.has(block.interactionId)) {
+			slotIndices.push({ index: i, interactionId: block.interactionId })
 		}
 	}
 
@@ -606,7 +606,6 @@ function enforceNoPipesInInlineChoiceInteraction(item: AssessmentItem): void {
 function enforceIdentifierOnlyMatching(item: AssessmentItem): void {
 	// Build allowed identifiers per responseIdentifier from interactions and dataTable dropdowns
 	const allowed: Record<string, Set<string>> = {}
-	// NEW: Map to track which interaction/widget owns each responseIdentifier
 	const responseIdOwners = new Map<string, string>()
 
 	const ensureSet = (id: string, ownerId: string): Set<string> => {
@@ -647,7 +646,7 @@ function enforceIdentifierOnlyMatching(item: AssessmentItem): void {
 					throw errors.new("missing responseidentifier")
 				}
 				const responseId = interaction.responseIdentifier
-				const seenIdentifiers = new Set<string>() // NEW: Check for case-sensitive duplicates within THIS interaction's choices
+			const seenIdentifiers = new Set<string>()
 				if (!("choices" in interaction) || !Array.isArray(interaction.choices)) {
 					logger.error("invalid choices array in interaction", {
 						interactionId
@@ -678,7 +677,6 @@ function enforceIdentifierOnlyMatching(item: AssessmentItem): void {
 
 			const dataTable = widget
 
-			// NEW: Check rowHeaderKey referential integrity
 			if (dataTable.rowHeaderKey !== null && typeof dataTable.rowHeaderKey === "string") {
 				const columnKeys = new Set(dataTable.columns.map((col: { key: string }) => col.key))
 				if (!columnKeys.has(dataTable.rowHeaderKey)) {
@@ -697,11 +695,9 @@ function enforceIdentifierOnlyMatching(item: AssessmentItem): void {
 				for (const cell of row) {
 					if (!cell || cell.type !== "dropdown") continue
 					const responseId: string = String(cell.responseIdentifier)
-					// NEW: Check for duplicate responseIdentifier *globally* for this dropdown cell
-					// This ensureSet call will throw if responseId is already used by another interaction/widget.
-					const choiceSetForResponseId = ensureSet(responseId, `${widgetId}_cell_${responseId}`)
+				const choiceSetForResponseId = ensureSet(responseId, `${widgetId}_cell_${responseId}`)
 
-					const seenIdentifiers = new Set<string>() // NEW: Check for case-sensitive duplicates within THIS dropdown's choices
+					const seenIdentifiers = new Set<string>()
 					for (const ch of cell.choices ?? []) {
 						const ident = String(ch.identifier)
 						// REMOVED: .toLowerCase() - now case-sensitive
@@ -760,12 +756,78 @@ function enforceIdentifierOnlyMatching(item: AssessmentItem): void {
 	}
 }
 
+function collectRefs(item: AssessmentItem): { widgetRefs: Set<string>; interactionRefs: Set<string> } {
+	const widgetRefs = new Set<string>()
+	const interactionRefs = new Set<string>()
+	
+	const walkInline = (inline: InlineContent | null) => {
+		if (!inline) return
+		for (const node of inline) {
+			if (node.type === "inlineWidgetRef") widgetRefs.add(node.widgetId)
+			if (node.type === "inlineInteractionRef") interactionRefs.add(node.interactionId)
+		}
+	}
+
+	const walkBlock = (block: BlockContent | null) => {
+		if (!block) return
+		for (const node of block) {
+			if (node.type === "widgetRef") widgetRefs.add(node.widgetId)
+			if (node.type === "interactionRef") interactionRefs.add(node.interactionId)
+			if (node.type === "paragraph") walkInline(node.content)
+			if (node.type === "unorderedList") node.items.forEach(walkInline)
+		}
+	}
+	
+	// Traverse all content areas
+	walkBlock(item.body)
+	item.feedbackBlocks.forEach((fb) => walkBlock(fb.content))
+
+	if (item.interactions) {
+		for (const interaction of Object.values(item.interactions)) {
+			if (interaction.type === "choiceInteraction" || interaction.type === "orderInteraction") {
+				walkInline(interaction.prompt)
+				interaction.choices.forEach((choice) => walkBlock(choice.content))
+			}
+			if (interaction.type === "inlineChoiceInteraction") {
+				interaction.choices.forEach((choice) => walkInline(choice.content))
+			}
+			if (interaction.type === "gapMatchInteraction") {
+				walkBlock(interaction.content)
+				interaction.gapTexts.forEach((gt) => walkInline(gt.content))
+			}
+		}
+	}
+    
+	if (item.widgets) {
+		for (const widget of Object.values(item.widgets)) {
+			if (widget.type === "dataTable" && widget.data) {
+				for (const row of widget.data) {
+					for (const cell of row) {
+						if (cell.type === "inline") {
+							walkInline(cell.content)
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	return { widgetRefs, interactionRefs }
+}
+
+function collectWidgetIds(item: AssessmentItem): Set<string> {
+    return collectRefs(item).widgetRefs
+}
+
 export async function compile(itemData: AssessmentItemInput): Promise<string> {
-	// Step 0: Build widget mapping prior to schema enforcement
+	// Step 0: Widget Type Derivation (Replaces AI mapping step)
+	// The widget mapping is now derived directly from the 'type' property of each widget definition.
 	const widgetMapping: Record<string, string> = {}
 	if (itemData.widgets) {
 		for (const [key, value] of Object.entries(itemData.widgets)) {
-			if (value?.type) widgetMapping[key] = value.type
+			if (value?.type) {
+				widgetMapping[key] = value.type
+			}
 		}
 	}
 
@@ -830,27 +892,54 @@ export async function compile(itemData: AssessmentItemInput): Promise<string> {
 	// as well as rowHeaderKey validation for dataTables.
 	enforceIdentifierOnlyMatching(enforcedItem)
 
-	const slots = new Map<string, string>()
+	const interactionSlots = new Map<string, string>()
+	const widgetSlots = new Map<string, string>()
 
+	// Step 1: Compile interactions and populate interactionSlots
+	if (enforcedItem.interactions) {
+		for (const [interactionId, interactionDef] of Object.entries(enforcedItem.interactions)) {
+			interactionSlots.set(interactionId, compileInteraction(interactionDef, widgetSlots, interactionSlots))
+		}
+	}
+
+	// Step 2: Derive the complete set of required widget IDs from ALL content
+	const requiredWidgetIds = collectWidgetIds(enforcedItem)
+	logger.debug("derived required widget ids from content", { count: requiredWidgetIds.size, ids: Array.from(requiredWidgetIds).slice(0, 10) })
+
+	// Step 3: Generate content ONLY for the required widgets
 	if (enforcedItem.widgets) {
-		for (const [widgetId, widgetDef] of Object.entries(enforcedItem.widgets)) {
-			// widgetDef is already typed correctly from the schema parse
+		for (const widgetId of requiredWidgetIds) {
+			const widgetDef = enforcedItem.widgets[widgetId]
+			if (!widgetDef) {
+				logger.error("content references widgetId not defined in widgets map", { widgetId })
+				throw errors.new("content references undefined widget")
+			}
 			const widgetHtml = await generateWidget(widgetDef)
 			if (widgetHtml.trim().startsWith("<svg")) {
-				slots.set(widgetId, `<img src="${encodeDataUri(widgetHtml)}" alt="Widget visualization" />`)
+				widgetSlots.set(widgetId, `<img src="${encodeDataUri(widgetHtml)}" alt="Widget visualization" />`)
 			} else {
-				slots.set(widgetId, widgetHtml)
+				widgetSlots.set(widgetId, widgetHtml)
 			}
 		}
 	}
-
-	if (enforcedItem.interactions) {
-		for (const [interactionId, interactionDef] of Object.entries(enforcedItem.interactions)) {
-			slots.set(interactionId, compileInteraction(interactionDef, slots))
+	
+	// Step 4: Linker Pass - ensure all refs are resolved
+	const { widgetRefs, interactionRefs } = collectRefs(enforcedItem)
+	for (const id of widgetRefs) {
+		if (!widgetSlots.has(id)) {
+			logger.error("unresolved widget reference", { widgetId: id, availableSlots: Array.from(widgetSlots.keys()) })
+			throw errors.new("unresolved widget reference")
+		}
+	}
+	for (const id of interactionRefs) {
+		if (!interactionSlots.has(id)) {
+			logger.error("unresolved interaction reference", { interactionId: id, availableSlots: Array.from(interactionSlots.keys()) })
+			throw errors.new("unresolved interaction reference")
 		}
 	}
 
-	const filledBody = enforcedItem.body ? renderBlockContent(enforcedItem.body, slots) : ""
+	// Step 5: Render final body and feedback with the populated slots
+	const filledBody = enforcedItem.body ? renderBlockContent(enforcedItem.body, widgetSlots, interactionSlots) : ""
 
 	// NEW: Dynamically determine outcome declarations from feedbackBlocks
 	const outcomeDeclarations = new Map<string, "single" | "multiple">()
@@ -891,7 +980,7 @@ export async function compile(itemData: AssessmentItemInput): Promise<string> {
 				})
 				throw errors.new("Interactive widgets are banned in feedback content.")
 			}
-			const contentXml = renderBlockContent(block.content, slots)
+			const contentXml = renderBlockContent(block.content, widgetSlots, interactionSlots)
 			return `        <qti-feedback-block outcome-identifier="${escapeXmlAttribute(block.outcomeIdentifier)}" identifier="${escapeXmlAttribute(block.identifier)}" show-hide="show">
             <qti-content-body>${contentXml}</qti-content-body>
         </qti-feedback-block>`

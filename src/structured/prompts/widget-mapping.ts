@@ -5,20 +5,17 @@ import type { AiContextEnvelope, ImageContext } from "../types"
 import { formatUnifiedContextSections } from "./shared"
 
 function createWidgetMappingSchema(slotNames: string[], allowedWidgetKeys: readonly string[]) {
-	const shape: Record<string, z.ZodType<string>> = {}
-	for (const slotName of slotNames) {
-		// MODIFIED: Allow the schema to accept either a valid widget type
-		// from the collection OR the specific "WIDGET_NOT_FOUND" bail string for ALL collections.
-		const validTypesAndBail = [...allowedWidgetKeys, "WIDGET_NOT_FOUND"]
-		shape[slotName] = z.string().refine((val) => validTypesAndBail.includes(val), {
-			message: `Must be one of: ${validTypesAndBail.join(", ")}`
-		})
-	}
-	return z.object({
-		widget_mapping: z
-			.object(shape)
-			.describe("A JSON object mapping each widget slot name to one of the allowed widget types or WIDGET_NOT_FOUND.")
-	})
+    const values = [...allowedWidgetKeys, "WIDGET_NOT_FOUND"]
+    const valueSchema = z.union(values.map((v) => z.literal(v)) as [z.ZodLiteral<string>, z.ZodLiteral<string>, ...z.ZodLiteral<string>[]])
+    const shape: Record<string, z.ZodType> = {}
+    for (const slotName of slotNames) {
+        shape[slotName] = valueSchema
+    }
+    return z.object({
+        widget_mapping: z
+            .object(shape)
+            .describe("A JSON object mapping each widget slot name to one of the allowed widget types or WIDGET_NOT_FOUND.")
+    })
 }
 export function createWidgetMappingPrompt(
 	envelope: AiContextEnvelope,

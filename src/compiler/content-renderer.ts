@@ -14,7 +14,11 @@ function escapeXmlText(text: string): string {
 		.replace(/>/g, "&gt;")
 }
 
-export function renderInlineContent(inlineItems: InlineContent | null | undefined, slots: Map<string, string>): string {
+export function renderInlineContent(
+	inlineItems: InlineContent | null,
+	widgetSlots: Map<string, string>,
+	interactionSlots: Map<string, string>
+): string {
 	if (!inlineItems) return ""
 	return inlineItems
 		.map((item) => {
@@ -22,21 +26,30 @@ export function renderInlineContent(inlineItems: InlineContent | null | undefine
 				case "text":
 					return escapeXmlText(item.content)
 				case "math":
-					// Ensure MathML is properly wrapped and namespaced
 					return `<math xmlns="http://www.w3.org/1998/Math/MathML">${item.mathml}</math>`
-				case "inlineSlot": {
-					const content = slots.get(item.slotId)
+				case "inlineWidgetRef": {
+					const content = widgetSlots.get(item.widgetId)
 					if (content === undefined) {
-						logger.error("content for inline slot not found", {
-							slotId: item.slotId,
-							availableSlots: Array.from(slots.keys())
+						logger.error("content for inline widget ref not found", {
+							widgetId: item.widgetId,
+							availableSlots: Array.from(widgetSlots.keys())
 						})
-						throw errors.new(`Compiler Error: Content for inline slot '${item.slotId}' not found.`)
+						throw errors.new("content for inline widget ref not found")
 					}
-					return content // Render directly, no wrapper
+					return content
+				}
+				case "inlineInteractionRef": {
+					const content = interactionSlots.get(item.interactionId)
+					if (content === undefined) {
+						logger.error("content for inline interaction ref not found", {
+							interactionId: item.interactionId,
+							availableSlots: Array.from(interactionSlots.keys())
+						})
+						throw errors.new("content for inline interaction ref not found")
+					}
+					return content
 				}
 				case "gap": {
-					// Render gap element for gap match interaction
 					return `<qti-gap identifier="${item.gapId}"/>`
 				}
 				default:
@@ -47,13 +60,17 @@ export function renderInlineContent(inlineItems: InlineContent | null | undefine
 		.join("")
 }
 
-export function renderBlockContent(blockItems: BlockContent | null | undefined, slots: Map<string, string>): string {
+export function renderBlockContent(
+	blockItems: BlockContent | null,
+	widgetSlots: Map<string, string>,
+	interactionSlots: Map<string, string>
+): string {
 	if (!blockItems) return ""
 	return blockItems
 		.map((item) => {
 			switch (item.type) {
 				case "paragraph":
-					return `<p>${renderInlineContent(item.content, slots)}</p>`
+					return `<p>${renderInlineContent(item.content, widgetSlots, interactionSlots)}</p>`
 				case "codeBlock":
 					return `<pre><code>${escapeXmlText(item.code)}</code></pre>`
 				case "table": {
@@ -69,17 +86,28 @@ export function renderBlockContent(blockItems: BlockContent | null | undefined, 
 					return `<table${classAttr}>${thead}<tbody>${tbodyRows}</tbody></table>`
 				}
 				case "unorderedList": {
-					const itemsXml = item.items.map((inline) => `<li><p>${renderInlineContent(inline, slots)}</p></li>`).join("")
+					const itemsXml = item.items.map((inline) => `<li><p>${renderInlineContent(inline, widgetSlots, interactionSlots)}</p></li>`).join("")
 					return `<ul>${itemsXml}</ul>`
 				}
-				case "blockSlot": {
-					const content = slots.get(item.slotId)
+				case "widgetRef": {
+					const content = widgetSlots.get(item.widgetId)
 					if (content === undefined) {
-						logger.error("content for block slot not found", {
-							slotId: item.slotId,
-							availableSlots: Array.from(slots.keys())
+						logger.error("content for widget ref not found", {
+							widgetId: item.widgetId,
+							availableSlots: Array.from(widgetSlots.keys())
 						})
-						throw errors.new(`Compiler Error: Content for block slot '${item.slotId}' not found.`)
+						throw errors.new("content for widget ref not found")
+					}
+					return content
+				}
+				case "interactionRef": {
+					const content = interactionSlots.get(item.interactionId)
+					if (content === undefined) {
+						logger.error("content for interaction ref not found", {
+							interactionId: item.interactionId,
+							availableSlots: Array.from(interactionSlots.keys())
+						})
+						throw errors.new("content for interaction ref not found")
 					}
 					return content
 				}

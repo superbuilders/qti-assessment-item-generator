@@ -159,7 +159,7 @@ const renderCellContent = (c: TableCell | undefined): string => {
 	if (c === undefined || c === null) return ""
 	switch (c.type) {
 		case "inline":
-			return renderInlineContent(c.content, new Map())
+			return renderInlineContent(c.content, new Map(), new Map())
 		case "number":
 			return String(c.value)
 		case "input": {
@@ -170,7 +170,7 @@ const renderCellContent = (c: TableCell | undefined): string => {
 			const choicesXml = c.choices
 				.map(
 					(ch) =>
-						`<qti-inline-choice identifier="${escapeXmlAttribute(ch.identifier)}">${renderInlineContent(ch.content, new Map())}</qti-inline-choice>`
+					`<qti-inline-choice identifier="${escapeXmlAttribute(ch.identifier)}">${renderInlineContent(ch.content, new Map(), new Map())}</qti-inline-choice>`
 				)
 				.join("\n                ")
 
@@ -212,7 +212,7 @@ export const generateDataTable: WidgetGenerator<typeof DataTablePropsSchema> = a
 			if (col.label === null || col.label === undefined) {
 				xml += `<th scope="col" style="${style}"></th>`
 			} else {
-				xml += `<th scope="col" style="${style}">${renderInlineContent(col.label, new Map())}</th>`
+			xml += `<th scope="col" style="${style}">${renderInlineContent(col.label, new Map(), new Map())}</th>`
 			}
 		}
 		xml += "</tr></thead>"

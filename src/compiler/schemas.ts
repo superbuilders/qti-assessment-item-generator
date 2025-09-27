@@ -35,16 +35,24 @@ function createInlineContentItemSchema() {
 				.describe("Mathematical content represented in MathML format"),
 			z
 				.object({
-					type: z
-						.literal("inlineSlot")
-						.describe("Identifies this as an inline placeholder for widgets or interactions"),
-					slotId: z
+					type: z.literal("inlineWidgetRef"),
+					widgetId: z
 						.string()
 						.regex(SLOT_IDENTIFIER_REGEX, "invalid slot identifier: must be lowercase with underscores")
-						.describe("Unique identifier that matches a widget or interaction key")
+						.describe("Unique identifier that matches a widget key")
 				})
 				.strict()
-				.describe("Placeholder for inline content that will be filled with a widget or interaction"),
+				.describe("Reference to a generated widget by id, to be rendered inline"),
+			z
+				.object({
+					type: z.literal("inlineInteractionRef"),
+					interactionId: z
+						.string()
+						.regex(SLOT_IDENTIFIER_REGEX, "invalid slot identifier: must be lowercase with underscores")
+						.describe("Unique identifier that matches an interaction key")
+				})
+				.strict()
+				.describe("Reference to a compiled interaction by id, to be rendered inline"),
 			z
 				.object({
 					type: z.literal("gap").describe("Identifies this as a gap for gap match interaction"),
@@ -105,14 +113,24 @@ function createBlockContentItemSchema() {
 				.describe("Simple HTML table with optional class and text-only cells"),
 			z
 				.object({
-					type: z.literal("blockSlot").describe("Identifies this as a block-level placeholder"),
-					slotId: z
+					type: z.literal("widgetRef"),
+					widgetId: z
 						.string()
 						.regex(SLOT_IDENTIFIER_REGEX, "invalid slot identifier: must be lowercase with underscores")
-						.describe("Unique identifier that matches a widget or interaction key")
+						.describe("Unique identifier that matches a widget key")
 				})
 				.strict()
-				.describe("Placeholder for block-level content that will be filled with a widget or interaction")
+				.describe("Reference to a generated widget by id, to be rendered as a block"),
+			z
+				.object({
+					type: z.literal("interactionRef"),
+					interactionId: z
+						.string()
+						.regex(SLOT_IDENTIFIER_REGEX, "invalid slot identifier: must be lowercase with underscores")
+						.describe("Unique identifier that matches an interaction key")
+				})
+				.strict()
+				.describe("Reference to a compiled interaction by id, to be rendered as a block")
 		])
 		.describe("Union type representing any block-level content element")
 }
@@ -553,7 +571,7 @@ export function createDynamicAssessmentItemSchema(widgetMapping: Record<string, 
 		.describe("A complete QTI 3.0 assessment item with content, interactions, and scoring rules.")
 
 	// The SHELL schema produced by Shot 1 of the AI pipeline.
-	// It has a structured body but only lists the *names* of slots to be filled.
+	// It has a structured body with ref placeholders.
 	const AssessmentItemShellSchema = z
 		.object({
 			identifier: z.string().describe("Unique identifier for this assessment item."),
@@ -561,18 +579,15 @@ export function createDynamicAssessmentItemSchema(widgetMapping: Record<string, 
 			responseDeclarations: z
 				.array(ResponseDeclarationSchema)
 				.describe("Defines correct answers and scoring for all interactions in this item."),
-			body: createBlockContentSchema().nullable().describe("The main content with slot placeholders."),
-			widgets: z.array(z.string()).describe("A list of unique identifiers for widget slots that must be filled."),
-			interactions: z
-				.array(z.string())
-				.describe("A list of unique identifiers for interaction slots that must be filled."),
+			body: createBlockContentSchema().nullable().describe("The main content with ref placeholders."),
+			// REMOVED: 'widgets' and 'interactions' arrays are no longer part of the shell.
 			feedbackBlocks: z
 				.array(FeedbackBlockSchema)
 				.min(1)
 				.describe("A list of feedback blocks to be displayed based on outcomes.")
 		})
 		.strict()
-		.describe("Initial assessment item structure with slot placeholders from the first AI generation shot.")
+		.describe("Initial assessment item structure with ref placeholders from the first AI generation shot.")
 
 	return {
 		AssessmentItemSchema,

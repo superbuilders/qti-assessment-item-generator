@@ -51,9 +51,9 @@ These are the ONLY interaction types we support. Any Perseus widget that maps to
 
 **CRITICAL: STRUCTURED CONTENT MODEL**
 Your entire output for any rich text field (like 'body' or 'feedbackBlocks') MUST be a JSON array of block-level items.
-- **Block Items**: Can be a paragraph \`{ "type": "paragraph", "content": [...] }\` or a slot \`{ "type": "blockSlot", "slotId": "..." }\`.
+- **Block Items**: Can be a paragraph \`{ "type": "paragraph", "content": [...] }\`, a widget reference \`{ "type": "widgetRef", "widgetId": "..." }\`, or an interaction reference \`{ "type": "interactionRef", "interactionId": "..." }\`.
 - **Paragraph Content**: The 'content' array inside a paragraph consists of inline items.
-- **Inline Items**: Can be text \`{ "type": "text", "content": "..." }\`, math \`{ "type": "math", "mathml": "..." }\`, or an inline slot \`{ "type": "inlineSlot", "slotId": "..." }\`.
+- **Inline Items**: Can be text \`{ "type": "text", "content": "..." }\`, math \`{ "type": "math", "mathml": "..." }\`, an inline widget reference \`{ "type": "inlineWidgetRef", "widgetId": "..." }\`, or an inline interaction reference \`{ "type": "inlineInteractionRef", "interactionId": "..." }\`.
 
 This structure is non-negotiable. You are FORBIDDEN from outputting raw HTML strings for content fields.
 

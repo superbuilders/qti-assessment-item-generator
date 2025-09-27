@@ -4,16 +4,19 @@ import { escapeXmlAttribute } from "../utils/xml-utils"
 import { renderBlockContent, renderInlineContent } from "./content-renderer"
 import type { AnyInteraction } from "./schemas"
 
-export function compileInteraction(interaction: AnyInteraction, slots: Map<string, string>): string {
+export function compileInteraction(
+	interaction: AnyInteraction,
+	widgetSlots: Map<string, string>,
+	interactionSlots: Map<string, string>
+): string {
 	let interactionXml: string
 
 	switch (interaction.type) {
 		case "choiceInteraction": {
-			const promptXml = renderInlineContent(interaction.prompt, slots)
+			const promptXml = renderInlineContent(interaction.prompt, widgetSlots, interactionSlots)
 			const choicesXml = interaction.choices
 				.map((c) => {
-					const contentXml = renderBlockContent(c.content, slots)
-					// MODIFIED: The logic for appending qti-feedback-inline has been removed.
+					const contentXml = renderBlockContent(c.content, widgetSlots, interactionSlots)
 					return `<qti-simple-choice identifier="${escapeXmlAttribute(c.identifier)}">${contentXml}</qti-simple-choice>`
 				})
 				.join("\n            ")
@@ -25,11 +28,10 @@ export function compileInteraction(interaction: AnyInteraction, slots: Map<strin
 			break
 		}
 		case "orderInteraction": {
-			const promptXml = renderInlineContent(interaction.prompt, slots)
+			const promptXml = renderInlineContent(interaction.prompt, widgetSlots, interactionSlots)
 			const choicesXml = interaction.choices
 				.map((c) => {
-					const contentXml = renderBlockContent(c.content, slots)
-					// MODIFIED: The logic for appending qti-feedback-inline has been removed.
+					const contentXml = renderBlockContent(c.content, widgetSlots, interactionSlots)
 					return `<qti-simple-choice identifier="${escapeXmlAttribute(c.identifier)}">${contentXml}</qti-simple-choice>`
 				})
 				.join("\n            ")
@@ -50,7 +52,7 @@ export function compileInteraction(interaction: AnyInteraction, slots: Map<strin
 			const choicesXml = interaction.choices
 				.map(
 					(c) =>
-						`<qti-inline-choice identifier="${escapeXmlAttribute(c.identifier)}">${renderInlineContent(c.content, slots)}</qti-inline-choice>`
+						`<qti-inline-choice identifier="${escapeXmlAttribute(c.identifier)}">${renderInlineContent(c.content, widgetSlots, interactionSlots)}</qti-inline-choice>`
 				)
 				.join("\n                ")
 
@@ -62,15 +64,13 @@ export function compileInteraction(interaction: AnyInteraction, slots: Map<strin
 		case "gapMatchInteraction": {
 			const gapTextsXml = interaction.gapTexts
 				.map((gt) => {
-					const contentXml = renderInlineContent(gt.content, slots)
+					const contentXml = renderInlineContent(gt.content, widgetSlots, interactionSlots)
 					return `<qti-gap-text identifier="${escapeXmlAttribute(gt.identifier)}" match-max="${gt.matchMax}">${contentXml}</qti-gap-text>`
 				})
 				.join("\n            ")
 
-			// Note: The actual gaps are embedded in body content via { type: "gap", gapId: "GAP_1" }
-			// and are rendered by the content renderer, not here
 			const innerContent = interaction.content
-				? `\n            ${renderBlockContent(interaction.content, slots)}\n        `
+				? `\n            ${renderBlockContent(interaction.content, widgetSlots, interactionSlots)}\n        `
 				: ""
 			interactionXml = `<qti-gap-match-interaction response-identifier="${escapeXmlAttribute(interaction.responseIdentifier)}" shuffle="${interaction.shuffle}" max-associations="0">
             ${gapTextsXml}${innerContent}
