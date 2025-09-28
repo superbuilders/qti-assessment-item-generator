@@ -19,6 +19,7 @@ import { createInteractionContentPrompt } from "./prompts/interactions"
 import { createWidgetContentPrompt } from "./prompts/widgets"
 import { createWidgetMappingPrompt } from "./prompts/widget-mapping"
 import type { AiContextEnvelope, ImageContext } from "./types"
+import { collectAllWidgetSlotIds } from "./collector"
 
 const OPENAI_MODEL = "gpt-5"
 const MAX_IMAGES_PER_REQUEST = 500
@@ -256,38 +257,24 @@ export async function generateFromEnvelope(
 		generatedInteractionKeys: Object.keys(generatedInteractions)
 	})
 
-    
-    function collectWidgetIdsFromShell(shell: AssessmentItemShell): string[] {
-        const ids = new Set<string>()
-        const walkInline = (inline: InlineContent | null): void => {
-            if (!inline) return
-            for (const node of inline) {
-                if (node && node.type === "inlineWidgetRef") ids.add(node.widgetId)
-            }
-        }
-        const walkBlock = (blocks: BlockContent | null): void => {
-            if (!blocks) return
-            for (const node of blocks) {
-                if (!node) continue
-                if (node.type === "widgetRef") ids.add(node.widgetId)
-                if (node.type === "paragraph") walkInline(node.content)
-                if (node.type === "unorderedList") node.items.forEach(walkInline)
-            }
-        }
-        walkBlock(shell.body)
-        for (const fb of shell.feedbackBlocks) walkBlock(fb.content)
-        return Array.from(ids)
-    }
-    const widgetIds = collectWidgetIdsFromShell(assessmentShell)
-    let generatedWidgets: Record<string, WidgetInput> = {}
-    if (widgetIds.length > 0) {
+	// NEW: Replace shell-only collection with full-item collection after interactions are generated
+	const requiredWidgetIds = collectAllWidgetSlotIds({
+		body: assessmentShell.body,
+		feedbackBlocks: assessmentShell.feedbackBlocks,
+		interactions: generatedInteractions,
+		widgets: null // No widgets in shell phase
+	})
+	logger.debug("collected all required widget ids", { count: requiredWidgetIds.length, ids: requiredWidgetIds })
+
+	let generatedWidgets: Record<string, WidgetInput> = {}
+	if (requiredWidgetIds.length > 0) {
         const bodyString = assessmentShell.body ? JSON.stringify(assessmentShell.body) : ""
         const mappingCall = await errors.try(
             (() => {
                 const { systemInstruction, userContent, WidgetMappingSchema } = createWidgetMappingPrompt(
                     envelope,
                     bodyString,
-                    widgetIds,
+                    requiredWidgetIds, // Use the complete list of IDs
                     widgetCollectionName,
                     imageContext
                 )
@@ -316,6 +303,31 @@ export async function generateFromEnvelope(
             throw errors.new("empty ai response: no parsed content for widget mapping")
         }
         const widgetMapping = mapChoice.message.parsed.widget_mapping as Record<string, keyof typeof allWidgetSchemas>
+
+        // NEW: Implement fail-fast validation immediately after widget mapping
+        const mappingKeys = new Set(Object.keys(widgetMapping))
+        const requiredIdsSet = new Set(requiredWidgetIds)
+        const missingKeys = requiredWidgetIds.filter((id) => !mappingKeys.has(id))
+        const extraKeys = Array.from(mappingKeys).filter((key) => !requiredIdsSet.has(key))
+
+        if (missingKeys.length > 0) {
+            logger.error("widget mapping missing required slots", { missingKeys })
+            throw errors.new(`widget mapping: missing slots: ${missingKeys.join(", ")}`)
+        }
+
+        if (extraKeys.length > 0) {
+            logger.error("widget mapping returned extra, unrequested slots", { extraKeys })
+            throw errors.new(`widget mapping: extra slots: ${extraKeys.join(", ")}`)
+        }
+
+        const notFoundSlots = Object.entries(widgetMapping)
+            .filter(([, type]) => type === "WIDGET_NOT_FOUND" as any)
+            .map(([id]) => id)
+
+        if (notFoundSlots.length > 0) {
+            logger.error("widget mapping returned WIDGET_NOT_FOUND for required slots", { notFoundSlots })
+            throw errors.new(`widget mapping: unmappable slots: ${notFoundSlots.join(", ")}`)
+        }
 
         const widgetPrompt = createWidgetContentPrompt(
             envelope,
@@ -351,6 +363,15 @@ export async function generateFromEnvelope(
             throw errors.new("empty ai response: no parsed content for widget generation")
         }
         generatedWidgets = wChoice.message.parsed as Record<string, WidgetInput>
+
+        // NEW: Implement fail-fast validation after widget content generation
+        const generatedKeys = new Set(Object.keys(generatedWidgets))
+        const missingContent = requiredWidgetIds.filter((id) => !generatedKeys.has(id))
+        if (missingContent.length > 0) {
+            logger.error("widget content generation did not produce all required widgets", { missingContent })
+            throw errors.new(`widget content generation: missing content for slots: ${missingContent.join(", ")}`)
+        }
+
         logger.debug("shot 4 complete", { generatedWidgetKeys: Object.keys(generatedWidgets) })
     }
 

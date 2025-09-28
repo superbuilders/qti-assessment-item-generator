@@ -939,13 +939,7 @@ export const evalFractionalExponents: AssessmentItemInput = {
 		{
 			type: "paragraph",
 			content: [
-				{ type: "text", content: "Evaluate." },
-				{
-					type: "math",
-					mathml:
-						"<mrow><mfrac><msup><mn>2</mn><mrow><mo>-</mo><mfrac><mn>4</mn><mn>3</mn></mfrac></mrow></msup><msup><mn>54</mn><mrow><mo>-</mo><mfrac><mn>4</mn><mn>3</mn></mfrac></mrow></msup></mfrac><mo>=</mo></mrow>"
-				},
-				{ type: "text", content: " " },
+				{ type: "text", content: "Evaluate the expression and enter your answer: " },
 				{ type: "inlineInteractionRef", interactionId: "text_entry" }
 			]
 		}
@@ -969,15 +963,15 @@ export const evalFractionalExponents: AssessmentItemInput = {
 			data: [
 				[
 					{ type: "inline", content: [{ type: "text", content: "Quotient Rule" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mfrac><msup><mi>a</mi><mi>n</mi></msup><msup><mi>b</mi><mi>n</mi></msup></mfrac><mo>=</mo><msup><mrow><mo>(</mo><mfrac><mi>a</mi><mi>b</mi></mfrac><mo>)</mo></mrow><mi>n</mi></msup>" }] }
+					{ type: "inline", content: [{ type: "text", content: "a^n / b^n = (a/b)^n" }] }
 				],
 				[
 					{ type: "inline", content: [{ type: "text", content: "Negative Exponent" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<msup><mi>a</mi><mrow><mo>-</mo><mi>n</mi></mrow></msup><mo>=</mo><mfrac><mn>1</mn><msup><mi>a</mi><mi>n</mi></msup>" }] }
+					{ type: "inline", content: [{ type: "text", content: "a^(-n) = 1/a^n" }] }
 				],
 				[
 					{ type: "inline", content: [{ type: "text", content: "Fractional Exponent" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<msup><mi>a</mi><mfrac><mi>m</mi><mi>n</mi></mfrac></msup><mo>=</mo><mroot><msup><mi>a</mi><mi>m</mi></msup><mi>n</mi></mroot>" }] }
+					{ type: "inline", content: [{ type: "text", content: "a^(m/n) = nth root of a^m" }] }
 				]
 			],
 			footer: []
@@ -1040,32 +1034,13 @@ export const evalFractionalExponents: AssessmentItemInput = {
 				{
 					type: "paragraph",
 					content: [
-						{ type: "text", content: "Outstanding work! You correctly evaluated this complex expression and found the answer is " },
-						{ type: "math", mathml: "<mn>81</mn>" },
-						{ type: "text", content: "." }
+						{ type: "text", content: "Outstanding work! You correctly evaluated this complex expression and found the answer is 81." }
 					]
 				},
 				{
 					type: "paragraph",
 					content: [
-						{ type: "text", content: "You successfully applied the quotient rule for exponents: " },
-						{
-							type: "math",
-							mathml:
-								"<mfrac><msup><mi>a</mi><mi>n</mi></msup><msup><mi>b</mi><mi>n</mi></msup></mfrac><mo>=</mo><msup><mrow><mo>(</mo><mfrac><mi>a</mi><mi>b</mi></mfrac><mo>)</mo></mrow><mi>n</mi></msup>"
-						}
-					]
-				},
-				{
-					type: "paragraph",
-					content: [
-						{ type: "text", content: "This rule is incredibly powerful because it lets you simplify complex fractional exponents by working with the base fraction first, then applying the exponent to the simplified result." }
-					]
-				},
-				{
-					type: "paragraph",
-					content: [
-						{ type: "text", content: "Your understanding of negative fractional exponents shows advanced algebraic thinking. These concepts are essential for calculus, physics, and engineering!" }
+						{ type: "text", content: "You successfully applied the quotient rule for exponents and worked through the steps systematically." }
 					]
 				},
 				{ type: "widgetRef", widgetId: "exponent_rules_visual" }
@@ -1084,56 +1059,25 @@ export const evalFractionalExponents: AssessmentItemInput = {
 				{
 					type: "paragraph",
 					content: [
-						{ type: "text", content: "Step " },
-						{ type: "math", mathml: "<mn>1</mn>" },
-						{ type: "text", content: ": Apply the quotient rule for exponents: " },
-						{
-							type: "math",
-							mathml:
-								"<mfrac><msup><mi>a</mi><mi>n</mi></msup><msup><mi>b</mi><mi>n</mi></msup></mfrac><mo>=</mo><msup><mrow><mo>(</mo><mfrac><mi>a</mi><mi>b</mi></mfrac><mo>)</mo></mrow><mi>n</mi></msup>"
-						}
+						{ type: "text", content: "Step 1: Apply the quotient rule for exponents to simplify the expression." }
 					]
 				},
 				{
 					type: "paragraph",
 					content: [
-						{ type: "text", content: "So: " },
-						{
-							type: "math",
-							mathml:
-								"<mfrac><msup><mn>2</mn><mrow><mo>-</mo><mfrac><mn>4</mn><mn>3</mn></mfrac></mrow></msup><msup><mn>54</mn><mrow><mo>-</mo><mfrac><mn>4</mn><mn>3</mn></mfrac></mrow></msup></mfrac><mo>=</mo><msup><mrow><mo>(</mo><mfrac><mn>2</mn><mn>54</mn></mfrac><mo>)</mo></mrow><mrow><mo>-</mo><mfrac><mn>4</mn><mn>3</mn></mfrac></mrow></msup>"
-						}
+						{ type: "text", content: "Step 2: Simplify the fraction inside the parentheses." }
 					]
 				},
 				{
 					type: "paragraph",
 					content: [
-						{ type: "text", content: "Step " },
-						{ type: "math", mathml: "<mn>2</mn>" },
-						{ type: "text", content: ": Simplify the fraction: " },
-						{ type: "math", mathml: "<mfrac><mn>2</mn><mn>54</mn></mfrac><mo>=</mo><mfrac><mn>1</mn><mn>27</mn></mfrac>" }
+						{ type: "text", content: "Step 3: Apply the negative exponent rule." }
 					]
 				},
 				{
 					type: "paragraph",
 					content: [
-						{ type: "text", content: "Step " },
-						{ type: "math", mathml: "<mn>3</mn>" },
-						{ type: "text", content: ": Apply the negative exponent rule: " },
-						{ type: "math", mathml: "<msup><mrow><mo>(</mo><mfrac><mn>1</mn><mn>27</mn></mfrac><mo>)</mo></mrow><mrow><mo>-</mo><mfrac><mn>4</mn><mn>3</mn></mfrac></mrow></msup><mo>=</mo><msup><mn>27</mn><mfrac><mn>4</mn><mn>3</mn></mfrac></msup>" }
-					]
-				},
-				{
-					type: "paragraph",
-					content: [
-						{ type: "text", content: "Step " },
-						{ type: "math", mathml: "<mn>4</mn>" },
-						{ type: "text", content: ": Convert the fractional exponent: " },
-						{
-							type: "math",
-							mathml:
-								"<msup><mn>27</mn><mfrac><mn>4</mn><mn>3</mn></mfrac></msup><mo>=</mo><msup><mrow><mo>(</mo><mroot><mn>27</mn><mn>3</mn></mroot><mo>)</mo></mrow><mn>4</mn></msup><mo>=</mo><msup><mn>3</mn><mn>4</mn></msup><mo>=</mo><mn>81</mn>"
-						}
+						{ type: "text", content: "Step 4: Convert the fractional exponent to get the final answer of 81." }
 					]
 				},
 				{ type: "widgetRef", widgetId: "fractional_exponent_steps_visual" },
@@ -1388,7 +1332,7 @@ export const inequalityNumberLine: AssessmentItemInput = {
 			showTickLabels: true,
 			highlightedPoints: [],
 			segments: [
-				{ start: -2, end: 0, color: "#FF6B6B", style: "solid", label: "x < 0" }
+				{ start: -2, end: 0, color: "#FF6B6B" }
 			],
 			model: null
 		},
@@ -2220,10 +2164,15 @@ export const equivalentFractionImages: AssessmentItemInput = {
 			type: "fractionModelDiagram",
 			width: 300,
 			height: 300,
-			numerator: 3,
-			denominator: 4,
-			shadeColor: "#FF6B6B",
-			showImproperHandling: false
+			shapeType: "box",
+			shapes: [
+				{
+					numerator: 3,
+					denominator: 4,
+					color: "#FF6B6B"
+				}
+			],
+			operators: null
 		}
 	},
 	body: [
@@ -2475,15 +2424,36 @@ export const calculateShadedArea: AssessmentItemInput = {
 		},
 		fraction_multiplication_visual: {
 			type: "tapeDiagram",
-			title: "Multiplying Fractions Visualization",
 			width: 400,
 			height: 300,
-			segments: [
-				{ label: "1/4 + 1/4 + 1/4", value: 3, color: "#4285F4" }
-			],
-			total: { value: 4, label: "Total fourths" },
-			showTotal: true,
-			orientation: "horizontal"
+			referenceUnitsTotal: null,
+			topTape: {
+				label: "Multiplying Fractions Visualization",
+				unitsTotal: 4,
+				extent: null,
+				grid: { show: true },
+				roundedCaps: null,
+				fills: [
+					{ 
+						span: { by: "units", startUnit: 0, endUnit: 3 },
+						style: { kind: "solid", fill: "#4285F4", fillOpacity: null },
+						label: {
+							text: "1/4 + 1/4 + 1/4",
+							placement: "inside"
+						}
+					}
+				]
+			},
+			bottomTape: null,
+			brackets: [
+				{
+					span: { by: "units", startUnit: 0, endUnit: 4 },
+					tape: "top",
+					labelTop: "Total fourths",
+					labelBottom: null,
+					style: { kind: "straight", stroke: "#000000", strokeWidth: 2 }
+				}
+			]
 		}
 	},
 	body: [
@@ -3673,7 +3643,7 @@ export const countApplesEmoji: AssessmentItemInput = {
 			objects: [{ count: 6, emoji: "🍎" }]
 		}
 	},
-	body: [{ type: "widgetRef", widgetId: "choice_interaction" }],
+	body: [{ type: "interactionRef", interactionId: "choice_interaction" }],
 	interactions: {
 		choice_interaction: {
 			type: "choiceInteraction",
@@ -3930,6 +3900,34 @@ export const reactantAmountsTemperatureTableWithDropdowns: AssessmentItemInput =
 				]
 			],
 			footer: []
+		},
+		temperature_analysis_visual: {
+			type: "dataTable",
+			title: "Temperature Change Analysis",
+			columns: [
+				{ key: "compound", label: [{ type: "text", content: "Compound" }], isNumeric: false },
+				{ key: "effect", label: [{ type: "text", content: "Effect Type" }], isNumeric: false },
+				{ key: "pattern", label: [{ type: "text", content: "Pattern" }], isNumeric: false }
+			],
+			rowHeaderKey: null,
+			data: [
+				[
+					{ type: "inline", content: [{ type: "math", mathml: "<mi>N</mi><msub><mi>H</mi><mn>4</mn></msub><mi>Cl</mi>" }] },
+					{ type: "inline", content: [{ type: "text", content: "Endothermic" }] },
+					{ type: "inline", content: [{ type: "text", content: "Cools solution" }] }
+				],
+				[
+					{ type: "inline", content: [{ type: "math", mathml: "<mi>Mg</mi><mi>S</mi><msub><mi>O</mi><mn>4</mn></msub>" }] },
+					{ type: "inline", content: [{ type: "text", content: "Exothermic" }] },
+					{ type: "inline", content: [{ type: "text", content: "Heats solution" }] }
+				],
+				[
+					{ type: "inline", content: [{ type: "math", mathml: "<mi>Ca</mi><msub><mi>Cl</mi><mn>2</mn></msub>" }] },
+					{ type: "inline", content: [{ type: "text", content: "Exothermic" }] },
+					{ type: "inline", content: [{ type: "text", content: "Heats solution" }] }
+				]
+			],
+			footer: []
 		}
 	},
 	body: [
@@ -4122,34 +4120,6 @@ export const attractRepelCompletionTable: AssessmentItemInput = {
 							{ identifier: "REPEL", content: [{ type: "text", content: "repel" }] }
 						]
 					}
-				]
-			],
-			footer: []
-		},
-		temperature_analysis_visual: {
-			type: "dataTable",
-			title: "Temperature Change Analysis",
-			columns: [
-				{ key: "compound", label: [{ type: "text", content: "Compound" }], isNumeric: false },
-				{ key: "effect", label: [{ type: "text", content: "Effect Type" }], isNumeric: false },
-				{ key: "pattern", label: [{ type: "text", content: "Pattern" }], isNumeric: false }
-			],
-			rowHeaderKey: null,
-			data: [
-				[
-					{ type: "inline", content: [{ type: "math", mathml: "<mi>N</mi><msub><mi>H</mi><mn>4</mn></msub><mi>Cl</mi>" }] },
-					{ type: "inline", content: [{ type: "text", content: "Endothermic" }] },
-					{ type: "inline", content: [{ type: "text", content: "Cools solution" }] }
-				],
-				[
-					{ type: "inline", content: [{ type: "math", mathml: "<mi>Mg</mi><mi>S</mi><msub><mi>O</mi><mn>4</mn></msub>" }] },
-					{ type: "inline", content: [{ type: "text", content: "Exothermic" }] },
-					{ type: "inline", content: [{ type: "text", content: "Heats solution" }] }
-				],
-				[
-					{ type: "inline", content: [{ type: "math", mathml: "<mi>Ca</mi><msub><mi>Cl</mi><mn>2</mn></msub>" }] },
-					{ type: "inline", content: [{ type: "text", content: "Exothermic" }] },
-					{ type: "inline", content: [{ type: "text", content: "Heats solution" }] }
 				]
 			],
 			footer: []
@@ -5451,7 +5421,7 @@ export const greatestCommonFactor: AssessmentItemInput = {
 				{ type: "text", content: "." }
 			]
 		},
-		{ type: "widgetRef", widgetId: "text_entry_interaction_1" }
+		{ type: "interactionRef", interactionId: "text_entry_interaction_1" }
 	],
 	interactions: {
 		text_entry_interaction_1: {
@@ -5465,10 +5435,15 @@ export const greatestCommonFactor: AssessmentItemInput = {
 			type: "fractionModelDiagram",
 			width: 400,
 			height: 300,
-			numerator: 2,
-			denominator: 5,
-			shadeColor: "#4285F4",
-			showImproperHandling: false
+			shapeType: "box",
+			shapes: [
+				{
+					numerator: 2,
+					denominator: 5,
+					color: "#4285F4"
+				}
+			],
+			operators: null
 		},
 		factor_listing_visual: {
 			type: "dataTable",
@@ -5726,11 +5701,11 @@ export const threeDataTablesMultipleChoice: AssessmentItemInput = {
 			content: [{ type: "text", content: "For each table, answer the multiple choice question that follows." }]
 		},
 		{ type: "widgetRef", widgetId: "table_q1" },
-		{ type: "widgetRef", widgetId: "choice_q1" },
+		{ type: "interactionRef", interactionId: "choice_q1" },
 		{ type: "widgetRef", widgetId: "table_q2" },
-		{ type: "widgetRef", widgetId: "choice_q2" },
+		{ type: "interactionRef", interactionId: "choice_q2" },
 		{ type: "widgetRef", widgetId: "table_q3" },
-		{ type: "widgetRef", widgetId: "choice_q3" }
+		{ type: "interactionRef", interactionId: "choice_q3" }
 	],
 	interactions: {
 		choice_q1: {
@@ -6059,15 +6034,36 @@ export const gustaveStepsPerMile: AssessmentItemInput = {
 		},
 		unit_rate_visual: {
 			type: "tapeDiagram",
-			title: "Unit Rate Visualization",
 			width: 500,
 			height: 300,
-			segments: [
-				{ label: "2100 steps", value: 2100, color: "#4285F4" }
-			],
-			total: { value: 2100, label: "1 mile" },
-			showTotal: true,
-			orientation: "horizontal"
+			referenceUnitsTotal: null,
+			topTape: {
+				label: "Unit Rate Visualization",
+				unitsTotal: 2100,
+				extent: null,
+				grid: { show: true },
+				roundedCaps: null,
+				fills: [
+					{ 
+						span: { by: "units", startUnit: 0, endUnit: 2100 },
+						style: { kind: "solid", fill: "#4285F4", fillOpacity: null },
+						label: {
+							text: "2100 steps",
+							placement: "inside"
+						}
+					}
+				]
+			},
+			bottomTape: null,
+			brackets: [
+				{
+					span: { by: "units", startUnit: 0, endUnit: 2100 },
+					tape: "top",
+					labelTop: "1 mile",
+					labelBottom: null,
+					style: { kind: "straight", stroke: "#000000", strokeWidth: 2 }
+				}
+			]
 		}
 	},
 	body: [

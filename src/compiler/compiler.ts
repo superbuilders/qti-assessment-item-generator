@@ -756,7 +756,7 @@ function enforceIdentifierOnlyMatching(item: AssessmentItem): void {
 	}
 }
 
-function collectRefs(item: AssessmentItem): { widgetRefs: Set<string>; interactionRefs: Set<string> } {
+function collectRefs(item: AssessmentItemInput): { widgetRefs: Set<string>; interactionRefs: Set<string> } {
 	const widgetRefs = new Set<string>()
 	const interactionRefs = new Set<string>()
 	
@@ -815,7 +815,7 @@ function collectRefs(item: AssessmentItem): { widgetRefs: Set<string>; interacti
 	return { widgetRefs, interactionRefs }
 }
 
-function collectWidgetIds(item: AssessmentItem): Set<string> {
+function collectWidgetIds(item: AssessmentItemInput): Set<string> {
     return collectRefs(item).widgetRefs
 }
 
@@ -895,18 +895,12 @@ export async function compile(itemData: AssessmentItemInput): Promise<string> {
 	const interactionSlots = new Map<string, string>()
 	const widgetSlots = new Map<string, string>()
 
-	// Step 1: Compile interactions and populate interactionSlots
-	if (enforcedItem.interactions) {
-		for (const [interactionId, interactionDef] of Object.entries(enforcedItem.interactions)) {
-			interactionSlots.set(interactionId, compileInteraction(interactionDef, widgetSlots, interactionSlots))
-		}
-	}
+	// Step 1: Derive the complete set of required widget IDs from ALL content
+	const requiredWidgetIds = collectWidgetIds(itemData)
+	logger.debug("derived required widget ids from content", { count: requiredWidgetIds.size, ids: Array.from(requiredWidgetIds) })
+	logger.debug("available widget definitions", { availableWidgets: Object.keys(itemData.widgets || {}) })
 
-	// Step 2: Derive the complete set of required widget IDs from ALL content
-	const requiredWidgetIds = collectWidgetIds(enforcedItem)
-	logger.debug("derived required widget ids from content", { count: requiredWidgetIds.size, ids: Array.from(requiredWidgetIds).slice(0, 10) })
-
-	// Step 3: Generate content ONLY for the required widgets
+	// Step 2: Generate content ONLY for the required widgets
 	if (enforcedItem.widgets) {
 		for (const widgetId of requiredWidgetIds) {
 			const widgetDef = enforcedItem.widgets[widgetId]
@@ -922,9 +916,16 @@ export async function compile(itemData: AssessmentItemInput): Promise<string> {
 			}
 		}
 	}
+
+	// Step 3: Compile interactions and populate interactionSlots (after widgets are generated)
+	if (enforcedItem.interactions) {
+		for (const [interactionId, interactionDef] of Object.entries(enforcedItem.interactions)) {
+			interactionSlots.set(interactionId, compileInteraction(interactionDef, widgetSlots, interactionSlots))
+		}
+	}
 	
 	// Step 4: Linker Pass - ensure all refs are resolved
-	const { widgetRefs, interactionRefs } = collectRefs(enforcedItem)
+	const { widgetRefs, interactionRefs } = collectRefs(itemData)
 	for (const id of widgetRefs) {
 		if (!widgetSlots.has(id)) {
 			logger.error("unresolved widget reference", { widgetId: id, availableSlots: Array.from(widgetSlots.keys()) })
