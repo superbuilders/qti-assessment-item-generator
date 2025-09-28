@@ -139,7 +139,7 @@ function generateProcessingForInteraction(decl: ResponseDeclaration, interaction
 		return `<qti-response-condition>${conditions}</qti-response-condition>`
 	}
 
-	const outcomeId = "FEEDBACK__GLOBAL"
+	const outcomeId = `FEEDBACK__${responseId}`
 	return `
     <qti-response-condition>
         <qti-response-if>

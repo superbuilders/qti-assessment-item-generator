@@ -79,6 +79,10 @@ export type InlineContent = z.infer<typeof InlineContentSchema>
 // LEVEL 1: BLOCK CONTENT (for body, feedback, choice content, etc.)
 // Factory functions for block content
 function createBlockContentItemSchema() {
+    // Define schemas for a rich, presentational table.
+    const TableRichCellSchema = createInlineContentSchema().nullable() // Reuse inline content for cells.
+    const TableRichRowSchema = z.array(TableRichCellSchema)
+
 	return z
 		.discriminatedUnion("type", [
 			z
@@ -104,13 +108,18 @@ function createBlockContentItemSchema() {
 				.describe("An unordered list with each item rendered as a list item containing a paragraph"),
 			z
 				.object({
-					type: z.literal("table").describe("Identifies this as a simple data table"),
-					className: z.string().nullable().describe("Optional CSS class name for table, e.g., 'grid'"),
-					header: z.array(z.string()).describe("Header cells as plain text"),
-					rows: z.array(z.array(z.string())).describe("Body rows (arrays of plain text cells)")
+					type: z.literal("orderedList").describe("Identifies this as an ordered list"),
+					items: z.array(createInlineContentSchema()).min(1).describe("List items as arrays of inline content")
 				})
 				.strict()
-				.describe("Simple HTML table with optional class and text-only cells"),
+				.describe("An ordered list with each item rendered as a numbered list item containing a paragraph"),
+            z
+                .object({
+                    type: z.literal("tableRich"),
+                    header: z.array(TableRichRowSchema).nullable(),
+                    rows: z.array(TableRichRowSchema)
+                })
+                .strict(),
 			z
 				.object({
 					type: z.literal("widgetRef"),
@@ -452,122 +461,101 @@ export function createDynamicAssessmentItemSchema(widgetMapping: Record<string, 
 				.describe("A list of feedback blocks to be displayed based on outcomes.")
 		})
 		.strict()
-		.superRefine((data, ctx) => {
-			// NEW: Cross-field validation for identifier consistency.
-			const responseIdToChoices = new Map<string, Set<string>>()
-			if (data.interactions) {
-				for (const interaction of Object.values(data.interactions)) {
-					if (interaction.type === "choiceInteraction" || interaction.type === "inlineChoiceInteraction") {
-						const choiceIds = new Set(interaction.choices.map((c) => c.identifier))
-						responseIdToChoices.set(interaction.responseIdentifier, choiceIds)
-					}
-				}
-			}
+        .superRefine((data, ctx) => {
+            // Cross-field validation for feedback per-response rules.
+            const responseIdToChoices = new Map<string, Set<string>>()
+            if (data.interactions) {
+                for (const interaction of Object.values(data.interactions)) {
+                    if (interaction.type === "choiceInteraction" || interaction.type === "inlineChoiceInteraction") {
+                        const choiceIds = new Set(interaction.choices.map((c) => c.identifier))
+                        responseIdToChoices.set(interaction.responseIdentifier, choiceIds)
+                    }
+                }
+            }
 
-			for (let i = 0; i < data.feedbackBlocks.length; i++) {
-				const fb = data.feedbackBlocks[i]
-				if (!fb) continue
-				// Reserved names guard
-				if (fb.outcomeIdentifier === "SCORE" || fb.outcomeIdentifier === "MAXSCORE") {
-					ctx.addIssue({
-						code: z.ZodIssueCode.custom,
-						message: "outcomeIdentifier must not be SCORE or MAXSCORE",
-						path: ["feedbackBlocks", i, "outcomeIdentifier"]
-					})
-				}
+            const declInfo = new Map<string, { baseType: string; cardinality: string }>()
+            for (const decl of data.responseDeclarations) {
+                declInfo.set(decl.identifier, { baseType: decl.baseType, cardinality: decl.cardinality })
+            }
 
-				if (fb.outcomeIdentifier === "FEEDBACK__GLOBAL") {
-					if (!/^(CORRECT|INCORRECT)$/.test(fb.identifier)) {
-						ctx.addIssue({
-							code: z.ZodIssueCode.custom,
-							message: "For a 'FEEDBACK__GLOBAL' outcome, block identifier must be 'CORRECT' or 'INCORRECT'.",
-							path: ["feedbackBlocks", i, "identifier"]
-						})
-					}
-					continue
-				}
+            // 1) outcomeIdentifier must be FEEDBACK__<responseId> (GLOBAL forbidden) and must reference an existing response
+            // Also build grouping per outcome for additional checks
+            const groupMap = new Map<string, { respId: string; baseType: string; idents: Set<string> }>()
+            for (let i = 0; i < data.feedbackBlocks.length; i++) {
+                const fb = data.feedbackBlocks[i]
+                if (!/^FEEDBACK__([A-Za-z0-9_]+)$/.test(fb.outcomeIdentifier)) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        message: "outcomeIdentifier must be FEEDBACK__<responseId>",
+                        path: ["feedbackBlocks", i, "outcomeIdentifier"]
+                    })
+                    continue
+                }
+                const respId = fb.outcomeIdentifier.replace(/^FEEDBACK__/, "")
+                const rd = declInfo.get(respId)
+                if (!rd) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        message: `no responseDeclaration found for outcome ${fb.outcomeIdentifier}`,
+                        path: ["feedbackBlocks", i, "outcomeIdentifier"]
+                    })
+                    continue
+                }
+                const g = groupMap.get(fb.outcomeIdentifier) ?? { respId, baseType: rd.baseType, idents: new Set<string>() }
+                g.idents.add(fb.identifier)
+                groupMap.set(fb.outcomeIdentifier, g)
 
-				const match = /^FEEDBACK__([A-Za-z0-9_]+)$/.exec(fb.outcomeIdentifier)
-				if (match?.[1]) {
-					const respId = match[1]
-					const allowedChoices = responseIdToChoices.get(respId)
-					if (!allowedChoices || !allowedChoices.has(fb.identifier)) {
-						ctx.addIssue({
-							code: z.ZodIssueCode.custom,
-							message: `Feedback block identifier "${fb.identifier}" not found in choices for response "${respId}".`,
-							path: ["feedbackBlocks", i, "identifier"]
-						})
-					}
-				} else {
-					ctx.addIssue({
-						code: z.ZodIssueCode.custom,
-						message: "Outcome identifier must be FEEDBACK__GLOBAL or FEEDBACK__<responseId>.",
-						path: ["feedbackBlocks", i, "outcomeIdentifier"]
-					})
-				}
-			}
+                if (rd.baseType === "identifier") {
+                    const allowedChoices = responseIdToChoices.get(respId)
+                    if (!allowedChoices || !allowedChoices.has(fb.identifier)) {
+                        ctx.addIssue({
+                            code: z.ZodIssueCode.custom,
+                            message: `feedback identifier '${fb.identifier}' not found in choices for response '${respId}'`,
+                            path: ["feedbackBlocks", i, "identifier"]
+                        })
+                    }
+                } else {
+                    if (!(fb.identifier === "CORRECT" || fb.identifier === "INCORRECT")) {
+                        ctx.addIssue({
+                            code: z.ZodIssueCode.custom,
+                            message: "non-enumerated responses must use CORRECT/INCORRECT identifiers",
+                            path: ["feedbackBlocks", i, "identifier"]
+                        })
+                    }
+                }
+            }
 
-			// Additional guards to ban invalid states
-			// 1) Uniqueness: within an outcomeIdentifier group, identifiers must be unique
-			const seen = new Set<string>()
-			for (let i = 0; i < data.feedbackBlocks.length; i++) {
-				const fb = data.feedbackBlocks[i]
-				const key = `${fb.outcomeIdentifier}::${fb.identifier}`
-				if (seen.has(key)) {
-					ctx.addIssue({
-						code: z.ZodIssueCode.custom,
-						message: "duplicate feedback block identifier within outcome group",
-						path: ["feedbackBlocks", i, "identifier"]
-					})
-				} else {
-					seen.add(key)
-				}
-			}
+            // 2) Uniqueness within outcomeIdentifier group
+            const seen = new Set<string>()
+            for (let i = 0; i < data.feedbackBlocks.length; i++) {
+                const fb = data.feedbackBlocks[i]
+                const key = `${fb.outcomeIdentifier}::${fb.identifier}`
+                if (seen.has(key)) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        message: "duplicate feedback block identifier within outcome group",
+                        path: ["feedbackBlocks", i, "identifier"]
+                    })
+                } else {
+                    seen.add(key)
+                }
+            }
 
-			// 2) Outcome-to-response linkage: FEEDBACK__<respId> must have a responseDeclaration with baseType 'identifier'
-			const declCardinality = new Map<string, { baseType: string; cardinality: string }>()
-			for (const decl of data.responseDeclarations) {
-				// All response declarations have baseType and cardinality due to the discriminated union
-				declCardinality.set(decl.identifier, {
-					baseType: decl.baseType,
-					cardinality: decl.cardinality
-				})
-			}
-			for (let i = 0; i < data.feedbackBlocks.length; i++) {
-				const fb = data.feedbackBlocks[i]
-				const m = /^FEEDBACK__([A-Za-z0-9_]+)$/.exec(fb.outcomeIdentifier)
-				if (!m || m[1] === "GLOBAL") continue
-				const rd = declCardinality.get(m[1])
-				if (!rd) {
-					ctx.addIssue({
-						code: z.ZodIssueCode.custom,
-						message: `no responseDeclaration found for outcome ${fb.outcomeIdentifier}`,
-						path: ["feedbackBlocks", i, "outcomeIdentifier"]
-					})
-					continue
-				}
-				if (rd.baseType !== "identifier") {
-					ctx.addIssue({
-						code: z.ZodIssueCode.custom,
-						message: `outcome ${fb.outcomeIdentifier} must target baseType 'identifier' response`,
-						path: ["feedbackBlocks", i, "outcomeIdentifier"]
-					})
-				}
-			}
-
-			// 3) FEEDBACK__GLOBAL presence requires at least one non-enumerated response (string|integer|float|directedPair)
-			const hasGlobal = data.feedbackBlocks.some((b) => b.outcomeIdentifier === "FEEDBACK__GLOBAL")
-			if (hasGlobal) {
-				const hasNonEnumerated = data.responseDeclarations.some((d) => d.baseType !== "identifier")
-				if (!hasNonEnumerated) {
-					ctx.addIssue({
-						code: z.ZodIssueCode.custom,
-						message: "FEEDBACK__GLOBAL requires at least one non-enumerated responseDeclaration",
-						path: ["feedbackBlocks"]
-					})
-				}
-			}
-		})
+            // 3) For non-enumerated responses, require exactly CORRECT and INCORRECT
+            for (const [outcome, g] of groupMap.entries()) {
+                if (g.baseType !== "identifier") {
+                    const hasCorrect = g.idents.has("CORRECT")
+                    const hasIncorrect = g.idents.has("INCORRECT")
+                    if (!hasCorrect || !hasIncorrect || g.idents.size !== 2) {
+                        ctx.addIssue({
+                            code: z.ZodIssueCode.custom,
+                            message: `outcome ${outcome} must contain exactly CORRECT and INCORRECT blocks`,
+                            path: ["feedbackBlocks"]
+                        })
+                    }
+                }
+            }
+        })
 		.describe("A complete QTI 3.0 assessment item with content, interactions, and scoring rules.")
 
 	// The SHELL schema produced by Shot 1 of the AI pipeline.
@@ -579,12 +567,8 @@ export function createDynamicAssessmentItemSchema(widgetMapping: Record<string, 
 			responseDeclarations: z
 				.array(ResponseDeclarationSchema)
 				.describe("Defines correct answers and scoring for all interactions in this item."),
-			body: createBlockContentSchema().nullable().describe("The main content with ref placeholders."),
-			// REMOVED: 'widgets' and 'interactions' arrays are no longer part of the shell.
-			feedbackBlocks: z
-				.array(FeedbackBlockSchema)
-				.min(1)
-				.describe("A list of feedback blocks to be displayed based on outcomes.")
+			body: createBlockContentSchema().nullable().describe("The main content with ref placeholders.")
+			// REMOVED: The `feedbackBlocks` property is no longer part of the shell.
 		})
 		.strict()
 		.describe("Initial assessment item structure with ref placeholders from the first AI generation shot.")

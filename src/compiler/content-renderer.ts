@@ -73,21 +73,28 @@ export function renderBlockContent(
 					return `<p>${renderInlineContent(item.content, widgetSlots, interactionSlots)}</p>`
 				case "codeBlock":
 					return `<pre><code>${escapeXmlText(item.code)}</code></pre>`
-				case "table": {
-					const classAttr = item.className ? ` class="${sanitizeXmlAttributeValue(item.className)}"` : ""
-					const headerCells = item.header.map((h) => `<th>${escapeXmlText(h)}</th>`).join("")
-					const thead = item.header.length > 0 ? `<thead><tr>${headerCells}</tr></thead>` : ""
-					const tbodyRows = item.rows
-						.map((row) => {
-							const cells = row.map((c) => `<td>${escapeXmlText(String(c))}</td>`).join("")
-							return `<tr>${cells}</tr>`
-						})
-						.join("")
-					return `<table${classAttr}>${thead}<tbody>${tbodyRows}</tbody></table>`
+				case "tableRich": {
+					const renderRow = (row: Array<InlineContent | null>, asHeader = false) =>
+						`<tr>${row
+						.map((cell) => {
+								const tag = asHeader ? "th" : "td"
+								// A cell contains an array of inline content items
+								return `<${tag}>${renderInlineContent(cell, widgetSlots, interactionSlots)}</${tag}>`
+							})
+							.join("")}</tr>`
+
+					const thead = item.header?.length ? `<thead>${item.header.map(r => renderRow(r, true)).join("")}</thead>` : ""
+					let tbodyRows = item.rows.map(r => renderRow(r)).join("")
+					// Footer support removed: do not emit <tfoot>; if footer provided by older data, fold into tbody as a final bold row is no longer supported
+					return `<table>${thead}<tbody>${tbodyRows}</tbody></table>`
 				}
 				case "unorderedList": {
 					const itemsXml = item.items.map((inline) => `<li><p>${renderInlineContent(inline, widgetSlots, interactionSlots)}</p></li>`).join("")
 					return `<ul>${itemsXml}</ul>`
+				}
+				case "orderedList": {
+					const itemsXml = item.items.map((inline) => `<li><p>${renderInlineContent(inline, widgetSlots, interactionSlots)}</p></li>`).join("")
+					return `<ol>${itemsXml}</ol>`
 				}
 				case "widgetRef": {
 					const content = widgetSlots.get(item.widgetId)

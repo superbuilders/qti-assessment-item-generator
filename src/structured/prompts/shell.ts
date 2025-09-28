@@ -15,8 +15,7 @@ function createShellFromExample(item: AssessmentItemInput) {
 		identifier: item.identifier,
 		title: item.title,
 		responseDeclarations: item.responseDeclarations,
-		body: item.body ?? null,
-		feedbackBlocks: item.feedbackBlocks
+		body: item.body ?? null
 	}
 	// Validate against the shell schema before returning
 	// Use safeParse to avoid throwing and to align with error handling policy
@@ -155,7 +154,7 @@ Positive example — correctly representing the same math as inline MathML (inne
 }
 \`\`\`
 Guideline:
-- If the visual is purely math, extract/represent it as inline MathML items in paragraphs. Only use widget slots for non-math visuals (charts, diagrams, tables, graphs) that are not expressible as text/MathML.
+- If the visual is purely math, extract/represent it as inline MathML items in paragraphs. Only use widget slots for non-math visuals (charts, diagrams, graphs) that are not expressible as text/MathML. Tables use tableRich block content, not widgets.
 
 **CRITICAL: EQUATIONS IN CHOICES ARE NOT WIDGETS**
 If a choice option shows only an equation or expression, represent it with inline MathML inside the choice — never as a widget slot like "choice_a_equation".
@@ -426,7 +425,7 @@ Positive example — comprehensive, educationally valuable feedback:
   "feedbackBlocks": [
     {
       "identifier": "CORRECT",
-      "outcomeIdentifier": "FEEDBACK__GLOBAL",
+      "outcomeIdentifier": "FEEDBACK__RESPONSE_TEXT",
       "content": [
         { "type": "paragraph", "content": [
           { "type": "text", "content": "Perfect! You matched all the vocabulary words correctly. You're becoming a space vocabulary expert!" }
@@ -438,7 +437,7 @@ Positive example — comprehensive, educationally valuable feedback:
     },
     {
       "identifier": "INCORRECT",
-      "outcomeIdentifier": "FEEDBACK__GLOBAL",
+      "outcomeIdentifier": "FEEDBACK__RESPONSE_TEXT",
       "content": [
         { "type": "paragraph", "content": [
           { "type": "text", "content": "Good effort! Let's explore these space vocabulary words together. Understanding these terms will unlock many exciting science concepts!" }
@@ -567,8 +566,8 @@ Remember: Feedback is your PRIMARY teaching tool. Every feedback block is an opp
 CRITICAL CLASSIFICATION RULE:
 - WIDGETS are COMPLETELY STATIC (images, graphs) - NO user input
 - INTERACTIONS require USER INPUT (typing, clicking, selecting) - ALL input elements MUST be interactions
-- EXCEPTION: TABLES ARE ALWAYS WIDGETS - Even if they contain input fields, tables MUST be widgets
-Perseus misleadingly calls both types "widgets" - you MUST reclassify based on whether user input is required, EXCEPT tables which are ALWAYS widgets.
+- TABLES ARE ALWAYS BLOCK CONTENT - Tables use the tableRich type and are never widgets
+Perseus misleadingly calls both types "widgets" - you MUST reclassify based on whether user input is required.
 
 ${supportedInteractionTypes}
 
@@ -576,12 +575,12 @@ ${supportedInteractionTypes}
 - \`plotter\` - interactive plotting/drawing → convert to \`choiceInteraction\` with static visuals in choices
 - \`interactive-graph\` - interactive graphing → convert to \`choiceInteraction\` with static visuals
 - \`grapher\` - interactive function graphing → convert to \`choiceInteraction\` with static visuals
-- \`matcher\` - matching items → SEE CRITICAL MATCHER RULES BELOW for when to use \`gapMatchInteraction\` vs \`dataTable\`
+- \`matcher\` - matching items → convert to \`gapMatchInteraction\` when appropriate (see CRITICAL MATCHER RULES below)
 - \`number-line\` - when used for plotting points (not just display) → convert to \`choiceInteraction\` with static visuals
 
 **Remember:** Perseus misleadingly calls interactive elements "widgets" in its JSON. IGNORE THIS. Reclassify based on whether user input is required, EXCEPT for tables which are ALWAYS widgets.
 
-	### CRITICAL: Matcher Conversion Rules - Gap Match vs Table
+	### CRITICAL: Matcher Conversion Rules - Gap Match vs TableRich
 
 **WHEN TO USE gapMatchInteraction (PREFERRED for fill-in-the-blank patterns):**
 - The left items are SHORT (single words, terms, numbers, or short phrases)
@@ -596,15 +595,44 @@ ${supportedInteractionTypes}
 4) In the body content, embed gaps using { "type": "gap", "gapId": "GAP_1" } where blanks appear
 5) Response declaration uses baseType "directedPair" with source->target pairs
 
-**WHEN TO USE dataTable with dropdowns (FALLBACK for traditional matching):**
-- Both sides have complete sentences or longer phrases
-- No clear "gap" pattern in the right side items
-- Traditional two-column matching exercise
-- Example: left=["Photosynthesis is...", "Respiration is..."], right=["Process using sunlight", "Process using oxygen"]
+**CRITICAL: TABLE GENERATION**
+- All tables MUST be generated as \`{ "type": "tableRich", ... }\` objects within the 'body'.
+- Tables are for presentation ONLY. They do not have a 'type' property in the widgets map.
+- For any interactive cell (e.g., a dropdown or text input), you MUST place an \`inlineInteractionRef\` inside the cell's content array.
+- The corresponding interaction (e.g., a dropdown) must be declared in the top-level 'interactions' array.
 
-**For dataTable:**
-1) Create exactly one widget slot named \`data_table\`
-2) Include a \`{ "type": "widgetRef", "widgetId": "data_table" }\` in the body
+**Positive Example: Table with Inline Dropdowns**
+\`\`\`json
+{
+  "body": [
+    {
+      "type": "tableRich",
+      "header": [
+        [
+          [{ "type": "text", "content": "Substance" }],
+          [{ "type": "text", "content": "Result" }]
+        ]
+      ],
+      "rows": [
+        [
+          [{ "type": "text", "content": "Aluminum" }],
+          [{ "type": "inlineInteractionRef", "interactionId": "dropdown_1" }]
+        ],
+        [
+          [{ "type": "text", "content": "Cork" }],
+          [{ "type": "inlineInteractionRef", "interactionId": "dropdown_2" }]
+        ]
+      ],
+      
+    }
+  ],
+  "interactions": ["dropdown_1", "dropdown_2"],
+  "responseDeclarations": [
+    { "identifier": "RESPONSE_1", "baseType": "identifier", ... },
+    { "identifier": "RESPONSE_2", "baseType": "identifier", ... }
+  ]
+}
+\`\`\`
 3) The left column lists items, right column has dropdowns
 
 	#### Worked Example — Gap Match (Perseus → Shell → QTI)
@@ -745,7 +773,7 @@ ${supportedInteractionTypes}
   "feedbackBlocks": [
     {
       "identifier": "CORRECT",
-      "outcomeIdentifier": "FEEDBACK__GLOBAL",
+      "outcomeIdentifier": "FEEDBACK__RESPONSE_TEXT",
       "content": [
         {
           "type": "paragraph",
@@ -763,7 +791,7 @@ ${supportedInteractionTypes}
     },
     {
       "identifier": "INCORRECT", 
-      "outcomeIdentifier": "FEEDBACK__GLOBAL",
+      "outcomeIdentifier": "FEEDBACK__RESPONSE_TEXT",
       "content": [
         {
           "type": "paragraph",
@@ -828,7 +856,7 @@ ${supportedInteractionTypes}
   "feedbackBlocks": [
     {
       "identifier": "CORRECT",
-      "outcomeIdentifier": "FEEDBACK__GLOBAL", 
+      "outcomeIdentifier": "FEEDBACK__RESPONSE_TEXT", 
       "content": [
         { 
           "type": "paragraph", 
@@ -846,7 +874,7 @@ ${supportedInteractionTypes}
     },
     {
       "identifier": "INCORRECT",
-      "outcomeIdentifier": "FEEDBACK__GLOBAL",
+      "outcomeIdentifier": "FEEDBACK__RESPONSE_TEXT",
       "content": [
         { 
           "type": "paragraph", 
@@ -971,30 +999,30 @@ Example shell for matcher conversion:
 {
   "body": [
     { "type": "paragraph", "content": [{ "type": "text", "content": "Match each item to its correct pair." }] },
-    { "type": "widgetRef", "widgetId": "data_table" }
+    { "type": "tableRich", "header": [...], "rows": [...] }
   ]
 }
 \`\`\`
 
 Notes for implementation:
-- The single \`data_table\` will be generated as a \`dataTable\` widget.
-- Each right-column cell must be a dropdown rendered as an inlineChoiceInteraction (inline, not block).
+- Each interactive cell must contain an \`inlineInteractionRef\` pointing to an \`inlineChoiceInteraction\`.
 - The dropdown choices should be the full set from the matcher's right side; correctness encoded in response declarations per row.
+- Tables are now purely presentational using the \`tableRich\` block content type.
 - No per-choice visuals or per-choice tables are allowed for matcher conversions.
 
 ### Perseus matcher field mapping (implementation detail)
 
 When \`widgets["matcher X"]\` is present in Perseus with the shape:
 
-- \`options.left\`: array of left-side items → becomes the table's first column (row headers). Render formulas as inline MathML.
+- \`options.left\`: array of left-side items → becomes the tableRich's first column (row headers). Render formulas as inline MathML.
 - \`options.right\`: array of right-side items → becomes the dropdown choices for EVERY row in the second column.
 - \`options.labels\`: \`[leftHeader, rightHeader]\` → becomes the two column headers, respectively.
 - \`options.orderMatters\`: can be ignored for dropdown rendering; scoring uses per-row correct identifiers.
 - \`options.padding\`: styling concern only; no effect on structure.
 
 Example mapping for the provided sample:
-- Left header: "Chemical formula " (note trailing space) → table column 1 header
-- Right header: "Name" → table column 2 header
+- Left header: "Chemical formula " (note trailing space) → tableRich column 1 header
+- Right header: "Name" → tableRich column 2 header
 - Left values: \`SrS\`, \`Na2SO4\`, \`Na2S\`, \`SrSO4\`, \`SrSe\`, \`Na2Se\` (render from LaTeX to MathML inline)
 - Dropdown choices (same for each row): \`strontium sulfide\`, \`sodium sulfate\`, \`sodium sulfide\`, \`strontium sulfate\`, \`strontium selenide\`, \`sodium selenide\`
 - Correct mapping: per row, the right choice matching the left formula's compound name
@@ -1047,7 +1075,7 @@ CRITICAL: Never embed images or SVGs directly. The body must contain ONLY text, 
   \`\`\`json
   {
     "identifier": "example-ke-dup-negative",
-    "title": "KE table duplicated inputs (negative)",
+    "title": "KE tableRich duplicated inputs (negative)",
     "body": [
       { "type": "paragraph", "content": [{ "type": "text", "content": "Consider the following passage." }] },
       { "type": "paragraph", "content": [{ "type": "text", "content": "Skeletal muscle is a type of tissue that helps move the bones of the skeleton. Skeletal muscles produce movement by contracting (shortening) in response to signals from the nervous system. These muscles require a large supply of energy in order to maintain their function. Each skeletal muscle is made up of specialized cells called myocytes." }] },
@@ -1059,7 +1087,7 @@ CRITICAL: Never embed images or SVGs directly. The body must contain ONLY text, 
   }
   \`\`\`
 
-  Negative example (DO NOT OUTPUT) — table required but rendered as sentences with inline dropdowns (cellular respiration):
+  Negative example (DO NOT OUTPUT) — tableRich required but rendered as sentences with inline dropdowns (cellular respiration):
   \`\`\`json
   {
     "identifier": "example-cellular-respiration-sentences-negative",
@@ -1267,7 +1295,7 @@ You MUST provide a feedbackBlocks array that contains feedback for all possible 
 
 **For choice-based interactions** (e.g., choiceInteraction, inlineChoiceInteraction): Create one feedback block for each choice. The block's identifier MUST match the choice's identifier. The outcomeIdentifier MUST be FEEDBACK__<responseIdentifier>, where <responseIdentifier> is the ID from the interaction.
 
-**For other interactions** (e.g., textEntry, orderInteraction, gapMatch): Create two feedback blocks with identifier values of "CORRECT" and "INCORRECT". The outcomeIdentifier MUST be FEEDBACK__GLOBAL.
+**For other interactions** (e.g., textEntry, orderInteraction, gapMatch): Create two feedback blocks with identifier values of "CORRECT" and "INCORRECT". The outcomeIdentifier MUST be FEEDBACK__<responseIdentifier>, where <responseIdentifier> is the ID from the interaction.
 
 The content field of each feedback block must contain rich, structured content using the same block content model as body content.
 
@@ -1317,7 +1345,7 @@ The content field of each feedback block must contain rich, structured content u
 "feedbackBlocks": [
   {
     "identifier": "CORRECT",
-    "outcomeIdentifier": "FEEDBACK__GLOBAL",
+    "outcomeIdentifier": "FEEDBACK__RESPONSE_TEXT",
     "content": [
       { "type": "paragraph", "content": [
         { "type": "text", "content": "Outstanding! Your sequence is perfectly correct." }
@@ -1334,7 +1362,7 @@ The content field of each feedback block must contain rich, structured content u
   },
   {
     "identifier": "INCORRECT",
-    "outcomeIdentifier": "FEEDBACK__GLOBAL",
+    "outcomeIdentifier": "FEEDBACK__RESPONSE_TEXT",
     "content": [
       { "type": "paragraph", "content": [
         { "type": "text", "content": "Let's work through this together. The correct order is: " },
@@ -1456,7 +1484,7 @@ This is a mandatory step for all questions involving a \`textEntryInteraction\`.
   "feedbackBlocks": [
     {
       "identifier": "CORRECT",
-      "outcomeIdentifier": "FEEDBACK__GLOBAL",
+      "outcomeIdentifier": "FEEDBACK__RESPONSE_TEXT",
       "content": [
         {
           "type": "paragraph",
@@ -1470,7 +1498,7 @@ This is a mandatory step for all questions involving a \`textEntryInteraction\`.
     },
     {
       "identifier": "INCORRECT",
-      "outcomeIdentifier": "FEEDBACK__GLOBAL", 
+      "outcomeIdentifier": "FEEDBACK__RESPONSE_TEXT", 
       "content": [
         {
           "type": "paragraph",
@@ -1514,7 +1542,7 @@ This is a mandatory step for all questions involving a \`textEntryInteraction\`.
   "feedbackBlocks": [
     {
       "identifier": "CORRECT",
-      "outcomeIdentifier": "FEEDBACK__GLOBAL",
+      "outcomeIdentifier": "FEEDBACK__RESPONSE_TEXT",
       "content": [
         {
           "type": "paragraph",
@@ -1528,7 +1556,7 @@ This is a mandatory step for all questions involving a \`textEntryInteraction\`.
     },
     {
       "identifier": "INCORRECT",
-      "outcomeIdentifier": "FEEDBACK__GLOBAL",
+      "outcomeIdentifier": "FEEDBACK__RESPONSE_TEXT",
       "content": [
         {
           "type": "paragraph", 
@@ -1707,13 +1735,10 @@ ${JSON.stringify(exampleShells, null, 2)}
     * This is NOT optional - the QTI compiler will REJECT any raw text currency/percent symbols
   - Do NOT create slots for currency. Never generate slotIds like "currency7" or "currency7_feedback".
 - **Table Rule (MANDATORY)**:
-  - Tables must NEVER be created as HTML \`<table>\` elements in the body.
-  - ALWAYS create a widget slot for every table (e.g., \`<slot name="table_widget_1" />\`) and add "table_widget_1" to the 'widgets' array.
-  
-  **CRITICAL: TABLES OWN THEIR INPUTS — NO DUPLICATE INTERACTIONS**
-  - If an input belongs in a table cell, embed it INSIDE the table widget (cell type 'input' or 'dropdown').
-  - Do NOT create any matching \`inlineSlot\` in the body for the same \`responseIdentifier\`.
-  - Do NOT list table-owned \`responseIdentifier\` values in the shell's top-level \`interactions\` array.
+  - All tables MUST be generated as \`{ "type": "tableRich", ... }\` objects within the 'body'.
+  - Tables are for presentation ONLY. They do not have a 'type' property in the widgets map.
+  - For any interactive cell (e.g., a dropdown or text input), you MUST place an \`inlineInteractionRef\` inside the cell's content array.
+  - The corresponding interaction (e.g., a dropdown) must be declared in the top-level 'interactions' array.
   - Do NOT repeat table rows below the table with separate inline inputs.
   - Each \`responseIdentifier\` MUST be rendered exactly once: either owned by a widget OR as a standalone interaction, never both.
 
@@ -1723,7 +1748,7 @@ ${JSON.stringify(exampleShells, null, 2)}
     "body": [
       { "type": "paragraph", "content": [{ "type": "text", "content": "A moving object's kinetic energy is determined by two factors." }] },
       { "type": "paragraph", "content": [{ "type": "text", "content": "Select whether each quantity determines an object's kinetic energy." }] },
-      { "type": "widgetRef", "widgetId": "ke_quantities_table" },
+      { "type": "tableRich", "header": [[...]], "rows": [[...]] },
       { "type": "paragraph", "content": [{ "type": "text", "content": "Mass: " }, { "type": "inlineInteractionRef", "interactionId": "dropdown_8" }] },
       { "type": "paragraph", "content": [{ "type": "text", "content": "Volume: " }, { "type": "inlineInteractionRef", "interactionId": "dropdown_10" }] },
       { "type": "paragraph", "content": [{ "type": "text", "content": "Height: " }, { "type": "inlineInteractionRef", "interactionId": "dropdown_11" }] },
@@ -1732,12 +1757,12 @@ ${JSON.stringify(exampleShells, null, 2)}
     "feedbackBlocks": [
       {
         "identifier": "CORRECT",
-        "outcomeIdentifier": "FEEDBACK__GLOBAL",
+        "outcomeIdentifier": "FEEDBACK__RESPONSE_TEXT",
         "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Correct! Well done." }] }]
       },
       {
         "identifier": "INCORRECT", 
-        "outcomeIdentifier": "FEEDBACK__GLOBAL",
+        "outcomeIdentifier": "FEEDBACK__RESPONSE_TEXT",
         "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Not quite. Please review your answers." }] }]
       }
     ],
@@ -1754,21 +1779,21 @@ ${JSON.stringify(exampleShells, null, 2)}
   \`\`\`json
   {
     "identifier": "example-ke-dup-positive",
-    "title": "KE table owns inputs (positive)",
+    "title": "KE tableRich owns inputs (positive)",
     "body": [
       { "type": "paragraph", "content": [{ "type": "text", "content": "A moving object's kinetic energy is determined by two factors." }] },
       { "type": "paragraph", "content": [{ "type": "text", "content": "Select whether each quantity determines an object's kinetic energy." }] },
-      { "type": "widgetRef", "widgetId": "ke_quantities_table" }
+      { "type": "tableRich", "header": [[...]], "rows": [[...]] }
     ],
     "feedbackBlocks": [
       {
         "identifier": "CORRECT",
-        "outcomeIdentifier": "FEEDBACK__GLOBAL",
+        "outcomeIdentifier": "FEEDBACK__RESPONSE_TEXT",
         "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Correct! Well done." }] }]
       },
       {
         "identifier": "INCORRECT", 
-        "outcomeIdentifier": "FEEDBACK__GLOBAL",
+        "outcomeIdentifier": "FEEDBACK__RESPONSE_TEXT",
         "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Not quite. Please review your answers." }] }]
       }
     ],
@@ -1791,18 +1816,18 @@ ${JSON.stringify(exampleShells, null, 2)}
       { "type": "paragraph", "content": [{ "type": "text", "content": "Only one student kept track of everyone's data. Unfortunately, their lab notebook got wet, and some of the labels were damaged." }] },
       { "type": "widgetRef", "widgetId": "image_1" },
       { "type": "paragraph", "content": [{ "type": "text", "content": "Use the data provided to identify the reactant and the amount that caused each temperature change. Each option is only used once." }] },
-      { "type": "widgetRef", "widgetId": "react_temp_table" },
+      { "type": "tableRich", "header": [[...]], "rows": [[...]] },
       { "type": "paragraph", "content": [{ "type": "text", "content": "Experiment C: Reactant " }, { "type": "inlineInteractionRef", "interactionId": "react_c" }, { "type": "text", "content": ", Amount " }, { "type": "inlineInteractionRef", "interactionId": "amt_c" }] }
     ],
     "feedbackBlocks": [
       {
         "identifier": "CORRECT",
-        "outcomeIdentifier": "FEEDBACK__GLOBAL",
+        "outcomeIdentifier": "FEEDBACK__RESPONSE_TEXT",
         "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Correct! Well done." }] }]
       },
       {
         "identifier": "INCORRECT", 
-        "outcomeIdentifier": "FEEDBACK__GLOBAL",
+        "outcomeIdentifier": "FEEDBACK__RESPONSE_TEXT",
         "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Not quite. Please review your answers." }] }]
       }
     ],
@@ -1821,22 +1846,22 @@ ${JSON.stringify(exampleShells, null, 2)}
   \`\`\`json
   {
     "identifier": "example-temp-dup-positive",
-    "title": "Temperature table owns inputs (positive)",
+    "title": "Temperature tableRich owns inputs (positive)",
     "body": [
       { "type": "paragraph", "content": [{ "type": "text", "content": "Several students tested how the temperature changed when dissolving different solids in the same amount of water." }] },
       { "type": "widgetRef", "widgetId": "image_1" },
       { "type": "paragraph", "content": [{ "type": "text", "content": "Use the data provided to identify the reactant and the amount that caused each temperature change. Each option is only used once." }] },
-      { "type": "widgetRef", "widgetId": "react_temp_table" }
+      { "type": "tableRich", "header": [[...]], "rows": [[...]], "rowHeaderCol": null, "footer": null }
     ],
     "feedbackBlocks": [
       {
         "identifier": "CORRECT",
-        "outcomeIdentifier": "FEEDBACK__GLOBAL",
+        "outcomeIdentifier": "FEEDBACK__RESPONSE_TEXT",
         "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Correct! Well done." }] }]
       },
       {
         "identifier": "INCORRECT", 
-        "outcomeIdentifier": "FEEDBACK__GLOBAL",
+        "outcomeIdentifier": "FEEDBACK__RESPONSE_TEXT",
         "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Not quite. Please review your answers." }] }]
       }
     ],
@@ -1853,8 +1878,8 @@ ${JSON.stringify(exampleShells, null, 2)}
 
   **BANNED: PSEUDO-TABLES AND PIPE/CARET CHARACTERS IN TEXT**
   - NEVER simulate tables by stacking paragraphs with delimiter characters (e.g., "Substance | Density ...").
-  - ALWAYS replace such lists with a dedicated table widget slot in the body and include its slotId in the widgets array.
-  - ABSOLUTE BAN: The vertical bar character \`|\` and the caret character \`^\` MUST NEVER appear in any text content anywhere in the output (body, prompts, feedback, choices). Use proper table widgets instead of textual pipes, and express exponents in MathML.
+  - ALWAYS replace such lists with a dedicated tableRich block in the body.
+  - ABSOLUTE BAN: The vertical bar character | and the caret character ^ MUST NEVER appear in any text content anywhere in the output (body, prompts, feedback, choices). Use proper tableRich blocks instead of textual pipes, and express exponents in MathML.
 
   Negative example (DO NOT OUTPUT) — pseudo-table paragraphs in body:
   \`\`\`json
@@ -1880,12 +1905,12 @@ ${JSON.stringify(exampleShells, null, 2)}
     "feedbackBlocks": [
       {
         "identifier": "CORRECT",
-        "outcomeIdentifier": "FEEDBACK__GLOBAL",
+        "outcomeIdentifier": "FEEDBACK__RESPONSE_TEXT",
         "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Correct! Well done." }] }]
       },
       {
         "identifier": "INCORRECT", 
-        "outcomeIdentifier": "FEEDBACK__GLOBAL",
+        "outcomeIdentifier": "FEEDBACK__RESPONSE_TEXT",
         "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Not quite. Please review your answers." }] }]
       }
     ],
@@ -1897,14 +1922,14 @@ ${JSON.stringify(exampleShells, null, 2)}
   }
   \`\`\`
 
-  Positive example — replace pseudo-table with a table widget slot:
+  Positive example — replace pseudo-table with a tableRich block:
   \`\`\`json
   {
     "identifier": "example-pseudo-table-positive",
     "title": "Replace pseudo-table with widget (positive)",
     "body": [
       { "type": "paragraph", "content": [{ "type": "text", "content": "A chemistry teacher fills a jar with liquid ethanol under a fume hood. She places three substances into the jar to see whether they will sink or float. The densities of the substances are listed below." }] },
-      { "type": "widgetRef", "widgetId": "density_table" },
+      { "type": "tableRich", "header": [[...]], "rows": [[...]] },
       { "type": "widgetRef", "widgetId": "image_1" },
       { "type": "paragraph", "content": [{ "type": "text", "content": "Complete the statements." }] },
       { "type": "paragraph", "content": [ { "type": "text", "content": "Aluminum " }, { "type": "inlineInteractionRef", "interactionId": "dropdown_1" }, { "type": "text", "content": " in ethanol." } ] },
@@ -1914,12 +1939,12 @@ ${JSON.stringify(exampleShells, null, 2)}
     "feedbackBlocks": [
       {
         "identifier": "CORRECT",
-        "outcomeIdentifier": "FEEDBACK__GLOBAL",
+        "outcomeIdentifier": "FEEDBACK__RESPONSE_TEXT",
         "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Correct! Well done." }] }]
       },
       {
         "identifier": "INCORRECT", 
-        "outcomeIdentifier": "FEEDBACK__GLOBAL",
+        "outcomeIdentifier": "FEEDBACK__RESPONSE_TEXT",
         "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Not quite. Please review your answers." }] }]
       }
     ],
@@ -1932,7 +1957,7 @@ ${JSON.stringify(exampleShells, null, 2)}
   \`\`\`
 
   **BANNED: SENTENCE-STACKED ROWS — USE TABLE WIDGET FOR ROW-WISE PROPERTIES**
-  - When content lists multiple rows with the same columns (e.g., State | Shape | Volume | Compressible), model it as a table widget.
+  - When content lists multiple rows with the same columns (e.g., State | Shape | Volume | Compressible), model it as a tableRich block.
   - Do NOT render each row as a paragraph with multiple inline slots.
 
   Negative example (DO NOT OUTPUT) — states of matter rendered as sentences with inline slots:
@@ -1949,12 +1974,12 @@ ${JSON.stringify(exampleShells, null, 2)}
     "feedbackBlocks": [
       {
         "identifier": "CORRECT",
-        "outcomeIdentifier": "FEEDBACK__GLOBAL",
+        "outcomeIdentifier": "FEEDBACK__RESPONSE_TEXT",
         "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Correct! Well done." }] }]
       },
       {
         "identifier": "INCORRECT", 
-        "outcomeIdentifier": "FEEDBACK__GLOBAL",
+        "outcomeIdentifier": "FEEDBACK__RESPONSE_TEXT",
         "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Not quite. Please review your answers." }] }]
       }
     ],
@@ -1972,11 +1997,11 @@ ${JSON.stringify(exampleShells, null, 2)}
   }
   \`\`\`
 
-  Positive example — model as a table widget with embedded dropdowns:
+  Positive example — model as a tableRich block with embedded dropdowns:
   \`\`\`json
   {
     "identifier": "example-states-table-positive",
-    "title": "States of matter table (positive)",
+    "title": "States of matter tableRich (positive)",
     "body": [
       { "type": "paragraph", "content": [{ "type": "text", "content": "Complete each row to describe the differences among solids, liquids, and gases." }] },
       { "type": "widgetRef", "widgetId": "states_table" }
@@ -1984,12 +2009,12 @@ ${JSON.stringify(exampleShells, null, 2)}
     "feedbackBlocks": [
       {
         "identifier": "CORRECT",
-        "outcomeIdentifier": "FEEDBACK__GLOBAL",
+        "outcomeIdentifier": "FEEDBACK__RESPONSE_TEXT",
         "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Correct! Well done." }] }]
       },
       {
         "identifier": "INCORRECT", 
-        "outcomeIdentifier": "FEEDBACK__GLOBAL",
+        "outcomeIdentifier": "FEEDBACK__RESPONSE_TEXT",
         "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Not quite. Please review your answers." }] }]
       }
     ],
@@ -2118,13 +2143,13 @@ ${JSON.stringify(exampleShells, null, 2)}
   }
   \`\`\`
 
-  WRONG (dataTable dropdown cells defined, but baseType is string and "correct" uses labels):
+  WRONG (tableRich dropdown cells defined, but baseType is string and "correct" uses labels):
   \`\`\`json
   {
-    "widgets": {
-      "react_temp_table": {
-        "type": "dataTable",
-        "data": [
+    "body": [
+      {
+        "type": "tableRich",
+        "rows": [
           [
             {
               "type": "dropdown",
@@ -2148,22 +2173,25 @@ ${JSON.stringify(exampleShells, null, 2)}
   CORRECT (baseType is identifier and "correct" is one of the cell choice identifiers):
   \`\`\`json
   {
-    "widgets": {
-      "react_temp_table": {
-        "type": "dataTable",
-        "data": [
+    "body": [
+      {
+        "type": "tableRich",
+        "rows": [
           [
-            {
-              "type": "dropdown",
-              "responseIdentifier": "dropdown_11",
-              "choices": [
-                { "identifier": "POS_2_0_C", "content": [{ "type": "math", "mathml": "<mo>+</mo><mn>2.0</mn><mo>°</mo><mi>C</mi>" }] },
-                { "identifier": "POS_4_2_C", "content": [{ "type": "math", "mathml": "<mo>+</mo><mn>4.2</mn><mo>°</mo><mi>C</mi>" }] }
-              ],
-              "shuffle": false
-            }
+            [{ "type": "inlineInteractionRef", "interactionId": "dropdown_11" }]
           ]
         ]
+      }
+    ],
+    "interactions": {
+      "dropdown_11": {
+        "type": "inlineChoiceInteraction",
+        "responseIdentifier": "dropdown_11",
+        "choices": [
+          { "identifier": "POS_2_0_C", "content": [{ "type": "math", "mathml": "<mo>+</mo><mn>2.0</mn><mo>°</mo><mi>C</mi>" }] },
+          { "identifier": "POS_4_2_C", "content": [{ "type": "math", "mathml": "<mo>+</mo><mn>4.2</mn><mo>°</mo><mi>C</mi>" }] }
+        ],
+        "shuffle": false
       }
     },
     "responseDeclarations": [

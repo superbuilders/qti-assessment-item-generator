@@ -1,5 +1,4 @@
 import {
-    DataTablePropsSchema,
     FractionModelDiagramPropsSchema,
     NPolygonPropsSchema,
     NumberLineWithActionPropsSchema,
@@ -14,7 +13,6 @@ export const teksMath4Collection = {
     schemas: {
         protractorAngleDiagram: ProtractorAngleDiagramPropsSchema,
         nPolygon: NPolygonPropsSchema,
-        dataTable: DataTablePropsSchema,
         dotPlot: DotPlotPropsSchema,
         tapeDiagram: TapeDiagramPropsSchema,
         numberLineWithAction: NumberLineWithActionPropsSchema,
@@ -24,7 +22,6 @@ export const teksMath4Collection = {
     widgetTypeKeys: [
         "protractorAngleDiagram",
         "nPolygon",
-        "dataTable",
         "dotPlot",
         "tapeDiagram",
         "numberLineWithAction",

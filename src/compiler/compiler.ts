@@ -21,7 +21,6 @@ import {
 
 export const ErrDuplicateResponseIdentifier = errors.new("duplicate response identifier")
 export const ErrDuplicateChoiceIdentifier = errors.new("duplicate choice identifiers")
-export const ErrInvalidRowHeaderKey = errors.new("invalid dataTable rowHeaderKey")
 
 // Type guard to check if a string is a valid widget type
 function isValidWidgetType(type: string): type is keyof typeof typedSchemas {
@@ -408,45 +407,70 @@ function dedupePromptTextFromBody(item: AssessmentItem): void {
 }
 
 function enforceNoPipesInBody(item: AssessmentItem): void {
-	if (!item.body) return
+    if (!item.body) return
 
-	for (let i = 0; i < item.body.length; i++) {
-		const block = item.body[i]
-		if (!block || block.type !== "paragraph") continue
-		const inline = block.content
-		for (let j = 0; j < inline.length; j++) {
-			const part = inline[j]
-			if (!part || part.type !== "text") continue
-			if (part.content.includes("|")) {
-				logger.error("pipe characters in body text", {
-					index: i,
-					snippet: part.content
-				})
-				throw errors.new("pipe characters banned in body text")
-			}
-		}
-	}
+    const checkInline = (inline: InlineContent | null, ctx: Record<string, unknown>) => {
+        if (!inline) return
+        for (let j = 0; j < inline.length; j++) {
+            const part = inline[j]
+            if (!part || part.type !== "text") continue
+            if (part.content.includes("|")) {
+                logger.error("pipe characters in body text", { ...ctx, snippet: part.content })
+                throw errors.new("pipe characters banned in body text")
+            }
+        }
+    }
+
+    for (let i = 0; i < item.body.length; i++) {
+        const block = item.body[i]
+        if (!block) continue
+        if (block.type === "paragraph") {
+            checkInline(block.content, { index: i })
+        } else if (block.type === "unorderedList" || block.type === "orderedList") {
+            block.items.forEach((inline, idx) => checkInline(inline, { index: i, itemIndex: idx }))
+        } else if (block.type === "tableRich") {
+            const walkRows = (rows: Array<Array<InlineContent | null>> | null) => {
+                if (!rows) return
+                rows.forEach((row, rIdx) => row.forEach((cell, cIdx) => checkInline(cell, { index: i, row: rIdx, col: cIdx })))
+            }
+            walkRows(block.header)
+            walkRows(block.rows)
+            // footer removed; nothing to walk
+        }
+    }
 }
 
 function enforceNoCaretsInBody(item: AssessmentItem): void {
-	if (!item.body) return
+    if (!item.body) return
 
-	for (let i = 0; i < item.body.length; i++) {
-		const block = item.body[i]
-		if (!block || block.type !== "paragraph") continue
-		const inline = block.content
-		for (let j = 0; j < inline.length; j++) {
-			const part = inline[j]
-			if (!part || part.type !== "text") continue
-			if (part.content.includes("^")) {
-				logger.error("caret characters in body text", {
-					index: i,
-					snippet: part.content
-				})
-				throw errors.new("caret characters banned in body text")
-			}
-		}
-	}
+    const checkInline = (inline: InlineContent | null, ctx: Record<string, unknown>) => {
+        if (!inline) return
+        for (let j = 0; j < inline.length; j++) {
+            const part = inline[j]
+            if (!part || part.type !== "text") continue
+            if (part.content.includes("^")) {
+                logger.error("caret characters in body text", { ...ctx, snippet: part.content })
+                throw errors.new("caret characters banned in body text")
+            }
+        }
+    }
+
+    for (let i = 0; i < item.body.length; i++) {
+        const block = item.body[i]
+        if (!block) continue
+        if (block.type === "paragraph") {
+            checkInline(block.content, { index: i })
+        } else if (block.type === "unorderedList" || block.type === "orderedList") {
+            block.items.forEach((inline, idx) => checkInline(inline, { index: i, itemIndex: idx }))
+        } else if (block.type === "tableRich") {
+            const walkRows = (rows: Array<Array<InlineContent | null>> | null) => {
+                if (!rows) return
+                rows.forEach((row, rIdx) => row.forEach((cell, cIdx) => checkInline(cell, { index: i, row: rIdx, col: cIdx })))
+            }
+            walkRows(block.header)
+            walkRows(block.rows)
+        }
+    }
 }
 
 function enforceNoPipesInChoiceInteraction(item: AssessmentItem): void {
@@ -604,27 +628,27 @@ function enforceNoPipesInInlineChoiceInteraction(item: AssessmentItem): void {
 // REMOVED: enforceNoPipesInTopLevelFeedback function no longer needed
 
 function enforceIdentifierOnlyMatching(item: AssessmentItem): void {
-	// Build allowed identifiers per responseIdentifier from interactions and dataTable dropdowns
+	// Build allowed identifiers per responseIdentifier from interactions
 	const allowed: Record<string, Set<string>> = {}
 	const responseIdOwners = new Map<string, string>()
 
-	const ensureSet = (id: string, ownerId: string): Set<string> => {
-		// NEW: Check for duplicate responseIdentifier across different interactions/widgets
-		const existingOwner = responseIdOwners.get(id)
-		if (existingOwner && existingOwner !== ownerId) {
-			logger.error("duplicate response identifier found across multiple interactions or widgets", {
-				responseIdentifier: id,
-				firstOwner: existingOwner,
-				secondOwner: ownerId
-			})
-			throw ErrDuplicateResponseIdentifier
-		}
-		responseIdOwners.set(id, ownerId)
-		if (!allowed[id]) {
-			allowed[id] = new Set<string>()
-		}
-		return allowed[id]
-	}
+    const ensureSet = (id: string, ownerId: string): Set<string> => {
+        // Check for duplicate responseIdentifier across different interactions
+        const existingOwner = responseIdOwners.get(id)
+        if (existingOwner && existingOwner !== ownerId) {
+            logger.error("duplicate response identifier found across multiple interactions", {
+                responseIdentifier: id,
+                firstOwner: existingOwner,
+                secondOwner: ownerId
+            })
+            throw ErrDuplicateResponseIdentifier
+        }
+        responseIdOwners.set(id, ownerId)
+        if (!allowed[id]) {
+            allowed[id] = new Set<string>()
+        }
+        return allowed[id]
+    }
 
 	// Interactions: inlineChoice, choice, order
 	if (item.interactions) {
@@ -670,52 +694,7 @@ function enforceIdentifierOnlyMatching(item: AssessmentItem): void {
 		}
 	}
 
-	// Widgets: dataTable dropdown cells
-	if (item.widgets) {
-		for (const [widgetId, widget] of Object.entries(item.widgets)) {
-			if (!widget || widget.type !== "dataTable") continue
-
-			const dataTable = widget
-
-			if (dataTable.rowHeaderKey !== null && typeof dataTable.rowHeaderKey === "string") {
-				const columnKeys = new Set(dataTable.columns.map((col: { key: string }) => col.key))
-				if (!columnKeys.has(dataTable.rowHeaderKey)) {
-					logger.error("dataTable rowHeaderKey references non-existent column", {
-						widgetId,
-						rowHeaderKey: dataTable.rowHeaderKey,
-						availableColumnKeys: Array.from(columnKeys)
-					})
-					throw ErrInvalidRowHeaderKey
-				}
-			}
-
-			const rows = Array.isArray(dataTable.data) ? dataTable.data : []
-			for (const row of rows) {
-				if (!Array.isArray(row)) continue
-				for (const cell of row) {
-					if (!cell || cell.type !== "dropdown") continue
-					const responseId: string = String(cell.responseIdentifier)
-				const choiceSetForResponseId = ensureSet(responseId, `${widgetId}_cell_${responseId}`)
-
-					const seenIdentifiers = new Set<string>()
-					for (const ch of cell.choices ?? []) {
-						const ident = String(ch.identifier)
-						// REMOVED: .toLowerCase() - now case-sensitive
-						if (seenIdentifiers.has(ident)) {
-							logger.error("duplicate dropdown identifiers in dataTable cell (case-sensitive)", {
-								widgetId,
-								responseIdentifier: responseId,
-								identifier: ident
-							})
-							throw ErrDuplicateChoiceIdentifier
-						}
-						seenIdentifiers.add(ident)
-						choiceSetForResponseId.add(ident)
-					}
-				}
-			}
-		}
-	}
+    // Note: dataTable widgets removed; no widget-owned responses are supported
 
 	// Validate response declarations for any responseIdentifier with allowed set
 	for (const decl of item.responseDeclarations) {
@@ -774,7 +753,17 @@ function collectRefs(item: AssessmentItemInput): { widgetRefs: Set<string>; inte
 			if (node.type === "widgetRef") widgetRefs.add(node.widgetId)
 			if (node.type === "interactionRef") interactionRefs.add(node.interactionId)
 			if (node.type === "paragraph") walkInline(node.content)
-			if (node.type === "unorderedList") node.items.forEach(walkInline)
+			if (node.type === "unorderedList" || node.type === "orderedList") node.items.forEach(walkInline)
+			if (node.type === "tableRich") {
+				const walkRows = (rows: Array<Array<InlineContent | null>> | null) => {
+					if (!rows) return
+					for (const row of rows) {
+						for (const cell of row) walkInline(cell)
+					}
+				}
+				walkRows(node.header)
+				walkRows(node.rows)
+			}
 		}
 	}
 	
@@ -798,19 +787,7 @@ function collectRefs(item: AssessmentItemInput): { widgetRefs: Set<string>; inte
 		}
 	}
     
-	if (item.widgets) {
-		for (const widget of Object.values(item.widgets)) {
-			if (widget.type === "dataTable" && widget.data) {
-				for (const row of widget.data) {
-					for (const cell of row) {
-						if (cell.type === "inline") {
-							walkInline(cell.content)
-						}
-					}
-				}
-			}
-		}
-	}
+	// dataTable support removed; no scanning within widget content
 	
 	return { widgetRefs, interactionRefs }
 }
@@ -889,7 +866,7 @@ export async function compile(itemData: AssessmentItemInput): Promise<string> {
 
 	// Enforce identifier-only matching; no ad-hoc rewriting
 	// This function now includes checks for duplicate responseIdentifiers and choice Identifiers,
-	// as well as rowHeaderKey validation for dataTables.
+	// Note: dataTable validation has been removed.
 	enforceIdentifierOnlyMatching(enforcedItem)
 
 	const interactionSlots = new Map<string, string>()
@@ -948,19 +925,19 @@ export async function compile(itemData: AssessmentItemInput): Promise<string> {
 		enforcedItem.responseDeclarations.map((rd) => [rd.identifier, rd.cardinality])
 	)
 
-	for (const block of enforcedItem.feedbackBlocks) {
-		const match = /^FEEDBACK__([A-Za-z0-9_]+)$/.exec(block.outcomeIdentifier)
-		const responseId = match?.[1]
+    for (const block of enforcedItem.feedbackBlocks) {
+        const match = /^FEEDBACK__([A-Za-z0-9_]+)$/.exec(block.outcomeIdentifier)
+        const responseId = match?.[1]
 
-		let cardinality: "single" | "multiple" = "single"
-		if (responseId && responseId !== "GLOBAL") {
-			const responseCardinality = responseCardinalityMap.get(responseId)
-			if (responseCardinality === "multiple") {
-				cardinality = "multiple"
-			}
-		}
-		outcomeDeclarations.set(block.outcomeIdentifier, cardinality)
-	}
+        let cardinality: "single" | "multiple" = "single"
+        if (responseId) {
+            const responseCardinality = responseCardinalityMap.get(responseId)
+            if (responseCardinality === "multiple") {
+                cardinality = "multiple"
+            }
+        }
+        outcomeDeclarations.set(block.outcomeIdentifier, cardinality)
+    }
 
 	const outcomeDeclarationsXml = Array.from(outcomeDeclarations.entries())
 		.map(
@@ -972,15 +949,54 @@ export async function compile(itemData: AssessmentItemInput): Promise<string> {
 	// NEW: Generate feedbackBlocks XML with interactive widget validation
 	const feedbackBlocksXml = enforcedItem.feedbackBlocks
 		.map((block) => {
-			// Validate against interactive widgets - strict allowlist for dataTable cells
-			const contentStr = JSON.stringify(block.content)
-			if (contentStr.includes('"type":"input"') || contentStr.includes('"type":"dropdown"')) {
-				logger.error("interactive widget found in feedback content", {
-					identifier: enforcedItem.identifier,
-					blockId: block.identifier
-				})
-				throw errors.new("Interactive widgets are banned in feedback content.")
+			// Validate feedback content contains no interactions
+			const assertNoInteractions = (blocks: BlockContent | null): void => {
+				if (!blocks) return
+				for (const node of blocks) {
+					if (!node) continue
+					if (node.type === "interactionRef") {
+						logger.error("interaction ref found in feedback content", { blockId: block.identifier })
+						throw errors.new("interactions banned in feedback content")
+					}
+					if (node.type === "paragraph") {
+						for (const part of node.content) {
+							if (part && part.type === "inlineInteractionRef") {
+								logger.error("inline interaction ref found in feedback content", { blockId: block.identifier })
+								throw errors.new("interactions banned in feedback content")
+							}
+						}
+					}
+					if (node.type === "unorderedList" || node.type === "orderedList") {
+						node.items.forEach((inline) => {
+							for (const part of inline) {
+								if (part && part.type === "inlineInteractionRef") {
+									logger.error("inline interaction ref found in feedback list content", { blockId: block.identifier })
+									throw errors.new("interactions banned in feedback content")
+								}
+							}
+						})
+					}
+					if (node.type === "tableRich") {
+						const scanRows = (rows: Array<Array<InlineContent | null>> | null) => {
+							if (!rows) return
+							for (const row of rows) {
+								for (const cell of row) {
+									if (!cell) continue
+									for (const part of cell) {
+										if (part && part.type === "inlineInteractionRef") {
+											logger.error("inline interaction ref found in feedback table content", { blockId: block.identifier })
+											throw errors.new("interactions banned in feedback content")
+										}
+									}
+								}
+							}
+						}
+						scanRows(node.header)
+						scanRows(node.rows)
+					}
+				}
 			}
+			assertNoInteractions(block.content)
 			const contentXml = renderBlockContent(block.content, widgetSlots, interactionSlots)
 			return `        <qti-feedback-block outcome-identifier="${escapeXmlAttribute(block.outcomeIdentifier)}" identifier="${escapeXmlAttribute(block.identifier)}" show-hide="show">
             <qti-content-body>${contentXml}</qti-content-body>

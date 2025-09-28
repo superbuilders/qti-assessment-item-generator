@@ -428,7 +428,7 @@ export function validateAssessmentItemInput(item: AssessmentItemInput, logger: l
 	}
 
 	// Validate each response declaration has a corresponding interaction responseIdentifier
-	// or an embedded input within a widget (e.g., dataTable input cells)
+	// Note: dataTable widgets have been removed
 	if (item.responseDeclarations.length > 0) {
 		// Guard: identifier base-type with single cardinality must have exactly one correct value
 		for (const decl of item.responseDeclarations) {
@@ -449,57 +449,12 @@ export function validateAssessmentItemInput(item: AssessmentItemInput, logger: l
 			}
 		}
 
-		const widgetEmbeddedResponseIds = new Set<string>()
-		if (item.widgets) {
-			for (const widget of Object.values(item.widgets)) {
-				// Best-effort detection for dataTable widget with input cells
-				// We avoid importing widget types here; rely on duck-typing by field presence
-				if (
-					typeof widget === "object" &&
-					widget !== null &&
-					"type" in widget &&
-					typeof widget.type === "string" &&
-					widget.type === "dataTable"
-				) {
-					// Helper: extract responseIdentifier from a cell using the standard "type" discriminant
-					const extractResponseId = (cell: unknown): string | null => {
-						if (typeof cell !== "object" || cell === null) return null
-						if (!("type" in cell) || typeof cell.type !== "string") return null
-						if (cell.type !== "input" && cell.type !== "dropdown") return null
-						if (!("responseIdentifier" in cell) || typeof cell.responseIdentifier !== "string") return null
-						return cell.responseIdentifier
-					}
-
-					const data = "data" in widget ? widget.data : undefined
-					if (Array.isArray(data)) {
-						for (const row of data) {
-							if (!Array.isArray(row)) continue
-							for (const cell of row) {
-								const rid = extractResponseId(cell)
-								if (rid) widgetEmbeddedResponseIds.add(rid)
-							}
-						}
-					}
-
-					const footer = "footer" in widget ? widget.footer : undefined
-					if (Array.isArray(footer)) {
-						for (const cell of footer) {
-							const rid = extractResponseId(cell)
-							if (rid) widgetEmbeddedResponseIds.add(rid)
-						}
-					}
-				}
-			}
-		}
-
 		for (const decl of item.responseDeclarations) {
-			if (!interactionResponseIds.has(decl.identifier) && !widgetEmbeddedResponseIds.has(decl.identifier)) {
+			if (!interactionResponseIds.has(decl.identifier)) {
 				logger.error("response declaration without matching interaction", {
 					responseIdentifier: decl.identifier
 				})
-				throw errors.new(
-					`response declaration '${decl.identifier}' has no matching interaction or embedded widget input`
-				)
+				throw errors.new(`response declaration '${decl.identifier}' has no matching interaction`)
 			}
 		}
 	}

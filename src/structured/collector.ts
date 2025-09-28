@@ -1,5 +1,4 @@
 import type {
-	AssessmentItemInput,
 	BlockContent,
 	InlineContent,
 	AnyInteraction
@@ -21,12 +20,32 @@ function walkBlock(blocks: BlockContent | null, out: Set<string>): void {
 		return
 	}
 	for (const node of blocks) {
-		if (node.type === "widgetRef") {
-			out.add(node.widgetId)
-		} else if (node.type === "paragraph") {
-			walkInline(node.content, out)
-		} else if (node.type === "unorderedList") {
-			node.items.forEach((item) => walkInline(item, out))
+		switch (node.type) {
+			case "widgetRef":
+				out.add(node.widgetId)
+				break
+			case "paragraph":
+				walkInline(node.content, out)
+				break
+			case "unorderedList":
+			case "orderedList":
+				node.items.forEach((item) => walkInline(item, out))
+				break
+			case "tableRich":
+				// Walk all cells in header, rows, and footer
+				const walkRows = (rows: Array<Array<InlineContent | null>> | null) => {
+					if (!rows) return
+					rows.forEach(row => {
+						row.forEach((cell) => walkInline(cell, out))
+					})
+				}
+				walkRows(node.header)
+				walkRows(node.rows)
+				break
+			case "codeBlock":
+			case "interactionRef":
+				// No nested content to walk
+				break
 		}
 	}
 }
@@ -52,13 +71,19 @@ function walkInteractions(
 				walkBlock(interaction.content, out)
 				interaction.gapTexts.forEach((gt) => walkInline(gt.content, out))
 				break
+			case "textEntryInteraction":
+				// No nested content to walk
+				break
+			case "unsupportedInteraction":
+				// No nested content to walk
+				break
 		}
 	}
 }
 
 /**
  * Collects all unique widget slot IDs from every location within an assessment item structure.
- * This includes the body, feedback blocks, interactions, and inline content within dataTable widgets.
+ * This includes the body, feedback blocks, interactions, and any nested inline content.
  *
  * @param item - An object conforming to the structure of an AssessmentItemInput.
  * @returns A sorted, de-duplicated array of all found widget slot IDs.
@@ -67,7 +92,6 @@ export function collectAllWidgetSlotIds(item: {
 	body: BlockContent | null
 	feedbackBlocks: Array<{ content: BlockContent }> | null
 	interactions: Record<string, AnyInteraction> | null
-	widgets: AssessmentItemInput["widgets"] | null
 }): string[] {
 	const out = new Set<string>()
 
@@ -76,21 +100,6 @@ export function collectAllWidgetSlotIds(item: {
 		item.feedbackBlocks.forEach((fb) => walkBlock(fb.content, out))
 	}
 	walkInteractions(item.interactions, out)
-
-	// Special case: Scan for inline content within dataTable cells
-	if (item.widgets) {
-		for (const widget of Object.values(item.widgets)) {
-			if (widget.type === "dataTable" && widget.data) {
-				for (const row of widget.data) {
-					for (const cell of row) {
-						if (cell.type === "inline") {
-							walkInline(cell.content, out)
-						}
-					}
-				}
-			}
-		}
-	}
 
 	return Array.from(out).sort()
 }

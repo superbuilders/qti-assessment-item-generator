@@ -18,7 +18,6 @@ import { ConceptualGraphPropsSchema } from "./generators/conceptual-graph"
 import { ConstraintGeometryDiagramPropsSchema } from "./generators/constraint-geometry-diagram"
 import { CoordinatePlaneComprehensivePropsSchema } from "./generators/coordinate-plane-comprehensive"
 import { CustomPolygonDiagramPropsSchema } from "./generators/custom-polygon-diagram"
-import { DataTablePropsSchema } from "./generators/data-table"
 import { DiscreteObjectRatioDiagramPropsSchema } from "./generators/discrete-object-ratio-diagram"
 import { DivergentBarChartPropsSchema } from "./generators/divergent-bar-chart"
 import { DivisionAreaDiagramPropsSchema } from "./generators/division-area-diagram"
@@ -127,7 +126,6 @@ export const allWidgetSchemas = {
 	protractorAngleDiagram: ProtractorAngleDiagramPropsSchema,
 	radiallyConstrainedAngleDiagram: RadiallyConstrainedAngleDiagramPropsSchema,
 	shapeTransformationGraph: ShapeTransformationGraphPropsSchema,
-	dataTable: DataTablePropsSchema,
 	discreteObjectRatioDiagram: DiscreteObjectRatioDiagramPropsSchema,
 	dotPlot: DotPlotPropsSchema,
 	doubleNumberLine: DoubleNumberLinePropsSchema,
@@ -217,7 +215,6 @@ export {
 	ConceptualGraphPropsSchema,
 	ConstraintGeometryDiagramPropsSchema,
 	CoordinatePlaneComprehensivePropsSchema,
-	DataTablePropsSchema,
 	DiscreteObjectRatioDiagramPropsSchema,
 	DivergentBarChartPropsSchema,
 	DivisionAreaDiagramPropsSchema,
@@ -315,7 +312,6 @@ export type CompositeShapeDiagramProps = z.input<typeof CompositeShapeDiagramPro
 export type ConceptualGraphProps = z.input<typeof ConceptualGraphPropsSchema>
 export type ConstraintGeometryDiagramProps = z.input<typeof ConstraintGeometryDiagramPropsSchema>
 export type CoordinatePlaneComprehensiveProps = z.input<typeof CoordinatePlaneComprehensivePropsSchema>
-export type DataTableProps = z.input<typeof DataTablePropsSchema>
 export type DiscreteObjectRatioDiagramProps = z.input<typeof DiscreteObjectRatioDiagramPropsSchema>
 export type DivergentBarChartProps = z.input<typeof DivergentBarChartPropsSchema>
 export type DivisionAreaDiagramProps = z.input<typeof DivisionAreaDiagramPropsSchema>
@@ -423,7 +419,6 @@ const widgetSchemasWithoutSpecialUnions = [
 	typedSchemas.protractorAngleDiagram,
 	typedSchemas.radiallyConstrainedAngleDiagram,
 	typedSchemas.shapeTransformationGraph,
-	typedSchemas.dataTable,
 	typedSchemas.integerChipModel,
 	typedSchemas.integerChipLegend,
 	typedSchemas.discreteObjectRatioDiagram,

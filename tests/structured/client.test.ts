@@ -66,18 +66,7 @@ mock.module("openai", () => {
 												},
 												{ type: "widgetRef", widgetId: "image_widget" }
 											],
-											feedbackBlocks: [
-												{
-													identifier: "CORRECT",
-													outcomeIdentifier: "FEEDBACK__GLOBAL",
-													content: [{ type: "paragraph", content: [{ type: "text", content: "Correct" }] }]
-												},
-												{
-													identifier: "INCORRECT",
-													outcomeIdentifier: "FEEDBACK__GLOBAL",
-													content: [{ type: "paragraph", content: [{ type: "text", content: "Incorrect" }] }]
-												}
-											]
+											// feedbackBlocks removed from shell schema
 										} satisfies AssessmentItemShell,
 										refusal: null
 									}
@@ -111,6 +100,39 @@ mock.module("openai", () => {
 												type: "textEntryInteraction",
 												responseIdentifier: "RESPONSE",
 												expectedLength: 2
+											}
+										},
+										refusal: null
+									}
+								}
+							]
+						}
+					}
+					if (functionName === "feedback_generator") {
+						return {
+							choices: [
+								{
+									message: {
+										parsed: {
+											feedback: {
+												"FEEDBACK__RESPONSE": {
+													"CORRECT": {
+														content: [
+															{
+																type: "paragraph",
+																content: [{ type: "text", content: "Correct! Well done." }]
+															}
+														]
+													},
+													"INCORRECT": {
+														content: [
+															{
+																type: "paragraph", 
+																content: [{ type: "text", content: "Not quite. Try again." }]
+															}
+														]
+													}
+												}
 											}
 										},
 										refusal: null
@@ -154,7 +176,7 @@ mock.module("openai", () => {
 })
 
 describe("Structured AI Pipeline", () => {
-	test("should correctly orchestrate the 4 shots and assemble the final assessment item", async () => {
+	test("should correctly orchestrate the 5 shots and assemble the final assessment item", async () => {
 		const OpenAI = (await import("openai")).default
 		const mockOpenAI = new OpenAI()
 

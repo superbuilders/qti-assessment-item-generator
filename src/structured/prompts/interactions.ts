@@ -304,7 +304,7 @@ WRONG: \`<mfenced open="(" close=")">content</mfenced>\` --> CORRECT: \`<mrow><m
 
 ${caretBanPromptSection}
 
-**Pipes in Text BANNED — Use widget slots for tables inside choices:**
+**Pipes in Text BANNED — Use tableRich blocks for tables inside choices:**
 WRONG (pipes in a choice paragraph):
 \`\`\`
 {
@@ -319,7 +319,7 @@ WRONG (pipes in a choice paragraph):
 }
 \`\`\`
 
-CORRECT (embed the declared table widget slot):
+CORRECT (embed the declared widget slot for tables):
 \`\`\`
 {
   "choices": [
@@ -577,7 +577,7 @@ CORRECT: \`content: [{ "type": "paragraph", "content": [{ "type": "text", "conte
 
 **ABSOLUTE REQUIREMENT: You MUST use ALL widget slots declared in the assessment shell that are not already used in the body.**
 
-When the assessment shell declares widget slots (especially those following patterns like \\\`choice_a_table\\\`, \\\`choice_b_table\\\`, or \\\`RESPONSE__A__v1\\\`), these are widgets specifically reserved for embedding inside interaction choices. The pipeline has already:
+When the assessment shell declares widget slots (especially those following patterns like \\\`choice_a_visual\\\`, \\\`choice_b_visual\\\`, or \\\`RESPONSE__A__v1\\\`), these are widgets specifically reserved for embedding inside interaction choices. The pipeline has already:
 1. Identified these widgets in Shot 1
 2. Mapped them to specific widget types in Shot 2
 3. Reserved them for use in this interaction generation step
@@ -622,7 +622,7 @@ When the assessment shell declares widget slots (especially those following patt
   }
 }
 \`\`\`
-**Why this is WRONG:** The shell declared \\\`choice_a_table\\\` and \\\`choice_b_table\\\` widgets, but the interaction didn't use them. These widgets will be pruned as "unused" and never generated, breaking the question.
+**Why this is WRONG:** The shell declared \\\`choice_a_visual\\\` and \\\`choice_b_visual\\\` widgets, but the interaction didn't use them. These widgets will be pruned as "unused" and never generated, breaking the question.
 
 **CORRECT (Using the declared widget slots):**
 \`\`\`json
@@ -633,13 +633,13 @@ When the assessment shell declares widget slots (especially those following patt
       {
         "identifier": "A",
         "content": [
-          { "type": "widgetRef", "widgetId": "choice_a_table" }
+          { "type": "widgetRef", "widgetId": "choice_a_visual" }
         ]
       },
       {
         "identifier": "B",
         "content": [
-          { "type": "widgetRef", "widgetId": "choice_b_table" }
+          { "type": "widgetRef", "widgetId": "choice_b_visual" }
         ]
       }
     ]
@@ -652,10 +652,10 @@ When the assessment shell declares widget slots (especially those following patt
 2. Identify which widgets are already used in the \\\`body\\\` 
 3. The remaining unused widgets MUST be embedded in your interaction choices
 4. Use the exact slotId from the shell - do not create new slot names
-5. For choice-level visuals (tables, images, diagrams), ALWAYS use blockSlot, never create text representations
+5. For choice-level visuals (images, diagrams), ALWAYS use widgetRef, never create text representations
 
 **Common Widget Slot Patterns to Watch For:**
-- \\\`choice_a_table\\\`, \\\`choice_b_table\\\`, etc. - Tables for each choice
+- \\\`choice_a_visual\\\`, \\\`choice_b_visual\\\`, etc. - Visuals for each choice
 - \\\`RESPONSE__A__v1\\\`, \\\`RESPONSE__B__v1\\\`, etc. - Visual widgets for choices
 - \\\`option_1_diagram\\\`, \\\`option_2_diagram\\\`, etc. - Diagrams for each choice
 - Any widget slot not used in the body MUST be used in the interaction

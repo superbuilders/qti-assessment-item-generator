@@ -16,8 +16,11 @@ import type { WidgetCollectionName } from "../widgets/collections"
 import { allWidgetSchemas, type WidgetInput } from "../widgets/registry"
 import { createAssessmentShellPrompt } from "./prompts/shell"
 import { createInteractionContentPrompt } from "./prompts/interactions"
+import { createFeedbackPrompt } from "./prompts/feedback"
 import { createWidgetContentPrompt } from "./prompts/widgets"
 import { createWidgetMappingPrompt } from "./prompts/widget-mapping"
+import { enumerateFeedbackTargets } from "./feedback-targets"
+import { feedbackMapToBlocks } from "./feedback-converter"
 import type { AiContextEnvelope, ImageContext } from "./types"
 import { collectAllWidgetSlotIds } from "./collector"
 
@@ -147,7 +150,7 @@ function collectInteractionIdsFromShell(shell: AssessmentItemShell): string[] {
         }
     }
     walkBlock(shell.body)
-    for (const fb of shell.feedbackBlocks) walkBlock(fb.content)
+    // Note: feedbackBlocks are no longer part of the shell
     return Array.from(ids)
 }
 
@@ -253,16 +256,57 @@ export async function generateFromEnvelope(
 		throw errors.wrap(interactionContentResult.error, "generate interaction content")
 	}
 	const generatedInteractions = interactionContentResult.data
-	logger.debug("shot 3 complete", {
+	logger.debug("shot 2 complete", {
 		generatedInteractionKeys: Object.keys(generatedInteractions)
 	})
 
-	// NEW: Replace shell-only collection with full-item collection after interactions are generated
+	// NEW: Shot 3 - Generate feedback
+	const feedbackTargets = enumerateFeedbackTargets(
+		assessmentShell.responseDeclarations,
+		generatedInteractions
+	)
+	logger.debug("enumerated feedback targets", { targets: feedbackTargets })
+
+	const { systemInstruction: feedbackSystem, userContent: feedbackUser, FeedbackSchema } = 
+		createFeedbackPrompt(envelope, assessmentShell, generatedInteractions, feedbackTargets, imageContext)
+	
+	const feedbackResult = await errors.try(
+		openai.chat.completions.parse({
+			model: OPENAI_MODEL,
+			messages: [
+				{ role: "system", content: feedbackSystem },
+				{ role: "user", content: feedbackUser }
+			],
+			response_format: zodResponseFormat(FeedbackSchema, "feedback_generator")
+		})
+	)
+	if (feedbackResult.error) {
+		logger.error("generate feedback", { error: feedbackResult.error })
+		throw errors.wrap(feedbackResult.error, "generate feedback")
+	}
+	const feedbackChoice = feedbackResult.data.choices[0]
+	if (!feedbackChoice?.message?.parsed) {
+		logger.error("CRITICAL: OpenAI feedback generation returned no parsed content")
+		throw errors.new("empty ai response: no parsed content for feedback generation")
+	}
+	const feedbackMap = feedbackChoice.message.parsed.feedback
+	const feedbackBlocks = feedbackMapToBlocks(feedbackMap)
+	
+	// Validation: ensure all targets were addressed
+	const generatedOutcomes = new Set(feedbackBlocks.map(fb => `${fb.outcomeIdentifier}::${fb.identifier}`))
+	const missingTargets = feedbackTargets.filter(t => !generatedOutcomes.has(`${t.outcomeIdentifier}::${t.blockIdentifier}`))
+	if (missingTargets.length > 0) {
+		logger.error("feedback generation missed required targets", { missingTargets })
+		throw errors.new(`feedback generation: missing targets: ${missingTargets.map(t => `${t.outcomeIdentifier}::${t.blockIdentifier}`).join(", ")}`)
+	}
+	
+	logger.debug("shot 3 complete", { feedbackBlockCount: feedbackBlocks.length })
+
+	// NEW: Replace shell-only collection with full-item collection after feedback is generated
 	const requiredWidgetIds = collectAllWidgetSlotIds({
 		body: assessmentShell.body,
-		feedbackBlocks: assessmentShell.feedbackBlocks,
-		interactions: generatedInteractions,
-		widgets: null // No widgets in shell phase
+		feedbackBlocks: feedbackBlocks,
+		interactions: generatedInteractions
 	})
 	logger.debug("collected all required widget ids", { count: requiredWidgetIds.length, ids: requiredWidgetIds })
 
@@ -372,13 +416,14 @@ export async function generateFromEnvelope(
             throw errors.new(`widget content generation: missing content for slots: ${missingContent.join(", ")}`)
         }
 
-        logger.debug("shot 4 complete", { generatedWidgetKeys: Object.keys(generatedWidgets) })
+        logger.debug("shot 5 complete", { generatedWidgetKeys: Object.keys(generatedWidgets) })
     }
 
 	const finalAssessmentItem: AssessmentItemInput = {
 		...assessmentShell,
 		interactions: generatedInteractions,
-		widgets: generatedWidgets
+		widgets: generatedWidgets,
+		feedbackBlocks: feedbackBlocks
 	}
 	return finalAssessmentItem
 }

@@ -100,7 +100,7 @@ export const probabilityNotPurpleSpinner: AssessmentItemInput = {
 	feedbackBlocks: [
 		{
 			identifier: "CORRECT",
-			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
 			content: [
 				{
 					type: "paragraph",
@@ -144,7 +144,7 @@ export const probabilityNotPurpleSpinner: AssessmentItemInput = {
 		},
 		{
 			identifier: "INCORRECT",
-			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
 			content: [
 				{
 					type: "paragraph",
@@ -492,7 +492,7 @@ export const linearModelEquationPrediction: AssessmentItemInput = {
 		// Feedback for text_entry (CORRECT/INCORRECT)
 		{
 			identifier: "CORRECT",
-			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
 			content: [
 				{
 					type: "paragraph",
@@ -533,7 +533,7 @@ export const linearModelEquationPrediction: AssessmentItemInput = {
 		},
 		{
 			identifier: "INCORRECT",
-			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
 			content: [
 				{
 					type: "paragraph",
@@ -952,30 +952,6 @@ export const evalFractionalExponents: AssessmentItemInput = {
 		}
 	},
 	widgets: {
-		exponent_rules_visual: {
-			type: "dataTable",
-			title: "Exponent Rules Reference",
-			columns: [
-				{ key: "rule", label: [{ type: "text", content: "Rule" }], isNumeric: false },
-				{ key: "example", label: [{ type: "text", content: "Example" }], isNumeric: false }
-			],
-			rowHeaderKey: null,
-			data: [
-				[
-					{ type: "inline", content: [{ type: "text", content: "Quotient Rule" }] },
-					{ type: "inline", content: [{ type: "text", content: "a^n / b^n = (a/b)^n" }] }
-				],
-				[
-					{ type: "inline", content: [{ type: "text", content: "Negative Exponent" }] },
-					{ type: "inline", content: [{ type: "text", content: "a^(-n) = 1/a^n" }] }
-				],
-				[
-					{ type: "inline", content: [{ type: "text", content: "Fractional Exponent" }] },
-					{ type: "inline", content: [{ type: "text", content: "a^(m/n) = nth root of a^m" }] }
-				]
-			],
-			footer: []
-		},
 		fractional_exponent_steps_visual: {
 			type: "tapeDiagram",
 			width: 500,
@@ -1029,7 +1005,7 @@ export const evalFractionalExponents: AssessmentItemInput = {
 	feedbackBlocks: [
 		{
 			identifier: "CORRECT",
-			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
 			content: [
 				{
 					type: "paragraph",
@@ -1043,12 +1019,34 @@ export const evalFractionalExponents: AssessmentItemInput = {
 						{ type: "text", content: "You successfully applied the quotient rule for exponents and worked through the steps systematically." }
 					]
 				},
-				{ type: "widgetRef", widgetId: "exponent_rules_visual" }
+				{
+					type: "tableRich",
+					header: [
+						[
+							[{ type: "text", content: "Rule" }],
+							[{ type: "text", content: "Example" }]
+						]
+					],
+					rows: [
+						[
+							[{ type: "text", content: "Quotient Rule" }],
+							[{ type: "text", content: "a^n / b^n = (a/b)^n" }]
+						],
+						[
+							[{ type: "text", content: "Negative Exponent" }],
+							[{ type: "text", content: "a^(-n) = 1/a^n" }]
+						],
+						[
+							[{ type: "text", content: "Fractional Exponent" }],
+							[{ type: "text", content: "a^(m/n) = nth root of a^m" }]
+						]
+					]
+				}
 			]
 		},
 		{
 			identifier: "INCORRECT",
-			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
 			content: [
 				{
 					type: "paragraph",
@@ -1154,37 +1152,11 @@ export const compare3DigitNumbers: AssessmentItemInput = {
 		}
 	},
 	widgets: {
-		place_value_comparison_visual: {
-			type: "dataTable",
-			title: "Place Value Breakdown",
-			columns: [
-				{ key: "number", label: [{ type: "text", content: "Number" }], isNumeric: false },
-				{ key: "hundreds", label: [{ type: "text", content: "Hundreds" }], isNumeric: true },
-				{ key: "tens", label: [{ type: "text", content: "Tens" }], isNumeric: true },
-				{ key: "ones", label: [{ type: "text", content: "Ones" }], isNumeric: true }
-			],
-			rowHeaderKey: null,
-			data: [
-				[
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>708</mn>" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>7</mn>" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>0</mn>" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>8</mn>" }] }
-				],
-				[
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>79</mn>" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>0</mn>" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>7</mn>" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>9</mn>" }] }
-				]
-			],
-			footer: []
-		}
 	},
 	feedbackBlocks: [
 		{
 			identifier: "CORRECT",
-			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
 			content: [
 				{
 					type: "paragraph",
@@ -1216,7 +1188,31 @@ export const compare3DigitNumbers: AssessmentItemInput = {
 						{ type: "text", content: "The greater than symbol (>) always \"eats\" the smaller number - it opens toward the larger number!" }
 					]
 				},
-				{ type: "widgetRef", widgetId: "place_value_comparison_visual" },
+				{
+					type: "tableRich",
+					header: [
+						[
+							[{ type: "text", content: "Number" }],
+							[{ type: "text", content: "Hundreds" }],
+							[{ type: "text", content: "Tens" }],
+							[{ type: "text", content: "Ones" }]
+						]
+					],
+					rows: [
+						[
+							[{ type: "math", mathml: "<mn>708</mn>" }],
+							[{ type: "math", mathml: "<mn>7</mn>" }],
+							[{ type: "math", mathml: "<mn>0</mn>" }],
+							[{ type: "math", mathml: "<mn>8</mn>" }]
+						],
+						[
+							[{ type: "math", mathml: "<mn>79</mn>" }],
+							[{ type: "math", mathml: "<mn>0</mn>" }],
+							[{ type: "math", mathml: "<mn>7</mn>" }],
+							[{ type: "math", mathml: "<mn>9</mn>" }]
+						]
+					]
+				},
 				{
 					type: "paragraph",
 					content: [
@@ -1227,7 +1223,7 @@ export const compare3DigitNumbers: AssessmentItemInput = {
 		},
 		{
 			identifier: "INCORRECT",
-			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
 			content: [
 				{
 					type: "paragraph",
@@ -1336,29 +1332,6 @@ export const inequalityNumberLine: AssessmentItemInput = {
 			],
 			model: null
 		},
-		inequality_notation_visual: {
-			type: "dataTable",
-			title: "Inequality Symbols",
-			columns: [
-				{ key: "symbol", label: [{ type: "text", content: "Symbol" }], isNumeric: false },
-				{ key: "meaning", label: [{ type: "text", content: "Meaning" }], isNumeric: false },
-				{ key: "circle", label: [{ type: "text", content: "Circle Type" }], isNumeric: false }
-			],
-			rowHeaderKey: null,
-			data: [
-				[
-					{ type: "inline", content: [{ type: "math", mathml: "<mo>&gt;</mo>" }] },
-					{ type: "inline", content: [{ type: "text", content: "greater than" }] },
-					{ type: "inline", content: [{ type: "text", content: "open ○" }] }
-				],
-				[
-					{ type: "inline", content: [{ type: "math", mathml: "<mo>≥</mo>" }] },
-					{ type: "inline", content: [{ type: "text", content: "greater than or equal" }] },
-					{ type: "inline", content: [{ type: "text", content: "closed ●" }] }
-				]
-			],
-			footer: []
-		}
 	},
 	body: [
 		{ type: "widgetRef", widgetId: "inequality_widget" },
@@ -1542,7 +1515,28 @@ export const inequalityNumberLine: AssessmentItemInput = {
 						{ type: "text", content: " - all values strictly greater than zero." }
 					]
 				},
-				{ type: "widgetRef", widgetId: "inequality_notation_visual" },
+				{
+					type: "tableRich",
+					header: [
+						[
+							[{ type: "text", content: "Symbol" }],
+							[{ type: "text", content: "Meaning" }],
+							[{ type: "text", content: "Circle Type" }]
+						]
+					],
+					rows: [
+						[
+							[{ type: "math", mathml: "<mo>&gt;</mo>" }],
+							[{ type: "text", content: "greater than" }],
+							[{ type: "text", content: "open ○" }]
+						],
+						[
+							[{ type: "math", mathml: "<mo>≥</mo>" }],
+							[{ type: "text", content: "greater than or equal" }],
+							[{ type: "text", content: "closed ●" }]
+						]
+					]
+				},
 				{
 					type: "paragraph",
 					content: [
@@ -1858,56 +1852,6 @@ export const twoWayFrequencyTable: AssessmentItemInput = {
 			intersectionCount: 23,
 			outsideCount: 30
 		},
-		table_widget: {
-			type: "dataTable",
-			title: null,
-			columns: [
-				{ key: "condition", label: [], isNumeric: false },
-				{ key: "received", label: [{ type: "text", content: "Received cold medicine" }], isNumeric: false },
-				{
-					key: "notReceived",
-					label: [{ type: "text", content: "Did not receive cold medicine" }],
-					isNumeric: false
-				}
-			],
-			rowHeaderKey: "condition",
-			data: [
-				[
-					{ type: "inline", content: [{ type: "text", content: "Cold lasted longer than 7 days" }] },
-					{ type: "input", responseIdentifier: "RESPONSE_A", expectedLength: 3 },
-					{ type: "input", responseIdentifier: "RESPONSE_B", expectedLength: 3 }
-				],
-				[
-					{ type: "inline", content: [{ type: "text", content: "Cold did not last longer than 7 days" }] },
-					{ type: "input", responseIdentifier: "RESPONSE_C", expectedLength: 3 },
-					{ type: "input", responseIdentifier: "RESPONSE_D", expectedLength: 3 }
-				]
-			],
-			footer: []
-		},
-		venn_to_table_visual: {
-			type: "dataTable",
-			title: "Venn to Table Conversion Guide",
-			columns: [
-				{ key: "region", label: [{ type: "text", content: "Venn Region" }], isNumeric: false },
-				{ key: "table_cell", label: [{ type: "text", content: "Table Cell" }], isNumeric: false },
-				{ key: "count", label: [{ type: "text", content: "Count" }], isNumeric: true }
-			],
-			rowHeaderKey: null,
-			data: [
-				[
-					{ type: "inline", content: [{ type: "text", content: "Overlap" }] },
-					{ type: "inline", content: [{ type: "text", content: "Medicine + Long Cold" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>23</mn>" }] }
-				],
-				[
-					{ type: "inline", content: [{ type: "text", content: "Medicine Only" }] },
-					{ type: "inline", content: [{ type: "text", content: "Medicine + Short Cold" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>27</mn>" }] }
-				]
-			],
-			footer: []
-		},
 		venn_diagram_breakdown: {
 			type: "vennDiagram",
 			width: 350,
@@ -1938,13 +1882,55 @@ export const twoWayFrequencyTable: AssessmentItemInput = {
 			type: "paragraph",
 			content: [{ type: "text", content: "Complete the following two-way frequency table." }]
 		},
-		{ type: "widgetRef", widgetId: "table_widget" }
+		{
+			type: "tableRich",
+			header: [
+				[
+					[],
+					[{ type: "text", content: "Received cold medicine" }],
+					[{ type: "text", content: "Did not receive cold medicine" }]
+				]
+			],
+			rows: [
+				[
+					[{ type: "text", content: "Cold lasted longer than 7 days" }],
+					[{ type: "inlineInteractionRef", interactionId: "input_a" }],
+					[{ type: "inlineInteractionRef", interactionId: "input_b" }]
+				],
+				[
+					[{ type: "text", content: "Cold did not last longer than 7 days" }],
+					[{ type: "inlineInteractionRef", interactionId: "input_c" }],
+					[{ type: "inlineInteractionRef", interactionId: "input_d" }]
+				]
+			]
+		}
 	],
-	interactions: {},
+	interactions: {
+		input_a: {
+			type: "textEntryInteraction",
+			responseIdentifier: "RESPONSE_A",
+			expectedLength: 3
+		},
+		input_b: {
+			type: "textEntryInteraction", 
+			responseIdentifier: "RESPONSE_B",
+			expectedLength: 3
+		},
+		input_c: {
+			type: "textEntryInteraction",
+			responseIdentifier: "RESPONSE_C", 
+			expectedLength: 3
+		},
+		input_d: {
+			type: "textEntryInteraction",
+			responseIdentifier: "RESPONSE_D",
+			expectedLength: 3
+		}
+	},
 	feedbackBlocks: [
 		{
 			identifier: "CORRECT",
-			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
 			content: [
 				{
 					type: "paragraph",
@@ -1968,7 +1954,28 @@ export const twoWayFrequencyTable: AssessmentItemInput = {
 						{ type: "text", content: "This skill of converting between different data representations (Venn diagrams ↔ two-way tables) is crucial for analyzing real-world studies and surveys!" }
 					]
 				},
-				{ type: "widgetRef", widgetId: "venn_to_table_visual" },
+				{
+					type: "tableRich",
+					header: [
+						[
+							[{ type: "text", content: "Venn Region" }],
+							[{ type: "text", content: "Table Cell" }],
+							[{ type: "text", content: "Count" }]
+						]
+					],
+					rows: [
+						[
+							[{ type: "text", content: "Overlap" }],
+							[{ type: "text", content: "Medicine + Long Cold" }],
+							[{ type: "math", mathml: "<mn>23</mn>" }]
+						],
+						[
+							[{ type: "text", content: "Medicine Only" }],
+							[{ type: "text", content: "Medicine + Short Cold" }],
+							[{ type: "math", mathml: "<mn>27</mn>" }]
+						]
+					]
+				},
 				{
 					type: "paragraph",
 					content: [
@@ -1979,7 +1986,7 @@ export const twoWayFrequencyTable: AssessmentItemInput = {
 		},
 		{
 			identifier: "INCORRECT",
-			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
 			content: [
 				{
 					type: "paragraph",
@@ -2132,34 +2139,6 @@ export const equivalentFractionImages: AssessmentItemInput = {
 				}
 			]
 		},
-		equivalent_fractions_visual: {
-			type: "dataTable",
-			title: "Equivalent Fraction Examples",
-			columns: [
-				{ key: "fraction", label: [{ type: "text", content: "Fraction" }], isNumeric: false },
-				{ key: "simplified", label: [{ type: "text", content: "Simplified" }], isNumeric: false },
-				{ key: "decimal", label: [{ type: "text", content: "Decimal" }], isNumeric: false }
-			],
-			rowHeaderKey: null,
-			data: [
-				[
-					{ type: "inline", content: [{ type: "math", mathml: "<mfrac><mn>3</mn><mn>6</mn></mfrac>" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mfrac><mn>1</mn><mn>2</mn></mfrac>" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>0.5</mn>" }] }
-				],
-				[
-					{ type: "inline", content: [{ type: "math", mathml: "<mfrac><mn>4</mn><mn>8</mn></mfrac>" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mfrac><mn>1</mn><mn>2</mn></mfrac>" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>0.5</mn>" }] }
-				],
-				[
-					{ type: "inline", content: [{ type: "math", mathml: "<mfrac><mn>2</mn><mn>4</mn></mfrac>" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mfrac><mn>1</mn><mn>2</mn></mfrac>" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>0.5</mn>" }] }
-				]
-			],
-			footer: []
-		},
 		fraction_comparison_visual: {
 			type: "fractionModelDiagram",
 			width: 300,
@@ -2249,7 +2228,33 @@ export const equivalentFractionImages: AssessmentItemInput = {
 						{ type: "text", content: " because we can multiply or divide both numerator and denominator by the same number!" }
 					]
 				},
-				{ type: "widgetRef", widgetId: "equivalent_fractions_visual" },
+				{
+					type: "tableRich",
+					header: [
+						[
+							[{ type: "text", content: "Fraction" }],
+							[{ type: "text", content: "Simplified" }],
+							[{ type: "text", content: "Decimal" }]
+						]
+					],
+					rows: [
+						[
+							[{ type: "math", mathml: "<mfrac><mn>3</mn><mn>6</mn></mfrac>" }],
+							[{ type: "math", mathml: "<mfrac><mn>1</mn><mn>2</mn></mfrac>" }],
+							[{ type: "math", mathml: "<mn>0.5</mn>" }]
+						],
+						[
+							[{ type: "math", mathml: "<mfrac><mn>4</mn><mn>8</mn></mfrac>" }],
+							[{ type: "math", mathml: "<mfrac><mn>1</mn><mn>2</mn></mfrac>" }],
+							[{ type: "math", mathml: "<mn>0.5</mn>" }]
+						],
+						[
+							[{ type: "math", mathml: "<mfrac><mn>2</mn><mn>4</mn></mfrac>" }],
+							[{ type: "math", mathml: "<mfrac><mn>1</mn><mn>2</mn></mfrac>" }],
+							[{ type: "math", mathml: "<mn>0.5</mn>" }]
+						]
+					]
+				},
 				{
 					type: "paragraph",
 					content: [
@@ -2694,39 +2699,11 @@ export const circleEquationCenterRadius: AssessmentItemInput = {
 		r_entry: { type: "textEntryInteraction", responseIdentifier: "RESPONSE_R", expectedLength: 2 }
 	},
 	widgets: {
-		completing_square_visual: {
-			type: "dataTable",
-			title: "Completing the Square Steps",
-			columns: [
-				{ key: "step", label: [{ type: "text", content: "Step" }], isNumeric: false },
-				{ key: "equation", label: [{ type: "text", content: "Equation" }], isNumeric: false },
-				{ key: "explanation", label: [{ type: "text", content: "What We Did" }], isNumeric: false }
-			],
-			rowHeaderKey: null,
-			data: [
-				[
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>1</mn>" }] },
-					{ type: "inline", content: [{ type: "text", content: "Group x and y terms" }] },
-					{ type: "inline", content: [{ type: "text", content: "Separate variables" }] }
-				],
-				[
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>2</mn>" }] },
-					{ type: "inline", content: [{ type: "text", content: "Complete squares" }] },
-					{ type: "inline", content: [{ type: "text", content: "Add/subtract constants" }] }
-				],
-				[
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>3</mn>" }] },
-					{ type: "inline", content: [{ type: "text", content: "Standard form" }] },
-					{ type: "inline", content: [{ type: "text", content: "Read center and radius" }] }
-				]
-			],
-			footer: []
-		}
 	},
 	feedbackBlocks: [
 		{
 			identifier: "CORRECT",
-			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
 			content: [
 				{
 					type: "paragraph",
@@ -2773,7 +2750,7 @@ export const circleEquationCenterRadius: AssessmentItemInput = {
 		},
 		{
 			identifier: "INCORRECT",
-			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
 			content: [
 				{
 					type: "paragraph",
@@ -2842,7 +2819,33 @@ export const circleEquationCenterRadius: AssessmentItemInput = {
 						}
 					]
 				},
-				{ type: "widgetRef", widgetId: "completing_square_visual" },
+				{
+					type: "tableRich",
+					header: [
+						[
+							[{ type: "text", content: "Step" }],
+							[{ type: "text", content: "Equation" }],
+							[{ type: "text", content: "What We Did" }]
+						]
+					],
+					rows: [
+						[
+							[{ type: "math", mathml: "<mn>1</mn>" }],
+							[{ type: "text", content: "Group x and y terms" }],
+							[{ type: "text", content: "Separate variables" }]
+						],
+						[
+							[{ type: "math", mathml: "<mn>2</mn>" }],
+							[{ type: "text", content: "Complete squares" }],
+							[{ type: "text", content: "Add/subtract constants" }]
+						],
+						[
+							[{ type: "math", mathml: "<mn>3</mn>" }],
+							[{ type: "text", content: "Standard form" }],
+							[{ type: "text", content: "Read center and radius" }]
+						]
+					]
+				},
 				{
 					type: "paragraph",
 					content: [
@@ -2871,62 +2874,6 @@ export const harukaExamScore: AssessmentItemInput = {
 		}
 	],
 	widgets: {
-		score_table: {
-			type: "dataTable",
-			title: null,
-			columns: [
-				{ key: "exam", label: [{ type: "text", content: "Final exam" }], isNumeric: false },
-				{ key: "score", label: [{ type: "text", content: "Score on a 100-point scale" }], isNumeric: true }
-			],
-			rowHeaderKey: null,
-			data: [
-				[
-					{ type: "inline", content: [{ type: "text", content: "Astronomy" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>72</mn>" }] }
-				],
-				[
-					{ type: "inline", content: [{ type: "text", content: "Biology" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>85</mn>" }] }
-				],
-				[
-					{ type: "inline", content: [{ type: "text", content: "Physics" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>92</mn>" }] }
-				],
-				[
-					{ type: "inline", content: [{ type: "text", content: "Chemistry" }] },
-					{ type: "inline", content: [{ type: "text", content: "?" }] }
-				]
-			],
-			footer: []
-		},
-		mean_calculation_visual: {
-			type: "dataTable",
-			title: "Mean Calculation Breakdown",
-			columns: [
-				{ key: "step", label: [{ type: "text", content: "Step" }], isNumeric: false },
-				{ key: "calculation", label: [{ type: "text", content: "Calculation" }], isNumeric: false },
-				{ key: "result", label: [{ type: "text", content: "Result" }], isNumeric: false }
-			],
-			rowHeaderKey: null,
-			data: [
-				[
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>1</mn>" }] },
-					{ type: "inline", content: [{ type: "text", content: "Total = Mean × Count" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>84</mn><mo>×</mo><mn>4</mn><mo>=</mo><mn>336</mn>" }] }
-				],
-				[
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>2</mn>" }] },
-					{ type: "inline", content: [{ type: "text", content: "Sum known scores" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>72</mn><mo>+</mo><mn>85</mn><mo>+</mo><mn>92</mn><mo>=</mo><mn>249</mn>" }] }
-				],
-				[
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>3</mn>" }] },
-					{ type: "inline", content: [{ type: "text", content: "Find missing score" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>336</mn><mo>-</mo><mn>249</mn><mo>=</mo><mn>87</mn>" }] }
-				]
-			],
-			footer: []
-		}
 	},
 	body: [
 		{
@@ -2935,7 +2882,33 @@ export const harukaExamScore: AssessmentItemInput = {
 				{ type: "text", content: "The following table shows each of Haruka's final exam scores last semester." }
 			]
 		},
-		{ type: "widgetRef", widgetId: "score_table" },
+		{
+			type: "tableRich",
+			header: [
+				[
+					[{ type: "text", content: "Final exam" }],
+					[{ type: "text", content: "Score on a 100-point scale" }]
+				]
+			],
+			rows: [
+				[
+					[{ type: "text", content: "Astronomy" }],
+					[{ type: "math", mathml: "<mn>72</mn>" }]
+				],
+				[
+					[{ type: "text", content: "Biology" }],
+					[{ type: "math", mathml: "<mn>85</mn>" }]
+				],
+				[
+					[{ type: "text", content: "Physics" }],
+					[{ type: "math", mathml: "<mn>92</mn>" }]
+				],
+				[
+					[{ type: "text", content: "Chemistry" }],
+					[{ type: "text", content: "?" }]
+				]
+			]
+		},
 		{
 			type: "paragraph",
 			content: [
@@ -2956,7 +2929,7 @@ export const harukaExamScore: AssessmentItemInput = {
 	feedbackBlocks: [
 		{
 			identifier: "CORRECT",
-			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
 			content: [
 				{
 					type: "paragraph",
@@ -2995,7 +2968,7 @@ export const harukaExamScore: AssessmentItemInput = {
 		},
 		{
 			identifier: "INCORRECT",
-			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
 			content: [
 				{
 					type: "paragraph",
@@ -3046,7 +3019,33 @@ export const harukaExamScore: AssessmentItemInput = {
 						{ type: "math", mathml: "<mn>336</mn><mo>-</mo><mn>72</mn><mo>-</mo><mn>85</mn><mo>-</mo><mn>92</mn><mo>=</mo><mn>87</mn>" }
 					]
 				},
-				{ type: "widgetRef", widgetId: "mean_calculation_visual" },
+				{
+					type: "tableRich",
+					header: [
+						[
+							[{ type: "text", content: "Step" }],
+							[{ type: "text", content: "Calculation" }],
+							[{ type: "text", content: "Result" }]
+						]
+					],
+					rows: [
+						[
+							[{ type: "math", mathml: "<mn>1</mn>" }],
+							[{ type: "text", content: "Total = Mean × Count" }],
+							[{ type: "math", mathml: "<mn>84</mn><mo>×</mo><mn>4</mn><mo>=</mo><mn>336</mn>" }]
+						],
+						[
+							[{ type: "math", mathml: "<mn>2</mn>" }],
+							[{ type: "text", content: "Sum known scores" }],
+							[{ type: "math", mathml: "<mn>72</mn><mo>+</mo><mn>85</mn><mo>+</mo><mn>92</mn><mo>=</mo><mn>249</mn>" }]
+						],
+						[
+							[{ type: "math", mathml: "<mn>3</mn>" }],
+							[{ type: "text", content: "Find missing score" }],
+							[{ type: "math", mathml: "<mn>336</mn><mo>-</mo><mn>249</mn><mo>=</mo><mn>87</mn>" }]
+						]
+					]
+				},
 				{
 					type: "paragraph",
 					content: [
@@ -3072,53 +3071,6 @@ export const libertyvilleBusinessCycle: AssessmentItemInput = {
 		}
 	],
 	widgets: {
-		gdp_table: {
-			type: "dataTable",
-			title: null,
-			columns: [
-				{ key: "year", label: [{ type: "text", content: "Year" }], isNumeric: false },
-				{ key: "gdp", label: [{ type: "text", content: "GDP (% change)" }], isNumeric: true },
-				{
-					key: "unemployment",
-					label: [{ type: "text", content: "Unemployment (% of the labor force)" }],
-					isNumeric: true
-				}
-			],
-			rowHeaderKey: null,
-			data: [
-				[
-					{ type: "inline", content: [{ type: "text", content: "2014" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>0</mn><mo>%</mo>" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>7</mn><mo>%</mo>" }] }
-				],
-				[
-					{ type: "inline", content: [{ type: "text", content: "2015" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mo>-</mo><mn>1</mn><mo>%</mo>" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>8</mn><mo>%</mo>" }] }
-				],
-				[
-					{ type: "inline", content: [{ type: "text", content: "2016" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mo>-</mo><mn>2</mn><mo>%</mo>" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>10</mn><mo>%</mo>" }] }
-				],
-				[
-					{ type: "inline", content: [{ type: "text", content: "2017" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>2</mn><mo>%</mo>" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>6</mn><mo>%</mo>" }] }
-				],
-				[
-					{ type: "inline", content: [{ type: "text", content: "2018" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>4</mn><mo>%</mo>" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>5</mn><mo>%</mo>" }] }
-				],
-				[
-					{ type: "inline", content: [{ type: "text", content: "2019" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>1</mn><mo>%</mo>" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>6</mn><mo>%</mo>" }] }
-				]
-			],
-			footer: []
-		}
 	},
 	body: [
 		{
@@ -3131,7 +3083,48 @@ export const libertyvilleBusinessCycle: AssessmentItemInput = {
 				}
 			]
 		},
-		{ type: "widgetRef", widgetId: "gdp_table" },
+		{
+			type: "tableRich",
+			header: [
+				[
+					[{ type: "text", content: "Year" }],
+					[{ type: "text", content: "GDP (% change)" }],
+					[{ type: "text", content: "Unemployment (% of the labor force)" }]
+				]
+			],
+			rows: [
+				[
+					[{ type: "text", content: "2014" }],
+					[{ type: "math", mathml: "<mn>0</mn><mo>%</mo>" }],
+					[{ type: "math", mathml: "<mn>7</mn><mo>%</mo>" }]
+				],
+				[
+					[{ type: "text", content: "2015" }],
+					[{ type: "math", mathml: "<mo>-</mo><mn>1</mn><mo>%</mo>" }],
+					[{ type: "math", mathml: "<mn>8</mn><mo>%</mo>" }]
+				],
+				[
+					[{ type: "text", content: "2016" }],
+					[{ type: "math", mathml: "<mo>-</mo><mn>2</mn><mo>%</mo>" }],
+					[{ type: "math", mathml: "<mn>10</mn><mo>%</mo>" }]
+				],
+				[
+					[{ type: "text", content: "2017" }],
+					[{ type: "math", mathml: "<mn>2</mn><mo>%</mo>" }],
+					[{ type: "math", mathml: "<mn>6</mn><mo>%</mo>" }]
+				],
+				[
+					[{ type: "text", content: "2018" }],
+					[{ type: "math", mathml: "<mn>4</mn><mo>%</mo>" }],
+					[{ type: "math", mathml: "<mn>5</mn><mo>%</mo>" }]
+				],
+				[
+					[{ type: "text", content: "2019" }],
+					[{ type: "math", mathml: "<mn>1</mn><mo>%</mo>" }],
+					[{ type: "math", mathml: "<mn>6</mn><mo>%</mo>" }]
+				]
+			]
+		},
 		{ type: "interactionRef", interactionId: "choice_interaction" }
 	],
 	interactions: {
@@ -3421,7 +3414,7 @@ export const stokesTheoremRewrite: AssessmentItemInput = {
 	feedbackBlocks: [
 		{
 			identifier: "CORRECT",
-			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
 			content: [
 				{
 					type: "paragraph",
@@ -3431,7 +3424,7 @@ export const stokesTheoremRewrite: AssessmentItemInput = {
 		},
 		{
 			identifier: "INCORRECT",
-			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
 			content: [
 				{
 					type: "paragraph",
@@ -3454,41 +3447,6 @@ export const estimateDerivativeFromTable: AssessmentItemInput = {
 		}
 	],
 	widgets: {
-		h_table: {
-			type: "dataTable",
-			title: null,
-			columns: [
-				{ key: "x", label: [], isNumeric: false },
-				{ key: "minus9", label: [], isNumeric: true },
-				{ key: "minus8", label: [], isNumeric: true },
-				{ key: "minus6", label: [], isNumeric: true },
-				{ key: "minus3", label: [], isNumeric: true },
-				{ key: "minus2", label: [], isNumeric: true },
-				{ key: "minus1", label: [], isNumeric: true }
-			],
-			rowHeaderKey: "x",
-			data: [
-				[
-					{ type: "inline", content: [{ type: "math", mathml: "<mi>x</mi>" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mo>-</mo><mn>9</mn>" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mo>-</mo><mn>8</mn>" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mo>-</mo><mn>6</mn>" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mo>-</mo><mn>3</mn>" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mo>-</mo><mn>2</mn>" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mo>-</mo><mn>1</mn>" }] }
-				],
-				[
-					{ type: "inline", content: [{ type: "math", mathml: "<mi>h</mi><mo>(</mo><mi>x</mi><mo>)</mo>" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mo>-</mo><mn>30</mn>" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mo>-</mo><mn>29</mn>" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mo>-</mo><mn>36</mn>" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mo>-</mo><mn>20</mn>" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mo>-</mo><mn>35</mn>" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mo>-</mo><mn>47</mn>" }] }
-				]
-			],
-			footer: []
-		}
 	},
 	body: [
 		{
@@ -3499,7 +3457,30 @@ export const estimateDerivativeFromTable: AssessmentItemInput = {
 				{ type: "text", content: "." }
 			]
 		},
-		{ type: "widgetRef", widgetId: "h_table" },
+		{
+			type: "tableRich",
+			header: null,
+			rows: [
+				[
+					[{ type: "math", mathml: "<mi>x</mi>" }],
+					[{ type: "math", mathml: "<mo>-</mo><mn>9</mn>" }],
+					[{ type: "math", mathml: "<mo>-</mo><mn>8</mn>" }],
+					[{ type: "math", mathml: "<mo>-</mo><mn>6</mn>" }],
+					[{ type: "math", mathml: "<mo>-</mo><mn>3</mn>" }],
+					[{ type: "math", mathml: "<mo>-</mo><mn>2</mn>" }],
+					[{ type: "math", mathml: "<mo>-</mo><mn>1</mn>" }]
+				],
+				[
+					[{ type: "math", mathml: "<mi>h</mi><mo>(</mo><mi>x</mi><mo>)</mo>" }],
+					[{ type: "math", mathml: "<mo>-</mo><mn>30</mn>" }],
+					[{ type: "math", mathml: "<mo>-</mo><mn>29</mn>" }],
+					[{ type: "math", mathml: "<mo>-</mo><mn>36</mn>" }],
+					[{ type: "math", mathml: "<mo>-</mo><mn>20</mn>" }],
+					[{ type: "math", mathml: "<mo>-</mo><mn>35</mn>" }],
+					[{ type: "math", mathml: "<mo>-</mo><mn>47</mn>" }]
+				]
+			]
+		},
 		{ type: "interactionRef", interactionId: "choice_interaction" }
 	],
 	interactions: {
@@ -3803,132 +3784,6 @@ export const reactantAmountsTemperatureTableWithDropdowns: AssessmentItemInput =
 		{ identifier: "RESPONSE_TEXT_ENTRY", cardinality: "single", baseType: "string", correct: "done" }
 	],
 	widgets: {
-		react_temp_table: {
-			type: "dataTable",
-			title: null,
-			columns: [
-				{ key: "experiment", label: [{ type: "text", content: "Experiment" }], isNumeric: false },
-				{ key: "reactant", label: [{ type: "text", content: "Reactant" }], isNumeric: false },
-				{ key: "amount", label: [{ type: "text", content: "Amount of reactant (grams)" }], isNumeric: false },
-				{ key: "temp", label: [{ type: "text", content: "Temperature change" }], isNumeric: false }
-			],
-			rowHeaderKey: "experiment",
-			data: [
-				[
-					{ type: "inline", content: [{ type: "text", content: "A" }] },
-					{ type: "inline", content: [{ type: "text", content: "NH4Cl" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>6.0</mn><mtext> grams</mtext>" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mo>-</mo><mn>3.6</mn><mo>°</mo><mi>C</mi>" }] }
-				],
-				[
-					{ type: "inline", content: [{ type: "text", content: "B" }] },
-					{ type: "inline", content: [{ type: "text", content: "MgSO4" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>5.0</mn><mtext> grams</mtext>" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mo>+</mo><mn>1.0</mn><mo>°</mo><mi>C</mi>" }] }
-				],
-				[
-					{ type: "inline", content: [{ type: "text", content: "C" }] },
-					{
-						type: "dropdown",
-						responseIdentifier: "RESPONSE_REACT_C",
-						shuffle: true,
-						choices: [
-							{ identifier: "NH4CL", content: [{ type: "text", content: "NH4Cl" }] },
-							{ identifier: "MGSO4", content: [{ type: "text", content: "MgSO4" }] },
-							{ identifier: "CACL2", content: [{ type: "text", content: "CaCl2" }] }
-						]
-					},
-					{
-						type: "dropdown",
-						responseIdentifier: "RESPONSE_AMT_C",
-						shuffle: true,
-						choices: [
-							{ identifier: "AMT_2_5", content: [{ type: "math", mathml: "<mn>2.5</mn>" }] },
-							{ identifier: "AMT_3_0", content: [{ type: "math", mathml: "<mn>3.0</mn>" }] },
-							{ identifier: "AMT_8_0", content: [{ type: "math", mathml: "<mn>8.0</mn>" }] }
-						]
-					},
-					{ type: "inline", content: [{ type: "math", mathml: "<mo>+</mo><mn>0.5</mn><mo>°</mo><mi>C</mi>" }] }
-				],
-				[
-					{ type: "inline", content: [{ type: "text", content: "D" }] },
-					{
-						type: "dropdown",
-						responseIdentifier: "RESPONSE_REACT_D",
-						shuffle: true,
-						choices: [
-							{ identifier: "NH4CL", content: [{ type: "text", content: "NH4Cl" }] },
-							{ identifier: "MGSO4", content: [{ type: "text", content: "MgSO4" }] },
-							{ identifier: "CACL2", content: [{ type: "text", content: "CaCl2" }] }
-						]
-					},
-					{
-						type: "dropdown",
-						responseIdentifier: "RESPONSE_AMT_D",
-						shuffle: true,
-						choices: [
-							{ identifier: "AMT_2_5", content: [{ type: "math", mathml: "<mn>2.5</mn>" }] },
-							{ identifier: "AMT_3_0", content: [{ type: "math", mathml: "<mn>3.0</mn>" }] },
-							{ identifier: "AMT_8_0", content: [{ type: "math", mathml: "<mn>8.0</mn>" }] }
-						]
-					},
-					{ type: "inline", content: [{ type: "math", mathml: "<mo>-</mo><mn>1.8</mn><mo>°</mo><mi>C</mi>" }] }
-				],
-				[
-					{ type: "inline", content: [{ type: "text", content: "E" }] },
-					{
-						type: "dropdown",
-						responseIdentifier: "RESPONSE_REACT_E",
-						shuffle: true,
-						choices: [
-							{ identifier: "NH4CL", content: [{ type: "text", content: "NH4Cl" }] },
-							{ identifier: "MGSO4", content: [{ type: "text", content: "MgSO4" }] },
-							{ identifier: "CACL2", content: [{ type: "text", content: "CaCl2" }] }
-						]
-					},
-					{
-						type: "dropdown",
-						responseIdentifier: "RESPONSE_AMT_E",
-						shuffle: true,
-						choices: [
-							{ identifier: "AMT_2_5", content: [{ type: "math", mathml: "<mn>2.5</mn>" }] },
-							{ identifier: "AMT_3_0", content: [{ type: "math", mathml: "<mn>3.0</mn>" }] },
-							{ identifier: "AMT_8_0", content: [{ type: "math", mathml: "<mn>8.0</mn>" }] }
-						]
-					},
-					{ type: "inline", content: [{ type: "math", mathml: "<mo>+</mo><mn>3.2</mn><mo>°</mo><mi>C</mi>" }] }
-				]
-			],
-			footer: []
-		},
-		temperature_analysis_visual: {
-			type: "dataTable",
-			title: "Temperature Change Analysis",
-			columns: [
-				{ key: "compound", label: [{ type: "text", content: "Compound" }], isNumeric: false },
-				{ key: "effect", label: [{ type: "text", content: "Effect Type" }], isNumeric: false },
-				{ key: "pattern", label: [{ type: "text", content: "Pattern" }], isNumeric: false }
-			],
-			rowHeaderKey: null,
-			data: [
-				[
-					{ type: "inline", content: [{ type: "math", mathml: "<mi>N</mi><msub><mi>H</mi><mn>4</mn></msub><mi>Cl</mi>" }] },
-					{ type: "inline", content: [{ type: "text", content: "Endothermic" }] },
-					{ type: "inline", content: [{ type: "text", content: "Cools solution" }] }
-				],
-				[
-					{ type: "inline", content: [{ type: "math", mathml: "<mi>Mg</mi><mi>S</mi><msub><mi>O</mi><mn>4</mn></msub>" }] },
-					{ type: "inline", content: [{ type: "text", content: "Exothermic" }] },
-					{ type: "inline", content: [{ type: "text", content: "Heats solution" }] }
-				],
-				[
-					{ type: "inline", content: [{ type: "math", mathml: "<mi>Ca</mi><msub><mi>Cl</mi><mn>2</mn></msub>" }] },
-					{ type: "inline", content: [{ type: "text", content: "Exothermic" }] },
-					{ type: "inline", content: [{ type: "text", content: "Heats solution" }] }
-				]
-			],
-			footer: []
-		}
 	},
 	body: [
 		{
@@ -3941,19 +3796,121 @@ export const reactantAmountsTemperatureTableWithDropdowns: AssessmentItemInput =
 				}
 			]
 		},
-		{ type: "widgetRef", widgetId: "react_temp_table" },
+		{
+			type: "tableRich",
+			header: [
+				[
+					[{ type: "text", content: "Experiment" }],
+					[{ type: "text", content: "Reactant" }],
+					[{ type: "text", content: "Amount of reactant (grams)" }],
+					[{ type: "text", content: "Temperature change" }]
+				]
+			],
+			rows: [
+				[
+					[{ type: "text", content: "A" }],
+					[{ type: "text", content: "NH4Cl" }],
+					[{ type: "math", mathml: "<mn>6.0</mn><mtext> grams</mtext>" }],
+					[{ type: "math", mathml: "<mo>-</mo><mn>3.6</mn><mo>°</mo><mi>C</mi>" }]
+				],
+				[
+					[{ type: "text", content: "B" }],
+					[{ type: "text", content: "MgSO4" }],
+					[{ type: "math", mathml: "<mn>5.0</mn><mtext> grams</mtext>" }],
+					[{ type: "math", mathml: "<mo>+</mo><mn>1.0</mn><mo>°</mo><mi>C</mi>" }]
+				],
+				[
+					[{ type: "text", content: "C" }],
+					[{ type: "inlineInteractionRef", interactionId: "dropdown_react_c" }],
+					[{ type: "inlineInteractionRef", interactionId: "dropdown_amt_c" }],
+					[{ type: "math", mathml: "<mo>+</mo><mn>0.5</mn><mo>°</mo><mi>C</mi>" }]
+				],
+				[
+					[{ type: "text", content: "D" }],
+					[{ type: "inlineInteractionRef", interactionId: "dropdown_react_d" }],
+					[{ type: "inlineInteractionRef", interactionId: "dropdown_amt_d" }],
+					[{ type: "math", mathml: "<mo>-</mo><mn>1.8</mn><mo>°</mo><mi>C</mi>" }]
+				],
+				[
+					[{ type: "text", content: "E" }],
+					[{ type: "inlineInteractionRef", interactionId: "dropdown_react_e" }],
+					[{ type: "inlineInteractionRef", interactionId: "dropdown_amt_e" }],
+					[{ type: "math", mathml: "<mo>+</mo><mn>3.2</mn><mo>°</mo><mi>C</mi>" }]
+				]
+			]
+		},
 		{
 			type: "paragraph",
 			content: [{ type: "text", content: "Select the reactant and amount for rows C, D, and E directly in the table." }]
 		}
 	],
 	interactions: {
-		text_entry: { type: "textEntryInteraction", responseIdentifier: "RESPONSE_TEXT_ENTRY", expectedLength: 10 }
+		text_entry: { type: "textEntryInteraction", responseIdentifier: "RESPONSE_TEXT_ENTRY", expectedLength: 10 },
+		dropdown_react_c: {
+			type: "inlineChoiceInteraction",
+						responseIdentifier: "RESPONSE_REACT_C",
+						shuffle: true,
+						choices: [
+							{ identifier: "NH4CL", content: [{ type: "text", content: "NH4Cl" }] },
+							{ identifier: "MGSO4", content: [{ type: "text", content: "MgSO4" }] },
+							{ identifier: "CACL2", content: [{ type: "text", content: "CaCl2" }] }
+						]
+					},
+		dropdown_amt_c: {
+			type: "inlineChoiceInteraction",
+						responseIdentifier: "RESPONSE_AMT_C",
+						shuffle: true,
+						choices: [
+							{ identifier: "AMT_2_5", content: [{ type: "math", mathml: "<mn>2.5</mn>" }] },
+							{ identifier: "AMT_3_0", content: [{ type: "math", mathml: "<mn>3.0</mn>" }] },
+							{ identifier: "AMT_8_0", content: [{ type: "math", mathml: "<mn>8.0</mn>" }] }
+						]
+					},
+		dropdown_react_d: {
+			type: "inlineChoiceInteraction",
+						responseIdentifier: "RESPONSE_REACT_D",
+						shuffle: true,
+						choices: [
+							{ identifier: "NH4CL", content: [{ type: "text", content: "NH4Cl" }] },
+							{ identifier: "MGSO4", content: [{ type: "text", content: "MgSO4" }] },
+							{ identifier: "CACL2", content: [{ type: "text", content: "CaCl2" }] }
+						]
+					},
+		dropdown_amt_d: {
+			type: "inlineChoiceInteraction",
+						responseIdentifier: "RESPONSE_AMT_D",
+						shuffle: true,
+						choices: [
+							{ identifier: "AMT_2_5", content: [{ type: "math", mathml: "<mn>2.5</mn>" }] },
+							{ identifier: "AMT_3_0", content: [{ type: "math", mathml: "<mn>3.0</mn>" }] },
+							{ identifier: "AMT_8_0", content: [{ type: "math", mathml: "<mn>8.0</mn>" }] }
+						]
+					},
+		dropdown_react_e: {
+			type: "inlineChoiceInteraction",
+						responseIdentifier: "RESPONSE_REACT_E",
+						shuffle: true,
+						choices: [
+							{ identifier: "NH4CL", content: [{ type: "text", content: "NH4Cl" }] },
+							{ identifier: "MGSO4", content: [{ type: "text", content: "MgSO4" }] },
+							{ identifier: "CACL2", content: [{ type: "text", content: "CaCl2" }] }
+						]
+					},
+		dropdown_amt_e: {
+			type: "inlineChoiceInteraction",
+						responseIdentifier: "RESPONSE_AMT_E",
+						shuffle: true,
+						choices: [
+							{ identifier: "AMT_2_5", content: [{ type: "math", mathml: "<mn>2.5</mn>" }] },
+							{ identifier: "AMT_3_0", content: [{ type: "math", mathml: "<mn>3.0</mn>" }] },
+							{ identifier: "AMT_8_0", content: [{ type: "math", mathml: "<mn>8.0</mn>" }] }
+						]
+		}
 	},
 	feedbackBlocks: [
 		{
 			identifier: "CORRECT",
-			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
 			content: [
 				{
 					type: "paragraph",
@@ -3983,7 +3940,7 @@ export const reactantAmountsTemperatureTableWithDropdowns: AssessmentItemInput =
 		},
 		{
 			identifier: "INCORRECT",
-			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
 			content: [
 				{
 					type: "paragraph",
@@ -4027,7 +3984,33 @@ export const reactantAmountsTemperatureTableWithDropdowns: AssessmentItemInput =
 						{ type: "text", content: ": Match compounds to their characteristic effects and scale by amount." }
 					]
 				},
-				{ type: "widgetRef", widgetId: "temperature_analysis_visual" }
+				{
+					type: "tableRich",
+					header: [
+						[
+							[{ type: "text", content: "Compound" }],
+							[{ type: "text", content: "Effect Type" }],
+							[{ type: "text", content: "Pattern" }]
+						]
+					],
+					rows: [
+						[
+							[{ type: "math", mathml: "<mi>N</mi><msub><mi>H</mi><mn>4</mn></msub><mi>Cl</mi>" }],
+							[{ type: "text", content: "Endothermic" }],
+							[{ type: "text", content: "Cools solution" }]
+						],
+						[
+							[{ type: "math", mathml: "<mi>Mg</mi><mi>S</mi><msub><mi>O</mi><mn>4</mn></msub>" }],
+							[{ type: "text", content: "Exothermic" }],
+							[{ type: "text", content: "Heats solution" }]
+						],
+						[
+							[{ type: "math", mathml: "<mi>Ca</mi><msub><mi>Cl</mi><mn>2</mn></msub>" }],
+							[{ type: "text", content: "Exothermic" }],
+							[{ type: "text", content: "Heats solution" }]
+						]
+					]
+				}
 			]
 		}
 	]
@@ -4044,121 +4027,80 @@ export const attractRepelCompletionTable: AssessmentItemInput = {
 		{ identifier: "RESPONSE_TEXT_ENTRY", cardinality: "single", baseType: "string", correct: "done" }
 	],
 	widgets: {
-		attract_repel_table: {
-			type: "dataTable",
-			title: null,
-			columns: [
-				{ key: "description", label: [{ type: "text", content: "Description of objects" }], isNumeric: false },
-				{
-					key: "result",
-					label: [{ type: "text", content: "Will the objects attract or repel each other?" }],
-					isNumeric: false
-				}
-			],
-			rowHeaderKey: null,
-			data: [
-				[
-					{ type: "inline", content: [{ type: "text", content: "two charged objects, both with positive charge" }] },
-					{
-						type: "dropdown",
-						responseIdentifier: "RESPONSE_R1",
-						shuffle: false,
-						choices: [
-							{ identifier: "ATTRACT", content: [{ type: "text", content: "attract" }] },
-							{ identifier: "REPEL", content: [{ type: "text", content: "repel" }] }
-						]
-					}
-				],
-				[
-					{
-						type: "inline",
-						content: [
-							{
-								type: "text",
-								content: "two charged objects, one with positive charge and the other with negative charge"
-							}
-						]
-					},
-					{
-						type: "dropdown",
-						responseIdentifier: "RESPONSE_R2",
-						shuffle: false,
-						choices: [
-							{ identifier: "ATTRACT", content: [{ type: "text", content: "attract" }] },
-							{ identifier: "REPEL", content: [{ type: "text", content: "repel" }] }
-						]
-					}
-				],
-				[
-					{
-						type: "inline",
-						content: [
-							{ type: "text", content: "two magnets, with the north pole of one facing the south pole of the other" }
-						]
-					},
-					{
-						type: "dropdown",
-						responseIdentifier: "RESPONSE_R3",
-						shuffle: false,
-						choices: [
-							{ identifier: "ATTRACT", content: [{ type: "text", content: "attract" }] },
-							{ identifier: "REPEL", content: [{ type: "text", content: "repel" }] }
-						]
-					}
-				],
-				[
-					{
-						type: "inline",
-						content: [{ type: "text", content: "two magnets, with their south poles facing each other" }]
-					},
-					{
-						type: "dropdown",
-						responseIdentifier: "RESPONSE_R4",
-						shuffle: false,
-						choices: [
-							{ identifier: "ATTRACT", content: [{ type: "text", content: "attract" }] },
-							{ identifier: "REPEL", content: [{ type: "text", content: "repel" }] }
-						]
-					}
-				]
-			],
-			footer: []
-		},
-		force_rules_visual: {
-			type: "dataTable",
-			title: "Force Rules Summary",
-			columns: [
-				{ key: "force_type", label: [{ type: "text", content: "Force Type" }], isNumeric: false },
-				{ key: "like_objects", label: [{ type: "text", content: "Like Objects" }], isNumeric: false },
-				{ key: "opposite_objects", label: [{ type: "text", content: "Opposite Objects" }], isNumeric: false }
-			],
-			rowHeaderKey: null,
-			data: [
-				[
-					{ type: "inline", content: [{ type: "text", content: "Electric" }] },
-					{ type: "inline", content: [{ type: "text", content: "Repel" }] },
-					{ type: "inline", content: [{ type: "text", content: "Attract" }] }
-				],
-				[
-					{ type: "inline", content: [{ type: "text", content: "Magnetic" }] },
-					{ type: "inline", content: [{ type: "text", content: "Repel" }] },
-					{ type: "inline", content: [{ type: "text", content: "Attract" }] }
-				]
-			],
-			footer: []
-		}
 	},
 	body: [
 		{ type: "paragraph", content: [{ type: "text", content: "Complete the table for each pair of objects." }] },
-		{ type: "widgetRef", widgetId: "attract_repel_table" }
+		{
+			type: "tableRich",
+			header: [
+				[
+					[{ type: "text", content: "Description of objects" }],
+					[{ type: "text", content: "Will the objects attract or repel each other?" }]
+				]
+			],
+			rows: [
+				[
+					[{ type: "text", content: "two charged objects, both with positive charge" }],
+					[{ type: "inlineInteractionRef", interactionId: "dropdown_r1" }]
+				],
+				[
+					[{ type: "text", content: "two charged objects, one with positive charge and the other with negative charge" }],
+					[{ type: "inlineInteractionRef", interactionId: "dropdown_r2" }]
+				],
+				[
+					[{ type: "text", content: "two magnets, with the north pole of one facing the south pole of the other" }],
+					[{ type: "inlineInteractionRef", interactionId: "dropdown_r3" }]
+				],
+				[
+					[{ type: "text", content: "two magnets, with their south poles facing each other" }],
+					[{ type: "inlineInteractionRef", interactionId: "dropdown_r4" }]
+				]
+			]
+		}
 	],
 	interactions: {
-		text_entry: { type: "textEntryInteraction", responseIdentifier: "RESPONSE_TEXT_ENTRY", expectedLength: 10 }
+		text_entry: { type: "textEntryInteraction", responseIdentifier: "RESPONSE_TEXT_ENTRY", expectedLength: 10 },
+		dropdown_r1: {
+			type: "inlineChoiceInteraction",
+						responseIdentifier: "RESPONSE_R1",
+			shuffle: true,
+						choices: [
+							{ identifier: "ATTRACT", content: [{ type: "text", content: "attract" }] },
+							{ identifier: "REPEL", content: [{ type: "text", content: "repel" }] }
+						]
+		},
+		dropdown_r2: {
+			type: "inlineChoiceInteraction",
+						responseIdentifier: "RESPONSE_R2",
+			shuffle: true,
+						choices: [
+							{ identifier: "ATTRACT", content: [{ type: "text", content: "attract" }] },
+							{ identifier: "REPEL", content: [{ type: "text", content: "repel" }] }
+						]
+		},
+		dropdown_r3: {
+			type: "inlineChoiceInteraction",
+						responseIdentifier: "RESPONSE_R3",
+			shuffle: true,
+						choices: [
+							{ identifier: "ATTRACT", content: [{ type: "text", content: "attract" }] },
+							{ identifier: "REPEL", content: [{ type: "text", content: "repel" }] }
+						]
+		},
+		dropdown_r4: {
+			type: "inlineChoiceInteraction",
+						responseIdentifier: "RESPONSE_R4",
+			shuffle: true,
+						choices: [
+							{ identifier: "ATTRACT", content: [{ type: "text", content: "attract" }] },
+							{ identifier: "REPEL", content: [{ type: "text", content: "repel" }] }
+						]
+					}
 	},
 	feedbackBlocks: [
 		{
 			identifier: "CORRECT",
-			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
 			content: [
 				{
 					type: "paragraph",
@@ -4210,7 +4152,7 @@ export const attractRepelCompletionTable: AssessmentItemInput = {
 		},
 		{
 			identifier: "INCORRECT",
-			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
 			content: [
 				{
 					type: "paragraph",
@@ -4272,7 +4214,28 @@ export const attractRepelCompletionTable: AssessmentItemInput = {
 						{ type: "text", content: "• North + South = attract" }
 					]
 				},
-				{ type: "widgetRef", widgetId: "force_rules_visual" }
+				{
+					type: "tableRich",
+					header: [
+						[
+							[{ type: "text", content: "Force Type" }],
+							[{ type: "text", content: "Like Objects" }],
+							[{ type: "text", content: "Opposite Objects" }]
+						]
+					],
+					rows: [
+						[
+							[{ type: "text", content: "Electric" }],
+							[{ type: "text", content: "Repel" }],
+							[{ type: "text", content: "Attract" }]
+						],
+						[
+							[{ type: "text", content: "Magnetic" }],
+							[{ type: "text", content: "Repel" }],
+							[{ type: "text", content: "Attract" }]
+						]
+					]
+				}
 			]
 		}
 	]
@@ -4290,34 +4253,6 @@ export const shapeBinBarChart: AssessmentItemInput = {
 		}
 	],
 	widgets: {
-		shapes_table: {
-			type: "dataTable",
-			title: null,
-			columns: [
-				{ key: "shape", label: [{ type: "text", content: "Type of shape" }], isNumeric: false },
-				{ key: "count", label: [{ type: "text", content: "Number of shapes" }], isNumeric: true }
-			],
-			rowHeaderKey: null,
-			data: [
-				[
-					{ type: "inline", content: [{ type: "text", content: "Triangles" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>8</mn>" }] }
-				],
-				[
-					{ type: "inline", content: [{ type: "text", content: "Circles" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>5</mn>" }] }
-				],
-				[
-					{ type: "inline", content: [{ type: "text", content: "Rectangles" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>3</mn>" }] }
-				],
-				[
-					{ type: "inline", content: [{ type: "text", content: "Squares" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>9</mn>" }] }
-				]
-			],
-			footer: []
-		},
 		chart_a: {
 			type: "barChart",
 			title: "",
@@ -4384,7 +4319,33 @@ export const shapeBinBarChart: AssessmentItemInput = {
 			type: "paragraph",
 			content: [{ type: "text", content: "A second grade classroom has a bin of shapes." }]
 		},
-		{ type: "widgetRef", widgetId: "shapes_table" },
+		{
+			type: "tableRich",
+			header: [
+				[
+					[{ type: "text", content: "Type of shape" }],
+					[{ type: "text", content: "Number of shapes" }]
+				]
+			],
+			rows: [
+				[
+					[{ type: "text", content: "Triangles" }],
+					[{ type: "math", mathml: "<mn>8</mn>" }]
+				],
+				[
+					[{ type: "text", content: "Circles" }],
+					[{ type: "math", mathml: "<mn>5</mn>" }]
+				],
+				[
+					[{ type: "text", content: "Rectangles" }],
+					[{ type: "math", mathml: "<mn>3</mn>" }]
+				],
+				[
+					[{ type: "text", content: "Squares" }],
+					[{ type: "math", mathml: "<mn>9</mn>" }]
+				]
+			]
+		},
 		{ type: "interactionRef", interactionId: "choice_interaction" }
 	],
 	interactions: {
@@ -4684,34 +4645,6 @@ export const gamesWonBarChart: AssessmentItemInput = {
 			],
 			barColor: "#4285F4"
 		},
-		bar_chart_reading_visual: {
-			type: "dataTable",
-			title: "Bar Chart Reading Steps",
-			columns: [
-				{ key: "step", label: [{ type: "text", content: "Step" }], isNumeric: false },
-				{ key: "action", label: [{ type: "text", content: "What to Do" }], isNumeric: false }
-			],
-			rowHeaderKey: null,
-			data: [
-				[
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>1</mn>" }] },
-					{ type: "inline", content: [{ type: "text", content: "Find the bar for your team" }] }
-				],
-				[
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>2</mn>" }] },
-					{ type: "inline", content: [{ type: "text", content: "Look at the top of the bar" }] }
-				],
-				[
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>3</mn>" }] },
-					{ type: "inline", content: [{ type: "text", content: "Trace horizontally to the y-axis" }] }
-				],
-				[
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>4</mn>" }] },
-					{ type: "inline", content: [{ type: "text", content: "Read the number value" }] }
-				]
-			],
-			footer: []
-		}
 	},
 	body: [
 		{
@@ -4741,7 +4674,7 @@ export const gamesWonBarChart: AssessmentItemInput = {
 	feedbackBlocks: [
 		{
 			identifier: "CORRECT",
-			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
 			content: [
 				{
 					type: "paragraph",
@@ -4779,7 +4712,7 @@ export const gamesWonBarChart: AssessmentItemInput = {
 		},
 		{
 			identifier: "INCORRECT",
-			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
 			content: [
 				{
 					type: "paragraph",
@@ -4813,7 +4746,33 @@ export const gamesWonBarChart: AssessmentItemInput = {
 						{ type: "text", content: "." }
 					]
 				},
-				{ type: "widgetRef", widgetId: "bar_chart_reading_visual" },
+				{
+					type: "tableRich",
+					header: [
+						[
+							[{ type: "text", content: "Step" }],
+							[{ type: "text", content: "What to Do" }]
+						]
+					],
+					rows: [
+						[
+							[{ type: "math", mathml: "<mn>1</mn>" }],
+							[{ type: "text", content: "Find the bar for your team" }]
+						],
+						[
+							[{ type: "math", mathml: "<mn>2</mn>" }],
+							[{ type: "text", content: "Look at the top of the bar" }]
+						],
+						[
+							[{ type: "math", mathml: "<mn>3</mn>" }],
+							[{ type: "text", content: "Trace horizontally to the y-axis" }]
+						],
+						[
+							[{ type: "math", mathml: "<mn>4</mn>" }],
+							[{ type: "text", content: "Read the number value" }]
+						]
+					]
+				},
 				{
 					type: "paragraph",
 					content: [
@@ -4856,39 +4815,6 @@ export const dollHeightLinePlot: AssessmentItemInput = {
 			dotColor: "#333333",
 			dotRadius: 6
 		},
-		dot_plot_reading_visual: {
-			type: "dataTable",
-			title: "Dot Plot Reading Guide",
-			columns: [
-				{ key: "height", label: [{ type: "text", content: "Height (cm)" }], isNumeric: true },
-				{ key: "dots", label: [{ type: "text", content: "Number of Dots" }], isNumeric: true },
-				{ key: "taller_than_22", label: [{ type: "text", content: "Taller than 22?" }], isNumeric: false }
-			],
-			rowHeaderKey: null,
-			data: [
-				[
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>21</mn>" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>1</mn>" }] },
-					{ type: "inline", content: [{ type: "text", content: "No" }] }
-				],
-				[
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>22</mn>" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>2</mn>" }] },
-					{ type: "inline", content: [{ type: "text", content: "No" }] }
-				],
-				[
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>23</mn>" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>3</mn>" }] },
-					{ type: "inline", content: [{ type: "text", content: "Yes" }] }
-				],
-				[
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>24</mn>" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>2</mn>" }] },
-					{ type: "inline", content: [{ type: "text", content: "Yes" }] }
-				]
-			],
-			footer: []
-		}
 	},
 	body: [
 		{
@@ -4916,7 +4842,7 @@ export const dollHeightLinePlot: AssessmentItemInput = {
 	feedbackBlocks: [
 		{
 			identifier: "CORRECT",
-			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
 			content: [
 				{
 					type: "paragraph",
@@ -4966,7 +4892,7 @@ export const dollHeightLinePlot: AssessmentItemInput = {
 		},
 		{
 			identifier: "INCORRECT",
-			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
 			content: [
 				{
 					type: "paragraph",
@@ -5030,7 +4956,38 @@ export const dollHeightLinePlot: AssessmentItemInput = {
 						{ type: "text", content: " cm." }
 					]
 				},
-				{ type: "widgetRef", widgetId: "dot_plot_reading_visual" }
+				{
+					type: "tableRich",
+					header: [
+						[
+							[{ type: "text", content: "Height (cm)" }],
+							[{ type: "text", content: "Number of Dots" }],
+							[{ type: "text", content: "Taller than 22?" }]
+						]
+					],
+					rows: [
+						[
+							[{ type: "math", mathml: "<mn>21</mn>" }],
+							[{ type: "math", mathml: "<mn>1</mn>" }],
+							[{ type: "text", content: "No" }]
+						],
+						[
+							[{ type: "math", mathml: "<mn>22</mn>" }],
+							[{ type: "math", mathml: "<mn>2</mn>" }],
+							[{ type: "text", content: "No" }]
+						],
+						[
+							[{ type: "math", mathml: "<mn>23</mn>" }],
+							[{ type: "math", mathml: "<mn>3</mn>" }],
+							[{ type: "text", content: "Yes" }]
+						],
+						[
+							[{ type: "math", mathml: "<mn>24</mn>" }],
+							[{ type: "math", mathml: "<mn>2</mn>" }],
+							[{ type: "text", content: "Yes" }]
+						]
+					]
+				}
 			]
 		}
 	]
@@ -5098,7 +5055,7 @@ export const timeOnNumberLine: AssessmentItemInput = {
 	feedbackBlocks: [
 		{
 			identifier: "CORRECT",
-			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
 			content: [
 				{
 					type: "paragraph",
@@ -5144,7 +5101,7 @@ export const timeOnNumberLine: AssessmentItemInput = {
 		},
 		{
 			identifier: "INCORRECT",
-			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
 			content: [
 				{
 					type: "paragraph",
@@ -5445,35 +5402,11 @@ export const greatestCommonFactor: AssessmentItemInput = {
 			],
 			operators: null
 		},
-		factor_listing_visual: {
-			type: "dataTable",
-			title: "Factor Comparison",
-			columns: [
-				{ key: "number", label: [{ type: "text", content: "Number" }], isNumeric: false },
-				{ key: "factors", label: [{ type: "text", content: "All Factors" }], isNumeric: false }
-			],
-			rowHeaderKey: null,
-			data: [
-				[
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>30</mn>" }] },
-					{ type: "inline", content: [{ type: "text", content: "1, 2, 3, 5, 6, 10, 15, 30" }] }
-				],
-				[
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>75</mn>" }] },
-					{ type: "inline", content: [{ type: "text", content: "1, 3, 5, 15, 25, 75" }] }
-				],
-				[
-					{ type: "inline", content: [{ type: "text", content: "Common" }] },
-					{ type: "inline", content: [{ type: "text", content: "1, 3, 5, 15" }] }
-				]
-			],
-			footer: []
-		}
 	},
 	feedbackBlocks: [
 		{
 			identifier: "CORRECT",
-			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
 			content: [
 				{
 					type: "paragraph",
@@ -5514,7 +5447,7 @@ export const greatestCommonFactor: AssessmentItemInput = {
 		},
 		{
 			identifier: "INCORRECT",
-			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
 			content: [
 				{
 					type: "paragraph",
@@ -5607,7 +5540,29 @@ export const greatestCommonFactor: AssessmentItemInput = {
 						{ type: "text", content: "!" }
 					]
 				},
-				{ type: "widgetRef", widgetId: "factor_listing_visual" }
+				{
+					type: "tableRich",
+					header: [
+						[
+							[{ type: "text", content: "Number" }],
+							[{ type: "text", content: "All Factors" }]
+						]
+					],
+					rows: [
+						[
+							[{ type: "math", mathml: "<mn>30</mn>" }],
+							[{ type: "text", content: "1, 2, 3, 5, 6, 10, 15, 30" }]
+						],
+						[
+							[{ type: "math", mathml: "<mn>75</mn>" }],
+							[{ type: "text", content: "1, 3, 5, 15, 25, 75" }]
+						],
+						[
+							[{ type: "text", content: "Common" }],
+							[{ type: "text", content: "1, 3, 5, 15" }]
+						]
+					]
+				}
 			]
 		}
 	]
@@ -5622,89 +5577,83 @@ export const threeDataTablesMultipleChoice: AssessmentItemInput = {
 		{ identifier: "RESPONSE_Q3", cardinality: "single", baseType: "identifier", correct: "C" }
 	],
 	widgets: {
-		table_q1: {
-			type: "dataTable",
-			title: null,
-			columns: [
-				{ key: "fruit", label: [{ type: "text", content: "Fruit" }], isNumeric: false },
-				{ key: "count", label: [{ type: "text", content: "Count" }], isNumeric: true }
-			],
-			rowHeaderKey: null,
-			data: [
-				[
-					{ type: "inline", content: [{ type: "text", content: "Apples" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>12</mn>" }] }
-				],
-				[
-					{ type: "inline", content: [{ type: "text", content: "Bananas" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>8</mn>" }] }
-				],
-				[
-					{ type: "inline", content: [{ type: "text", content: "Cherries" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>4</mn>" }] }
-				]
-			],
-			footer: []
-		},
-		table_q2: {
-			type: "dataTable",
-			title: null,
-			columns: [
-				{ key: "city", label: [{ type: "text", content: "City" }], isNumeric: false },
-				{ key: "temp", label: [{ type: "text", content: "Temperature (°F)" }], isNumeric: true }
-			],
-			rowHeaderKey: null,
-			data: [
-				[
-					{ type: "inline", content: [{ type: "text", content: "Springfield" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>72</mn>" }] }
-				],
-				[
-					{ type: "inline", content: [{ type: "text", content: "Riverton" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>65</mn>" }] }
-				],
-				[
-					{ type: "inline", content: [{ type: "text", content: "Lakeside" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>80</mn>" }] }
-				]
-			],
-			footer: []
-		},
-		table_q3: {
-			type: "dataTable",
-			title: null,
-			columns: [
-				{ key: "subject", label: [{ type: "text", content: "Subject" }], isNumeric: false },
-				{ key: "minutes", label: [{ type: "text", content: "Minutes studied" }], isNumeric: true }
-			],
-			rowHeaderKey: null,
-			data: [
-				[
-					{ type: "inline", content: [{ type: "text", content: "Math" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>45</mn>" }] }
-				],
-				[
-					{ type: "inline", content: [{ type: "text", content: "Science" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>30</mn>" }] }
-				],
-				[
-					{ type: "inline", content: [{ type: "text", content: "History" }] },
-					{ type: "inline", content: [{ type: "math", mathml: "<mn>15</mn>" }] }
-				]
-			],
-			footer: []
-		}
 	},
 	body: [
 		{
 			type: "paragraph",
 			content: [{ type: "text", content: "For each table, answer the multiple choice question that follows." }]
 		},
-		{ type: "widgetRef", widgetId: "table_q1" },
+		{
+			type: "tableRich",
+			header: [
+				[
+					[{ type: "text", content: "Fruit" }],
+					[{ type: "text", content: "Count" }]
+				]
+			],
+			rows: [
+				[
+					[{ type: "text", content: "Apples" }],
+					[{ type: "math", mathml: "<mn>12</mn>" }]
+				],
+				[
+					[{ type: "text", content: "Bananas" }],
+					[{ type: "math", mathml: "<mn>8</mn>" }]
+				],
+				[
+					[{ type: "text", content: "Cherries" }],
+					[{ type: "math", mathml: "<mn>4</mn>" }]
+				]
+			]
+		},
 		{ type: "interactionRef", interactionId: "choice_q1" },
-		{ type: "widgetRef", widgetId: "table_q2" },
+		{
+			type: "tableRich",
+			header: [
+				[
+					[{ type: "text", content: "City" }],
+					[{ type: "text", content: "Temperature (°F)" }]
+				]
+			],
+			rows: [
+				[
+					[{ type: "text", content: "Springfield" }],
+					[{ type: "math", mathml: "<mn>72</mn>" }]
+				],
+				[
+					[{ type: "text", content: "Riverton" }],
+					[{ type: "math", mathml: "<mn>65</mn>" }]
+				],
+				[
+					[{ type: "text", content: "Lakeside" }],
+					[{ type: "math", mathml: "<mn>80</mn>" }]
+				]
+			]
+		},
 		{ type: "interactionRef", interactionId: "choice_q2" },
-		{ type: "widgetRef", widgetId: "table_q3" },
+		{
+			type: "tableRich",
+			header: [
+				[
+					[{ type: "text", content: "Subject" }],
+					[{ type: "text", content: "Minutes studied" }]
+				]
+			],
+			rows: [
+				[
+					[{ type: "text", content: "Math" }],
+					[{ type: "math", mathml: "<mn>45</mn>" }]
+				],
+				[
+					[{ type: "text", content: "Science" }],
+					[{ type: "math", mathml: "<mn>30</mn>" }]
+				],
+				[
+					[{ type: "text", content: "History" }],
+					[{ type: "math", mathml: "<mn>15</mn>" }]
+				]
+			]
+		},
 		{ type: "interactionRef", interactionId: "choice_q3" }
 	],
 	interactions: {
@@ -6097,7 +6046,7 @@ export const gustaveStepsPerMile: AssessmentItemInput = {
 	feedbackBlocks: [
 		{
 			identifier: "CORRECT",
-			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
 			content: [
 				{
 					type: "paragraph",
@@ -6141,7 +6090,7 @@ export const gustaveStepsPerMile: AssessmentItemInput = {
 		},
 		{
 			identifier: "INCORRECT",
-			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
 			content: [
 				{
 					type: "paragraph",
@@ -6458,7 +6407,7 @@ export const reactionRateChangesTable: AssessmentItemInput = {
 								identifier: "DECREASE"
 							}
 						],
-						shuffle: false,
+						shuffle: true,
 						responseIdentifier: "RESPONSE_DROPDOWN_1"
 					}
 				],
@@ -6494,7 +6443,7 @@ export const reactionRateChangesTable: AssessmentItemInput = {
 								identifier: "DECREASE"
 							}
 						],
-						shuffle: false,
+						shuffle: true,
 						responseIdentifier: "RESPONSE_DROPDOWN_2"
 					}
 				],
@@ -6530,12 +6479,12 @@ export const reactionRateChangesTable: AssessmentItemInput = {
 								identifier: "DECREASE"
 							}
 						],
-						shuffle: false,
+						shuffle: true,
 						responseIdentifier: "RESPONSE_DROPDOWN_3"
 					}
 				]
 			],
-			type: "dataTable",
+			type: "emojiImage",
 			title: "How changes affect the reaction rate",
 			footer: null,
 			columns: [
@@ -6566,7 +6515,7 @@ export const reactionRateChangesTable: AssessmentItemInput = {
 	feedbackBlocks: [
 		{
 			identifier: "CORRECT",
-			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
 			content: [
 				{
 					type: "paragraph",
@@ -6582,7 +6531,7 @@ export const reactionRateChangesTable: AssessmentItemInput = {
 		},
 		{
 			identifier: "INCORRECT",
-			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
 			content: [
 				{
 					type: "paragraph",
@@ -6763,7 +6712,7 @@ export const kineticEnergyMassSpeedRelationships: AssessmentItemInput = {
 	feedbackBlocks: [
 		{
 			identifier: "CORRECT",
-			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
 			content: [
 				{
 					type: "paragraph",
@@ -6789,7 +6738,7 @@ export const kineticEnergyMassSpeedRelationships: AssessmentItemInput = {
 		},
 		{
 			identifier: "INCORRECT",
-			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
 			content: [
 				{
 					type: "paragraph",
@@ -7118,7 +7067,7 @@ export const reactantAmountsTempChangeTablePerseus: AssessmentItemInput = {
 								identifier: "POS_4_2_C"
 							}
 						],
-						shuffle: false,
+						shuffle: true,
 						responseIdentifier: "RESPONSE_DROPDOWN_13"
 					}
 				],
@@ -7149,7 +7098,7 @@ export const reactantAmountsTempChangeTablePerseus: AssessmentItemInput = {
 								identifier: "BAOH2"
 							}
 						],
-						shuffle: false,
+						shuffle: true,
 						responseIdentifier: "RESPONSE_DROPDOWN_9"
 					},
 					{
@@ -7175,7 +7124,7 @@ export const reactantAmountsTempChangeTablePerseus: AssessmentItemInput = {
 								identifier: "POS_4_2_C"
 							}
 						],
-						shuffle: false,
+						shuffle: true,
 						responseIdentifier: "RESPONSE_DROPDOWN_12"
 					}
 				],
@@ -7206,7 +7155,7 @@ export const reactantAmountsTempChangeTablePerseus: AssessmentItemInput = {
 								identifier: "BAOH2"
 							}
 						],
-						shuffle: false,
+						shuffle: true,
 						responseIdentifier: "RESPONSE_DROPDOWN_10"
 					},
 					{
@@ -7232,12 +7181,12 @@ export const reactantAmountsTempChangeTablePerseus: AssessmentItemInput = {
 								identifier: "POS_4_2_C"
 							}
 						],
-						shuffle: false,
+						shuffle: true,
 						responseIdentifier: "RESPONSE_DROPDOWN_11"
 					}
 				]
 			],
-			type: "dataTable",
+			type: "emojiImage",
 			title: "Experiment data",
 			footer: null,
 			columns: [
@@ -7249,7 +7198,7 @@ export const reactantAmountsTempChangeTablePerseus: AssessmentItemInput = {
 			rowHeaderKey: "experiment"
 		},
 		reaction_pattern_visual: {
-			type: "dataTable",
+			type: "emojiImage",
 			title: "Reaction Pattern Analysis",
 			columns: [
 				{ key: "experiment", label: [{ type: "text", content: "Experiment" }], isNumeric: false },
@@ -7281,7 +7230,7 @@ export const reactantAmountsTempChangeTablePerseus: AssessmentItemInput = {
 	feedbackBlocks: [
 		{
 			identifier: "CORRECT",
-			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
 			content: [
 				{
 					type: "paragraph",
@@ -7339,7 +7288,7 @@ export const reactantAmountsTempChangeTablePerseus: AssessmentItemInput = {
 		},
 		{
 			identifier: "INCORRECT",
-			outcomeIdentifier: "FEEDBACK__GLOBAL",
+			outcomeIdentifier: "FEEDBACK__RESPONSE",
 			content: [
 				{
 					type: "paragraph",

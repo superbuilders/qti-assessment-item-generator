@@ -17,7 +17,6 @@ import { generateConceptualGraph } from "./generators/conceptual-graph"
 import { generateConstraintGeometryDiagram } from "./generators/constraint-geometry-diagram"
 import { generateCoordinatePlaneComprehensive } from "./generators/coordinate-plane-comprehensive"
 import { generateCustomPolygonDiagram } from "./generators/custom-polygon-diagram"
-import { generateDataTable } from "./generators/data-table"
 import { generateDiscreteObjectRatioDiagram } from "./generators/discrete-object-ratio-diagram"
 import { generateDivergentBarChart } from "./generators/divergent-bar-chart"
 import { generateDivisionAreaDiagram } from "./generators/division-area-diagram"
@@ -165,8 +164,6 @@ export async function generateWidget(widgetInput: WidgetInput): Promise<string> 
 			return await generatePolygonGraph(widget)
 		case "shapeTransformationGraph":
 			return await generateShapeTransformationGraph(widget)
-		case "dataTable":
-			return await generateDataTable(widget)
 		case "discreteObjectRatioDiagram":
 			return await generateDiscreteObjectRatioDiagram(widget)
 		case "dotPlot":

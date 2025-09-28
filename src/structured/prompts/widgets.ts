@@ -43,78 +43,6 @@ export function createWidgetContentPrompt(
 		return lines.join("\n")
 	}
 
-	// Detect whether the current mapping includes any dataTable widgets and prepare
-	// a conditional section enforcing MathML for chemical formulas/equations.
-	const hasDataTable = Object.values(widgetMapping).some((t) => t === "dataTable")
-	const chemicalMathmlSection = hasDataTable
-		? `
-**CRITICAL (DATA TABLE WIDGETS): CHEMICAL FORMULAS AND EQUATIONS MUST BE MATHML — NEVER PLAIN TEXT**
-
-- In data tables, ANY chemical formula or reaction MUST be expressed using proper MathML, not raw text.
-- Use subscripts and superscripts with MathML: <msub> for subscripts (e.g., H2 as <msub><mi>H</mi><mn>2</mn></msub>), <msup> for charges (e.g., Ca2+ as <msup><mi>Ca</mi><mrow><mn>2</mn><mo>+</mo></mrow></msup>).
-- For reactions, use operators as MathML tokens: arrow as <mo>→</mo>, plus as <mo>+</mo>.
-- Phase/medium labels like (aq), (s), (l), (g) should be wrapped in <mtext> inside parentheses.
-- This applies to ALL places inside a data table: column headers, inline cell content, and dropdown choices.
-
-Negative example (DO NOT OUTPUT) — chemical formulas as plain text in a data table:
-\`\`\`json
-{
-  "react_temp_table": {
-    "type": "dataTable",
-    "columns": [
-      { "key": "experiment", "label": [{ "type": "text", "content": "Experiment" }], "isNumeric": false },
-      { "key": "reactant",  "label": [{ "type": "text", "content": "Reactant" }],   "isNumeric": false }
-    ],
-    "data": [
-      [
-        { "type": "inline", "content": [{ "type": "text", "content": "A" }] },
-        { "type": "inline", "content": [{ "type": "text", "content": "NH4Cl" }] }
-      ],
-      [
-        { "type": "inline", "content": [{ "type": "text", "content": "B" }] },
-        { "type": "inline", "content": [{ "type": "text", "content": "MgSO4" }] }
-      ]
-    ],
-    "rowHeaderKey": "experiment"
-  }
-}
-\`\`\`
-
-Positive example — chemical formulas correctly expressed in MathML in a data table:
-\`\`\`json
-{
-  "react_temp_table": {
-    "type": "dataTable",
-    "columns": [
-      { "key": "experiment", "label": [{ "type": "text", "content": "Experiment" }], "isNumeric": false },
-      { "key": "reactant",  "label": [{ "type": "text", "content": "Reactant" }],   "isNumeric": false }
-    ],
-    "data": [
-      [
-        { "type": "inline", "content": [{ "type": "text", "content": "A" }] },
-        { "type": "inline", "content": [
-          { "type": "math", "mathml": "<mi>N</mi><msub><mi>H</mi><mn>4</mn></msub><mi>Cl</mi>" }
-        ] }
-      ],
-      [
-        { "type": "inline", "content": [{ "type": "text", "content": "B" }] },
-        { "type": "inline", "content": [
-          { "type": "math", "mathml": "<mi>Mg</mi><mi>S</mi><msub><mi>O</mi><mn>4</mn></msub>" }
-        ] }
-      ],
-      [
-        { "type": "inline", "content": [{ "type": "text", "content": "C" }] },
-        { "type": "inline", "content": [
-          { "type": "math", "mathml": "<mi>Ca</mi><msub><mi>Cl</mi><mn>2</mn></msub>" }
-        ] }
-      ]
-    ],
-    "rowHeaderKey": "experiment"
-  }
-}
-\`\`\`
-`
-		: ""
 
 	const systemInstruction = `You are an expert in educational content conversion with vision capabilities, focused on generating widget content for QTI assessments. Your task is to generate ONLY the widget content objects based on the original Perseus JSON, an assessment shell, a mapping that specifies the exact widget type for each slot, and accompanying visual context.
 
@@ -154,8 +82,6 @@ The following are CATEGORICALLY FORBIDDEN in ANY part of your output:
 
 5. **NO INVALID XML CHARACTERS** - Do not include control characters or non-characters:
    - Disallowed: U+0000–U+001F (except TAB U+0009, LF U+000A, CR U+000D), U+FFFE, U+FFFF, and unpaired surrogates.
-
-${chemicalMathmlSection}
 
 **Currency: Comprehensive Examples**
 
@@ -237,7 +163,7 @@ ${JSON.stringify(widgetMapping, null, 2)}
 Example output structure:
 {
   "widget_1": { "type": "doubleNumberLine", "width": 400, ... },
-  "table_1": { "type": "dataTable", "columns": [...], ... }
+  "chart_1": { "type": "barChart", "data": [...], ... }
 }
 
 ## NEGATIVE EXAMPLES FROM REAL ERRORS (DO NOT OUTPUT THESE)
@@ -259,12 +185,12 @@ WRONG: \`<mfenced open="(" close=")">content</mfenced>\` --> CORRECT: \`<mrow><m
 
 ${caretBanPromptSection}
 
-**Pipes in Text BANNED — Use proper data table widgets instead of textual pipes:**
+**Pipes in Text BANNED — Use proper structured content instead of textual pipes:**
 WRONG (pseudo-table using pipes in widget content):
 \`\`\`
 {
-  "some_table": {
-    "type": "dataTable",
+  "some_widget": {
+    "type": "emojiImage",
     "columns": [
       { "key": "c1", "label": [{ "type": "text", "content": "Seconds | Meters" }], "isNumeric": false }
     ],
@@ -275,22 +201,13 @@ WRONG (pseudo-table using pipes in widget content):
 }
 \`\`\`
 
-CORRECT (structured columns and cells, no text pipes):
+CORRECT (proper widget without pipes):
 \`\`\`
 {
-  "some_table": {
-    "type": "dataTable",
-    "columns": [
-      { "key": "seconds", "label": [{ "type": "text", "content": "Seconds" }], "isNumeric": true },
-      { "key": "meters",  "label": [{ "type": "text", "content": "Meters" }],  "isNumeric": true }
-    ],
-    "data": [
-      [
-        { "type": "inline", "content": [{ "type": "text", "content": "8" }] },
-        { "type": "inline", "content": [{ "type": "text", "content": "225" }] }
-      ]
-    ],
-    "rowHeaderKey": "seconds"
+  "some_widget": {
+    "type": "emojiImage",
+    "emojis": ["⏱️", "📏"],
+    "description": "Time and distance data: 8 seconds corresponds to 225 meters"
   }
 }
 \`\`\`
@@ -327,7 +244,7 @@ WRONG: \`feedback: '<p>Incorrect. Try again.</p>'\` (HTML string)
 CORRECT: \`feedback: [{ "type": "text", "content": "Incorrect. Try again." }]\`
 
 **LaTeX in Widget Properties BANNED:**
-WRONG (e.g., in a dataTable): \`"label": "Value of $$x$$"\`
+WRONG (e.g., in any widget): \`"label": "Value of $$x$$"\`
 CORRECT: \`"label": "Value of <math><mi>x</mi></math>"\`
 
 **Answer Leakage in Widgets BANNED:**

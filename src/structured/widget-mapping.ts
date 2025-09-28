@@ -83,7 +83,6 @@ Use "WIDGET_NOT_FOUND" if:
 
 - Prefer specific widgets over \`urlImage\`:
   - Graphs/charts/plots: choose graph/plot widgets (e.g., \`barChart\`, \`lineGraph\`, \`conceptualGraph\`, \`scatterPlot\`, \`populationBarChart\`, etc.)
-  - Tables: choose \`dataTable\`
   - Set comparisons: choose \`vennDiagram\`
   - Reference resources: choose specific resource widgets (e.g., \`periodicTable\`)
   - Emoji-only assets: choose \`emojiImage\`

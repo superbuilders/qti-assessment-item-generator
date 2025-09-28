@@ -176,8 +176,7 @@ Use "WIDGET_NOT_FOUND" **ONLY** if:
 
 - Prefer specific widgets over \`urlImage\`:
   - Graphs/charts/plots: choose graph/plot widgets (e.g., \`barChart\`, \`lineGraph\`, \`conceptualGraph\`, \`scatterPlot\`, \`populationBarChart\`, etc.)
-		  - Tables: choose \`dataTable\`
-		  - Tabular textual information with no numbers: prefer \`dataTable\` over \`boxGrid\`
+		  - Tables: use \`tableRich\` block content (not widget)
 		  - Use \`boxGrid\` primarily for numeric/mathematical arrays or when per-cell highlighting is essential
   - Set comparisons: choose \`vennDiagram\`
   - Reference resources: choose specific resource widgets (e.g., \`periodicTable\`)
@@ -271,7 +270,7 @@ Correct mapping when graph widgets are available:
 
 	systemInstruction += `
 
-**CRITICAL RULE**: You MUST choose a widget type from the list (or "WIDGET_NOT_FOUND") for every slot. Do not refuse or omit any slot. The slot list includes visuals used inside choices; you MUST map each slot.
+**CRITICAL RULE**: You MUST choose a widget type from the list (or "WIDGET_NOT_FOUND") for every slot. Do not refuse or omit any slot. The slot list includes visuals used inside choices and feedback blocks; you MUST map each slot.
 
 **⚠️ SEMANTIC OBJECT ENFORCEMENT**: For any visual content showing recognizable real-world objects, creatures, items, or things, you MUST prefer \`emojiImage\` over \`WIDGET_NOT_FOUND\`. This applies to ALL physical objects that exist in reality and can be named with a noun - not just common ones. The emojiImage widget is specifically designed to replace arbitrary object images with appropriate emoji representations. WIDGET_NOT_FOUND should be reserved for truly unmappable content like abstract concepts, complex diagrams, or interactive elements - NOT for any identifiable real-world object.
 

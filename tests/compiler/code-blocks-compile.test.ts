@@ -24,8 +24,8 @@ describe("Compiler: code blocks", () => {
 				TE_INT: { type: "textEntryInteraction", responseIdentifier: "RESPONSE_TE", expectedLength: null }
 			},
 			feedbackBlocks: [
-				{ identifier: "CORRECT", outcomeIdentifier: "FEEDBACK__GLOBAL", content: [] },
-				{ identifier: "INCORRECT", outcomeIdentifier: "FEEDBACK__GLOBAL", content: [] }
+				{ identifier: "CORRECT", outcomeIdentifier: "FEEDBACK__RESPONSE_TE", content: [{ type: "paragraph", content: [{ type: "text", content: "Correct" }] }] },
+				{ identifier: "INCORRECT", outcomeIdentifier: "FEEDBACK__RESPONSE_TE", content: [{ type: "paragraph", content: [{ type: "text", content: "Incorrect" }] }] }
 			]
 		}
 		const xml = await compile(item)
