@@ -59,67 +59,7 @@ describe("Compiler Identifier Validation Integration Tests", () => {
 		return expect(compile(itemWithDuplicate)).rejects.toThrow(ErrDuplicateResponseIdentifier)
 	})
 
-	test.skip("should throw ErrDuplicateResponseIdentifier for duplicates between an interaction and a widget", async () => {
-		const itemWithDuplicate: AssessmentItemInput = {
-			identifier: "test-interaction-widget-duplicate",
-			title: "Test Interaction Widget Duplicate",
-			body: [],
-			feedbackBlocks: [
-				{
-					identifier: "CORRECT",
-					outcomeIdentifier: "FEEDBACK__RESPONSE_TEXT",
-					content: [{ type: "paragraph", content: [{ type: "text", content: "Correct" }] }]
-				},
-				{
-					identifier: "INCORRECT",
-					outcomeIdentifier: "FEEDBACK__RESPONSE_TEXT",
-					content: [{ type: "paragraph", content: [{ type: "text", content: "Incorrect" }] }]
-				}
-			],
-			interactions: {
-				interaction_1: {
-					type: "choiceInteraction",
-					responseIdentifier: "RESPONSE_1",
-					prompt: [],
-					choices: [
-						{ identifier: "A", content: [] },
-						{ identifier: "B", content: [] }
-					],
-					shuffle: true,
-					minChoices: 1,
-					maxChoices: 1
-				},
-				text_entry: { type: "textEntryInteraction", responseIdentifier: "RESPONSE_TEXT", expectedLength: 10 }
-			},
-			widgets: {
-				table_1: {
-					type: "dataTable",
-					title: null,
-					columns: [{ key: "col1", label: [], isNumeric: false }],
-					rowHeaderKey: null,
-					data: [
-						[
-							{
-								type: "dropdown",
-								responseIdentifier: "RESPONSE_1", // DUPLICATE
-								shuffle: true,
-								choices: [
-									{ identifier: "X", content: [] },
-									{ identifier: "Y", content: [] }
-								]
-							}
-						]
-					],
-					footer: []
-				}
-			},
-			responseDeclarations: [
-				{ identifier: "RESPONSE_1", cardinality: "single", baseType: "identifier", correct: "A" },
-				{ identifier: "RESPONSE_TEXT", cardinality: "single", baseType: "string", correct: "test" }
-			]
-		}
-		return expect(compile(itemWithDuplicate)).rejects.toThrow(ErrDuplicateResponseIdentifier)
-	})
+    
 
 	test("should throw ErrDuplicateChoiceIdentifier for duplicates within a choiceInteraction", async () => {
 		const itemWithDuplicate: AssessmentItemInput = {
@@ -153,59 +93,9 @@ describe("Compiler Identifier Validation Integration Tests", () => {
 		return expect(compile(itemWithDuplicate)).rejects.toThrow(ErrDuplicateChoiceIdentifier)
 	})
 
-	test.skip("should throw ErrDuplicateChoiceIdentifier for duplicates within a dataTable dropdown", async () => {
-		const itemWithDuplicate: AssessmentItemInput = {
-			identifier: "test-datatable-duplicate",
-			title: "Test DataTable Duplicate",
-			body: [],
-			feedbackBlocks: [
-				{
-					identifier: "CORRECT",
-					outcomeIdentifier: "FEEDBACK__RESPONSE_TEXT",
-					content: [{ type: "paragraph", content: [{ type: "text", content: "Correct" }] }]
-				},
-				{
-					identifier: "INCORRECT",
-					outcomeIdentifier: "FEEDBACK__RESPONSE_TEXT",
-					content: [{ type: "paragraph", content: [{ type: "text", content: "Incorrect" }] }]
-				}
-			],
-			interactions: {
-				text_entry: { type: "textEntryInteraction", responseIdentifier: "RESPONSE_TEXT", expectedLength: 10 }
-			},
-			widgets: {
-				table_1: {
-					type: "dataTable",
-					title: null,
-					columns: [{ key: "col1", label: [], isNumeric: false }],
-					rowHeaderKey: null,
-					data: [
-						[
-							{
-								type: "dropdown",
-								responseIdentifier: "RESPONSE_1",
-								shuffle: true,
-								choices: [
-									{ identifier: "A", content: [] },
-									{ identifier: "A", content: [] } // DUPLICATE
-								]
-							}
-						]
-					],
-					footer: []
-				}
-			},
-			responseDeclarations: [
-				{ identifier: "RESPONSE_1", cardinality: "single", baseType: "identifier", correct: "A" },
-				{ identifier: "RESPONSE_TEXT", cardinality: "single", baseType: "string", correct: "test" }
-			]
-		}
-		return expect(compile(itemWithDuplicate)).rejects.toThrow(ErrDuplicateChoiceIdentifier)
-	})
+    
 
-	test.skip("dataTable widget removed - test disabled", () => {
-		// Test disabled - dataTable widget removed
-	})
+    
 
 	test("should compile successfully with complex valid identifiers", async () => {
 		const validItem: AssessmentItemInput = {

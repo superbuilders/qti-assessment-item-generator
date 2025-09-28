@@ -74,19 +74,23 @@ export function renderBlockContent(
 				case "codeBlock":
 					return `<pre><code>${escapeXmlText(item.code)}</code></pre>`
 				case "tableRich": {
+					const tableStyle = "border-collapse: collapse; width: 100%;"
+					const thStyle = "border: 1px solid #ddd; padding: 8px 12px; text-align: left; vertical-align: top;"
+					const tdStyle = "border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;"
 					const renderRow = (row: Array<InlineContent | null>, asHeader = false) =>
 						`<tr>${row
-						.map((cell) => {
+							.map((cell) => {
 								const tag = asHeader ? "th" : "td"
+								const cellStyle = asHeader ? thStyle : tdStyle
 								// A cell contains an array of inline content items
-								return `<${tag}>${renderInlineContent(cell, widgetSlots, interactionSlots)}</${tag}>`
+								return `<${tag} style="${cellStyle}">${renderInlineContent(cell, widgetSlots, interactionSlots)}</${tag}>`
 							})
 							.join("")}</tr>`
 
 					const thead = item.header?.length ? `<thead>${item.header.map(r => renderRow(r, true)).join("")}</thead>` : ""
 					let tbodyRows = item.rows.map(r => renderRow(r)).join("")
 					// Footer support removed: do not emit <tfoot>; if footer provided by older data, fold into tbody as a final bold row is no longer supported
-					return `<table>${thead}<tbody>${tbodyRows}</tbody></table>`
+					return `<table style="${tableStyle}">${thead}<tbody>${tbodyRows}</tbody></table>`
 				}
 				case "unorderedList": {
 					const itemsXml = item.items.map((inline) => `<li><p>${renderInlineContent(inline, widgetSlots, interactionSlots)}</p></li>`).join("")

@@ -72,7 +72,7 @@ export function compileInteraction(
 			const innerContent = interaction.content
 				? `\n            ${renderBlockContent(interaction.content, widgetSlots, interactionSlots)}\n        `
 				: ""
-			interactionXml = `<qti-gap-match-interaction response-identifier="${escapeXmlAttribute(interaction.responseIdentifier)}" shuffle="${interaction.shuffle}" max-associations="0">
+			interactionXml = `<qti-gap-match-interaction response-identifier="${escapeXmlAttribute(interaction.responseIdentifier)}" shuffle="${interaction.shuffle}" max-associations="${interaction.gaps.length}">
             ${gapTextsXml}${innerContent}
         </qti-gap-match-interaction>`
 			break
