@@ -11,6 +11,7 @@ ignore_patterns:
   - "examples/**"
   - "teks-staar-scrape/**"
   - "docs/**"
+  - "data/**"
 priority_rules:
   - score: 99
     pattern: "^rules/"
