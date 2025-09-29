@@ -1,8 +1,9 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import type OpenAI from "openai"
+import type { ChatCompletion, ChatCompletionCreateParamsNonStreaming } from "openai/resources/chat/completions"
 import { z } from "zod"
-import type { AssessmentItemInput, BlockContent, ResponseDeclaration } from "../compiler/schemas"
+import type { AssessmentItemInput, BlockContent, InlineContent, ResponseDeclaration } from "../compiler/schemas"
 import type { WidgetCollection } from "../widgets/collections/types"
 import { allWidgetSchemas, type Widget, WidgetSchema } from "../widgets/registry"
 
@@ -97,23 +98,23 @@ async function generateAssessmentShell(
 	}
 
 	logger.debug("calling openai for assessment shell with multimodal input")
-	const response = await errors.try(
-		openai.chat.completions.create({
-			model: OPENAI_MODEL,
-			messages: [
-				{ role: "system", content: systemInstruction },
-				{ role: "user", content: messageContent }
-			],
-			response_format: {
-				type: "json_schema",
-				json_schema: {
-					name: "assessment_shell_generator",
-					schema: jsonSchema,
-					strict: true
-				}
+	const params: ChatCompletionCreateParamsNonStreaming = {
+		model: OPENAI_MODEL,
+		messages: [
+			{ role: "system", content: systemInstruction },
+			{ role: "user", content: messageContent }
+		],
+		response_format: {
+			type: "json_schema",
+			json_schema: {
+				name: "assessment_shell_generator",
+				schema: jsonSchema as Record<string, unknown>,
+				strict: true
 			}
-		})
-	)
+		},
+		stream: false
+	}
+	const response = await errors.try(openai.chat.completions.create(params))
 	if (response.error) {
 		logger.error("ai shell generation", {
 			error: response.error
@@ -121,7 +122,8 @@ async function generateAssessmentShell(
 		throw errors.wrap(response.error, "ai shell generation")
 	}
 
-	const choice = response.data.choices[0]
+	const completion = response.data as ChatCompletion
+	const choice = completion.choices[0]
 	if (!choice) {
 		logger.error("openai returned no choices")
 		throw errors.new("openai returned no choices")
@@ -149,46 +151,61 @@ async function generateAssessmentShell(
 	return validation.data
 }
 
-function collectInteractionIdsFromShell(shell: { body: unknown }): string[] {
+function collectInteractionIdsFromShell(shell: { body: BlockContent | null }): string[] {
 	const ids = new Set<string>()
 
-	function walkInline(inline: unknown): void {
-		if (!inline || !Array.isArray(inline)) return
+	function walkInline(inline: InlineContent): void {
 		for (const node of inline) {
-			if (
-				node &&
-				typeof node === "object" &&
-				"type" in node &&
-				node.type === "inlineInteractionRef" &&
-				"interactionId" in node &&
-				typeof node.interactionId === "string"
-			) {
+			if (node.type === "inlineInteractionRef") {
 				ids.add(node.interactionId)
 			}
 		}
 	}
 
-	function walkBlock(blocks: unknown): void {
-		if (!blocks || !Array.isArray(blocks)) return
+	function walkBlock(blocks: BlockContent): void {
 		for (const node of blocks) {
-			if (!node || typeof node !== "object" || !("type" in node)) continue
-			if (node.type === "interactionRef" && "interactionId" in node && typeof node.interactionId === "string") {
-				ids.add(node.interactionId)
-			}
-			if (node.type === "paragraph" && "content" in node) {
-				walkInline(node.content)
-			}
-			if (
-				(node.type === "unorderedList" || node.type === "orderedList") &&
-				"items" in node &&
-				Array.isArray(node.items)
-			) {
-				node.items.forEach(walkInline)
+			switch (node.type) {
+				case "interactionRef":
+					ids.add(node.interactionId)
+					break
+				case "paragraph":
+					walkInline(node.content)
+					break
+				case "unorderedList":
+				case "orderedList":
+					for (const item of node.items) {
+						walkInline(item)
+					}
+					break
+				case "tableRich":
+					if (node.header) {
+						for (const row of node.header) {
+							for (const cell of row) {
+								if (cell) {
+									walkInline(cell)
+								}
+							}
+						}
+					}
+					for (const row of node.rows) {
+						for (const cell of row) {
+							if (cell) {
+								walkInline(cell)
+							}
+						}
+					}
+					break
+				case "widgetRef":
+				case "codeBlock":
+					// These don't contain interactions
+					break
 			}
 		}
 	}
 
-	walkBlock(shell.body)
+	if (shell.body) {
+		walkBlock(shell.body)
+	}
 	return Array.from(ids)
 }
 
@@ -222,29 +239,30 @@ async function generateInteractionContent(
 	}
 
 	logger.debug("calling openai for interaction content generation with multimodal input", { interactionIds })
-	const response = await errors.try(
-		openai.chat.completions.create({
-			model: OPENAI_MODEL,
-			messages: [
-				{ role: "system", content: systemInstruction },
-				{ role: "user", content: messageContent }
-			],
-			response_format: {
+	const params: ChatCompletionCreateParamsNonStreaming = {
+		model: OPENAI_MODEL,
+		messages: [
+			{ role: "system", content: systemInstruction },
+			{ role: "user", content: messageContent }
+		],
+		response_format: {
 				type: "json_schema",
 				json_schema: {
 					name: "interaction_content_generator",
-					schema: jsonSchema,
+					schema: jsonSchema as Record<string, unknown>,
 					strict: true
 				}
-			}
-		})
-	)
+			},
+		stream: false
+	}
+	const response = await errors.try(openai.chat.completions.create(params))
 	if (response.error) {
 		logger.error("ai interaction generation", { error: response.error })
 		throw errors.wrap(response.error, "ai interaction generation")
 	}
 
-	const choice = response.data.choices[0]
+	const completion = response.data as ChatCompletion
+	const choice = completion.choices[0]
 	if (!choice?.message?.content) {
 		logger.error("openai interaction generation returned no content")
 		throw errors.new("empty ai response: no content for interaction generation")
@@ -343,29 +361,30 @@ export async function generateFromEnvelope(
 	)
 
 	const feedbackJsonSchema = toJSONSchemaPromptSafe(FeedbackSchema)
-	const feedbackResult = await errors.try(
-		openai.chat.completions.create({
-			model: OPENAI_MODEL,
-			messages: [
-				{ role: "system", content: feedbackSystem },
-				{ role: "user", content: feedbackUser }
-			],
-			response_format: {
+	const feedbackParams: ChatCompletionCreateParamsNonStreaming = {
+		model: OPENAI_MODEL,
+		messages: [
+			{ role: "system", content: feedbackSystem },
+			{ role: "user", content: feedbackUser }
+		],
+		response_format: {
 				type: "json_schema",
 				json_schema: {
 					name: "feedback_generator",
-					schema: feedbackJsonSchema,
+					schema: feedbackJsonSchema as Record<string, unknown>,
 					strict: true
 				}
-			}
-		})
-	)
+			},
+		stream: false
+	}
+	const feedbackResult = await errors.try(openai.chat.completions.create(feedbackParams))
 	if (feedbackResult.error) {
 		logger.error("generate feedback", { error: feedbackResult.error })
 		throw errors.wrap(feedbackResult.error, "generate feedback")
 	}
 
-	const feedbackChoice = feedbackResult.data.choices[0]
+	const feedbackCompletion = feedbackResult.data as ChatCompletion
+	const feedbackChoice = feedbackCompletion.choices[0]
 	if (!feedbackChoice?.message?.content) {
 		logger.error("openai feedback generation returned no content")
 		throw errors.new("empty ai response: no content for feedback generation")
@@ -433,29 +452,30 @@ export async function generateFromEnvelope(
 		const WidgetCollectionSchema = z.record(z.string(), WidgetSchema)
 		const widgetJsonSchema = toJSONSchemaPromptSafe(WidgetCollectionSchema)
 
-		const widgetsResponse = await errors.try(
-			openai.chat.completions.create({
-				model: OPENAI_MODEL,
-				messages: [
-					{ role: "system", content: widgetPrompt.systemInstruction },
-					{ role: "user", content: widgetPrompt.userContent }
-				],
-				response_format: {
+		const widgetParams: ChatCompletionCreateParamsNonStreaming = {
+			model: OPENAI_MODEL,
+			messages: [
+				{ role: "system", content: widgetPrompt.systemInstruction },
+				{ role: "user", content: widgetPrompt.userContent }
+			],
+			response_format: {
 					type: "json_schema",
 					json_schema: {
 						name: "widget_content_generator",
-						schema: widgetJsonSchema,
+						schema: widgetJsonSchema as Record<string, unknown>,
 						strict: true
 					}
-				}
-			})
-		)
+				},
+			stream: false
+		}
+		const widgetsResponse = await errors.try(openai.chat.completions.create(widgetParams))
 		if (widgetsResponse.error) {
 			logger.error("generate widget content", { error: widgetsResponse.error })
 			throw errors.wrap(widgetsResponse.error, "ai widget generation")
 		}
 
-		const wChoice = widgetsResponse.data.choices[0]
+		const widgetCompletion = widgetsResponse.data as ChatCompletion
+		const wChoice = widgetCompletion.choices[0]
 		if (!wChoice?.message?.content) {
 			logger.error("widget generation returned no content")
 			throw errors.new("empty ai response: no content for widget generation")

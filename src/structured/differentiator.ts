@@ -1,6 +1,7 @@
 import * as errors from "@superbuilders/errors"
 import type * as logger from "@superbuilders/slog"
 import type OpenAI from "openai"
+import type { ChatCompletion, ChatCompletionCreateParamsNonStreaming } from "openai/resources/chat/completions"
 import { z } from "zod"
 import { type AssessmentItemInput, createDynamicAssessmentItemSchema } from "../compiler/schemas"
 import { allWidgetSchemas, type Widget, WidgetSchema } from "../widgets/registry"
@@ -352,29 +353,30 @@ async function planContentDifferentiation(
 
 	const jsonSchema = toJSONSchemaPromptSafe(ContentPlanResponseSchema)
 
-	const result = await errors.try(
-		openai.chat.completions.create({
-			model: OPENAI_MODEL,
-			messages: [
-				{ role: "system", content: systemInstruction },
-				{ role: "user", content: userContent }
-			],
-			response_format: {
-				type: "json_schema",
-				json_schema: {
-					name: "differentiation_planner",
-					schema: jsonSchema,
-					strict: true
-				}
+	const params: ChatCompletionCreateParamsNonStreaming = {
+		model: OPENAI_MODEL,
+		messages: [
+			{ role: "system", content: systemInstruction },
+			{ role: "user", content: userContent }
+		],
+		response_format: {
+			type: "json_schema",
+			json_schema: {
+				name: "differentiation_planner",
+				schema: jsonSchema as Record<string, unknown>,
+				strict: true
 			}
-		})
-	)
+		},
+		stream: false
+	}
+	const result = await errors.try(openai.chat.completions.create(params))
 	if (result.error) {
 		logger.error("openai differentiation planning call failed", { error: result.error })
 		throw errors.wrap(result.error, "ai differentiation planning")
 	}
 
-	const choice = result.data.choices[0]
+	const completion = result.data as ChatCompletion
+	const choice = completion.choices[0]
 	if (!choice?.message?.content) {
 		logger.error("openai planning call returned no content")
 		throw errors.new("empty ai response: no content for differentiation plan")
@@ -537,30 +539,31 @@ async function regenerateWidgetsViaLLM(
 		userChars: userLen
 	})
 
-	const llmResult = await errors.try(
-		openai.chat.completions.create({
-			model: OPENAI_MODEL,
-			messages: [
-				{ role: "system", content: systemInstruction },
-				{ role: "user", content: userContent }
-			],
-			response_format: {
-				type: "json_schema",
-				json_schema: {
-					name: "widgets_generator",
-					schema: jsonSchema,
-					strict: true
-				}
+	const params: ChatCompletionCreateParamsNonStreaming = {
+		model: OPENAI_MODEL,
+		messages: [
+			{ role: "system", content: systemInstruction },
+			{ role: "user", content: userContent }
+		],
+		response_format: {
+			type: "json_schema",
+			json_schema: {
+				name: "widgets_generator",
+				schema: jsonSchema as Record<string, unknown>,
+				strict: true
 			}
-		})
-	)
+		},
+		stream: false
+	}
+	const llmResult = await errors.try(openai.chat.completions.create(params))
 	if (llmResult.error) {
 		logger.error("openai widget generation call failed", { error: llmResult.error })
 		throw errors.wrap(llmResult.error, "ai widget generation")
 	}
 	logger.info("openai widget generation completed")
 
-	const choice = llmResult.data.choices[0]
+	const completion = llmResult.data as ChatCompletion
+	const choice = completion.choices[0]
 	if (!choice?.message?.content) {
 		logger.error("openai widget generation returned no content")
 		throw errors.new("empty ai response: no content for widgets")

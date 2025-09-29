@@ -12,7 +12,7 @@ import {
 import { PERSEUS_SVG_CACHE } from "../fixtures/perseus-svgs/cache"
 
 // Mock fetch function that returns cached Perseus SVGs
-const mockFetch = async (url: string | Request | URL, init?: RequestInit): Promise<Response> => {
+const mockFetchImpl = async (url: string | Request | URL, init?: RequestInit): Promise<Response> => {
 	const urlString = url.toString()
 
 	// Handle HEAD requests - check if we have the SVG in cache
@@ -38,6 +38,8 @@ const mockFetch = async (url: string | Request | URL, init?: RequestInit): Promi
 
 	return new Response(null, { status: 404, statusText: "Not Found" })
 }
+
+const mockFetch = mockFetchImpl as typeof fetch
 
 describe("Perseus E2E Regression Suite", () => {
 	// Test Case 1: Direct HTTPS URL for an SVG
@@ -114,7 +116,7 @@ describe("Perseus E2E Regression Suite", () => {
 	// This tests that the context builder still correctly processes any associated
 	// `web+graphie` images from the hints, even if the main widget is unsupported by the AI.
 	test("should resolve hint images even for an unsupported widget type", async () => {
-		const result = await errors.try(buildPerseusEnvelope(interactiveGraphPlotting, mockFetch as typeof fetch))
+		const result = await errors.try(buildPerseusEnvelope(interactiveGraphPlotting, mockFetch))
 
 		expect(result.error).toBeFalsy()
 		if (result.error) {
