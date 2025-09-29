@@ -1,9 +1,8 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { ErrUnsupportedInteraction } from "../structured/client"
-import type { WidgetCollection } from "../widgets/collections/types"
-import { createCollectionScopedItemSchema } from "../structured/schemas"
 import { escapeXmlAttribute } from "../utils/xml-utils"
+import type { WidgetCollection } from "../widgets/collections/types"
 import { typedSchemas } from "../widgets/registry"
 import { generateWidget } from "../widgets/widget-generator"
 import { renderBlockContent } from "./content-renderer"
@@ -11,7 +10,7 @@ import { encodeDataUri } from "./helpers"
 import { compileInteraction } from "./interaction-compiler"
 import { validateAssessmentItemInput } from "./pre-validator"
 import { compileResponseDeclarations, compileResponseProcessing } from "./response-processor"
-import type { AssessmentItem, AssessmentItemInput, BlockContent, InlineContent, AnyInteraction } from "./schemas"
+import type { AssessmentItem, AssessmentItemInput, BlockContent, InlineContent } from "./schemas"
 import { createDynamicAssessmentItemSchema } from "./schemas"
 import {
 	convertHtmlEntities,
@@ -576,7 +575,7 @@ function enforceNoCaretsInChoiceInteraction(item: AssessmentItem): void {
 function enforceNoCaretsInInlineChoiceInteraction(item: AssessmentItem): void {
 	if (!item.interactions) return
 
-	for (const [interactionId, interaction] of Object.entries(item.interactions) as [string, AnyInteraction][]) {
+	for (const [interactionId, interaction] of Object.entries(item.interactions)) {
 		if (!interaction || interaction.type !== "inlineChoiceInteraction") continue
 
 		// choice inline content
@@ -604,7 +603,7 @@ function enforceNoCaretsInInlineChoiceInteraction(item: AssessmentItem): void {
 function enforceNoPipesInInlineChoiceInteraction(item: AssessmentItem): void {
 	if (!item.interactions) return
 
-	for (const [interactionId, interaction] of Object.entries(item.interactions) as [string, AnyInteraction][]) {
+	for (const [interactionId, interaction] of Object.entries(item.interactions)) {
 		if (!interaction || interaction.type !== "inlineChoiceInteraction") continue
 
 		// choice inline content
@@ -771,20 +770,28 @@ function collectRefs(item: AssessmentItemInput): { widgetRefs: Set<string>; inte
 
 	// Traverse all content areas
 	walkBlock(item.body)
-	item.feedbackBlocks.forEach((fb) => walkBlock(fb.content))
+	for (const fb of item.feedbackBlocks) {
+		walkBlock(fb.content)
+	}
 
 	if (item.interactions) {
 		for (const interaction of Object.values(item.interactions)) {
 			if (interaction.type === "choiceInteraction" || interaction.type === "orderInteraction") {
 				walkInline(interaction.prompt)
-				interaction.choices.forEach((choice) => walkBlock(choice.content))
+				for (const choice of interaction.choices) {
+					walkBlock(choice.content)
+				}
 			}
 			if (interaction.type === "inlineChoiceInteraction") {
-				interaction.choices.forEach((choice) => walkInline(choice.content))
+				for (const choice of interaction.choices) {
+					walkInline(choice.content)
+				}
 			}
 			if (interaction.type === "gapMatchInteraction") {
 				walkBlock(interaction.content)
-				interaction.gapTexts.forEach((gt) => walkInline(gt.content))
+				for (const gt of interaction.gapTexts) {
+					walkInline(gt.content)
+				}
 			}
 		}
 	}
@@ -798,18 +805,7 @@ function collectWidgetIds(item: AssessmentItemInput): Set<string> {
 	return collectRefs(item).widgetRefs
 }
 
-export async function compile(
-	itemData: AssessmentItemInput,
-	widgetCollection: WidgetCollection
-): Promise<string> {
-	// Re-validate with collection-scoped schema
-	const ItemSchema = createCollectionScopedItemSchema(widgetCollection)
-	const validation = ItemSchema.safeParse(itemData)
-	if (!validation.success) {
-		logger.error("compiler validation failed", { error: validation.error })
-		throw errors.wrap(validation.error, "compiler validation failed")
-	}
-	
+export async function compile(itemData: AssessmentItemInput, widgetCollection: WidgetCollection): Promise<string> {
 	// Step 0: Widget Type Derivation (Replaces AI mapping step)
 	// The widget mapping is now derived directly from the 'type' property of each widget definition.
 	const widgetMapping: Record<string, string> = {}
@@ -989,14 +985,14 @@ export async function compile(
 						}
 					}
 					if (node.type === "unorderedList" || node.type === "orderedList") {
-						node.items.forEach((inline) => {
+						for (const inline of node.items) {
 							for (const part of inline) {
 								if (part && part.type === "inlineInteractionRef") {
 									logger.error("inline interaction ref found in feedback list content", { blockId: block.identifier })
 									throw errors.new("interactions banned in feedback content")
 								}
 							}
-						})
+						}
 					}
 					if (node.type === "tableRich") {
 						const scanRows = (rows: Array<Array<InlineContent | null>> | null) => {

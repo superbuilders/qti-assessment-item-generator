@@ -6,7 +6,7 @@ import OpenAI from "openai"
 import { compile } from "../src/compiler/compiler"
 import type { AssessmentItemInput } from "../src/compiler/schemas"
 import { differentiateAssessmentItem } from "../src/structured/differentiator"
-import { mathCoreCollection } from "../src/widgets/collections/math-core"
+import { allWidgetsCollection } from "../src/widgets/collections/all"
 
 // Test input - plant and pot combinations
 const sourceItem: AssessmentItemInput = {
@@ -220,7 +220,7 @@ async function main() {
 
 	// Optionally compile one variation to XML
 	logger.info("compiling first variation to qti xml")
-	const xmlResult = await errors.try(compile(differentiatedItems[0], mathCoreCollection))
+	const xmlResult = await errors.try(compile(differentiatedItems[0], allWidgetsCollection))
 
 	if (xmlResult.error) {
 		logger.error("compilation failed", { error: xmlResult.error })

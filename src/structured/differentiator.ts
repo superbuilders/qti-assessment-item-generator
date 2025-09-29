@@ -3,7 +3,8 @@ import type * as logger from "@superbuilders/slog"
 import type OpenAI from "openai"
 import { z } from "zod"
 import { type AssessmentItemInput, createDynamicAssessmentItemSchema } from "../compiler/schemas"
-import { allWidgetSchemas, WidgetSchema, type Widget } from "../widgets/registry"
+import { allWidgetSchemas, type Widget, WidgetSchema } from "../widgets/registry"
+import { toJSONSchemaPromptSafe } from "./json-schema"
 import { transformArraysToObjects, transformObjectsToArrays } from "./shape-helpers"
 import { generateZodSchemaFromObject } from "./zod-runtime-generator"
 
@@ -83,7 +84,7 @@ function buildShot1WidgetInfoSection(assessmentItem: AssessmentItemInput, logger
 			throw errors.new("internal widget type mismatch")
 		}
 		const zodSchema = allWidgetSchemas[typeName]
-		const jsonSchema = z.toJSONSchema(zodSchema)
+		const jsonSchema = toJSONSchemaPromptSafe(zodSchema)
 		if (!isRecord(jsonSchema)) {
 			logger.error("invalid json schema structure for widget type", { typeName })
 			throw errors.new("widget json schema invalid structure")
@@ -349,7 +350,7 @@ async function planContentDifferentiation(
 		"You MUST reword all body sentences and every choice; do not copy sentences from the source."
 	].join("\n")
 
-	const jsonSchema = z.toJSONSchema(ContentPlanResponseSchema)
+	const jsonSchema = toJSONSchemaPromptSafe(ContentPlanResponseSchema)
 
 	const result = await errors.try(
 		openai.chat.completions.create({
@@ -378,8 +379,9 @@ async function planContentDifferentiation(
 		logger.error("openai planning call returned no content")
 		throw errors.new("empty ai response: no content for differentiation plan")
 	}
+	const content = choice.message.content
 
-	const parseResult = errors.trySync(() => JSON.parse(choice.message.content!))
+	const parseResult = errors.trySync(() => JSON.parse(content))
 	if (parseResult.error) {
 		logger.error("json parse", { error: parseResult.error })
 		throw errors.wrap(parseResult.error, "json parse")
@@ -523,7 +525,7 @@ async function regenerateWidgetsViaLLM(
 		"Return ONLY a JSON object with a single key 'widgets' whose value is an object mapping keys to fully-formed widget objects."
 	].join("\n")
 
-	const jsonSchema = z.toJSONSchema(WidgetsEnvelopeSchema)
+	const jsonSchema = toJSONSchemaPromptSafe(WidgetsEnvelopeSchema)
 
 	// Log prompt meta (avoid logging full prompt to keep logs readable)
 	const systemLen = systemInstruction.length
@@ -557,32 +559,33 @@ async function regenerateWidgetsViaLLM(
 		throw errors.wrap(llmResult.error, "ai widget generation")
 	}
 	logger.info("openai widget generation completed")
-	
+
 	const choice = llmResult.data.choices[0]
 	if (!choice?.message?.content) {
 		logger.error("openai widget generation returned no content")
 		throw errors.new("empty ai response: no content for widgets")
 	}
+	const content = choice.message.content
 
-	const parseResult = errors.trySync(() => JSON.parse(choice.message.content!))
+	const parseResult = errors.trySync(() => JSON.parse(content))
 	if (parseResult.error) {
 		logger.error("json parse", { error: parseResult.error })
 		throw errors.wrap(parseResult.error, "json parse")
 	}
 
-    const validation = WidgetsEnvelopeSchema.safeParse(parseResult.data)
+	const validation = WidgetsEnvelopeSchema.safeParse(parseResult.data)
 	if (!validation.success) {
 		logger.error("widgets validation failed", { error: validation.error })
 		throw errors.wrap(validation.error, "widgets validation")
 	}
 
-    // Re-validate widgets against the global union to ensure type is Widget
-    const revalidate = z.record(z.string(), WidgetSchema).safeParse(validation.data.widgets)
-    if (!revalidate.success) {
-        logger.error("widgets post-validate against union failed", { error: revalidate.error })
-        throw errors.wrap(revalidate.error, "widgets post-validate")
-    }
-    return revalidate.data
+	// Re-validate widgets against the global union to ensure type is Widget
+	const revalidate = z.record(z.string(), WidgetSchema).safeParse(validation.data.widgets)
+	if (!revalidate.success) {
+		logger.error("widgets post-validate against union failed", { error: revalidate.error })
+		throw errors.wrap(revalidate.error, "widgets post-validate")
+	}
+	return revalidate.data
 }
 
 /**
@@ -649,12 +652,16 @@ export async function differentiateAssessmentItem(
 		const regeneratedWidgets = widgetsResult.data
 
 		const finalItem: AssessmentItemInput = { ...plan, identifier, widgets: regeneratedWidgets }
-		
+
 		// Build widget enum for validation
-        const keys = Object.values(widgetTypes)
-        const tuple = [keys[0], ...keys.slice(1)] as [string, ...string[]]
-        const widgetEnum = z.enum(tuple)
-        const { AssessmentItemSchema: finalItemSchema } = createDynamicAssessmentItemSchema(widgetTypes, widgetEnum)
+		const keys = Object.values(widgetTypes)
+		if (keys.length === 0) {
+			logger.error("widget types validation: no widget types found")
+			throw errors.new("widget types: at least one widget type required")
+		}
+		const tuple: [string, ...string[]] = [keys[0], ...keys.slice(1)]
+		const widgetEnum = z.enum(tuple)
+		const { AssessmentItemSchema: finalItemSchema } = createDynamicAssessmentItemSchema(widgetTypes, widgetEnum)
 		const finalValidation = finalItemSchema.safeParse(finalItem)
 		if (!finalValidation.success) {
 			logger.error("final differentiated item failed schema validation", { identifier, error: finalValidation.error })

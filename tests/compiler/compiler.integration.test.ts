@@ -3,7 +3,7 @@ import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { compile, ErrDuplicateChoiceIdentifier, ErrDuplicateResponseIdentifier } from "../../src/compiler/compiler"
 import type { AssessmentItemInput } from "../../src/compiler/schemas"
-import { mathCoreCollection } from "../../src/widgets/collections/math-core"
+import { allWidgetsCollection } from "../../src/widgets/collections/all"
 
 describe("Compiler Identifier Validation Integration Tests", () => {
 	test("should throw ErrDuplicateResponseIdentifier for duplicates across interactions", async () => {
@@ -53,7 +53,7 @@ describe("Compiler Identifier Validation Integration Tests", () => {
 				{ identifier: "RESPONSE_TEXT", cardinality: "single", baseType: "string", correct: "test" }
 			]
 		}
-		return expect(compile(itemWithDuplicate, mathCoreCollection)).rejects.toThrow(ErrDuplicateResponseIdentifier)
+		return expect(compile(itemWithDuplicate, allWidgetsCollection)).rejects.toThrow(ErrDuplicateResponseIdentifier)
 	})
 
 	test("should throw ErrDuplicateChoiceIdentifier for duplicates within a choiceInteraction", async () => {
@@ -85,7 +85,7 @@ describe("Compiler Identifier Validation Integration Tests", () => {
 			widgets: {},
 			responseDeclarations: [{ identifier: "RESPONSE_1", cardinality: "single", baseType: "identifier", correct: "A" }]
 		}
-		return expect(compile(itemWithDuplicate, mathCoreCollection)).rejects.toThrow(ErrDuplicateChoiceIdentifier)
+		return expect(compile(itemWithDuplicate, allWidgetsCollection)).rejects.toThrow(ErrDuplicateChoiceIdentifier)
 	})
 
 	test("should compile successfully with complex valid identifiers", async () => {
@@ -127,7 +127,7 @@ describe("Compiler Identifier Validation Integration Tests", () => {
 			]
 		}
 
-		const result = await errors.try(compile(validItem, mathCoreCollection))
+		const result = await errors.try(compile(validItem, allWidgetsCollection))
 		if (result.error) {
 			logger.error("valid item failed compilation unexpectedly", { error: result.error })
 		}

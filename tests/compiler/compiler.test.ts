@@ -4,12 +4,12 @@ import * as logger from "@superbuilders/slog"
 import { XMLValidator } from "fast-xml-parser"
 import { compile } from "../../src/compiler/compiler"
 import { allExamples } from "../../src/examples"
-import { mathCoreCollection } from "../../src/widgets/collections/math-core"
+import { allWidgetsCollection } from "../../src/widgets/collections/all"
 
 describe("QTI Compiler End-to-End Tests", () => {
 	for (const example of allExamples) {
 		test(`should compile example "${example.identifier}" without errors`, async () => {
-			const result = await errors.try(compile(example, mathCoreCollection))
+			const result = await errors.try(compile(example, allWidgetsCollection))
 			if (result.error) {
 				logger.error("compilation failed for example", {
 					identifier: example.identifier,
@@ -31,7 +31,7 @@ describe("QTI Compiler End-to-End Tests", () => {
 	// Snapshot test for each example to catch any regression in XML output
 	for (const example of allExamples) {
 		test(`should produce consistent XML output for "${example.identifier}"`, async () => {
-			const result = await errors.try(compile(example, mathCoreCollection))
+			const result = await errors.try(compile(example, allWidgetsCollection))
 			expect(result.error).toBeFalsy()
 			if (result.error) {
 				logger.error("test setup failed", { error: result.error })

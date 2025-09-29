@@ -1,7 +1,7 @@
 import type { WidgetCollection } from "../../widgets/collections/types"
 import type { AiContextEnvelope, ImageContext } from "../types"
 import { caretBanPromptSection } from "./caret"
-import { formatUnifiedContextSections, createWidgetSelectionPromptSection } from "./shared"
+import { createWidgetSelectionPromptSection, formatUnifiedContextSections } from "./shared"
 
 export function createInteractionContentPrompt(
 	envelope: AiContextEnvelope,

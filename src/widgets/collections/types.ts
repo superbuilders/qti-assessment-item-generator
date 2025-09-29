@@ -5,5 +5,3 @@ export type WidgetCollection = {
 	readonly widgetTypeKeys: readonly string[]
 	readonly schemas: Record<string, z.ZodTypeAny>
 }
-
-

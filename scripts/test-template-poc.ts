@@ -3,7 +3,7 @@ import * as logger from "@superbuilders/slog"
 import { compile } from "../src/compiler/compiler"
 import type { AssessmentItemInput } from "../src/compiler/schemas"
 import fractionAddition from "../src/templates/math/fraction-addition"
-import { mathCoreCollection } from "../src/widgets/collections/math-core"
+import { allWidgetsCollection } from "../src/widgets/collections/all"
 
 async function main() {
 	logger.info("starting template poc test", {
@@ -39,7 +39,7 @@ async function main() {
 	logger.info("successfully generated assessmentiteminput from template")
 
 	// 5. Pass the generated data structure to the compiler.
-	const compileResult = await errors.try(compile(assessmentItemInput, mathCoreCollection))
+	const compileResult = await errors.try(compile(assessmentItemInput, allWidgetsCollection))
 	if (compileResult.error) {
 		logger.error("qti compilation failed", { error: compileResult.error })
 		throw errors.wrap(compileResult.error, "compilation")

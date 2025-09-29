@@ -1,15 +1,12 @@
-import * as logger from "@superbuilders/slog"
 import * as errors from "@superbuilders/errors"
+import * as logger from "@superbuilders/slog"
 import type { AnyInteraction, BlockContent, InlineContent } from "../compiler/schemas"
 
-function walkInline(
-    inline: InlineContent | null,
-    out: Map<string, string>
-): void {
+function walkInline(inline: InlineContent | null, out: Map<string, string>): void {
 	if (!inline) return
 	for (const node of inline) {
 		if (node.type === "inlineWidgetRef") {
-            const existing = out.get(node.widgetId)
+			const existing = out.get(node.widgetId)
 			if (existing && existing !== node.widgetType) {
 				logger.error("conflicting widgetType for same widgetId", {
 					widgetId: node.widgetId,
@@ -18,20 +15,17 @@ function walkInline(
 				})
 				throw errors.new("conflicting widgetType values for same widgetId")
 			}
-            out.set(node.widgetId, node.widgetType)
+			out.set(node.widgetId, node.widgetType)
 		}
 	}
 }
 
-function walkBlock(
-    blocks: BlockContent | null,
-    out: Map<string, string>
-): void {
+function walkBlock(blocks: BlockContent | null, out: Map<string, string>): void {
 	if (!blocks) return
 	for (const node of blocks) {
 		switch (node.type) {
 			case "widgetRef": {
-                const existing = out.get(node.widgetId)
+				const existing = out.get(node.widgetId)
 				if (existing && existing !== node.widgetType) {
 					logger.error("conflicting widgetType for same widgetId", {
 						widgetId: node.widgetId,
@@ -40,7 +34,7 @@ function walkBlock(
 					})
 					throw errors.new("conflicting widgetType values for same widgetId")
 				}
-                out.set(node.widgetId, node.widgetType)
+				out.set(node.widgetId, node.widgetType)
 				break
 			}
 			case "paragraph":
@@ -48,14 +42,18 @@ function walkBlock(
 				break
 			case "unorderedList":
 			case "orderedList":
-				node.items.forEach((item) => walkInline(item, out))
+				for (const item of node.items) {
+					walkInline(item, out)
+				}
 				break
 			case "tableRich": {
 				const walkRows = (rows: Array<Array<InlineContent | null>> | null) => {
 					if (!rows) return
-					rows.forEach((row) => {
-						row.forEach((cell) => walkInline(cell, out))
-					})
+					for (const row of rows) {
+						for (const cell of row) {
+							walkInline(cell, out)
+						}
+					}
 				}
 				walkRows(node.header)
 				walkRows(node.rows)
@@ -68,24 +66,27 @@ function walkBlock(
 	}
 }
 
-function walkInteractions(
-    interactions: Record<string, AnyInteraction> | null,
-    out: Map<string, string>
-): void {
+function walkInteractions(interactions: Record<string, AnyInteraction> | null, out: Map<string, string>): void {
 	if (!interactions) return
 	for (const interaction of Object.values(interactions)) {
 		switch (interaction.type) {
 			case "choiceInteraction":
 			case "orderInteraction":
 				walkInline(interaction.prompt, out)
-				interaction.choices.forEach((choice) => walkBlock(choice.content, out))
+				for (const choice of interaction.choices) {
+					walkBlock(choice.content, out)
+				}
 				break
 			case "inlineChoiceInteraction":
-				interaction.choices.forEach((choice) => walkInline(choice.content, out))
+				for (const choice of interaction.choices) {
+					walkInline(choice.content, out)
+				}
 				break
 			case "gapMatchInteraction":
 				walkBlock(interaction.content, out)
-				interaction.gapTexts.forEach((gt) => walkInline(gt.content, out))
+				for (const gt of interaction.gapTexts) {
+					walkInline(gt.content, out)
+				}
 				break
 			case "textEntryInteraction":
 			case "unsupportedInteraction":
@@ -106,11 +107,13 @@ export function collectWidgetRefs(item: {
 	feedbackBlocks: Array<{ content: BlockContent }> | null
 	interactions: Record<string, AnyInteraction> | null
 }): Map<string, string> {
-    const out = new Map<string, string>()
+	const out = new Map<string, string>()
 
 	walkBlock(item.body, out)
 	if (item.feedbackBlocks) {
-		item.feedbackBlocks.forEach((fb) => walkBlock(fb.content, out))
+		for (const fb of item.feedbackBlocks) {
+			walkBlock(fb.content, out)
+		}
 	}
 	walkInteractions(item.interactions, out)
 

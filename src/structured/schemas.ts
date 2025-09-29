@@ -1,23 +1,43 @@
-import { z } from "zod"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
+import { z } from "zod"
+import { CHOICE_IDENTIFIER_REGEX, RESPONSE_IDENTIFIER_REGEX } from "../compiler/qti-constants"
 import {
 	createAssessmentItemShellSchema,
 	createBlockContentSchema,
 	createDynamicAssessmentItemSchema,
 	createInlineContentSchema
 } from "../compiler/schemas"
-import { RESPONSE_IDENTIFIER_REGEX, CHOICE_IDENTIFIER_REGEX } from "../compiler/qti-constants"
 import type { WidgetCollection } from "../widgets/collections/types"
 import { typedSchemas } from "../widgets/registry"
 
+/**
+ * Helper to build a union of literals without unsafe type assertions.
+ * This follows the PRD's requirement to avoid `as` casts for type safety.
+ */
+function buildLiteralUnion(values: readonly string[]) {
+	const literals = values.map((v) => z.literal(v))
+	if (literals.length === 0) {
+		logger.error("literal union: empty array")
+		throw errors.new("cannot build literal union from empty array")
+	}
+	if (literals.length === 1) {
+		return literals[0]
+	}
+	// Safe because we've checked length >= 2 above
+	const first = literals[0]
+	const second = literals[1]
+	const rest = literals.slice(2)
+	const tuple: [z.ZodLiteral<string>, z.ZodLiteral<string>, ...z.ZodLiteral<string>[]] = [first, second, ...rest]
+	return z.union(tuple)
+}
+
 export function createWidgetTypeEnumFromCollection(collection: WidgetCollection) {
-    const keys = Array.from(collection.widgetTypeKeys)
-    if (keys.length === 0) {
-        logger.error("collection has no widgetTypeKeys", { collection: collection.name })
-        throw errors.new(`collection has no widgetTypeKeys: ${collection.name}`)
-    }
-    return z.enum([keys[0], ...keys.slice(1)] as [string, ...string[]])
+	if (!collection.widgetTypeKeys || collection.widgetTypeKeys.length === 0) {
+		logger.error("collection has no widgetTypeKeys", { collection: collection.name })
+		throw errors.new(`collection has no widgetTypeKeys: ${collection.name}`)
+	}
+	return buildLiteralUnion(collection.widgetTypeKeys)
 }
 
 /**
@@ -35,10 +55,7 @@ export function createCollectionScopedShellSchema(collection: WidgetCollection) 
  * If you add a new interaction type to `src/compiler/schemas.ts`, you MUST also
  * add its corresponding scoped definition here to ensure widgetType validation propagates.
  */
-export function createCollectionScopedInteractionSchema(
-    _interactionIds: string[],
-	collection: WidgetCollection
-) {
+export function createCollectionScopedInteractionSchema(_interactionIds: string[], collection: WidgetCollection) {
 	const ScopedWidgetEnum = createWidgetTypeEnumFromCollection(collection)
 	const ScopedInlineContentSchema = createInlineContentSchema(ScopedWidgetEnum)
 	const ScopedBlockContentSchema = createBlockContentSchema(ScopedWidgetEnum)
@@ -120,7 +137,7 @@ export function createCollectionScopedInteractionSchema(
 				.regex(RESPONSE_IDENTIFIER_REGEX, "invalid response identifier: must start with RESPONSE")
 				.describe("Links this interaction to its response declaration for scoring."),
 			prompt: ScopedInlineContentSchema.describe(
-				"Explicit instructions for arranging items that MUST: (1) name the sort property (e.g., density, size, value), (2) state the sort direction using unambiguous phrases like 'least to greatest' or 'greatest to least', and (3) include the axis phrase '(top to bottom)' to match the enforced vertical orientation."
+				"Explicit instructions for arranging items that MUST: (1) name the sort property (e.g., density, size, value), (2) state the sort direction using unambiguous phrases like 'least to greatest' or 'greatest to least'."
 			),
 			choices: z
 				.array(
@@ -148,7 +165,7 @@ export function createCollectionScopedInteractionSchema(
 		})
 		.strict()
 		.describe(
-			"An interaction where users arrange items in a specific sequence or order. Prompts must specify the sort property, direction, and axis phrase '(top to bottom)'."
+			"An interaction where users arrange items in a specific sequence or order. Prompts must specify the sort property and direction."
 		)
 
 	const GapMatchInteractionSchema = z
@@ -159,11 +176,9 @@ export function createCollectionScopedInteractionSchema(
 				.regex(RESPONSE_IDENTIFIER_REGEX, "invalid response identifier: must start with RESPONSE")
 				.describe("Links this interaction to its response declaration for scoring."),
 			shuffle: z.boolean().describe("Whether to shuffle the order of gap-text items (draggable tokens)."),
-			content: ScopedBlockContentSchema
-				.nullable()
-				.describe(
-					"Optional block content (e.g., <ul>/<li>/<p>) containing sentences with gap placeholders to render inside the interaction."
-				),
+			content: ScopedBlockContentSchema.nullable().describe(
+				"Optional block content (e.g., <ul>/<li>/<p>) containing sentences with gap placeholders to render inside the interaction."
+			),
 			gapTexts: z
 				.array(
 					z
@@ -231,8 +246,8 @@ export function createCollectionScopedInteractionSchema(
 		])
 		.describe("A discriminated union representing any possible QTI interaction type supported by the system.")
 
-    // Use record to preserve value inference while we enforce required keys at call sites
-    return z.record(z.string(), ScopedAnyInteractionSchema)
+	// Use record to preserve value inference while we enforce required keys at call sites
+	return z.record(z.string(), ScopedAnyInteractionSchema)
 }
 
 /**
@@ -255,11 +270,8 @@ export function createCollectionScopedFeedbackSchema(
 	}
 
 	// Build dynamic schema shape
-	const OutcomeSchema = z.record(
-		z.string(),
-		z.object({ content: ScopedBlockContentSchema }).strict()
-	)
-	return z.object({ feedback: z.record(z.string(), OutcomeSchema)}).strict()
+	const OutcomeSchema = z.record(z.string(), z.object({ content: ScopedBlockContentSchema }).strict())
+	return z.object({ feedback: z.record(z.string(), OutcomeSchema) }).strict()
 }
 
 /**
@@ -268,14 +280,19 @@ export function createCollectionScopedFeedbackSchema(
  */
 export function createCollectionScopedItemSchema(collection: WidgetCollection) {
 	const ScopedWidgetEnum = createWidgetTypeEnumFromCollection(collection)
-	
+
 	// Build a widget mapping that includes all widgets from the collection
 	// This is used for the dynamic schema creation
 	const widgetMapping: Record<string, keyof typeof typedSchemas> = {}
 	for (const key of collection.widgetTypeKeys) {
+		if (!(key in typedSchemas)) {
+			logger.error("widget type not in registry", { key, collection: collection.name })
+			throw errors.new(`widget type '${key}' not found in typedSchemas`)
+		}
+		// Safe assertion: we verified key exists in typedSchemas above
 		widgetMapping[`_placeholder_${key}`] = key as keyof typeof typedSchemas
 	}
-	
+
 	const { AssessmentItemSchema } = createDynamicAssessmentItemSchema(widgetMapping, ScopedWidgetEnum)
 	return AssessmentItemSchema
 }

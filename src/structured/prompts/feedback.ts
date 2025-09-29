@@ -1,9 +1,9 @@
 import type { AnyInteraction, AssessmentItemShell } from "../../compiler/schemas"
 import type { WidgetCollection } from "../../widgets/collections/types"
 import type { enumerateFeedbackTargets } from "../feedback-targets"
-import type { AiContextEnvelope, ImageContext } from "../types"
 import { createCollectionScopedFeedbackSchema } from "../schemas"
-import { formatUnifiedContextSections, createWidgetSelectionPromptSection } from "./shared"
+import type { AiContextEnvelope, ImageContext } from "../types"
+import { createWidgetSelectionPromptSection, formatUnifiedContextSections } from "./shared"
 
 /**
  * Creates a feedback generation prompt with a dynamically-generated Zod schema

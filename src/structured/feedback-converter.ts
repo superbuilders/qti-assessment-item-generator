@@ -1,4 +1,4 @@
-import type { AssessmentItemInput } from "../compiler/schemas"
+import type { AssessmentItemInput, BlockContent } from "../compiler/schemas"
 
 /**
  * Converts the AI's structured feedback map into the flat array of feedback blocks
@@ -25,7 +25,7 @@ import type { AssessmentItemInput } from "../compiler/schemas"
  * ]
  */
 export function feedbackMapToBlocks(
-	feedbackMap: Record<string, Record<string, { content: any }>>
+	feedbackMap: Record<string, Record<string, { content: BlockContent }>>
 ): AssessmentItemInput["feedbackBlocks"] {
 	const blocks: AssessmentItemInput["feedbackBlocks"] = []
 

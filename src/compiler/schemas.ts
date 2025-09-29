@@ -13,9 +13,7 @@ import {
 
 // LEVEL 2: INLINE CONTENT (for paragraphs, prompts, etc.)
 // Factory functions to create fresh schema instances (avoids $ref in JSON Schema)
-export function createInlineContentItemSchema(
-	widgetTypeEnum: z.ZodType<string>
-) {
+export function createInlineContentItemSchema(widgetTypeEnum: z.ZodType<string>) {
 	return z
 		.discriminatedUnion("type", [
 			z
@@ -70,9 +68,7 @@ export function createInlineContentItemSchema(
 		.describe("Union type representing any inline content element")
 }
 
-export function createInlineContentSchema(
-	widgetTypeEnum: z.ZodType<string>
-) {
+export function createInlineContentSchema(widgetTypeEnum: z.ZodType<string>) {
 	return z
 		.array(createInlineContentItemSchema(widgetTypeEnum))
 		.describe("Array of inline content items that can be rendered within a paragraph or prompt")
@@ -80,9 +76,7 @@ export function createInlineContentSchema(
 
 // LEVEL 1: BLOCK CONTENT (for body, feedback, choice content, etc.)
 // Factory functions for block content
-export function createBlockContentItemSchema(
-	widgetTypeEnum: z.ZodType<string>
-) {
+export function createBlockContentItemSchema(widgetTypeEnum: z.ZodType<string>) {
 	const InlineSchema = createInlineContentSchema(widgetTypeEnum)
 	const TableRichCellSchema = InlineSchema.nullable()
 	const TableRichRowSchema = z.array(TableRichCellSchema)
@@ -149,19 +143,15 @@ export function createBlockContentItemSchema(
 		.describe("Union type representing any block-level content element")
 }
 
-export function createBlockContentSchema(
-	widgetTypeEnum: z.ZodType<string>
-) {
+export function createBlockContentSchema(widgetTypeEnum: z.ZodType<string>) {
 	return z
 		.array(createBlockContentItemSchema(widgetTypeEnum))
 		.describe("Array of block content items representing the document structure")
 }
 
-export function createAssessmentItemShellSchema(
-	widgetTypeEnum: z.ZodType<string>
-) {
+export function createAssessmentItemShellSchema(widgetTypeEnum: z.ZodType<string>) {
 	const ResponseDeclarationSchema = createResponseDeclarationSchema()
-	
+
 	return z
 		.object({
 			identifier: z.string().describe("Unique identifier for this assessment item."),
@@ -225,7 +215,9 @@ function createResponseDeclarationSchema() {
 			IdentifierResponseDeclarationSchema,
 			DirectedPairResponseDeclarationSchema
 		])
-		.describe("Defines the correct answer for an interaction, with a structure that varies based on the response's baseType.")
+		.describe(
+			"Defines the correct answer for an interaction, with a structure that varies based on the response's baseType."
+		)
 }
 
 export function createDynamicAssessmentItemSchema(
@@ -328,7 +320,7 @@ export function createDynamicAssessmentItemSchema(
 				.regex(RESPONSE_IDENTIFIER_REGEX, "invalid response identifier: must start with RESPONSE")
 				.describe("Links this interaction to its response declaration for scoring."),
 			prompt: InlineSchema.describe(
-				"Explicit instructions for arranging items that MUST: (1) name the sort property (e.g., density, size, value), (2) state the sort direction using unambiguous phrases like 'least to greatest' or 'greatest to least', and (3) include the axis phrase '(top to bottom)' to match the enforced vertical orientation."
+				"Explicit instructions for arranging items that MUST: (1) name the sort property (e.g., density, size, value), (2) state the sort direction using unambiguous phrases like 'least to greatest' or 'greatest to least'."
 			),
 			choices: z
 				.array(
@@ -356,7 +348,7 @@ export function createDynamicAssessmentItemSchema(
 		})
 		.strict()
 		.describe(
-			"An interaction where users arrange items in a specific sequence or order. Prompts must never be vague (e.g., 'Arrange the items in correct order'). They must specify the sort property, the direction (ascending/descending using 'least to greatest'/'greatest to least'), and include the axis phrase '(top to bottom)'."
+			"An interaction where users arrange items in a specific sequence or order. Prompts must specify the sort property and the direction (ascending/descending using 'least to greatest'/'greatest to least')."
 		)
 
 	const GapMatchInteractionSchema = z
@@ -367,11 +359,9 @@ export function createDynamicAssessmentItemSchema(
 				.regex(RESPONSE_IDENTIFIER_REGEX, "invalid response identifier: must start with RESPONSE")
 				.describe("Links this interaction to its response declaration for scoring."),
 			shuffle: z.boolean().describe("Whether to shuffle the order of gap-text items (draggable tokens)."),
-			content: BlockSchema
-				.nullable()
-				.describe(
-					"Optional block content (e.g., <ul>/<li>/<p>) containing sentences with gap placeholders to render inside the interaction."
-				),
+			content: BlockSchema.nullable().describe(
+				"Optional block content (e.g., <ul>/<li>/<p>) containing sentences with gap placeholders to render inside the interaction."
+			),
 			gapTexts: z
 				.array(
 					z
@@ -478,10 +468,9 @@ export function createDynamicAssessmentItemSchema(
 		})
 		.strict()
 		.superRefine((data, ctx) => {
-			type AnyInteractionType = z.infer<typeof AnyInteractionSchema>
 			const responseIdToChoices = new Map<string, Set<string>>()
 			if (data.interactions) {
-				for (const interaction of Object.values(data.interactions) as AnyInteractionType[]) {
+				for (const interaction of Object.values(data.interactions)) {
 					if (interaction.type === "choiceInteraction" || interaction.type === "inlineChoiceInteraction") {
 						const choiceIds = new Set(interaction.choices.map((c) => c.identifier))
 						responseIdToChoices.set(interaction.responseIdentifier, choiceIds)
@@ -603,16 +592,59 @@ export type BlockContentItem =
 export type BlockContent = BlockContentItem[]
 
 export type ResponseDeclaration =
-	| { identifier: string; cardinality: "single" | "multiple" | "ordered"; baseType: "string" | "integer" | "float"; correct: string | number }
-	| { identifier: string; cardinality: "single" | "multiple" | "ordered"; baseType: "identifier"; correct: string | string[] }
-	| { identifier: string; cardinality: "multiple" | "ordered"; baseType: "directedPair"; correct: Array<{ source: string; target: string }>; allowEmpty: boolean }
+	| {
+			identifier: string
+			cardinality: "single" | "multiple" | "ordered"
+			baseType: "string" | "integer" | "float"
+			correct: string | number
+	  }
+	| {
+			identifier: string
+			cardinality: "single" | "multiple" | "ordered"
+			baseType: "identifier"
+			correct: string | string[]
+	  }
+	| {
+			identifier: string
+			cardinality: "multiple" | "ordered"
+			baseType: "directedPair"
+			correct: Array<{ source: string; target: string }>
+			allowEmpty: boolean
+	  }
 
 export type AnyInteraction =
-	| { type: "choiceInteraction"; responseIdentifier: string; prompt: InlineContent; choices: Array<{ identifier: string; content: BlockContent }>; shuffle: true; minChoices: number; maxChoices: number }
-	| { type: "inlineChoiceInteraction"; responseIdentifier: string; choices: Array<{ identifier: string; content: InlineContent }>; shuffle: true }
+	| {
+			type: "choiceInteraction"
+			responseIdentifier: string
+			prompt: InlineContent
+			choices: Array<{ identifier: string; content: BlockContent }>
+			shuffle: true
+			minChoices: number
+			maxChoices: number
+	  }
+	| {
+			type: "inlineChoiceInteraction"
+			responseIdentifier: string
+			choices: Array<{ identifier: string; content: InlineContent }>
+			shuffle: true
+	  }
 	| { type: "textEntryInteraction"; responseIdentifier: string; expectedLength: number | null }
-	| { type: "orderInteraction"; responseIdentifier: string; prompt: InlineContent; choices: Array<{ identifier: string; content: BlockContent }>; shuffle: true; orientation: "vertical" }
-	| { type: "gapMatchInteraction"; responseIdentifier: string; shuffle: boolean; content: BlockContent | null; gapTexts: Array<{ identifier: string; matchMax: number; content: InlineContent }>; gaps: Array<{ identifier: string; required: boolean | null }> }
+	| {
+			type: "orderInteraction"
+			responseIdentifier: string
+			prompt: InlineContent
+			choices: Array<{ identifier: string; content: BlockContent }>
+			shuffle: true
+			orientation: "vertical"
+	  }
+	| {
+			type: "gapMatchInteraction"
+			responseIdentifier: string
+			shuffle: boolean
+			content: BlockContent | null
+			gapTexts: Array<{ identifier: string; matchMax: number; content: InlineContent }>
+			gaps: Array<{ identifier: string; required: boolean | null }>
+	  }
 	| { type: "unsupportedInteraction"; perseusType: string; responseIdentifier: string }
 
 export type AssessmentItemShell = {

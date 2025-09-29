@@ -231,11 +231,9 @@ function validateTextEntryCanonicalAnswerRules(item: AssessmentItemInput, logger
 
 	// Find all response identifiers that belong to a textEntryInteraction.
 	const textEntryDeclarations = item.responseDeclarations.filter((decl) =>
-		Object.values(item.interactions ?? {}).some(
-			(interaction) => {
-				return interaction.type === "textEntryInteraction" && interaction.responseIdentifier === decl.identifier
-			}
-		)
+		Object.values(item.interactions ?? {}).some((interaction) => {
+			return interaction.type === "textEntryInteraction" && interaction.responseIdentifier === decl.identifier
+		})
 	)
 
 	if (textEntryDeclarations.length === 0) {

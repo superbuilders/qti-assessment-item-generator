@@ -9,13 +9,13 @@ mock.module("openai", () => {
 	class MockOpenAI {
 		chat = {
 			completions: {
-				parse: async () => {
+				create: async () => {
 					// Return a pre-defined differentiated item with array-like objects
 					return {
 						choices: [
 							{
 								message: {
-									parsed: {
+									content: JSON.stringify({
 										plans: [
 											{
 												title: "Differentiated Item",
@@ -38,24 +38,32 @@ mock.module("openai", () => {
 														}
 													}
 												},
-												interactions: {},
-												feedback: {
-													correct: {
-														__sb_idx__0: {
-															type: "paragraph",
-															content: { __sb_idx__0: { type: "text", content: "Correct!" } }
+												interactions: null,
+												feedbackBlocks: {
+													__sb_idx__0: {
+														identifier: "CORRECT",
+														outcomeIdentifier: "FEEDBACK__GLOBAL",
+														content: {
+															__sb_idx__0: {
+																type: "paragraph",
+																content: { __sb_idx__0: { type: "text", content: "Correct!" } }
+															}
 														}
 													},
-													incorrect: {
-														__sb_idx__0: {
-															type: "paragraph",
-															content: { __sb_idx__0: { type: "text", content: "Incorrect." } }
+													__sb_idx__1: {
+														identifier: "INCORRECT",
+														outcomeIdentifier: "FEEDBACK__GLOBAL",
+														content: {
+															__sb_idx__0: {
+																type: "paragraph",
+																content: { __sb_idx__0: { type: "text", content: "Incorrect." } }
+															}
 														}
 													}
 												}
 											}
 										]
-									},
+									}),
 									refusal: null
 								}
 							}

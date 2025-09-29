@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test"
 import { compile } from "../../src/compiler/compiler"
 import type { AssessmentItemInput } from "../../src/compiler/schemas"
-import { mathCoreCollection } from "../../src/widgets/collections/math-core"
+import { allWidgetsCollection } from "../../src/widgets/collections/all"
 
 describe("Compiler: code blocks", () => {
 	test("should render code blocks in body and escape correctly", async () => {
@@ -37,7 +37,7 @@ describe("Compiler: code blocks", () => {
 				}
 			]
 		}
-		const xml = await compile(item, mathCoreCollection)
+		const xml = await compile(item, allWidgetsCollection)
 		expect(xml).toContain("<pre><code>")
 		expect(xml).toContain("print(i &lt; 5)")
 		expect(xml).toMatchSnapshot()

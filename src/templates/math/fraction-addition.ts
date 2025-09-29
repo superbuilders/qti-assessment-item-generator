@@ -44,9 +44,7 @@ export const PropsSchema = z
  * @param props - An object containing the two fractions to be added.
  * @returns An AssessmentItemInput object ready for the QTI compiler.
  */
-export function generateFractionAdditionQuestion(
-	props: z.input<typeof PropsSchema>
-): AssessmentItemInput {
+export function generateFractionAdditionQuestion(props: z.input<typeof PropsSchema>): AssessmentItemInput {
 	const { addend1, addend2 } = props
 	// --- 3a. Self-Contained Mathematical Helpers ---
 	// To ensure the template is a pure, dependency-free module, all core

@@ -1,7 +1,7 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import type { AnyInteraction } from "../compiler/schemas"
-import { type WidgetCollectionName, widgetCollections } from "../widgets/collections"
+import { widgetCollections } from "../widgets/collections"
 import { allWidgetSchemas } from "../widgets/registry"
 import { caretBanPromptSection } from "./caret"
 import type { ImageContext } from "./perseus-image-resolver"
@@ -18,11 +18,11 @@ export function createWidgetContentPrompt(
 	userContent: string
 } {
 	function buildWidgetTypeDescriptionsForCollection(): string {
-		const collection = widgetCollections[widgetCollectionName as WidgetCollectionName]
-		if (!collection) {
+		if (!(widgetCollectionName in widgetCollections)) {
 			logger.error("unknown widget collection", { widgetCollectionName })
 			throw errors.new(`unknown widget collection: ${widgetCollectionName}`)
 		}
+		const collection = widgetCollections[widgetCollectionName]
 		const sortedKeys = [...collection.widgetTypeKeys].sort()
 		const lines: string[] = []
 		function hasDef(x: unknown): x is { _def?: { description?: unknown } } {

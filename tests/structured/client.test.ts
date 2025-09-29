@@ -3,7 +3,7 @@ import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { buildPerseusEnvelope } from "../../src/structured/ai-context-builder"
 import { generateFromEnvelope } from "../../src/structured/client"
-import { mathCoreCollection } from "../../src/widgets/collections/math-core"
+import { allWidgetsCollection } from "../../src/widgets/collections/all"
 
 // Define the minimal interface we need for testing
 interface MockOpenAIInterface {
@@ -133,8 +133,8 @@ mock.module("openai", () => {
 								type: "urlImage",
 								url: "https://example.com/image.png",
 								alt: "Mock image",
-								width: 100,
-								height: 100,
+								width: 300,
+								height: 300,
 								caption: null,
 								attribution: null
 							}
@@ -163,7 +163,7 @@ mock.module("openai", () => {
 })
 
 describe("Structured AI Pipeline", () => {
-	test("should correctly orchestrate the 5 shots and assemble the final assessment item", async () => {
+	test("should correctly orchestrate the 4 shots and assemble the final assessment item", async () => {
 		const OpenAI = (await import("openai")).default
 		const mockOpenAI = new OpenAI()
 
@@ -174,7 +174,7 @@ describe("Structured AI Pipeline", () => {
 		}
 
 		const envelope = await buildPerseusEnvelope(perseusData)
-		const result = await errors.try(generateFromEnvelope(mockOpenAI, logger, envelope, mathCoreCollection))
+		const result = await errors.try(generateFromEnvelope(mockOpenAI, logger, envelope, allWidgetsCollection))
 
 		expect(result.error).toBeFalsy()
 		if (result.error) {
@@ -213,7 +213,7 @@ describe("Structured AI Pipeline", () => {
 			multimodalImagePayloads: []
 		}
 
-		const result = await errors.try(generateFromEnvelope(mockOpenAI, logger, emptyEnvelope, mathCoreCollection))
+		const result = await errors.try(generateFromEnvelope(mockOpenAI, logger, emptyEnvelope, allWidgetsCollection))
 
 		expect(result.error).toBeTruthy()
 		expect(result.error?.message).toContain("primaryContent cannot be empty")
@@ -235,6 +235,12 @@ describe("Structured AI Pipeline", () => {
 
 		// The function should throw when trying to build the enum from empty keys
 		expect(result.error).toBeTruthy()
-		expect(result.error?.message).toContain("widgetTypeKeys")
+		// Error is wrapped, so check the cause chain
+		if (result.error && "cause" in result.error && result.error.cause) {
+			const causeMsg = String(result.error.cause)
+			expect(causeMsg).toContain("widgetTypeKeys")
+		} else {
+			expect(result.error?.message).toContain("generate assessment shell")
+		}
 	})
 })

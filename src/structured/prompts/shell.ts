@@ -3,10 +3,10 @@ import * as logger from "@superbuilders/slog"
 import type { AssessmentItemInput } from "../../compiler/schemas"
 import { allExamples } from "../../examples"
 import type { WidgetCollection } from "../../widgets/collections/types"
-import type { AiContextEnvelope, ImageContext } from "../types"
 import { createCollectionScopedShellSchema } from "../schemas"
+import type { AiContextEnvelope, ImageContext } from "../types"
 import { caretBanPromptSection } from "./caret"
-import { formatUnifiedContextSections, createWidgetSelectionPromptSection } from "./shared"
+import { createWidgetSelectionPromptSection, formatUnifiedContextSections } from "./shared"
 
 // Helper to convert a full AssessmentItemInput into a shell for prompt examples
 function createShellFromExample(item: AssessmentItemInput, collection: WidgetCollection) {

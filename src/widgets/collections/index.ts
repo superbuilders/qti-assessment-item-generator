@@ -1,11 +1,11 @@
+import { allWidgetsCollection } from "./all"
 import { fourthGradeMathCollection } from "./fourth-grade-math"
-import { mathCoreCollection } from "./math-core"
 import { scienceCollection } from "./science"
 import { simpleVisualCollection } from "./simple-visual"
 import { teksMath4Collection } from "./teks-math-4"
 
 export const widgetCollections = {
-	[mathCoreCollection.name]: mathCoreCollection,
+	[allWidgetsCollection.name]: allWidgetsCollection,
 	[scienceCollection.name]: scienceCollection,
 	[simpleVisualCollection.name]: simpleVisualCollection,
 	[fourthGradeMathCollection.name]: fourthGradeMathCollection,
