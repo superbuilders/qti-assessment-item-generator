@@ -10,6 +10,10 @@ import { generateFromEnvelope } from "../src/structured/client"
 import type { AiContextEnvelope } from "../src/structured/types"
 import type { WidgetCollectionName } from "../src/widgets/collections"
 
+// Enable debug logging for this script
+logger.setDefaultLogLevel(logger.DEBUG)
+logger.info("staar batch generator started with debug logging enabled")
+
 // --- Configuration ---
 const ROOT_DIR = "teks-staar-scrape/staar_test_scrape"
 const WIDGET_COLLECTION: WidgetCollectionName = "teks-math-4"
@@ -120,6 +124,20 @@ async function processQuestionDir(dir: string, openai: OpenAI): Promise<void> {
 		totalTextLength,
 		estimatedTokens: Math.round(totalTextLength / 4) // Rough estimate: ~4 chars per token
 	})
+	
+	// Debug log the envelope contents for troubleshooting widget mapping issues
+	logger.debug("envelope primaryContent", {
+		questionDir: questionDirName,
+		fullContent: html
+	})
+	
+	if (supplementaryContent.length > 0) {
+		logger.debug("envelope supplementaryContent", {
+			questionDir: questionDirName,
+			svgCount: supplementaryContent.length,
+			allSvgs: supplementaryContent
+		})
+	}
 
 	// 4. Generate Structured Item from Envelope
 	logger.info("calling openai to generate structured item", { questionDir: questionDirName, collection: WIDGET_COLLECTION })

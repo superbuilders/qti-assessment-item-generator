@@ -5,8 +5,8 @@ export const protractorAngleDiagramExamples: ProtractorAngleDiagramProps[] = [
 		type: "protractorAngleDiagram",
 		width: 400,
 		height: 300,
-		smallerReading: 0,
-		largerReading: 45,
+		startingReading: 0,
+		angleDegrees: 45,
 		startPointLabel: "A",
 		centerPointLabel: "B",
 		endPointLabel: "C"
@@ -15,8 +15,8 @@ export const protractorAngleDiagramExamples: ProtractorAngleDiagramProps[] = [
 		type: "protractorAngleDiagram",
 		width: 450,
 		height: 350,
-		smallerReading: 0,
-		largerReading: 120,
+		startingReading: 0,
+		angleDegrees: 120,
 		startPointLabel: "D",
 		centerPointLabel: "E",
 		endPointLabel: "F"
@@ -26,8 +26,8 @@ export const protractorAngleDiagramExamples: ProtractorAngleDiagramProps[] = [
 		type: "protractorAngleDiagram",
 		width: 480,
 		height: 340,
-		smallerReading: 125,
-		largerReading: 160,
+		startingReading: 125,
+		angleDegrees: 35,
 		startPointLabel: "A",
 		centerPointLabel: "B",
 		endPointLabel: "C"
@@ -36,8 +36,8 @@ export const protractorAngleDiagramExamples: ProtractorAngleDiagramProps[] = [
 		type: "protractorAngleDiagram",
 		width: 350,
 		height: 300,
-		smallerReading: 0,
-		largerReading: 90,
+		startingReading: 0,
+		angleDegrees: 90,
 		startPointLabel: "",
 		centerPointLabel: "",
 		endPointLabel: ""

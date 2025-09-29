@@ -17,18 +17,18 @@ export const ProtractorAngleDiagramPropsSchema = z
 		type: z.literal("protractorAngleDiagram"),
 		width: createWidthSchema(),
 		height: createHeightSchema(),
-		smallerReading: z
+		startingReading: z
 			.number()
 			.min(0)
 			.max(180)
 			.describe(
-				"smaller protractor reading in degrees on the inner (ccw) scale, where 0° is to the right and 180° to the left. larger reading must be greater"
+				"starting ray position in degrees on the inner (ccw) scale, where 0° is to the right and 180° to the left"
 			),
-		largerReading: z
+		angleDegrees: z
 			.number()
 			.min(0)
 			.max(180)
-			.describe("larger protractor reading in degrees on the inner (ccw) scale; must be greater than smaller reading"),
+			.describe("angle size in degrees measured counterclockwise from the starting ray"),
 		startPointLabel: z.string().describe("label for the starting point (e.g., 'A'). use empty string for no label."),
 		centerPointLabel: z
 			.string()
@@ -46,7 +46,7 @@ export type ProtractorAngleDiagramProps = z.infer<typeof ProtractorAngleDiagramP
 export const generateProtractorAngleDiagram: WidgetGenerator<typeof ProtractorAngleDiagramPropsSchema> = async (
 	props
 ) => {
-	const { width, height, smallerReading, largerReading, startPointLabel, centerPointLabel, endPointLabel } = props
+	const { width, height, startingReading, angleDegrees, startPointLabel, centerPointLabel, endPointLabel } = props
 
 	const canvas = new CanvasImpl({
 		chartArea: { left: 0, top: 0, width, height },
@@ -86,17 +86,25 @@ export const generateProtractorAngleDiagram: WidgetGenerator<typeof ProtractorAn
 	const centerX = protractorCenterX
 	const centerY = protractorCenterY
 
-	// validate readings
-	if (!(largerReading > smallerReading)) {
-		logger.error("invalid protractor readings", { smallerReading, largerReading })
-		throw errors.new("larger reading must be greater than smaller reading")
+	// validate inputs
+	if (angleDegrees <= 0) {
+		logger.error("invalid angle size", { angleDegrees })
+		throw errors.new("angle must be greater than zero")
+	}
+	if (startingReading < 0 || startingReading > 180) {
+		logger.error("invalid starting reading", { startingReading })
+		throw errors.new("invalid starting reading")
+	}
+	if (angleDegrees > 180) {
+		logger.error("invalid angle size", { angleDegrees })
+		throw errors.new("invalid angle size")
 	}
 
 	// convert readings to radians (inner CCW scale)
 	const degToRad = (d: number) => (d * Math.PI) / 180
-	const startAngleRad = degToRad(smallerReading)
-	const endAngleRad = degToRad(largerReading)
-	const angleRad = endAngleRad - startAngleRad
+	const startAngleRad = degToRad(startingReading)
+	const angleRad = degToRad(angleDegrees)
+	const endAngleRad = startAngleRad + angleRad
 
 	// compute ray endpoints (to arrow tips)
 	const startX = centerX + (lineLength + arrowOffset) * Math.cos(startAngleRad)
