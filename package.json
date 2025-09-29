@@ -28,10 +28,10 @@
 		"url": "https://github.com/superbuilders/qti-assessment-item-generator"
 	},
 	"devDependencies": {
-		"@types/bun": "1.2.21",
-		"@types/node": "^24.3.1",
+		"@types/bun": "1.2.23",
+		"@types/node": "^24.6.0",
 		"dotenv": "^17.2.2",
-		"openai": "^5.20.1"
+		"openai": "^5.23.1"
 	},
 	"peerDependencies": {
 		"typescript": "^5.9.2",
@@ -45,14 +45,14 @@
 	},
 	"dependencies": {
 		"@biomejs/biome": "^2.0.0-beta.6",
-		"@superbuilders/errors": "2.0.1",
+		"@superbuilders/errors": "3.0.2",
 		"@superbuilders/slog": "4.0.0",
 		"@types/he": "1.2.3",
 		"fast-xml-parser": "5.2.5",
 		"glob": "^11.0.3",
 		"he": "1.2.0",
 		"z3-solver": "4.15.3",
-		"zod": "^3"
+		"zod": "^4.1.11"
 	},
 	"exports": {
 		"./package.json": "./package.json",

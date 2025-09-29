@@ -1,4 +1,4 @@
-import type { AssessmentItemShell, AnyInteraction } from "../compiler/schemas"
+import type { AnyInteraction, AssessmentItemShell } from "../compiler/schemas"
 
 export type FeedbackTarget = {
 	outcomeIdentifier: string
@@ -22,24 +22,24 @@ export function enumerateFeedbackTargets(
 ): FeedbackTarget[] {
 	const targets: FeedbackTarget[] = []
 	const responseIdToBaseType = new Map<string, string>()
-	
+
 	// Build map of response IDs to their base types
 	for (const rd of responseDeclarations) {
 		responseIdToBaseType.set(rd.identifier, rd.baseType)
 	}
-	
+
 	// For each interaction, determine what feedback targets are needed
 	for (const interaction of Object.values(interactions)) {
 		const responseId = interaction.responseIdentifier
 		const baseType = responseIdToBaseType.get(responseId)
-		
+
 		if (!baseType) {
 			// Skip interactions that don't have corresponding response declarations
 			continue
 		}
-		
+
 		const outcomeIdentifier = `FEEDBACK__${responseId}`
-		
+
 		if (baseType === "identifier") {
 			// Enumerated response - generate per-choice feedback
 			if (interaction.type === "choiceInteraction" || interaction.type === "inlineChoiceInteraction") {
@@ -64,6 +64,6 @@ export function enumerateFeedbackTargets(
 			)
 		}
 	}
-	
+
 	return targets
 }

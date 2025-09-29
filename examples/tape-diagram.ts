@@ -228,7 +228,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: " ",
 			extent: null,
 			unitsTotal: 4,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		brackets: [
 			{
@@ -274,7 +274,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: " ",
 			extent: null,
 			unitsTotal: 6,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		brackets: [
 			{
@@ -320,7 +320,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: null,
 			extent: null,
 			unitsTotal: 5,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		brackets: [
 			{
@@ -366,7 +366,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: " ",
 			extent: null,
 			unitsTotal: 5,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		brackets: [
 			{
@@ -412,7 +412,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: "Time (minutes)",
 			extent: null,
 			unitsTotal: 11,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		brackets: [
 			{
@@ -458,7 +458,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: null,
 			extent: null,
 			unitsTotal: 10,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		brackets: [
 			{
@@ -519,7 +519,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: " ",
 			extent: null,
 			unitsTotal: 6,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		brackets: [
 			{
@@ -565,7 +565,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: " ",
 			extent: null,
 			unitsTotal: 10,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		brackets: [
 			{
@@ -611,7 +611,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: "Time (minutes)",
 			extent: null,
 			unitsTotal: 10,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		brackets: [
 			{
@@ -657,7 +657,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: " ",
 			extent: null,
 			unitsTotal: 7,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		brackets: [
 			{
@@ -693,7 +693,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 				startUnit: 0
 			},
 			unitsTotal: 7,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		brackets: [
 			{
@@ -737,7 +737,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 				startUnit: 0
 			},
 			unitsTotal: 5,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		referenceUnitsTotal: 7
 	},
@@ -755,7 +755,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 				startUnit: 0
 			},
 			unitsTotal: 5,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		brackets: [
 			{
@@ -795,7 +795,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: "Non-winning spaces",
 			extent: null,
 			unitsTotal: 6,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		referenceUnitsTotal: 6
 	},
@@ -827,7 +827,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 				startUnit: 0
 			},
 			unitsTotal: 4,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		brackets: [
 			{
@@ -885,7 +885,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 				startUnit: 0
 			},
 			unitsTotal: 1,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		referenceUnitsTotal: 5
 	},
@@ -917,7 +917,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 				startUnit: 0
 			},
 			unitsTotal: 4,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		brackets: [
 			{
@@ -975,7 +975,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 				startUnit: 0
 			},
 			unitsTotal: 5,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		referenceUnitsTotal: 5
 	},
@@ -1007,7 +1007,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 				startPct: 0
 			},
 			unitsTotal: 3,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		brackets: [
 			{
@@ -1065,7 +1065,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 				startPct: 0
 			},
 			unitsTotal: 5,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		referenceUnitsTotal: null
 	},
@@ -1097,7 +1097,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 				startUnit: 0
 			},
 			unitsTotal: 3,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		brackets: [
 			{
@@ -1155,7 +1155,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 				startUnit: 0
 			},
 			unitsTotal: 1,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		referenceUnitsTotal: 3
 	},
@@ -1187,7 +1187,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 				startUnit: 0
 			},
 			unitsTotal: 6,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		brackets: [
 			{
@@ -1245,7 +1245,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 				startUnit: 0
 			},
 			unitsTotal: 1,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		referenceUnitsTotal: 6
 	},
@@ -1259,7 +1259,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: null,
 			extent: null,
 			unitsTotal: 3,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		brackets: [
 			{
@@ -1299,7 +1299,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: null,
 			extent: null,
 			unitsTotal: 7,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		referenceUnitsTotal: null
 	},
@@ -1331,7 +1331,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 				startUnit: 0
 			},
 			unitsTotal: 3,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		brackets: [
 			{
@@ -1389,7 +1389,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 				startUnit: 0
 			},
 			unitsTotal: 2,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		referenceUnitsTotal: 3
 	},
@@ -1407,7 +1407,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 				startUnit: 0
 			},
 			unitsTotal: 5,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		brackets: [
 			{
@@ -1451,7 +1451,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 				startUnit: 0
 			},
 			unitsTotal: 3,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		referenceUnitsTotal: 5
 	},
@@ -1469,7 +1469,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 				startUnit: 0
 			},
 			unitsTotal: 3,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		brackets: [
 			{
@@ -1509,7 +1509,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: null,
 			extent: null,
 			unitsTotal: 5,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		referenceUnitsTotal: 5
 	},
@@ -1537,7 +1537,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: "Ducklings",
 			extent: null,
 			unitsTotal: 5,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		brackets: [
 			{
@@ -1595,7 +1595,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 				startUnit: 0
 			},
 			unitsTotal: 5,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		referenceUnitsTotal: null
 	},
@@ -1627,7 +1627,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 				startUnit: 0
 			},
 			unitsTotal: 4,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		brackets: [
 			{
@@ -1685,7 +1685,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 				startUnit: 0
 			},
 			unitsTotal: 3,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		referenceUnitsTotal: 4
 	},
@@ -1717,7 +1717,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 				startUnit: 0
 			},
 			unitsTotal: 3,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		brackets: [
 			{
@@ -1775,7 +1775,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 				startUnit: 0
 			},
 			unitsTotal: 2,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		referenceUnitsTotal: 3
 	},
@@ -1793,7 +1793,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 				startUnit: 0
 			},
 			unitsTotal: 2,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		brackets: [
 			{
@@ -1837,7 +1837,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 				startUnit: 0
 			},
 			unitsTotal: 2,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		referenceUnitsTotal: 2
 	},
@@ -1869,7 +1869,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 				startUnit: 0
 			},
 			unitsTotal: 4,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		brackets: [
 			{
@@ -1927,7 +1927,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 				startUnit: 0
 			},
 			unitsTotal: 6,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		referenceUnitsTotal: 6
 	},
@@ -1959,7 +1959,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 				startUnit: 0
 			},
 			unitsTotal: 4,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		brackets: [
 			{
@@ -2013,7 +2013,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: "Spices, grams",
 			extent: null,
 			unitsTotal: 12,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		referenceUnitsTotal: 12
 	},
@@ -2041,7 +2041,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: "Blue volume",
 			extent: null,
 			unitsTotal: 10,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		brackets: [
 			{
@@ -2099,7 +2099,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 				startUnit: 0
 			},
 			unitsTotal: 6,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		referenceUnitsTotal: 10
 	},
@@ -2131,7 +2131,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 				startUnit: 0
 			},
 			unitsTotal: 8,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		brackets: [
 			{
@@ -2189,7 +2189,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 				startUnit: 0
 			},
 			unitsTotal: 6,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		referenceUnitsTotal: 8
 	},
@@ -2221,7 +2221,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 				startUnit: 0
 			},
 			unitsTotal: 6,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		brackets: [
 			{
@@ -2279,7 +2279,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 				startUnit: 0
 			},
 			unitsTotal: 9,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		referenceUnitsTotal: 9
 	},
@@ -2311,7 +2311,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 				startUnit: 0
 			},
 			unitsTotal: 3,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		brackets: [
 			{
@@ -2369,7 +2369,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 				startUnit: 0
 			},
 			unitsTotal: 9,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		referenceUnitsTotal: 9
 	},
@@ -2400,7 +2400,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: " ",
 			extent: null,
 			unitsTotal: 19,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		brackets: [],
 		bottomTape: {
@@ -2442,7 +2442,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: " ",
 			extent: null,
 			unitsTotal: 19,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		referenceUnitsTotal: null
 	},
@@ -2489,7 +2489,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: " ",
 			extent: null,
 			unitsTotal: 100,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		brackets: [],
 		bottomTape: {
@@ -2515,7 +2515,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: " ",
 			extent: null,
 			unitsTotal: 100,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		referenceUnitsTotal: null
 	},
@@ -2562,7 +2562,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: null,
 			extent: null,
 			unitsTotal: 12,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		brackets: [],
 		bottomTape: {
@@ -2588,7 +2588,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: null,
 			extent: null,
 			unitsTotal: 12,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		referenceUnitsTotal: 12
 	},
@@ -2635,7 +2635,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: null,
 			extent: null,
 			unitsTotal: 42,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		brackets: [],
 		bottomTape: {
@@ -2661,7 +2661,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: null,
 			extent: null,
 			unitsTotal: 42,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		referenceUnitsTotal: null
 	},
@@ -2692,7 +2692,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: "Top",
 			extent: null,
 			unitsTotal: 17,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		brackets: [],
 		bottomTape: {
@@ -2734,7 +2734,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: "Bottom",
 			extent: null,
 			unitsTotal: 17,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		referenceUnitsTotal: null
 	},
@@ -2801,7 +2801,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 				startUnit: 0
 			},
 			unitsTotal: 3,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		brackets: [],
 		bottomTape: {
@@ -2831,7 +2831,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 				startUnit: 0
 			},
 			unitsTotal: 1,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		referenceUnitsTotal: 3
 	},
@@ -2845,7 +2845,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: " ",
 			extent: null,
 			unitsTotal: 25,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		brackets: [
 			{
@@ -2903,7 +2903,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: " ",
 			extent: null,
 			unitsTotal: 25,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		referenceUnitsTotal: null
 	},
@@ -2917,7 +2917,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: " ",
 			extent: null,
 			unitsTotal: 5,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		brackets: [
 			{
@@ -3023,7 +3023,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: " ",
 			extent: null,
 			unitsTotal: 5,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		referenceUnitsTotal: null
 	},
@@ -3134,7 +3134,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: " ",
 			extent: null,
 			unitsTotal: 6,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		brackets: [],
 		bottomTape: {
@@ -3160,7 +3160,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: " ",
 			extent: null,
 			unitsTotal: 1,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		referenceUnitsTotal: null
 	},
@@ -3191,7 +3191,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: " ",
 			extent: null,
 			unitsTotal: 8,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		brackets: [],
 		bottomTape: {
@@ -3329,7 +3329,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: " ",
 			extent: null,
 			unitsTotal: 8,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		referenceUnitsTotal: null
 	},
@@ -3408,7 +3408,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: " ",
 			extent: null,
 			unitsTotal: 4,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		brackets: [],
 		bottomTape: {
@@ -3434,7 +3434,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: " ",
 			extent: null,
 			unitsTotal: 1,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		referenceUnitsTotal: null
 	},
@@ -3448,7 +3448,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: " ",
 			extent: null,
 			unitsTotal: 7,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		brackets: [
 			{
@@ -3586,7 +3586,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: " ",
 			extent: null,
 			unitsTotal: 7,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		referenceUnitsTotal: null
 	},
@@ -3617,7 +3617,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: " ",
 			extent: null,
 			unitsTotal: 16,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		brackets: [],
 		bottomTape: {
@@ -3691,7 +3691,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: " ",
 			extent: null,
 			unitsTotal: 4,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		referenceUnitsTotal: null
 	},
@@ -3738,7 +3738,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: " ",
 			extent: null,
 			unitsTotal: 2,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		brackets: [],
 		bottomTape: {
@@ -3764,7 +3764,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: " ",
 			extent: null,
 			unitsTotal: 2,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		referenceUnitsTotal: 2
 	},
@@ -3811,7 +3811,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: " ",
 			extent: null,
 			unitsTotal: 10,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		brackets: [],
 		bottomTape: {
@@ -3837,7 +3837,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: " ",
 			extent: null,
 			unitsTotal: 10,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		referenceUnitsTotal: null
 	},
@@ -3868,7 +3868,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: " ",
 			extent: null,
 			unitsTotal: 10,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		brackets: [],
 		bottomTape: {
@@ -3910,7 +3910,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: " ",
 			extent: null,
 			unitsTotal: 10,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		referenceUnitsTotal: null
 	},
@@ -3957,7 +3957,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: "Top",
 			extent: null,
 			unitsTotal: 100,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		brackets: [],
 		bottomTape: {
@@ -3983,7 +3983,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: "Bottom",
 			extent: null,
 			unitsTotal: 100,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		referenceUnitsTotal: null
 	},
@@ -4014,7 +4014,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: " ",
 			extent: null,
 			unitsTotal: 1,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		brackets: [],
 		bottomTape: {
@@ -4056,7 +4056,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: " ",
 			extent: null,
 			unitsTotal: 2,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		referenceUnitsTotal: null
 	},
@@ -4103,7 +4103,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: " ",
 			extent: null,
 			unitsTotal: 17,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		brackets: [],
 		bottomTape: {
@@ -4129,7 +4129,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: " ",
 			extent: null,
 			unitsTotal: 17,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		referenceUnitsTotal: 17
 	},
@@ -4240,7 +4240,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: " ",
 			extent: null,
 			unitsTotal: 6,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		brackets: [],
 		bottomTape: {
@@ -4266,7 +4266,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: " ",
 			extent: null,
 			unitsTotal: 1,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		referenceUnitsTotal: null
 	},
@@ -4377,7 +4377,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: " ",
 			extent: null,
 			unitsTotal: 6,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		brackets: [],
 		bottomTape: {
@@ -4403,7 +4403,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: " ",
 			extent: null,
 			unitsTotal: 1,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		referenceUnitsTotal: null
 	},
@@ -4434,7 +4434,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: " ",
 			extent: null,
 			unitsTotal: 1,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		brackets: [],
 		bottomTape: {
@@ -4524,7 +4524,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: " ",
 			extent: null,
 			unitsTotal: 5,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		referenceUnitsTotal: null
 	},
@@ -4571,7 +4571,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: "Top",
 			extent: null,
 			unitsTotal: 10,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		brackets: [],
 		bottomTape: {
@@ -4597,7 +4597,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 			label: "Bottom",
 			extent: null,
 			unitsTotal: 10,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		referenceUnitsTotal: null
 	},
@@ -4632,7 +4632,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 				startUnit: 0
 			},
 			unitsTotal: 11,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		brackets: [],
 		bottomTape: {
@@ -4680,7 +4680,7 @@ export const tapeDiagramExamples: TapeDiagramProps[] = [
 				startUnit: 0
 			},
 			unitsTotal: 11,
-			roundedCaps: false,
+			roundedCaps: false
 		},
 		referenceUnitsTotal: 11
 	}

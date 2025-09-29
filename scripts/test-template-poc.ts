@@ -1,9 +1,9 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import type { z } from "zod"
 import { compile } from "../src/compiler/compiler"
-import { AssessmentItemSchema } from "../src/compiler/schemas"
+import type { AssessmentItemInput } from "../src/compiler/schemas"
 import fractionAddition from "../src/templates/math/fraction-addition"
+import { mathCoreCollection } from "../src/widgets/collections/math-core"
 
 async function main() {
 	logger.info("starting template poc test", {
@@ -35,19 +35,11 @@ async function main() {
 		logger.error("template function failed", { error: itemInputResult.error })
 		throw errors.wrap(itemInputResult.error, "template generation")
 	}
-	const assessmentItemInputRaw = itemInputResult.data
-
-	// Validate and strongly type against AssessmentItem schema
-	const aiValidation = AssessmentItemSchema.safeParse(assessmentItemInputRaw)
-	if (!aiValidation.success) {
-		logger.error("generated assessmentiteminput failed schema validation", { error: aiValidation.error })
-		throw errors.wrap(aiValidation.error, "assessment item validation")
-	}
-	const assessmentItemInput: z.input<typeof AssessmentItemSchema> = aiValidation.data
+	const assessmentItemInput: AssessmentItemInput = itemInputResult.data
 	logger.info("successfully generated assessmentiteminput from template")
 
 	// 5. Pass the generated data structure to the compiler.
-	const compileResult = await errors.try(compile(assessmentItemInput))
+	const compileResult = await errors.try(compile(assessmentItemInput, mathCoreCollection))
 	if (compileResult.error) {
 		logger.error("qti compilation failed", { error: compileResult.error })
 		throw errors.wrap(compileResult.error, "compilation")

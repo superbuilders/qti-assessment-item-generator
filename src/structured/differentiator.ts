@@ -1,10 +1,9 @@
 import * as errors from "@superbuilders/errors"
 import type * as logger from "@superbuilders/slog"
 import type OpenAI from "openai"
-import { zodResponseFormat } from "openai/helpers/zod"
 import { z } from "zod"
 import { type AssessmentItemInput, createDynamicAssessmentItemSchema } from "../compiler/schemas"
-import { allWidgetSchemas } from "../widgets/registry"
+import { allWidgetSchemas, WidgetSchema, type Widget } from "../widgets/registry"
 import { transformArraysToObjects, transformObjectsToArrays } from "./shape-helpers"
 import { generateZodSchemaFromObject } from "./zod-runtime-generator"
 
@@ -28,7 +27,7 @@ function isContentPlan(value: unknown): value is ContentPlan {
 	if (!isRecord(value)) return false
 	// ContentPlan must not have widgets or identifier
 	if ("widgets" in value || "identifier" in value) return false
-	// We trust that zodResponseFormat has validated the rest of the structure
+	// We trust that validation has validated the rest of the structure
 	return true
 }
 
@@ -84,15 +83,7 @@ function buildShot1WidgetInfoSection(assessmentItem: AssessmentItemInput, logger
 			throw errors.new("internal widget type mismatch")
 		}
 		const zodSchema = allWidgetSchemas[typeName]
-		const responseFormat = zodResponseFormat(zodSchema, `widget_${typeName}`)
-		// The helper returns an OpenAI-consumable JSON Schema with no $ref
-		// Extract only top-level properties and required to keep token usage small
-		const jsonSchemaContainer = responseFormat.json_schema
-		if (!jsonSchemaContainer) {
-			logger.error("missing json schema for widget type", { typeName })
-			throw errors.new("widget schema export missing json schema")
-		}
-		const jsonSchema = getProp(jsonSchemaContainer, "schema")
+		const jsonSchema = z.toJSONSchema(zodSchema)
 		if (!isRecord(jsonSchema)) {
 			logger.error("invalid json schema structure for widget type", { typeName })
 			throw errors.new("widget json schema invalid structure")
@@ -358,34 +349,50 @@ async function planContentDifferentiation(
 		"You MUST reword all body sentences and every choice; do not copy sentences from the source."
 	].join("\n")
 
-	const responseFormat = zodResponseFormat(ContentPlanResponseSchema, "differentiation_planner")
+	const jsonSchema = z.toJSONSchema(ContentPlanResponseSchema)
 
 	const result = await errors.try(
-		openai.chat.completions.parse({
+		openai.chat.completions.create({
 			model: OPENAI_MODEL,
 			messages: [
 				{ role: "system", content: systemInstruction },
 				{ role: "user", content: userContent }
 			],
-			response_format: responseFormat
+			response_format: {
+				type: "json_schema",
+				json_schema: {
+					name: "differentiation_planner",
+					schema: jsonSchema,
+					strict: true
+				}
+			}
 		})
 	)
-
 	if (result.error) {
 		logger.error("openai differentiation planning call failed", { error: result.error })
 		throw errors.wrap(result.error, "ai differentiation planning")
 	}
 
 	const choice = result.data.choices[0]
-	if (!choice?.message?.parsed) {
-		logger.error("openai planning call returned no parsed content")
-		throw errors.new("empty ai response: no parsed content for differentiation plan")
+	if (!choice?.message?.content) {
+		logger.error("openai planning call returned no content")
+		throw errors.new("empty ai response: no content for differentiation plan")
+	}
+
+	const parseResult = errors.trySync(() => JSON.parse(choice.message.content!))
+	if (parseResult.error) {
+		logger.error("json parse", { error: parseResult.error })
+		throw errors.wrap(parseResult.error, "json parse")
+	}
+
+	const validation = ContentPlanResponseSchema.safeParse(parseResult.data)
+	if (!validation.success) {
+		logger.error("plan validation failed", { error: validation.error })
+		throw errors.wrap(validation.error, "plan validation")
 	}
 
 	// Convert the object-based structures from the AI back into our standard array-based format.
-	// The plans are already validated by zodResponseFormat, so we know they match the structure
-	// We'll validate and properly type the results
-	const transformedPlans = choice.message.parsed.plans.map((plan: unknown) => transformObjectsToArrays(plan))
+	const transformedPlans = validation.data.plans.map((plan: unknown) => transformObjectsToArrays(plan))
 	const finalPlans: ContentPlan[] = []
 
 	// Post-validation: Ensure structural integrity of the generated plans.
@@ -480,7 +487,7 @@ async function regenerateWidgetsViaLLM(
 	sourceItem: AssessmentItemInput,
 	plan: ContentPlan,
 	widgetTypes: Record<string, keyof typeof allWidgetSchemas>
-): Promise<Record<string, unknown>> {
+): Promise<Record<string, Widget>> {
 	const widgetKeys = Object.keys(widgetTypes)
 	logger.info("shot 2 widget generation starting", { widgetKeysCount: widgetKeys.length })
 	const WidgetsEnvelopeSchema = z.object({ widgets: buildWidgetsResponseSchema(logger, widgetTypes) }).strict()
@@ -516,7 +523,7 @@ async function regenerateWidgetsViaLLM(
 		"Return ONLY a JSON object with a single key 'widgets' whose value is an object mapping keys to fully-formed widget objects."
 	].join("\n")
 
-	const responseFormat = zodResponseFormat(WidgetsEnvelopeSchema, "widgets_generator")
+	const jsonSchema = z.toJSONSchema(WidgetsEnvelopeSchema)
 
 	// Log prompt meta (avoid logging full prompt to keep logs readable)
 	const systemLen = systemInstruction.length
@@ -529,13 +536,20 @@ async function regenerateWidgetsViaLLM(
 	})
 
 	const llmResult = await errors.try(
-		openai.chat.completions.parse({
+		openai.chat.completions.create({
 			model: OPENAI_MODEL,
 			messages: [
 				{ role: "system", content: systemInstruction },
 				{ role: "user", content: userContent }
 			],
-			response_format: responseFormat
+			response_format: {
+				type: "json_schema",
+				json_schema: {
+					name: "widgets_generator",
+					schema: jsonSchema,
+					strict: true
+				}
+			}
 		})
 	)
 	if (llmResult.error) {
@@ -543,13 +557,32 @@ async function regenerateWidgetsViaLLM(
 		throw errors.wrap(llmResult.error, "ai widget generation")
 	}
 	logger.info("openai widget generation completed")
+	
 	const choice = llmResult.data.choices[0]
-	if (!choice?.message?.parsed) {
-		logger.error("openai widget generation returned no parsed content")
-		throw errors.new("empty ai response: no parsed widget content")
+	if (!choice?.message?.content) {
+		logger.error("openai widget generation returned no content")
+		throw errors.new("empty ai response: no content for widgets")
 	}
 
-	return choice.message.parsed.widgets
+	const parseResult = errors.trySync(() => JSON.parse(choice.message.content!))
+	if (parseResult.error) {
+		logger.error("json parse", { error: parseResult.error })
+		throw errors.wrap(parseResult.error, "json parse")
+	}
+
+    const validation = WidgetsEnvelopeSchema.safeParse(parseResult.data)
+	if (!validation.success) {
+		logger.error("widgets validation failed", { error: validation.error })
+		throw errors.wrap(validation.error, "widgets validation")
+	}
+
+    // Re-validate widgets against the global union to ensure type is Widget
+    const revalidate = z.record(z.string(), WidgetSchema).safeParse(validation.data.widgets)
+    if (!revalidate.success) {
+        logger.error("widgets post-validate against union failed", { error: revalidate.error })
+        throw errors.wrap(revalidate.error, "widgets post-validate")
+    }
+    return revalidate.data
 }
 
 /**
@@ -616,7 +649,12 @@ export async function differentiateAssessmentItem(
 		const regeneratedWidgets = widgetsResult.data
 
 		const finalItem: AssessmentItemInput = { ...plan, identifier, widgets: regeneratedWidgets }
-		const { AssessmentItemSchema: finalItemSchema } = createDynamicAssessmentItemSchema(widgetTypes)
+		
+		// Build widget enum for validation
+        const keys = Object.values(widgetTypes)
+        const tuple = [keys[0], ...keys.slice(1)] as [string, ...string[]]
+        const widgetEnum = z.enum(tuple)
+        const { AssessmentItemSchema: finalItemSchema } = createDynamicAssessmentItemSchema(widgetTypes, widgetEnum)
 		const finalValidation = finalItemSchema.safeParse(finalItem)
 		if (!finalValidation.success) {
 			logger.error("final differentiated item failed schema validation", { identifier, error: finalValidation.error })

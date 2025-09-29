@@ -77,7 +77,8 @@ export const probabilityNotPurpleSpinner: AssessmentItemInput = {
 		},
 		{
 			type: "widgetRef",
-			widgetId: "image_1"
+			widgetId: "image_1",
+			widgetType: "probabilitySpinner"
 		}
 	],
 	interactions: {
@@ -95,7 +96,10 @@ export const probabilityNotPurpleSpinner: AssessmentItemInput = {
 				{
 					type: "paragraph",
 					content: [
-						{ type: "text", content: "Excellent work! You correctly found that the probability of not landing on purple is " },
+						{
+							type: "text",
+							content: "Excellent work! You correctly found that the probability of not landing on purple is "
+						},
 						{ type: "math", mathml: "<mfrac><mn>3</mn><mn>4</mn></mfrac>" },
 						{ type: "text", content: " = " },
 						{ type: "math", mathml: "<mn>0.75</mn>" },
@@ -107,16 +111,23 @@ export const probabilityNotPurpleSpinner: AssessmentItemInput = {
 				{
 					type: "paragraph",
 					content: [
-						{ type: "text", content: "You understood that \"not purple\" means any of the other " },
+						{ type: "text", content: 'You understood that "not purple" means any of the other ' },
 						{ type: "math", mathml: "<mn>3</mn>" },
-						{ type: "text", content: " colors: pink, blue, or green. Since each sector is equally likely, we count favorable outcomes over total outcomes." }
+						{
+							type: "text",
+							content:
+								" colors: pink, blue, or green. Since each sector is equally likely, we count favorable outcomes over total outcomes."
+						}
 					]
 				},
 				{
 					type: "paragraph",
 					content: [
 						{ type: "text", content: "This is called complementary probability. Instead of finding " },
-						{ type: "math", mathml: "<mi>P</mi><mo>(</mo><mtext>purple</mtext><mo>)</mo><mo>=</mo><mfrac><mn>1</mn><mn>4</mn></mfrac>" },
+						{
+							type: "math",
+							mathml: "<mi>P</mi><mo>(</mo><mtext>purple</mtext><mo>)</mo><mo>=</mo><mfrac><mn>1</mn><mn>4</mn></mfrac>"
+						},
 						{ type: "text", content: " and then subtracting from " },
 						{ type: "math", mathml: "<mn>1</mn>" },
 						{ type: "text", content: ", you directly counted the " },
@@ -127,7 +138,11 @@ export const probabilityNotPurpleSpinner: AssessmentItemInput = {
 				{
 					type: "paragraph",
 					content: [
-						{ type: "text", content: "Real-world connection: This same thinking applies to any situation where you want the opposite of an event - like the probability of NOT raining, or NOT getting a specific card from a deck." }
+						{
+							type: "text",
+							content:
+								"Real-world connection: This same thinking applies to any situation where you want the opposite of an event - like the probability of NOT raining, or NOT getting a specific card from a deck."
+						}
 					]
 				}
 			]
@@ -139,7 +154,11 @@ export const probabilityNotPurpleSpinner: AssessmentItemInput = {
 				{
 					type: "paragraph",
 					content: [
-						{ type: "text", content: "Let's work through this step by step! Probability questions can be tricky, but there's a clear method." }
+						{
+							type: "text",
+							content:
+								"Let's work through this step by step! Probability questions can be tricky, but there's a clear method."
+						}
 					]
 				},
 				{
@@ -157,7 +176,10 @@ export const probabilityNotPurpleSpinner: AssessmentItemInput = {
 					content: [
 						{ type: "text", content: "Step " },
 						{ type: "math", mathml: "<mn>2</mn>" },
-						{ type: "text", content: ": Count the favorable outcomes. \"Not purple\" means any sector except purple, so that's " },
+						{
+							type: "text",
+							content: ': Count the favorable outcomes. "Not purple" means any sector except purple, so that\'s '
+						},
 						{ type: "math", mathml: "<mn>3</mn>" },
 						{ type: "text", content: " sectors (pink, blue, and green)." }
 					]
@@ -173,11 +195,14 @@ export const probabilityNotPurpleSpinner: AssessmentItemInput = {
 						{ type: "math", mathml: "<mfrac><mn>3</mn><mn>4</mn></mfrac>" }
 					]
 				},
-				
+
 				{
 					type: "paragraph",
 					content: [
-						{ type: "text", content: "Memory tip: When you see \"not\" in a probability question, count everything EXCEPT that outcome!" }
+						{
+							type: "text",
+							content: 'Memory tip: When you see "not" in a probability question, count everything EXCEPT that outcome!'
+						}
 					]
 				}
 			]
@@ -197,7 +222,7 @@ export const linearModelEquationPrediction: AssessmentItemInput = {
 				}
 			]
 		},
-		{ type: "widgetRef", widgetId: "image_1" },
+		{ type: "widgetRef", widgetId: "image_1", widgetType: "lineEquationGraph" },
 		{
 			type: "paragraph",
 			content: [{ type: "text", content: "Which of these linear equations best describes the given model?" }]
@@ -250,7 +275,11 @@ export const linearModelEquationPrediction: AssessmentItemInput = {
 				{
 					type: "paragraph",
 					content: [
-						{ type: "text", content: "Outstanding! You correctly identified that a reasonable linear model fits the points with a slope of " },
+						{
+							type: "text",
+							content:
+								"Outstanding! You correctly identified that a reasonable linear model fits the points with a slope of "
+						},
 						{ type: "math", mathml: "<mn>2</mn>" },
 						{ type: "text", content: " and a y-intercept of " },
 						{ type: "math", mathml: "<mn>1.5</mn>" },
@@ -275,11 +304,15 @@ export const linearModelEquationPrediction: AssessmentItemInput = {
 						{ type: "text", content: " suggests he covers some initial distance even at time zero." }
 					]
 				},
-				
+
 				{
 					type: "paragraph",
 					content: [
-						{ type: "text", content: "This type of linear modeling is used everywhere: predicting sales growth, calculating medication dosages over time, and even estimating how much fuel a car uses per mile!" }
+						{
+							type: "text",
+							content:
+								"This type of linear modeling is used everywhere: predicting sales growth, calculating medication dosages over time, and even estimating how much fuel a car uses per mile!"
+						}
 					]
 				}
 			]
@@ -291,7 +324,11 @@ export const linearModelEquationPrediction: AssessmentItemInput = {
 				{
 					type: "paragraph",
 					content: [
-						{ type: "text", content: "Good thinking, but let's examine the slope more carefully! You identified the y-intercept correctly as " },
+						{
+							type: "text",
+							content:
+								"Good thinking, but let's examine the slope more carefully! You identified the y-intercept correctly as "
+						},
 						{ type: "math", mathml: "<mn>1.5</mn>" },
 						{ type: "text", content: ", which shows you understand where the line crosses the y-axis." }
 					]
@@ -322,7 +359,11 @@ export const linearModelEquationPrediction: AssessmentItemInput = {
 						{ type: "text", content: "Slope = " },
 						{ type: "math", mathml: "<mfrac><mtext>rise</mtext><mtext>run</mtext></mfrac>" },
 						{ type: "text", content: " = " },
-						{ type: "math", mathml: "<mfrac><mrow><mn>9.5</mn><mo>-</mo><mn>1.5</mn></mrow><mrow><mn>4</mn><mo>-</mo><mn>0</mn></mrow></mfrac>" },
+						{
+							type: "math",
+							mathml:
+								"<mfrac><mrow><mn>9.5</mn><mo>-</mo><mn>1.5</mn></mrow><mrow><mn>4</mn><mo>-</mo><mn>0</mn></mrow></mfrac>"
+						},
 						{ type: "text", content: " = " },
 						{ type: "math", mathml: "<mfrac><mn>8</mn><mn>4</mn></mfrac>" },
 						{ type: "text", content: " = " },
@@ -333,9 +374,17 @@ export const linearModelEquationPrediction: AssessmentItemInput = {
 					type: "paragraph",
 					content: [
 						{ type: "text", content: "So the correct equation is " },
-						{ type: "math", mathml: "<mover accent=\"true\"><mi>y</mi><mo>^</mo></mover><mo>=</mo><mn>2</mn><mi>x</mi><mo>+</mo><mn>1.5</mn>" },
+						{
+							type: "math",
+							mathml:
+								'<mover accent="true"><mi>y</mi><mo>^</mo></mover><mo>=</mo><mn>2</mn><mi>x</mi><mo>+</mo><mn>1.5</mn>'
+						},
 						{ type: "text", content: ", not " },
-						{ type: "math", mathml: "<mover accent=\"true\"><mi>y</mi><mo>^</mo></mover><mo>=</mo><mn>1</mn><mi>x</mi><mo>+</mo><mn>1.5</mn>" },
+						{
+							type: "math",
+							mathml:
+								'<mover accent="true"><mi>y</mi><mo>^</mo></mover><mo>=</mo><mn>1</mn><mi>x</mi><mo>+</mo><mn>1.5</mn>'
+						},
 						{ type: "text", content: "." }
 					]
 				}
@@ -350,7 +399,10 @@ export const linearModelEquationPrediction: AssessmentItemInput = {
 					content: [
 						{ type: "text", content: "Great work on finding the slope as " },
 						{ type: "math", mathml: "<mn>2</mn>" },
-						{ type: "text", content: "! You correctly calculated the rate of change. Now let's check the y-intercept together." }
+						{
+							type: "text",
+							content: "! You correctly calculated the rate of change. Now let's check the y-intercept together."
+						}
 					]
 				},
 				{
@@ -376,14 +428,22 @@ export const linearModelEquationPrediction: AssessmentItemInput = {
 				{
 					type: "paragraph",
 					content: [
-						{ type: "text", content: "Remember: A positive y-intercept means the line starts above the x-axis, while a negative y-intercept means it starts below the x-axis." }
+						{
+							type: "text",
+							content:
+								"Remember: A positive y-intercept means the line starts above the x-axis, while a negative y-intercept means it starts below the x-axis."
+						}
 					]
 				},
 				{
 					type: "paragraph",
 					content: [
 						{ type: "text", content: "The correct equation is " },
-						{ type: "math", mathml: "<mover accent=\"true\"><mi>y</mi><mo>^</mo></mover><mo>=</mo><mn>2</mn><mi>x</mi><mo>+</mo><mn>1.5</mn>" },
+						{
+							type: "math",
+							mathml:
+								'<mover accent="true"><mi>y</mi><mo>^</mo></mover><mo>=</mo><mn>2</mn><mi>x</mi><mo>+</mo><mn>1.5</mn>'
+						},
 						{ type: "text", content: " (positive " },
 						{ type: "math", mathml: "<mn>1.5</mn>" },
 						{ type: "text", content: ", not negative)." }
@@ -398,7 +458,11 @@ export const linearModelEquationPrediction: AssessmentItemInput = {
 				{
 					type: "paragraph",
 					content: [
-						{ type: "text", content: "Let's work through finding both the slope and y-intercept systematically! Linear equations have the form " },
+						{
+							type: "text",
+							content:
+								"Let's work through finding both the slope and y-intercept systematically! Linear equations have the form "
+						},
 						{ type: "math", mathml: "<mi>y</mi><mo>=</mo><mi>m</mi><mi>x</mi><mo>+</mo><mi>b</mi>" },
 						{ type: "text", content: " where " },
 						{ type: "math", mathml: "<mi>m</mi>" },
@@ -410,7 +474,10 @@ export const linearModelEquationPrediction: AssessmentItemInput = {
 				{
 					type: "paragraph",
 					content: [
-						{ type: "text", content: "Finding the y-intercept: Look where the line crosses the y-axis. This appears to be at " },
+						{
+							type: "text",
+							content: "Finding the y-intercept: Look where the line crosses the y-axis. This appears to be at "
+						},
 						{ type: "text", content: "(" },
 						{ type: "math", mathml: "<mn>0</mn>" },
 						{ type: "text", content: ", " },
@@ -427,7 +494,11 @@ export const linearModelEquationPrediction: AssessmentItemInput = {
 						{ type: "text", content: "Finding the slope: Pick " },
 						{ type: "math", mathml: "<mn>2</mn>" },
 						{ type: "text", content: " points and use " },
-						{ type: "math", mathml: "<mi>m</mi><mo>=</mo><mfrac><mrow><mi>y</mi><mn>2</mn><mo>-</mo><mi>y</mi><mn>1</mn></mrow><mrow><mi>x</mi><mn>2</mn><mo>-</mo><mi>x</mi><mn>1</mn></mrow></mfrac>" },
+						{
+							type: "math",
+							mathml:
+								"<mi>m</mi><mo>=</mo><mfrac><mrow><mi>y</mi><mn>2</mn><mo>-</mo><mi>y</mi><mn>1</mn></mrow><mrow><mi>x</mi><mn>2</mn><mo>-</mo><mi>x</mi><mn>1</mn></mrow></mfrac>"
+						},
 						{ type: "text", content: ". Using points " },
 						{ type: "text", content: "(" },
 						{ type: "math", mathml: "<mn>2</mn>" },
@@ -447,7 +518,11 @@ export const linearModelEquationPrediction: AssessmentItemInput = {
 					type: "paragraph",
 					content: [
 						{ type: "text", content: "Slope = " },
-						{ type: "math", mathml: "<mfrac><mrow><mn>9.5</mn><mo>-</mo><mn>5</mn></mrow><mrow><mn>4</mn><mo>-</mo><mn>2</mn></mrow></mfrac>" },
+						{
+							type: "math",
+							mathml:
+								"<mfrac><mrow><mn>9.5</mn><mo>-</mo><mn>5</mn></mrow><mrow><mn>4</mn><mo>-</mo><mn>2</mn></mrow></mfrac>"
+						},
 						{ type: "text", content: " = " },
 						{ type: "math", mathml: "<mfrac><mn>4.5</mn><mn>2</mn></mfrac>" },
 						{ type: "text", content: " = " },
@@ -460,7 +535,11 @@ export const linearModelEquationPrediction: AssessmentItemInput = {
 					type: "paragraph",
 					content: [
 						{ type: "text", content: "Therefore, the equation is " },
-						{ type: "math", mathml: "<mover accent=\"true\"><mi>y</mi><mo>^</mo></mover><mo>=</mo><mn>2</mn><mi>x</mi><mo>+</mo><mn>1.5</mn>" },
+						{
+							type: "math",
+							mathml:
+								'<mover accent="true"><mi>y</mi><mo>^</mo></mover><mo>=</mo><mn>2</mn><mi>x</mi><mo>+</mo><mn>1.5</mn>'
+						},
 						{ type: "text", content: "." }
 					]
 				}
@@ -495,7 +574,11 @@ export const linearModelEquationPrediction: AssessmentItemInput = {
 				{
 					type: "paragraph",
 					content: [
-						{ type: "text", content: "You demonstrated excellent understanding of how to use linear models for prediction! This skill is crucial for making informed decisions based on data patterns." }
+						{
+							type: "text",
+							content:
+								"You demonstrated excellent understanding of how to use linear models for prediction! This skill is crucial for making informed decisions based on data patterns."
+						}
 					]
 				},
 				{
@@ -515,7 +598,11 @@ export const linearModelEquationPrediction: AssessmentItemInput = {
 				{
 					type: "paragraph",
 					content: [
-						{ type: "text", content: "Let's work through this prediction step by step! Using linear models to make predictions is a powerful skill once you get the process down." }
+						{
+							type: "text",
+							content:
+								"Let's work through this prediction step by step! Using linear models to make predictions is a powerful skill once you get the process down."
+						}
 					]
 				},
 				{
@@ -523,7 +610,10 @@ export const linearModelEquationPrediction: AssessmentItemInput = {
 					content: [
 						{ type: "text", content: "Step " },
 						{ type: "math", mathml: "<mn>1</mn>" },
-						{ type: "text", content: ": First, we need the correct linear equation. From the graph, we can estimate the slope from " },
+						{
+							type: "text",
+							content: ": First, we need the correct linear equation. From the graph, we can estimate the slope from "
+						},
 						{ type: "math", mathml: "<mn>2</mn>" },
 						{ type: "text", content: " clear points on the fitted line." }
 					]
@@ -579,11 +669,12 @@ export const linearModelEquationPrediction: AssessmentItemInput = {
 					content: [
 						{
 							type: "math",
-							mathml: '<mrow><mover accent="true"><mi>y</mi><mo>^</mo></mover><mo>=</mo><mn>2</mn><mo>(</mo><mn>6</mn><mo>)</mo><mo>+</mo><mn>1.5</mn><mo>=</mo><mn>12</mn><mo>+</mo><mn>1.5</mn><mo>=</mo><mn>13.5</mn></mrow>'
+							mathml:
+								'<mrow><mover accent="true"><mi>y</mi><mo>^</mo></mover><mo>=</mo><mn>2</mn><mo>(</mo><mn>6</mn><mo>)</mo><mo>+</mo><mn>1.5</mn><mo>=</mo><mn>12</mn><mo>+</mo><mn>1.5</mn><mo>=</mo><mn>13.5</mn></mrow>'
 						}
 					]
 				},
-			
+
 				{
 					type: "paragraph",
 					content: [
@@ -703,10 +794,10 @@ export const inequalityNumberLine: AssessmentItemInput = {
 					color: "#4285F4"
 				}
 			]
-		},
+		}
 	},
 	body: [
-		{ type: "widgetRef", widgetId: "inequality_widget" },
+		{ type: "widgetRef", widgetId: "inequality_widget", widgetType: "inequalityNumberLine" },
 		{ type: "interactionRef", interactionId: "choice_interaction" }
 	],
 	interactions: {
@@ -765,7 +856,11 @@ export const inequalityNumberLine: AssessmentItemInput = {
 				{
 					type: "paragraph",
 					content: [
-						{ type: "text", content: "I can see why you might think this! Let's examine the direction of the shading on the number line more carefully." }
+						{
+							type: "text",
+							content:
+								"I can see why you might think this! Let's examine the direction of the shading on the number line more carefully."
+						}
 					]
 				},
 				{
@@ -780,7 +875,7 @@ export const inequalityNumberLine: AssessmentItemInput = {
 						{ type: "text", content: " (toward positive numbers)." }
 					]
 				},
-				
+
 				{
 					type: "paragraph",
 					content: [
@@ -804,7 +899,11 @@ export const inequalityNumberLine: AssessmentItemInput = {
 				{
 					type: "paragraph",
 					content: [
-						{ type: "text", content: "Good thinking about the direction! You correctly noticed that the shading goes to the right (positive direction), but let's look at the point at " },
+						{
+							type: "text",
+							content:
+								"Good thinking about the direction! You correctly noticed that the shading goes to the right (positive direction), but let's look at the point at "
+						},
 						{ type: "math", mathml: "<mn>0</mn>" },
 						{ type: "text", content: " more carefully." }
 					]
@@ -823,15 +922,11 @@ export const inequalityNumberLine: AssessmentItemInput = {
 				},
 				{
 					type: "paragraph",
-					content: [
-						{ type: "text", content: "• Open circle (○) means the boundary point is NOT included" }
-					]
+					content: [{ type: "text", content: "• Open circle (○) means the boundary point is NOT included" }]
 				},
 				{
 					type: "paragraph",
-					content: [
-						{ type: "text", content: "• Closed circle (●) means the boundary point IS included" }
-					]
+					content: [{ type: "text", content: "• Closed circle (●) means the boundary point IS included" }]
 				},
 				{
 					type: "paragraph",
@@ -859,9 +954,7 @@ export const inequalityNumberLine: AssessmentItemInput = {
 				},
 				{
 					type: "paragraph",
-					content: [
-						{ type: "text", content: "You noticed that:" }
-					]
+					content: [{ type: "text", content: "You noticed that:" }]
 				},
 				{
 					type: "paragraph",
@@ -875,9 +968,7 @@ export const inequalityNumberLine: AssessmentItemInput = {
 				},
 				{
 					type: "paragraph",
-					content: [
-						{ type: "text", content: "• The shading extends to the right, representing all positive values" }
-					]
+					content: [{ type: "text", content: "• The shading extends to the right, representing all positive values" }]
 				},
 				{
 					type: "paragraph",
@@ -912,7 +1003,11 @@ export const inequalityNumberLine: AssessmentItemInput = {
 				{
 					type: "paragraph",
 					content: [
-						{ type: "text", content: "This skill of reading inequality graphs is essential for solving systems of inequalities and understanding domain/range in functions!" }
+						{
+							type: "text",
+							content:
+								"This skill of reading inequality graphs is essential for solving systems of inequalities and understanding domain/range in functions!"
+						}
 					]
 				}
 			]
@@ -924,16 +1019,17 @@ export const inequalityNumberLine: AssessmentItemInput = {
 				{
 					type: "paragraph",
 					content: [
-						{ type: "text", content: "Close! You correctly identified the direction (positive values), but let's examine whether " },
+						{
+							type: "text",
+							content: "Close! You correctly identified the direction (positive values), but let's examine whether "
+						},
 						{ type: "math", mathml: "<mn>0</mn>" },
 						{ type: "text", content: " itself is included." }
 					]
 				},
 				{
 					type: "paragraph",
-					content: [
-						{ type: "text", content: "The key difference between ≥ and > is the boundary point:" }
-					]
+					content: [{ type: "text", content: "The key difference between ≥ and > is the boundary point:" }]
 				},
 				{
 					type: "paragraph",
@@ -1007,7 +1103,7 @@ export const twoWayFrequencyTable: AssessmentItemInput = {
 				{ type: "text", content: " days or longer." }
 			]
 		},
-		{ type: "widgetRef", widgetId: "venn_widget" },
+		{ type: "widgetRef", widgetId: "venn_widget", widgetType: "vennDiagram" },
 		{
 			type: "paragraph",
 			content: [{ type: "text", content: "Complete the following two-way frequency table." }]
@@ -1065,7 +1161,11 @@ export const twoWayFrequencyTable: AssessmentItemInput = {
 				{
 					type: "paragraph",
 					content: [
-						{ type: "text", content: "Outstanding work! You successfully transferred all the data from the Venn diagram to the two-way frequency table." }
+						{
+							type: "text",
+							content:
+								"Outstanding work! You successfully transferred all the data from the Venn diagram to the two-way frequency table."
+						}
 					]
 				},
 				{
@@ -1081,7 +1181,11 @@ export const twoWayFrequencyTable: AssessmentItemInput = {
 				{
 					type: "paragraph",
 					content: [
-						{ type: "text", content: "This skill of converting between different data representations (Venn diagrams ↔ two-way tables) is crucial for analyzing real-world studies and surveys!" }
+						{
+							type: "text",
+							content:
+								"This skill of converting between different data representations (Venn diagrams ↔ two-way tables) is crucial for analyzing real-world studies and surveys!"
+						}
 					]
 				},
 				{
@@ -1109,7 +1213,10 @@ export const twoWayFrequencyTable: AssessmentItemInput = {
 				{
 					type: "paragraph",
 					content: [
-						{ type: "text", content: "Challenge: Can you think of another study where a two-way table would help organize the data?" }
+						{
+							type: "text",
+							content: "Challenge: Can you think of another study where a two-way table would help organize the data?"
+						}
 					]
 				}
 			]
@@ -1121,7 +1228,11 @@ export const twoWayFrequencyTable: AssessmentItemInput = {
 				{
 					type: "paragraph",
 					content: [
-						{ type: "text", content: "Let's work through converting this Venn diagram to a two-way table step by step! This is a valuable skill for organizing data." }
+						{
+							type: "text",
+							content:
+								"Let's work through converting this Venn diagram to a two-way table step by step! This is a valuable skill for organizing data."
+						}
 					]
 				},
 				{
@@ -1165,11 +1276,15 @@ export const twoWayFrequencyTable: AssessmentItemInput = {
 						{ type: "text", content: "... wait, that's negative! This means we need to recalculate." }
 					]
 				},
-				
+
 				{
 					type: "paragraph",
 					content: [
-						{ type: "text", content: "Remember: The overlap goes in the cell where both conditions are true, then work outward to fill the rest!" }
+						{
+							type: "text",
+							content:
+								"Remember: The overlap goes in the cell where both conditions are true, then work outward to fill the rest!"
+						}
 					]
 				}
 			]
@@ -1198,13 +1313,17 @@ export const twoWayFrequencyTable: AssessmentItemInput = {
 				{
 					type: "paragraph",
 					content: [
-						{ type: "text", content: "To find this value, look at the \"Cold longer than " },
+						{ type: "text", content: 'To find this value, look at the "Cold longer than ' },
 						{ type: "math", mathml: "<mn>7</mn>" },
-						{ type: "text", content: " days\" circle. It shows " },
+						{ type: "text", content: ' days" circle. It shows ' },
 						{ type: "math", mathml: "<mn>20</mn>" },
 						{ type: "text", content: " total, with " },
 						{ type: "math", mathml: "<mn>23</mn>" },
-						{ type: "text", content: " in the overlap. Since the overlap counts people who got medicine, those outside must not have received medicine." }
+						{
+							type: "text",
+							content:
+								" in the overlap. Since the overlap counts people who got medicine, those outside must not have received medicine."
+						}
 					]
 				}
 			]
@@ -1231,13 +1350,16 @@ export const twoWayFrequencyTable: AssessmentItemInput = {
 				{
 					type: "paragraph",
 					content: [
-						{ type: "text", content: "The \"Received medicine\" circle shows " },
+						{ type: "text", content: 'The "Received medicine" circle shows ' },
 						{ type: "math", mathml: "<mn>27</mn>" },
 						{ type: "text", content: " total. Since " },
 						{ type: "math", mathml: "<mn>23</mn>" },
 						{ type: "text", content: " are in the overlap (long cold), the remaining must have had shorter colds: " },
 						{ type: "math", mathml: "<mn>27</mn><mo>-</mo><mn>23</mn><mo>=</mo><mn>4</mn>" },
-						{ type: "text", content: ". Wait, that doesn't match the answer. Let me reconsider the Venn diagram interpretation." }
+						{
+							type: "text",
+							content: ". Wait, that doesn't match the answer. Let me reconsider the Venn diagram interpretation."
+						}
 					]
 				}
 			]
@@ -1252,7 +1374,10 @@ export const twoWayFrequencyTable: AssessmentItemInput = {
 					content: [
 						{ type: "text", content: "Perfect! You found that " },
 						{ type: "math", mathml: "<mn>30</mn>" },
-						{ type: "text", content: " people neither received medicine nor had long colds - they're outside both circles." }
+						{
+							type: "text",
+							content: " people neither received medicine nor had long colds - they're outside both circles."
+						}
 					]
 				}
 			]
@@ -1391,7 +1516,7 @@ export const equivalentFractionImages: AssessmentItemInput = {
 				{ type: "text", content: " of the following rectangle is shaded." }
 			]
 		},
-		{ type: "widgetRef", widgetId: "stimulus_shape" },
+		{ type: "widgetRef", widgetId: "stimulus_shape", widgetType: "partitionedShape" },
 		{ type: "interactionRef", interactionId: "choice_interaction" }
 	],
 	interactions: {
@@ -1409,15 +1534,15 @@ export const equivalentFractionImages: AssessmentItemInput = {
 			choices: [
 				{
 					identifier: "A",
-					content: [{ type: "widgetRef", widgetId: "choice_a_shape" }]
+					content: [{ type: "widgetRef", widgetId: "choice_a_shape", widgetType: "partitionedShape" }]
 				},
 				{
 					identifier: "B",
-					content: [{ type: "widgetRef", widgetId: "choice_b_shape" }]
+					content: [{ type: "widgetRef", widgetId: "choice_b_shape", widgetType: "partitionedShape" }]
 				},
 				{
 					identifier: "C",
-					content: [{ type: "widgetRef", widgetId: "choice_c_shape" }]
+					content: [{ type: "widgetRef", widgetId: "choice_c_shape", widgetType: "partitionedShape" }]
 				}
 			]
 		}
@@ -1430,7 +1555,10 @@ export const equivalentFractionImages: AssessmentItemInput = {
 				{
 					type: "paragraph",
 					content: [
-						{ type: "text", content: "Excellent choice! This rectangle demonstrates perfect equivalent fraction understanding." }
+						{
+							type: "text",
+							content: "Excellent choice! This rectangle demonstrates perfect equivalent fraction understanding."
+						}
 					]
 				},
 				{
@@ -1454,7 +1582,10 @@ export const equivalentFractionImages: AssessmentItemInput = {
 						{ type: "math", mathml: "<mfrac><mn>1</mn><mn>2</mn></mfrac>" },
 						{ type: "text", content: " = " },
 						{ type: "math", mathml: "<mfrac><mn>3</mn><mn>6</mn></mfrac>" },
-						{ type: "text", content: " because we can multiply or divide both numerator and denominator by the same number!" }
+						{
+							type: "text",
+							content: " because we can multiply or divide both numerator and denominator by the same number!"
+						}
 					]
 				},
 				{
@@ -1487,7 +1618,11 @@ export const equivalentFractionImages: AssessmentItemInput = {
 				{
 					type: "paragraph",
 					content: [
-						{ type: "text", content: "This understanding of equivalent fractions is essential for adding fractions, converting between fractions and decimals, and solving proportion problems!" }
+						{
+							type: "text",
+							content:
+								"This understanding of equivalent fractions is essential for adding fractions, converting between fractions and decimals, and solving proportion problems!"
+						}
 					]
 				}
 			]
@@ -1499,7 +1634,10 @@ export const equivalentFractionImages: AssessmentItemInput = {
 				{
 					type: "paragraph",
 					content: [
-						{ type: "text", content: "Another excellent choice! You found a different rectangle that also shows exactly " },
+						{
+							type: "text",
+							content: "Another excellent choice! You found a different rectangle that also shows exactly "
+						},
 						{ type: "math", mathml: "<mfrac><mn>3</mn><mn>6</mn></mfrac>" },
 						{ type: "text", content: " shaded." }
 					]
@@ -1531,7 +1669,11 @@ export const equivalentFractionImages: AssessmentItemInput = {
 				{
 					type: "paragraph",
 					content: [
-						{ type: "text", content: "You're seeing that the same fraction can look different depending on how we divide the shape, but the actual amount shaded stays the same." }
+						{
+							type: "text",
+							content:
+								"You're seeing that the same fraction can look different depending on how we divide the shape, but the actual amount shaded stays the same."
+						}
 					]
 				}
 			]
@@ -1543,7 +1685,11 @@ export const equivalentFractionImages: AssessmentItemInput = {
 				{
 					type: "paragraph",
 					content: [
-						{ type: "text", content: "I can see why you might choose this! Let's examine this rectangle together and compare it to our target fraction." }
+						{
+							type: "text",
+							content:
+								"I can see why you might choose this! Let's examine this rectangle together and compare it to our target fraction."
+						}
 					]
 				},
 				{
@@ -1575,18 +1721,25 @@ export const equivalentFractionImages: AssessmentItemInput = {
 				{
 					type: "paragraph",
 					content: [
-						{ type: "math", mathml: "<mfrac><mn>3</mn><mn>6</mn></mfrac><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac>" },
+						{
+							type: "math",
+							mathml: "<mfrac><mn>3</mn><mn>6</mn></mfrac><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac>"
+						},
 						{ type: "text", content: ", but " },
 						{ type: "math", mathml: "<mfrac><mn>3</mn><mn>4</mn></mfrac>" },
 						{ type: "text", content: " cannot be simplified to " },
 						{ type: "math", mathml: "<mfrac><mn>1</mn><mn>2</mn></mfrac>" }
 					]
 				},
-				
+
 				{
 					type: "paragraph",
 					content: [
-						{ type: "text", content: "Remember: To check if fractions are equivalent, simplify both to their lowest terms and see if they match!" }
+						{
+							type: "text",
+							content:
+								"Remember: To check if fractions are equivalent, simplify both to their lowest terms and see if they match!"
+						}
 					]
 				}
 			]
@@ -1603,7 +1756,7 @@ export const reactantAmountsTemperatureTableWithDropdowns: AssessmentItemInput =
 		{ identifier: "RESPONSE_REACT_D", cardinality: "single", baseType: "identifier", correct: "NH4CL" },
 		{ identifier: "RESPONSE_AMT_D", cardinality: "single", baseType: "identifier", correct: "AMT_3_0" },
 		{ identifier: "RESPONSE_REACT_E", cardinality: "single", baseType: "identifier", correct: "CACL2" },
-			{ identifier: "RESPONSE_AMT_E", cardinality: "single", baseType: "identifier", correct: "AMT_8_0" }
+		{ identifier: "RESPONSE_AMT_E", cardinality: "single", baseType: "identifier", correct: "AMT_8_0" }
 	],
 	widgets: {
 		temperature_changes_chart: {
@@ -1687,7 +1840,7 @@ export const reactantAmountsTemperatureTableWithDropdowns: AssessmentItemInput =
 			type: "paragraph",
 			content: [{ type: "text", content: "Select the reactant and amount for rows C, D, and E directly in the table." }]
 		},
-		{ type: "widgetRef", widgetId: "temperature_changes_chart" }
+		{ type: "widgetRef", widgetId: "temperature_changes_chart", widgetType: "lineGraph" }
 	],
 	interactions: {
 		dropdown_react_c: {
@@ -1695,9 +1848,18 @@ export const reactantAmountsTemperatureTableWithDropdowns: AssessmentItemInput =
 			responseIdentifier: "RESPONSE_REACT_C",
 			shuffle: true,
 			choices: [
-				{ identifier: "NH4CL", content: [{ type: "math", mathml: "<mrow><mi>N</mi><msub><mi>H</mi><mn>4</mn></msub><mi>Cl</mi></mrow>" }] },
-				{ identifier: "MGSO4", content: [{ type: "math", mathml: "<mrow><mi>Mg</mi><mi>S</mi><msub><mi>O</mi><mn>4</mn></msub></mrow>" }] },
-				{ identifier: "CACL2", content: [{ type: "math", mathml: "<mrow><mi>Ca</mi><msub><mi>Cl</mi><mn>2</mn></msub></mrow>" }] }
+				{
+					identifier: "NH4CL",
+					content: [{ type: "math", mathml: "<mrow><mi>N</mi><msub><mi>H</mi><mn>4</mn></msub><mi>Cl</mi></mrow>" }]
+				},
+				{
+					identifier: "MGSO4",
+					content: [{ type: "math", mathml: "<mrow><mi>Mg</mi><mi>S</mi><msub><mi>O</mi><mn>4</mn></msub></mrow>" }]
+				},
+				{
+					identifier: "CACL2",
+					content: [{ type: "math", mathml: "<mrow><mi>Ca</mi><msub><mi>Cl</mi><mn>2</mn></msub></mrow>" }]
+				}
 			]
 		},
 		dropdown_amt_c: {
@@ -1715,9 +1877,18 @@ export const reactantAmountsTemperatureTableWithDropdowns: AssessmentItemInput =
 			responseIdentifier: "RESPONSE_REACT_D",
 			shuffle: true,
 			choices: [
-				{ identifier: "NH4CL", content: [{ type: "math", mathml: "<mrow><mi>N</mi><msub><mi>H</mi><mn>4</mn></msub><mi>Cl</mi></mrow>" }] },
-				{ identifier: "MGSO4", content: [{ type: "math", mathml: "<mrow><mi>Mg</mi><mi>S</mi><msub><mi>O</mi><mn>4</mn></msub></mrow>" }] },
-				{ identifier: "CACL2", content: [{ type: "math", mathml: "<mrow><mi>Ca</mi><msub><mi>Cl</mi><mn>2</mn></msub></mrow>" }] }
+				{
+					identifier: "NH4CL",
+					content: [{ type: "math", mathml: "<mrow><mi>N</mi><msub><mi>H</mi><mn>4</mn></msub><mi>Cl</mi></mrow>" }]
+				},
+				{
+					identifier: "MGSO4",
+					content: [{ type: "math", mathml: "<mrow><mi>Mg</mi><mi>S</mi><msub><mi>O</mi><mn>4</mn></msub></mrow>" }]
+				},
+				{
+					identifier: "CACL2",
+					content: [{ type: "math", mathml: "<mrow><mi>Ca</mi><msub><mi>Cl</mi><mn>2</mn></msub></mrow>" }]
+				}
 			]
 		},
 		dropdown_amt_d: {
@@ -1735,9 +1906,18 @@ export const reactantAmountsTemperatureTableWithDropdowns: AssessmentItemInput =
 			responseIdentifier: "RESPONSE_REACT_E",
 			shuffle: true,
 			choices: [
-				{ identifier: "NH4CL", content: [{ type: "math", mathml: "<mrow><mi>N</mi><msub><mi>H</mi><mn>4</mn></msub><mi>Cl</mi></mrow>" }] },
-				{ identifier: "MGSO4", content: [{ type: "math", mathml: "<mrow><mi>Mg</mi><mi>S</mi><msub><mi>O</mi><mn>4</mn></msub></mrow>" }] },
-				{ identifier: "CACL2", content: [{ type: "math", mathml: "<mrow><mi>Ca</mi><msub><mi>Cl</mi><mn>2</mn></msub></mrow>" }] }
+				{
+					identifier: "NH4CL",
+					content: [{ type: "math", mathml: "<mrow><mi>N</mi><msub><mi>H</mi><mn>4</mn></msub><mi>Cl</mi></mrow>" }]
+				},
+				{
+					identifier: "MGSO4",
+					content: [{ type: "math", mathml: "<mrow><mi>Mg</mi><mi>S</mi><msub><mi>O</mi><mn>4</mn></msub></mrow>" }]
+				},
+				{
+					identifier: "CACL2",
+					content: [{ type: "math", mathml: "<mrow><mi>Ca</mi><msub><mi>Cl</mi><mn>2</mn></msub></mrow>" }]
+				}
 			]
 		},
 		dropdown_amt_e: {
@@ -1762,7 +1942,11 @@ export const reactantAmountsTemperatureTableWithDropdowns: AssessmentItemInput =
 					content: [
 						{ type: "text", content: "Correct! " },
 						{ type: "math", mathml: "<mrow><mi>Mg</mi><mi>S</mi><msub><mi>O</mi><mn>4</mn></msub></mrow>" },
-						{ type: "text", content: " produces a small positive temperature change because it releases heat when dissolving (exothermic)." }
+						{
+							type: "text",
+							content:
+								" produces a small positive temperature change because it releases heat when dissolving (exothermic)."
+						}
 					]
 				}
 			]
@@ -1776,7 +1960,10 @@ export const reactantAmountsTemperatureTableWithDropdowns: AssessmentItemInput =
 					content: [
 						{ type: "text", content: "Not quite. " },
 						{ type: "math", mathml: "<mrow><mi>N</mi><msub><mi>H</mi><mn>4</mn></msub><mi>Cl</mi></mrow>" },
-						{ type: "text", content: " causes cooling (negative temperature change), but experiment C shows a positive change." }
+						{
+							type: "text",
+							content: " causes cooling (negative temperature change), but experiment C shows a positive change."
+						}
 					]
 				}
 			]
@@ -1790,7 +1977,10 @@ export const reactantAmountsTemperatureTableWithDropdowns: AssessmentItemInput =
 					content: [
 						{ type: "text", content: "Not quite. While " },
 						{ type: "math", mathml: "<mrow><mi>Ca</mi><msub><mi>Cl</mi><mn>2</mn></msub></mrow>" },
-						{ type: "text", content: " does cause heating, it produces a much larger temperature change than the small " },
+						{
+							type: "text",
+							content: " does cause heating, it produces a much larger temperature change than the small "
+						},
 						{ type: "math", mathml: "<mo>+</mo><mn>0.5</mn><mo>°</mo><mi>C</mi>" },
 						{ type: "text", content: " observed." }
 					]
@@ -1822,8 +2012,8 @@ export const reactantAmountsTemperatureTableWithDropdowns: AssessmentItemInput =
 						{ type: "text", content: "This amount would produce a slightly larger temperature change than observed." }
 					]
 				}
-					]
-				},
+			]
+		},
 		{
 			identifier: "AMT_8_0",
 			outcomeIdentifier: "FEEDBACK__RESPONSE_AMT_C",
@@ -1831,7 +2021,10 @@ export const reactantAmountsTemperatureTableWithDropdowns: AssessmentItemInput =
 				{
 					type: "paragraph",
 					content: [
-						{ type: "text", content: "This large amount would produce a much stronger temperature change than the small " },
+						{
+							type: "text",
+							content: "This large amount would produce a much stronger temperature change than the small "
+						},
 						{ type: "math", mathml: "<mo>+</mo><mn>0.5</mn><mo>°</mo><mi>C</mi>" },
 						{ type: "text", content: " observed." }
 					]
@@ -1916,9 +2109,7 @@ export const reactantAmountsTemperatureTableWithDropdowns: AssessmentItemInput =
 			content: [
 				{
 					type: "paragraph",
-					content: [
-						{ type: "text", content: "This large amount would produce much stronger cooling than observed." }
-					]
+					content: [{ type: "text", content: "This large amount would produce much stronger cooling than observed." }]
 				}
 			]
 		},
@@ -2004,9 +2195,7 @@ export const reactantAmountsTemperatureTableWithDropdowns: AssessmentItemInput =
 			content: [
 				{
 					type: "paragraph",
-					content: [
-						{ type: "text", content: "This moderate amount would still produce less heating than observed." }
-					]
+					content: [{ type: "text", content: "This moderate amount would still produce less heating than observed." }]
 				}
 			]
 		}
@@ -2066,10 +2255,13 @@ export const orderPlanetsFromSun: AssessmentItemInput = {
 		{
 			type: "paragraph",
 			content: [
-				{ type: "text", content: "The diagram shows the four inner planets of our solar system. Distances are not to scale." }
+				{
+					type: "text",
+					content: "The diagram shows the four inner planets of our solar system. Distances are not to scale."
+				}
 			]
 		},
-		{ type: "widgetRef", widgetId: "solar_system_diagram" },
+		{ type: "widgetRef", widgetId: "solar_system_diagram", widgetType: "emojiImage" },
 		{ type: "interactionRef", interactionId: "planet_order" }
 	],
 	interactions: {
@@ -2077,7 +2269,10 @@ export const orderPlanetsFromSun: AssessmentItemInput = {
 			type: "orderInteraction",
 			responseIdentifier: "RESPONSE",
 			prompt: [
-				{ type: "text", content: "Arrange these planets by their distance from the Sun, from least to greatest (top to bottom):" }
+				{
+					type: "text",
+					content: "Arrange these planets by their distance from the Sun, from least to greatest (top to bottom):"
+				}
 			],
 			choices: [
 				{
@@ -2175,7 +2370,10 @@ export const orderPlanetsFromSun: AssessmentItemInput = {
 					content: [
 						{ type: "text", content: "Venus is the second planet from the Sun at " },
 						{ type: "math", mathml: "<mn>0.72</mn>" },
-						{ type: "text", content: " AU. It's the hottest planet in our solar system despite not being closest to the Sun." }
+						{
+							type: "text",
+							content: " AU. It's the hottest planet in our solar system despite not being closest to the Sun."
+						}
 					]
 				}
 			]
@@ -2214,13 +2412,16 @@ export const chemicalEquationGapMatch: AssessmentItemInput = {
 			allowEmpty: false
 		}
 	],
-	widgets: {
-	},
+	widgets: {},
 	body: [
 		{
 			type: "paragraph",
 			content: [
-				{ type: "text", content: "Photosynthesis is the process by which plants convert light energy into chemical energy. Complete the balanced chemical equation by dragging the correct formulas into the gaps." }
+				{
+					type: "text",
+					content:
+						"Photosynthesis is the process by which plants convert light energy into chemical energy. Complete the balanced chemical equation by dragging the correct formulas into the gaps."
+				}
 			]
 		},
 		{ type: "interactionRef", interactionId: "equation_completion" }
@@ -2266,7 +2467,13 @@ export const chemicalEquationGapMatch: AssessmentItemInput = {
 				{
 					identifier: "FORMULA_C6H12O6",
 					matchMax: 1,
-					content: [{ type: "math", mathml: "<mrow><msub><mi>C</mi><mn>6</mn></msub><msub><mi>H</mi><mn>12</mn></msub><msub><mi>O</mi><mn>6</mn></msub></mrow>" }]
+					content: [
+						{
+							type: "math",
+							mathml:
+								"<mrow><msub><mi>C</mi><mn>6</mn></msub><msub><mi>H</mi><mn>12</mn></msub><msub><mi>O</mi><mn>6</mn></msub></mrow>"
+						}
+					]
 				},
 				{
 					identifier: "FORMULA_N2",
@@ -2289,9 +2496,7 @@ export const chemicalEquationGapMatch: AssessmentItemInput = {
 			content: [
 				{
 					type: "paragraph",
-					content: [
-						{ type: "text", content: "Excellent! You correctly completed the photosynthesis equation:" }
-					]
+					content: [{ type: "text", content: "Excellent! You correctly completed the photosynthesis equation:" }]
 				},
 				{
 					type: "paragraph",
@@ -2300,7 +2505,11 @@ export const chemicalEquationGapMatch: AssessmentItemInput = {
 						{ type: "text", content: " + " },
 						{ type: "math", mathml: "<mn>6</mn><mrow><msub><mi>H</mi><mn>2</mn></msub><mi>O</mi></mrow>" },
 						{ type: "text", content: " → " },
-						{ type: "math", mathml: "<mrow><msub><mi>C</mi><mn>6</mn></msub><msub><mi>H</mi><mn>12</mn></msub><msub><mi>O</mi><mn>6</mn></msub></mrow>" },
+						{
+							type: "math",
+							mathml:
+								"<mrow><msub><mi>C</mi><mn>6</mn></msub><msub><mi>H</mi><mn>12</mn></msub><msub><mi>O</mi><mn>6</mn></msub></mrow>"
+						},
 						{ type: "text", content: " + " },
 						{ type: "math", mathml: "<mn>6</mn><mrow><msub><mi>O</mi><mn>2</mn></msub></mrow>" }
 					]
@@ -2308,7 +2517,11 @@ export const chemicalEquationGapMatch: AssessmentItemInput = {
 				{
 					type: "paragraph",
 					content: [
-						{ type: "text", content: "This shows that plants use carbon dioxide and water to produce glucose (sugar) and oxygen, powered by sunlight!" }
+						{
+							type: "text",
+							content:
+								"This shows that plants use carbon dioxide and water to produce glucose (sugar) and oxygen, powered by sunlight!"
+						}
 					]
 				}
 			]
@@ -2319,9 +2532,7 @@ export const chemicalEquationGapMatch: AssessmentItemInput = {
 			content: [
 				{
 					type: "paragraph",
-					content: [
-						{ type: "text", content: "Let's review the photosynthesis equation step by step!" }
-					]
+					content: [{ type: "text", content: "Let's review the photosynthesis equation step by step!" }]
 				},
 				{
 					type: "unorderedList",
@@ -2335,7 +2546,11 @@ export const chemicalEquationGapMatch: AssessmentItemInput = {
 						],
 						[
 							{ type: "text", content: "Products (right side): They produce " },
-							{ type: "math", mathml: "<mrow><msub><mi>C</mi><mn>6</mn></msub><msub><mi>H</mi><mn>12</mn></msub><msub><mi>O</mi><mn>6</mn></msub></mrow>" },
+							{
+								type: "math",
+								mathml:
+									"<mrow><msub><mi>C</mi><mn>6</mn></msub><msub><mi>H</mi><mn>12</mn></msub><msub><mi>O</mi><mn>6</mn></msub></mrow>"
+							},
 							{ type: "text", content: " (glucose) for energy and release " },
 							{ type: "math", mathml: "<mrow><msub><mi>O</mi><mn>2</mn></msub></mrow>" },
 							{ type: "text", content: " into the atmosphere" }

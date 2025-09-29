@@ -1,9 +1,9 @@
-import { z } from "zod"
-import type { AssessmentItemShell, AnyInteraction } from "../../compiler/schemas"
-import { createBlockContentSchema } from "../../compiler/schemas"
+import type { AnyInteraction, AssessmentItemShell } from "../../compiler/schemas"
+import type { WidgetCollection } from "../../widgets/collections/types"
+import type { enumerateFeedbackTargets } from "../feedback-targets"
 import type { AiContextEnvelope, ImageContext } from "../types"
-import { enumerateFeedbackTargets } from "../feedback-targets"
-import { formatUnifiedContextSections } from "./shared"
+import { createCollectionScopedFeedbackSchema } from "../schemas"
+import { formatUnifiedContextSections, createWidgetSelectionPromptSection } from "./shared"
 
 /**
  * Creates a feedback generation prompt with a dynamically-generated Zod schema
@@ -14,33 +14,11 @@ export function createFeedbackPrompt(
 	assessmentShell: AssessmentItemShell,
 	interactions: Record<string, AnyInteraction>,
 	feedbackTargets: ReturnType<typeof enumerateFeedbackTargets>,
-	imageContext: ImageContext
+	imageContext: ImageContext,
+	widgetCollection: WidgetCollection
 ) {
-	// Group targets by outcome identifier to build the schema shape
-	const outcomeGroups = new Map<string, string[]>()
-	for (const target of feedbackTargets) {
-		if (!outcomeGroups.has(target.outcomeIdentifier)) {
-			outcomeGroups.set(target.outcomeIdentifier, [])
-		}
-		outcomeGroups.get(target.outcomeIdentifier)!.push(target.blockIdentifier)
-	}
-	
-	// Build dynamic schema shape
-	const feedbackSchemaShape: Record<string, z.ZodType> = {}
-	for (const [outcomeId, blockIds] of outcomeGroups) {
-		const blockShape: Record<string, z.ZodType> = {}
-		for (const blockId of blockIds) {
-			blockShape[blockId] = z.object({
-				content: createBlockContentSchema()
-			}).strict()
-		}
-		feedbackSchemaShape[outcomeId] = z.object(blockShape).strict()
-	}
-	
-	const FeedbackSchema = z.object({
-		feedback: z.object(feedbackSchemaShape).strict()
-	}).strict()
-	
+	const FeedbackSchema = createCollectionScopedFeedbackSchema(feedbackTargets, widgetCollection)
+
 	const systemInstruction = `You are an expert in educational content and QTI standards. Your task is to generate comprehensive, high-quality feedback for all possible outcomes in an assessment item.
 
 **⚠️ CRITICAL: GRAMMATICAL ERROR CORRECTION ⚠️**
@@ -99,9 +77,13 @@ This is the single source of truth for feedback structure:
 - For mathematical content, use proper MathML formatting
 - Maintain educational tone throughout`
 
+	const widgetSelectionSection = createWidgetSelectionPromptSection(widgetCollection)
+
 	const userContent = `Generate comprehensive feedback for this assessment item based on the provided context and requirements.
 
 ${formatUnifiedContextSections(envelope, imageContext)}
+
+${widgetSelectionSection}
 
 ## Assessment Shell (for context):
 \`\`\`json
@@ -116,7 +98,7 @@ ${JSON.stringify(interactions, null, 2)}
 ## Required Feedback Targets:
 You MUST generate feedback for exactly these targets:
 
-${feedbackTargets.map(t => `- Outcome: ${t.outcomeIdentifier}, Block: ${t.blockIdentifier}`).join('\n')}
+${feedbackTargets.map((t) => `- Outcome: ${t.outcomeIdentifier}, Block: ${t.blockIdentifier}`).join("\n")}
 
 ## Instructions:
 

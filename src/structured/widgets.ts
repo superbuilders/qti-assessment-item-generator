@@ -1,3 +1,5 @@
+import * as errors from "@superbuilders/errors"
+import * as logger from "@superbuilders/slog"
 import type { AnyInteraction } from "../compiler/schemas"
 import { type WidgetCollectionName, widgetCollections } from "../widgets/collections"
 import { allWidgetSchemas } from "../widgets/registry"
@@ -9,14 +11,18 @@ export function createWidgetContentPrompt(
 	assessmentShell: unknown,
 	widgetMapping: Record<string, keyof typeof allWidgetSchemas>,
 	generatedInteractions: Record<string, AnyInteraction>,
-	widgetCollectionName: WidgetCollectionName,
+	widgetCollectionName: string,
 	imageContext: ImageContext
 ): {
 	systemInstruction: string
 	userContent: string
 } {
 	function buildWidgetTypeDescriptionsForCollection(): string {
-		const collection = widgetCollections[widgetCollectionName]
+		const collection = widgetCollections[widgetCollectionName as WidgetCollectionName]
+		if (!collection) {
+			logger.error("unknown widget collection", { widgetCollectionName })
+			throw errors.new(`unknown widget collection: ${widgetCollectionName}`)
+		}
 		const sortedKeys = [...collection.widgetTypeKeys].sort()
 		const lines: string[] = []
 		function hasDef(x: unknown): x is { _def?: { description?: unknown } } {
@@ -41,7 +47,6 @@ export function createWidgetContentPrompt(
 		}
 		return lines.join("\n")
 	}
-
 
 	const systemInstruction = `You are an expert in educational content conversion with vision capabilities, focused on generating widget content for QTI assessments. Your task is to generate ONLY the widget content objects based on the original Perseus JSON, an assessment shell, a mapping that specifies the exact widget type for each slot, and accompanying visual context.
 

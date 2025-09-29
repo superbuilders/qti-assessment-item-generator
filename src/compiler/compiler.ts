@@ -1,6 +1,8 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { ErrUnsupportedInteraction } from "../structured/client"
+import type { WidgetCollection } from "../widgets/collections/types"
+import { createCollectionScopedItemSchema } from "../structured/schemas"
 import { escapeXmlAttribute } from "../utils/xml-utils"
 import { typedSchemas } from "../widgets/registry"
 import { generateWidget } from "../widgets/widget-generator"
@@ -9,7 +11,7 @@ import { encodeDataUri } from "./helpers"
 import { compileInteraction } from "./interaction-compiler"
 import { validateAssessmentItemInput } from "./pre-validator"
 import { compileResponseDeclarations, compileResponseProcessing } from "./response-processor"
-import type { AssessmentItem, AssessmentItemInput, InlineContent, BlockContent } from "./schemas"
+import type { AssessmentItem, AssessmentItemInput, BlockContent, InlineContent, AnyInteraction } from "./schemas"
 import { createDynamicAssessmentItemSchema } from "./schemas"
 import {
 	convertHtmlEntities,
@@ -407,70 +409,70 @@ function dedupePromptTextFromBody(item: AssessmentItem): void {
 }
 
 function enforceNoPipesInBody(item: AssessmentItem): void {
-    if (!item.body) return
+	if (!item.body) return
 
-    const checkInline = (inline: InlineContent | null, ctx: Record<string, unknown>) => {
-        if (!inline) return
-        for (let j = 0; j < inline.length; j++) {
-            const part = inline[j]
-            if (!part || part.type !== "text") continue
-            if (part.content.includes("|")) {
-                logger.error("pipe characters in body text", { ...ctx, snippet: part.content })
-                throw errors.new("pipe characters banned in body text")
-            }
-        }
-    }
+	const checkInline = (inline: InlineContent | null, ctx: Record<string, unknown>) => {
+		if (!inline) return
+		for (let j = 0; j < inline.length; j++) {
+			const part = inline[j]
+			if (!part || part.type !== "text") continue
+			if (part.content.includes("|")) {
+				logger.error("pipe characters in body text", { ...ctx, snippet: part.content })
+				throw errors.new("pipe characters banned in body text")
+			}
+		}
+	}
 
-    for (let i = 0; i < item.body.length; i++) {
-        const block = item.body[i]
-        if (!block) continue
-        if (block.type === "paragraph") {
-            checkInline(block.content, { index: i })
-        } else if (block.type === "unorderedList" || block.type === "orderedList") {
-            block.items.forEach((inline, idx) => checkInline(inline, { index: i, itemIndex: idx }))
-        } else if (block.type === "tableRich") {
-            const walkRows = (rows: Array<Array<InlineContent | null>> | null) => {
-                if (!rows) return
-                rows.forEach((row, rIdx) => row.forEach((cell, cIdx) => checkInline(cell, { index: i, row: rIdx, col: cIdx })))
-            }
-            walkRows(block.header)
-            walkRows(block.rows)
-            // footer removed; nothing to walk
-        }
-    }
+	for (let i = 0; i < item.body.length; i++) {
+		const block = item.body[i]
+		if (!block) continue
+		if (block.type === "paragraph") {
+			checkInline(block.content, { index: i })
+		} else if (block.type === "unorderedList" || block.type === "orderedList") {
+			block.items.forEach((inline, idx) => checkInline(inline, { index: i, itemIndex: idx }))
+		} else if (block.type === "tableRich") {
+			const walkRows = (rows: Array<Array<InlineContent | null>> | null) => {
+				if (!rows) return
+				rows.forEach((row, rIdx) => row.forEach((cell, cIdx) => checkInline(cell, { index: i, row: rIdx, col: cIdx })))
+			}
+			walkRows(block.header)
+			walkRows(block.rows)
+			// footer removed; nothing to walk
+		}
+	}
 }
 
 function enforceNoCaretsInBody(item: AssessmentItem): void {
-    if (!item.body) return
+	if (!item.body) return
 
-    const checkInline = (inline: InlineContent | null, ctx: Record<string, unknown>) => {
-        if (!inline) return
-        for (let j = 0; j < inline.length; j++) {
-            const part = inline[j]
-            if (!part || part.type !== "text") continue
-            if (part.content.includes("^")) {
-                logger.error("caret characters in body text", { ...ctx, snippet: part.content })
-                throw errors.new("caret characters banned in body text")
-            }
-        }
-    }
+	const checkInline = (inline: InlineContent | null, ctx: Record<string, unknown>) => {
+		if (!inline) return
+		for (let j = 0; j < inline.length; j++) {
+			const part = inline[j]
+			if (!part || part.type !== "text") continue
+			if (part.content.includes("^")) {
+				logger.error("caret characters in body text", { ...ctx, snippet: part.content })
+				throw errors.new("caret characters banned in body text")
+			}
+		}
+	}
 
-    for (let i = 0; i < item.body.length; i++) {
-        const block = item.body[i]
-        if (!block) continue
-        if (block.type === "paragraph") {
-            checkInline(block.content, { index: i })
-        } else if (block.type === "unorderedList" || block.type === "orderedList") {
-            block.items.forEach((inline, idx) => checkInline(inline, { index: i, itemIndex: idx }))
-        } else if (block.type === "tableRich") {
-            const walkRows = (rows: Array<Array<InlineContent | null>> | null) => {
-                if (!rows) return
-                rows.forEach((row, rIdx) => row.forEach((cell, cIdx) => checkInline(cell, { index: i, row: rIdx, col: cIdx })))
-            }
-            walkRows(block.header)
-            walkRows(block.rows)
-        }
-    }
+	for (let i = 0; i < item.body.length; i++) {
+		const block = item.body[i]
+		if (!block) continue
+		if (block.type === "paragraph") {
+			checkInline(block.content, { index: i })
+		} else if (block.type === "unorderedList" || block.type === "orderedList") {
+			block.items.forEach((inline, idx) => checkInline(inline, { index: i, itemIndex: idx }))
+		} else if (block.type === "tableRich") {
+			const walkRows = (rows: Array<Array<InlineContent | null>> | null) => {
+				if (!rows) return
+				rows.forEach((row, rIdx) => row.forEach((cell, cIdx) => checkInline(cell, { index: i, row: rIdx, col: cIdx })))
+			}
+			walkRows(block.header)
+			walkRows(block.rows)
+		}
+	}
 }
 
 function enforceNoPipesInChoiceInteraction(item: AssessmentItem): void {
@@ -574,7 +576,7 @@ function enforceNoCaretsInChoiceInteraction(item: AssessmentItem): void {
 function enforceNoCaretsInInlineChoiceInteraction(item: AssessmentItem): void {
 	if (!item.interactions) return
 
-	for (const [interactionId, interaction] of Object.entries(item.interactions)) {
+	for (const [interactionId, interaction] of Object.entries(item.interactions) as [string, AnyInteraction][]) {
 		if (!interaction || interaction.type !== "inlineChoiceInteraction") continue
 
 		// choice inline content
@@ -602,7 +604,7 @@ function enforceNoCaretsInInlineChoiceInteraction(item: AssessmentItem): void {
 function enforceNoPipesInInlineChoiceInteraction(item: AssessmentItem): void {
 	if (!item.interactions) return
 
-	for (const [interactionId, interaction] of Object.entries(item.interactions)) {
+	for (const [interactionId, interaction] of Object.entries(item.interactions) as [string, AnyInteraction][]) {
 		if (!interaction || interaction.type !== "inlineChoiceInteraction") continue
 
 		// choice inline content
@@ -632,23 +634,23 @@ function enforceIdentifierOnlyMatching(item: AssessmentItem): void {
 	const allowed: Record<string, Set<string>> = {}
 	const responseIdOwners = new Map<string, string>()
 
-    const ensureSet = (id: string, ownerId: string): Set<string> => {
-        // Check for duplicate responseIdentifier across different interactions
-        const existingOwner = responseIdOwners.get(id)
-        if (existingOwner && existingOwner !== ownerId) {
-            logger.error("duplicate response identifier found across multiple interactions", {
-                responseIdentifier: id,
-                firstOwner: existingOwner,
-                secondOwner: ownerId
-            })
-            throw ErrDuplicateResponseIdentifier
-        }
-        responseIdOwners.set(id, ownerId)
-        if (!allowed[id]) {
-            allowed[id] = new Set<string>()
-        }
-        return allowed[id]
-    }
+	const ensureSet = (id: string, ownerId: string): Set<string> => {
+		// Check for duplicate responseIdentifier across different interactions
+		const existingOwner = responseIdOwners.get(id)
+		if (existingOwner && existingOwner !== ownerId) {
+			logger.error("duplicate response identifier found across multiple interactions", {
+				responseIdentifier: id,
+				firstOwner: existingOwner,
+				secondOwner: ownerId
+			})
+			throw ErrDuplicateResponseIdentifier
+		}
+		responseIdOwners.set(id, ownerId)
+		if (!allowed[id]) {
+			allowed[id] = new Set<string>()
+		}
+		return allowed[id]
+	}
 
 	// Interactions: inlineChoice, choice, order
 	if (item.interactions) {
@@ -670,7 +672,7 @@ function enforceIdentifierOnlyMatching(item: AssessmentItem): void {
 					throw errors.new("missing responseidentifier")
 				}
 				const responseId = interaction.responseIdentifier
-			const seenIdentifiers = new Set<string>()
+				const seenIdentifiers = new Set<string>()
 				if (!("choices" in interaction) || !Array.isArray(interaction.choices)) {
 					logger.error("invalid choices array in interaction", {
 						interactionId
@@ -694,7 +696,7 @@ function enforceIdentifierOnlyMatching(item: AssessmentItem): void {
 		}
 	}
 
-    // Note: dataTable widgets removed; no widget-owned responses are supported
+	// Note: dataTable widgets removed; no widget-owned responses are supported
 
 	// Validate response declarations for any responseIdentifier with allowed set
 	for (const decl of item.responseDeclarations) {
@@ -738,7 +740,7 @@ function enforceIdentifierOnlyMatching(item: AssessmentItem): void {
 function collectRefs(item: AssessmentItemInput): { widgetRefs: Set<string>; interactionRefs: Set<string> } {
 	const widgetRefs = new Set<string>()
 	const interactionRefs = new Set<string>()
-	
+
 	const walkInline = (inline: InlineContent | null) => {
 		if (!inline) return
 		for (const node of inline) {
@@ -766,7 +768,7 @@ function collectRefs(item: AssessmentItemInput): { widgetRefs: Set<string>; inte
 			}
 		}
 	}
-	
+
 	// Traverse all content areas
 	walkBlock(item.body)
 	item.feedbackBlocks.forEach((fb) => walkBlock(fb.content))
@@ -786,17 +788,28 @@ function collectRefs(item: AssessmentItemInput): { widgetRefs: Set<string>; inte
 			}
 		}
 	}
-    
+
 	// dataTable support removed; no scanning within widget content
-	
+
 	return { widgetRefs, interactionRefs }
 }
 
 function collectWidgetIds(item: AssessmentItemInput): Set<string> {
-    return collectRefs(item).widgetRefs
+	return collectRefs(item).widgetRefs
 }
 
-export async function compile(itemData: AssessmentItemInput): Promise<string> {
+export async function compile(
+	itemData: AssessmentItemInput,
+	widgetCollection: WidgetCollection
+): Promise<string> {
+	// Re-validate with collection-scoped schema
+	const ItemSchema = createCollectionScopedItemSchema(widgetCollection)
+	const validation = ItemSchema.safeParse(itemData)
+	if (!validation.success) {
+		logger.error("compiler validation failed", { error: validation.error })
+		throw errors.wrap(validation.error, "compiler validation failed")
+	}
+	
 	// Step 0: Widget Type Derivation (Replaces AI mapping step)
 	// The widget mapping is now derived directly from the 'type' property of each widget definition.
 	const widgetMapping: Record<string, string> = {}
@@ -825,7 +838,10 @@ export async function compile(itemData: AssessmentItemInput): Promise<string> {
 		throw errors.new(`Invalid widget type "${type}" for slot "${key}" provided in mapping.`)
 	}
 
-	const { AssessmentItemSchema } = createDynamicAssessmentItemSchema(validatedWidgetMapping)
+	// Use the collection-scoped enum for validation
+	const { createWidgetTypeEnumFromCollection } = await import("../structured/schemas")
+	const ScopedWidgetEnum = createWidgetTypeEnumFromCollection(widgetCollection)
+	const { AssessmentItemSchema } = createDynamicAssessmentItemSchema(validatedWidgetMapping, ScopedWidgetEnum)
 	const itemResult = AssessmentItemSchema.safeParse(itemData)
 	if (!itemResult.success) {
 		logger.error("schema enforcement failed", { error: itemResult.error })
@@ -874,7 +890,10 @@ export async function compile(itemData: AssessmentItemInput): Promise<string> {
 
 	// Step 1: Derive the complete set of required widget IDs from ALL content
 	const requiredWidgetIds = collectWidgetIds(itemData)
-	logger.debug("derived required widget ids from content", { count: requiredWidgetIds.size, ids: Array.from(requiredWidgetIds) })
+	logger.debug("derived required widget ids from content", {
+		count: requiredWidgetIds.size,
+		ids: Array.from(requiredWidgetIds)
+	})
 	logger.debug("available widget definitions", { availableWidgets: Object.keys(itemData.widgets || {}) })
 
 	// Step 2: Generate content ONLY for the required widgets
@@ -900,7 +919,7 @@ export async function compile(itemData: AssessmentItemInput): Promise<string> {
 			interactionSlots.set(interactionId, compileInteraction(interactionDef, widgetSlots, interactionSlots))
 		}
 	}
-	
+
 	// Step 4: Linker Pass - ensure all refs are resolved
 	const { widgetRefs, interactionRefs } = collectRefs(itemData)
 	for (const id of widgetRefs) {
@@ -911,7 +930,10 @@ export async function compile(itemData: AssessmentItemInput): Promise<string> {
 	}
 	for (const id of interactionRefs) {
 		if (!interactionSlots.has(id)) {
-			logger.error("unresolved interaction reference", { interactionId: id, availableSlots: Array.from(interactionSlots.keys()) })
+			logger.error("unresolved interaction reference", {
+				interactionId: id,
+				availableSlots: Array.from(interactionSlots.keys())
+			})
 			throw errors.new("unresolved interaction reference")
 		}
 	}
@@ -925,19 +947,19 @@ export async function compile(itemData: AssessmentItemInput): Promise<string> {
 		enforcedItem.responseDeclarations.map((rd) => [rd.identifier, rd.cardinality])
 	)
 
-    for (const block of enforcedItem.feedbackBlocks) {
-        const match = /^FEEDBACK__([A-Za-z0-9_]+)$/.exec(block.outcomeIdentifier)
-        const responseId = match?.[1]
+	for (const block of enforcedItem.feedbackBlocks) {
+		const match = /^FEEDBACK__([A-Za-z0-9_]+)$/.exec(block.outcomeIdentifier)
+		const responseId = match?.[1]
 
-        let cardinality: "single" | "multiple" = "single"
-        if (responseId) {
-            const responseCardinality = responseCardinalityMap.get(responseId)
-            if (responseCardinality === "multiple") {
-                cardinality = "multiple"
-            }
-        }
-        outcomeDeclarations.set(block.outcomeIdentifier, cardinality)
-    }
+		let cardinality: "single" | "multiple" = "single"
+		if (responseId) {
+			const responseCardinality = responseCardinalityMap.get(responseId)
+			if (responseCardinality === "multiple") {
+				cardinality = "multiple"
+			}
+		}
+		outcomeDeclarations.set(block.outcomeIdentifier, cardinality)
+	}
 
 	const outcomeDeclarationsXml = Array.from(outcomeDeclarations.entries())
 		.map(
@@ -984,7 +1006,9 @@ export async function compile(itemData: AssessmentItemInput): Promise<string> {
 									if (!cell) continue
 									for (const part of cell) {
 										if (part && part.type === "inlineInteractionRef") {
-											logger.error("inline interaction ref found in feedback table content", { blockId: block.identifier })
+											logger.error("inline interaction ref found in feedback table content", {
+												blockId: block.identifier
+											})
 											throw errors.new("interactions banned in feedback content")
 										}
 									}

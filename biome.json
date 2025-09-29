@@ -19,15 +19,7 @@
 	},
 	"files": {
 		"ignoreUnknown": false,
-		"includes": [
-			"**",
-			"!**/node_modules",
-			"!**/.next",
-			"!**/.expo",
-			"!**/dist",
-			"!**/out",
-			"!**/src/components/ui"
-		],
+		"includes": ["**", "!**/node_modules", "!**/.next", "!**/.expo", "!**/dist", "!**/out", "!**/src/components/ui"],
 		"maxSize": 5000000
 	},
 	"formatter": {

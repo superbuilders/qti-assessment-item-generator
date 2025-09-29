@@ -16,14 +16,13 @@ export const SimpleArrowPropsSchema = z.object({
 	strokeWidth: z.number().positive(),
 	arrowSize: z.number().positive(),
 	// Optional circles along the arrow
-	circles: z
-		.array(
-			z.object({
-				position: z.number().min(0).max(1), // 0 = start, 1 = end
-				radius: z.number().positive(),
-				fill: z.string()
-			})
-		)
+	circles: z.array(
+		z.object({
+			position: z.number().min(0).max(1), // 0 = start, 1 = end
+			radius: z.number().positive(),
+			fill: z.string()
+		})
+	)
 })
 
 export type SimpleArrowProps = z.infer<typeof SimpleArrowPropsSchema>

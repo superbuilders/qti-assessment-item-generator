@@ -103,7 +103,7 @@ export const generateLabeledRectangleDiagram: WidgetGenerator<typeof LabeledRect
 			y: rectY - 35, // Positioned above the rectangle
 			width: rectWidth,
 			height: 30,
-			content: `<div xmlns="http://www.w3.org/1999/xhtml" style="${labelStyle} font-size: ${fontPx}px;"><math xmlns=\"http://www.w3.org/1998/Math/MathML\">${topLabel}</math></div>`
+			content: `<div xmlns="http://www.w3.org/1999/xhtml" style="${labelStyle} font-size: ${fontPx}px;"><math xmlns="http://www.w3.org/1998/Math/MathML">${topLabel}</math></div>`
 		})
 	}
 
@@ -115,7 +115,7 @@ export const generateLabeledRectangleDiagram: WidgetGenerator<typeof LabeledRect
 			y: rectY + rectHeight + 5, // Positioned below the rectangle
 			width: rectWidth,
 			height: 30,
-			content: `<div xmlns="http://www.w3.org/1999/xhtml" style="${labelStyle} font-size: ${fontPx}px;"><math xmlns=\"http://www.w3.org/1998/Math/MathML\">${bottomLabel}</math></div>`
+			content: `<div xmlns="http://www.w3.org/1999/xhtml" style="${labelStyle} font-size: ${fontPx}px;"><math xmlns="http://www.w3.org/1998/Math/MathML">${bottomLabel}</math></div>`
 		})
 	}
 
@@ -134,7 +134,7 @@ export const generateLabeledRectangleDiagram: WidgetGenerator<typeof LabeledRect
 				y: transformOriginY - containerHeight / 2,
 				width: containerWidth,
 				height: containerHeight,
-				content: `<div xmlns="http://www.w3.org/1999/xhtml" style="${labelStyle} font-size: ${fontPx}px;"><math xmlns=\"http://www.w3.org/1998/Math/MathML\">${leftLabel}</math></div>`
+				content: `<div xmlns="http://www.w3.org/1999/xhtml" style="${labelStyle} font-size: ${fontPx}px;"><math xmlns="http://www.w3.org/1998/Math/MathML">${leftLabel}</math></div>`
 			})
 		})
 	}
@@ -154,7 +154,7 @@ export const generateLabeledRectangleDiagram: WidgetGenerator<typeof LabeledRect
 				y: transformOriginY - containerHeight / 2,
 				width: containerWidth,
 				height: containerHeight,
-				content: `<div xmlns="http://www.w3.org/1999/xhtml" style="${labelStyle} font-size: ${fontPx}px;"><math xmlns=\"http://www.w3.org/1998/Math/MathML\">${rightLabel}</math></div>`
+				content: `<div xmlns="http://www.w3.org/1999/xhtml" style="${labelStyle} font-size: ${fontPx}px;"><math xmlns="http://www.w3.org/1998/Math/MathML">${rightLabel}</math></div>`
 			})
 		})
 	}
@@ -167,7 +167,7 @@ export const generateLabeledRectangleDiagram: WidgetGenerator<typeof LabeledRect
 			y: rectY,
 			width: rectWidth,
 			height: rectHeight,
-			content: `<div xmlns="http://www.w3.org/1999/xhtml" style="${labelStyle} font-size: ${fontPx}px; font-weight: bold;"><math xmlns=\"http://www.w3.org/1998/Math/MathML\">${areaLabel}</math></div>`
+			content: `<div xmlns="http://www.w3.org/1999/xhtml" style="${labelStyle} font-size: ${fontPx}px; font-weight: bold;"><math xmlns="http://www.w3.org/1998/Math/MathML">${areaLabel}</math></div>`
 		})
 	}
 

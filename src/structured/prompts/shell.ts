@@ -1,14 +1,15 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import type { AssessmentItemInput } from "../../compiler/schemas"
-import { AssessmentItemShellSchema } from "../../compiler/schemas"
 import { allExamples } from "../../examples"
+import type { WidgetCollection } from "../../widgets/collections/types"
 import type { AiContextEnvelope, ImageContext } from "../types"
+import { createCollectionScopedShellSchema } from "../schemas"
 import { caretBanPromptSection } from "./caret"
-import { formatUnifiedContextSections } from "./shared"
+import { formatUnifiedContextSections, createWidgetSelectionPromptSection } from "./shared"
 
 // Helper to convert a full AssessmentItemInput into a shell for prompt examples
-function createShellFromExample(item: AssessmentItemInput) {
+function createShellFromExample(item: AssessmentItemInput, collection: WidgetCollection) {
 	// The shell now derives widget/interaction usage from refs in content.
 	// Do NOT include legacy 'widgets' or 'interactions' arrays.
 	const shell = {
@@ -19,7 +20,8 @@ function createShellFromExample(item: AssessmentItemInput) {
 	}
 	// Validate against the shell schema before returning
 	// Use safeParse to avoid throwing and to align with error handling policy
-	const result = AssessmentItemShellSchema.safeParse(shell)
+	const ShellSchema = createCollectionScopedShellSchema(collection)
+	const result = ShellSchema.safeParse(shell)
 	if (!result.success) {
 		logger.error("example shell validation failed", {
 			shell,
@@ -32,7 +34,8 @@ function createShellFromExample(item: AssessmentItemInput) {
 
 export function createAssessmentShellPrompt(
 	envelope: AiContextEnvelope,
-	imageContext: ImageContext
+	imageContext: ImageContext,
+	widgetCollection: WidgetCollection
 ): {
 	systemInstruction: string
 	userContent: string
@@ -261,11 +264,11 @@ Positive example — comprehensive, educationally valuable feedback:
         { "type": "paragraph", "content": [
           { "type": "text", "content": "• " },
           { "type": "math", "mathml": "<mn>3</mn><mo>×</mo><mn>4</mn>" },
-          { "type": "text", "content": " means \"" },
+          { "type": "text", "content": " means "" },
           { "type": "math", "mathml": "<mn>3</mn>" },
           { "type": "text", "content": " groups of " },
           { "type": "math", "mathml": "<mn>4</mn>" },
-          { "type": "text", "content": "\"" }
+          { "type": "text", "content": """ }
         ] },
         { "type": "paragraph", "content": [
           { "type": "text", "content": "• We can write this as: " },
@@ -346,13 +349,13 @@ Positive example — comprehensive, educationally valuable feedback:
         { "type": "paragraph", "content": [
           { "type": "text", "content": "Practice tip: Try skip counting by " },
           { "type": "math", "mathml": "<mn>4</mn>" },
-          { "type": "text", "content": "s three times: \"" },
+          { "type": "text", "content": "s three times: "" },
           { "type": "math", "mathml": "<mn>4</mn>" },
           { "type": "text", "content": ", " },
           { "type": "math", "mathml": "<mn>8</mn>" },
           { "type": "text", "content": ", " },
           { "type": "math", "mathml": "<mn>12</mn>" },
-          { "type": "text", "content": "\" - that's " },
+          { "type": "text", "content": "" - that's " },
           { "type": "math", "mathml": "<mn>3</mn><mo>×</mo><mn>4</mn>" },
           { "type": "text", "content": "!" }
         ] }
@@ -379,15 +382,15 @@ Positive example — comprehensive, educationally valuable feedback:
         { "type": "paragraph", "content": [
           { "type": "text", "content": "• " },
           { "type": "math", "mathml": "<mn>3</mn><mo>×</mo><mn>4</mn>" },
-          { "type": "text", "content": " means \"" },
+          { "type": "text", "content": " means "" },
           { "type": "math", "mathml": "<mn>3</mn>" },
           { "type": "text", "content": " times " },
           { "type": "math", "mathml": "<mn>4</mn>" },
-          { "type": "text", "content": "\" or \"" },
+          { "type": "text", "content": "" or "" },
           { "type": "math", "mathml": "<mn>3</mn>" },
           { "type": "text", "content": " groups of " },
           { "type": "math", "mathml": "<mn>4</mn>" },
-          { "type": "text", "content": "\"" }
+          { "type": "text", "content": """ }
         ] },
         { "type": "paragraph", "content": [
           { "type": "text", "content": "• The first number (" },
@@ -475,12 +478,12 @@ Positive example — comprehensive, educationally valuable feedback:
         { "type": "paragraph", "content": [
           { "type": "text", "content": "" },
           { "type": "math", "mathml": "<mn>2</mn>" },
-          { "type": "text", "content": ". Find context clues (\"around the sun\" suggests circular movement → orbit)" }
+          { "type": "text", "content": ". Find context clues ("around the sun" suggests circular movement → orbit)" }
         ] },
         { "type": "paragraph", "content": [
           { "type": "text", "content": "" },
           { "type": "math", "mathml": "<mn>3</mn>" },
-          { "type": "text", "content": ". Consider word intensity (immense is stronger than just \"big\")" }
+          { "type": "text", "content": ". Consider word intensity (immense is stronger than just "big")" }
         ] },
         { "type": "widgetRef", "widgetId": "vocabulary_strategy_visual" },
         { "type": "paragraph", "content": [
@@ -1580,9 +1583,9 @@ This is a mandatory step for all questions involving a \`textEntryInteraction\`.
 }
 \`\`\`
 
-**MANDATORY: Student Instruction Checklist (when baseType=\"string\")**
+**MANDATORY: Student Instruction Checklist (when baseType="string")**
 
-When you choose \`baseType=\"string\"\` to enforce a specific format, you MUST add a clear instruction for the student in the assessment \`body\` (as a new paragraph or appended in parentheses to the prompt). Use one or more of the following, as applicable:
+When you choose \`baseType="string"\` to enforce a specific format, you MUST add a clear instruction for the student in the assessment \`body\` (as a new paragraph or appended in parentheses to the prompt). Use one or more of the following, as applicable:
 
 - Fractions: "(In the simplest form without spaces)"
 - Algebraic expressions/equations: "(Do not include spaces in your answer)"
@@ -1688,11 +1691,15 @@ Any discrepancy will cause your output to be rejected. Review your work carefull
 		const invalidIdentifiers = ["linear", "quadratic", "two_times", "four_times"]
 		return !example.feedbackBlocks.some((block) => invalidIdentifiers.includes(block.identifier))
 	})
-	const exampleShells = validExamples.map(createShellFromExample)
+	const exampleShells = validExamples.map((ex) => createShellFromExample(ex, widgetCollection))
+
+	const widgetSelectionSection = createWidgetSelectionPromptSection(widgetCollection)
 
 	const userContent = `Convert the following source into an assessment shell. Use the provided context, including raster images for vision and vector images as text, to understand the content fully.
 
 ${formatUnifiedContextSections(envelope, imageContext)}
+
+${widgetSelectionSection}
 
 ## Target Shell Examples
 Below are examples of the exact 'shell' structure you must generate. Study them to understand the desired output format, especially how MathML is used and how widget/interaction slots are defined.
@@ -1710,8 +1717,9 @@ ${JSON.stringify(exampleShells, null, 2)}
     - **Exception 2 - Unsupported interactive widgets converted to multiple choice**: When converting unsupported widgets (plotter, interactive-graph, etc.), you MUST create THREE additional widget slots for the choice options (e.g., \`dot_plot_choice_a\`, \`dot_plot_choice_b\`, \`dot_plot_choice_c\`).
     - Do NOT render these per-choice visuals in the shell body. Simply reserve their widget slot identifiers in the \`widgets\` array for later use by the interaction content shot.
   - **Placeholders**:
-  - For ALL Perseus widgets (including 'image' widgets), create a { "type": "widgetRef", "widgetId": "..." } placeholder in the 'body' and add its identifier to the 'widgets' string array.
-  - For Perseus resources (reference materials such as periodic tables or formula sheets), when the current widget collection includes a matching widget type (e.g., 'periodicTable' in 'simple-visual'), you MUST create a dedicated widget slot for the resource, include its identifier in the 'widgets' array, and place a { "type": "widgetRef", "widgetId": "..." } at the correct position in the body.
+  - For ALL Perseus widgets (including 'image' widgets), create a { "type": "widgetRef", "widgetId": "...", "widgetType": "..." } placeholder in the 'body' and add its identifier to the 'widgets' string array.
+  - **CRITICAL: widgetType is REQUIRED** - Every widgetRef and inlineWidgetRef MUST include a "widgetType" property with a value from the Available Widget Types list provided above. Choose the most semantically appropriate widget type for the visual content.
+  - For Perseus resources (reference materials such as periodic tables or formula sheets), when the current widget collection includes a matching widget type (e.g., 'periodicTable' in 'simple-visual'), you MUST create a dedicated widget slot for the resource, include its identifier in the 'widgets' array, and place a { "type": "widgetRef", "widgetId": "...", "widgetType": "..." } at the correct position in the body.
   - For inline interactions (e.g., 'text-input', 'inline-choice'), create { "type": "inlineInteractionRef", "interactionId": "..." } inside paragraph content.
   - For block interactions (e.g., 'radio', 'order'), create { "type": "widgetRef", "widgetId": "..." } in the body array.
   - **NEVER EMBED IMAGES OR SVGs**: You MUST NOT generate \`<img>\` tags, \`<svg>\` tags, or data URIs in the 'body' string. This is a critical requirement. ALL images and visual elements must be handled as widgets referenced by slots. If you see an image in Perseus, create a widget slot for it, never embed it directly.

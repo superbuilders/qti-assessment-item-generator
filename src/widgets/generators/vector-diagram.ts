@@ -65,7 +65,7 @@ export const VectorDiagramPropsSchema = z
 		gridColor: z
 			.string()
 			.regex(CSS_COLOR_PATTERN, "invalid css color")
-			
+
 			.describe("Color of the grid lines"),
 		vectors: z.array(createVectorSchema()).describe("Array of vectors to draw"),
 		// NOTE: Avoid setting a default here because OpenAI's JSON Schema parser

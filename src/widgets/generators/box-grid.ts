@@ -168,7 +168,7 @@ export const generateBoxGrid: WidgetGenerator<typeof BoxGridPropsSchema> = async
 
 				const fontPx = 14
 				// Increase font size for better legibility in grid cells
-				const xhtml = `<!DOCTYPE html><div xmlns="http://www.w3.org/1999/xhtml" style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-family:${theme.font.family.sans};color:${theme.colors.text};"><math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\" style=\"font-size:${fontPx * 1.25}px;\">${inner}</math></div>`
+				const xhtml = `<!DOCTYPE html><div xmlns="http://www.w3.org/1999/xhtml" style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-family:${theme.font.family.sans};color:${theme.colors.text};"><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline" style="font-size:${fontPx * 1.25}px;">${inner}</math></div>`
 
 				canvas.drawForeignObject({
 					x: x,

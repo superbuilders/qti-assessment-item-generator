@@ -87,17 +87,23 @@ export function renderBlockContent(
 							})
 							.join("")}</tr>`
 
-					const thead = item.header?.length ? `<thead>${item.header.map(r => renderRow(r, true)).join("")}</thead>` : ""
-					let tbodyRows = item.rows.map(r => renderRow(r)).join("")
+					const thead = item.header?.length
+						? `<thead>${item.header.map((r) => renderRow(r, true)).join("")}</thead>`
+						: ""
+					let tbodyRows = item.rows.map((r) => renderRow(r)).join("")
 					// Footer support removed: do not emit <tfoot>; if footer provided by older data, fold into tbody as a final bold row is no longer supported
 					return `<table style="${tableStyle}">${thead}<tbody>${tbodyRows}</tbody></table>`
 				}
 				case "unorderedList": {
-					const itemsXml = item.items.map((inline) => `<li><p>${renderInlineContent(inline, widgetSlots, interactionSlots)}</p></li>`).join("")
+					const itemsXml = item.items
+						.map((inline) => `<li><p>${renderInlineContent(inline, widgetSlots, interactionSlots)}</p></li>`)
+						.join("")
 					return `<ul>${itemsXml}</ul>`
 				}
 				case "orderedList": {
-					const itemsXml = item.items.map((inline) => `<li><p>${renderInlineContent(inline, widgetSlots, interactionSlots)}</p></li>`).join("")
+					const itemsXml = item.items
+						.map((inline) => `<li><p>${renderInlineContent(inline, widgetSlots, interactionSlots)}</p></li>`)
+						.join("")
 					return `<ol>${itemsXml}</ol>`
 				}
 				case "widgetRef": {

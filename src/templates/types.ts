@@ -10,16 +10,13 @@ import type { AssessmentItemInput } from "../compiler/schemas"
  * - propsSchema: Zod schema describing the required input; must be strict and total (no defaults added at runtime).
  * - generate: pure, deterministic function that transforms validated input into AssessmentItemInput.
  */
-type AssessmentSchemaT = typeof import("../compiler/schemas").AssessmentItemSchema
+// AssessmentItemSchema no longer exported - use AssessmentItemInput type instead
 type FractionSchemaT = typeof import("./schemas").FractionSchema
 type NumericValueSchemaT = typeof import("./schemas").NumericValueSchema
 type RationalValueSchemaT = typeof import("./schemas").RationalValueSchema
 type PartitionedShapePropsSchemaT = typeof import("../widgets/registry").PartitionedShapePropsSchema
 
 export type TemplateContext = {
-	assessment: {
-		AssessmentItemSchema: AssessmentSchemaT
-	}
 	valueSchemas: {
 		FractionSchema: FractionSchemaT
 		NumericValueSchema: NumericValueSchemaT

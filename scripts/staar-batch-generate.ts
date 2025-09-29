@@ -1,14 +1,14 @@
 #!/usr/bin/env bun
 
-import * as path from "node:path"
 import * as fs from "node:fs/promises"
+import * as path from "node:path"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import OpenAI from "openai"
 import { compile } from "../src/compiler/compiler"
 import { generateFromEnvelope } from "../src/structured/client"
 import type { AiContextEnvelope } from "../src/structured/types"
-import type { WidgetCollectionName } from "../src/widgets/collections"
+import { teksMath4Collection } from "../src/widgets/collections/teks-math-4"
 
 // Enable debug logging for this script
 logger.setDefaultLogLevel(logger.DEBUG)
@@ -16,7 +16,7 @@ logger.info("staar batch generator started with debug logging enabled")
 
 // --- Configuration ---
 const ROOT_DIR = "teks-staar-scrape/staar_test_scrape"
-const WIDGET_COLLECTION: WidgetCollectionName = "teks-math-4"
+const WIDGET_COLLECTION = teksMath4Collection
 
 const OUTPUT_DIR_ARG = process.argv[2]
 if (!OUTPUT_DIR_ARG) {
@@ -56,7 +56,7 @@ async function findHtmlFilename(dir: string): Promise<string> {
 async function processQuestionDir(dir: string, openai: OpenAI): Promise<void> {
 	const questionDirName = path.basename(dir)
 	logger.info("starting question processing", { questionDir: questionDirName, fullPath: dir })
-	
+
 	const htmlFilenameResult = await errors.try(findHtmlFilename(dir))
 	if (htmlFilenameResult.error) {
 		logger.error("failed to find html filename", { questionDir: questionDirName, error: htmlFilenameResult.error })
@@ -71,7 +71,11 @@ async function processQuestionDir(dir: string, openai: OpenAI): Promise<void> {
 	// 1. Read Primary HTML Content
 	const htmlBytesResult = await errors.try(fs.readFile(htmlPath))
 	if (htmlBytesResult.error) {
-		logger.error("failed to read primary html file", { questionDir: questionDirName, file: htmlPath, error: htmlBytesResult.error })
+		logger.error("failed to read primary html file", {
+			questionDir: questionDirName,
+			file: htmlPath,
+			error: htmlBytesResult.error
+		})
 		throw errors.wrap(htmlBytesResult.error, "html read")
 	}
 	const html = htmlBytesResult.data.toString("utf8")
@@ -84,25 +88,37 @@ async function processQuestionDir(dir: string, openai: OpenAI): Promise<void> {
 		logger.debug("svgs directory not found or unreadable, skipping", { questionDir: questionDirName, svgsDir })
 	} else {
 		const svgFiles = svgEntriesResult.data.filter((e) => e.isFile() && e.name.toLowerCase().endsWith(".svg"))
-		logger.debug("found svg files", { questionDir: questionDirName, svgFileCount: svgFiles.length, svgFiles: svgFiles.map(f => f.name) })
-		
+		logger.debug("found svg files", {
+			questionDir: questionDirName,
+			svgFileCount: svgFiles.length,
+			svgFiles: svgFiles.map((f) => f.name)
+		})
+
 		const svgReads = await Promise.all(
 			svgFiles.map(async (f) => {
 				const p = path.join(svgsDir, f.name)
 				const textResult = await errors.try(fs.readFile(p, "utf8"))
 				if (textResult.error) {
-					logger.warn("failed to read svg file, skipping", { questionDir: questionDirName, file: p, error: textResult.error })
+					logger.warn("failed to read svg file, skipping", {
+						questionDir: questionDirName,
+						file: p,
+						error: textResult.error
+					})
 					return null
 				}
-				logger.debug("loaded svg file", { questionDir: questionDirName, svgFile: f.name, svgLength: textResult.data.length })
+				logger.debug("loaded svg file", {
+					questionDir: questionDirName,
+					svgFile: f.name,
+					svgLength: textResult.data.length
+				})
 				return `<!-- NAME: ${f.name} -->\n${textResult.data}`
 			})
 		)
 		supplementaryContent = svgReads.filter((content): content is string => content !== null)
 		const totalSvgLength = supplementaryContent.reduce((sum, content) => sum + content.length, 0)
-		logger.info("loaded supplementary svg content", { 
-			questionDir: questionDirName, 
-			svgCount: supplementaryContent.length, 
+		logger.info("loaded supplementary svg content", {
+			questionDir: questionDirName,
+			svgCount: supplementaryContent.length,
 			totalSvgLength,
 			avgSvgLength: supplementaryContent.length > 0 ? Math.round(totalSvgLength / supplementaryContent.length) : 0
 		})
@@ -115,22 +131,22 @@ async function processQuestionDir(dir: string, openai: OpenAI): Promise<void> {
 		multimodalImageUrls: [],
 		multimodalImagePayloads: []
 	}
-	
+
 	const totalTextLength = html.length + supplementaryContent.reduce((sum, content) => sum + content.length, 0)
-	logger.info("constructed ai context envelope", { 
+	logger.info("constructed ai context envelope", {
 		questionDir: questionDirName,
 		primaryContentLength: html.length,
 		supplementaryContentCount: supplementaryContent.length,
 		totalTextLength,
 		estimatedTokens: Math.round(totalTextLength / 4) // Rough estimate: ~4 chars per token
 	})
-	
+
 	// Debug log the envelope contents for troubleshooting widget mapping issues
 	logger.debug("envelope primaryContent", {
 		questionDir: questionDirName,
 		fullContent: html
 	})
-	
+
 	if (supplementaryContent.length > 0) {
 		logger.debug("envelope supplementaryContent", {
 			questionDir: questionDirName,
@@ -140,48 +156,62 @@ async function processQuestionDir(dir: string, openai: OpenAI): Promise<void> {
 	}
 
 	// 4. Generate Structured Item from Envelope
-	logger.info("calling openai to generate structured item", { questionDir: questionDirName, collection: WIDGET_COLLECTION })
+	logger.info("calling openai to generate structured item", {
+		questionDir: questionDirName,
+		collection: WIDGET_COLLECTION
+	})
 	const structuredResult = await errors.try(generateFromEnvelope(openai, logger, envelope, WIDGET_COLLECTION))
 	if (structuredResult.error) {
-		logger.error("failed to generate structured item from envelope", { 
-			questionDir: questionDirName, 
+		logger.error("failed to generate structured item from envelope", {
+			questionDir: questionDirName,
 			totalTextLength,
 			estimatedTokens: Math.round(totalTextLength / 4),
-			error: structuredResult.error 
+			error: structuredResult.error
 		})
 		throw errors.wrap(structuredResult.error, "generate from envelope")
 	}
 	const structuredItem = structuredResult.data
 	logger.info("successfully generated structured item", { questionDir: questionDirName })
-	
+
 	const structuredJsonPath = path.join(OUTPUT_DIR, `${questionDirName}-structured-item.json`)
 	const writeJsonResult = await errors.try(
 		fs.writeFile(structuredJsonPath, JSON.stringify(structuredItem, null, 2), "utf8")
 	)
 	if (writeJsonResult.error) {
-		logger.error("failed to write structured item json", { questionDir: questionDirName, file: structuredJsonPath, error: writeJsonResult.error })
+		logger.error("failed to write structured item json", {
+			questionDir: questionDirName,
+			file: structuredJsonPath,
+			error: writeJsonResult.error
+		})
 		throw errors.wrap(writeJsonResult.error, "json write")
 	}
 	logger.info("wrote structured item json", { questionDir: questionDirName, file: structuredJsonPath })
 
 	// 5. Compile Structured Item to QTI XML
 	logger.info("compiling structured item to qti xml", { questionDir: questionDirName })
-	const compileResult = await errors.try(compile(structuredItem))
+	const compileResult = await errors.try(compile(structuredItem, WIDGET_COLLECTION))
 	if (compileResult.error) {
-		logger.error("failed to compile structured item to qti", { questionDir: questionDirName, error: compileResult.error })
+		logger.error("failed to compile structured item to qti", {
+			questionDir: questionDirName,
+			error: compileResult.error
+		})
 		throw errors.wrap(compileResult.error, "qti compilation")
 	}
 	const compiledXml = compileResult.data
 	logger.info("successfully compiled to qti xml", { questionDir: questionDirName, xmlLength: compiledXml.length })
-	
+
 	const compiledXmlPath = path.join(OUTPUT_DIR, `${questionDirName}-compiled.xml`)
 	const writeXmlResult = await errors.try(fs.writeFile(compiledXmlPath, compiledXml, "utf8"))
 	if (writeXmlResult.error) {
-		logger.error("failed to write compiled xml", { questionDir: questionDirName, file: compiledXmlPath, error: writeXmlResult.error })
+		logger.error("failed to write compiled xml", {
+			questionDir: questionDirName,
+			file: compiledXmlPath,
+			error: writeXmlResult.error
+		})
 		throw errors.wrap(writeXmlResult.error, "xml write")
 	}
 	logger.info("wrote compiled qti xml", { questionDir: questionDirName, file: compiledXmlPath })
-	
+
 	logger.info("completed question processing", { questionDir: questionDirName })
 }
 
@@ -193,14 +223,14 @@ async function main() {
 		logger.error("openai api key not set")
 		throw errors.new("OPENAI_API_KEY environment variable is not set")
 	}
-	
+
 	logger.info("validating output directory", { outputDir: OUTPUT_DIR })
 	const outputDirResult = await errors.try(fs.access(OUTPUT_DIR, fs.constants.F_OK))
 	if (outputDirResult.error) {
 		logger.error("output directory does not exist", { outputDir: OUTPUT_DIR, error: outputDirResult.error })
 		throw errors.wrap(outputDirResult.error, "output directory validation")
 	}
-	
+
 	const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 
 	const rootEntriesResult = await errors.try(fs.readdir(ROOT, { withFileTypes: true }))

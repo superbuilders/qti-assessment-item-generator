@@ -13,3 +13,5 @@ export const widgetCollections = {
 } as const
 
 export type WidgetCollectionName = keyof typeof widgetCollections
+
+export type { WidgetCollection } from "./types"

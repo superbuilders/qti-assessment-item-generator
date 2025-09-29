@@ -1,18 +1,18 @@
 import { describe, expect, mock, test } from "bun:test"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import type { AssessmentItemShell } from "../../src/compiler/schemas"
 import { buildPerseusEnvelope } from "../../src/structured/ai-context-builder"
 import { generateFromEnvelope } from "../../src/structured/client"
+import { mathCoreCollection } from "../../src/widgets/collections/math-core"
 
 // Define the minimal interface we need for testing
 interface MockOpenAIInterface {
 	chat: {
 		completions: {
-			parse: (options: unknown) => Promise<{
+			create: (options: unknown) => Promise<{
 				choices: Array<{
 					message: {
-						parsed: unknown
+						content: string | null
 						refusal: null
 					}
 				}>
@@ -26,7 +26,7 @@ mock.module("openai", () => {
 	class MockOpenAI implements MockOpenAIInterface {
 		chat = {
 			completions: {
-				parse: async (options: unknown) => {
+				create: async (options: unknown) => {
 					// Simulate responses based on the function name in the schema
 					const functionName =
 						typeof options === "object" &&
@@ -41,49 +41,33 @@ mock.module("openai", () => {
 							? options.response_format.json_schema.name
 							: undefined
 					if (functionName === "assessment_shell_generator") {
-						return {
-							choices: [
+						const shellData = {
+							identifier: "mock-item-1",
+							title: "Mock Item",
+							responseDeclarations: [
 								{
-									message: {
-										parsed: {
-											identifier: "mock-item-1",
-											title: "Mock Item",
-											responseDeclarations: [
-												{
-													identifier: "RESPONSE",
-													cardinality: "single",
-													baseType: "string",
-													correct: "42"
-												}
-											],
-											body: [
-												{
-													type: "paragraph",
-													content: [
-														{ type: "text", content: "What is the answer? " },
-														{ type: "inlineInteractionRef", interactionId: "text_entry" }
-													]
-												},
-												{ type: "widgetRef", widgetId: "image_widget" }
-											],
-											// feedbackBlocks removed from shell schema
-										} satisfies AssessmentItemShell,
-										refusal: null
-									}
+									identifier: "RESPONSE",
+									cardinality: "single",
+									baseType: "string",
+									correct: "42"
 								}
+							],
+							body: [
+								{
+									type: "paragraph",
+									content: [
+										{ type: "text", content: "What is the answer? " },
+										{ type: "inlineInteractionRef", interactionId: "text_entry" }
+									]
+								},
+								{ type: "widgetRef", widgetId: "image_widget", widgetType: "urlImage" }
 							]
 						}
-					}
-					if (functionName === "widget_mapper") {
 						return {
 							choices: [
 								{
 									message: {
-										parsed: {
-											widget_mapping: {
-												image_widget: "urlImage"
-											}
-										},
+										content: JSON.stringify(shellData),
 										refusal: null
 									}
 								}
@@ -91,17 +75,18 @@ mock.module("openai", () => {
 						}
 					}
 					if (functionName === "interaction_content_generator") {
+						const interactionData = {
+							text_entry: {
+								type: "textEntryInteraction",
+								responseIdentifier: "RESPONSE",
+								expectedLength: 2
+							}
+						}
 						return {
 							choices: [
 								{
 									message: {
-										parsed: {
-											text_entry: {
-												type: "textEntryInteraction",
-												responseIdentifier: "RESPONSE",
-												expectedLength: 2
-											}
-										},
+										content: JSON.stringify(interactionData),
 										refusal: null
 									}
 								}
@@ -109,32 +94,33 @@ mock.module("openai", () => {
 						}
 					}
 					if (functionName === "feedback_generator") {
+						const feedbackData = {
+							feedback: {
+								FEEDBACK__RESPONSE: {
+									CORRECT: {
+										content: [
+											{
+												type: "paragraph",
+												content: [{ type: "text", content: "Correct! Well done." }]
+											}
+										]
+									},
+									INCORRECT: {
+										content: [
+											{
+												type: "paragraph",
+												content: [{ type: "text", content: "Not quite. Try again." }]
+											}
+										]
+									}
+								}
+							}
+						}
 						return {
 							choices: [
 								{
 									message: {
-										parsed: {
-											feedback: {
-												"FEEDBACK__RESPONSE": {
-													"CORRECT": {
-														content: [
-															{
-																type: "paragraph",
-																content: [{ type: "text", content: "Correct! Well done." }]
-															}
-														]
-													},
-													"INCORRECT": {
-														content: [
-															{
-																type: "paragraph", 
-																content: [{ type: "text", content: "Not quite. Try again." }]
-															}
-														]
-													}
-												}
-											}
-										},
+										content: JSON.stringify(feedbackData),
 										refusal: null
 									}
 								}
@@ -142,21 +128,22 @@ mock.module("openai", () => {
 						}
 					}
 					if (functionName === "widget_content_generator") {
+						const widgetData = {
+							image_widget: {
+								type: "urlImage",
+								url: "https://example.com/image.png",
+								alt: "Mock image",
+								width: 100,
+								height: 100,
+								caption: null,
+								attribution: null
+							}
+						}
 						return {
 							choices: [
 								{
 									message: {
-										parsed: {
-											image_widget: {
-												type: "urlImage",
-												url: "https://example.com/image.png",
-												alt: "Mock image",
-												width: 100,
-												height: 100,
-												caption: null,
-												attribution: null
-											}
-										},
+										content: JSON.stringify(widgetData),
 										refusal: null
 									}
 								}
@@ -187,7 +174,7 @@ describe("Structured AI Pipeline", () => {
 		}
 
 		const envelope = await buildPerseusEnvelope(perseusData)
-		const result = await errors.try(generateFromEnvelope(mockOpenAI, logger, envelope, "math-core"))
+		const result = await errors.try(generateFromEnvelope(mockOpenAI, logger, envelope, mathCoreCollection))
 
 		expect(result.error).toBeFalsy()
 		if (result.error) {
@@ -226,13 +213,13 @@ describe("Structured AI Pipeline", () => {
 			multimodalImagePayloads: []
 		}
 
-		const result = await errors.try(generateFromEnvelope(mockOpenAI, logger, emptyEnvelope, "math-core"))
+		const result = await errors.try(generateFromEnvelope(mockOpenAI, logger, emptyEnvelope, mathCoreCollection))
 
 		expect(result.error).toBeTruthy()
 		expect(result.error?.message).toContain("primaryContent cannot be empty")
 	})
 
-	test("should fail when widgetCollectionName is invalid - no fallbacks", async () => {
+	test("should fail when widgetCollection has no widgetTypeKeys - no fallbacks", async () => {
 		const OpenAI = (await import("openai")).default
 		const mockOpenAI = new OpenAI()
 
@@ -243,13 +230,11 @@ describe("Structured AI Pipeline", () => {
 			multimodalImagePayloads: []
 		}
 
-		// This should fail at TypeScript level, but let's test runtime behavior
-		// @ts-expect-error - Testing invalid collection name
-		const result = await errors.try(generateFromEnvelope(mockOpenAI, logger, envelope, "invalid-collection"))
+		const invalidCollection = { name: "invalid", widgetTypeKeys: [], schemas: {} }
+		const result = await errors.try(generateFromEnvelope(mockOpenAI, logger, envelope, invalidCollection))
 
-		// The function should either fail at compile time or throw at runtime
-		// Since TypeScript should catch this, the test mainly documents the expected behavior
-		expect(result.error || true).toBeTruthy()
+		// The function should throw when trying to build the enum from empty keys
+		expect(result.error).toBeTruthy()
+		expect(result.error?.message).toContain("widgetTypeKeys")
 	})
-
 })

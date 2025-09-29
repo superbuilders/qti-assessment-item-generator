@@ -4,7 +4,7 @@
 // input shape, and the core types it needs to produce from your library.
 // -----------------------------------------------------------------------------
 import { z } from "zod"
-import type { AssessmentItemInput, AssessmentItemSchema, BlockContent } from "../../compiler/schemas"
+import type { AssessmentItemInput, BlockContent } from "../../compiler/schemas"
 import { FractionSchema } from "../schemas"
 import type { TemplateModule } from "../types"
 
@@ -46,7 +46,7 @@ export const PropsSchema = z
  */
 export function generateFractionAdditionQuestion(
 	props: z.input<typeof PropsSchema>
-): z.input<typeof AssessmentItemSchema> {
+): AssessmentItemInput {
 	const { addend1, addend2 } = props
 	// --- 3a. Self-Contained Mathematical Helpers ---
 	// To ensure the template is a pure, dependency-free module, all core
@@ -158,7 +158,7 @@ export function generateFractionAdditionQuestion(
 	const correctChoiceIndex = finalChoices.findIndex((c) => c.isCorrect)
 
 	// --- 3d. Construct the Final AssessmentItemInput Object ---
-	const assessmentItem: z.input<typeof AssessmentItemSchema> = {
+	const assessmentItem: AssessmentItemInput = {
 		identifier: `fraction-addition-${f1.numerator}-${f1.denominator}-plus-${f2.numerator}-${f2.denominator}`,
 		title: `Fraction Addition: ${f1.numerator}/${f1.denominator} + ${f2.numerator}/${f2.denominator}`,
 

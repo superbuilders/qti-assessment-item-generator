@@ -6,6 +6,7 @@ import OpenAI from "openai"
 import { compile } from "../src/compiler/compiler"
 import type { AssessmentItemInput } from "../src/compiler/schemas"
 import { differentiateAssessmentItem } from "../src/structured/differentiator"
+import { mathCoreCollection } from "../src/widgets/collections/math-core"
 
 // Test input - plant and pot combinations
 const sourceItem: AssessmentItemInput = {
@@ -34,7 +35,7 @@ const sourceItem: AssessmentItemInput = {
 				{ type: "text", content: " women's discus throwers at the U.S. qualifying meet." }
 			]
 		},
-		{ type: "widgetRef", widgetId: "image_1" },
+		{ type: "widgetRef", widgetId: "image_1", widgetType: "boxPlot" },
 		{ type: "paragraph", content: [{ type: "text", content: "Which conclusion is supported by these box plots?" }] },
 		{ type: "interactionRef", interactionId: "choice_interaction" }
 	],
@@ -56,16 +57,16 @@ const sourceItem: AssessmentItemInput = {
 			outcomeIdentifier: "FEEDBACK__GLOBAL",
 			content: [
 				{
-				type: "paragraph",
-				content: [
-					{
-						type: "text",
-						content:
-							"Correct! The center of the Olympic final distribution is higher than the center of the U.S. qualifier distribution, so the Olympic final distances were greater on average."
-					}
-				]
-			}
-		]
+					type: "paragraph",
+					content: [
+						{
+							type: "text",
+							content:
+								"Correct! The center of the Olympic final distribution is higher than the center of the U.S. qualifier distribution, so the Olympic final distances were greater on average."
+						}
+					]
+				}
+			]
 		},
 		{
 			identifier: "INCORRECT",
@@ -219,7 +220,7 @@ async function main() {
 
 	// Optionally compile one variation to XML
 	logger.info("compiling first variation to qti xml")
-	const xmlResult = await errors.try(compile(differentiatedItems[0]))
+	const xmlResult = await errors.try(compile(differentiatedItems[0], mathCoreCollection))
 
 	if (xmlResult.error) {
 		logger.error("compilation failed", { error: xmlResult.error })

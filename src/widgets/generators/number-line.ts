@@ -521,7 +521,7 @@ export const generateNumberLine: WidgetGenerator<typeof NumberLinePropsSchema> =
 				// Do not clamp to top padding; allow negative viewBox adjustments to preserve consistent gap
 				const safeY = yPos - desiredGapFromAxisPx - labelHeight
 				// Bottom-align MathML inside the foreignObject so visual gap is consistent regardless of content height
-				const xhtml = `<!DOCTYPE html><div xmlns="http://www.w3.org/1999/xhtml" style="display:flex;align-items:flex-end;justify-content:center;width:100%;height:100%;line-height:1;font-family:${theme.font.family.sans};color:${p.color};"><math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\" style=\"font-size:${fontPx * 1.2}px;\">${inner}</math></div>`
+				const xhtml = `<!DOCTYPE html><div xmlns="http://www.w3.org/1999/xhtml" style="display:flex;align-items:flex-end;justify-content:center;width:100%;height:100%;line-height:1;font-family:${theme.font.family.sans};color:${p.color};"><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline" style="font-size:${fontPx * 1.2}px;">${inner}</math></div>`
 				canvas.drawForeignObject({
 					x: px - labelWidth / 2,
 					y: safeY,
@@ -622,7 +622,7 @@ export const generateNumberLine: WidgetGenerator<typeof NumberLinePropsSchema> =
 				// Do not clamp to the right edge; allow viewBox expansion to preserve consistent gap
 				const safeX = xPos + desiredGapFromAxisPx
 				// Left-align MathML inside the foreignObject so visual gap is consistent regardless of content width
-				const xhtml = `<!DOCTYPE html><div xmlns="http://www.w3.org/1999/xhtml" style="display:flex;align-items:center;justify-content:flex-start;width:100%;height:100%;line-height:1;font-family:${theme.font.family.sans};color:${p.color};"><math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\" style=\"font-size:${fontPx * 1.2}px;\">${inner}</math></div>`
+				const xhtml = `<!DOCTYPE html><div xmlns="http://www.w3.org/1999/xhtml" style="display:flex;align-items:center;justify-content:flex-start;width:100%;height:100%;line-height:1;font-family:${theme.font.family.sans};color:${p.color};"><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline" style="font-size:${fontPx * 1.2}px;">${inner}</math></div>`
 				canvas.drawForeignObject({
 					x: safeX,
 					y: py - labelHeight / 2,

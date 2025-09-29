@@ -1,13 +1,13 @@
-import type { allWidgetSchemas } from "../../widgets/registry"
+import type { WidgetCollection } from "../../widgets/collections/types"
 import type { AiContextEnvelope, ImageContext } from "../types"
 import { caretBanPromptSection } from "./caret"
-import { formatUnifiedContextSections } from "./shared"
+import { formatUnifiedContextSections, createWidgetSelectionPromptSection } from "./shared"
 
 export function createInteractionContentPrompt(
 	envelope: AiContextEnvelope,
 	assessmentShell: unknown,
 	imageContext: ImageContext,
-	widgetMapping?: Record<string, keyof typeof allWidgetSchemas>
+	widgetCollection: WidgetCollection
 ): {
 	systemInstruction: string
 	userContent: string
@@ -250,19 +250,17 @@ SCAN ALL text content (prompts, choices, feedback) for "$" or "%" - these MUST b
    - NEVER include visual or textual cues that indicate the correct response
    - **ABSOLUTE RULE**: Answers are ONLY allowed in feedback fields. HARD STOP. NO EXCEPTIONS.`
 
+	const widgetSelectionSection = createWidgetSelectionPromptSection(widgetCollection)
+
 	const userContent = `Generate interaction content based on the following inputs. Use the provided context, including raster images for vision and vector images as text, to understand the content fully.
 
 ${formatUnifiedContextSections(envelope, imageContext)}
 
+${widgetSelectionSection}
+
 ## Assessment Shell (for context):
 \`\`\`json
 ${JSON.stringify(assessmentShell, null, 2)}
-\`\`\`
-
-## Widget Mapping (for context):
-This mapping shows the widget type for each widget slot declared in the shell.
-\`\`\`json
-${widgetMapping ? JSON.stringify(widgetMapping, null, 2) : "No widget mapping available"}
 \`\`\`
 
 ## Instructions:

@@ -1,29 +1,48 @@
-import type {
-	BlockContent,
-	InlineContent,
-	AnyInteraction
-} from "../compiler/schemas"
+import * as logger from "@superbuilders/slog"
+import * as errors from "@superbuilders/errors"
+import type { AnyInteraction, BlockContent, InlineContent } from "../compiler/schemas"
 
-function walkInline(inline: InlineContent | null, out: Set<string>): void {
-	if (!inline) {
-		return
-	}
+function walkInline(
+    inline: InlineContent | null,
+    out: Map<string, string>
+): void {
+	if (!inline) return
 	for (const node of inline) {
 		if (node.type === "inlineWidgetRef") {
-			out.add(node.widgetId)
+            const existing = out.get(node.widgetId)
+			if (existing && existing !== node.widgetType) {
+				logger.error("conflicting widgetType for same widgetId", {
+					widgetId: node.widgetId,
+					existingType: existing,
+					newType: node.widgetType
+				})
+				throw errors.new("conflicting widgetType values for same widgetId")
+			}
+            out.set(node.widgetId, node.widgetType)
 		}
 	}
 }
 
-function walkBlock(blocks: BlockContent | null, out: Set<string>): void {
-	if (!blocks) {
-		return
-	}
+function walkBlock(
+    blocks: BlockContent | null,
+    out: Map<string, string>
+): void {
+	if (!blocks) return
 	for (const node of blocks) {
 		switch (node.type) {
-			case "widgetRef":
-				out.add(node.widgetId)
+			case "widgetRef": {
+                const existing = out.get(node.widgetId)
+				if (existing && existing !== node.widgetType) {
+					logger.error("conflicting widgetType for same widgetId", {
+						widgetId: node.widgetId,
+						existingType: existing,
+						newType: node.widgetType
+					})
+					throw errors.new("conflicting widgetType values for same widgetId")
+				}
+                out.set(node.widgetId, node.widgetType)
 				break
+			}
 			case "paragraph":
 				walkInline(node.content, out)
 				break
@@ -31,32 +50,29 @@ function walkBlock(blocks: BlockContent | null, out: Set<string>): void {
 			case "orderedList":
 				node.items.forEach((item) => walkInline(item, out))
 				break
-			case "tableRich":
-				// Walk all cells in header, rows, and footer
+			case "tableRich": {
 				const walkRows = (rows: Array<Array<InlineContent | null>> | null) => {
 					if (!rows) return
-					rows.forEach(row => {
+					rows.forEach((row) => {
 						row.forEach((cell) => walkInline(cell, out))
 					})
 				}
 				walkRows(node.header)
 				walkRows(node.rows)
 				break
+			}
 			case "codeBlock":
 			case "interactionRef":
-				// No nested content to walk
 				break
 		}
 	}
 }
 
 function walkInteractions(
-	interactions: Record<string, AnyInteraction> | null,
-	out: Set<string>
+    interactions: Record<string, AnyInteraction> | null,
+    out: Map<string, string>
 ): void {
-	if (!interactions) {
-		return
-	}
+	if (!interactions) return
 	for (const interaction of Object.values(interactions)) {
 		switch (interaction.type) {
 			case "choiceInteraction":
@@ -72,28 +88,25 @@ function walkInteractions(
 				interaction.gapTexts.forEach((gt) => walkInline(gt.content, out))
 				break
 			case "textEntryInteraction":
-				// No nested content to walk
-				break
 			case "unsupportedInteraction":
-				// No nested content to walk
 				break
 		}
 	}
 }
 
 /**
- * Collects all unique widget slot IDs from every location within an assessment item structure.
- * This includes the body, feedback blocks, interactions, and any nested inline content.
+ * Collects all widget references with their types from every location within an assessment item structure.
+ * This includes the body, feedback blocks, interactions (prompts, choices, gap texts), and any nested inline content.
  *
  * @param item - An object conforming to the structure of an AssessmentItemInput.
- * @returns A sorted, de-duplicated array of all found widget slot IDs.
+ * @returns A Map from widgetId to widgetType. Throws if the same widgetId has conflicting types.
  */
-export function collectAllWidgetSlotIds(item: {
+export function collectWidgetRefs(item: {
 	body: BlockContent | null
 	feedbackBlocks: Array<{ content: BlockContent }> | null
 	interactions: Record<string, AnyInteraction> | null
-}): string[] {
-	const out = new Set<string>()
+}): Map<string, string> {
+    const out = new Map<string, string>()
 
 	walkBlock(item.body, out)
 	if (item.feedbackBlocks) {
@@ -101,5 +114,17 @@ export function collectAllWidgetSlotIds(item: {
 	}
 	walkInteractions(item.interactions, out)
 
-	return Array.from(out).sort()
+	return out
+}
+
+/**
+ * Legacy function for backward compatibility - collects just the IDs
+ */
+export function collectAllWidgetSlotIds(item: {
+	body: BlockContent | null
+	feedbackBlocks: Array<{ content: BlockContent }> | null
+	interactions: Record<string, AnyInteraction> | null
+}): string[] {
+	const refs = collectWidgetRefs(item)
+	return Array.from(refs.keys()).sort()
 }

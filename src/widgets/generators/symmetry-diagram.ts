@@ -2,9 +2,9 @@ import { z } from "zod"
 import { CanvasImpl } from "../../utils/canvas-impl"
 import { PADDING } from "../../utils/constants"
 import { CSS_COLOR_PATTERN } from "../../utils/css-color"
+import { Path2D } from "../../utils/path-builder"
 import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
 import { theme } from "../../utils/theme"
-import { Path2D } from "../../utils/path-builder"
 import type { WidgetGenerator } from "../types"
 
 // Define the schema for the symmetry diagram widget's properties.
@@ -14,7 +14,16 @@ export const SymmetryDiagramPropsSchema = z
 		width: createWidthSchema(),
 		height: createHeightSchema(),
 		shape: z
-			.enum(["isoscelesTrapezoid", "regularTriangle", "isoscelesTriangle", "rectangle", "heart", "square", "rhombus", "fourPointStar"])
+			.enum([
+				"isoscelesTrapezoid",
+				"regularTriangle",
+				"isoscelesTriangle",
+				"rectangle",
+				"heart",
+				"square",
+				"rhombus",
+				"fourPointStar"
+			])
 			.describe("The geometric shape to display."),
 		drawCorrectLines: z.boolean().describe("Whether to draw the correct lines of symmetry for the shape."),
 		drawIncorrectLines: z.boolean().describe("Whether to draw a common set of incorrect lines of symmetry."),
@@ -22,7 +31,7 @@ export const SymmetryDiagramPropsSchema = z
 			.string()
 			.regex(CSS_COLOR_PATTERN, "invalid css color")
 			.default(theme.colors.background)
-			.describe("The fill color for the shape."),
+			.describe("The fill color for the shape.")
 	})
 	.strict()
 	.describe(
@@ -169,28 +178,14 @@ export const generateSymmetryDiagram: WidgetGenerator<typeof SymmetryDiagramProp
 				.moveTo(cx, cy + 65.6 * s)
 				.arcTo(6.1 * s, 6.1 * s, 0, 0, 1, cx - 3.9 * s, cy + 64.3 * s)
 				.lineTo(cx - 19.5 * s, cy + 53.3 * s)
-				.bezierCurveTo(
-					cx - 60.6 * s,
-					cy + 23.9 * s,
-					cx - 81.5 * s,
-					cy - 11.1 * s,
-					cx - 73.2 * s,
-					cy - 39.6 * s
-				)
+				.bezierCurveTo(cx - 60.6 * s, cy + 23.9 * s, cx - 81.5 * s, cy - 11.1 * s, cx - 73.2 * s, cy - 39.6 * s)
 				.bezierCurveTo(cx - 68.8 * s, cy - 55 * s, cx - 53.4 * s, cy - 65.6 * s, cx - 37.6 * s, cy - 65.6 * s)
 				.bezierCurveTo(cx - 34.2 * s, cy - 65.6 * s, cx - 19.5 * s, cy - 65.3 * s, cx - 10.7 * s, cy - 54.7 * s)
 				.arcTo(77.1 * s, 77.1 * s, 0, 0, 1, cx, cy - 19.3 * s)
 				.arcTo(77.1 * s, 77.1 * s, 0, 0, 1, cx + 10.7 * s, cy - 54.7 * s)
 				.bezierCurveTo(cx + 19.5 * s, cy - 65.3 * s, cx + 34.2 * s, cy - 65.6 * s, cx + 37.6 * s, cy - 65.6 * s)
 				.bezierCurveTo(cx + 53.4 * s, cy - 65.6 * s, cx + 68.8 * s, cy - 55 * s, cx + 73.2 * s, cy - 39.6 * s)
-				.bezierCurveTo(
-					cx + 81.5 * s,
-					cy - 11.1 * s,
-					cx + 60.6 * s,
-					cy + 23.9 * s,
-					cx + 19.5 * s,
-					cy + 53.3 * s
-				)
+				.bezierCurveTo(cx + 81.5 * s, cy - 11.1 * s, cx + 60.6 * s, cy + 23.9 * s, cx + 19.5 * s, cy + 53.3 * s)
 				.lineTo(cx + 3.9 * s, cy + 64.3 * s)
 				.arcTo(6.1 * s, 6.1 * s, 0, 0, 1, cx, cy + 65.6 * s)
 			canvas.drawPath(path, { fill: shapeColor, stroke: strokeColor, strokeWidth: 2 })
@@ -271,5 +266,3 @@ export const generateSymmetryDiagram: WidgetGenerator<typeof SymmetryDiagramProp
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}">${svgBody}</svg>`
 }
-
-

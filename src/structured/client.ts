@@ -1,28 +1,26 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import type OpenAI from "openai"
-import { zodResponseFormat } from "openai/helpers/zod"
 import { z } from "zod"
-import {
-    type AnyInteraction,
-    AnyInteractionSchema,
-    type AssessmentItemInput,
-    type AssessmentItemShell,
-    AssessmentItemShellSchema,
-    type BlockContent,
-    type InlineContent
-} from "../compiler/schemas"
-import type { WidgetCollectionName } from "../widgets/collections"
-import { allWidgetSchemas, type WidgetInput } from "../widgets/registry"
-import { createAssessmentShellPrompt } from "./prompts/shell"
-import { createInteractionContentPrompt } from "./prompts/interactions"
-import { createFeedbackPrompt } from "./prompts/feedback"
-import { createWidgetContentPrompt } from "./prompts/widgets"
-import { createWidgetMappingPrompt } from "./prompts/widget-mapping"
-import { enumerateFeedbackTargets } from "./feedback-targets"
+import { type AssessmentItemInput, type BlockContent, type ResponseDeclaration } from "../compiler/schemas"
+import type { WidgetCollection } from "../widgets/collections/types"
+import { allWidgetSchemas, WidgetSchema, type Widget } from "../widgets/registry"
+
+function isWidgetTypeKey(v: string): v is keyof typeof allWidgetSchemas {
+    return v in allWidgetSchemas
+}
+import { collectWidgetRefs } from "./collector"
 import { feedbackMapToBlocks } from "./feedback-converter"
+import { enumerateFeedbackTargets } from "./feedback-targets"
+import { createFeedbackPrompt } from "./prompts/feedback"
+import { createInteractionContentPrompt } from "./prompts/interactions"
+import { createAssessmentShellPrompt } from "./prompts/shell"
+import { createWidgetContentPrompt } from "./prompts/widgets"
+import {
+	createCollectionScopedShellSchema,
+	createCollectionScopedInteractionSchema
+} from "./schemas"
 import type { AiContextEnvelope, ImageContext } from "./types"
-import { collectAllWidgetSlotIds } from "./collector"
 
 const OPENAI_MODEL = "gpt-5"
 const MAX_IMAGES_PER_REQUEST = 500
@@ -77,21 +75,22 @@ async function resolveRasterImages(envelope: AiContextEnvelope): Promise<ImageCo
 	return { imageUrls: finalImageUrls }
 }
 
-
-
 async function generateAssessmentShell(
 	openai: OpenAI,
 	logger: logger.Logger,
 	envelope: AiContextEnvelope,
-	imageContext: ImageContext
-): Promise<AssessmentItemShell> {
-	const { systemInstruction, userContent } = createAssessmentShellPrompt(envelope, imageContext)
+	imageContext: ImageContext,
+	widgetCollection: WidgetCollection
+) {
+	const { systemInstruction, userContent } = createAssessmentShellPrompt(envelope, imageContext, widgetCollection)
 
-	const responseFormat = zodResponseFormat(AssessmentItemShellSchema, "assessment_shell_generator")
+	const ShellSchema = createCollectionScopedShellSchema(widgetCollection)
+	type ShellT = z.infer<typeof ShellSchema>
+	const jsonSchema = z.toJSONSchema(ShellSchema)
+	
 	logger.debug("generated json schema for openai", {
 		functionName: "generateAssessmentShell",
-		generatorName: "assessment_shell_generator",
-		schema: JSON.stringify(responseFormat.json_schema?.schema, null, 2)
+		generatorName: "assessment_shell_generator"
 	})
 
 	const messageContent: OpenAI.ChatCompletionContentPart[] = [{ type: "text", text: userContent }]
@@ -101,17 +100,24 @@ async function generateAssessmentShell(
 
 	logger.debug("calling openai for assessment shell with multimodal input")
 	const response = await errors.try(
-		openai.chat.completions.parse({
+		openai.chat.completions.create({
 			model: OPENAI_MODEL,
 			messages: [
 				{ role: "system", content: systemInstruction },
 				{ role: "user", content: messageContent }
 			],
-			response_format: responseFormat
+			response_format: {
+				type: "json_schema",
+				json_schema: {
+					name: "assessment_shell_generator",
+					schema: jsonSchema,
+					strict: true
+				}
+			}
 		})
 	)
 	if (response.error) {
-		logger.error("failed to generate assessment shell", {
+		logger.error("ai shell generation", {
 			error: response.error
 		})
 		throw errors.wrap(response.error, "ai shell generation")
@@ -119,101 +125,142 @@ async function generateAssessmentShell(
 
 	const choice = response.data.choices[0]
 	if (!choice) {
-		logger.error("CRITICAL: OpenAI response contained no choices")
+		logger.error("openai returned no choices")
 		throw errors.new("openai returned no choices")
 	}
 
 	const message = choice.message
-	if (!message.parsed) {
-		logger.error("CRITICAL: OpenAI returned no parsed content for shell generation")
-		throw errors.new("empty ai response: no parsed content")
+	if (!message.content) {
+		logger.error("openai returned no content")
+		throw errors.new("empty ai response: no content")
 	}
 
-	return message.parsed
+	const parseResult = errors.trySync(() => JSON.parse(message.content!))
+	if (parseResult.error) {
+		logger.error("json parse", { error: parseResult.error })
+		throw errors.wrap(parseResult.error, "json parse")
+	}
+
+	const validation = ShellSchema.safeParse(parseResult.data)
+	if (!validation.success) {
+		logger.error("shell validation failed", { error: validation.error })
+		throw errors.wrap(validation.error, "shell validation")
+	}
+
+	return validation.data
 }
 
-function collectInteractionIdsFromShell(shell: AssessmentItemShell): string[] {
-    const ids = new Set<string>()
-    const walkInline = (inline: InlineContent | null): void => {
-        if (!inline) return
-        for (const node of inline) {
-            if (node && node.type === "inlineInteractionRef") ids.add(node.interactionId)
-        }
-    }
-    const walkBlock = (blocks: BlockContent | null): void => {
-        if (!blocks) return
-        for (const node of blocks) {
-            if (!node) continue
-            if (node.type === "interactionRef") ids.add(node.interactionId)
-            if (node.type === "paragraph") walkInline(node.content)
-            if (node.type === "unorderedList") node.items.forEach(walkInline)
-        }
-    }
-    walkBlock(shell.body)
-    // Note: feedbackBlocks are no longer part of the shell
-    return Array.from(ids)
-}
-
-function createInteractionCollectionSchema(interactionIds: string[]) {
-    const shape: Record<string, z.ZodType> = {}
-    for (const id of interactionIds) {
-        shape[id] = AnyInteractionSchema
-    }
-    return z.object(shape)
+function collectInteractionIdsFromShell(shell: { body: unknown }): string[] {
+	const ids = new Set<string>()
+	
+	function walkInline(inline: unknown): void {
+		if (!inline || !Array.isArray(inline)) return
+		for (const node of inline) {
+			if (node && typeof node === "object" && "type" in node && node.type === "inlineInteractionRef" && "interactionId" in node && typeof node.interactionId === "string") {
+				ids.add(node.interactionId)
+			}
+		}
+	}
+	
+	function walkBlock(blocks: unknown): void {
+		if (!blocks || !Array.isArray(blocks)) return
+		for (const node of blocks) {
+			if (!node || typeof node !== "object" || !("type" in node)) continue
+			if (node.type === "interactionRef" && "interactionId" in node && typeof node.interactionId === "string") {
+				ids.add(node.interactionId)
+			}
+			if (node.type === "paragraph" && "content" in node) {
+				walkInline(node.content)
+			}
+			if ((node.type === "unorderedList" || node.type === "orderedList") && "items" in node && Array.isArray(node.items)) {
+				node.items.forEach(walkInline)
+			}
+		}
+	}
+	
+	walkBlock(shell.body)
+	return Array.from(ids)
 }
 
 async function generateInteractionContent(
-    openai: OpenAI,
-    logger: logger.Logger,
-    envelope: AiContextEnvelope,
-    assessmentShell: AssessmentItemShell,
-    imageContext: ImageContext,
-    interactionIds: string[]
-): Promise<Record<string, AnyInteraction>> {
-    if (interactionIds.length === 0) {
-        logger.debug("no interactions to generate, skipping shot 3")
-        return {}
-    }
-    const { systemInstruction, userContent } = createInteractionContentPrompt(
-        envelope,
-        assessmentShell,
-        imageContext
-    )
-    const InteractionCollectionSchema = createInteractionCollectionSchema(interactionIds)
-    const responseFormat = zodResponseFormat(InteractionCollectionSchema, "interaction_content_generator")
-    const messageContent: OpenAI.ChatCompletionContentPart[] = [{ type: "text", text: userContent }]
-    for (const imageUrl of imageContext.imageUrls) {
-        messageContent.push({ type: "image_url", image_url: { url: imageUrl, detail: "high" } })
-    }
-    logger.debug("calling openai for interaction content generation with multimodal input", { interactionIds })
-    const response = await errors.try(
-        openai.chat.completions.parse({
-            model: OPENAI_MODEL,
-            messages: [
-                { role: "system", content: systemInstruction },
-                { role: "user", content: messageContent }
-            ],
-            response_format: responseFormat
-        })
-    )
-    if (response.error) {
-        logger.error("failed to generate interaction content", { error: response.error })
-        throw errors.wrap(response.error, "ai interaction generation")
-    }
-    const choice = response.data.choices[0]
-    if (!choice?.message?.parsed) {
-        logger.error("CRITICAL: OpenAI interaction generation returned no parsed content")
-        throw errors.new("empty ai response: no parsed content for interaction generation")
-    }
-    return choice.message.parsed as Record<string, AnyInteraction>
-}
+	openai: OpenAI,
+	logger: logger.Logger,
+	envelope: AiContextEnvelope,
+	assessmentShell: { body: BlockContent | null; responseDeclarations: ResponseDeclaration[] },
+	imageContext: ImageContext,
+	interactionIds: string[],
+	widgetCollection: WidgetCollection
+) {
+	if (interactionIds.length === 0) {
+		logger.debug("no interactions to generate, skipping shot 2")
+		return {}
+	}
+	
+	const { systemInstruction, userContent } = createInteractionContentPrompt(
+		envelope,
+		assessmentShell,
+		imageContext,
+		widgetCollection
+	)
+	
+	const InteractionSchema = createCollectionScopedInteractionSchema(interactionIds, widgetCollection)
+	type InteractionsT = z.infer<typeof InteractionSchema>
+	const jsonSchema = z.toJSONSchema(InteractionSchema)
+	
+	const messageContent: OpenAI.ChatCompletionContentPart[] = [{ type: "text", text: userContent }]
+	for (const imageUrl of imageContext.imageUrls) {
+		messageContent.push({ type: "image_url", image_url: { url: imageUrl, detail: "high" } })
+	}
+	
+	logger.debug("calling openai for interaction content generation with multimodal input", { interactionIds })
+	const response = await errors.try(
+		openai.chat.completions.create({
+			model: OPENAI_MODEL,
+			messages: [
+				{ role: "system", content: systemInstruction },
+				{ role: "user", content: messageContent }
+			],
+			response_format: {
+				type: "json_schema",
+				json_schema: {
+					name: "interaction_content_generator",
+					schema: jsonSchema,
+					strict: true
+				}
+			}
+		})
+	)
+	if (response.error) {
+		logger.error("ai interaction generation", { error: response.error })
+		throw errors.wrap(response.error, "ai interaction generation")
+	}
+	
+	const choice = response.data.choices[0]
+	if (!choice?.message?.content) {
+		logger.error("openai interaction generation returned no content")
+		throw errors.new("empty ai response: no content for interaction generation")
+	}
+	
+	const parseResult = errors.trySync(() => JSON.parse(choice.message.content!))
+	if (parseResult.error) {
+		logger.error("json parse", { error: parseResult.error })
+		throw errors.wrap(parseResult.error, "json parse")
+	}
+	
+	const validation = InteractionSchema.safeParse(parseResult.data)
+	if (!validation.success) {
+		logger.error("interaction validation failed", { error: validation.error })
+		throw errors.wrap(validation.error, "interaction validation")
+	}
 
+	return validation.data as InteractionsT
+}
 
 export async function generateFromEnvelope(
 	openai: OpenAI,
 	logger: logger.Logger,
 	envelope: AiContextEnvelope,
-	widgetCollectionName: WidgetCollectionName
+	widgetCollection: WidgetCollection
 ): Promise<AssessmentItemInput> {
 	if (!envelope.primaryContent || envelope.primaryContent.trim() === "") {
 		logger.error("envelope validation failed", { reason: "primaryContent is empty" })
@@ -221,7 +268,7 @@ export async function generateFromEnvelope(
 	}
 
 	logger.info("starting structured qti generation from envelope", {
-		widgetCollection: widgetCollectionName,
+		widgetCollection: widgetCollection.name,
 		primaryContentLength: envelope.primaryContent.length,
 		supplementaryContentCount: envelope.supplementaryContent.length,
 		multimodalUrlCount: envelope.multimodalImageUrls.length,
@@ -230,12 +277,14 @@ export async function generateFromEnvelope(
 
 	const resolvedImagesResult = await errors.try(resolveRasterImages(envelope))
 	if (resolvedImagesResult.error) {
-		logger.error("failed to resolve raster images from envelope", { error: resolvedImagesResult.error })
+		logger.error("raster image resolution", { error: resolvedImagesResult.error })
 		throw errors.wrap(resolvedImagesResult.error, "raster image resolution")
 	}
 	const imageContext = resolvedImagesResult.data
 
-	const shellResult = await errors.try(generateAssessmentShell(openai, logger, envelope, imageContext))
+	const shellResult = await errors.try(
+		generateAssessmentShell(openai, logger, envelope, imageContext, widgetCollection)
+	)
 	if (shellResult.error) {
 		logger.error("generate assessment shell", { error: shellResult.error })
 		throw errors.wrap(shellResult.error, "generate assessment shell")
@@ -245,12 +294,18 @@ export async function generateFromEnvelope(
 		identifier: assessmentShell.identifier
 	})
 
-	
-
-    const interactionIds = collectInteractionIdsFromShell(assessmentShell)
-    const interactionContentResult = await errors.try(
-        generateInteractionContent(openai, logger, envelope, assessmentShell, imageContext, interactionIds)
-    )
+	const interactionIds = collectInteractionIdsFromShell(assessmentShell)
+	const interactionContentResult = await errors.try(
+		generateInteractionContent(
+			openai,
+			logger,
+			envelope,
+			assessmentShell,
+			imageContext,
+			interactionIds,
+			widgetCollection
+		)
+	)
 	if (interactionContentResult.error) {
 		logger.error("generate interaction content", { error: interactionContentResult.error })
 		throw errors.wrap(interactionContentResult.error, "generate interaction content")
@@ -260,170 +315,164 @@ export async function generateFromEnvelope(
 		generatedInteractionKeys: Object.keys(generatedInteractions)
 	})
 
-	// NEW: Shot 3 - Generate feedback
-	const feedbackTargets = enumerateFeedbackTargets(
-		assessmentShell.responseDeclarations,
-		generatedInteractions
-	)
+	// Shot 3 - Generate feedback
+	const feedbackTargets = enumerateFeedbackTargets(assessmentShell.responseDeclarations, generatedInteractions)
 	logger.debug("enumerated feedback targets", { targets: feedbackTargets })
 
-	const { systemInstruction: feedbackSystem, userContent: feedbackUser, FeedbackSchema } = 
-		createFeedbackPrompt(envelope, assessmentShell, generatedInteractions, feedbackTargets, imageContext)
-	
+	const {
+		systemInstruction: feedbackSystem,
+		userContent: feedbackUser,
+		FeedbackSchema
+	} = createFeedbackPrompt(envelope, assessmentShell, generatedInteractions, feedbackTargets, imageContext, widgetCollection)
+
+	const feedbackJsonSchema = z.toJSONSchema(FeedbackSchema)
 	const feedbackResult = await errors.try(
-		openai.chat.completions.parse({
+		openai.chat.completions.create({
 			model: OPENAI_MODEL,
 			messages: [
 				{ role: "system", content: feedbackSystem },
 				{ role: "user", content: feedbackUser }
 			],
-			response_format: zodResponseFormat(FeedbackSchema, "feedback_generator")
+			response_format: {
+				type: "json_schema",
+				json_schema: {
+					name: "feedback_generator",
+					schema: feedbackJsonSchema,
+					strict: true
+				}
+			}
 		})
 	)
 	if (feedbackResult.error) {
 		logger.error("generate feedback", { error: feedbackResult.error })
 		throw errors.wrap(feedbackResult.error, "generate feedback")
 	}
-	const feedbackChoice = feedbackResult.data.choices[0]
-	if (!feedbackChoice?.message?.parsed) {
-		logger.error("CRITICAL: OpenAI feedback generation returned no parsed content")
-		throw errors.new("empty ai response: no parsed content for feedback generation")
-	}
-	const feedbackMap = feedbackChoice.message.parsed.feedback
-	const feedbackBlocks = feedbackMapToBlocks(feedbackMap)
 	
+	const feedbackChoice = feedbackResult.data.choices[0]
+	if (!feedbackChoice?.message?.content) {
+		logger.error("openai feedback generation returned no content")
+		throw errors.new("empty ai response: no content for feedback generation")
+	}
+	
+	const feedbackParseResult = errors.trySync(() => JSON.parse(feedbackChoice.message.content!))
+	if (feedbackParseResult.error) {
+		logger.error("json parse", { error: feedbackParseResult.error })
+		throw errors.wrap(feedbackParseResult.error, "json parse")
+	}
+	
+	const feedbackValidation = FeedbackSchema.safeParse(feedbackParseResult.data)
+	if (!feedbackValidation.success) {
+		logger.error("feedback validation failed", { error: feedbackValidation.error })
+		throw errors.wrap(feedbackValidation.error, "feedback validation")
+	}
+	
+	const feedbackBlocks = feedbackMapToBlocks(feedbackValidation.data.feedback)
+
 	// Validation: ensure all targets were addressed
-	const generatedOutcomes = new Set(feedbackBlocks.map(fb => `${fb.outcomeIdentifier}::${fb.identifier}`))
-	const missingTargets = feedbackTargets.filter(t => !generatedOutcomes.has(`${t.outcomeIdentifier}::${t.blockIdentifier}`))
+	const generatedOutcomes = new Set(feedbackBlocks.map((fb) => `${fb.outcomeIdentifier}::${fb.identifier}`))
+	const missingTargets = feedbackTargets.filter(
+		(t) => !generatedOutcomes.has(`${t.outcomeIdentifier}::${t.blockIdentifier}`)
+	)
 	if (missingTargets.length > 0) {
 		logger.error("feedback generation missed required targets", { missingTargets })
-		throw errors.new(`feedback generation: missing targets: ${missingTargets.map(t => `${t.outcomeIdentifier}::${t.blockIdentifier}`).join(", ")}`)
+		throw errors.new(
+			`feedback generation: missing targets: ${missingTargets.map((t) => `${t.outcomeIdentifier}::${t.blockIdentifier}`).join(", ")}`
+		)
 	}
-	
+
 	logger.debug("shot 3 complete", { feedbackBlockCount: feedbackBlocks.length })
 
-	// NEW: Replace shell-only collection with full-item collection after feedback is generated
-	const requiredWidgetIds = collectAllWidgetSlotIds({
+	// Shot 4: Collect widget refs with types and generate widget content
+	const widgetRefs = collectWidgetRefs({
 		body: assessmentShell.body,
 		feedbackBlocks: feedbackBlocks,
 		interactions: generatedInteractions
 	})
-	logger.debug("collected all required widget ids", { count: requiredWidgetIds.length, ids: requiredWidgetIds })
+	
+	logger.debug("collected widget refs", { count: widgetRefs.size, refs: Array.from(widgetRefs.entries()) })
 
-	let generatedWidgets: Record<string, WidgetInput> = {}
-	if (requiredWidgetIds.length > 0) {
-        const bodyString = assessmentShell.body ? JSON.stringify(assessmentShell.body) : ""
-        const mappingCall = await errors.try(
-            (() => {
-                const { systemInstruction, userContent, WidgetMappingSchema } = createWidgetMappingPrompt(
-                    envelope,
-                    bodyString,
-                    requiredWidgetIds, // Use the complete list of IDs
-                    widgetCollectionName,
-                    imageContext
-                )
-                const responseFormat = zodResponseFormat(WidgetMappingSchema, "widget_mapper")
-                const messageContent: OpenAI.ChatCompletionContentPart[] = [{ type: "text", text: userContent }]
-                for (const imageUrl of imageContext.imageUrls) {
-                    messageContent.push({ type: "image_url", image_url: { url: imageUrl, detail: "high" } })
-                }
-                return openai.chat.completions.parse({
-                    model: OPENAI_MODEL,
-                    messages: [
-                        { role: "system", content: systemInstruction },
-                        { role: "user", content: messageContent }
-                    ],
-                    response_format: responseFormat
-                })
-            })()
-        )
-        if (mappingCall.error) {
-            logger.error("map slots to widgets via refs", { error: mappingCall.error })
-            throw errors.wrap(mappingCall.error, "ai widget mapping")
+	let generatedWidgets: Record<string, Widget> = {}
+    if (widgetRefs.size > 0) {
+        // Build a typed mapping with runtime guard
+        const widgetMapping: Record<string, keyof typeof allWidgetSchemas> = {}
+        for (const [id, typeName] of widgetRefs) {
+            if (!isWidgetTypeKey(typeName)) {
+                logger.error("unknown widget type in refs", { widgetId: id, typeName })
+                throw errors.new("unknown widget type in refs")
+            }
+            widgetMapping[id] = typeName
         }
-        const mapChoice = mappingCall.data.choices[0]
-        if (!mapChoice?.message?.parsed) {
-            logger.error("widget mapping returned no parsed content")
-            throw errors.new("empty ai response: no parsed content for widget mapping")
-        }
-        const widgetMapping = mapChoice.message.parsed.widget_mapping as Record<string, keyof typeof allWidgetSchemas>
+		const widgetPrompt = createWidgetContentPrompt(
+			envelope,
+			assessmentShell,
+			widgetMapping,
+			generatedInteractions,
+			widgetCollection.name,
+			imageContext
+		)
+		
+		// Accept any widget id → widget union; enforce required ids below
+		const WidgetCollectionSchema = z.record(z.string(), WidgetSchema)
+		const widgetJsonSchema = z.toJSONSchema(WidgetCollectionSchema)
+		
+		const widgetsResponse = await errors.try(
+			openai.chat.completions.create({
+				model: OPENAI_MODEL,
+				messages: [
+					{ role: "system", content: widgetPrompt.systemInstruction },
+					{ role: "user", content: widgetPrompt.userContent }
+				],
+				response_format: {
+					type: "json_schema",
+					json_schema: {
+						name: "widget_content_generator",
+						schema: widgetJsonSchema,
+						strict: true
+					}
+				}
+			})
+		)
+		if (widgetsResponse.error) {
+			logger.error("generate widget content", { error: widgetsResponse.error })
+			throw errors.wrap(widgetsResponse.error, "ai widget generation")
+		}
+		
+		const wChoice = widgetsResponse.data.choices[0]
+		if (!wChoice?.message?.content) {
+			logger.error("widget generation returned no content")
+			throw errors.new("empty ai response: no content for widget generation")
+		}
+		
+		const widgetParseResult = errors.trySync(() => JSON.parse(wChoice.message.content!))
+		if (widgetParseResult.error) {
+			logger.error("json parse", { error: widgetParseResult.error })
+			throw errors.wrap(widgetParseResult.error, "json parse")
+		}
+		
+		const widgetValidation = WidgetCollectionSchema.safeParse(widgetParseResult.data)
+		if (!widgetValidation.success) {
+			logger.error("widget validation failed", { error: widgetValidation.error })
+			throw errors.wrap(widgetValidation.error, "widget validation")
+		}
 
-        // NEW: Implement fail-fast validation immediately after widget mapping
-        const mappingKeys = new Set(Object.keys(widgetMapping))
-        const requiredIdsSet = new Set(requiredWidgetIds)
-        const missingKeys = requiredWidgetIds.filter((id) => !mappingKeys.has(id))
-        const extraKeys = Array.from(mappingKeys).filter((key) => !requiredIdsSet.has(key))
+		generatedWidgets = widgetValidation.data
 
-        if (missingKeys.length > 0) {
-            logger.error("widget mapping missing required slots", { missingKeys })
-            throw errors.new(`widget mapping: missing slots: ${missingKeys.join(", ")}`)
-        }
+		// Validate all required widgets were generated
+		const generatedKeys = new Set(Object.keys(generatedWidgets))
+		const requiredIds = Array.from(widgetRefs.keys())
+		const missingContent = requiredIds.filter((id) => !generatedKeys.has(id))
+		if (missingContent.length > 0) {
+			logger.error("widget content generation did not produce all required widgets", { missingContent })
+			throw errors.new(`widget content generation: missing content for slots: ${missingContent.join(", ")}`)
+		}
 
-        if (extraKeys.length > 0) {
-            logger.error("widget mapping returned extra, unrequested slots", { extraKeys })
-            throw errors.new(`widget mapping: extra slots: ${extraKeys.join(", ")}`)
-        }
+		logger.debug("shot 4 complete", { generatedWidgetKeys: Object.keys(generatedWidgets) })
+	}
 
-        const notFoundSlots = Object.entries(widgetMapping)
-            .filter(([, type]) => type === "WIDGET_NOT_FOUND" as any)
-            .map(([id]) => id)
-
-        if (notFoundSlots.length > 0) {
-            logger.error("widget mapping returned WIDGET_NOT_FOUND for required slots", { notFoundSlots })
-            throw errors.new(`widget mapping: unmappable slots: ${notFoundSlots.join(", ")}`)
-        }
-
-        const widgetPrompt = createWidgetContentPrompt(
-            envelope,
-            assessmentShell,
-            widgetMapping,
-            generatedInteractions,
-            widgetCollectionName,
-            imageContext
-        )
-        const WidgetCollectionSchemaShape: Record<string, z.ZodType> = {}
-        for (const [id, typeKey] of Object.entries(widgetMapping)) {
-            const schema = allWidgetSchemas[typeKey]
-            if (schema) WidgetCollectionSchemaShape[id] = schema
-        }
-        const WidgetCollectionSchema = z.object(WidgetCollectionSchemaShape)
-        const widgetsResponse = await errors.try(
-            openai.chat.completions.parse({
-                model: OPENAI_MODEL,
-                messages: [
-                    { role: "system", content: widgetPrompt.systemInstruction },
-                    { role: "user", content: widgetPrompt.userContent }
-                ],
-                response_format: zodResponseFormat(WidgetCollectionSchema, "widget_content_generator")
-            })
-        )
-        if (widgetsResponse.error) {
-            logger.error("generate widget content", { error: widgetsResponse.error })
-            throw errors.wrap(widgetsResponse.error, "ai widget generation")
-        }
-        const wChoice = widgetsResponse.data.choices[0]
-        if (!wChoice?.message?.parsed) {
-            logger.error("widget generation returned no parsed content")
-            throw errors.new("empty ai response: no parsed content for widget generation")
-        }
-        generatedWidgets = wChoice.message.parsed as Record<string, WidgetInput>
-
-        // NEW: Implement fail-fast validation after widget content generation
-        const generatedKeys = new Set(Object.keys(generatedWidgets))
-        const missingContent = requiredWidgetIds.filter((id) => !generatedKeys.has(id))
-        if (missingContent.length > 0) {
-            logger.error("widget content generation did not produce all required widgets", { missingContent })
-            throw errors.new(`widget content generation: missing content for slots: ${missingContent.join(", ")}`)
-        }
-
-        logger.debug("shot 5 complete", { generatedWidgetKeys: Object.keys(generatedWidgets) })
-    }
-
-	const finalAssessmentItem: AssessmentItemInput = {
+	return {
 		...assessmentShell,
 		interactions: generatedInteractions,
 		widgets: generatedWidgets,
 		feedbackBlocks: feedbackBlocks
 	}
-	return finalAssessmentItem
 }

@@ -1197,7 +1197,7 @@ export const generateTriangleDiagram: WidgetGenerator<typeof TriangleDiagramProp
 				const labelWidth = 120
 				const labelHeight = 32
 				const transform = `rotate(${rotationAngle} ${lx} ${ly})`
-				const xhtml = `<!DOCTYPE html><div xmlns="http://www.w3.org/1999/xhtml" style="display:flex;align-items:flex-end;justify-content:center;width:100%;height:100%;line-height:1;font-family:${theme.font.family.sans};color:${theme.colors.black};"><math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\" style=\"font-size:${fontPx * 1.1}px;\">${lbl.mathml}</math></div>`
+				const xhtml = `<!DOCTYPE html><div xmlns="http://www.w3.org/1999/xhtml" style="display:flex;align-items:flex-end;justify-content:center;width:100%;height:100%;line-height:1;font-family:${theme.font.family.sans};color:${theme.colors.black};"><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline" style="font-size:${fontPx * 1.1}px;">${lbl.mathml}</math></div>`
 				canvas.drawForeignObject({
 					x: lx - labelWidth / 2,
 					y: ly - labelHeight / 2,

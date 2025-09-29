@@ -23,35 +23,35 @@ function hasZodDef(obj: unknown): obj is { _def: unknown } {
 }
 
 function containsDefault(schema: z.ZodType, visited = new Set<z.ZodType>()): boolean {
-    if (!hasZodDef(schema)) return false
-    if (visited.has(schema)) return false
-    visited.add(schema)
+	if (!hasZodDef(schema)) return false
+	if (visited.has(schema)) return false
+	visited.add(schema)
 
-    const defUnknown: unknown = (schema satisfies { _def: unknown })._def
-    if (isRecord(defUnknown) && hasKey(defUnknown, "typeName") && defUnknown.typeName === "ZodDefault") return true
+	const defUnknown: unknown = (schema satisfies { _def: unknown })._def
+	if (isRecord(defUnknown) && hasKey(defUnknown, "typeName") && defUnknown.typeName === "ZodDefault") return true
 
-    // Generic deep traversal over all enumerable properties on _def
-    if (isRecord(defUnknown)) {
-        for (const value of Object.values(defUnknown)) {
-            if (isZodSchema(value)) {
-                if (containsDefault(value, visited)) return true
-                continue
-            }
-            if (Array.isArray(value)) {
-                for (const v of value) {
-                    if (isZodSchema(v) && containsDefault(v, visited)) return true
-                }
-                continue
-            }
-            if (isRecord(value)) {
-                for (const v of Object.values(value)) {
-                    if (isZodSchema(v) && containsDefault(v, visited)) return true
-                }
-            }
-        }
-    }
+	// Generic deep traversal over all enumerable properties on _def
+	if (isRecord(defUnknown)) {
+		for (const value of Object.values(defUnknown)) {
+			if (isZodSchema(value)) {
+				if (containsDefault(value, visited)) return true
+				continue
+			}
+			if (Array.isArray(value)) {
+				for (const v of value) {
+					if (isZodSchema(v) && containsDefault(v, visited)) return true
+				}
+				continue
+			}
+			if (isRecord(value)) {
+				for (const v of Object.values(value)) {
+					if (isZodSchema(v) && containsDefault(v, visited)) return true
+				}
+			}
+		}
+	}
 
-    return false
+	return false
 }
 
 describe("Zod Schema Default Ban", () => {

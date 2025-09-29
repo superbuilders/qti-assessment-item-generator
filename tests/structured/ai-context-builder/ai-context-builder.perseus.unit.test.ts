@@ -203,7 +203,7 @@ describe("buildPerseusEnvelope (unit)", () => {
 				{
 					images: {},
 					content:
-						"$\\text{Probability} = \\\dfrac{\\text{Number of favorable outcomes}}{\\text{Number of possible outcomes}}$",
+						"$\\text{Probability} = \\dfrac{\\text{Number of favorable outcomes}}{\\text{Number of possible outcomes}}$",
 					replace: false,
 					widgets: {}
 				},
@@ -216,7 +216,7 @@ describe("buildPerseusEnvelope (unit)", () => {
 				},
 				{
 					images: {},
-					content: "$\\qquad \\text{P(draw a blue or red marble}) = \\\dfrac{16}{21}\\approx0.76$",
+					content: "$\\qquad \\text{P(draw a blue or red marble}) = \\dfrac{16}{21}\\approx0.76$",
 					replace: false,
 					widgets: {}
 				}

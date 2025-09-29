@@ -84,6 +84,7 @@ import { SinCosineWidgetPropsSchema } from "./generators/sin-cosine-widget"
 import { StackedItemsDiagramPropsSchema } from "./generators/stacked-items-diagram"
 import { StickPlotPropsSchema } from "./generators/stick-plot"
 import { SubtractionWithRegroupingPropsSchema } from "./generators/subtraction-with-regrouping"
+import { SymmetryDiagramPropsSchema } from "./generators/symmetry-diagram"
 import { TapeDiagramPropsSchema } from "./generators/tape-diagram"
 import { TransformationDiagramPropsSchema } from "./generators/transformation-diagram"
 import { TransversalAngleDiagramPropsSchema } from "./generators/transversal-angle-diagram"
@@ -96,7 +97,6 @@ import { VennDiagramPropsSchema } from "./generators/venn-diagram"
 import { VerticalArithmeticSetupPropsSchema } from "./generators/vertical-arithmetic-setup"
 import { VideoPropsSchema } from "./generators/video"
 import { WheelDiagramPropsSchema } from "./generators/wheel-diagram"
-import { SymmetryDiagramPropsSchema } from "./generators/symmetry-diagram"
 
 // Master registry of widget schemas for dynamic validation and prompting
 export const allWidgetSchemas = {
@@ -193,8 +193,7 @@ export const allWidgetSchemas = {
 	pesSpectrum: PESSpectrumPropsSchema,
 	stickPlot: StickPlotPropsSchema,
 	video: VideoPropsSchema,
-	marbleDiagram: MarbleDiagramPropsSchema
-,
+	marbleDiagram: MarbleDiagramPropsSchema,
 	symmetryDiagram: SymmetryDiagramPropsSchema
 } as const
 

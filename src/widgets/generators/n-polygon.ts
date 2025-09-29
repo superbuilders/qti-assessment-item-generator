@@ -16,31 +16,32 @@ export const NPolygonPropsSchema = z
 		height: createHeightSchema(),
 		polygons: z
 			.array(
-				z
-					.object({
-						shape: z
-							.enum([
-								"regularTriangle",
-								"regularSquare",
-								"rectangle",
-								"regularPentagon",
-								"regularHexagon",
-								"regularHeptagon",
-								"regularOctagon",
-								"rightTrapezoid",
-								"pentagonTwoConsecutiveRightAngles"
-							])
-							.describe(
-								"The specific polygon shape to render. Regular variants render equilateral/equiangular polygons (regularTriangle, regularSquare, regularPentagon, regularHexagon, regularHeptagon, regularOctagon). Rectangle uses a 4:3 aspect ratio. rightTrapezoid is a quadrilateral with exactly one pair of parallel sides and two right angles. pentagonTwoConsecutiveRightAngles is a pentagon with two adjacent right-angle vertices (house shape)."
-							),
-						fillColor: z
-							.string()
-							.regex(CSS_COLOR_PATTERN, "invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)")
-							.describe("The hex-only fill color for this polygon.")
-					})
+				z.object({
+					shape: z
+						.enum([
+							"regularTriangle",
+							"regularSquare",
+							"rectangle",
+							"regularPentagon",
+							"regularHexagon",
+							"regularHeptagon",
+							"regularOctagon",
+							"rightTrapezoid",
+							"pentagonTwoConsecutiveRightAngles"
+						])
+						.describe(
+							"The specific polygon shape to render. Regular variants render equilateral/equiangular polygons (regularTriangle, regularSquare, regularPentagon, regularHexagon, regularHeptagon, regularOctagon). Rectangle uses a 4:3 aspect ratio. rightTrapezoid is a quadrilateral with exactly one pair of parallel sides and two right angles. pentagonTwoConsecutiveRightAngles is a pentagon with two adjacent right-angle vertices (house shape)."
+						),
+					fillColor: z
+						.string()
+						.regex(CSS_COLOR_PATTERN, "invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)")
+						.describe("The hex-only fill color for this polygon.")
+				})
 			)
 			.min(1)
-			.describe("Array of polygon definitions. Can contain a single polygon or multiple polygons to display side-by-side with automatic spacing. Each polygon is centered within its allocated horizontal space.")
+			.describe(
+				"Array of polygon definitions. Can contain a single polygon or multiple polygons to display side-by-side with automatic spacing. Each polygon is centered within its allocated horizontal space."
+			)
 	})
 	.strict()
 	.describe(
@@ -76,7 +77,9 @@ export const generateNPolygon: WidgetGenerator<typeof NPolygonPropsSchema> = asy
 		const cy = tileTop + tileH / 2
 		const radius = Math.min(tileW, tileH) / 2 - PADDING
 
-		function isRegularShape(s: (typeof polygons)[number]["shape"]): s is
+		function isRegularShape(
+			s: (typeof polygons)[number]["shape"]
+		): s is
 			| "regularTriangle"
 			| "regularSquare"
 			| "regularPentagon"
@@ -94,12 +97,7 @@ export const generateNPolygon: WidgetGenerator<typeof NPolygonPropsSchema> = asy
 		}
 
 		const regularSides: Record<
-			| "regularTriangle"
-			| "regularSquare"
-			| "regularPentagon"
-			| "regularHexagon"
-			| "regularHeptagon"
-			| "regularOctagon",
+			"regularTriangle" | "regularSquare" | "regularPentagon" | "regularHexagon" | "regularHeptagon" | "regularOctagon",
 			number
 		> = {
 			regularTriangle: 3,

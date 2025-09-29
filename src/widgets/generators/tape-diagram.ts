@@ -329,7 +329,7 @@ function createTapeSchema() {
 						.boolean()
 						.describe(
 							"Whether to display grid lines separating each unit. True shows unit boundaries making discrete units visible. False creates a continuous bar without internal divisions."
-						),
+						)
 				})
 				.strict()
 				.describe(
