@@ -51,6 +51,13 @@ export class Path2D {
 		return this
 	}
 
+	/**
+	 * Alias for cubic Bézier curves to match common Canvas/SVG naming styles used by generators
+	 */
+	cubicCurveTo(cp1x: number, cp1y: number, cp2x: number, cp2y: number, x: number, y: number): this {
+		return this.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, x, y)
+	}
+
 	// For arc commands, we must track the bounding box of the curve itself.
 	// For simplicity in this implementation, we will track the start and end points
 	// of the arc segment as a reasonable approximation. A more advanced implementation

@@ -94,6 +94,7 @@ import { generateVectorDiagram } from "./generators/vector-diagram"
 import { generateVennDiagram } from "./generators/venn-diagram"
 import { generateVerticalArithmeticSetup } from "./generators/vertical-arithmetic-setup"
 import { generateWheelDiagram } from "./generators/wheel-diagram"
+import { generateSymmetryDiagram } from "./generators/symmetry-diagram"
 import { type WidgetInput, WidgetSchema } from "./registry"
 
 export async function generateWidget(widgetInput: WidgetInput): Promise<string> {
@@ -290,6 +291,8 @@ export async function generateWidget(widgetInput: WidgetInput): Promise<string> 
 			return await generateStickPlot(widget)
 		case "marbleDiagram":
 			return await generateMarbleDiagram(widget)
+		case "symmetryDiagram":
+			return await generateSymmetryDiagram(widget)
 		default:
 			logger.error("unknown widget type", { widget })
 			throw errors.new(`Unknown widget type: ${JSON.stringify(widget)}`)

@@ -7,6 +7,7 @@ import {
     TapeDiagramPropsSchema,
     DotPlotPropsSchema
 } from "../registry"
+import { SymmetryDiagramPropsSchema } from "../generators/symmetry-diagram"
 
 export const teksMath4Collection = {
     name: "teks-math-4",
@@ -17,7 +18,8 @@ export const teksMath4Collection = {
         tapeDiagram: TapeDiagramPropsSchema,
         numberLineWithAction: NumberLineWithActionPropsSchema,
         fractionModelDiagram: FractionModelDiagramPropsSchema,
-        quantityFractionalDiagram: QuantityFractionalDiagramPropsSchema
+        quantityFractionalDiagram: QuantityFractionalDiagramPropsSchema,
+        symmetryDiagram: SymmetryDiagramPropsSchema
     },
     widgetTypeKeys: [
         "protractorAngleDiagram",
@@ -26,7 +28,8 @@ export const teksMath4Collection = {
         "tapeDiagram",
         "numberLineWithAction",
         "fractionModelDiagram",
-        "quantityFractionalDiagram"
+        "quantityFractionalDiagram",
+        "symmetryDiagram"
     ] as const
 } as const
 

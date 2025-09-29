@@ -96,6 +96,7 @@ import { VennDiagramPropsSchema } from "./generators/venn-diagram"
 import { VerticalArithmeticSetupPropsSchema } from "./generators/vertical-arithmetic-setup"
 import { VideoPropsSchema } from "./generators/video"
 import { WheelDiagramPropsSchema } from "./generators/wheel-diagram"
+import { SymmetryDiagramPropsSchema } from "./generators/symmetry-diagram"
 
 // Master registry of widget schemas for dynamic validation and prompting
 export const allWidgetSchemas = {
@@ -193,6 +194,8 @@ export const allWidgetSchemas = {
 	stickPlot: StickPlotPropsSchema,
 	video: VideoPropsSchema,
 	marbleDiagram: MarbleDiagramPropsSchema
+,
+	symmetryDiagram: SymmetryDiagramPropsSchema
 } as const
 
 export const typedSchemas = allWidgetSchemas
@@ -292,7 +295,8 @@ export {
 	PESSpectrumPropsSchema,
 	StickPlotPropsSchema,
 	VideoPropsSchema,
-	MarbleDiagramPropsSchema
+	MarbleDiagramPropsSchema,
+	SymmetryDiagramPropsSchema
 }
 
 // NEW: Input types for each schema
@@ -483,7 +487,8 @@ const widgetSchemasWithoutSpecialUnions = [
 	typedSchemas.pesSpectrum,
 	typedSchemas.stickPlot,
 	typedSchemas.video,
-	typedSchemas.marbleDiagram
+	typedSchemas.marbleDiagram,
+	typedSchemas.symmetryDiagram
 ] as const
 
 export const WidgetSchema = z.union([
