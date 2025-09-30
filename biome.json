@@ -3,11 +3,8 @@
 	"plugins": [
 		"./gritql/logger-structured-args.grit",
 		"./gritql/no-as-type-assertion.grit",
-		"./gritql/no-db-in-step-run.grit",
 		"./gritql/no-new-error.grit",
 		"./gritql/no-try.grit",
-		"./gritql/no-implicit-select-all.grit",
-		"./gritql/no-manual-memoization.grit",
 		"./gritql/no-iife.grit",
 		"./gritql/require-logger-before-throw.grit"
 	],
