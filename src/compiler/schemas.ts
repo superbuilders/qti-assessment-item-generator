@@ -183,7 +183,7 @@ export function createAssessmentItemShellSchema<const E extends WidgetTypeTuple>
 
 // Feedback Plan Schemas (NEW)
 export const FeedbackDimensionSchema = z
-	.union([
+	.discriminatedUnion("kind", [
 		z
 			.object({
 				responseIdentifier: z
