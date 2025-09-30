@@ -4,12 +4,7 @@ import { z } from "zod"
 import { MATHML_INNER_PATTERN } from "../utils/mathml"
 import { typedSchemas } from "../widgets/registry"
 import type { WidgetTypeTuple } from "../widgets/collections/types"
-import {
-	CHOICE_IDENTIFIER_REGEX,
-	FEEDBACK_BLOCK_IDENTIFIER_REGEX,
-	RESPONSE_IDENTIFIER_REGEX,
-	SLOT_IDENTIFIER_REGEX
-} from "./qti-constants"
+import { CHOICE_IDENTIFIER_REGEX, RESPONSE_IDENTIFIER_REGEX, SLOT_IDENTIFIER_REGEX } from "./qti-constants"
 
 // Banned characters validation for text content
 const BannedCharsRegex = /[\^|]/
@@ -27,7 +22,6 @@ export function createInlineContentItemSchema<const E extends WidgetTypeTuple>(
 			z
 				.object({
 					type: z.literal("text").describe("Identifies this as plain text content"),
-					// Use the new SafeTextSchema instead of z.string()
 					content: SafeTextSchema.describe("The actual text content to display")
 				})
 				.strict()
@@ -206,7 +200,7 @@ export const FeedbackDimensionSchema = z
 
 export const FeedbackCombinationSchema = z
 	.object({
-		id: z.string().regex(FEEDBACK_BLOCK_IDENTIFIER_REGEX),
+		id: z.string().min(1),
 		path: z
 			.array(
 				z
@@ -519,10 +513,7 @@ export function createDynamicAssessmentItemSchema<const E extends WidgetTypeTupl
 				.describe("A map of interaction identifiers to their full interaction object definitions."),
 			feedbackPlan: FeedbackPlanSchema,
 			feedbackBlocks: z
-				.record(
-					z.string().regex(FEEDBACK_BLOCK_IDENTIFIER_REGEX, "invalid feedback block identifier"),
-					BlockSchema
-				)
+				.record(z.string().min(1), BlockSchema)
 				.describe("A map of feedback identifiers to their rich content blocks.")
 		})
 		.strict()
