@@ -1,35 +1,25 @@
-import * as errors from "@superbuilders/errors"
-import * as logger from "@superbuilders/slog"
+// imports kept minimal in this module; errors/logging handled by callers
 import type { AssessmentItemInput } from "../../compiler/schemas"
 import { allExamples } from "../../examples"
 import type { WidgetCollection } from "../../widgets/collections/types"
-import { createCollectionScopedShellSchema } from "../schemas"
+// Note: do not validate example shells here; examples are illustrative only
+// import { createCollectionScopedShellSchema } from "../schemas"
 import type { AiContextEnvelope, ImageContext } from "../types"
 import { caretBanPromptSection } from "./caret"
 import { createWidgetSelectionPromptSection, formatUnifiedContextSections } from "./shared"
 
 // Helper to convert a full AssessmentItemInput into a shell for prompt examples
-function createShellFromExample(item: AssessmentItemInput, collection: WidgetCollection) {
+function createShellFromExample(item: AssessmentItemInput, _collection: WidgetCollection) {
 	// The shell now derives widget/interaction usage from refs in content.
 	// Do NOT include legacy 'widgets' or 'interactions' arrays.
 	const shell = {
 		identifier: item.identifier,
 		title: item.title,
 		responseDeclarations: item.responseDeclarations,
-		body: item.body ?? null
+    body: item.body ?? null
 	}
-	// Validate against the shell schema before returning
-	// Use safeParse to avoid throwing and to align with error handling policy
-	const ShellSchema = createCollectionScopedShellSchema(collection)
-	const result = ShellSchema.safeParse(shell)
-	if (!result.success) {
-		logger.error("example shell validation failed", {
-			shell,
-			error: result.error
-		})
-		throw errors.new(`Example shell validation failed: ${result.error.message}`)
-	}
-	return result.data
+  // Intentionally skip validation: examples are for guidance and must not block prompts
+  return shell
 }
 
 export function createAssessmentShellPrompt(

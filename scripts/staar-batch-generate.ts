@@ -158,7 +158,7 @@ async function processQuestionDir(dir: string, openai: OpenAI): Promise<void> {
 	// 4. Generate Structured Item from Envelope
 	logger.info("calling openai to generate structured item", {
 		questionDir: questionDirName,
-		collection: WIDGET_COLLECTION
+		collection: WIDGET_COLLECTION.name
 	})
 	const structuredResult = await errors.try(generateFromEnvelope(openai, logger, envelope, WIDGET_COLLECTION))
 	if (structuredResult.error) {
@@ -243,7 +243,7 @@ async function main() {
 		.filter((e) => e.isDirectory() && /^question_\d{2}$/.test(e.name))
 		.map((e) => path.join(ROOT, e.name))
 
-	logger.info("starting staar batch generation", { count: questionDirs.length, collection: WIDGET_COLLECTION })
+	logger.info("starting staar batch generation", { count: questionDirs.length, collection: WIDGET_COLLECTION.name })
 
 	const results = await Promise.allSettled(
 		questionDirs.map(async (dir) => {
