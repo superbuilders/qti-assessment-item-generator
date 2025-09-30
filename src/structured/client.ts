@@ -13,7 +13,7 @@ function isWidgetTypeKey(v: string): v is keyof typeof allWidgetSchemas {
 
 import { collectWidgetRefs } from "./collector"
 import { buildFeedbackPlanFromInteractions } from "./feedback-plan-builder"
-import { convertNestedFeedbackToBlocks } from "./feedback-converter"
+import { validateNestedFeedback, convertNestedFeedbackToBlocks } from "./feedback-nested-schema"
 import { toJSONSchemaPromptSafe } from "./json-schema"
 import { createFeedbackPrompt } from "./prompts/feedback"
 import { createInteractionContentPrompt } from "./prompts/interactions"
@@ -410,13 +410,8 @@ export async function generateFromEnvelope(
 		throw errors.wrap(feedbackParseResult.error, "json parse")
 	}
 
-	const feedbackValidation = FeedbackSchema.safeParse(feedbackParseResult.data)
-	if (!feedbackValidation.success) {
-		logger.error("feedback validation failed", { error: feedbackValidation.error })
-		throw errors.wrap(feedbackValidation.error, "feedback validation")
-	}
-
-	const feedbackBlocks = convertNestedFeedbackToBlocks(feedbackValidation.data.feedback, feedbackPlan)
+	const validatedNestedFeedback = validateNestedFeedback(feedbackParseResult.data, feedbackPlan, widgetCollection)
+	const feedbackBlocks = convertNestedFeedbackToBlocks(validatedNestedFeedback, feedbackPlan)
 	logger.debug("shot 3 complete", { feedbackBlockCount: Object.keys(feedbackBlocks).length })
 
 	// Shot 4: Collect widget refs with types and generate widget content

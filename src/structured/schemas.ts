@@ -251,36 +251,16 @@ export function createCollectionScopedInteractionSchema(_interactionIds: string[
 	return z.record(z.string(), ScopedAnyInteractionSchema)
 }
 
+// Import the centralized feedback schema builder
+import { createNestedFeedbackZodSchema } from "./feedback-nested-schema"
+
 /**
  * Creates a dynamic, collection-scoped Zod schema for generating feedback content.
- * Builds the nested schema strictly from the provided feedbackPlan (no inference).
+ * @deprecated Use createNestedFeedbackZodSchema from feedback-nested-schema.ts instead.
  */
 export function createCollectionScopedFeedbackSchema(feedbackPlan: FeedbackPlan, collection: WidgetCollection) {
-	const ScopedWidgetEnum = createWidgetTypeEnumFromCollection(collection)
-	const ScopedBlockContentSchema = createBlockContentSchema(ScopedWidgetEnum)
-	const LeafNodeSchema = z.object({ content: ScopedBlockContentSchema }).strict()
-
-	let overallFeedbackShape: z.ZodType<unknown>
-	if (feedbackPlan.mode === "fallback") {
-		overallFeedbackShape = z.object({ CORRECT: LeafNodeSchema, INCORRECT: LeafNodeSchema }).strict()
-	} else {
-		let current: z.ZodType<unknown> = LeafNodeSchema
-		for (let i = feedbackPlan.dimensions.length - 1; i >= 0; i--) {
-			const dimension = feedbackPlan.dimensions[i]
-			const shapeEntries: Record<string, z.ZodType<unknown>> = {}
-			const keys = dimension.kind === "enumerated" ? dimension.keys : ["CORRECT", "INCORRECT"]
-			for (const key of keys) {
-				shapeEntries[key] = current
-			}
-			const inner = z.object(shapeEntries).strict()
-			current = z.object({ [dimension.responseIdentifier]: inner }).strict()
-		}
-		overallFeedbackShape = current
-	}
-
-	const FeedbackMapSchema = z.object({ FEEDBACK__OVERALL: overallFeedbackShape }).strict()
-
-	return z.object({ feedback: FeedbackMapSchema }).strict()
+	// This function now just wraps the new centralized utility.
+	return createNestedFeedbackZodSchema(feedbackPlan, collection)
 }
 
 /**

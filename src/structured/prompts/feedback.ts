@@ -1,6 +1,6 @@
 import type { AssessmentItemShell, FeedbackPlan } from "../../compiler/schemas"
 import type { WidgetCollection } from "../../widgets/collections/types"
-import { createCollectionScopedFeedbackSchema } from "../schemas"
+import { createNestedFeedbackZodSchema } from "../feedback-nested-schema"
 import type { AiContextEnvelope, ImageContext } from "../types"
 import { createWidgetSelectionPromptSection, formatUnifiedContextSections } from "./shared"
 
@@ -15,7 +15,8 @@ export function createFeedbackPrompt(
 	imageContext: ImageContext,
 	widgetCollection: WidgetCollection
 ) {
-	const FeedbackSchema = createCollectionScopedFeedbackSchema(feedbackPlan, widgetCollection)
+	// Build the nested authoring schema inside the prompt helper
+	const FeedbackSchema = createNestedFeedbackZodSchema(feedbackPlan, widgetCollection)
 
 	const systemInstruction = `You are an expert in educational content. Your task is to generate comprehensive feedback for all possible outcomes in an assessment item.
 

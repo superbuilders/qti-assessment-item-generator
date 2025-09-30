@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test"
-import { convertNestedFeedbackToBlocks } from "../../src/structured/feedback-converter"
+import { convertNestedFeedbackToBlocks } from "../../src/structured/feedback-nested-schema"
 import type { FeedbackPlan } from "../../src/compiler/schemas"
 
 describe("convertNestedFeedbackToBlocks", () => {

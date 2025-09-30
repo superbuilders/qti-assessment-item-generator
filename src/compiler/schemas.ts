@@ -67,15 +67,15 @@ export function createInlineContentItemSchema(widgetTypeEnum: z.ZodType<string>)
 		.describe("Union type representing any inline content element")
 }
 
-export function createInlineContentSchema(widgetTypeEnum: z.ZodType<string>) {
-	return z
-		.array(createInlineContentItemSchema(widgetTypeEnum))
-		.describe("Array of inline content items that can be rendered within a paragraph or prompt")
+export function createInlineContentSchema(widgetTypeEnum: z.ZodType<string>): z.ZodType<InlineContent> {
+    return z
+        .array(createInlineContentItemSchema(widgetTypeEnum))
+        .describe("Array of inline content items that can be rendered within a paragraph or prompt")
 }
 
 // LEVEL 1: BLOCK CONTENT (for body, feedback, choice content, etc.)
 // Factory functions for block content
-export function createBlockContentItemSchema(widgetTypeEnum: z.ZodType<string>) {
+export function createBlockContentItemSchema(widgetTypeEnum: z.ZodType<string>): z.ZodType<BlockContentItem> {
 	const InlineSchema = createInlineContentSchema(widgetTypeEnum)
 	const TableRichCellSchema = InlineSchema.nullable()
 	const TableRichRowSchema = z.array(TableRichCellSchema)
@@ -139,13 +139,13 @@ export function createBlockContentItemSchema(widgetTypeEnum: z.ZodType<string>) 
 				.strict()
 				.describe("Reference to a compiled interaction by id, to be rendered as a block")
 		])
-		.describe("Union type representing any block-level content element")
+        .describe("Union type representing any block-level content element")
 }
 
-export function createBlockContentSchema(widgetTypeEnum: z.ZodType<string>) {
-	return z
-		.array(createBlockContentItemSchema(widgetTypeEnum))
-		.describe("Array of block content items representing the document structure")
+export function createBlockContentSchema(widgetTypeEnum: z.ZodType<string>): z.ZodType<BlockContent> {
+    return z
+        .array(createBlockContentItemSchema(widgetTypeEnum))
+        .describe("Array of block content items representing the document structure")
 }
 
 export function createAssessmentItemShellSchema(widgetTypeEnum: z.ZodType<string>) {
