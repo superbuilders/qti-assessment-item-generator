@@ -49,35 +49,41 @@ export function createNestedFeedbackZodSchema<P extends FeedbackPlan, const E ex
 	const ScopedBlockContentSchema: z.ZodType<BlockContent<E>> = createBlockContentSchema(widgetTypeKeys)
 	const LeafNodeSchema: z.ZodType<AuthoringNestedLeaf<E>> = z.object({ content: ScopedBlockContentSchema }).strict()
 
-    // Recursive nested node schema: { [responseIdentifier]: { [key]: Leaf | Node } }
-    const NestedNodeSchema: z.ZodType<AuthoringNestedNode<FeedbackPlan, E>> = z.lazy(() =>
-        z.record(z.string(), z.record(z.string(), z.union([LeafNodeSchema, NestedNodeSchema])))
-    )
+	// Build overall feedback shape dynamically
+	let overallFeedbackShape: z.ZodTypeAny
+	if (feedbackPlan.mode === "fallback") {
+		overallFeedbackShape = z
+			.object({
+				CORRECT: LeafNodeSchema,
+				INCORRECT: LeafNodeSchema
+			})
+			.strict()
+	} else {
+		// SIMPLIFIED: Reverted to a direct recursive build, which is cleaner.
+		let current: z.ZodTypeAny = LeafNodeSchema
+		for (let i = feedbackPlan.dimensions.length - 1; i >= 0; i--) {
+			const dimension = feedbackPlan.dimensions[i]
+			if (!dimension) {
+				logger.error("undefined dimension in feedback plan", { index: i, dimensionCount: feedbackPlan.dimensions.length })
+				throw errors.new("undefined dimension in feedback plan")
+			}
+			const shapeEntries: Record<string, z.ZodTypeAny> = {}
+			const keys = dimension.kind === "enumerated" ? dimension.keys : ["CORRECT", "INCORRECT"]
 
-    const FallbackOverallSchema: z.ZodType<AuthoringFeedbackOverall<FeedbackPlan, E>> = z
-        .object({ CORRECT: LeafNodeSchema, INCORRECT: LeafNodeSchema })
-        .strict()
+			for (const key of keys) {
+				shapeEntries[key] = current
+			}
 
-    const OverallUnionSchema: z.ZodType<AuthoringFeedbackOverall<FeedbackPlan, E>> = z.union([
-        FallbackOverallSchema,
-        NestedNodeSchema
-    ])
+			const inner = z.object(shapeEntries).strict()
+			current = z.object({ [dimension.responseIdentifier]: inner }).strict()
+		}
+		overallFeedbackShape = current
+	}
 
-    // Enforce mode-specific shape
-    const OverallSchema = OverallUnionSchema.superRefine((val, ctx) => {
-        const isFallback = typeof val === "object" && val !== null && "CORRECT" in val && "INCORRECT" in val
-        if (feedbackPlan.mode === "fallback" && !isFallback) {
-            ctx.addIssue({ code: z.ZodIssueCode.custom, message: "expected fallback overall shape" })
-        }
-        if (feedbackPlan.mode !== "fallback" && isFallback) {
-            ctx.addIssue({ code: z.ZodIssueCode.custom, message: "fallback overall shape not allowed in combo mode" })
-        }
-    })
-
-    const FeedbackMapSchema = z.object({ FEEDBACK__OVERALL: OverallSchema }).strict()
+    const FeedbackMapSchema = z.object({ FEEDBACK__OVERALL: overallFeedbackShape }).strict()
     const schema = z.object({ feedback: FeedbackMapSchema }).strict()
 	// Add a type assertion to resolve the TypeScript error.
-    return schema as z.ZodType<NestedFeedbackAuthoring<FeedbackPlan, E>>
+    return schema as z.ZodType<NestedFeedbackAuthoring<P, E>>
 }
 
 /**
