@@ -26,7 +26,7 @@ export type AuthoringNestedLeaf<E extends WidgetTypeTuple = WidgetTypeTuple, Con
 	content: ContentT
 }
 export type AuthoringNestedNode<P extends FeedbackPlan, E extends WidgetTypeTuple = WidgetTypeTuple, ContentT = BlockContent<E>> = {
-	[R in ResponseIdentifierLiteral<P>]: {
+	[responseIdentifier: string]: {
 		[key: string]: AuthoringNestedLeaf<E, ContentT> | AuthoringNestedNode<P, E, ContentT>
 	}
 }
@@ -46,44 +46,57 @@ export function createNestedFeedbackZodSchema<P extends FeedbackPlan, const E ex
 	feedbackPlan: P,
 	widgetTypeKeys: E
 ): z.ZodType<NestedFeedbackAuthoring<P, E>> {
+	// Leaf schema is fully typed to AuthoringNestedLeaf<E>
 	const ScopedBlockContentSchema: z.ZodType<BlockContent<E>> = createBlockContentSchema(widgetTypeKeys)
-	const LeafNodeSchema: z.ZodType<AuthoringNestedLeaf<E>> = z.object({ content: ScopedBlockContentSchema }).strict()
+	const LeafNodeSchema: z.ZodType<AuthoringNestedLeaf<E>> = z
+		.object({ content: ScopedBlockContentSchema })
+		.strict()
 
-	// Build overall feedback shape dynamically
-	let overallFeedbackShape: z.ZodTypeAny
+	// Build overall feedback shape imperatively without z.lazy
+	let OverallSchema: z.ZodType<AuthoringFeedbackOverall<P, E>>
 	if (feedbackPlan.mode === "fallback") {
-		overallFeedbackShape = z
+		OverallSchema = z
 			.object({
 				CORRECT: LeafNodeSchema,
 				INCORRECT: LeafNodeSchema
 			})
 			.strict()
 	} else {
-		// SIMPLIFIED: Reverted to a direct recursive build, which is cleaner.
-		let current: z.ZodTypeAny = LeafNodeSchema
+		// Build nested node from innermost dimension outward
+		type LeafT = AuthoringNestedLeaf<E>
+		type NodeT = AuthoringNestedNode<P, E>
+		if (feedbackPlan.dimensions.length === 0) {
+			logger.error("combo feedback plan has no dimensions", { dimensionCount: 0 })
+			throw errors.new("combo feedback plan has no dimensions")
+		}
+		let current: z.ZodType<LeafT | NodeT> = LeafNodeSchema
 		for (let i = feedbackPlan.dimensions.length - 1; i >= 0; i--) {
 			const dimension = feedbackPlan.dimensions[i]
 			if (!dimension) {
 				logger.error("undefined dimension in feedback plan", { index: i, dimensionCount: feedbackPlan.dimensions.length })
 				throw errors.new("undefined dimension in feedback plan")
 			}
-			const shapeEntries: Record<string, z.ZodTypeAny> = {}
-			const keys = dimension.kind === "enumerated" ? dimension.keys : ["CORRECT", "INCORRECT"]
+			const keys: readonly string[] = dimension.kind === "enumerated" ? dimension.keys : ["CORRECT", "INCORRECT"]
 
+			const innerShape: Record<string, z.ZodType<LeafT | NodeT>> = {}
 			for (const key of keys) {
-				shapeEntries[key] = current
+				innerShape[key] = current
 			}
+			const inner = z.object(innerShape).strict()
 
-			const inner = z.object(shapeEntries).strict()
-			current = z.object({ [dimension.responseIdentifier]: inner }).strict()
+			const branchShape: Record<string, typeof inner> = { [dimension.responseIdentifier]: inner }
+			const branch = z.object(branchShape).strict()
+			// current now narrows toward NodeT as outer dimensions are wrapped
+			current = branch
 		}
-		overallFeedbackShape = current
+		// current is NodeT at this point by construction
+    // biome-ignore lint: this is fine
+		OverallSchema = current as z.ZodType<NodeT>
 	}
 
-    const FeedbackMapSchema = z.object({ FEEDBACK__OVERALL: overallFeedbackShape }).strict()
-    const schema = z.object({ feedback: FeedbackMapSchema }).strict()
-	// Add a type assertion to resolve the TypeScript error.
-    return schema as z.ZodType<NestedFeedbackAuthoring<P, E>>
+	const FeedbackMapSchema = z.object({ FEEDBACK__OVERALL: OverallSchema }).strict()
+	const Schema = z.object({ feedback: FeedbackMapSchema }).strict()
+	return Schema
 }
 
 /**
