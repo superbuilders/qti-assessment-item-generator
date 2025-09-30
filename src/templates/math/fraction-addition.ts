@@ -8,6 +8,10 @@ import type { AssessmentItemInput, BlockContent } from "../../compiler/schemas"
 import { FractionSchema } from "../schemas"
 import type { TemplateModule } from "../types"
 
+// Define the exact widget tuple used by this template
+// The template includes a 'partitionedShape' widget in the widgets map below
+export type TemplateWidgets = readonly ["partitionedShape"]
+
 // -----------------------------------------------------------------------------
 // 2. FUNDAMENTAL DATA TYPE & TEMPLATE PROPS SCHEMA
 // This section defines the public contract of the template. It is the only
@@ -44,7 +48,7 @@ export const PropsSchema = z
  * @param props - An object containing the two fractions to be added.
  * @returns An AssessmentItemInput object ready for the QTI compiler.
  */
-export function generateFractionAdditionQuestion(props: z.input<typeof PropsSchema>): AssessmentItemInput {
+export function generateFractionAdditionQuestion(props: z.input<typeof PropsSchema>): AssessmentItemInput<TemplateWidgets> {
 	const { addend1, addend2 } = props
 	// --- 3a. Self-Contained Mathematical Helpers ---
 	// To ensure the template is a pure, dependency-free module, all core
@@ -157,7 +161,7 @@ export function generateFractionAdditionQuestion(props: z.input<typeof PropsSche
 
 	// --- 3d. Construct the Final AssessmentItemInput Object ---
 	// TODO: Update this template to use feedbackPlan + map structure
-	const assessmentItem: AssessmentItemInput = {
+	const assessmentItem: AssessmentItemInput<TemplateWidgets> = {
 		identifier: `fraction-addition-${f1.numerator}-${f1.denominator}-plus-${f2.numerator}-${f2.denominator}`,
 		title: `Fraction Addition: ${f1.numerator}/${f1.denominator} + ${f2.numerator}/${f2.denominator}`,
 
@@ -245,7 +249,7 @@ export function generateFractionAdditionQuestion(props: z.input<typeof PropsSche
 			}))
 		},
 		feedbackBlocks: Object.fromEntries(finalChoices.map((choice, index) => {
-			let feedbackContent: BlockContent
+			let feedbackContent: BlockContent<TemplateWidgets> = []
 
 			// Helper to format the step-by-step solution
 			const commonDenom = f1.denominator * f2.denominator
@@ -253,7 +257,7 @@ export function generateFractionAdditionQuestion(props: z.input<typeof PropsSche
 			const num2Expanded = Math.abs(f2.numerator) * f1.denominator
 			const sumNumerator = num1Expanded + num2Expanded
 
-			const workedExample: BlockContent = [
+			const workedExample: BlockContent<TemplateWidgets> = [
 				{
 					type: "paragraph",
 					content: [{ type: "text", content: "Complete step-by-step solution:" }]
@@ -342,7 +346,7 @@ export function generateFractionAdditionQuestion(props: z.input<typeof PropsSche
 						...workedExample
 					]
 					break
-
+				
 				case "ADD_ACROSS":
 					feedbackContent = [
 						{
@@ -382,7 +386,7 @@ export function generateFractionAdditionQuestion(props: z.input<typeof PropsSche
 						}
 					]
 					break
-
+				
 				case "ADD_NUM_KEEP_DEN":
 					feedbackContent = [
 						{
@@ -421,7 +425,7 @@ export function generateFractionAdditionQuestion(props: z.input<typeof PropsSche
 						}
 					]
 					break
-
+				
 				case "MULTIPLY_DENOMINATORS_ONLY":
 					feedbackContent = [
 						{
@@ -459,7 +463,7 @@ export function generateFractionAdditionQuestion(props: z.input<typeof PropsSche
 						}
 					]
 					break
-
+				
 				case "FORGOT_TO_SIMPLIFY":
 					feedbackContent = [
 						{
@@ -495,7 +499,7 @@ export function generateFractionAdditionQuestion(props: z.input<typeof PropsSche
 						}
 					]
 					break
-
+				
 				default:
 					// Fallback for any other type
 					feedbackContent = [

@@ -3,6 +3,7 @@ import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import type { AssessmentItemInput } from "../../src/compiler/schemas"
 import { differentiateAssessmentItem } from "../../src/structured/differentiator"
+import { allWidgetsCollection } from "../../src/widgets/collections/all"
 
 // Mock the OpenAI client
 mock.module("openai", () => {
@@ -84,7 +85,7 @@ describe("Differentiation Pipeline", () => {
 		const OpenAI = (await import("openai")).default
 		const mockOpenAI = new OpenAI()
 
-		const originalItem: AssessmentItemInput = {
+		const originalItem: AssessmentItemInput<readonly []> = {
 			identifier: "original-item",
 			title: "Original Item",
 			responseDeclarations: [
@@ -117,7 +118,7 @@ describe("Differentiation Pipeline", () => {
 			}
 		}
 
-		const result = await errors.try(differentiateAssessmentItem(mockOpenAI, logger, originalItem, 1))
+		const result = await errors.try(differentiateAssessmentItem(mockOpenAI, logger, originalItem, 1, allWidgetsCollection))
 		expect(result.error).toBeFalsy()
 
 		const differentiated = result.data

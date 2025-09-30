@@ -8,7 +8,7 @@ import { allWidgetsCollection } from "../../src/widgets/collections/all"
 
 describe("JSON Schema Preflight", () => {
 	test("collection-scoped shell schema converts to JSON Schema", () => {
-		const Shell = createCollectionScopedShellSchema(allWidgetsCollection)
+		const Shell = createCollectionScopedShellSchema(allWidgetsCollection.widgetTypeKeys)
 		const result = errors.trySync(() => z.toJSONSchema(Shell))
 		if (result.error) {
 			logger.error("shell schema json conversion", { error: result.error })

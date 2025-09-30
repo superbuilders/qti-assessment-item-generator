@@ -2,7 +2,7 @@ import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { ErrUnsupportedInteraction } from "../structured/client"
 import { escapeXmlAttribute } from "../utils/xml-utils"
-import type { WidgetCollection } from "../widgets/collections/types"
+import type { WidgetCollection, WidgetTypeTuple } from "../widgets/collections/types"
 import { typedSchemas } from "../widgets/registry"
 import { generateWidget } from "../widgets/widget-generator"
 import { renderBlockContent } from "./content-renderer"
@@ -28,7 +28,16 @@ function isValidWidgetType(type: string): type is keyof typeof typedSchemas {
 	return Object.keys(typedSchemas).includes(type)
 }
 
-function dedupePromptTextFromBody(item: AssessmentItem): void {
+// REMOVED: The following functions are no longer needed as their logic has been
+// moved into the Zod schemas for a single source of truth.
+// - enforceNoPipesInBody
+// - enforceNoCaretsInBody
+// - enforceNoPipesInChoiceInteraction
+// - enforceNoCaretsInChoiceInteraction
+// - enforceNoCaretsInInlineChoiceInteraction
+// - enforceNoPipesInInlineChoiceInteraction
+
+function dedupePromptTextFromBody<E extends WidgetTypeTuple>(item: AssessmentItem<E>): void {
 	if (!item.interactions || !item.body) return
 
 	// --- normalization helpers ---
@@ -157,7 +166,7 @@ function dedupePromptTextFromBody(item: AssessmentItem): void {
 		const raw = moMatches.length > 0 ? moMatches.join(" ") : mathml.replace(/<[^>]+>/g, " ")
 		return toComparable(raw)
 	}
-	const normalizeInline = (inline: InlineContent): string => {
+	const normalizeInline = (inline: InlineContent<E>): string => {
 		let out = ""
 		for (const part of inline) {
 			if (part.type === "text") {
@@ -286,7 +295,7 @@ function dedupePromptTextFromBody(item: AssessmentItem): void {
 		promptByInteraction[id] = p
 	}
 	const extractTextWithSpans = (
-		inline: InlineContent
+		inline: InlineContent<E>
 	): {
 		text: string
 		spans: Array<{ partIdx: number; start: number; end: number }>
@@ -355,7 +364,7 @@ function dedupePromptTextFromBody(item: AssessmentItem): void {
 				if (sNorm === "") continue
 				const sTokens = tokenizeForFuzzy(sNorm)
 				if (!tokensStrictlySimilar(sTokens, promptTokens, 0.9)) continue
-				const newInline: InlineContent = []
+				const newInline: InlineContent<E> = []
 				for (let pIdx = 0; pIdx < block.content.length; pIdx++) {
 					const part = block.content[pIdx]
 					if (!part) continue
@@ -407,228 +416,7 @@ function dedupePromptTextFromBody(item: AssessmentItem): void {
 	}
 }
 
-function enforceNoPipesInBody(item: AssessmentItem): void {
-	if (!item.body) return
-
-	const checkInline = (inline: InlineContent | null, ctx: Record<string, unknown>) => {
-		if (!inline) return
-		for (let j = 0; j < inline.length; j++) {
-			const part = inline[j]
-			if (!part || part.type !== "text") continue
-			if (part.content.includes("|")) {
-				logger.error("pipe characters in body text", { ...ctx, snippet: part.content })
-				throw errors.new("pipe characters banned in body text")
-			}
-		}
-	}
-
-	for (let i = 0; i < item.body.length; i++) {
-		const block = item.body[i]
-		if (!block) continue
-		if (block.type === "paragraph") {
-			checkInline(block.content, { index: i })
-		} else if (block.type === "unorderedList" || block.type === "orderedList") {
-			block.items.forEach((inline, idx) => checkInline(inline, { index: i, itemIndex: idx }))
-		} else if (block.type === "tableRich") {
-			const walkRows = (rows: Array<Array<InlineContent | null>> | null) => {
-				if (!rows) return
-				rows.forEach((row, rIdx) => row.forEach((cell, cIdx) => checkInline(cell, { index: i, row: rIdx, col: cIdx })))
-			}
-			walkRows(block.header)
-			walkRows(block.rows)
-			// footer removed; nothing to walk
-		}
-	}
-}
-
-function enforceNoCaretsInBody(item: AssessmentItem): void {
-	if (!item.body) return
-
-	const checkInline = (inline: InlineContent | null, ctx: Record<string, unknown>) => {
-		if (!inline) return
-		for (let j = 0; j < inline.length; j++) {
-			const part = inline[j]
-			if (!part || part.type !== "text") continue
-			if (part.content.includes("^")) {
-				logger.error("caret characters in body text", { ...ctx, snippet: part.content })
-				throw errors.new("caret characters banned in body text")
-			}
-		}
-	}
-
-	for (let i = 0; i < item.body.length; i++) {
-		const block = item.body[i]
-		if (!block) continue
-		if (block.type === "paragraph") {
-			checkInline(block.content, { index: i })
-		} else if (block.type === "unorderedList" || block.type === "orderedList") {
-			block.items.forEach((inline, idx) => checkInline(inline, { index: i, itemIndex: idx }))
-		} else if (block.type === "tableRich") {
-			const walkRows = (rows: Array<Array<InlineContent | null>> | null) => {
-				if (!rows) return
-				rows.forEach((row, rIdx) => row.forEach((cell, cIdx) => checkInline(cell, { index: i, row: rIdx, col: cIdx })))
-			}
-			walkRows(block.header)
-			walkRows(block.rows)
-		}
-	}
-}
-
-function enforceNoPipesInChoiceInteraction(item: AssessmentItem): void {
-	if (!item.interactions) return
-
-	for (const [interactionId, interaction] of Object.entries(item.interactions)) {
-		if (!interaction || interaction.type !== "choiceInteraction") continue
-
-		// Check prompt inline content
-		if (interaction.prompt && interaction.prompt.length > 0) {
-			for (let i = 0; i < interaction.prompt.length; i++) {
-				const part = interaction.prompt[i]
-				if (!part || part.type !== "text") continue
-				if (part.content.includes("|")) {
-					logger.error("pipe characters in choice prompt", {
-						interactionId,
-						snippet: part.content
-					})
-					throw errors.new("pipe characters banned in choice prompt")
-				}
-			}
-		}
-
-		// Check each choice block content and optional feedback
-		for (let cIdx = 0; cIdx < interaction.choices.length; cIdx++) {
-			const choice = interaction.choices[cIdx]
-			if (!choice) continue
-			// Scan block content for paragraphs with text parts
-			for (let bIdx = 0; bIdx < choice.content.length; bIdx++) {
-				const block = choice.content[bIdx]
-				if (!block || block.type !== "paragraph") continue
-				const inline = block.content
-				for (let pIdx = 0; pIdx < inline.length; pIdx++) {
-					const part = inline[pIdx]
-					if (!part || part.type !== "text") continue
-					if (part.content.includes("|")) {
-						logger.error("pipe characters in choice content", {
-							interactionId,
-							choiceIndex: cIdx,
-							snippet: part.content
-						})
-						throw errors.new("pipe characters banned in choice content")
-					}
-				}
-			}
-
-			// REMOVED: choice feedback validation no longer needed
-		}
-	}
-}
-
-function enforceNoCaretsInChoiceInteraction(item: AssessmentItem): void {
-	if (!item.interactions) return
-
-	for (const [interactionId, interaction] of Object.entries(item.interactions)) {
-		if (!interaction || interaction.type !== "choiceInteraction") continue
-
-		// Check prompt inline content
-		if (interaction.prompt && interaction.prompt.length > 0) {
-			for (let i = 0; i < interaction.prompt.length; i++) {
-				const part = interaction.prompt[i]
-				if (!part || part.type !== "text") continue
-				if (part.content.includes("^")) {
-					logger.error("caret characters in choice prompt", {
-						interactionId,
-						snippet: part.content
-					})
-					throw errors.new("caret characters banned in choice prompt")
-				}
-			}
-		}
-
-		// Check each choice block content and optional feedback
-		for (let cIdx = 0; cIdx < interaction.choices.length; cIdx++) {
-			const choice = interaction.choices[cIdx]
-			if (!choice) continue
-			// Scan block content for paragraphs with text parts
-			for (let bIdx = 0; bIdx < choice.content.length; bIdx++) {
-				const block = choice.content[bIdx]
-				if (!block || block.type !== "paragraph") continue
-				const inline = block.content
-				for (let pIdx = 0; pIdx < inline.length; pIdx++) {
-					const part = inline[pIdx]
-					if (!part || part.type !== "text") continue
-					if (part.content.includes("^")) {
-						logger.error("caret characters in choice content", {
-							interactionId,
-							choiceIndex: cIdx,
-							snippet: part.content
-						})
-						throw errors.new("caret characters banned in choice content")
-					}
-				}
-			}
-
-			// REMOVED: choice feedback validation no longer needed
-		}
-	}
-}
-
-function enforceNoCaretsInInlineChoiceInteraction(item: AssessmentItem): void {
-	if (!item.interactions) return
-
-	for (const [interactionId, interaction] of Object.entries(item.interactions)) {
-		if (!interaction || interaction.type !== "inlineChoiceInteraction") continue
-
-		// choice inline content
-		for (let cIdx = 0; cIdx < interaction.choices.length; cIdx++) {
-			const choice = interaction.choices[cIdx]
-			if (!choice) continue
-			for (let pIdx = 0; pIdx < choice.content.length; pIdx++) {
-				const part = choice.content[pIdx]
-				if (!part || part.type !== "text") continue
-				if (part.content.includes("^")) {
-					logger.error("caret characters in inline choice content", {
-						interactionId,
-						choiceIndex: cIdx,
-						snippet: part.content
-					})
-					throw errors.new("caret characters banned in inline choice content")
-				}
-			}
-		}
-	}
-}
-
-// REMOVED: enforceNoCaretsInTopLevelFeedback function no longer needed
-
-function enforceNoPipesInInlineChoiceInteraction(item: AssessmentItem): void {
-	if (!item.interactions) return
-
-	for (const [interactionId, interaction] of Object.entries(item.interactions)) {
-		if (!interaction || interaction.type !== "inlineChoiceInteraction") continue
-
-		// choice inline content
-		for (let cIdx = 0; cIdx < interaction.choices.length; cIdx++) {
-			const choice = interaction.choices[cIdx]
-			if (!choice) continue
-			for (let pIdx = 0; pIdx < choice.content.length; pIdx++) {
-				const part = choice.content[pIdx]
-				if (!part || part.type !== "text") continue
-				if (part.content.includes("|")) {
-					logger.error("pipe characters in inline choice content", {
-						interactionId,
-						choiceIndex: cIdx,
-						snippet: part.content
-					})
-					throw errors.new("pipe characters banned in inline choice content")
-				}
-			}
-		}
-	}
-}
-
-// REMOVED: enforceNoPipesInTopLevelFeedback function no longer needed
-
-function enforceIdentifierOnlyMatching(item: AssessmentItem): void {
+function enforceIdentifierOnlyMatching<E extends WidgetTypeTuple>(item: AssessmentItem<E>): void {
 	// Build allowed identifiers per responseIdentifier from interactions
 	const allowed: Record<string, Set<string>> = {}
 	const responseIdOwners = new Map<string, string>()
@@ -736,11 +524,13 @@ function enforceIdentifierOnlyMatching(item: AssessmentItem): void {
 	}
 }
 
-function collectRefs(item: AssessmentItemInput): { widgetRefs: Set<string>; interactionRefs: Set<string> } {
+function collectRefs<E extends WidgetTypeTuple>(
+	item: AssessmentItemInput<E>
+): { widgetRefs: Set<string>; interactionRefs: Set<string> } {
 	const widgetRefs = new Set<string>()
 	const interactionRefs = new Set<string>()
 
-	const walkInline = (inline: InlineContent | null) => {
+	const walkInline = (inline: InlineContent<E> | null) => {
 		if (!inline) return
 		for (const node of inline) {
 			if (node.type === "inlineWidgetRef") widgetRefs.add(node.widgetId)
@@ -748,7 +538,7 @@ function collectRefs(item: AssessmentItemInput): { widgetRefs: Set<string>; inte
 		}
 	}
 
-	const walkBlock = (block: BlockContent | null) => {
+	const walkBlock = (block: BlockContent<E> | null) => {
 		if (!block) return
 		for (const node of block) {
 			if (node.type === "widgetRef") widgetRefs.add(node.widgetId)
@@ -756,7 +546,7 @@ function collectRefs(item: AssessmentItemInput): { widgetRefs: Set<string>; inte
 			if (node.type === "paragraph") walkInline(node.content)
 			if (node.type === "unorderedList" || node.type === "orderedList") node.items.forEach(walkInline)
 			if (node.type === "tableRich") {
-				const walkRows = (rows: Array<Array<InlineContent | null>> | null) => {
+				const walkRows = (rows: Array<Array<InlineContent<E> | null>> | null) => {
 					if (!rows) return
 					for (const row of rows) {
 						for (const cell of row) walkInline(cell)
@@ -801,11 +591,14 @@ function collectRefs(item: AssessmentItemInput): { widgetRefs: Set<string>; inte
 	return { widgetRefs, interactionRefs }
 }
 
-function collectWidgetIds(item: AssessmentItemInput): Set<string> {
+function collectWidgetIds<E extends WidgetTypeTuple>(item: AssessmentItemInput<E>): Set<string> {
 	return collectRefs(item).widgetRefs
 }
 
-export async function compile(itemData: AssessmentItemInput, widgetCollection: WidgetCollection): Promise<string> {
+export async function compile<const E extends WidgetTypeTuple>(
+	itemData: AssessmentItemInput<E>,
+	widgetCollection: WidgetCollection<E>
+): Promise<string> {
 	// Step 0: Widget Type Derivation (Replaces AI mapping step)
 	// The widget mapping is now derived directly from the 'type' property of each widget definition.
 	const widgetMapping: Record<string, string> = {}
@@ -834,10 +627,8 @@ export async function compile(itemData: AssessmentItemInput, widgetCollection: W
 		throw errors.new(`Invalid widget type "${type}" for slot "${key}" provided in mapping.`)
 	}
 
-	// Use the collection-scoped enum for validation
-	const { createWidgetTypeEnumFromCollection } = await import("../structured/schemas")
-	const ScopedWidgetEnum = createWidgetTypeEnumFromCollection(widgetCollection)
-	const { AssessmentItemSchema } = createDynamicAssessmentItemSchema(validatedWidgetMapping, ScopedWidgetEnum)
+	// Use the collection's widgetTypeKeys tuple for validation
+	const { AssessmentItemSchema } = createDynamicAssessmentItemSchema(validatedWidgetMapping, widgetCollection.widgetTypeKeys)
 	const itemResult = AssessmentItemSchema.safeParse(itemData)
 	if (!itemResult.success) {
 		logger.error("schema enforcement failed", { error: itemResult.error })
@@ -868,14 +659,15 @@ export async function compile(itemData: AssessmentItemInput, widgetCollection: W
 	// Manual deduplication of paragraphs that duplicate an interaction prompt
 	dedupePromptTextFromBody(enforcedItem)
 	validateAssessmentItemInput(enforcedItem, logger)
-	enforceNoPipesInBody(enforcedItem)
-	enforceNoCaretsInBody(enforcedItem)
-	enforceNoPipesInChoiceInteraction(enforcedItem)
-	enforceNoCaretsInChoiceInteraction(enforcedItem)
-	enforceNoPipesInInlineChoiceInteraction(enforcedItem)
-	enforceNoCaretsInInlineChoiceInteraction(enforcedItem)
-	// REMOVED: Top-level feedback validation functions no longer needed
 
+	// REMOVED: The following function calls are now redundant.
+	// enforceNoPipesInBody(enforcedItem)
+	// enforceNoCaretsInBody(enforcedItem)
+	// enforceNoPipesInChoiceInteraction(enforcedItem)
+	// enforceNoCaretsInChoiceInteraction(enforcedItem)
+	// enforceNoPipesInInlineChoiceInteraction(enforcedItem)
+	// enforceNoCaretsInInlineChoiceInteraction(enforcedItem)
+	
 	// Enforce identifier-only matching; no ad-hoc rewriting
 	// This function now includes checks for duplicate responseIdentifiers and choice Identifiers,
 	// Note: dataTable validation has been removed.
@@ -949,7 +741,7 @@ export async function compile(itemData: AssessmentItemInput, widgetCollection: W
 				throw errors.new("ErrMissingFeedbackContent")
 			}
 
-			const assertNoInteractions = (blocks: BlockContent | null): void => {
+			const assertNoInteractions = (blocks: BlockContent<E> | null): void => {
 				if (!blocks) return
 				for (const node of blocks) {
 					if (!node) continue
@@ -976,7 +768,7 @@ export async function compile(itemData: AssessmentItemInput, widgetCollection: W
 						}
 					}
 					if (node.type === "tableRich") {
-						const scanRows = (rows: Array<Array<InlineContent | null>> | null) => {
+						const scanRows = (rows: Array<Array<InlineContent<E> | null>> | null) => {
 							if (!rows) return
 							for (const row of rows) {
 								for (const cell of row) {

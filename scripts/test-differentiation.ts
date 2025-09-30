@@ -9,7 +9,7 @@ import { differentiateAssessmentItem } from "../src/structured/differentiator"
 import { allWidgetsCollection } from "../src/widgets/collections/all"
 
 // Test input - plant and pot combinations
-const sourceItem: AssessmentItemInput = {
+const sourceItem: AssessmentItemInput<readonly ["boxPlot"]> = {
 	body: [
 		{
 			type: "paragraph",
@@ -167,7 +167,7 @@ async function main() {
 	logger.info("generating variations", { count: numVariations })
 
 	// Run differentiation
-	const result = await errors.try(differentiateAssessmentItem(openai, logger, sourceItem, numVariations))
+	const result = await errors.try(differentiateAssessmentItem(openai, logger, sourceItem, numVariations, allWidgetsCollection))
 
 	if (result.error) {
 		logger.error("differentiation failed", { error: result.error })

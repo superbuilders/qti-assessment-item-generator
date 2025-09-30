@@ -1,8 +1,9 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import type { AnyInteraction, BlockContent, InlineContent } from "../compiler/schemas"
+import { WidgetTypeTuple } from "../widgets/collections/types"
 
-function walkInline(inline: InlineContent | null, out: Map<string, string>): void {
+function walkInline<E extends WidgetTypeTuple>(inline: InlineContent<E> | null, out: Map<string, string>): void {
 	if (!inline) return
 	for (const node of inline) {
 		if (node.type === "inlineWidgetRef") {
@@ -20,7 +21,7 @@ function walkInline(inline: InlineContent | null, out: Map<string, string>): voi
 	}
 }
 
-function walkBlock(blocks: BlockContent | null, out: Map<string, string>): void {
+function walkBlock<E extends WidgetTypeTuple>(blocks: BlockContent<E> | null, out: Map<string, string>): void {
 	if (!blocks) return
 	for (const node of blocks) {
 		switch (node.type) {
@@ -47,7 +48,7 @@ function walkBlock(blocks: BlockContent | null, out: Map<string, string>): void 
 				}
 				break
 			case "tableRich": {
-				const walkRows = (rows: Array<Array<InlineContent | null>> | null) => {
+				const walkRows = (rows: Array<Array<InlineContent<E> | null>> | null) => {
 					if (!rows) return
 					for (const row of rows) {
 						for (const cell of row) {
@@ -66,7 +67,7 @@ function walkBlock(blocks: BlockContent | null, out: Map<string, string>): void 
 	}
 }
 
-function walkInteractions(interactions: Record<string, AnyInteraction> | null, out: Map<string, string>): void {
+function walkInteractions<E extends WidgetTypeTuple>(interactions: Record<string, AnyInteraction<E>> | null, out: Map<string, string>): void {
 	if (!interactions) return
 	for (const interaction of Object.values(interactions)) {
 		switch (interaction.type) {
@@ -102,10 +103,10 @@ function walkInteractions(interactions: Record<string, AnyInteraction> | null, o
  * @param item - An object conforming to the structure of an AssessmentItemInput.
  * @returns A Map from widgetId to widgetType. Throws if the same widgetId has conflicting types.
  */
-export function collectWidgetRefs(item: {
-	body: BlockContent | null
-	feedbackBlocks: Record<string, BlockContent> | null
-	interactions: Record<string, AnyInteraction> | null
+export function collectWidgetRefs<E extends WidgetTypeTuple>(item: {
+	body: BlockContent<E> | null
+	feedbackBlocks: Record<string, BlockContent<E>> | null
+	interactions: Record<string, AnyInteraction<E>> | null
 }): Map<string, string> {
 	const out = new Map<string, string>()
 
@@ -123,10 +124,10 @@ export function collectWidgetRefs(item: {
 /**
  * Legacy function for backward compatibility - collects just the IDs
  */
-export function collectAllWidgetSlotIds(item: {
-	body: BlockContent | null
-	feedbackBlocks: Record<string, BlockContent> | null
-	interactions: Record<string, AnyInteraction> | null
+export function collectAllWidgetSlotIds<E extends WidgetTypeTuple>(item: {
+	body: BlockContent<E> | null
+	feedbackBlocks: Record<string, BlockContent<E>> | null
+	interactions: Record<string, AnyInteraction<E>> | null
 }): string[] {
 	const refs = collectWidgetRefs(item)
 	return Array.from(refs.keys()).sort()

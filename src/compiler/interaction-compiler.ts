@@ -1,11 +1,12 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { escapeXmlAttribute } from "../utils/xml-utils"
+import type { WidgetTypeTuple } from "../widgets/collections/types"
 import { renderBlockContent, renderInlineContent } from "./content-renderer"
 import type { AnyInteraction } from "./schemas"
 
-export function compileInteraction(
-	interaction: AnyInteraction,
+export function compileInteraction<E extends WidgetTypeTuple = WidgetTypeTuple>(
+	interaction: AnyInteraction<E>,
 	widgetSlots: Map<string, string>,
 	interactionSlots: Map<string, string>
 ): string {
@@ -15,7 +16,7 @@ export function compileInteraction(
 		case "choiceInteraction": {
 			const promptXml = renderInlineContent(interaction.prompt, widgetSlots, interactionSlots)
 			const choicesXml = interaction.choices
-				.map((c) => {
+				.map((c): string => {
 					const contentXml = renderBlockContent(c.content, widgetSlots, interactionSlots)
 					return `<qti-simple-choice identifier="${escapeXmlAttribute(c.identifier)}">${contentXml}</qti-simple-choice>`
 				})
@@ -30,7 +31,7 @@ export function compileInteraction(
 		case "orderInteraction": {
 			const promptXml = renderInlineContent(interaction.prompt, widgetSlots, interactionSlots)
 			const choicesXml = interaction.choices
-				.map((c) => {
+				.map((c): string => {
 					const contentXml = renderBlockContent(c.content, widgetSlots, interactionSlots)
 					return `<qti-simple-choice identifier="${escapeXmlAttribute(c.identifier)}">${contentXml}</qti-simple-choice>`
 				})
@@ -51,7 +52,7 @@ export function compileInteraction(
 		case "inlineChoiceInteraction": {
 			const choicesXml = interaction.choices
 				.map(
-					(c) =>
+					(c): string =>
 						`<qti-inline-choice identifier="${escapeXmlAttribute(c.identifier)}">${renderInlineContent(c.content, widgetSlots, interactionSlots)}</qti-inline-choice>`
 				)
 				.join("\n                ")
@@ -63,7 +64,7 @@ export function compileInteraction(
 		}
 		case "gapMatchInteraction": {
 			const gapTextsXml = interaction.gapTexts
-				.map((gt) => {
+				.map((gt): string => {
 					const contentXml = renderInlineContent(gt.content, widgetSlots, interactionSlots)
 					return `<qti-gap-text identifier="${escapeXmlAttribute(gt.identifier)}" match-max="${gt.matchMax}">${contentXml}</qti-gap-text>`
 				})

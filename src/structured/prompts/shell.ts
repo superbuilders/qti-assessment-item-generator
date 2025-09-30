@@ -7,9 +7,10 @@ import type { WidgetCollection } from "../../widgets/collections/types"
 import type { AiContextEnvelope, ImageContext } from "../types"
 import { caretBanPromptSection } from "./caret"
 import { createWidgetSelectionPromptSection, formatUnifiedContextSections } from "./shared"
+import { WidgetTypeTuple } from "../../widgets/collections/types"
 
 // Helper to convert a full AssessmentItemInput into a shell for prompt examples
-function createShellFromExample(item: AssessmentItemInput, _collection: WidgetCollection) {
+function createShellFromExample<const E extends WidgetTypeTuple>(item: AssessmentItemInput<E>) {
 	// The shell now derives widget/interaction usage from refs in content.
 	// Do NOT include legacy 'widgets' or 'interactions' arrays.
 	const shell = {
@@ -22,10 +23,10 @@ function createShellFromExample(item: AssessmentItemInput, _collection: WidgetCo
   return shell
 }
 
-export function createAssessmentShellPrompt(
+export function createAssessmentShellPrompt<const E extends WidgetTypeTuple>(
 	envelope: AiContextEnvelope,
 	imageContext: ImageContext,
-	widgetCollection: WidgetCollection
+	widgetCollection: WidgetCollection<E>
 ): {
 	systemInstruction: string
 	userContent: string
@@ -1677,7 +1678,7 @@ ALL mathematical content MUST be converted to valid, modern MathML. NO EXCEPTION
 Any discrepancy will cause your output to be rejected. Review your work carefully to ensure the body's slots and the declaration arrays are perfectly synchronized.`
 
 	const validExamples = allExamples
-	const exampleShells = validExamples.map((ex) => createShellFromExample(ex, widgetCollection))
+	const exampleShells = validExamples.map((ex) => createShellFromExample(ex))
 
 	const widgetSelectionSection = createWidgetSelectionPromptSection(widgetCollection)
 

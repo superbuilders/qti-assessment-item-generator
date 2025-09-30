@@ -4,7 +4,7 @@ import type { AssessmentItem } from "../../src/compiler/schemas"
 
 describe("compileResponseDeclarations", () => {
 	test("emits directedPair correct-response and mapping", () => {
-		const decls: AssessmentItem["responseDeclarations"] = [
+		const decls: AssessmentItem<readonly []>["responseDeclarations"] = [
 			{
 				identifier: "RESPONSE",
 				cardinality: "multiple",
@@ -25,7 +25,7 @@ describe("compileResponseDeclarations", () => {
 	})
 
 	test("emits single textual mapping for string", () => {
-		const decls: AssessmentItem["responseDeclarations"] = [
+		const decls: AssessmentItem<readonly []>["responseDeclarations"] = [
 			{ identifier: "RESPONSE", cardinality: "single", baseType: "string", correct: "42" }
 		]
 		const xml = compileResponseDeclarations(decls)
@@ -37,7 +37,7 @@ describe("compileResponseDeclarations", () => {
 	})
 
 	test("emits identifier list without mapping when cardinality multiple", () => {
-		const decls: AssessmentItem["responseDeclarations"] = [
+		const decls: AssessmentItem<readonly []>["responseDeclarations"] = [
 			{ identifier: "RESPONSE", cardinality: "multiple", baseType: "identifier", correct: ["A", "C"] }
 		]
 		const xml = compileResponseDeclarations(decls)

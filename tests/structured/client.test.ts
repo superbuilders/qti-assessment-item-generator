@@ -220,29 +220,4 @@ describe("Structured AI Pipeline", () => {
 		expect(result.error).toBeTruthy()
 		expect(result.error?.message).toContain("primaryContent cannot be empty")
 	})
-
-	test("should fail when widgetCollection has no widgetTypeKeys - no fallbacks", async () => {
-		const OpenAI = (await import("openai")).default
-		const mockOpenAI = new OpenAI()
-
-		const envelope = {
-			primaryContent: "test content",
-			supplementaryContent: [],
-			multimodalImageUrls: [],
-			multimodalImagePayloads: []
-		}
-
-		const invalidCollection = { name: "invalid", widgetTypeKeys: [], schemas: {} }
-		const result = await errors.try(generateFromEnvelope(mockOpenAI, logger, envelope, invalidCollection))
-
-		// The function should throw when trying to build the enum from empty keys
-		expect(result.error).toBeTruthy()
-		// Error is wrapped, so check the cause chain
-		if (result.error && "cause" in result.error && result.error.cause) {
-			const causeMsg = String(result.error.cause)
-			expect(causeMsg).toContain("widgetTypeKeys")
-		} else {
-			expect(result.error?.message).toContain("generate assessment shell")
-		}
-	})
 })

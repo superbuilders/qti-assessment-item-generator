@@ -4,7 +4,7 @@ import type OpenAI from "openai"
 import type { ChatCompletion, ChatCompletionCreateParamsNonStreaming } from "openai/resources/chat/completions"
 import { z } from "zod"
 import type { AssessmentItemInput, BlockContent, InlineContent, ResponseDeclaration } from "../compiler/schemas"
-import type { WidgetCollection } from "../widgets/collections/types"
+import type { WidgetCollection, WidgetTypeTuple } from "../widgets/collections/types"
 import { allWidgetSchemas, type Widget, WidgetSchema } from "../widgets/registry"
 
 function isWidgetTypeKey(v: string): v is keyof typeof allWidgetSchemas {
@@ -75,16 +75,16 @@ async function resolveRasterImages(envelope: AiContextEnvelope): Promise<ImageCo
 	return { imageUrls: finalImageUrls }
 }
 
-async function generateAssessmentShell(
+async function generateAssessmentShell<const E extends WidgetTypeTuple>(
 	openai: OpenAI,
 	logger: logger.Logger,
 	envelope: AiContextEnvelope,
 	imageContext: ImageContext,
-	widgetCollection: WidgetCollection
+	widgetCollection: WidgetCollection<E>
 ) {
 	const { systemInstruction, userContent } = createAssessmentShellPrompt(envelope, imageContext, widgetCollection)
 
-	const ShellSchema = createCollectionScopedShellSchema(widgetCollection)
+	const ShellSchema = createCollectionScopedShellSchema(widgetCollection.widgetTypeKeys)
 	const jsonSchema = toJSONSchemaPromptSafe(ShellSchema)
 
 	logger.debug("generated json schema for openai", {
@@ -152,10 +152,10 @@ async function generateAssessmentShell(
 	return validation.data
 }
 
-function collectInteractionIdsFromShell(shell: { body: BlockContent | null }): string[] {
+function collectInteractionIdsFromShell<E extends WidgetTypeTuple>(shell: { body: BlockContent<E> | null }): string[] {
 	const ids = new Set<string>()
 
-	function walkInline(inline: InlineContent): void {
+	function walkInline(inline: InlineContent<E>): void {
 		for (const node of inline) {
 			if (node.type === "inlineInteractionRef") {
 				ids.add(node.interactionId)
@@ -163,7 +163,7 @@ function collectInteractionIdsFromShell(shell: { body: BlockContent | null }): s
 		}
 	}
 
-	function walkBlock(blocks: BlockContent): void {
+	function walkBlock(blocks: BlockContent<E>): void {
 		for (const node of blocks) {
 			switch (node.type) {
 				case "interactionRef":
@@ -210,14 +210,14 @@ function collectInteractionIdsFromShell(shell: { body: BlockContent | null }): s
 	return Array.from(ids)
 }
 
-async function generateInteractionContent(
+async function generateInteractionContent<const E extends WidgetTypeTuple>(
 	openai: OpenAI,
 	logger: logger.Logger,
 	envelope: AiContextEnvelope,
-	assessmentShell: { body: BlockContent | null; responseDeclarations: ResponseDeclaration[] },
+	assessmentShell: { body: BlockContent<E> | null; responseDeclarations: ResponseDeclaration[] },
 	imageContext: ImageContext,
 	interactionIds: string[],
-	widgetCollection: WidgetCollection
+	widgetCollection: WidgetCollection<E>
 ) {
 	if (interactionIds.length === 0) {
 		logger.debug("no interactions to generate, skipping shot 2")
@@ -231,7 +231,7 @@ async function generateInteractionContent(
 		widgetCollection
 	)
 
-	const InteractionSchema = createCollectionScopedInteractionSchema(interactionIds, widgetCollection)
+	const InteractionSchema = createCollectionScopedInteractionSchema(interactionIds, widgetCollection.widgetTypeKeys)
 	const jsonSchema = toJSONSchemaPromptSafe(InteractionSchema)
 
 	logger.debug("generated json schema for openai", {
@@ -292,12 +292,12 @@ async function generateInteractionContent(
 	return validation.data
 }
 
-export async function generateFromEnvelope(
+export async function generateFromEnvelope<const E extends WidgetTypeTuple>(
 	openai: OpenAI,
 	logger: logger.Logger,
 	envelope: AiContextEnvelope,
-	widgetCollection: WidgetCollection
-): Promise<AssessmentItemInput> {
+	widgetCollection: WidgetCollection<E>
+): Promise<AssessmentItemInput<E>> {
 	if (!envelope.primaryContent || envelope.primaryContent.trim() === "") {
 		logger.error("envelope validation failed", { reason: "primaryContent is empty" })
 		throw errors.new("primaryContent cannot be empty")
@@ -410,7 +410,7 @@ export async function generateFromEnvelope(
 		throw errors.wrap(feedbackParseResult.error, "json parse")
 	}
 
-	const validatedNestedFeedback = validateNestedFeedback(feedbackParseResult.data, feedbackPlan, widgetCollection)
+	const validatedNestedFeedback = validateNestedFeedback(feedbackParseResult.data, feedbackPlan, widgetCollection.widgetTypeKeys)
 	const feedbackBlocks = convertNestedFeedbackToBlocks(validatedNestedFeedback, feedbackPlan)
 	logger.debug("shot 3 complete", { feedbackBlockCount: Object.keys(feedbackBlocks).length })
 

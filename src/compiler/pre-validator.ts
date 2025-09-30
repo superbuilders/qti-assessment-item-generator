@@ -10,6 +10,7 @@ import {
 } from "../qti-validation/utils"
 import { deriveComboIdentifier, normalizeIdPart } from "./helpers"
 import type { AssessmentItemInput, BlockContent, InlineContent } from "./schemas"
+import { WidgetTypeTuple } from "../widgets/collections/types"
 
 /**
  * Validates that a MathML fragment is well-formed XML.
@@ -60,7 +61,7 @@ function validateMathMLWellFormed(mathml: string, context: string, logger: logge
 	}
 }
 
-function validateInlineContent(items: InlineContent, _context: string, logger: logger.Logger): void {
+function validateInlineContent<E extends WidgetTypeTuple>(items: InlineContent<E>, _context: string, logger: logger.Logger): void {
 	if (!Array.isArray(items)) {
 		logger.error("inline content is not an array", { context: _context })
 		throw errors.new(`${_context} must be an array of inline items`)
@@ -207,7 +208,7 @@ function validateInlineContent(items: InlineContent, _context: string, logger: l
 	}
 }
 
-function validateBlockContent(items: BlockContent, _context: string, logger: logger.Logger): void {
+function validateBlockContent<E extends WidgetTypeTuple>(items: BlockContent<E>, _context: string, logger: logger.Logger): void {
 	if (!Array.isArray(items)) {
 		logger.error("block content is not an array", { context: _context })
 		throw errors.new(`${_context} must be an array of block items`)
@@ -225,7 +226,7 @@ function validateBlockContent(items: BlockContent, _context: string, logger: log
  * Intentionally minimal: only enforce that numeric baseTypes are used with numeric values.
  * All formatting instructions and canonicalization guidance are handled in prompting, not here.
  */
-function validateTextEntryCanonicalAnswerRules(item: AssessmentItemInput, logger: logger.Logger): void {
+function validateTextEntryCanonicalAnswerRules<E extends WidgetTypeTuple>(item: AssessmentItemInput<E>, logger: logger.Logger): void {
 	if (!item.interactions || !item.responseDeclarations) {
 		return
 	}
@@ -262,7 +263,7 @@ function validateTextEntryCanonicalAnswerRules(item: AssessmentItemInput, logger
 	}
 }
 
-export function validateAssessmentItemInput(item: AssessmentItemInput, logger: logger.Logger): void {
+export function validateAssessmentItemInput<E extends WidgetTypeTuple>(item: AssessmentItemInput<E>, logger: logger.Logger): void {
 	// Require at least one response declaration to avoid generating empty response-processing blocks
 	if (!item.responseDeclarations || item.responseDeclarations.length === 0) {
 		logger.error("no response declarations present", {
@@ -307,16 +308,7 @@ export function validateAssessmentItemInput(item: AssessmentItemInput, logger: l
 					if (interaction.prompt && interaction.prompt.length > 0) {
 						validateInlineContent(interaction.prompt, `interaction[${key}].prompt`, logger)
 					}
-					if (interaction.choices.length < 2) {
-						logger.error("interaction has insufficient choices", {
-							interactionKey: key,
-							interactionType: interaction.type,
-							choiceCount: interaction.choices.length
-						})
-						throw errors.new(
-							`${interaction.type} must have at least 2 choices, but only ${interaction.choices.length} found in interaction[${key}]`
-						)
-					}
+					// REMOVED: The check for interaction.choices.length < 2 is now handled by Zod.
 					for (const choice of interaction.choices) {
 						validateBlockContent(choice.content, `interaction[${key}].choice[${choice.identifier}]`, logger)
 						// REMOVED: choice.feedback validation no longer needed
@@ -359,16 +351,7 @@ export function validateAssessmentItemInput(item: AssessmentItemInput, logger: l
 					if (interaction.prompt && interaction.prompt.length > 0) {
 						validateInlineContent(interaction.prompt, `interaction[${key}].prompt`, logger)
 					}
-					if (interaction.choices.length < 2) {
-						logger.error("interaction has insufficient choices", {
-							interactionKey: key,
-							interactionType: interaction.type,
-							choiceCount: interaction.choices.length
-						})
-						throw errors.new(
-							`${interaction.type} must have at least 2 choices, but only ${interaction.choices.length} found in interaction[${key}]`
-						)
-					}
+					// REMOVED: The check for interaction.choices.length < 2 is now handled by Zod.
 					for (const choice of interaction.choices) {
 						validateBlockContent(choice.content, `interaction[${key}].choice[${choice.identifier}]`, logger)
 						// REMOVED: choice.feedback validation no longer needed
@@ -457,7 +440,7 @@ export function validateAssessmentItemInput(item: AssessmentItemInput, logger: l
 	validateFeedbackPlan(item, logger)
 }
 
-function validateFeedbackPlan(item: AssessmentItemInput, logger: logger.Logger): void {
+function validateFeedbackPlan<E extends WidgetTypeTuple>(item: AssessmentItemInput<E>, logger: logger.Logger): void {
 	const { feedbackPlan, responseDeclarations, interactions, feedbackBlocks } = item
 	const declMap = new Map(responseDeclarations.map((d) => [d.identifier, d]))
 	const interactionMap = new Map(Object.values(interactions ?? {}).map((i) => [i.responseIdentifier, i]))

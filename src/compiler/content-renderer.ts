@@ -1,6 +1,7 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { sanitizeXmlAttributeValue } from "../utils/xml-utils"
+import type { WidgetTypeTuple } from "../widgets/collections/types"
 import type { BlockContent, InlineContent } from "./schemas"
 
 /**
@@ -14,14 +15,14 @@ function escapeXmlText(text: string): string {
 		.replace(/>/g, "&gt;")
 }
 
-export function renderInlineContent(
-	inlineItems: InlineContent | null,
+export function renderInlineContent<E extends WidgetTypeTuple = WidgetTypeTuple>(
+	inlineItems: InlineContent<E> | null,
 	widgetSlots: Map<string, string>,
 	interactionSlots: Map<string, string>
 ): string {
 	if (!inlineItems) return ""
 	return inlineItems
-		.map((item) => {
+		.map((item): string => {
 			switch (item.type) {
 				case "text":
 					return escapeXmlText(item.content)
@@ -60,14 +61,14 @@ export function renderInlineContent(
 		.join("")
 }
 
-export function renderBlockContent(
-	blockItems: BlockContent | null,
+export function renderBlockContent<E extends WidgetTypeTuple = WidgetTypeTuple>(
+	blockItems: BlockContent<E> | null,
 	widgetSlots: Map<string, string>,
 	interactionSlots: Map<string, string>
 ): string {
 	if (!blockItems) return ""
 	return blockItems
-		.map((item) => {
+		.map((item): string => {
 			switch (item.type) {
 				case "paragraph":
 					return `<p>${renderInlineContent(item.content, widgetSlots, interactionSlots)}</p>`
@@ -77,7 +78,7 @@ export function renderBlockContent(
 					const tableStyle = "border-collapse: collapse; width: 100%;"
 					const thStyle = "border: 1px solid #ddd; padding: 8px 12px; text-align: left; vertical-align: top;"
 					const tdStyle = "border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;"
-					const renderRow = (row: Array<InlineContent | null>, asHeader = false) =>
+					const renderRow = (row: Array<InlineContent<E> | null>, asHeader = false) =>
 						`<tr>${row
 							.map((cell) => {
 								const tag = asHeader ? "th" : "td"
@@ -88,21 +89,21 @@ export function renderBlockContent(
 							.join("")}</tr>`
 
 					const thead = item.header?.length
-						? `<thead>${item.header.map((r) => renderRow(r, true)).join("")}</thead>`
+						? `<thead>${item.header.map((r: Array<InlineContent<E> | null>) => renderRow(r, true)).join("")}</thead>`
 						: ""
-					let tbodyRows = item.rows.map((r) => renderRow(r)).join("")
+					let tbodyRows = item.rows.map((r: Array<InlineContent<E> | null>) => renderRow(r)).join("")
 					// Footer support removed: do not emit <tfoot>; if footer provided by older data, fold into tbody as a final bold row is no longer supported
 					return `<table style="${tableStyle}">${thead}<tbody>${tbodyRows}</tbody></table>`
 				}
 				case "unorderedList": {
 					const itemsXml = item.items
-						.map((inline) => `<li><p>${renderInlineContent(inline, widgetSlots, interactionSlots)}</p></li>`)
+						.map((inline: InlineContent<E>) => `<li><p>${renderInlineContent(inline, widgetSlots, interactionSlots)}</p></li>`)
 						.join("")
 					return `<ul>${itemsXml}</ul>`
 				}
 				case "orderedList": {
 					const itemsXml = item.items
-						.map((inline) => `<li><p>${renderInlineContent(inline, widgetSlots, interactionSlots)}</p></li>`)
+						.map((inline: InlineContent<E>) => `<li><p>${renderInlineContent(inline, widgetSlots, interactionSlots)}</p></li>`)
 						.join("")
 					return `<ol>${itemsXml}</ol>`
 				}

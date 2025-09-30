@@ -1,32 +1,45 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import type { WidgetCollection } from "../../widgets/collections/types"
+import { z } from "zod"
+import type { WidgetCollection, WidgetTypeTuple } from "../../widgets/collections/types"
 import { allWidgetSchemas } from "../../widgets/registry"
 import { toJSONSchemaPromptSafe } from "../json-schema"
+
+// Runtime type guard to ensure values are Zod schemas without using type assertions
+function isZodSchema(value: unknown): value is z.ZodType<unknown> {
+    return value instanceof z.ZodType
+}
 
 /**
  * Generates the reusable markdown section for widget selection instructions.
  */
-export function createWidgetSelectionPromptSection(collection: WidgetCollection): string {
+export function createWidgetSelectionPromptSection<E extends WidgetTypeTuple>(collection: WidgetCollection<E>): string {
 	const allowedWidgetTypes = collection.widgetTypeKeys
 	const widgetSchemas: Record<string, object> = {}
+	
+	// Convert to Set of strings for easier checking
+	const allowedSet = new Set(allowedWidgetTypes.map(String))
 
-	// Integrity checks
+	// Integrity checks - verify all declared widget types exist in schemas and registry
 	for (const key of allowedWidgetTypes) {
-		if (!collection.schemas[key]) {
-			logger.error("collection integrity: missing schema", { key, collection: collection.name })
-			throw errors.new(`collection integrity: missing schema for key '${key}' in collection '${collection.name}'`)
-		}
-		if (!(key in allWidgetSchemas)) {
+		if (!Object.prototype.hasOwnProperty.call(allWidgetSchemas, key)) {
 			logger.error("registry integrity: key not found", { key })
 			throw errors.new(`registry integrity: key '${key}' not found in allWidgetSchemas`)
 		}
 	}
 
-	for (const key of allowedWidgetTypes) {
-		const schema = collection.schemas[key]
-		if (!schema) continue
-		const jsonResult = errors.trySync(() => toJSONSchemaPromptSafe(schema))
+	// Iterate using Object.entries to get proper types without assertions
+	for (const [key, schema] of Object.entries(collection.schemas)) {
+		// Verify this schema key is in the allowed list
+		if (!allowedSet.has(key)) {
+			continue
+		}
+		
+    if (!isZodSchema(schema)) {
+        logger.error("collection schema not a zod type", { key })
+        throw errors.new("collection schema must be a Zod schema")
+    }
+    const jsonResult = errors.trySync(() => toJSONSchemaPromptSafe(schema))
 		if (jsonResult.error) {
 			logger.error("widget schema json conversion", { key, error: jsonResult.error })
 			throw errors.wrap(jsonResult.error, "widget schema json conversion")

@@ -1,4 +1,5 @@
 import type { AnyInteraction, AssessmentItemShell } from "../compiler/schemas"
+import { WidgetTypeTuple } from "../widgets/collections/types"
 
 export type FeedbackTarget = {
 	outcomeIdentifier: string
@@ -16,9 +17,9 @@ export type FeedbackTarget = {
  * @param interactions - Generated interactions that reference these responses
  * @returns Array of feedback targets with outcome and block identifiers
  */
-export function enumerateFeedbackTargets(
-	responseDeclarations: AssessmentItemShell["responseDeclarations"],
-	interactions: Record<string, AnyInteraction>
+export function enumerateFeedbackTargets<E extends WidgetTypeTuple>(
+	responseDeclarations: AssessmentItemShell<E>["responseDeclarations"],
+	interactions: Record<string, AnyInteraction<E>>
 ): FeedbackTarget[] {
 	const targets: FeedbackTarget[] = []
 	const responseIdToBaseType = new Map<string, string>()

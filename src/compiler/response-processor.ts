@@ -1,11 +1,12 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { escapeXmlAttribute } from "../utils/xml-utils"
+import type { WidgetTypeTuple } from "../widgets/collections/types"
 import type { AssessmentItem, FeedbackDimension } from "./schemas"
 
-export function compileResponseDeclarations(decls: AssessmentItem["responseDeclarations"]): string {
+export function compileResponseDeclarations<E extends WidgetTypeTuple>(decls: AssessmentItem<E>["responseDeclarations"]): string {
 	return decls
-		.map((decl) => {
+		.map((decl): string => {
 			// Handle directedPair base type separately
 			if (decl.baseType === "directedPair") {
 				// Type narrowing: when baseType is "directedPair", correct is an array of {source, target} objects
@@ -19,7 +20,7 @@ export function compileResponseDeclarations(decls: AssessmentItem["responseDecla
 				}
 				const pairs = decl.correct
 				const correctXml = pairs
-					.map((p: unknown) => {
+					.map((p: unknown): string => {
 						if (typeof p !== "object" || p === null) {
 							logger.error("invalid directedPair correct value", { identifier: decl.identifier, value: p })
 							throw errors.new("invalid directedPair correct value structure")
@@ -38,7 +39,7 @@ export function compileResponseDeclarations(decls: AssessmentItem["responseDecla
 
 				// Add mapping for partial credit (1 point per correct association)
 				const mappingXml = pairs
-					.map((p: unknown) => {
+					.map((p: unknown): string => {
 						if (typeof p !== "object" || p === null) {
 							logger.error("invalid directedPair value for mapping", { identifier: decl.identifier, value: p })
 							throw errors.new("invalid directedPair correct value for mapping")
@@ -72,7 +73,7 @@ export function compileResponseDeclarations(decls: AssessmentItem["responseDecla
 			// Directly map the provided correct values without generating any alternatives.
 			const correctXml = correctValues
 				.map(
-					(v: unknown) =>
+					(v: unknown): string =>
 						`<qti-value>${String(v).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</qti-value>`
 				)
 				.join("\n            ")
@@ -89,8 +90,8 @@ export function compileResponseDeclarations(decls: AssessmentItem["responseDecla
 				decl.cardinality === "single" &&
 				(decl.baseType === "string" || decl.baseType === "integer" || decl.baseType === "float")
 			if (isSingleResponse) {
-				const mappingXml = correctValues
-					.map((v: unknown) => {
+				 const mappingXml = correctValues
+					.map((v: unknown): string => {
 						const key = typeof v === "string" || typeof v === "number" ? String(v) : ""
 						return `\n            <qti-map-entry map-key="${escapeXmlAttribute(key)}" mapped-value="1"/>`
 					})
@@ -105,15 +106,15 @@ export function compileResponseDeclarations(decls: AssessmentItem["responseDecla
 		.join("")
 }
 
-function generateComboModeProcessing(item: AssessmentItem): string {
+function generateComboModeProcessing<E extends WidgetTypeTuple>(item: AssessmentItem<E>): string {
 	const { dimensions, combinations } = item.feedbackPlan
 
 	function buildConditionTree(dims: FeedbackDimension[], pathSegments: Array<{ responseIdentifier: string; key: string }>): string {
 		if (dims.length === 0) {
-			const matchingCombo = combinations.find((combo) => {
+			const matchingCombo = combinations.find((combo): boolean => {
 				if (combo.path.length !== pathSegments.length) return false
-				return combo.path.every(
-					(seg, i) =>
+					return combo.path.every(
+						(seg, i): boolean =>
 						seg.responseIdentifier === pathSegments[i].responseIdentifier && seg.key === pathSegments[i].key
 				)
 			})
@@ -136,7 +137,7 @@ function generateComboModeProcessing(item: AssessmentItem): string {
 
 		if (currentDim.kind === "enumerated") {
 			const conditions = currentDim.keys
-				.map((key, index) => {
+				.map((key, index): string => {
 					const tag = index === 0 ? "qti-response-if" : "qti-response-else-if"
 					const choiceId = escapeXmlAttribute(key)
 					const newPathSegments = [...pathSegments, { responseIdentifier: currentDim.responseIdentifier, key }]
@@ -177,14 +178,14 @@ function generateComboModeProcessing(item: AssessmentItem): string {
 	return buildConditionTree(dimensions, [])
 }
 
-function generateFallbackModeProcessing(item: AssessmentItem): string {
+function generateFallbackModeProcessing<E extends WidgetTypeTuple>(item: AssessmentItem<E>): string {
 	if (item.feedbackPlan.dimensions.length === 0) {
 		logger.error("no dimensions for fallback mode processing", { itemIdentifier: item.identifier })
 		throw errors.new("fallback mode requires at least one dimension")
 	}
 
 	const matchConditions = item.feedbackPlan.dimensions.map(
-		(dim) =>
+		(dim): string =>
 			`<qti-match><qti-variable identifier="${escapeXmlAttribute(dim.responseIdentifier)}"/><qti-correct identifier="${escapeXmlAttribute(dim.responseIdentifier)}"/></qti-match>`
 	)
 
@@ -211,7 +212,7 @@ function generateFallbackModeProcessing(item: AssessmentItem): string {
     </qti-response-condition>`
 }
 
-export function compileResponseProcessing(item: AssessmentItem): string {
+export function compileResponseProcessing<E extends WidgetTypeTuple>(item: AssessmentItem<E>): string {
 	const processingRules: string[] = []
 	const { feedbackPlan } = item
 
@@ -228,7 +229,7 @@ export function compileResponseProcessing(item: AssessmentItem): string {
 	}
 
 	const scoreConditions = item.responseDeclarations
-		.map((decl) => {
+		.map((decl): string => {
 			const responseId = escapeXmlAttribute(decl.identifier)
 			return `<qti-match><qti-variable identifier="${responseId}"/><qti-correct identifier="${responseId}"/></qti-match>`
 		})

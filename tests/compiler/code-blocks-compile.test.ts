@@ -5,7 +5,7 @@ import { allWidgetsCollection } from "../../src/widgets/collections/all"
 
 describe("Compiler: code blocks", () => {
 	test("should render code blocks in body and escape correctly", async () => {
-		const item: AssessmentItemInput = {
+		const item: AssessmentItemInput<readonly []> = {
 			identifier: "code-block-item",
 			title: "Code Block Support",
 			responseDeclarations: [

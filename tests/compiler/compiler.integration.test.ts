@@ -7,8 +7,8 @@ import { allWidgetsCollection } from "../../src/widgets/collections/all"
 
 describe("Compiler Identifier Validation Integration Tests", () => {
 	test("should throw ErrDuplicateResponseIdentifier for duplicates across interactions", async () => {
-		const itemWithDuplicate: AssessmentItemInput = {
-			identifier: "test-duplicate-response",
+		const itemWithDuplicate: AssessmentItemInput<readonly []> = {
+			identifier: "test-duplicate-response",	
 			title: "Test Duplicate Response",
 			body: [],
 			feedbackPlan: {
@@ -57,7 +57,7 @@ describe("Compiler Identifier Validation Integration Tests", () => {
 	})
 
 	test("should throw ErrDuplicateChoiceIdentifier for duplicates within a choiceInteraction", async () => {
-		const itemWithDuplicate: AssessmentItemInput = {
+		const itemWithDuplicate: AssessmentItemInput<readonly []> = {
 			identifier: "test-choice-duplicate",
 			title: "Test Choice Duplicate",
 			body: [],
@@ -93,7 +93,7 @@ describe("Compiler Identifier Validation Integration Tests", () => {
 	})
 
 	test("should compile successfully with complex valid identifiers", async () => {
-		const validItem: AssessmentItemInput = {
+		const validItem: AssessmentItemInput<readonly []> = {
 			identifier: "test-valid-complex",
 			title: "Test Valid Complex",
 			body: [],

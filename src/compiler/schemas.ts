@@ -3,6 +3,7 @@ import * as logger from "@superbuilders/slog"
 import { z } from "zod"
 import { MATHML_INNER_PATTERN } from "../utils/mathml"
 import { typedSchemas } from "../widgets/registry"
+import type { WidgetTypeTuple } from "../widgets/collections/types"
 import {
 	CHOICE_IDENTIFIER_REGEX,
 	FEEDBACK_BLOCK_IDENTIFIER_REGEX,
@@ -10,15 +11,24 @@ import {
 	SLOT_IDENTIFIER_REGEX
 } from "./qti-constants"
 
+// Banned characters validation for text content
+const BannedCharsRegex = /[\^|]/
+const SafeTextSchema = z.string().refine((val) => !BannedCharsRegex.test(val), {
+	message: "Text content cannot contain '^' or '|' characters."
+})
+
 // LEVEL 2: INLINE CONTENT (for paragraphs, prompts, etc.)
 // Factory functions to create fresh schema instances (avoids $ref in JSON Schema)
-export function createInlineContentItemSchema(widgetTypeEnum: z.ZodType<string>) {
+export function createInlineContentItemSchema<const E extends WidgetTypeTuple>(
+	widgetTypeKeys: E
+) {
 	return z
 		.discriminatedUnion("type", [
 			z
 				.object({
 					type: z.literal("text").describe("Identifies this as plain text content"),
-					content: z.string().describe("The actual text content to display")
+					// Use the new SafeTextSchema instead of z.string()
+					content: SafeTextSchema.describe("The actual text content to display")
 				})
 				.strict()
 				.describe("Plain text content that will be rendered as-is"),
@@ -39,7 +49,7 @@ export function createInlineContentItemSchema(widgetTypeEnum: z.ZodType<string>)
 						.string()
 						.regex(SLOT_IDENTIFIER_REGEX, "invalid slot identifier: must be lowercase with underscores")
 						.describe("Unique identifier that matches a widget key"),
-					widgetType: widgetTypeEnum
+					widgetType: z.enum(widgetTypeKeys)
 				})
 				.strict()
 				.describe("Reference to a generated widget by id, to be rendered inline"),
@@ -67,16 +77,20 @@ export function createInlineContentItemSchema(widgetTypeEnum: z.ZodType<string>)
 		.describe("Union type representing any inline content element")
 }
 
-export function createInlineContentSchema(widgetTypeEnum: z.ZodType<string>): z.ZodType<InlineContent> {
-    return z
-        .array(createInlineContentItemSchema(widgetTypeEnum))
-        .describe("Array of inline content items that can be rendered within a paragraph or prompt")
+export function createInlineContentSchema<const E extends WidgetTypeTuple>(
+	widgetTypeKeys: E
+): z.ZodType<InlineContent<E>> {
+	return z
+		.array(createInlineContentItemSchema(widgetTypeKeys))
+		.describe("Array of inline content items that can be rendered within a paragraph or prompt")
 }
 
 // LEVEL 1: BLOCK CONTENT (for body, feedback, choice content, etc.)
 // Factory functions for block content
-export function createBlockContentItemSchema(widgetTypeEnum: z.ZodType<string>): z.ZodType<BlockContentItem> {
-	const InlineSchema = createInlineContentSchema(widgetTypeEnum)
+export function createBlockContentItemSchema<const E extends WidgetTypeTuple>(
+	widgetTypeKeys: E
+): z.ZodType<BlockContentItem<E>> {
+	const InlineSchema = createInlineContentSchema(widgetTypeKeys)
 	const TableRichCellSchema = InlineSchema.nullable()
 	const TableRichRowSchema = z.array(TableRichCellSchema)
 
@@ -124,7 +138,7 @@ export function createBlockContentItemSchema(widgetTypeEnum: z.ZodType<string>):
 						.string()
 						.regex(SLOT_IDENTIFIER_REGEX, "invalid slot identifier: must be lowercase with underscores")
 						.describe("Unique identifier that matches a widget key"),
-					widgetType: widgetTypeEnum
+					widgetType: z.enum(widgetTypeKeys)
 				})
 				.strict()
 				.describe("Reference to a generated widget by id, to be rendered as a block"),
@@ -139,16 +153,19 @@ export function createBlockContentItemSchema(widgetTypeEnum: z.ZodType<string>):
 				.strict()
 				.describe("Reference to a compiled interaction by id, to be rendered as a block")
 		])
-        .describe("Union type representing any block-level content element")
+		.describe("Union type representing any block-level content element")
 }
 
-export function createBlockContentSchema(widgetTypeEnum: z.ZodType<string>): z.ZodType<BlockContent> {
-    return z
-        .array(createBlockContentItemSchema(widgetTypeEnum))
-        .describe("Array of block content items representing the document structure")
+export function createBlockContentSchema<const E extends WidgetTypeTuple>(
+	widgetTypeKeys: E
+): z.ZodType<BlockContent<E>> {
+	return z
+		.array(createBlockContentItemSchema(widgetTypeKeys))
+		.describe("Array of block content items representing the document structure")
 }
 
-export function createAssessmentItemShellSchema(widgetTypeEnum: z.ZodType<string>) {
+
+export function createAssessmentItemShellSchema<const E extends WidgetTypeTuple>(widgetTypeKeys: E) {
 	const ResponseDeclarationSchema = createResponseDeclarationSchema()
 
 	return z
@@ -158,7 +175,7 @@ export function createAssessmentItemShellSchema(widgetTypeEnum: z.ZodType<string
 			responseDeclarations: z
 				.array(ResponseDeclarationSchema)
 				.describe("Defines correct answers and scoring for all interactions in this item."),
-			body: createBlockContentSchema(widgetTypeEnum).nullable().describe("The main content with ref placeholders.")
+			body: createBlockContentSchema(widgetTypeKeys).nullable().describe("The main content with ref placeholders.")
 		})
 		.strict()
 		.describe("Initial assessment item structure with ref placeholders from the first AI generation shot.")
@@ -271,9 +288,9 @@ function createResponseDeclarationSchema() {
 		)
 }
 
-export function createDynamicAssessmentItemSchema(
+export function createDynamicAssessmentItemSchema<const E extends WidgetTypeTuple>(
 	widgetMapping: Record<string, keyof typeof typedSchemas>,
-	widgetTypeEnum: z.ZodType<string>
+	widgetTypeKeys: E
 ) {
 	type WidgetSchema = (typeof typedSchemas)[keyof typeof typedSchemas]
 	const widgetShape: Record<string, WidgetSchema> = {}
@@ -292,8 +309,8 @@ export function createDynamicAssessmentItemSchema(
 	}
 
 	const DynamicWidgetsSchema = z.object(widgetShape).describe("Map of widget slot IDs to their widget definitions")
-	const InlineSchema = createInlineContentSchema(widgetTypeEnum)
-	const BlockSchema = createBlockContentSchema(widgetTypeEnum)
+	const InlineSchema = createInlineContentSchema(widgetTypeKeys)
+	const BlockSchema = createBlockContentSchema(widgetTypeKeys)
 
 	const InlineChoiceSchema = z
 		.object({
@@ -329,7 +346,8 @@ export function createDynamicAssessmentItemSchema(
 						.strict()
 						.describe("A single choice option with content and optional feedback")
 				)
-				.min(1)
+				// Enforce a minimum of 2 choices at the schema level.
+				.min(2)
 				.describe("Array of selectable choice options."),
 			shuffle: z.literal(true).describe("Whether to randomize the order of choices. Always true to ensure fairness."),
 			minChoices: z.number().int().min(0).describe("The minimum number of choices the user must select."),
@@ -386,7 +404,8 @@ export function createDynamicAssessmentItemSchema(
 						.strict()
 						.describe("An orderable item with content and optional feedback")
 				)
-				.min(1)
+				// Enforce a minimum of 2 choices at the schema level.
+				.min(2)
 				.describe("Array of items to be arranged in order."),
 			shuffle: z
 				.literal(true)
@@ -509,7 +528,7 @@ export function createDynamicAssessmentItemSchema(
 		.strict()
 		.describe("A complete QTI 3.0 assessment item with content, interactions, and scoring rules.")
 
-	const AssessmentItemShellSchema = createAssessmentItemShellSchema(widgetTypeEnum)
+	const AssessmentItemShellSchema = createAssessmentItemShellSchema(widgetTypeKeys)
 
 	return {
 		AssessmentItemSchema,
@@ -521,25 +540,25 @@ export function createDynamicAssessmentItemSchema(
 // Export only the Widget type and simplified structural types
 export type Widget = z.infer<(typeof typedSchemas)[keyof typeof typedSchemas]>
 
-export type InlineContentItem =
+export type InlineContentItem<E extends WidgetTypeTuple> =
 	| { type: "text"; content: string }
 	| { type: "math"; mathml: string }
-	| { type: "inlineWidgetRef"; widgetId: string; widgetType: string }
+	| { type: "inlineWidgetRef"; widgetId: string; widgetType: E[number] }
 	| { type: "inlineInteractionRef"; interactionId: string }
 	| { type: "gap"; gapId: string }
 
-export type InlineContent = InlineContentItem[]
+export type InlineContent<E extends WidgetTypeTuple> = Array<InlineContentItem<E>>
 
-export type BlockContentItem =
-	| { type: "paragraph"; content: InlineContent }
+export type BlockContentItem<E extends WidgetTypeTuple> =
+	| { type: "paragraph"; content: InlineContent<E> }
 	| { type: "codeBlock"; code: string }
-	| { type: "unorderedList"; items: InlineContent[] }
-	| { type: "orderedList"; items: InlineContent[] }
-	| { type: "tableRich"; header: (InlineContent | null)[][] | null; rows: (InlineContent | null)[][] }
-	| { type: "widgetRef"; widgetId: string; widgetType: string }
+	| { type: "unorderedList"; items: InlineContent<E>[] }
+	| { type: "orderedList"; items: InlineContent<E>[] }
+	| { type: "tableRich"; header: (InlineContent<E> | null)[][] | null; rows: (InlineContent<E> | null)[][] }
+	| { type: "widgetRef"; widgetId: string; widgetType: E[number] }
 	| { type: "interactionRef"; interactionId: string }
 
-export type BlockContent = BlockContentItem[]
+export type BlockContent<E extends WidgetTypeTuple> = Array<BlockContentItem<E>>
 
 export type ResponseDeclaration =
 	| {
@@ -562,12 +581,12 @@ export type ResponseDeclaration =
 			allowEmpty: boolean
 	  }
 
-export type AnyInteraction =
+export type AnyInteraction<E extends WidgetTypeTuple> =
 	| {
 			type: "choiceInteraction"
 			responseIdentifier: string
-			prompt: InlineContent
-			choices: Array<{ identifier: string; content: BlockContent }>
+			prompt: InlineContent<E>
+			choices: Array<{ identifier: string; content: BlockContent<E> }>
 			shuffle: true
 			minChoices: number
 			maxChoices: number
@@ -575,15 +594,15 @@ export type AnyInteraction =
 	| {
 			type: "inlineChoiceInteraction"
 			responseIdentifier: string
-			choices: Array<{ identifier: string; content: InlineContent }>
+			choices: Array<{ identifier: string; content: InlineContent<E> }>
 			shuffle: true
 	  }
 	| { type: "textEntryInteraction"; responseIdentifier: string; expectedLength: number | null }
 	| {
 			type: "orderInteraction"
 			responseIdentifier: string
-			prompt: InlineContent
-			choices: Array<{ identifier: string; content: BlockContent }>
+			prompt: InlineContent<E>
+			choices: Array<{ identifier: string; content: BlockContent<E> }>
 			shuffle: true
 			orientation: "vertical"
 	  }
@@ -591,32 +610,32 @@ export type AnyInteraction =
 			type: "gapMatchInteraction"
 			responseIdentifier: string
 			shuffle: boolean
-			content: BlockContent | null
-			gapTexts: Array<{ identifier: string; matchMax: number; content: InlineContent }>
+			content: BlockContent<E> | null
+			gapTexts: Array<{ identifier: string; matchMax: number; content: InlineContent<E> }>
 			gaps: Array<{ identifier: string; required: boolean | null }>
 	  }
 	| { type: "unsupportedInteraction"; perseusType: string; responseIdentifier: string }
 
-export type AssessmentItemShell = {
+export type AssessmentItemShell<E extends WidgetTypeTuple> = {
 	identifier: string
 	title: string
 	responseDeclarations: ResponseDeclaration[]
-	body: BlockContent | null
+	body: BlockContent<E> | null
 }
 
 export type FeedbackDimension = z.infer<typeof FeedbackDimensionSchema>
 export type FeedbackCombination = z.infer<typeof FeedbackCombinationSchema>
 export type FeedbackPlan = z.infer<typeof FeedbackPlanSchema>
 
-export type AssessmentItem = {
+export type AssessmentItem<E extends WidgetTypeTuple> = {
 	identifier: string
 	title: string
 	responseDeclarations: ResponseDeclaration[]
-	body: BlockContent | null
+	body: BlockContent<E> | null
 	widgets: Record<string, Widget> | null
-	interactions: Record<string, AnyInteraction> | null
+	interactions: Record<string, AnyInteraction<E>> | null
 	feedbackPlan: FeedbackPlan
-	feedbackBlocks: Record<string, BlockContent>
+	feedbackBlocks: Record<string, BlockContent<E>>
 }
 
-export type AssessmentItemInput = AssessmentItem
+export type AssessmentItemInput<E extends WidgetTypeTuple> = AssessmentItem<E>

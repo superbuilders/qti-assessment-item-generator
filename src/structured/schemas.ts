@@ -7,46 +7,22 @@ import {
 	createBlockContentSchema,
 	createDynamicAssessmentItemSchema,
 	createInlineContentSchema,
-	type FeedbackPlan
+	type FeedbackPlan,
+	type AssessmentItemShell,
+	type AnyInteraction,
+	type AssessmentItem
 } from "../compiler/schemas"
-import type { WidgetCollection } from "../widgets/collections/types"
+import type { WidgetCollection, WidgetTypeTuple } from "../widgets/collections/types"
 import { typedSchemas } from "../widgets/registry"
 
-/**
- * Helper to build a union of literals without unsafe type assertions.
- * This follows the PRD's requirement to avoid `as` casts for type safety.
- */
-function buildLiteralUnion(values: readonly string[]) {
-	const literals = values.map((v) => z.literal(v))
-	if (literals.length === 0) {
-		logger.error("literal union: empty array")
-		throw errors.new("cannot build literal union from empty array")
-	}
-	if (literals.length === 1) {
-		return literals[0]
-	}
-	// Safe because we've checked length >= 2 above
-	const first = literals[0]
-	const second = literals[1]
-	const rest = literals.slice(2)
-	const tuple: [z.ZodLiteral<string>, z.ZodLiteral<string>, ...z.ZodLiteral<string>[]] = [first, second, ...rest]
-	return z.union(tuple)
-}
-
-export function createWidgetTypeEnumFromCollection(collection: WidgetCollection) {
-	if (!collection.widgetTypeKeys || collection.widgetTypeKeys.length === 0) {
-		logger.error("collection has no widgetTypeKeys", { collection: collection.name })
-		throw errors.new(`collection has no widgetTypeKeys: ${collection.name}`)
-	}
-	return buildLiteralUnion(collection.widgetTypeKeys)
-}
 
 /**
  * Creates a dynamic, collection-scoped Zod schema for the AssessmentItemShell.
  */
-export function createCollectionScopedShellSchema(collection: WidgetCollection) {
-	const ScopedWidgetEnum = createWidgetTypeEnumFromCollection(collection)
-	return createAssessmentItemShellSchema(ScopedWidgetEnum)
+export function createCollectionScopedShellSchema<const E extends WidgetTypeTuple>(
+	widgetTypeKeys: E
+): z.ZodType<AssessmentItemShell<E>> {
+	return createAssessmentItemShellSchema(widgetTypeKeys)
 }
 
 /**
@@ -56,10 +32,12 @@ export function createCollectionScopedShellSchema(collection: WidgetCollection) 
  * If you add a new interaction type to `src/compiler/schemas.ts`, you MUST also
  * add its corresponding scoped definition here to ensure widgetType validation propagates.
  */
-export function createCollectionScopedInteractionSchema(_interactionIds: string[], collection: WidgetCollection) {
-	const ScopedWidgetEnum = createWidgetTypeEnumFromCollection(collection)
-	const ScopedInlineContentSchema = createInlineContentSchema(ScopedWidgetEnum)
-	const ScopedBlockContentSchema = createBlockContentSchema(ScopedWidgetEnum)
+export function createCollectionScopedInteractionSchema<const E extends WidgetTypeTuple>(
+	_interactionIds: string[],
+	widgetTypeKeys: E
+): z.ZodType<Record<string, AnyInteraction<E>>> {
+	const ScopedInlineContentSchema = createInlineContentSchema(widgetTypeKeys)
+	const ScopedBlockContentSchema = createBlockContentSchema(widgetTypeKeys)
 
 	// Rebuild all interaction types with scoped content schemas
 	const InlineChoiceSchema = z
@@ -248,7 +226,7 @@ export function createCollectionScopedInteractionSchema(_interactionIds: string[
 		.describe("A discriminated union representing any possible QTI interaction type supported by the system.")
 
 	// Use record to preserve value inference while we enforce required keys at call sites
-	return z.record(z.string(), ScopedAnyInteractionSchema)
+    return z.record(z.string(), ScopedAnyInteractionSchema)
 }
 
 // Import the centralized feedback schema builder
@@ -258,18 +236,18 @@ import { createNestedFeedbackZodSchema } from "./feedback-nested-schema"
  * Creates a dynamic, collection-scoped Zod schema for generating feedback content.
  * @deprecated Use createNestedFeedbackZodSchema from feedback-nested-schema.ts instead.
  */
-export function createCollectionScopedFeedbackSchema(feedbackPlan: FeedbackPlan, collection: WidgetCollection) {
+export function createCollectionScopedFeedbackSchema<const E extends WidgetTypeTuple>(feedbackPlan: FeedbackPlan, widgetTypeKeys: E) {
 	// This function now just wraps the new centralized utility.
-	return createNestedFeedbackZodSchema(feedbackPlan, collection)
+	return createNestedFeedbackZodSchema(feedbackPlan, widgetTypeKeys)
 }
 
 /**
  * Creates a collection-scoped schema for the complete AssessmentItemInput
  * to be used for compiler validation
  */
-export function createCollectionScopedItemSchema(collection: WidgetCollection) {
-	const ScopedWidgetEnum = createWidgetTypeEnumFromCollection(collection)
-
+export function createCollectionScopedItemSchema<const E extends WidgetTypeTuple>(
+	collection: WidgetCollection<E>
+): z.ZodType<AssessmentItem<E>> {
 	// Build a widget mapping that includes all widgets from the collection
 	// This is used for the dynamic schema creation
 	const widgetMapping: Record<string, keyof typeof typedSchemas> = {}
@@ -282,6 +260,6 @@ export function createCollectionScopedItemSchema(collection: WidgetCollection) {
 		widgetMapping[`_placeholder_${key}`] = key as keyof typeof typedSchemas
 	}
 
-	const { AssessmentItemSchema } = createDynamicAssessmentItemSchema(widgetMapping, ScopedWidgetEnum)
+	const { AssessmentItemSchema } = createDynamicAssessmentItemSchema(widgetMapping, collection.widgetTypeKeys)
 	return AssessmentItemSchema
 }

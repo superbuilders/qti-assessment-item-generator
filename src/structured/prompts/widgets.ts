@@ -1,17 +1,18 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import type { AnyInteraction } from "../../compiler/schemas"
+import type { AnyInteraction, AssessmentItemShell } from "../../compiler/schemas"
 import { widgetCollections } from "../../widgets/collections"
 import { allWidgetSchemas } from "../../widgets/registry"
 import type { AiContextEnvelope, ImageContext } from "../types"
 import { caretBanPromptSection } from "./caret"
 import { formatUnifiedContextSections } from "./shared"
+import { WidgetTypeTuple } from "../../widgets/collections/types"
 
-export function createWidgetContentPrompt(
+export function createWidgetContentPrompt<E extends WidgetTypeTuple>(
 	envelope: AiContextEnvelope,
-	assessmentShell: unknown,
+	assessmentShell: AssessmentItemShell<E>,
 	widgetMapping: Record<string, keyof typeof allWidgetSchemas>,
-	generatedInteractions: Record<string, AnyInteraction>,
+	generatedInteractions: Record<string, AnyInteraction<E>>,
 	widgetCollectionName: string,
 	imageContext: ImageContext
 ): {

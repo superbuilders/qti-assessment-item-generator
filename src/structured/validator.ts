@@ -8,9 +8,10 @@ import {
 	sanitizeHtmlEntities,
 	sanitizeMathMLOperators
 } from "../qti-validation/utils"
+import { WidgetTypeTuple } from "../widgets/collections/types"
 
 // NEW: Recursive walker function for inline content
-function processInlineContent(items: InlineContent | null, logger: logger.Logger): void {
+function processInlineContent<E extends WidgetTypeTuple>(items: InlineContent<E> | null, logger: logger.Logger): void {
 	if (!items) return
 	for (const item of items) {
 		if (item.type === "text") {
@@ -39,7 +40,7 @@ function processInlineContent(items: InlineContent | null, logger: logger.Logger
 }
 
 // NEW: Recursive walker function for block content
-function processBlockContent(items: BlockContent | null, logger: logger.Logger): void {
+function processBlockContent<E extends WidgetTypeTuple>(items: BlockContent<E> | null, logger: logger.Logger): void {
 	if (!items) return
 	for (const item of items) {
 		if (item.type === "paragraph") {
@@ -56,12 +57,12 @@ function processBlockContent(items: BlockContent | null, logger: logger.Logger):
 	}
 }
 
-export function validateAndSanitizeHtmlFields(item: AssessmentItemInput, logger: logger.Logger): AssessmentItemInput {
+export function validateAndSanitizeHtmlFields<E extends WidgetTypeTuple>(item: AssessmentItemInput<E>, logger: logger.Logger): AssessmentItemInput<E> {
 	// Deep clone the object to avoid mutating the original
 	// Using JSON parse/stringify for deep cloning
 	const clonedData = JSON.parse(JSON.stringify(item))
 	// Validate the cloned data has the expected shape
-	const sanitizedItem: AssessmentItemInput = clonedData
+	const sanitizedItem: AssessmentItemInput<E> = clonedData
 
 	// Apply processing to all structured content fields
 	processBlockContent(sanitizedItem.body, logger)
