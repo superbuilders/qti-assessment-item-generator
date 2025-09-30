@@ -89,7 +89,8 @@ async function generateAssessmentShell(
 
 	logger.debug("generated json schema for openai", {
 		functionName: "generateAssessmentShell",
-		generatorName: "assessment_shell_generator"
+		generatorName: "assessment_shell_generator",
+		schema: jsonSchema
 	})
 
 	const messageContent: OpenAI.ChatCompletionContentPart[] = [{ type: "text", text: userContent }]
@@ -233,6 +234,13 @@ async function generateInteractionContent(
 	const InteractionSchema = createCollectionScopedInteractionSchema(interactionIds, widgetCollection)
 	const jsonSchema = toJSONSchemaPromptSafe(InteractionSchema)
 
+	logger.debug("generated json schema for openai", {
+		functionName: "generateInteractionContent",
+		generatorName: "interaction_content_generator",
+		interactionIds,
+		schema: jsonSchema
+	})
+
 	const messageContent: OpenAI.ChatCompletionContentPart[] = [{ type: "text", text: userContent }]
 	for (const imageUrl of imageContext.imageUrls) {
 		messageContent.push({ type: "image_url", image_url: { url: imageUrl, detail: "high" } })
@@ -361,6 +369,11 @@ export async function generateFromEnvelope(
 	)
 
 	const feedbackJsonSchema = toJSONSchemaPromptSafe(FeedbackSchema)
+	logger.debug("generated json schema for openai", {
+		functionName: "generateFeedback",
+		generatorName: "feedback_generator",
+		schema: feedbackJsonSchema
+	})
 	const feedbackParams: ChatCompletionCreateParamsNonStreaming = {
 		model: OPENAI_MODEL,
 		messages: [
@@ -451,6 +464,11 @@ export async function generateFromEnvelope(
 		// Accept any widget id → widget union; enforce required ids below
 		const WidgetCollectionSchema = z.record(z.string(), WidgetSchema)
 		const widgetJsonSchema = toJSONSchemaPromptSafe(WidgetCollectionSchema)
+		logger.debug("generated json schema for openai", {
+			functionName: "generateWidgetContent",
+			generatorName: "widget_content_generator",
+			schema: widgetJsonSchema
+		})
 
 		const widgetParams: ChatCompletionCreateParamsNonStreaming = {
 			model: OPENAI_MODEL,
