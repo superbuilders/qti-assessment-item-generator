@@ -6,7 +6,6 @@ import { typedSchemas } from "../widgets/registry"
 import {
 	CHOICE_IDENTIFIER_REGEX,
 	FEEDBACK_BLOCK_IDENTIFIER_REGEX,
-	OUTCOME_IDENTIFIER_REGEX,
 	RESPONSE_IDENTIFIER_REGEX,
 	SLOT_IDENTIFIER_REGEX
 } from "./qti-constants"
@@ -164,6 +163,58 @@ export function createAssessmentItemShellSchema(widgetTypeEnum: z.ZodType<string
 		.strict()
 		.describe("Initial assessment item structure with ref placeholders from the first AI generation shot.")
 }
+
+// Feedback Plan Schemas (NEW)
+export const FeedbackDimensionSchema = z
+	.union([
+		z
+			.object({
+				responseIdentifier: z
+					.string()
+					.regex(RESPONSE_IDENTIFIER_REGEX, "invalid response identifier: must start with RESPONSE"),
+				kind: z.literal("enumerated"),
+				keys: z.array(z.string()).min(1)
+			})
+			.strict(),
+		z
+			.object({
+				responseIdentifier: z
+					.string()
+					.regex(RESPONSE_IDENTIFIER_REGEX, "invalid response identifier: must start with RESPONSE"),
+				kind: z.literal("binary")
+			})
+			.strict()
+	])
+	.describe("Defines a single dimension for feedback evaluation, linked to a response.")
+
+export const FeedbackCombinationSchema = z
+	.object({
+		id: z.string().regex(FEEDBACK_BLOCK_IDENTIFIER_REGEX),
+		path: z
+			.array(
+				z
+					.object({
+						responseIdentifier: z.string().regex(RESPONSE_IDENTIFIER_REGEX),
+						key: z.union([
+							z.literal("CORRECT"),
+							z.literal("INCORRECT"),
+							z.string().regex(CHOICE_IDENTIFIER_REGEX)
+						])
+					})
+					.strict()
+			)
+			.min(1)
+	})
+	.strict()
+
+export const FeedbackPlanSchema = z
+	.object({
+		mode: z.union([z.literal("combo"), z.literal("fallback")]).describe("The evaluation mode for feedback."),
+		dimensions: z.array(FeedbackDimensionSchema).min(1).describe("Ordered list of dimensions for feedback evaluation."),
+		combinations: z.array(FeedbackCombinationSchema).min(1).describe("Explicit mapping from paths to FB identifiers.")
+	})
+	.strict()
+	.describe("The explicit contract for feedback evaluation.")
 
 // Response Declaration Schema (shared across all dynamic schemas)
 function createResponseDeclarationSchema() {
@@ -431,20 +482,6 @@ export function createDynamicAssessmentItemSchema(
 
 	const ResponseDeclarationSchema = createResponseDeclarationSchema()
 
-	const FeedbackBlockSchema = z
-		.object({
-			identifier: z
-				.string()
-				.regex(FEEDBACK_BLOCK_IDENTIFIER_REGEX, "invalid feedback block identifier")
-				.describe("Identifier for the feedback block, e.g., 'A', 'B', 'CORRECT'."),
-			outcomeIdentifier: z
-				.string()
-				.regex(OUTCOME_IDENTIFIER_REGEX, "invalid outcome identifier")
-				.describe("The outcome variable this feedback is tied to, e.g., 'FEEDBACK__RESPONSE'."),
-			content: BlockSchema.describe("The rich content of the feedback block.")
-		})
-		.strict()
-
 	const AssessmentItemSchema = z
 		.object({
 			identifier: z.string().describe("Unique identifier for this assessment item."),
@@ -461,102 +498,15 @@ export function createDynamicAssessmentItemSchema(
 				.record(z.string(), AnyInteractionSchema)
 				.nullable()
 				.describe("A map of interaction identifiers to their full interaction object definitions."),
+			feedbackPlan: FeedbackPlanSchema,
 			feedbackBlocks: z
-				.array(FeedbackBlockSchema)
-				.min(1)
-				.describe("A list of feedback blocks to be displayed based on outcomes.")
+				.record(
+					z.string().regex(FEEDBACK_BLOCK_IDENTIFIER_REGEX, "invalid feedback block identifier"),
+					BlockSchema
+				)
+				.describe("A map of feedback identifiers to their rich content blocks.")
 		})
 		.strict()
-		.superRefine((data, ctx) => {
-			const responseIdToChoices = new Map<string, Set<string>>()
-			if (data.interactions) {
-				for (const interaction of Object.values(data.interactions)) {
-					if (interaction.type === "choiceInteraction" || interaction.type === "inlineChoiceInteraction") {
-						const choiceIds = new Set(interaction.choices.map((c) => c.identifier))
-						responseIdToChoices.set(interaction.responseIdentifier, choiceIds)
-					}
-				}
-			}
-
-			const declInfo = new Map<string, { baseType: string; cardinality: string }>()
-			for (const decl of data.responseDeclarations) {
-				declInfo.set(decl.identifier, { baseType: decl.baseType, cardinality: decl.cardinality })
-			}
-
-			const groupMap = new Map<string, { respId: string; baseType: string; idents: Set<string> }>()
-			for (let i = 0; i < data.feedbackBlocks.length; i++) {
-				const fb = data.feedbackBlocks[i]
-				if (!/^FEEDBACK__([A-Za-z0-9_]+)$/.test(fb.outcomeIdentifier)) {
-					ctx.addIssue({
-						code: z.ZodIssueCode.custom,
-						message: "outcomeIdentifier must be FEEDBACK__<responseId>",
-						path: ["feedbackBlocks", i, "outcomeIdentifier"]
-					})
-					continue
-				}
-				const respId = fb.outcomeIdentifier.replace(/^FEEDBACK__/, "")
-				const rd = declInfo.get(respId)
-				if (!rd) {
-					ctx.addIssue({
-						code: z.ZodIssueCode.custom,
-						message: `no responseDeclaration found for outcome ${fb.outcomeIdentifier}`,
-						path: ["feedbackBlocks", i, "outcomeIdentifier"]
-					})
-					continue
-				}
-				const g = groupMap.get(fb.outcomeIdentifier) ?? { respId, baseType: rd.baseType, idents: new Set<string>() }
-				g.idents.add(fb.identifier)
-				groupMap.set(fb.outcomeIdentifier, g)
-
-				if (rd.baseType === "identifier") {
-					const allowedChoices = responseIdToChoices.get(respId)
-					if (!allowedChoices || !allowedChoices.has(fb.identifier)) {
-						ctx.addIssue({
-							code: z.ZodIssueCode.custom,
-							message: `feedback identifier '${fb.identifier}' not found in choices for response '${respId}'`,
-							path: ["feedbackBlocks", i, "identifier"]
-						})
-					}
-				} else {
-					if (!(fb.identifier === "CORRECT" || fb.identifier === "INCORRECT")) {
-						ctx.addIssue({
-							code: z.ZodIssueCode.custom,
-							message: "non-enumerated responses must use CORRECT/INCORRECT identifiers",
-							path: ["feedbackBlocks", i, "identifier"]
-						})
-					}
-				}
-			}
-
-			const seen = new Set<string>()
-			for (let i = 0; i < data.feedbackBlocks.length; i++) {
-				const fb = data.feedbackBlocks[i]
-				const key = `${fb.outcomeIdentifier}::${fb.identifier}`
-				if (seen.has(key)) {
-					ctx.addIssue({
-						code: z.ZodIssueCode.custom,
-						message: "duplicate feedback block identifier within outcome group",
-						path: ["feedbackBlocks", i, "identifier"]
-					})
-				} else {
-					seen.add(key)
-				}
-			}
-
-			for (const [outcome, g] of groupMap.entries()) {
-				if (g.baseType !== "identifier") {
-					const hasCorrect = g.idents.has("CORRECT")
-					const hasIncorrect = g.idents.has("INCORRECT")
-					if (!hasCorrect || !hasIncorrect || g.idents.size !== 2) {
-						ctx.addIssue({
-							code: z.ZodIssueCode.custom,
-							message: `outcome ${outcome} must contain exactly CORRECT and INCORRECT blocks`,
-							path: ["feedbackBlocks"]
-						})
-					}
-				}
-			}
-		})
 		.describe("A complete QTI 3.0 assessment item with content, interactions, and scoring rules.")
 
 	const AssessmentItemShellSchema = createAssessmentItemShellSchema(widgetTypeEnum)
@@ -654,6 +604,10 @@ export type AssessmentItemShell = {
 	body: BlockContent | null
 }
 
+export type FeedbackDimension = z.infer<typeof FeedbackDimensionSchema>
+export type FeedbackCombination = z.infer<typeof FeedbackCombinationSchema>
+export type FeedbackPlan = z.infer<typeof FeedbackPlanSchema>
+
 export type AssessmentItem = {
 	identifier: string
 	title: string
@@ -661,7 +615,8 @@ export type AssessmentItem = {
 	body: BlockContent | null
 	widgets: Record<string, Widget> | null
 	interactions: Record<string, AnyInteraction> | null
-	feedbackBlocks: Array<{ identifier: string; outcomeIdentifier: string; content: BlockContent }>
+	feedbackPlan: FeedbackPlan
+	feedbackBlocks: Record<string, BlockContent>
 }
 
 export type AssessmentItemInput = AssessmentItem

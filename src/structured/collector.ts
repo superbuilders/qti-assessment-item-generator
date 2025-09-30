@@ -104,15 +104,15 @@ function walkInteractions(interactions: Record<string, AnyInteraction> | null, o
  */
 export function collectWidgetRefs(item: {
 	body: BlockContent | null
-	feedbackBlocks: Array<{ content: BlockContent }> | null
+	feedbackBlocks: Record<string, BlockContent> | null
 	interactions: Record<string, AnyInteraction> | null
 }): Map<string, string> {
 	const out = new Map<string, string>()
 
 	walkBlock(item.body, out)
 	if (item.feedbackBlocks) {
-		for (const fb of item.feedbackBlocks) {
-			walkBlock(fb.content, out)
+		for (const content of Object.values(item.feedbackBlocks)) {
+			walkBlock(content, out)
 		}
 	}
 	walkInteractions(item.interactions, out)
@@ -125,7 +125,7 @@ export function collectWidgetRefs(item: {
  */
 export function collectAllWidgetSlotIds(item: {
 	body: BlockContent | null
-	feedbackBlocks: Array<{ content: BlockContent }> | null
+	feedbackBlocks: Record<string, BlockContent> | null
 	interactions: Record<string, AnyInteraction> | null
 }): string[] {
 	const refs = collectWidgetRefs(item)

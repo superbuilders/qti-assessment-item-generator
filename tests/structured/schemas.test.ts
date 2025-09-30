@@ -68,14 +68,18 @@ describe("Structured Schemas JSON Schema Generation", () => {
 	})
 
 	test("createCollectionScopedFeedbackSchema produces valid JSON Schema", () => {
-		const feedbackTargets = [
-			{ outcomeIdentifier: "FEEDBACK__RESPONSE", blockIdentifier: "CORRECT" },
-			{ outcomeIdentifier: "FEEDBACK__RESPONSE", blockIdentifier: "INCORRECT" }
-		]
-		const feedbackSchema = createCollectionScopedFeedbackSchema(feedbackTargets, allWidgetsCollection)
-		expect(feedbackSchema).toBeDefined()
+		const feedbackPlan = {
+			mode: "combo" as const,
+			dimensions: [{ responseIdentifier: "RESPONSE", kind: "binary" as const }],
+			combinations: [
+				{ id: "FB__RESPONSE_CORRECT", path: [{ responseIdentifier: "RESPONSE", key: "CORRECT" }] },
+				{ id: "FB__RESPONSE_INCORRECT", path: [{ responseIdentifier: "RESPONSE", key: "INCORRECT" }] }
+			]
+		}
+		const FeedbackSchema = createCollectionScopedFeedbackSchema(feedbackPlan, allWidgetsCollection)
+		expect(FeedbackSchema).toBeDefined()
 
-		const result = errors.trySync(() => toJSONSchemaPromptSafe(feedbackSchema))
+		const result = errors.trySync(() => toJSONSchemaPromptSafe(FeedbackSchema))
 		if (result.error) {
 			logger.error("feedback schema json conversion", { error: result.error })
 			throw errors.wrap(result.error, "feedback schema json conversion")

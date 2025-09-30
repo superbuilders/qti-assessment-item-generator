@@ -93,10 +93,11 @@ mock.module("openai", () => {
 							]
 						}
 					}
-					if (functionName === "feedback_generator") {
-						const feedbackData = {
-							feedback: {
-								FEEDBACK__RESPONSE: {
+				if (functionName === "feedback_generator") {
+					const feedbackData = {
+						feedback: {
+							FEEDBACK__OVERALL: {
+								RESPONSE: {
 									CORRECT: {
 										content: [
 											{
@@ -116,6 +117,7 @@ mock.module("openai", () => {
 								}
 							}
 						}
+					}
 						return {
 							choices: [
 								{

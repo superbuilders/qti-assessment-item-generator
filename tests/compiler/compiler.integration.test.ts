@@ -11,18 +11,18 @@ describe("Compiler Identifier Validation Integration Tests", () => {
 			identifier: "test-duplicate-response",
 			title: "Test Duplicate Response",
 			body: [],
-			feedbackBlocks: [
-				{
-					identifier: "CORRECT",
-					outcomeIdentifier: "FEEDBACK__RESPONSE_TEXT",
-					content: [{ type: "paragraph", content: [{ type: "text", content: "Correct" }] }]
-				},
-				{
-					identifier: "INCORRECT",
-					outcomeIdentifier: "FEEDBACK__RESPONSE_TEXT",
-					content: [{ type: "paragraph", content: [{ type: "text", content: "Incorrect" }] }]
-				}
-			],
+			feedbackPlan: {
+				mode: "fallback",
+				dimensions: [{ responseIdentifier: "RESPONSE_1", kind: "binary" }],
+				combinations: [
+					{ id: "CORRECT", path: [{ responseIdentifier: "RESPONSE_1", key: "CORRECT" }] },
+					{ id: "INCORRECT", path: [{ responseIdentifier: "RESPONSE_1", key: "INCORRECT" }] }
+				]
+			},
+			feedbackBlocks: {
+				CORRECT: [{ type: "paragraph", content: [{ type: "text", content: "Correct" }] }],
+				INCORRECT: [{ type: "paragraph", content: [{ type: "text", content: "Incorrect" }] }]
+			},
 			interactions: {
 				interaction_1: {
 					type: "choiceInteraction",
@@ -61,13 +61,17 @@ describe("Compiler Identifier Validation Integration Tests", () => {
 			identifier: "test-choice-duplicate",
 			title: "Test Choice Duplicate",
 			body: [],
-			feedbackBlocks: [
-				{
-					identifier: "A",
-					outcomeIdentifier: "FEEDBACK__RESPONSE_1",
-					content: [{ type: "paragraph", content: [{ type: "text", content: "Choice A" }] }]
-				}
-			],
+			feedbackPlan: {
+				mode: "combo",
+				dimensions: [{ responseIdentifier: "RESPONSE_1", kind: "enumerated", keys: ["A", "A"] }],
+				combinations: [
+					{ id: "FB__RESPONSE_1_A", path: [{ responseIdentifier: "RESPONSE_1", key: "A" }] },
+					{ id: "FB__RESPONSE_1_A", path: [{ responseIdentifier: "RESPONSE_1", key: "A" }] }
+				]
+			},
+			feedbackBlocks: {
+				FB__RESPONSE_1_A: [{ type: "paragraph", content: [{ type: "text", content: "Choice A" }] }]
+			},
 			interactions: {
 				interaction_1: {
 					type: "choiceInteraction",
@@ -93,18 +97,53 @@ describe("Compiler Identifier Validation Integration Tests", () => {
 			identifier: "test-valid-complex",
 			title: "Test Valid Complex",
 			body: [],
-			feedbackBlocks: [
-				{
-					identifier: "CORRECT",
-					outcomeIdentifier: "FEEDBACK__RESPONSE_TEXT",
-					content: [{ type: "paragraph", content: [{ type: "text", content: "Correct" }] }]
-				},
-				{
-					identifier: "INCORRECT",
-					outcomeIdentifier: "FEEDBACK__RESPONSE_TEXT",
-					content: [{ type: "paragraph", content: [{ type: "text", content: "Incorrect" }] }]
-				}
-			],
+			feedbackPlan: {
+				mode: "combo",
+				dimensions: [
+					{ responseIdentifier: "RESPONSE_1", kind: "enumerated", keys: ["A", "B"] },
+					{ responseIdentifier: "RESPONSE_TEXT", kind: "binary" }
+				],
+				combinations: [
+					{
+						id: "FB__RESPONSE_1_A__RESPONSE_TEXT_CORRECT",
+						path: [
+							{ responseIdentifier: "RESPONSE_1", key: "A" },
+							{ responseIdentifier: "RESPONSE_TEXT", key: "CORRECT" }
+						]
+					},
+					{
+						id: "FB__RESPONSE_1_A__RESPONSE_TEXT_INCORRECT",
+						path: [
+							{ responseIdentifier: "RESPONSE_1", key: "A" },
+							{ responseIdentifier: "RESPONSE_TEXT", key: "INCORRECT" }
+						]
+					},
+					{
+						id: "FB__RESPONSE_1_B__RESPONSE_TEXT_CORRECT",
+						path: [
+							{ responseIdentifier: "RESPONSE_1", key: "B" },
+							{ responseIdentifier: "RESPONSE_TEXT", key: "CORRECT" }
+						]
+					},
+					{
+						id: "FB__RESPONSE_1_B__RESPONSE_TEXT_INCORRECT",
+						path: [
+							{ responseIdentifier: "RESPONSE_1", key: "B" },
+							{ responseIdentifier: "RESPONSE_TEXT", key: "INCORRECT" }
+						]
+					}
+				]
+			},
+			feedbackBlocks: {
+				FB__RESPONSE_1_A__RESPONSE_TEXT_CORRECT: [{ type: "paragraph", content: [{ type: "text", content: "A + Correct" }] }],
+				FB__RESPONSE_1_A__RESPONSE_TEXT_INCORRECT: [
+					{ type: "paragraph", content: [{ type: "text", content: "A + Incorrect" }] }
+				],
+				FB__RESPONSE_1_B__RESPONSE_TEXT_CORRECT: [{ type: "paragraph", content: [{ type: "text", content: "B + Correct" }] }],
+				FB__RESPONSE_1_B__RESPONSE_TEXT_INCORRECT: [
+					{ type: "paragraph", content: [{ type: "text", content: "B + Incorrect" }] }
+				]
+			},
 			interactions: {
 				interaction_1: {
 					type: "choiceInteraction",

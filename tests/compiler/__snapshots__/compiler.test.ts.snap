@@ -21,25 +21,20 @@ exports[`QTI Compiler End-to-End Tests should produce consistent XML output for 
     <qti-outcome-declaration identifier="SCORE" cardinality="single" base-type="float">
         <qti-default-value><qti-value>0</qti-value></qti-default-value>
     </qti-outcome-declaration>
-    <qti-outcome-declaration identifier="FEEDBACK__RESPONSE" cardinality="single" base-type="identifier"/>
+    <qti-outcome-declaration identifier="FEEDBACK__OVERALL" cardinality="single" base-type="identifier"/>
     <qti-item-body>
         <p>You spin the spinner shown below once. The spinner has <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>4</mn></math> equal sectors colored pink, purple, blue, and green.</p>
         <p>What is <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>P</mi><mo>(</mo><mtext>not purple</mtext><mo>)</mo></math>?</p>
         <p>If necessary, round your answer to <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>2</mn></math> decimal places.</p>
         <p>Answer: <qti-text-entry-interaction response-identifier="RESPONSE" expected-length="4"/></p>
         <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzQ3IiBoZWlnaHQ9IjM0MCIgdmlld0JveD0iLTIwIC0yMCAzNDcgMzQwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIj48ZGVmcz48c3R5bGU+LnRpdGxlIHsgZm9udC1zaXplOiAxNnB4OyBmb250LXdlaWdodDogYm9sZDsgdGV4dC1hbmNob3I6IG1pZGRsZTsgfTwvc3R5bGU+PC9kZWZzPjxwYXRoIGQ9Ik0gMTUwIDE1MCBMIDE1MCAyMCBBIDEzMCAxMzAgMCAwIDEgMjgwIDE1MCBaIiBmaWxsPSIjMjhhZTdiIiBzdHJva2U9IiMwMDAwMDAiIHN0cm9rZS13aWR0aD0iMS41Ii8+PHBhdGggZD0iTSAxNTAgMTUwIEwgMjgwIDE1MCBBIDEzMCAxMzAgMCAwIDEgMTUwIDI4MCBaIiBmaWxsPSIjNjQ5NWVkIiBzdHJva2U9IiMwMDAwMDAiIHN0cm9rZS13aWR0aD0iMS41Ii8+PHBhdGggZD0iTSAxNTAgMTUwIEwgMTUwIDI4MCBBIDEzMCAxMzAgMCAwIDEgMjAgMTUwLjAwMDAwMDAwMDAwMDAzIFoiIGZpbGw9IiM5ZDM4YmQiIHN0cm9rZT0iIzAwMDAwMCIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48cGF0aCBkPSJNIDE1MCAxNTAgTCAyMCAxNTAuMDAwMDAwMDAwMDAwMDMgQSAxMzAgMTMwIDAgMCAxIDE0OS45OTk5OTk5OTk5OTk5NyAyMCBaIiBmaWxsPSIjZmYwMGFmIiBzdHJva2U9IiMwMDAwMDAiIHN0cm9rZS13aWR0aD0iMS41Ii8+PGcgdHJhbnNmb3JtPSJyb3RhdGUoODAsIDE1MCwgMTUwKSI+PHBvbHlnb24gcG9pbnRzPSIxNTAsMTQ0IDI5NCwxNDQgMjk0LDEzOCAzMDYsMTUwIDI5NCwxNjIgMjk0LDE1NiAxNTAsMTU2IiBmaWxsPSIjNTU1NTU1IiBzdHJva2U9IiMwMDAwMDAiIHN0cm9rZS13aWR0aD0iMSIvPjwvZz48Y2lyY2xlIGN4PSIxNTAiIGN5PSIxNTAiIHI9IjEyIiBmaWxsPSIjZmFmYWZhIiBzdHJva2U9IiMwMDAwMDAiIHN0cm9rZS13aWR0aD0iMiIvPjwvc3ZnPg==" alt="Widget visualization" />
-        <qti-feedback-block outcome-identifier="FEEDBACK__RESPONSE" identifier="CORRECT" show-hide="show">
-            <qti-content-body><p>Excellent work! You correctly found that the probability of not landing on purple is <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>3</mn><mn>4</mn></mfrac></math> = <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>0.75</mn></math> (or <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>75</mn><mo>%</mo></math>).</p>
-        <p>You understood that "not purple" means any of the other <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>3</mn></math> colors: pink, blue, or green. Since each sector is equally likely, we count favorable outcomes over total outcomes.</p>
-        <p>This is called complementary probability. Instead of finding <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>P</mi><mo>(</mo><mtext>purple</mtext><mo>)</mo><mo>=</mo><mfrac><mn>1</mn><mn>4</mn></mfrac></math> and then subtracting from <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>1</mn></math>, you directly counted the <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>3</mn></math> non-purple sectors!</p>
-        <p>Real-world connection: This same thinking applies to any situation where you want the opposite of an event - like the probability of NOT raining, or NOT getting a specific card from a deck.</p></qti-content-body>
+        <qti-feedback-block outcome-identifier="FEEDBACK__OVERALL" identifier="FB__RESPONSE_CORRECT" show-hide="show">
+            <qti-content-body><p>Excellent work! The probability of not landing on purple is <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>3</mn><mn>4</mn></mfrac></math> (or 0.75).</p>
+        <p>You understood that "not purple" means any of the other <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>3</mn></math> colors. Since each sector is equally likely, the probability is the number of favorable outcomes (3) divided by the total number of outcomes (4).</p></qti-content-body>
         </qti-feedback-block>
-        <qti-feedback-block outcome-identifier="FEEDBACK__RESPONSE" identifier="INCORRECT" show-hide="show">
-            <qti-content-body><p>Let's work through this step by step! Probability questions can be tricky, but there's a clear method.</p>
-        <p>Step <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>1</mn></math>: Count the total number of equally likely outcomes. The spinner has <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>4</mn></math> equal sectors.</p>
-        <p>Step <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>2</mn></math>: Count the favorable outcomes. "Not purple" means any sector except purple, so that's <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>3</mn></math> sectors (pink, blue, and green).</p>
-        <p>Step <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>3</mn></math>: Calculate probability = <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mtext>favorable outcomes</mtext><mtext>total outcomes</mtext></mfrac></math> = <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>3</mn><mn>4</mn></mfrac></math></p>
-        <p>Memory tip: When you see "not" in a probability question, count everything EXCEPT that outcome!</p></qti-content-body>
+        <qti-feedback-block outcome-identifier="FEEDBACK__OVERALL" identifier="FB__RESPONSE_INCORRECT" show-hide="show">
+            <qti-content-body><p>Not quite. Let's break it down:</p>
+        <ol><li><p>Count the total outcomes: There are <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>4</mn></math> equal sectors.</p></li><li><p>Count the favorable outcomes: "Not purple" includes pink, blue, and green, which is <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>3</mn></math> sectors.</p></li><li><p>Calculate the probability: <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mtext>Favorable</mtext><mtext>Total</mtext></mfrac><mo>=</mo><mfrac><mn>3</mn><mn>4</mn></mfrac></math></p></li></ol></qti-content-body>
         </qti-feedback-block>
     </qti-item-body>
     <qti-response-processing>
@@ -50,13 +45,13 @@ exports[`QTI Compiler End-to-End Tests should produce consistent XML output for 
                 <qti-variable identifier="RESPONSE"/>
                 <qti-correct identifier="RESPONSE"/>
             </qti-match>
-            <qti-set-outcome-value identifier="FEEDBACK__RESPONSE">
-                <qti-base-value base-type="identifier">CORRECT</qti-base-value>
+            <qti-set-outcome-value identifier="FEEDBACK__OVERALL">
+                <qti-base-value base-type="identifier">FB__RESPONSE_CORRECT</qti-base-value>
             </qti-set-outcome-value>
         </qti-response-if>
         <qti-response-else>
-            <qti-set-outcome-value identifier="FEEDBACK__RESPONSE">
-                <qti-base-value base-type="identifier">INCORRECT</qti-base-value>
+            <qti-set-outcome-value identifier="FEEDBACK__OVERALL">
+                <qti-base-value base-type="identifier">FB__RESPONSE_INCORRECT</qti-base-value>
             </qti-set-outcome-value>
         </qti-response-else>
     </qti-response-condition>
@@ -90,126 +85,148 @@ exports[`QTI Compiler End-to-End Tests should produce consistent XML output for 
             <qti-value>A</qti-value>
         </qti-correct-response>
     </qti-response-declaration>
-    <qti-response-declaration identifier="RESPONSE_TEXT" cardinality="single" base-type="string">
+    <qti-response-declaration identifier="RESPONSE_TEXT" cardinality="single" base-type="float">
         <qti-correct-response>
-            <qti-value>27/2</qti-value>
+            <qti-value>13.5</qti-value>
         </qti-correct-response>
         <qti-mapping default-value="0">
-            <qti-map-entry map-key="27/2" mapped-value="1"/>
+            <qti-map-entry map-key="13.5" mapped-value="1"/>
         </qti-mapping>
     </qti-response-declaration>
     <qti-outcome-declaration identifier="SCORE" cardinality="single" base-type="float">
         <qti-default-value><qti-value>0</qti-value></qti-default-value>
     </qti-outcome-declaration>
-    <qti-outcome-declaration identifier="FEEDBACK__RESPONSE_CHOICE" cardinality="single" base-type="identifier"/>
-    <qti-outcome-declaration identifier="FEEDBACK__RESPONSE_TEXT" cardinality="single" base-type="identifier"/>
+    <qti-outcome-declaration identifier="FEEDBACK__OVERALL" cardinality="single" base-type="identifier"/>
     <qti-item-body>
         <p>Daniel wants to predict how far he can hike based on the time he spends on the hike. He collected some data on the time (in hours) and distance (in kilometers) of some of his previous hikes. A line was fit to the data to model the relationship.</p>
-        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzk1IiBoZWlnaHQ9IjM3OSIgdmlld0JveD0iLTggLTggMzk1IDM3OSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMiI+PGRlZnM+PGNsaXBQYXRoIGlkPSJjbGlwLTAiPjxyZWN0IHg9IjY2LjQiIHk9IjU2LjU5OTk5OTk5OTk5OTk5NCIgd2lkdGg9IjI3Mi42IiBoZWlnaHQ9IjI1Ny40Ii8+PC9jbGlwUGF0aD48L2RlZnM+PHRleHQgeD0iMjAyLjcwMDAwMDAwMDAwMDAyIiB5PSIyMCIgZm9udC1zaXplPSIxOCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzMzMzMzMyI+PHRzcGFuIHg9IjIwMi43MDAwMDAwMDAwMDAwMiIgZHk9IjBlbSI+VGltZSB2cyBkaXN0YW5jZSBtb2RlbDwvdHNwYW4+PC90ZXh0PjxsaW5lIHgxPSI5My42NjAwMDAwMDAwMDAwMSIgeTE9IjU2LjU5OTk5OTk5OTk5OTk5NCIgeDI9IjkzLjY2MDAwMDAwMDAwMDAxIiB5Mj0iMzE0IiBzdHJva2U9IiNlMGUwZTAiIHN0cm9rZS13aWR0aD0iMSIvPjxsaW5lIHgxPSIxMjAuOTIwMDAwMDAwMDAwMDIiIHkxPSI1Ni41OTk5OTk5OTk5OTk5OTQiIHgyPSIxMjAuOTIwMDAwMDAwMDAwMDIiIHkyPSIzMTQiIHN0cm9rZT0iI2UwZTBlMCIgc3Ryb2tlLXdpZHRoPSIxIi8+PGxpbmUgeDE9IjE0OC4xOCIgeTE9IjU2LjU5OTk5OTk5OTk5OTk5NCIgeDI9IjE0OC4xOCIgeTI9IjMxNCIgc3Ryb2tlPSIjZTBlMGUwIiBzdHJva2Utd2lkdGg9IjEiLz48bGluZSB4MT0iMTc1LjQ0IiB5MT0iNTYuNTk5OTk5OTk5OTk5OTk0IiB4Mj0iMTc1LjQ0IiB5Mj0iMzE0IiBzdHJva2U9IiNlMGUwZTAiIHN0cm9rZS13aWR0aD0iMSIvPjxsaW5lIHgxPSIyMDIuNzAwMDAwMDAwMDAwMDIiIHkxPSI1Ni41OTk5OTk5OTk5OTk5OTQiIHgyPSIyMDIuNzAwMDAwMDAwMDAwMDIiIHkyPSIzMTQiIHN0cm9rZT0iI2UwZTBlMCIgc3Ryb2tlLXdpZHRoPSIxIi8+PGxpbmUgeDE9IjIyOS45NiIgeTE9IjU2LjU5OTk5OTk5OTk5OTk5NCIgeDI9IjIyOS45NiIgeTI9IjMxNCIgc3Ryb2tlPSIjZTBlMGUwIiBzdHJva2Utd2lkdGg9IjEiLz48bGluZSB4MT0iMjU3LjIyIiB5MT0iNTYuNTk5OTk5OTk5OTk5OTk0IiB4Mj0iMjU3LjIyIiB5Mj0iMzE0IiBzdHJva2U9IiNlMGUwZTAiIHN0cm9rZS13aWR0aD0iMSIvPjxsaW5lIHgxPSIyODQuNDgiIHkxPSI1Ni41OTk5OTk5OTk5OTk5OTQiIHgyPSIyODQuNDgiIHkyPSIzMTQiIHN0cm9rZT0iI2UwZTBlMCIgc3Ryb2tlLXdpZHRoPSIxIi8+PGxpbmUgeDE9IjMxMS43NCIgeTE9IjU2LjU5OTk5OTk5OTk5OTk5NCIgeDI9IjMxMS43NCIgeTI9IjMxNCIgc3Ryb2tlPSIjZTBlMGUwIiBzdHJva2Utd2lkdGg9IjEiLz48bGluZSB4MT0iMzM5IiB5MT0iNTYuNTk5OTk5OTk5OTk5OTk0IiB4Mj0iMzM5IiB5Mj0iMzE0IiBzdHJva2U9IiNlMGUwZTAiIHN0cm9rZS13aWR0aD0iMSIvPjxsaW5lIHgxPSI2Ni40IiB5MT0iMjg4LjI2IiB4Mj0iMzM5IiB5Mj0iMjg4LjI2IiBzdHJva2U9IiNlMGUwZTAiIHN0cm9rZS13aWR0aD0iMSIvPjxsaW5lIHgxPSI2Ni40IiB5MT0iMjYyLjUyIiB4Mj0iMzM5IiB5Mj0iMjYyLjUyIiBzdHJva2U9IiNlMGUwZTAiIHN0cm9rZS13aWR0aD0iMSIvPjxsaW5lIHgxPSI2Ni40IiB5MT0iMjM2Ljc4IiB4Mj0iMzM5IiB5Mj0iMjM2Ljc4IiBzdHJva2U9IiNlMGUwZTAiIHN0cm9rZS13aWR0aD0iMSIvPjxsaW5lIHgxPSI2Ni40IiB5MT0iMjExLjA0MDAwMDAwMDAwMDAyIiB4Mj0iMzM5IiB5Mj0iMjExLjA0MDAwMDAwMDAwMDAyIiBzdHJva2U9IiNlMGUwZTAiIHN0cm9rZS13aWR0aD0iMSIvPjxsaW5lIHgxPSI2Ni40IiB5MT0iMTg1LjMiIHgyPSIzMzkiIHkyPSIxODUuMyIgc3Ryb2tlPSIjZTBlMGUwIiBzdHJva2Utd2lkdGg9IjEiLz48bGluZSB4MT0iNjYuNCIgeTE9IjE1OS41NiIgeDI9IjMzOSIgeTI9IjE1OS41NiIgc3Ryb2tlPSIjZTBlMGUwIiBzdHJva2Utd2lkdGg9IjEiLz48bGluZSB4MT0iNjYuNCIgeTE9IjEzMy44MjAwMDAwMDAwMDAwMiIgeDI9IjMzOSIgeTI9IjEzMy44MjAwMDAwMDAwMDAwMiIgc3Ryb2tlPSIjZTBlMGUwIiBzdHJva2Utd2lkdGg9IjEiLz48bGluZSB4MT0iNjYuNCIgeTE9IjEwOC4wODAwMDAwMDAwMDAwMSIgeDI9IjMzOSIgeTI9IjEwOC4wODAwMDAwMDAwMDAwMSIgc3Ryb2tlPSIjZTBlMGUwIiBzdHJva2Utd2lkdGg9IjEiLz48bGluZSB4MT0iNjYuNCIgeTE9IjgyLjM0IiB4Mj0iMzM5IiB5Mj0iODIuMzQiIHN0cm9rZT0iI2UwZTBlMCIgc3Ryb2tlLXdpZHRoPSIxIi8+PGxpbmUgeDE9IjY2LjQiIHkxPSI1Ni42MDAwMDAwMDAwMDAwMiIgeDI9IjMzOSIgeTI9IjU2LjYwMDAwMDAwMDAwMDAyIiBzdHJva2U9IiNlMGUwZTAiIHN0cm9rZS13aWR0aD0iMSIvPjxsaW5lIHgxPSI2Ni40IiB5MT0iMzE0IiB4Mj0iMzM5IiB5Mj0iMzE0IiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PGxpbmUgeDE9IjY2LjQiIHkxPSI1Ni41OTk5OTk5OTk5OTk5OTQiIHgyPSI2Ni40IiB5Mj0iMzE0IiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PGxpbmUgeDE9IjkzLjY2MDAwMDAwMDAwMDAxIiB5MT0iMzEwIiB4Mj0iOTMuNjYwMDAwMDAwMDAwMDEiIHkyPSIzMTgiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxIi8+PHRleHQgeD0iOTMuNjYwMDAwMDAwMDAwMDEiIHk9IjMyOSIgZm9udC1zaXplPSIxMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzMzMzMzMyI+MTwvdGV4dD48bGluZSB4MT0iMTIwLjkyMDAwMDAwMDAwMDAyIiB5MT0iMzEwIiB4Mj0iMTIwLjkyMDAwMDAwMDAwMDAyIiB5Mj0iMzE4IiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMSIvPjx0ZXh0IHg9IjEyMC45MjAwMDAwMDAwMDAwMiIgeT0iMzI5IiBmb250LXNpemU9IjEyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMzMzMzMzIj4yPC90ZXh0PjxsaW5lIHgxPSIxNDguMTgiIHkxPSIzMTAiIHgyPSIxNDguMTgiIHkyPSIzMTgiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxIi8+PHRleHQgeD0iMTQ4LjE4IiB5PSIzMjkiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMzMzMzMzMiPjM8L3RleHQ+PGxpbmUgeDE9IjE3NS40NCIgeTE9IjMxMCIgeDI9IjE3NS40NCIgeTI9IjMxOCIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEiLz48dGV4dCB4PSIxNzUuNDQiIHk9IjMyOSIgZm9udC1zaXplPSIxMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzMzMzMzMyI+NDwvdGV4dD48bGluZSB4MT0iMjAyLjcwMDAwMDAwMDAwMDAyIiB5MT0iMzEwIiB4Mj0iMjAyLjcwMDAwMDAwMDAwMDAyIiB5Mj0iMzE4IiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMSIvPjx0ZXh0IHg9IjIwMi43MDAwMDAwMDAwMDAwMiIgeT0iMzI5IiBmb250LXNpemU9IjEyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMzMzMzMzIj41PC90ZXh0PjxsaW5lIHgxPSIyMjkuOTYiIHkxPSIzMTAiIHgyPSIyMjkuOTYiIHkyPSIzMTgiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxIi8+PHRleHQgeD0iMjI5Ljk2IiB5PSIzMjkiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMzMzMzMzMiPjY8L3RleHQ+PGxpbmUgeDE9IjI1Ny4yMiIgeTE9IjMxMCIgeDI9IjI1Ny4yMiIgeTI9IjMxOCIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEiLz48dGV4dCB4PSIyNTcuMjIiIHk9IjMyOSIgZm9udC1zaXplPSIxMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzMzMzMzMyI+NzwvdGV4dD48bGluZSB4MT0iMjg0LjQ4IiB5MT0iMzEwIiB4Mj0iMjg0LjQ4IiB5Mj0iMzE4IiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMSIvPjx0ZXh0IHg9IjI4NC40OCIgeT0iMzI5IiBmb250LXNpemU9IjEyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMzMzMzMzIj44PC90ZXh0PjxsaW5lIHgxPSIzMTEuNzQiIHkxPSIzMTAiIHgyPSIzMTEuNzQiIHkyPSIzMTgiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxIi8+PHRleHQgeD0iMzExLjc0IiB5PSIzMjkiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMzMzMzMzMiPjk8L3RleHQ+PGxpbmUgeDE9IjMzOSIgeTE9IjMxMCIgeDI9IjMzOSIgeTI9IjMxOCIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEiLz48dGV4dCB4PSIzMzkiIHk9IjMyOSIgZm9udC1zaXplPSIxMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzMzMzMzMyI+MTA8L3RleHQ+PGxpbmUgeDE9IjYyLjQwMDAwMDAwMDAwMDAwNiIgeTE9IjI4OC4yNiIgeDI9IjcwLjQiIHkyPSIyODguMjYiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxIi8+PHRleHQgeD0iNTguNDAwMDAwMDAwMDAwMDA2IiB5PSIyOTIuMjYiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJlbmQiIGZpbGw9IiMzMzMzMzMiPjI8L3RleHQ+PGxpbmUgeDE9IjYyLjQwMDAwMDAwMDAwMDAwNiIgeTE9IjI2Mi41MiIgeDI9IjcwLjQiIHkyPSIyNjIuNTIiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxIi8+PHRleHQgeD0iNTguNDAwMDAwMDAwMDAwMDA2IiB5PSIyNjYuNTIiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJlbmQiIGZpbGw9IiMzMzMzMzMiPjQ8L3RleHQ+PGxpbmUgeDE9IjYyLjQwMDAwMDAwMDAwMDAwNiIgeTE9IjIzNi43OCIgeDI9IjcwLjQiIHkyPSIyMzYuNzgiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxIi8+PHRleHQgeD0iNTguNDAwMDAwMDAwMDAwMDA2IiB5PSIyNDAuNzgiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJlbmQiIGZpbGw9IiMzMzMzMzMiPjY8L3RleHQ+PGxpbmUgeDE9IjYyLjQwMDAwMDAwMDAwMDAwNiIgeTE9IjIxMS4wNDAwMDAwMDAwMDAwMiIgeDI9IjcwLjQiIHkyPSIyMTEuMDQwMDAwMDAwMDAwMDIiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxIi8+PHRleHQgeD0iNTguNDAwMDAwMDAwMDAwMDA2IiB5PSIyMTUuMDQwMDAwMDAwMDAwMDIiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJlbmQiIGZpbGw9IiMzMzMzMzMiPjg8L3RleHQ+PGxpbmUgeDE9IjYyLjQwMDAwMDAwMDAwMDAwNiIgeTE9IjE4NS4zIiB4Mj0iNzAuNCIgeTI9IjE4NS4zIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMSIvPjx0ZXh0IHg9IjU4LjQwMDAwMDAwMDAwMDAwNiIgeT0iMTg5LjMiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJlbmQiIGZpbGw9IiMzMzMzMzMiPjEwPC90ZXh0PjxsaW5lIHgxPSI2Mi40MDAwMDAwMDAwMDAwMDYiIHkxPSIxNTkuNTYiIHgyPSI3MC40IiB5Mj0iMTU5LjU2IiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMSIvPjx0ZXh0IHg9IjU4LjQwMDAwMDAwMDAwMDAwNiIgeT0iMTYzLjU2IiBmb250LXNpemU9IjEyIiB0ZXh0LWFuY2hvcj0iZW5kIiBmaWxsPSIjMzMzMzMzIj4xMjwvdGV4dD48bGluZSB4MT0iNjIuNDAwMDAwMDAwMDAwMDA2IiB5MT0iMTMzLjgyMDAwMDAwMDAwMDAyIiB4Mj0iNzAuNCIgeTI9IjEzMy44MjAwMDAwMDAwMDAwMiIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEiLz48dGV4dCB4PSI1OC40MDAwMDAwMDAwMDAwMDYiIHk9IjEzNy44MjAwMDAwMDAwMDAwMiIgZm9udC1zaXplPSIxMiIgdGV4dC1hbmNob3I9ImVuZCIgZmlsbD0iIzMzMzMzMyI+MTQ8L3RleHQ+PGxpbmUgeDE9IjYyLjQwMDAwMDAwMDAwMDAwNiIgeTE9IjEwOC4wODAwMDAwMDAwMDAwMSIgeDI9IjcwLjQiIHkyPSIxMDguMDgwMDAwMDAwMDAwMDEiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxIi8+PHRleHQgeD0iNTguNDAwMDAwMDAwMDAwMDA2IiB5PSIxMTIuMDgwMDAwMDAwMDAwMDEiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJlbmQiIGZpbGw9IiMzMzMzMzMiPjE2PC90ZXh0PjxsaW5lIHgxPSI2Mi40MDAwMDAwMDAwMDAwMDYiIHkxPSI4Mi4zNCIgeDI9IjcwLjQiIHkyPSI4Mi4zNCIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEiLz48dGV4dCB4PSI1OC40MDAwMDAwMDAwMDAwMDYiIHk9Ijg2LjM0IiBmb250LXNpemU9IjEyIiB0ZXh0LWFuY2hvcj0iZW5kIiBmaWxsPSIjMzMzMzMzIj4xODwvdGV4dD48bGluZSB4MT0iNjIuNDAwMDAwMDAwMDAwMDA2IiB5MT0iNTYuNjAwMDAwMDAwMDAwMDIiIHgyPSI3MC40IiB5Mj0iNTYuNjAwMDAwMDAwMDAwMDIiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxIi8+PHRleHQgeD0iNTguNDAwMDAwMDAwMDAwMDA2IiB5PSI2MC42MDAwMDAwMDAwMDAwMiIgZm9udC1zaXplPSIxMiIgdGV4dC1hbmNob3I9ImVuZCIgZmlsbD0iIzMzMzMzMyI+MjA8L3RleHQ+PHRleHQgeD0iMjAyLjcwMDAwMDAwMDAwMDAyIiB5PSIzNDkiIGZvbnQtc2l6ZT0iMTQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMzMzMzMzMiPlRpbWUgKGhvdXJzKTwvdGV4dD48dGV4dCB4PSIyMC4wMDAwMDAwMDAwMDAwMDciIHk9IjE4NS4yOTk5OTk5OTk5OTk5OCIgZm9udC1zaXplPSIxNCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzMzMzMzMyIgdHJhbnNmb3JtPSJyb3RhdGUoLTkwLCAyMC4wMDAwMDAwMDAwMDAwMDcsIDE4NS4yOTk5OTk5OTk5OTk5OCkiPjx0c3BhbiB4PSIyMC4wMDAwMDAwMDAwMDAwMDciIGR5PSIwZW0iPkRpc3RhbmNlIChraWxvbWV0ZXJzKTwvdHNwYW4+PC90ZXh0PjxsaW5lIHgxPSI2Ni40IiB5MT0iMjg5LjgxNzczNzgxOTAyNTUiIHgyPSIzMzkiIHkyPSI0Mi4zNzEzMzQxMDY3Mjg1MSIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjIiLz48Y2lyY2xlIGN4PSIxMjAuOTIwMDAwMDAwMDAwMDIiIGN5PSIyNDkuNjUiIHI9IjUiIGZpbGw9IiMwMDAwMDAiIGZpbGwtb3BhY2l0eT0iMC45Ii8+PHRleHQgeD0iMTI1LjkyMDAwMDAwMDAwMDAyIiB5PSIyNDQuNjUiIGZvbnQtc2l6ZT0iMTEiIGZpbGw9IiMzMzMzMzMiPjwvdGV4dD48Y2lyY2xlIGN4PSIxNDEuMzY1IiBjeT0iMjExLjA0MDAwMDAwMDAwMDAyIiByPSI1IiBmaWxsPSIjMDAwMDAwIiBmaWxsLW9wYWNpdHk9IjAuOSIvPjx0ZXh0IHg9IjE0Ni4zNjUiIHk9IjIwNi4wNDAwMDAwMDAwMDAwMiIgZm9udC1zaXplPSIxMSIgZmlsbD0iIzMzMzMzMyI+PC90ZXh0PjxjaXJjbGUgY3g9IjE3NS40NCIgY3k9IjE5MS43MzUiIHI9IjUiIGZpbGw9IiMwMDAwMDAiIGZpbGwtb3BhY2l0eT0iMC45Ii8+PHRleHQgeD0iMTgwLjQ0IiB5PSIxODYuNzM1IiBmb250LXNpemU9IjExIiBmaWxsPSIjMzMzMzMzIj48L3RleHQ+PGNpcmNsZSBjeD0iMjY0LjAzNSIgY3k9IjEwOC4wODAwMDAwMDAwMDAwMSIgcj0iNSIgZmlsbD0iIzAwMDAwMCIgZmlsbC1vcGFjaXR5PSIwLjkiLz48dGV4dCB4PSIyNjkuMDM1IiB5PSIxMDMuMDgwMDAwMDAwMDAwMDEiIGZvbnQtc2l6ZT0iMTEiIGZpbGw9IiMzMzMzMzMiPjwvdGV4dD48Y2lyY2xlIGN4PSIyOTguMTEiIGN5PSI4Mi4zNCIgcj0iNSIgZmlsbD0iIzAwMDAwMCIgZmlsbC1vcGFjaXR5PSIwLjkiLz48dGV4dCB4PSIzMDMuMTEiIHk9Ijc3LjM0IiBmb250LXNpemU9IjExIiBmaWxsPSIjMzMzMzMzIj48L3RleHQ+PGxpbmUgeDE9IjM1NCIgeTE9IjYzLjU5OTk5OTk5OTk5OTk5NCIgeDI9IjM3NCIgeTI9IjYzLjU5OTk5OTk5OTk5OTk5NCIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjIiLz48dGV4dCB4PSIzNzkiIHk9IjY2LjYiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IiMwMDAwMDAiPjwvdGV4dD48L3N2Zz4=" alt="Widget visualization" />
+        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzc1IiBoZWlnaHQ9IjM3OSIgdmlld0JveD0iLTggLTggMzc1IDM3OSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMiI+PGRlZnM+PGNsaXBQYXRoIGlkPSJjbGlwLTAiPjxyZWN0IHg9IjY2LjQiIHk9IjU2LjU5OTk5OTk5OTk5OTk5NCIgd2lkdGg9IjI3Mi42IiBoZWlnaHQ9IjI1Ny40Ii8+PC9jbGlwUGF0aD48L2RlZnM+PHRleHQgeD0iMjAyLjcwMDAwMDAwMDAwMDAyIiB5PSIyMCIgZm9udC1zaXplPSIxOCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzMzMzMzMyI+PHRzcGFuIHg9IjIwMi43MDAwMDAwMDAwMDAwMiIgZHk9IjBlbSI+VGltZSB2cyBkaXN0YW5jZSBtb2RlbDwvdHNwYW4+PC90ZXh0PjxsaW5lIHgxPSI5My42NjAwMDAwMDAwMDAwMSIgeTE9IjU2LjU5OTk5OTk5OTk5OTk5NCIgeDI9IjkzLjY2MDAwMDAwMDAwMDAxIiB5Mj0iMzE0IiBzdHJva2U9IiNlMGUwZTAiIHN0cm9rZS13aWR0aD0iMSIvPjxsaW5lIHgxPSIxMjAuOTIwMDAwMDAwMDAwMDIiIHkxPSI1Ni41OTk5OTk5OTk5OTk5OTQiIHgyPSIxMjAuOTIwMDAwMDAwMDAwMDIiIHkyPSIzMTQiIHN0cm9rZT0iI2UwZTBlMCIgc3Ryb2tlLXdpZHRoPSIxIi8+PGxpbmUgeDE9IjE0OC4xOCIgeTE9IjU2LjU5OTk5OTk5OTk5OTk5NCIgeDI9IjE0OC4xOCIgeTI9IjMxNCIgc3Ryb2tlPSIjZTBlMGUwIiBzdHJva2Utd2lkdGg9IjEiLz48bGluZSB4MT0iMTc1LjQ0IiB5MT0iNTYuNTk5OTk5OTk5OTk5OTk0IiB4Mj0iMTc1LjQ0IiB5Mj0iMzE0IiBzdHJva2U9IiNlMGUwZTAiIHN0cm9rZS13aWR0aD0iMSIvPjxsaW5lIHgxPSIyMDIuNzAwMDAwMDAwMDAwMDIiIHkxPSI1Ni41OTk5OTk5OTk5OTk5OTQiIHgyPSIyMDIuNzAwMDAwMDAwMDAwMDIiIHkyPSIzMTQiIHN0cm9rZT0iI2UwZTBlMCIgc3Ryb2tlLXdpZHRoPSIxIi8+PGxpbmUgeDE9IjIyOS45NiIgeTE9IjU2LjU5OTk5OTk5OTk5OTk5NCIgeDI9IjIyOS45NiIgeTI9IjMxNCIgc3Ryb2tlPSIjZTBlMGUwIiBzdHJva2Utd2lkdGg9IjEiLz48bGluZSB4MT0iMjU3LjIyIiB5MT0iNTYuNTk5OTk5OTk5OTk5OTk0IiB4Mj0iMjU3LjIyIiB5Mj0iMzE0IiBzdHJva2U9IiNlMGUwZTAiIHN0cm9rZS13aWR0aD0iMSIvPjxsaW5lIHgxPSIyODQuNDgiIHkxPSI1Ni41OTk5OTk5OTk5OTk5OTQiIHgyPSIyODQuNDgiIHkyPSIzMTQiIHN0cm9rZT0iI2UwZTBlMCIgc3Ryb2tlLXdpZHRoPSIxIi8+PGxpbmUgeDE9IjMxMS43NCIgeTE9IjU2LjU5OTk5OTk5OTk5OTk5NCIgeDI9IjMxMS43NCIgeTI9IjMxNCIgc3Ryb2tlPSIjZTBlMGUwIiBzdHJva2Utd2lkdGg9IjEiLz48bGluZSB4MT0iMzM5IiB5MT0iNTYuNTk5OTk5OTk5OTk5OTk0IiB4Mj0iMzM5IiB5Mj0iMzE0IiBzdHJva2U9IiNlMGUwZTAiIHN0cm9rZS13aWR0aD0iMSIvPjxsaW5lIHgxPSI2Ni40IiB5MT0iMjg4LjI2IiB4Mj0iMzM5IiB5Mj0iMjg4LjI2IiBzdHJva2U9IiNlMGUwZTAiIHN0cm9rZS13aWR0aD0iMSIvPjxsaW5lIHgxPSI2Ni40IiB5MT0iMjYyLjUyIiB4Mj0iMzM5IiB5Mj0iMjYyLjUyIiBzdHJva2U9IiNlMGUwZTAiIHN0cm9rZS13aWR0aD0iMSIvPjxsaW5lIHgxPSI2Ni40IiB5MT0iMjM2Ljc4IiB4Mj0iMzM5IiB5Mj0iMjM2Ljc4IiBzdHJva2U9IiNlMGUwZTAiIHN0cm9rZS13aWR0aD0iMSIvPjxsaW5lIHgxPSI2Ni40IiB5MT0iMjExLjA0MDAwMDAwMDAwMDAyIiB4Mj0iMzM5IiB5Mj0iMjExLjA0MDAwMDAwMDAwMDAyIiBzdHJva2U9IiNlMGUwZTAiIHN0cm9rZS13aWR0aD0iMSIvPjxsaW5lIHgxPSI2Ni40IiB5MT0iMTg1LjMiIHgyPSIzMzkiIHkyPSIxODUuMyIgc3Ryb2tlPSIjZTBlMGUwIiBzdHJva2Utd2lkdGg9IjEiLz48bGluZSB4MT0iNjYuNCIgeTE9IjE1OS41NiIgeDI9IjMzOSIgeTI9IjE1OS41NiIgc3Ryb2tlPSIjZTBlMGUwIiBzdHJva2Utd2lkdGg9IjEiLz48bGluZSB4MT0iNjYuNCIgeTE9IjEzMy44MjAwMDAwMDAwMDAwMiIgeDI9IjMzOSIgeTI9IjEzMy44MjAwMDAwMDAwMDAwMiIgc3Ryb2tlPSIjZTBlMGUwIiBzdHJva2Utd2lkdGg9IjEiLz48bGluZSB4MT0iNjYuNCIgeTE9IjEwOC4wODAwMDAwMDAwMDAwMSIgeDI9IjMzOSIgeTI9IjEwOC4wODAwMDAwMDAwMDAwMSIgc3Ryb2tlPSIjZTBlMGUwIiBzdHJva2Utd2lkdGg9IjEiLz48bGluZSB4MT0iNjYuNCIgeTE9IjgyLjM0IiB4Mj0iMzM5IiB5Mj0iODIuMzQiIHN0cm9rZT0iI2UwZTBlMCIgc3Ryb2tlLXdpZHRoPSIxIi8+PGxpbmUgeDE9IjY2LjQiIHkxPSI1Ni42MDAwMDAwMDAwMDAwMiIgeDI9IjMzOSIgeTI9IjU2LjYwMDAwMDAwMDAwMDAyIiBzdHJva2U9IiNlMGUwZTAiIHN0cm9rZS13aWR0aD0iMSIvPjxsaW5lIHgxPSI2Ni40IiB5MT0iMzE0IiB4Mj0iMzM5IiB5Mj0iMzE0IiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PGxpbmUgeDE9IjY2LjQiIHkxPSI1Ni41OTk5OTk5OTk5OTk5OTQiIHgyPSI2Ni40IiB5Mj0iMzE0IiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PGxpbmUgeDE9IjkzLjY2MDAwMDAwMDAwMDAxIiB5MT0iMzEwIiB4Mj0iOTMuNjYwMDAwMDAwMDAwMDEiIHkyPSIzMTgiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxIi8+PHRleHQgeD0iOTMuNjYwMDAwMDAwMDAwMDEiIHk9IjMyOSIgZm9udC1zaXplPSIxMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzMzMzMzMyI+MTwvdGV4dD48bGluZSB4MT0iMTIwLjkyMDAwMDAwMDAwMDAyIiB5MT0iMzEwIiB4Mj0iMTIwLjkyMDAwMDAwMDAwMDAyIiB5Mj0iMzE4IiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMSIvPjx0ZXh0IHg9IjEyMC45MjAwMDAwMDAwMDAwMiIgeT0iMzI5IiBmb250LXNpemU9IjEyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMzMzMzMzIj4yPC90ZXh0PjxsaW5lIHgxPSIxNDguMTgiIHkxPSIzMTAiIHgyPSIxNDguMTgiIHkyPSIzMTgiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxIi8+PHRleHQgeD0iMTQ4LjE4IiB5PSIzMjkiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMzMzMzMzMiPjM8L3RleHQ+PGxpbmUgeDE9IjE3NS40NCIgeTE9IjMxMCIgeDI9IjE3NS40NCIgeTI9IjMxOCIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEiLz48dGV4dCB4PSIxNzUuNDQiIHk9IjMyOSIgZm9udC1zaXplPSIxMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzMzMzMzMyI+NDwvdGV4dD48bGluZSB4MT0iMjAyLjcwMDAwMDAwMDAwMDAyIiB5MT0iMzEwIiB4Mj0iMjAyLjcwMDAwMDAwMDAwMDAyIiB5Mj0iMzE4IiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMSIvPjx0ZXh0IHg9IjIwMi43MDAwMDAwMDAwMDAwMiIgeT0iMzI5IiBmb250LXNpemU9IjEyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMzMzMzMzIj41PC90ZXh0PjxsaW5lIHgxPSIyMjkuOTYiIHkxPSIzMTAiIHgyPSIyMjkuOTYiIHkyPSIzMTgiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxIi8+PHRleHQgeD0iMjI5Ljk2IiB5PSIzMjkiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMzMzMzMzMiPjY8L3RleHQ+PGxpbmUgeDE9IjI1Ny4yMiIgeTE9IjMxMCIgeDI9IjI1Ny4yMiIgeTI9IjMxOCIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEiLz48dGV4dCB4PSIyNTcuMjIiIHk9IjMyOSIgZm9udC1zaXplPSIxMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzMzMzMzMyI+NzwvdGV4dD48bGluZSB4MT0iMjg0LjQ4IiB5MT0iMzEwIiB4Mj0iMjg0LjQ4IiB5Mj0iMzE4IiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMSIvPjx0ZXh0IHg9IjI4NC40OCIgeT0iMzI5IiBmb250LXNpemU9IjEyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMzMzMzMzIj44PC90ZXh0PjxsaW5lIHgxPSIzMTEuNzQiIHkxPSIzMTAiIHgyPSIzMTEuNzQiIHkyPSIzMTgiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxIi8+PHRleHQgeD0iMzExLjc0IiB5PSIzMjkiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMzMzMzMzMiPjk8L3RleHQ+PGxpbmUgeDE9IjMzOSIgeTE9IjMxMCIgeDI9IjMzOSIgeTI9IjMxOCIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEiLz48dGV4dCB4PSIzMzkiIHk9IjMyOSIgZm9udC1zaXplPSIxMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzMzMzMzMyI+MTA8L3RleHQ+PGxpbmUgeDE9IjYyLjQwMDAwMDAwMDAwMDAwNiIgeTE9IjI4OC4yNiIgeDI9IjcwLjQiIHkyPSIyODguMjYiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxIi8+PHRleHQgeD0iNTguNDAwMDAwMDAwMDAwMDA2IiB5PSIyOTIuMjYiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJlbmQiIGZpbGw9IiMzMzMzMzMiPjI8L3RleHQ+PGxpbmUgeDE9IjYyLjQwMDAwMDAwMDAwMDAwNiIgeTE9IjI2Mi41MiIgeDI9IjcwLjQiIHkyPSIyNjIuNTIiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxIi8+PHRleHQgeD0iNTguNDAwMDAwMDAwMDAwMDA2IiB5PSIyNjYuNTIiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJlbmQiIGZpbGw9IiMzMzMzMzMiPjQ8L3RleHQ+PGxpbmUgeDE9IjYyLjQwMDAwMDAwMDAwMDAwNiIgeTE9IjIzNi43OCIgeDI9IjcwLjQiIHkyPSIyMzYuNzgiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxIi8+PHRleHQgeD0iNTguNDAwMDAwMDAwMDAwMDA2IiB5PSIyNDAuNzgiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJlbmQiIGZpbGw9IiMzMzMzMzMiPjY8L3RleHQ+PGxpbmUgeDE9IjYyLjQwMDAwMDAwMDAwMDAwNiIgeTE9IjIxMS4wNDAwMDAwMDAwMDAwMiIgeDI9IjcwLjQiIHkyPSIyMTEuMDQwMDAwMDAwMDAwMDIiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxIi8+PHRleHQgeD0iNTguNDAwMDAwMDAwMDAwMDA2IiB5PSIyMTUuMDQwMDAwMDAwMDAwMDIiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJlbmQiIGZpbGw9IiMzMzMzMzMiPjg8L3RleHQ+PGxpbmUgeDE9IjYyLjQwMDAwMDAwMDAwMDAwNiIgeTE9IjE4NS4zIiB4Mj0iNzAuNCIgeTI9IjE4NS4zIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMSIvPjx0ZXh0IHg9IjU4LjQwMDAwMDAwMDAwMDAwNiIgeT0iMTg5LjMiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJlbmQiIGZpbGw9IiMzMzMzMzMiPjEwPC90ZXh0PjxsaW5lIHgxPSI2Mi40MDAwMDAwMDAwMDAwMDYiIHkxPSIxNTkuNTYiIHgyPSI3MC40IiB5Mj0iMTU5LjU2IiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMSIvPjx0ZXh0IHg9IjU4LjQwMDAwMDAwMDAwMDAwNiIgeT0iMTYzLjU2IiBmb250LXNpemU9IjEyIiB0ZXh0LWFuY2hvcj0iZW5kIiBmaWxsPSIjMzMzMzMzIj4xMjwvdGV4dD48bGluZSB4MT0iNjIuNDAwMDAwMDAwMDAwMDA2IiB5MT0iMTMzLjgyMDAwMDAwMDAwMDAyIiB4Mj0iNzAuNCIgeTI9IjEzMy44MjAwMDAwMDAwMDAwMiIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEiLz48dGV4dCB4PSI1OC40MDAwMDAwMDAwMDAwMDYiIHk9IjEzNy44MjAwMDAwMDAwMDAwMiIgZm9udC1zaXplPSIxMiIgdGV4dC1hbmNob3I9ImVuZCIgZmlsbD0iIzMzMzMzMyI+MTQ8L3RleHQ+PGxpbmUgeDE9IjYyLjQwMDAwMDAwMDAwMDAwNiIgeTE9IjEwOC4wODAwMDAwMDAwMDAwMSIgeDI9IjcwLjQiIHkyPSIxMDguMDgwMDAwMDAwMDAwMDEiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxIi8+PHRleHQgeD0iNTguNDAwMDAwMDAwMDAwMDA2IiB5PSIxMTIuMDgwMDAwMDAwMDAwMDEiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJlbmQiIGZpbGw9IiMzMzMzMzMiPjE2PC90ZXh0PjxsaW5lIHgxPSI2Mi40MDAwMDAwMDAwMDAwMDYiIHkxPSI4Mi4zNCIgeDI9IjcwLjQiIHkyPSI4Mi4zNCIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEiLz48dGV4dCB4PSI1OC40MDAwMDAwMDAwMDAwMDYiIHk9Ijg2LjM0IiBmb250LXNpemU9IjEyIiB0ZXh0LWFuY2hvcj0iZW5kIiBmaWxsPSIjMzMzMzMzIj4xODwvdGV4dD48bGluZSB4MT0iNjIuNDAwMDAwMDAwMDAwMDA2IiB5MT0iNTYuNjAwMDAwMDAwMDAwMDIiIHgyPSI3MC40IiB5Mj0iNTYuNjAwMDAwMDAwMDAwMDIiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxIi8+PHRleHQgeD0iNTguNDAwMDAwMDAwMDAwMDA2IiB5PSI2MC42MDAwMDAwMDAwMDAwMiIgZm9udC1zaXplPSIxMiIgdGV4dC1hbmNob3I9ImVuZCIgZmlsbD0iIzMzMzMzMyI+MjA8L3RleHQ+PHRleHQgeD0iMjAyLjcwMDAwMDAwMDAwMDAyIiB5PSIzNDkiIGZvbnQtc2l6ZT0iMTQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMzMzMzMzMiPlRpbWUgKGhvdXJzKTwvdGV4dD48dGV4dCB4PSIyMC4wMDAwMDAwMDAwMDAwMDciIHk9IjE4NS4yOTk5OTk5OTk5OTk5OCIgZm9udC1zaXplPSIxNCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzMzMzMzMyIgdHJhbnNmb3JtPSJyb3RhdGUoLTkwLCAyMC4wMDAwMDAwMDAwMDAwMDcsIDE4NS4yOTk5OTk5OTk5OTk5OCkiPjx0c3BhbiB4PSIyMC4wMDAwMDAwMDAwMDAwMDciIGR5PSIwZW0iPkRpc3RhbmNlIChraWxvbWV0ZXJzKTwvdHNwYW4+PC90ZXh0PjxjaXJjbGUgY3g9IjEyMC45MjAwMDAwMDAwMDAwMiIgY3k9IjI0OS42NSIgcj0iNSIgZmlsbD0iIzAwMDAwMCIgZmlsbC1vcGFjaXR5PSIwLjkiLz48dGV4dCB4PSIxMjUuOTIwMDAwMDAwMDAwMDIiIHk9IjI0NC42NSIgZm9udC1zaXplPSIxMSIgZmlsbD0iIzMzMzMzMyI+PC90ZXh0PjxjaXJjbGUgY3g9IjE0MS4zNjUiIGN5PSIyMTEuMDQwMDAwMDAwMDAwMDIiIHI9IjUiIGZpbGw9IiMwMDAwMDAiIGZpbGwtb3BhY2l0eT0iMC45Ii8+PHRleHQgeD0iMTQ2LjM2NSIgeT0iMjA2LjA0MDAwMDAwMDAwMDAyIiBmb250LXNpemU9IjExIiBmaWxsPSIjMzMzMzMzIj48L3RleHQ+PGNpcmNsZSBjeD0iMTc1LjQ0IiBjeT0iMTkxLjczNSIgcj0iNSIgZmlsbD0iIzAwMDAwMCIgZmlsbC1vcGFjaXR5PSIwLjkiLz48dGV4dCB4PSIxODAuNDQiIHk9IjE4Ni43MzUiIGZvbnQtc2l6ZT0iMTEiIGZpbGw9IiMzMzMzMzMiPjwvdGV4dD48Y2lyY2xlIGN4PSIyNjQuMDM1IiBjeT0iMTA4LjA4MDAwMDAwMDAwMDAxIiByPSI1IiBmaWxsPSIjMDAwMDAwIiBmaWxsLW9wYWNpdHk9IjAuOSIvPjx0ZXh0IHg9IjI2OS4wMzUiIHk9IjEwMy4wODAwMDAwMDAwMDAwMSIgZm9udC1zaXplPSIxMSIgZmlsbD0iIzMzMzMzMyI+PC90ZXh0PjxjaXJjbGUgY3g9IjI5OC4xMSIgY3k9IjgyLjM0IiByPSI1IiBmaWxsPSIjMDAwMDAwIiBmaWxsLW9wYWNpdHk9IjAuOSIvPjx0ZXh0IHg9IjMwMy4xMSIgeT0iNzcuMzQiIGZvbnQtc2l6ZT0iMTEiIGZpbGw9IiMzMzMzMzMiPjwvdGV4dD48L3N2Zz4=" alt="Widget visualization" />
         <p>Which of these linear equations best describes the given model?</p>
         <div><qti-choice-interaction response-identifier="RESPONSE_CHOICE" shuffle="true" min-choices="1" max-choices="1">
             <qti-prompt></qti-prompt>
-            <qti-simple-choice identifier="A"><p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mover accent="true"><mi>y</mi><mo>^</mo></mover><mo>=</mo><mn>2</mn><mi>x</mi><mo>+</mo><mn>1.5</mn></mrow></math></p></qti-simple-choice>
-            <qti-simple-choice identifier="B"><p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mover accent="true"><mi>y</mi><mo>^</mo></mover><mo>=</mo><mi>x</mi><mo>+</mo><mn>1.5</mn></mrow></math></p></qti-simple-choice>
-            <qti-simple-choice identifier="C"><p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mover accent="true"><mi>y</mi><mo>^</mo></mover><mo>=</mo><mn>2</mn><mi>x</mi><mo>-</mo><mn>1.5</mn></mrow></math></p></qti-simple-choice>
-            <qti-simple-choice identifier="D"><p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mover accent="true"><mi>y</mi><mo>^</mo></mover><mo>=</mo><mi>x</mi><mo>-</mo><mn>1.5</mn></mrow></math></p></qti-simple-choice>
+            <qti-simple-choice identifier="A"><p><math xmlns="http://www.w3.org/1998/Math/MathML"><mover accent="true"><mi>y</mi><mo>^</mo></mover><mo>=</mo><mn>2</mn><mi>x</mi><mo>+</mo><mn>1.5</mn></math></p></qti-simple-choice>
+            <qti-simple-choice identifier="B"><p><math xmlns="http://www.w3.org/1998/Math/MathML"><mover accent="true"><mi>y</mi><mo>^</mo></mover><mo>=</mo><mi>x</mi><mo>+</mo><mn>1.5</mn></math></p></qti-simple-choice>
+            <qti-simple-choice identifier="C"><p><math xmlns="http://www.w3.org/1998/Math/MathML"><mover accent="true"><mi>y</mi><mo>^</mo></mover><mo>=</mo><mn>2</mn><mi>x</mi><mo>-</mo><mn>1.5</mn></math></p></qti-simple-choice>
+            <qti-simple-choice identifier="D"><p><math xmlns="http://www.w3.org/1998/Math/MathML"><mover accent="true"><mi>y</mi><mo>^</mo></mover><mo>=</mo><mi>x</mi><mo>-</mo><mn>1.5</mn></math></p></qti-simple-choice>
         </qti-choice-interaction></div>
         <p>Based on this equation, estimate the distance Daniel can hike in <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>6</mn></math> hours.</p>
         <p>Round your answer to the nearest tenth.</p>
         <p><qti-text-entry-interaction response-identifier="RESPONSE_TEXT"/> km</p>
-        <qti-feedback-block outcome-identifier="FEEDBACK__RESPONSE_CHOICE" identifier="A" show-hide="show">
-            <qti-content-body><p>Outstanding! You correctly identified that a reasonable linear model fits the points with a slope of <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>2</mn></math> and a y-intercept of <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>1.5</mn></math>, giving us the equation <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mover accent="true"><mi>y</mi><mo>^</mo></mover><mo>=</mo><mn>2</mn><mi>x</mi><mo>+</mo><mn>1.5</mn></mrow></math>.</p>
-        <p>You demonstrated excellent understanding of linear modeling! The slope of <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>2</mn></math> means Daniel hikes approximately <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>2</mn></math> kilometers for every hour, and the y-intercept of <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>1.5</mn></math> suggests he covers some initial distance even at time zero.</p>
-        <p>This type of linear modeling is used everywhere: predicting sales growth, calculating medication dosages over time, and even estimating how much fuel a car uses per mile!</p></qti-content-body>
+        <qti-feedback-block outcome-identifier="FEEDBACK__OVERALL" identifier="FB__RESPONSE_CHOICE_A__RESPONSE_TEXT_CORRECT" show-hide="show">
+            <qti-content-body><p>Perfect on both parts! The correct equation is indeed <math xmlns="http://www.w3.org/1998/Math/MathML"><mover accent="true"><mi>y</mi><mo>^</mo></mover><mo>=</mo><mn>2</mn><mi>x</mi><mo>+</mo><mn>1.5</mn></math>, and using it to predict for 6 hours gives <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>13.5</mn></math> km.</p></qti-content-body>
         </qti-feedback-block>
-        <qti-feedback-block outcome-identifier="FEEDBACK__RESPONSE_CHOICE" identifier="B" show-hide="show">
-            <qti-content-body><p>Good thinking, but let's examine the slope more carefully! You identified the y-intercept correctly as <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>1.5</mn></math>, which shows you understand where the line crosses the y-axis.</p>
-        <p>To find the slope, pick <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>2</mn></math> clear points on the line. For example, from (<math xmlns="http://www.w3.org/1998/Math/MathML"><mn>0</mn></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>1.5</mn></math>) to (<math xmlns="http://www.w3.org/1998/Math/MathML"><mn>4</mn></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>9.5</mn></math>):</p>
-        <p>Slope = <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mtext>rise</mtext><mtext>run</mtext></mfrac></math> = <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mrow><mn>9.5</mn><mo>-</mo><mn>1.5</mn></mrow><mrow><mn>4</mn><mo>-</mo><mn>0</mn></mrow></mfrac></math> = <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>8</mn><mn>4</mn></mfrac></math> = <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>2</mn></math></p>
-        <p>So the correct equation is <math xmlns="http://www.w3.org/1998/Math/MathML"><mover accent="true"><mi>y</mi><mo>^</mo></mover><mo>=</mo><mn>2</mn><mi>x</mi><mo>+</mo><mn>1.5</mn></math>, not <math xmlns="http://www.w3.org/1998/Math/MathML"><mover accent="true"><mi>y</mi><mo>^</mo></mover><mo>=</mo><mn>1</mn><mi>x</mi><mo>+</mo><mn>1.5</mn></math>.</p></qti-content-body>
+        <qti-feedback-block outcome-identifier="FEEDBACK__OVERALL" identifier="FB__RESPONSE_CHOICE_A__RESPONSE_TEXT_INCORRECT" show-hide="show">
+            <qti-content-body><p>You correctly identified the equation as <math xmlns="http://www.w3.org/1998/Math/MathML"><mover accent="true"><mi>y</mi><mo>^</mo></mover><mo>=</mo><mn>2</mn><mi>x</mi><mo>+</mo><mn>1.5</mn></math>, but your prediction for 6 hours was incorrect. Let's re-calculate: <math xmlns="http://www.w3.org/1998/Math/MathML"><mover accent="true"><mi>y</mi><mo>^</mo></mover><mo>=</mo><mn>2</mn><mo>(</mo><mn>6</mn><mo>)</mo><mo>+</mo><mn>1.5</mn><mo>=</mo><mn>12</mn><mo>+</mo><mn>1.5</mn><mo>=</mo><mn>13.5</mn></math></p></qti-content-body>
         </qti-feedback-block>
-        <qti-feedback-block outcome-identifier="FEEDBACK__RESPONSE_CHOICE" identifier="C" show-hide="show">
-            <qti-content-body><p>Great work on finding the slope as <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>2</mn></math>! You correctly calculated the rate of change. Now let's check the y-intercept together.</p>
-        <p>The y-intercept is where the line crosses the y-axis (when <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi><mo>=</mo><mn>0</mn></math>). Looking at the graph, the line appears to cross at (<math xmlns="http://www.w3.org/1998/Math/MathML"><mn>0</mn></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>1.5</mn></math>), not (<math xmlns="http://www.w3.org/1998/Math/MathML"><mn>0</mn></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mo>-</mo><mn>1.5</mn></math>).</p>
-        <p>Remember: A positive y-intercept means the line starts above the x-axis, while a negative y-intercept means it starts below the x-axis.</p>
-        <p>The correct equation is <math xmlns="http://www.w3.org/1998/Math/MathML"><mover accent="true"><mi>y</mi><mo>^</mo></mover><mo>=</mo><mn>2</mn><mi>x</mi><mo>+</mo><mn>1.5</mn></math> (positive <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>1.5</mn></math>, not negative).</p></qti-content-body>
+        <qti-feedback-block outcome-identifier="FEEDBACK__OVERALL" identifier="FB__RESPONSE_CHOICE_B__RESPONSE_TEXT_CORRECT" show-hide="show">
+            <qti-content-body><p>Your prediction calculation was correct, but it was based on the wrong equation. The slope of the line is closer to 2, not 1. The correct equation is <math xmlns="http://www.w3.org/1998/Math/MathML"><mover accent="true"><mi>y</mi><mo>^</mo></mover><mo>=</mo><mn>2</mn><mi>x</mi><mo>+</mo><mn>1.5</mn></math>.</p></qti-content-body>
         </qti-feedback-block>
-        <qti-feedback-block outcome-identifier="FEEDBACK__RESPONSE_CHOICE" identifier="D" show-hide="show">
-            <qti-content-body><p>Let's work through finding both the slope and y-intercept systematically! Linear equations have the form <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>y</mi><mo>=</mo><mi>m</mi><mi>x</mi><mo>+</mo><mi>b</mi></math> where <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>m</mi></math> is slope and <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>b</mi></math> is y-intercept.</p>
-        <p>Finding the y-intercept: Look where the line crosses the y-axis. This appears to be at (<math xmlns="http://www.w3.org/1998/Math/MathML"><mn>0</mn></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>1.5</mn></math>), so <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>b</mi><mo>=</mo><mn>1.5</mn></math>.</p>
-        <p>Finding the slope: Pick <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>2</mn></math> points and use <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>m</mi><mo>=</mo><mfrac><mrow><mi>y</mi><mn>2</mn><mo>-</mo><mi>y</mi><mn>1</mn></mrow><mrow><mi>x</mi><mn>2</mn><mo>-</mo><mi>x</mi><mn>1</mn></mrow></mfrac></math>. Using points (<math xmlns="http://www.w3.org/1998/Math/MathML"><mn>2</mn></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>5</mn></math>) and (<math xmlns="http://www.w3.org/1998/Math/MathML"><mn>4</mn></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>9.5</mn></math>):</p>
-        <p>Slope = <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mrow><mn>9.5</mn><mo>-</mo><mn>5</mn></mrow><mrow><mn>4</mn><mo>-</mo><mn>2</mn></mrow></mfrac></math> = <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>4.5</mn><mn>2</mn></mfrac></math> = <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>2.25</mn></math> ≈ <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>2</mn></math></p>
-        <p>Therefore, the equation is <math xmlns="http://www.w3.org/1998/Math/MathML"><mover accent="true"><mi>y</mi><mo>^</mo></mover><mo>=</mo><mn>2</mn><mi>x</mi><mo>+</mo><mn>1.5</mn></math>.</p></qti-content-body>
+        <qti-feedback-block outcome-identifier="FEEDBACK__OVERALL" identifier="FB__RESPONSE_CHOICE_B__RESPONSE_TEXT_INCORRECT" show-hide="show">
+            <qti-content-body><p>It looks like there were errors in both parts. The correct equation has a slope of 2 and a y-intercept of 1.5. Using that, the prediction for 6 hours is 13.5 km.</p></qti-content-body>
         </qti-feedback-block>
-        <qti-feedback-block outcome-identifier="FEEDBACK__RESPONSE_TEXT" identifier="CORRECT" show-hide="show">
-            <qti-content-body><p>Perfect! You correctly used the model to predict that in <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>6</mn></math> hours, Daniel can hike <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>13.5</mn></math> kilometers.</p>
-        <p>Your calculation was spot-on: <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mover accent="true"><mi>y</mi><mo>^</mo></mover><mo>=</mo><mn>2</mn><mo>(</mo><mn>6</mn><mo>)</mo><mo>+</mo><mn>1.5</mn><mo>=</mo><mn>12</mn><mo>+</mo><mn>1.5</mn><mo>=</mo><mn>13.5</mn></mrow></math></p>
-        <p>You demonstrated excellent understanding of how to use linear models for prediction! This skill is crucial for making informed decisions based on data patterns.</p>
-        <p>Challenge: If Daniel wanted to hike exactly <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>20</mn></math> kilometers, how many hours would that take according to this model?</p></qti-content-body>
+        <qti-feedback-block outcome-identifier="FEEDBACK__OVERALL" identifier="FB__RESPONSE_CHOICE_C__RESPONSE_TEXT_CORRECT" show-hide="show">
+            <qti-content-body><p>Your prediction calculation was correct, but it was based on the wrong equation. The y-intercept is positive (1.5), not negative. The correct equation is <math xmlns="http://www.w3.org/1998/Math/MathML"><mover accent="true"><mi>y</mi><mo>^</mo></mover><mo>=</mo><mn>2</mn><mi>x</mi><mo>+</mo><mn>1.5</mn></math>.</p></qti-content-body>
         </qti-feedback-block>
-        <qti-feedback-block outcome-identifier="FEEDBACK__RESPONSE_TEXT" identifier="INCORRECT" show-hide="show">
-            <qti-content-body><p>Let's work through this prediction step by step! Using linear models to make predictions is a powerful skill once you get the process down.</p>
-        <p>Step <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>1</mn></math>: First, we need the correct linear equation. From the graph, we can estimate the slope from <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>2</mn></math> clear points on the fitted line.</p>
-        <p>Using points (<math xmlns="http://www.w3.org/1998/Math/MathML"><mn>0</mn></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>1.5</mn></math>) and (<math xmlns="http://www.w3.org/1998/Math/MathML"><mn>4</mn></math>, <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>9.5</mn></math>), the slope is <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mrow><mn>9.5</mn><mo>-</mo><mn>1.5</mn></mrow><mrow><mn>4</mn><mo>-</mo><mn>0</mn></mrow></mfrac><mo>=</mo><mfrac><mn>8</mn><mn>4</mn></mfrac><mo>=</mo><mn>2</mn></mrow></math></p>
-        <p>The y-intercept is <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>1.5</mn></math>, so our model is <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mover accent="true"><mi>y</mi><mo>^</mo></mover><mo>=</mo><mn>2</mn><mi>x</mi><mo>+</mo><mn>1.5</mn></mrow></math></p>
-        <p>Step <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>2</mn></math>: Substitute <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi><mo>=</mo><mn>6</mn></math> hours into the equation:</p>
-        <p><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mover accent="true"><mi>y</mi><mo>^</mo></mover><mo>=</mo><mn>2</mn><mo>(</mo><mn>6</mn><mo>)</mo><mo>+</mo><mn>1.5</mn><mo>=</mo><mn>12</mn><mo>+</mo><mn>1.5</mn><mo>=</mo><mn>13.5</mn></mrow></math></p>
-        <p>Therefore, Daniel can hike approximately <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>13.5</mn></math> kilometers in <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>6</mn></math> hours.</p></qti-content-body>
+        <qti-feedback-block outcome-identifier="FEEDBACK__OVERALL" identifier="FB__RESPONSE_CHOICE_C__RESPONSE_TEXT_INCORRECT" show-hide="show">
+            <qti-content-body><p>It looks like there were errors in both parts. The correct equation has a positive y-intercept (1.5). Using that, the prediction for 6 hours is 13.5 km.</p></qti-content-body>
+        </qti-feedback-block>
+        <qti-feedback-block outcome-identifier="FEEDBACK__OVERALL" identifier="FB__RESPONSE_CHOICE_D__RESPONSE_TEXT_CORRECT" show-hide="show">
+            <qti-content-body><p>Your prediction calculation was correct, but it was based on the wrong equation. The slope is 2 and the y-intercept is positive 1.5. The correct equation is <math xmlns="http://www.w3.org/1998/Math/MathML"><mover accent="true"><mi>y</mi><mo>^</mo></mover><mo>=</mo><mn>2</mn><mi>x</mi><mo>+</mo><mn>1.5</mn></math>.</p></qti-content-body>
+        </qti-feedback-block>
+        <qti-feedback-block outcome-identifier="FEEDBACK__OVERALL" identifier="FB__RESPONSE_CHOICE_D__RESPONSE_TEXT_INCORRECT" show-hide="show">
+            <qti-content-body><p>It looks like there were errors in both parts. The correct equation is <math xmlns="http://www.w3.org/1998/Math/MathML"><mover accent="true"><mi>y</mi><mo>^</mo></mover><mo>=</mo><mn>2</mn><mi>x</mi><mo>+</mo><mn>1.5</mn></math>. Using that, the prediction for 6 hours is 13.5 km.</p></qti-content-body>
         </qti-feedback-block>
     </qti-item-body>
     <qti-response-processing>
-        <qti-response-condition>
+        
+    <qti-response-condition>
         <qti-response-if>
             <qti-match>
                 <qti-variable identifier="RESPONSE_CHOICE"/>
                 <qti-base-value base-type="identifier">A</qti-base-value>
             </qti-match>
-            <qti-set-outcome-value identifier="FEEDBACK__RESPONSE_CHOICE">
-                <qti-base-value base-type="identifier">A</qti-base-value>
-            </qti-set-outcome-value>
-        </qti-response-if>
-        <qti-response-else-if>
-            <qti-match>
-                <qti-variable identifier="RESPONSE_CHOICE"/>
-                <qti-base-value base-type="identifier">B</qti-base-value>
-            </qti-match>
-            <qti-set-outcome-value identifier="FEEDBACK__RESPONSE_CHOICE">
-                <qti-base-value base-type="identifier">B</qti-base-value>
-            </qti-set-outcome-value>
-        </qti-response-else-if>
-        <qti-response-else-if>
-            <qti-match>
-                <qti-variable identifier="RESPONSE_CHOICE"/>
-                <qti-base-value base-type="identifier">C</qti-base-value>
-            </qti-match>
-            <qti-set-outcome-value identifier="FEEDBACK__RESPONSE_CHOICE">
-                <qti-base-value base-type="identifier">C</qti-base-value>
-            </qti-set-outcome-value>
-        </qti-response-else-if>
-        <qti-response-else-if>
-            <qti-match>
-                <qti-variable identifier="RESPONSE_CHOICE"/>
-                <qti-base-value base-type="identifier">D</qti-base-value>
-            </qti-match>
-            <qti-set-outcome-value identifier="FEEDBACK__RESPONSE_CHOICE">
-                <qti-base-value base-type="identifier">D</qti-base-value>
-            </qti-set-outcome-value>
-        </qti-response-else-if></qti-response-condition>
     <qti-response-condition>
         <qti-response-if>
             <qti-match>
                 <qti-variable identifier="RESPONSE_TEXT"/>
                 <qti-correct identifier="RESPONSE_TEXT"/>
             </qti-match>
-            <qti-set-outcome-value identifier="FEEDBACK__RESPONSE_TEXT">
-                <qti-base-value base-type="identifier">CORRECT</qti-base-value>
+            <qti-set-outcome-value identifier="FEEDBACK__OVERALL">
+                <qti-base-value base-type="identifier">FB__RESPONSE_CHOICE_A__RESPONSE_TEXT_CORRECT</qti-base-value>
             </qti-set-outcome-value>
         </qti-response-if>
         <qti-response-else>
-            <qti-set-outcome-value identifier="FEEDBACK__RESPONSE_TEXT">
-                <qti-base-value base-type="identifier">INCORRECT</qti-base-value>
+            <qti-set-outcome-value identifier="FEEDBACK__OVERALL">
+                <qti-base-value base-type="identifier">FB__RESPONSE_CHOICE_A__RESPONSE_TEXT_INCORRECT</qti-base-value>
             </qti-set-outcome-value>
         </qti-response-else>
+    </qti-response-condition>
+        </qti-response-if>
+        <qti-response-else-if>
+            <qti-match>
+                <qti-variable identifier="RESPONSE_CHOICE"/>
+                <qti-base-value base-type="identifier">B</qti-base-value>
+            </qti-match>
+    <qti-response-condition>
+        <qti-response-if>
+            <qti-match>
+                <qti-variable identifier="RESPONSE_TEXT"/>
+                <qti-correct identifier="RESPONSE_TEXT"/>
+            </qti-match>
+            <qti-set-outcome-value identifier="FEEDBACK__OVERALL">
+                <qti-base-value base-type="identifier">FB__RESPONSE_CHOICE_B__RESPONSE_TEXT_CORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-if>
+        <qti-response-else>
+            <qti-set-outcome-value identifier="FEEDBACK__OVERALL">
+                <qti-base-value base-type="identifier">FB__RESPONSE_CHOICE_B__RESPONSE_TEXT_INCORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-else>
+    </qti-response-condition>
+        </qti-response-else-if>
+        <qti-response-else-if>
+            <qti-match>
+                <qti-variable identifier="RESPONSE_CHOICE"/>
+                <qti-base-value base-type="identifier">C</qti-base-value>
+            </qti-match>
+    <qti-response-condition>
+        <qti-response-if>
+            <qti-match>
+                <qti-variable identifier="RESPONSE_TEXT"/>
+                <qti-correct identifier="RESPONSE_TEXT"/>
+            </qti-match>
+            <qti-set-outcome-value identifier="FEEDBACK__OVERALL">
+                <qti-base-value base-type="identifier">FB__RESPONSE_CHOICE_C__RESPONSE_TEXT_CORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-if>
+        <qti-response-else>
+            <qti-set-outcome-value identifier="FEEDBACK__OVERALL">
+                <qti-base-value base-type="identifier">FB__RESPONSE_CHOICE_C__RESPONSE_TEXT_INCORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-else>
+    </qti-response-condition>
+        </qti-response-else-if>
+        <qti-response-else-if>
+            <qti-match>
+                <qti-variable identifier="RESPONSE_CHOICE"/>
+                <qti-base-value base-type="identifier">D</qti-base-value>
+            </qti-match>
+    <qti-response-condition>
+        <qti-response-if>
+            <qti-match>
+                <qti-variable identifier="RESPONSE_TEXT"/>
+                <qti-correct identifier="RESPONSE_TEXT"/>
+            </qti-match>
+            <qti-set-outcome-value identifier="FEEDBACK__OVERALL">
+                <qti-base-value base-type="identifier">FB__RESPONSE_CHOICE_D__RESPONSE_TEXT_CORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-if>
+        <qti-response-else>
+            <qti-set-outcome-value identifier="FEEDBACK__OVERALL">
+                <qti-base-value base-type="identifier">FB__RESPONSE_CHOICE_D__RESPONSE_TEXT_INCORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-else>
+    </qti-response-condition>
+        </qti-response-else-if>
     </qti-response-condition>
     <qti-response-condition>
         <qti-response-if>
@@ -245,7 +262,7 @@ exports[`QTI Compiler End-to-End Tests should produce consistent XML output for 
     <qti-outcome-declaration identifier="SCORE" cardinality="single" base-type="float">
         <qti-default-value><qti-value>0</qti-value></qti-default-value>
     </qti-outcome-declaration>
-    <qti-outcome-declaration identifier="FEEDBACK__RESPONSE" cardinality="single" base-type="identifier"/>
+    <qti-outcome-declaration identifier="FEEDBACK__OVERALL" cardinality="single" base-type="identifier"/>
     <qti-item-body>
         <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTQwIiBoZWlnaHQ9IjM0MCIgdmlld0JveD0iLTIwIC0yMCA1NDAgMzQwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjEyIj48ZGVmcz48bWFya2VyIGlkPSJhcnJvdyIgdmlld0JveD0iMCAwIDEwIDEwIiByZWZYPSI4IiByZWZZPSI1IiBtYXJrZXJXaWR0aD0iNiIgbWFya2VySGVpZ2h0PSI2IiBvcmllbnQ9ImF1dG8tc3RhcnQtcmV2ZXJzZSI+PHBhdGggZD0iTSAwIDAgTCAxMCA1IEwgMCAxMCB6IiBmaWxsPSIjMzMzMzMzIi8+PC9tYXJrZXI+PG1hcmtlciBpZD0iYXJyb3ctNDI4NWY0IiB2aWV3Qm94PSIwIDAgMTAgMTAiIHJlZlg9IjYiIHJlZlk9IjUiIG1hcmtlcldpZHRoPSIzIiBtYXJrZXJIZWlnaHQ9IjMiIG9yaWVudD0iYXV0by1zdGFydC1yZXZlcnNlIj48cGF0aCBkPSJNIDAgMCBMIDEwIDUgTCAwIDEwIHoiIGZpbGw9IiM0Mjg1ZjQiLz48L21hcmtlcj48L2RlZnM+PGxpbmUgeDE9IjIwIiB5MT0iMTUwIiB4Mj0iNDgwIiB5Mj0iMTUwIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41IiBtYXJrZXItc3RhcnQ9InVybCgjYXJyb3cpIiBtYXJrZXItZW5kPSJ1cmwoI2Fycm93KSIvPjxsaW5lIHgxPSIyMCIgeTE9IjE0MiIgeDI9IjIwIiB5Mj0iMTU4IiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PHRleHQgeD0iMjAiIHk9IjE3NSIgZm9udC1zaXplPSIxMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzMzMzMzMyI+LTU8L3RleHQ+PGxpbmUgeDE9IjY2IiB5MT0iMTQyIiB4Mj0iNjYiIHkyPSIxNTgiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48dGV4dCB4PSI2NiIgeT0iMTc1IiBmb250LXNpemU9IjEyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMzMzMzMzIj4tNDwvdGV4dD48bGluZSB4MT0iMTEyIiB5MT0iMTQyIiB4Mj0iMTEyIiB5Mj0iMTU4IiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PHRleHQgeD0iMTEyIiB5PSIxNzUiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMzMzMzMzMiPi0zPC90ZXh0PjxsaW5lIHgxPSIxNTgiIHkxPSIxNDIiIHgyPSIxNTgiIHkyPSIxNTgiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48dGV4dCB4PSIxNTgiIHk9IjE3NSIgZm9udC1zaXplPSIxMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzMzMzMzMyI+LTI8L3RleHQ+PGxpbmUgeDE9IjIwNCIgeTE9IjE0MiIgeDI9IjIwNCIgeTI9IjE1OCIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjx0ZXh0IHg9IjIwNCIgeT0iMTc1IiBmb250LXNpemU9IjEyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMzMzMzMzIj4tMTwvdGV4dD48bGluZSB4MT0iMjUwIiB5MT0iMTQyIiB4Mj0iMjUwIiB5Mj0iMTU4IiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PHRleHQgeD0iMjUwIiB5PSIxNzUiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMzMzMzMzMiPjA8L3RleHQ+PGxpbmUgeDE9IjI5NiIgeTE9IjE0MiIgeDI9IjI5NiIgeTI9IjE1OCIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjx0ZXh0IHg9IjI5NiIgeT0iMTc1IiBmb250LXNpemU9IjEyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMzMzMzMzIj4xPC90ZXh0PjxsaW5lIHgxPSIzNDIiIHkxPSIxNDIiIHgyPSIzNDIiIHkyPSIxNTgiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48dGV4dCB4PSIzNDIiIHk9IjE3NSIgZm9udC1zaXplPSIxMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzMzMzMzMyI+MjwvdGV4dD48bGluZSB4MT0iMzg4IiB5MT0iMTQyIiB4Mj0iMzg4IiB5Mj0iMTU4IiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PHRleHQgeD0iMzg4IiB5PSIxNzUiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMzMzMzMzMiPjM8L3RleHQ+PGxpbmUgeDE9IjQzNCIgeTE9IjE0MiIgeDI9IjQzNCIgeTI9IjE1OCIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjx0ZXh0IHg9IjQzNCIgeT0iMTc1IiBmb250LXNpemU9IjEyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMzMzMzMzIj40PC90ZXh0PjxsaW5lIHgxPSI0ODAiIHkxPSIxNDIiIHgyPSI0ODAiIHkyPSIxNTgiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48dGV4dCB4PSI0ODAiIHk9IjE3NSIgZm9udC1zaXplPSIxMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzMzMzMzMyI+NTwvdGV4dD48bGluZSB4MT0iMjUwIiB5MT0iMTUwIiB4Mj0iNDgwIiB5Mj0iMTUwIiBzdHJva2U9IiM0Mjg1ZjQiIHN0cm9rZS13aWR0aD0iNCIgc3Ryb2tlLWxpbmVjYXA9ImJ1dHQiIG1hcmtlci1lbmQ9InVybCgjYXJyb3ctNDI4NWY0KSIvPjxjaXJjbGUgY3g9IjI1MCIgY3k9IjE1MCIgcj0iNSIgZmlsbD0iI2ZhZmFmYSIgc3Ryb2tlPSIjNDI4NWY0IiBzdHJva2Utd2lkdGg9IjEuNSIvPjwvc3ZnPg==" alt="Widget visualization" />
         <div><qti-choice-interaction response-identifier="RESPONSE" shuffle="true" min-choices="1" max-choices="1">
@@ -255,45 +272,29 @@ exports[`QTI Compiler End-to-End Tests should produce consistent XML output for 
             <qti-simple-choice identifier="C"><p><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi><mo>&gt;</mo><mn>0</mn></math></p></qti-simple-choice>
             <qti-simple-choice identifier="D"><p><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi><mo>≥</mo><mn>0</mn></math></p></qti-simple-choice>
         </qti-choice-interaction></div>
-        <qti-feedback-block outcome-identifier="FEEDBACK__RESPONSE" identifier="A" show-hide="show">
-            <qti-content-body><p>I can see why you might think this! Let's examine the direction of the shading on the number line more carefully.</p>
-        <p>The inequality <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi><mo>&lt;</mo><mn>0</mn></math> would show shading to the LEFT of <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>0</mn></math> (toward negative numbers). But this graph shows shading to the RIGHT of <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>0</mn></math> (toward positive numbers).</p>
-        <p>The correct inequality is <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi><mo>&gt;</mo><mn>0</mn></math> because the shading goes toward positive values.</p>
-        <p>Memory tip: The shading always shows you which values make the inequality true!</p></qti-content-body>
+        <qti-feedback-block outcome-identifier="FEEDBACK__OVERALL" identifier="FB__RESPONSE_A" show-hide="show">
+            <qti-content-body><p>Not quite. The inequality <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi><mo>&lt;</mo><mn>0</mn></math> represents all numbers to the LEFT of 0, but the graph shows shading to the RIGHT.</p></qti-content-body>
         </qti-feedback-block>
-        <qti-feedback-block outcome-identifier="FEEDBACK__RESPONSE" identifier="B" show-hide="show">
-            <qti-content-body><p>Good thinking about the direction! You correctly noticed that the shading goes to the right (positive direction), but let's look at the point at <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>0</mn></math> more carefully.</p>
-        <p>The difference between <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi><mo>≤</mo><mn>0</mn></math> and <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi><mo>&gt;</mo><mn>0</mn></math> is whether <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>0</mn></math> itself is included:</p>
-        <p>• Open circle (○) means the boundary point is NOT included</p>
-        <p>• Closed circle (●) means the boundary point IS included</p>
-        <p>Since this graph shows an open circle at <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>0</mn></math>, the value <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>0</mn></math> is NOT included, so we use <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi><mo>&gt;</mo><mn>0</mn></math> (not ≤).</p></qti-content-body>
+        <qti-feedback-block outcome-identifier="FEEDBACK__OVERALL" identifier="FB__RESPONSE_B" show-hide="show">
+            <qti-content-body><p>Close! The symbol <math xmlns="http://www.w3.org/1998/Math/MathML"><mo>≤</mo></math> means 'less than or equal to', but the graph shows values greater than 0, and the open circle means 0 is not included.</p></qti-content-body>
         </qti-feedback-block>
-        <qti-feedback-block outcome-identifier="FEEDBACK__RESPONSE" identifier="C" show-hide="show">
-            <qti-content-body><p>Perfect! You correctly interpreted both parts of this number line graph.</p>
-        <p>You noticed that:</p>
-        <p>• The open circle at <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>0</mn></math> means <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>0</mn></math> is NOT included</p>
-        <p>• The shading extends to the right, representing all positive values</p>
-        <p>Together, this gives us <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi><mo>&gt;</mo><mn>0</mn></math> - all values strictly greater than zero.</p>
-        <table style="border-collapse: collapse; width: 100%;"><thead><tr><th style="border: 1px solid #ddd; padding: 8px 12px; text-align: left; vertical-align: top;">Symbol</th><th style="border: 1px solid #ddd; padding: 8px 12px; text-align: left; vertical-align: top;">Meaning</th><th style="border: 1px solid #ddd; padding: 8px 12px; text-align: left; vertical-align: top;">Circle Type</th></tr></thead><tbody><tr><td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;"><math xmlns="http://www.w3.org/1998/Math/MathML"><mo>&gt;</mo></math></td><td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;">greater than</td><td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;">open ○</td></tr><tr><td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;"><math xmlns="http://www.w3.org/1998/Math/MathML"><mo>≥</mo></math></td><td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;">greater than or equal</td><td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;">closed ●</td></tr></tbody></table>
-        <p>This skill of reading inequality graphs is essential for solving systems of inequalities and understanding domain/range in functions!</p></qti-content-body>
+        <qti-feedback-block outcome-identifier="FEEDBACK__OVERALL" identifier="FB__RESPONSE_C" show-hide="show">
+            <qti-content-body><p>Correct! The graph shows an open circle at 0 and shading to the right, which represents all numbers strictly greater than 0 (<math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi><mo>&gt;</mo><mn>0</mn></math>).</p></qti-content-body>
         </qti-feedback-block>
-        <qti-feedback-block outcome-identifier="FEEDBACK__RESPONSE" identifier="D" show-hide="show">
-            <qti-content-body><p>Close! You correctly identified the direction (positive values), but let's examine whether <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>0</mn></math> itself is included.</p>
-        <p>The key difference between ≥ and &gt; is the boundary point:</p>
-        <p>• <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi><mo>≥</mo><mn>0</mn></math> includes <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>0</mn></math> (shown with a closed circle ●)</p>
-        <p>• <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi><mo>&gt;</mo><mn>0</mn></math> excludes <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>0</mn></math> (shown with an open circle ○)</p>
-        <p>Since this graph shows an open circle at <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>0</mn></math>, the correct inequality is <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi><mo>&gt;</mo><mn>0</mn></math>, not <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi><mo>≥</mo><mn>0</mn></math>.</p></qti-content-body>
+        <qti-feedback-block outcome-identifier="FEEDBACK__OVERALL" identifier="FB__RESPONSE_D" show-hide="show">
+            <qti-content-body><p>Almost! The symbol <math xmlns="http://www.w3.org/1998/Math/MathML"><mo>≥</mo></math> would require a closed circle at 0 to show that 0 is included in the solution.</p></qti-content-body>
         </qti-feedback-block>
     </qti-item-body>
     <qti-response-processing>
-        <qti-response-condition>
+        
+    <qti-response-condition>
         <qti-response-if>
             <qti-match>
                 <qti-variable identifier="RESPONSE"/>
                 <qti-base-value base-type="identifier">A</qti-base-value>
             </qti-match>
-            <qti-set-outcome-value identifier="FEEDBACK__RESPONSE">
-                <qti-base-value base-type="identifier">A</qti-base-value>
+            <qti-set-outcome-value identifier="FEEDBACK__OVERALL">
+                <qti-base-value base-type="identifier">FB__RESPONSE_A</qti-base-value>
             </qti-set-outcome-value>
         </qti-response-if>
         <qti-response-else-if>
@@ -301,8 +302,8 @@ exports[`QTI Compiler End-to-End Tests should produce consistent XML output for 
                 <qti-variable identifier="RESPONSE"/>
                 <qti-base-value base-type="identifier">B</qti-base-value>
             </qti-match>
-            <qti-set-outcome-value identifier="FEEDBACK__RESPONSE">
-                <qti-base-value base-type="identifier">B</qti-base-value>
+            <qti-set-outcome-value identifier="FEEDBACK__OVERALL">
+                <qti-base-value base-type="identifier">FB__RESPONSE_B</qti-base-value>
             </qti-set-outcome-value>
         </qti-response-else-if>
         <qti-response-else-if>
@@ -310,8 +311,8 @@ exports[`QTI Compiler End-to-End Tests should produce consistent XML output for 
                 <qti-variable identifier="RESPONSE"/>
                 <qti-base-value base-type="identifier">C</qti-base-value>
             </qti-match>
-            <qti-set-outcome-value identifier="FEEDBACK__RESPONSE">
-                <qti-base-value base-type="identifier">C</qti-base-value>
+            <qti-set-outcome-value identifier="FEEDBACK__OVERALL">
+                <qti-base-value base-type="identifier">FB__RESPONSE_C</qti-base-value>
             </qti-set-outcome-value>
         </qti-response-else-if>
         <qti-response-else-if>
@@ -319,10 +320,11 @@ exports[`QTI Compiler End-to-End Tests should produce consistent XML output for 
                 <qti-variable identifier="RESPONSE"/>
                 <qti-base-value base-type="identifier">D</qti-base-value>
             </qti-match>
-            <qti-set-outcome-value identifier="FEEDBACK__RESPONSE">
-                <qti-base-value base-type="identifier">D</qti-base-value>
+            <qti-set-outcome-value identifier="FEEDBACK__OVERALL">
+                <qti-base-value base-type="identifier">FB__RESPONSE_D</qti-base-value>
             </qti-set-outcome-value>
-        </qti-response-else-if></qti-response-condition>
+        </qti-response-else-if>
+    </qti-response-condition>
     <qti-response-condition>
         <qti-response-if>
             <qti-and>
@@ -366,10 +368,10 @@ exports[`QTI Compiler End-to-End Tests should produce consistent XML output for 
     </qti-response-declaration>
     <qti-response-declaration identifier="RESPONSE_C" cardinality="single" base-type="integer">
         <qti-correct-response>
-            <qti-value>27</qti-value>
+            <qti-value>4</qti-value>
         </qti-correct-response>
         <qti-mapping default-value="0">
-            <qti-map-entry map-key="27" mapped-value="1"/>
+            <qti-map-entry map-key="4" mapped-value="1"/>
         </qti-mapping>
     </qti-response-declaration>
     <qti-response-declaration identifier="RESPONSE_D" cardinality="single" base-type="integer">
@@ -383,47 +385,59 @@ exports[`QTI Compiler End-to-End Tests should produce consistent XML output for 
     <qti-outcome-declaration identifier="SCORE" cardinality="single" base-type="float">
         <qti-default-value><qti-value>0</qti-value></qti-default-value>
     </qti-outcome-declaration>
-    <qti-outcome-declaration identifier="FEEDBACK__RESPONSE_A" cardinality="single" base-type="identifier"/>
-    <qti-outcome-declaration identifier="FEEDBACK__RESPONSE_B" cardinality="single" base-type="identifier"/>
-    <qti-outcome-declaration identifier="FEEDBACK__RESPONSE_C" cardinality="single" base-type="identifier"/>
-    <qti-outcome-declaration identifier="FEEDBACK__RESPONSE_D" cardinality="single" base-type="identifier"/>
+    <qti-outcome-declaration identifier="FEEDBACK__OVERALL" cardinality="single" base-type="identifier"/>
     <qti-item-body>
-        <p>The Cold Be Gone Company conducted a study with <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>100</mn></math> participants. Each participant either received cold medicine or did not receive cold medicine, and the company recorded whether the participant's cold lasted <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>7</mn></math> days or longer.</p>
-        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzkwIiBoZWlnaHQ9IjM0MCIgdmlld0JveD0iLTIwIC0yMCAzOTAgMzQwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIj48ZGVmcz48c3R5bGU+LmxhYmVsIHsgZm9udC1zaXplOiAxNnB4OyBmb250LXdlaWdodDogYm9sZDsgdGV4dC1hbmNob3I6IG1pZGRsZTsgfSAuY291bnQgeyBmb250LXNpemU6IDE4cHg7IHRleHQtYW5jaG9yOiBtaWRkbGU7IH08L3N0eWxlPjwvZGVmcz48cmVjdCB4PSIxIiB5PSIxIiB3aWR0aD0iMzQ4IiBoZWlnaHQ9IjI5OCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMzMzMzMzIi8+PGNpcmNsZSBjeD0iMTI2Ljg3NSIgY3k9IjE1MCIgcj0iODcuNSIgZmlsbD0iIzFFOTBGRjk5IiBzdHJva2U9IiMzMzMzMzMiIGZpbGwtb3BhY2l0eT0iMC42Ii8+PGNpcmNsZSBjeD0iMjIzLjEyNSIgY3k9IjE1MCIgcj0iODcuNSIgZmlsbD0iI0ZGNkI2Qjk5IiBzdHJva2U9IiMzMzMzMzMiIGZpbGwtb3BhY2l0eT0iMC42Ii8+PHRleHQgeD0iODMuMTI1IiB5PSIzMC4xNSIgZm9udC1zaXplPSIxNiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC13ZWlnaHQ9IjcwMCI+PHRzcGFuIHg9IjgzLjEyNSIgZHk9IjBlbSI+Q29sZCBNZWRpY2luZTwvdHNwYW4+PC90ZXh0Pjx0ZXh0IHg9IjI2Ni44NzUiIHk9IjIwLjU1IiBmb250LXNpemU9IjE2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXdlaWdodD0iNzAwIj48dHNwYW4geD0iMjY2Ljg3NSIgZHk9IjBlbSI+Q29sZCBsb25nZXI8L3RzcGFuPjx0c3BhbiB4PSIyNjYuODc1IiBkeT0iMS4yZW0iPnRoYW4gNyBkYXlzPC90c3Bhbj48L3RleHQ+PHRleHQgeD0iODMuMTI1IiB5PSIxNTAiIGZvbnQtc2l6ZT0iMTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiPjI3PC90ZXh0Pjx0ZXh0IHg9IjI2Ni44NzUiIHk9IjE1MCIgZm9udC1zaXplPSIxOCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSI+MjA8L3RleHQ+PHRleHQgeD0iMTc1IiB5PSIxNTAiIGZvbnQtc2l6ZT0iMTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiPjIzPC90ZXh0Pjx0ZXh0IHg9IjE3NSIgeT0iMjgwIiBmb250LXNpemU9IjE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj4zMDwvdGV4dD48L3N2Zz4=" alt="Widget visualization" />
+        <p>The Cold Be Gone Company conducted a study with <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>100</mn></math> participants. Each participant either received cold medicine or did not receive cold medicine, and the company recorded whether the participant's cold lasted 7 days or longer.</p>
+        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzkwIiBoZWlnaHQ9IjM0MCIgdmlld0JveD0iLTIwIC0yMCAzOTAgMzQwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIj48ZGVmcz48c3R5bGU+LmxhYmVsIHsgZm9udC1zaXplOiAxNnB4OyBmb250LXdlaWdodDogYm9sZDsgdGV4dC1hbmNob3I6IG1pZGRsZTsgfSAuY291bnQgeyBmb250LXNpemU6IDE4cHg7IHRleHQtYW5jaG9yOiBtaWRkbGU7IH08L3N0eWxlPjwvZGVmcz48cmVjdCB4PSIxIiB5PSIxIiB3aWR0aD0iMzQ4IiBoZWlnaHQ9IjI5OCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMzMzMzMzIi8+PGNpcmNsZSBjeD0iMTI2Ljg3NSIgY3k9IjE1MCIgcj0iODcuNSIgZmlsbD0iIzFFOTBGRjk5IiBzdHJva2U9IiMzMzMzMzMiIGZpbGwtb3BhY2l0eT0iMC42Ii8+PGNpcmNsZSBjeD0iMjIzLjEyNSIgY3k9IjE1MCIgcj0iODcuNSIgZmlsbD0iI0ZGNkI2Qjk5IiBzdHJva2U9IiMzMzMzMzMiIGZpbGwtb3BhY2l0eT0iMC42Ii8+PHRleHQgeD0iODMuMTI1IiB5PSIzMC4xNSIgZm9udC1zaXplPSIxNiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC13ZWlnaHQ9IjcwMCI+PHRzcGFuIHg9IjgzLjEyNSIgZHk9IjBlbSI+Q29sZCBNZWRpY2luZTwvdHNwYW4+PC90ZXh0Pjx0ZXh0IHg9IjI2Ni44NzUiIHk9IjIwLjU1IiBmb250LXNpemU9IjE2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXdlaWdodD0iNzAwIj48dHNwYW4geD0iMjY2Ljg3NSIgZHk9IjBlbSI+Q29sZCBsb25nZXI8L3RzcGFuPjx0c3BhbiB4PSIyNjYuODc1IiBkeT0iMS4yZW0iPnRoYW4gNyBkYXlzPC90c3Bhbj48L3RleHQ+PHRleHQgeD0iODMuMTI1IiB5PSIxNTAiIGZvbnQtc2l6ZT0iMTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiPjI3PC90ZXh0Pjx0ZXh0IHg9IjI2Ni44NzUiIHk9IjE1MCIgZm9udC1zaXplPSIxOCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSI+NDM8L3RleHQ+PHRleHQgeD0iMTc1IiB5PSIxNTAiIGZvbnQtc2l6ZT0iMTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiPjIzPC90ZXh0Pjx0ZXh0IHg9IjE3NSIgeT0iMjgwIiBmb250LXNpemU9IjE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj4zMDwvdGV4dD48L3N2Zz4=" alt="Widget visualization" />
         <p>Complete the following two-way frequency table.</p>
-        <table style="border-collapse: collapse; width: 100%;"><thead><tr><th style="border: 1px solid #ddd; padding: 8px 12px; text-align: left; vertical-align: top;"></th><th style="border: 1px solid #ddd; padding: 8px 12px; text-align: left; vertical-align: top;">Received cold medicine</th><th style="border: 1px solid #ddd; padding: 8px 12px; text-align: left; vertical-align: top;">Did not receive cold medicine</th></tr></thead><tbody><tr><td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;">Cold lasted longer than 7 days</td><td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;"><qti-text-entry-interaction response-identifier="RESPONSE_A" expected-length="3"/></td><td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;"><qti-text-entry-interaction response-identifier="RESPONSE_B" expected-length="3"/></td></tr><tr><td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;">Cold did not last longer than 7 days</td><td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;"><qti-text-entry-interaction response-identifier="RESPONSE_C" expected-length="3"/></td><td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;"><qti-text-entry-interaction response-identifier="RESPONSE_D" expected-length="3"/></td></tr></tbody></table>
-        <qti-feedback-block outcome-identifier="FEEDBACK__RESPONSE_A" identifier="CORRECT" show-hide="show">
-            <qti-content-body><p>Outstanding work! You successfully transferred all the data from the Venn diagram to the two-way frequency table.</p>
-        <p>You correctly identified that the overlap region (<math xmlns="http://www.w3.org/1998/Math/MathML"><mn>23</mn></math> people) represents those who both received medicine AND had a cold lasting <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>7</mn></math> days or longer.</p>
-        <p>This skill of converting between different data representations (Venn diagrams ↔ two-way tables) is crucial for analyzing real-world studies and surveys!</p>
-        <table style="border-collapse: collapse; width: 100%;"><thead><tr><th style="border: 1px solid #ddd; padding: 8px 12px; text-align: left; vertical-align: top;">Venn Region</th><th style="border: 1px solid #ddd; padding: 8px 12px; text-align: left; vertical-align: top;">Table Cell</th><th style="border: 1px solid #ddd; padding: 8px 12px; text-align: left; vertical-align: top;">Count</th></tr></thead><tbody><tr><td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;">Overlap</td><td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;">Medicine + Long Cold</td><td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;"><math xmlns="http://www.w3.org/1998/Math/MathML"><mn>23</mn></math></td></tr><tr><td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;">Medicine Only</td><td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;">Medicine + Short Cold</td><td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;"><math xmlns="http://www.w3.org/1998/Math/MathML"><mn>27</mn></math></td></tr></tbody></table>
-        <p>Challenge: Can you think of another study where a two-way table would help organize the data?</p></qti-content-body>
+        <table style="border-collapse: collapse; width: 100%;"><thead><tr><th style="border: 1px solid #ddd; padding: 8px 12px; text-align: left; vertical-align: top;"></th><th style="border: 1px solid #ddd; padding: 8px 12px; text-align: left; vertical-align: top;">Received cold medicine</th><th style="border: 1px solid #ddd; padding: 8px 12px; text-align: left; vertical-align: top;">Did not receive cold medicine</th></tr></thead><tbody><tr><td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;">Cold lasted &gt; 7 days</td><td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;"><qti-text-entry-interaction response-identifier="RESPONSE_A" expected-length="3"/></td><td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;"><qti-text-entry-interaction response-identifier="RESPONSE_B" expected-length="3"/></td></tr><tr><td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;">Cold lasted ≤ 7 days</td><td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;"><qti-text-entry-interaction response-identifier="RESPONSE_C" expected-length="3"/></td><td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;"><qti-text-entry-interaction response-identifier="RESPONSE_D" expected-length="3"/></td></tr></tbody></table>
+        <qti-feedback-block outcome-identifier="FEEDBACK__OVERALL" identifier="FB__RESPONSE_A_CORRECT__RESPONSE_B_CORRECT__RESPONSE_C_CORRECT__RESPONSE_D_CORRECT" show-hide="show">
+            <qti-content-body><p>All entries correct based on the Venn diagram.</p></qti-content-body>
         </qti-feedback-block>
-        <qti-feedback-block outcome-identifier="FEEDBACK__RESPONSE_A" identifier="INCORRECT" show-hide="show">
-            <qti-content-body><p>Let's work through converting this Venn diagram to a two-way table step by step! This is a valuable skill for organizing data.</p>
-        <p>Step <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>1</mn></math>: Identify what the overlap represents. The <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>23</mn></math> in the center means <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>23</mn></math> people both received medicine AND had a cold lasting ≥ <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>7</mn></math> days.</p>
-        <p>Step <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>2</mn></math>: Calculate the remaining sections:</p>
-        <p>• Medicine circle total is <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>27</mn></math>, so medicine-only = <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>27</mn><mo>-</mo><mn>23</mn><mo>=</mo><mn>4</mn></math></p>
-        <p>• Long cold circle total is <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>20</mn></math>, so long-cold-only = <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>20</mn><mo>-</mo><mn>23</mn></math>... wait, that's negative! This means we need to recalculate.</p>
-        <p>Remember: The overlap goes in the cell where both conditions are true, then work outward to fill the rest!</p></qti-content-body>
+        <qti-feedback-block outcome-identifier="FEEDBACK__OVERALL" identifier="FB__RESPONSE_A_CORRECT__RESPONSE_B_CORRECT__RESPONSE_C_CORRECT__RESPONSE_D_INCORRECT" show-hide="show">
+            <qti-content-body><p>D is incorrect; revisit the outside region count.</p></qti-content-body>
         </qti-feedback-block>
-        <qti-feedback-block outcome-identifier="FEEDBACK__RESPONSE_B" identifier="CORRECT" show-hide="show">
-            <qti-content-body><p>Great! You found that <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>20</mn></math> people did not receive medicine but still had a cold lasting longer than <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>7</mn></math> days.</p></qti-content-body>
+        <qti-feedback-block outcome-identifier="FEEDBACK__OVERALL" identifier="FB__RESPONSE_A_CORRECT__RESPONSE_B_CORRECT__RESPONSE_C_INCORRECT__RESPONSE_D_CORRECT" show-hide="show">
+            <qti-content-body><p>C is incorrect; compute 27 - 23 = 4.</p></qti-content-body>
         </qti-feedback-block>
-        <qti-feedback-block outcome-identifier="FEEDBACK__RESPONSE_B" identifier="INCORRECT" show-hide="show">
-            <qti-content-body><p>To find this value, look at the "Cold longer than <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>7</mn></math> days" circle. It shows <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>20</mn></math> total, with <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>23</mn></math> in the overlap. Since the overlap counts people who got medicine, those outside must not have received medicine.</p></qti-content-body>
+        <qti-feedback-block outcome-identifier="FEEDBACK__OVERALL" identifier="FB__RESPONSE_A_CORRECT__RESPONSE_B_CORRECT__RESPONSE_C_INCORRECT__RESPONSE_D_INCORRECT" show-hide="show">
+            <qti-content-body><p>C and D incorrect; review cold ≤ 7 days and outside counts.</p></qti-content-body>
         </qti-feedback-block>
-        <qti-feedback-block outcome-identifier="FEEDBACK__RESPONSE_C" identifier="CORRECT" show-hide="show">
-            <qti-content-body><p>Excellent! You correctly calculated that <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>27</mn></math> people received medicine and had shorter colds.</p></qti-content-body>
+        <qti-feedback-block outcome-identifier="FEEDBACK__OVERALL" identifier="FB__RESPONSE_A_CORRECT__RESPONSE_B_INCORRECT__RESPONSE_C_CORRECT__RESPONSE_D_CORRECT" show-hide="show">
+            <qti-content-body><p>B is incorrect; compute 43 - 23 = 20.</p></qti-content-body>
         </qti-feedback-block>
-        <qti-feedback-block outcome-identifier="FEEDBACK__RESPONSE_C" identifier="INCORRECT" show-hide="show">
-            <qti-content-body><p>The "Received medicine" circle shows <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>27</mn></math> total. Since <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>23</mn></math> are in the overlap (long cold), the remaining must have had shorter colds: <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>27</mn><mo>-</mo><mn>23</mn><mo>=</mo><mn>4</mn></math>. Wait, that doesn't match the answer. Let me reconsider the Venn diagram interpretation.</p></qti-content-body>
+        <qti-feedback-block outcome-identifier="FEEDBACK__OVERALL" identifier="FB__RESPONSE_A_CORRECT__RESPONSE_B_INCORRECT__RESPONSE_C_CORRECT__RESPONSE_D_INCORRECT" show-hide="show">
+            <qti-content-body><p>B and D incorrect; review &gt; 7 days and outside counts.</p></qti-content-body>
         </qti-feedback-block>
-        <qti-feedback-block outcome-identifier="FEEDBACK__RESPONSE_D" identifier="CORRECT" show-hide="show">
-            <qti-content-body><p>Perfect! You found that <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>30</mn></math> people neither received medicine nor had long colds - they're outside both circles.</p></qti-content-body>
+        <qti-feedback-block outcome-identifier="FEEDBACK__OVERALL" identifier="FB__RESPONSE_A_CORRECT__RESPONSE_B_INCORRECT__RESPONSE_C_INCORRECT__RESPONSE_D_CORRECT" show-hide="show">
+            <qti-content-body><p>B and C incorrect; recompute 20 and 4.</p></qti-content-body>
         </qti-feedback-block>
-        <qti-feedback-block outcome-identifier="FEEDBACK__RESPONSE_D" identifier="INCORRECT" show-hide="show">
-            <qti-content-body><p>The number outside both circles is given directly as <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>30</mn></math>. These people didn't receive medicine AND had colds lasting <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>7</mn></math> days or less.</p></qti-content-body>
+        <qti-feedback-block outcome-identifier="FEEDBACK__OVERALL" identifier="FB__RESPONSE_A_CORRECT__RESPONSE_B_INCORRECT__RESPONSE_C_INCORRECT__RESPONSE_D_INCORRECT" show-hide="show">
+            <qti-content-body><p>B, C, D incorrect; revisit all non-intersection counts.</p></qti-content-body>
+        </qti-feedback-block>
+        <qti-feedback-block outcome-identifier="FEEDBACK__OVERALL" identifier="FB__RESPONSE_A_INCORRECT__RESPONSE_B_CORRECT__RESPONSE_C_CORRECT__RESPONSE_D_CORRECT" show-hide="show">
+            <qti-content-body><p>A is incorrect; the intersection is 23.</p></qti-content-body>
+        </qti-feedback-block>
+        <qti-feedback-block outcome-identifier="FEEDBACK__OVERALL" identifier="FB__RESPONSE_A_INCORRECT__RESPONSE_B_CORRECT__RESPONSE_C_CORRECT__RESPONSE_D_INCORRECT" show-hide="show">
+            <qti-content-body><p>A and D incorrect; intersection is 23; recheck outside.</p></qti-content-body>
+        </qti-feedback-block>
+        <qti-feedback-block outcome-identifier="FEEDBACK__OVERALL" identifier="FB__RESPONSE_A_INCORRECT__RESPONSE_B_CORRECT__RESPONSE_C_INCORRECT__RESPONSE_D_CORRECT" show-hide="show">
+            <qti-content-body><p>A and C incorrect; intersection is 23; compute 4.</p></qti-content-body>
+        </qti-feedback-block>
+        <qti-feedback-block outcome-identifier="FEEDBACK__OVERALL" identifier="FB__RESPONSE_A_INCORRECT__RESPONSE_B_CORRECT__RESPONSE_C_INCORRECT__RESPONSE_D_INCORRECT" show-hide="show">
+            <qti-content-body><p>A, C, D incorrect; intersection is 23; recompute 4 and outside.</p></qti-content-body>
+        </qti-feedback-block>
+        <qti-feedback-block outcome-identifier="FEEDBACK__OVERALL" identifier="FB__RESPONSE_A_INCORRECT__RESPONSE_B_INCORRECT__RESPONSE_C_CORRECT__RESPONSE_D_CORRECT" show-hide="show">
+            <qti-content-body><p>A and B incorrect; intersection is 23; compute 20.</p></qti-content-body>
+        </qti-feedback-block>
+        <qti-feedback-block outcome-identifier="FEEDBACK__OVERALL" identifier="FB__RESPONSE_A_INCORRECT__RESPONSE_B_INCORRECT__RESPONSE_C_CORRECT__RESPONSE_D_INCORRECT" show-hide="show">
+            <qti-content-body><p>A, B, D incorrect; recompute 23, 20, outside.</p></qti-content-body>
+        </qti-feedback-block>
+        <qti-feedback-block outcome-identifier="FEEDBACK__OVERALL" identifier="FB__RESPONSE_A_INCORRECT__RESPONSE_B_INCORRECT__RESPONSE_C_INCORRECT__RESPONSE_D_CORRECT" show-hide="show">
+            <qti-content-body><p>A, B, C incorrect; recompute 23, 20, 4.</p></qti-content-body>
+        </qti-feedback-block>
+        <qti-feedback-block outcome-identifier="FEEDBACK__OVERALL" identifier="FB__RESPONSE_A_INCORRECT__RESPONSE_B_INCORRECT__RESPONSE_C_INCORRECT__RESPONSE_D_INCORRECT" show-hide="show">
+            <qti-content-body><p>All entries incorrect; re-derive each cell from the Venn diagram.</p></qti-content-body>
         </qti-feedback-block>
     </qti-item-body>
     <qti-response-processing>
@@ -434,62 +448,196 @@ exports[`QTI Compiler End-to-End Tests should produce consistent XML output for 
                 <qti-variable identifier="RESPONSE_A"/>
                 <qti-correct identifier="RESPONSE_A"/>
             </qti-match>
-            <qti-set-outcome-value identifier="FEEDBACK__RESPONSE_A">
-                <qti-base-value base-type="identifier">CORRECT</qti-base-value>
-            </qti-set-outcome-value>
-        </qti-response-if>
-        <qti-response-else>
-            <qti-set-outcome-value identifier="FEEDBACK__RESPONSE_A">
-                <qti-base-value base-type="identifier">INCORRECT</qti-base-value>
-            </qti-set-outcome-value>
-        </qti-response-else>
-    </qti-response-condition>
     <qti-response-condition>
         <qti-response-if>
             <qti-match>
                 <qti-variable identifier="RESPONSE_B"/>
                 <qti-correct identifier="RESPONSE_B"/>
             </qti-match>
-            <qti-set-outcome-value identifier="FEEDBACK__RESPONSE_B">
-                <qti-base-value base-type="identifier">CORRECT</qti-base-value>
-            </qti-set-outcome-value>
-        </qti-response-if>
-        <qti-response-else>
-            <qti-set-outcome-value identifier="FEEDBACK__RESPONSE_B">
-                <qti-base-value base-type="identifier">INCORRECT</qti-base-value>
-            </qti-set-outcome-value>
-        </qti-response-else>
-    </qti-response-condition>
     <qti-response-condition>
         <qti-response-if>
             <qti-match>
                 <qti-variable identifier="RESPONSE_C"/>
                 <qti-correct identifier="RESPONSE_C"/>
             </qti-match>
-            <qti-set-outcome-value identifier="FEEDBACK__RESPONSE_C">
-                <qti-base-value base-type="identifier">CORRECT</qti-base-value>
-            </qti-set-outcome-value>
-        </qti-response-if>
-        <qti-response-else>
-            <qti-set-outcome-value identifier="FEEDBACK__RESPONSE_C">
-                <qti-base-value base-type="identifier">INCORRECT</qti-base-value>
-            </qti-set-outcome-value>
-        </qti-response-else>
-    </qti-response-condition>
     <qti-response-condition>
         <qti-response-if>
             <qti-match>
                 <qti-variable identifier="RESPONSE_D"/>
                 <qti-correct identifier="RESPONSE_D"/>
             </qti-match>
-            <qti-set-outcome-value identifier="FEEDBACK__RESPONSE_D">
-                <qti-base-value base-type="identifier">CORRECT</qti-base-value>
+            <qti-set-outcome-value identifier="FEEDBACK__OVERALL">
+                <qti-base-value base-type="identifier">FB__RESPONSE_A_CORRECT__RESPONSE_B_CORRECT__RESPONSE_C_CORRECT__RESPONSE_D_CORRECT</qti-base-value>
             </qti-set-outcome-value>
         </qti-response-if>
         <qti-response-else>
-            <qti-set-outcome-value identifier="FEEDBACK__RESPONSE_D">
-                <qti-base-value base-type="identifier">INCORRECT</qti-base-value>
+            <qti-set-outcome-value identifier="FEEDBACK__OVERALL">
+                <qti-base-value base-type="identifier">FB__RESPONSE_A_CORRECT__RESPONSE_B_CORRECT__RESPONSE_C_CORRECT__RESPONSE_D_INCORRECT</qti-base-value>
             </qti-set-outcome-value>
+        </qti-response-else>
+    </qti-response-condition>
+        </qti-response-if>
+        <qti-response-else>
+    <qti-response-condition>
+        <qti-response-if>
+            <qti-match>
+                <qti-variable identifier="RESPONSE_D"/>
+                <qti-correct identifier="RESPONSE_D"/>
+            </qti-match>
+            <qti-set-outcome-value identifier="FEEDBACK__OVERALL">
+                <qti-base-value base-type="identifier">FB__RESPONSE_A_CORRECT__RESPONSE_B_CORRECT__RESPONSE_C_INCORRECT__RESPONSE_D_CORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-if>
+        <qti-response-else>
+            <qti-set-outcome-value identifier="FEEDBACK__OVERALL">
+                <qti-base-value base-type="identifier">FB__RESPONSE_A_CORRECT__RESPONSE_B_CORRECT__RESPONSE_C_INCORRECT__RESPONSE_D_INCORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-else>
+    </qti-response-condition>
+        </qti-response-else>
+    </qti-response-condition>
+        </qti-response-if>
+        <qti-response-else>
+    <qti-response-condition>
+        <qti-response-if>
+            <qti-match>
+                <qti-variable identifier="RESPONSE_C"/>
+                <qti-correct identifier="RESPONSE_C"/>
+            </qti-match>
+    <qti-response-condition>
+        <qti-response-if>
+            <qti-match>
+                <qti-variable identifier="RESPONSE_D"/>
+                <qti-correct identifier="RESPONSE_D"/>
+            </qti-match>
+            <qti-set-outcome-value identifier="FEEDBACK__OVERALL">
+                <qti-base-value base-type="identifier">FB__RESPONSE_A_CORRECT__RESPONSE_B_INCORRECT__RESPONSE_C_CORRECT__RESPONSE_D_CORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-if>
+        <qti-response-else>
+            <qti-set-outcome-value identifier="FEEDBACK__OVERALL">
+                <qti-base-value base-type="identifier">FB__RESPONSE_A_CORRECT__RESPONSE_B_INCORRECT__RESPONSE_C_CORRECT__RESPONSE_D_INCORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-else>
+    </qti-response-condition>
+        </qti-response-if>
+        <qti-response-else>
+    <qti-response-condition>
+        <qti-response-if>
+            <qti-match>
+                <qti-variable identifier="RESPONSE_D"/>
+                <qti-correct identifier="RESPONSE_D"/>
+            </qti-match>
+            <qti-set-outcome-value identifier="FEEDBACK__OVERALL">
+                <qti-base-value base-type="identifier">FB__RESPONSE_A_CORRECT__RESPONSE_B_INCORRECT__RESPONSE_C_INCORRECT__RESPONSE_D_CORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-if>
+        <qti-response-else>
+            <qti-set-outcome-value identifier="FEEDBACK__OVERALL">
+                <qti-base-value base-type="identifier">FB__RESPONSE_A_CORRECT__RESPONSE_B_INCORRECT__RESPONSE_C_INCORRECT__RESPONSE_D_INCORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-else>
+    </qti-response-condition>
+        </qti-response-else>
+    </qti-response-condition>
+        </qti-response-else>
+    </qti-response-condition>
+        </qti-response-if>
+        <qti-response-else>
+    <qti-response-condition>
+        <qti-response-if>
+            <qti-match>
+                <qti-variable identifier="RESPONSE_B"/>
+                <qti-correct identifier="RESPONSE_B"/>
+            </qti-match>
+    <qti-response-condition>
+        <qti-response-if>
+            <qti-match>
+                <qti-variable identifier="RESPONSE_C"/>
+                <qti-correct identifier="RESPONSE_C"/>
+            </qti-match>
+    <qti-response-condition>
+        <qti-response-if>
+            <qti-match>
+                <qti-variable identifier="RESPONSE_D"/>
+                <qti-correct identifier="RESPONSE_D"/>
+            </qti-match>
+            <qti-set-outcome-value identifier="FEEDBACK__OVERALL">
+                <qti-base-value base-type="identifier">FB__RESPONSE_A_INCORRECT__RESPONSE_B_CORRECT__RESPONSE_C_CORRECT__RESPONSE_D_CORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-if>
+        <qti-response-else>
+            <qti-set-outcome-value identifier="FEEDBACK__OVERALL">
+                <qti-base-value base-type="identifier">FB__RESPONSE_A_INCORRECT__RESPONSE_B_CORRECT__RESPONSE_C_CORRECT__RESPONSE_D_INCORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-else>
+    </qti-response-condition>
+        </qti-response-if>
+        <qti-response-else>
+    <qti-response-condition>
+        <qti-response-if>
+            <qti-match>
+                <qti-variable identifier="RESPONSE_D"/>
+                <qti-correct identifier="RESPONSE_D"/>
+            </qti-match>
+            <qti-set-outcome-value identifier="FEEDBACK__OVERALL">
+                <qti-base-value base-type="identifier">FB__RESPONSE_A_INCORRECT__RESPONSE_B_CORRECT__RESPONSE_C_INCORRECT__RESPONSE_D_CORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-if>
+        <qti-response-else>
+            <qti-set-outcome-value identifier="FEEDBACK__OVERALL">
+                <qti-base-value base-type="identifier">FB__RESPONSE_A_INCORRECT__RESPONSE_B_CORRECT__RESPONSE_C_INCORRECT__RESPONSE_D_INCORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-else>
+    </qti-response-condition>
+        </qti-response-else>
+    </qti-response-condition>
+        </qti-response-if>
+        <qti-response-else>
+    <qti-response-condition>
+        <qti-response-if>
+            <qti-match>
+                <qti-variable identifier="RESPONSE_C"/>
+                <qti-correct identifier="RESPONSE_C"/>
+            </qti-match>
+    <qti-response-condition>
+        <qti-response-if>
+            <qti-match>
+                <qti-variable identifier="RESPONSE_D"/>
+                <qti-correct identifier="RESPONSE_D"/>
+            </qti-match>
+            <qti-set-outcome-value identifier="FEEDBACK__OVERALL">
+                <qti-base-value base-type="identifier">FB__RESPONSE_A_INCORRECT__RESPONSE_B_INCORRECT__RESPONSE_C_CORRECT__RESPONSE_D_CORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-if>
+        <qti-response-else>
+            <qti-set-outcome-value identifier="FEEDBACK__OVERALL">
+                <qti-base-value base-type="identifier">FB__RESPONSE_A_INCORRECT__RESPONSE_B_INCORRECT__RESPONSE_C_CORRECT__RESPONSE_D_INCORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-else>
+    </qti-response-condition>
+        </qti-response-if>
+        <qti-response-else>
+    <qti-response-condition>
+        <qti-response-if>
+            <qti-match>
+                <qti-variable identifier="RESPONSE_D"/>
+                <qti-correct identifier="RESPONSE_D"/>
+            </qti-match>
+            <qti-set-outcome-value identifier="FEEDBACK__OVERALL">
+                <qti-base-value base-type="identifier">FB__RESPONSE_A_INCORRECT__RESPONSE_B_INCORRECT__RESPONSE_C_INCORRECT__RESPONSE_D_CORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-if>
+        <qti-response-else>
+            <qti-set-outcome-value identifier="FEEDBACK__OVERALL">
+                <qti-base-value base-type="identifier">FB__RESPONSE_A_INCORRECT__RESPONSE_B_INCORRECT__RESPONSE_C_INCORRECT__RESPONSE_D_INCORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-else>
+    </qti-response-condition>
+        </qti-response-else>
+    </qti-response-condition>
+        </qti-response-else>
+    </qti-response-condition>
         </qti-response-else>
     </qti-response-condition>
     <qti-response-condition>
@@ -529,42 +677,41 @@ exports[`QTI Compiler End-to-End Tests should produce consistent XML output for 
     <qti-outcome-declaration identifier="SCORE" cardinality="single" base-type="float">
         <qti-default-value><qti-value>0</qti-value></qti-default-value>
     </qti-outcome-declaration>
-    <qti-outcome-declaration identifier="FEEDBACK__RESPONSE" cardinality="multiple" base-type="identifier"/>
+    <qti-outcome-declaration identifier="FEEDBACK__OVERALL" cardinality="single" base-type="identifier"/>
     <qti-item-body>
         <p><math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>3</mn><mn>6</mn></mfrac></math> of the following rectangle is shaded.</p>
         <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzQxIiBoZWlnaHQ9IjM0MSIgdmlld0JveD0iLTIxIC0yMSAzNDEgMzQxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSI1MCIgaGVpZ2h0PSIzMDAiIGZpbGw9IiM0Mjg1RjQ4MCIgc3Ryb2tlPSIjZTBlMGUwIiBzdHJva2Utd2lkdGg9IjEiIGZpbGwtb3BhY2l0eT0iMC41Ii8+PHJlY3QgeD0iNTAiIHk9IjAiIHdpZHRoPSI1MCIgaGVpZ2h0PSIzMDAiIGZpbGw9IiM0Mjg1RjQ4MCIgc3Ryb2tlPSIjZTBlMGUwIiBzdHJva2Utd2lkdGg9IjEiIGZpbGwtb3BhY2l0eT0iMC41Ii8+PHJlY3QgeD0iMTAwIiB5PSIwIiB3aWR0aD0iNTAiIGhlaWdodD0iMzAwIiBmaWxsPSIjNDI4NUY0ODAiIHN0cm9rZT0iI2UwZTBlMCIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsLW9wYWNpdHk9IjAuNSIvPjxyZWN0IHg9IjE1MCIgeT0iMCIgd2lkdGg9IjUwIiBoZWlnaHQ9IjMwMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZTBlMGUwIiBzdHJva2Utd2lkdGg9IjEiIGZpbGwtb3BhY2l0eT0iMSIvPjxyZWN0IHg9IjIwMCIgeT0iMCIgd2lkdGg9IjUwIiBoZWlnaHQ9IjMwMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZTBlMGUwIiBzdHJva2Utd2lkdGg9IjEiIGZpbGwtb3BhY2l0eT0iMSIvPjxyZWN0IHg9IjI1MCIgeT0iMCIgd2lkdGg9IjUwIiBoZWlnaHQ9IjMwMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZTBlMGUwIiBzdHJva2Utd2lkdGg9IjEiIGZpbGwtb3BhY2l0eT0iMSIvPjwvc3ZnPg==" alt="Widget visualization" />
         <div><qti-choice-interaction response-identifier="RESPONSE" shuffle="true" min-choices="0" max-choices="3">
-            <qti-prompt>Which of the following rectangles have exactly <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>3</mn><mn>6</mn></mfrac></math> of their area shaded?</qti-prompt>
+            <qti-prompt>Which of the following rectangles have an equivalent shaded area? Select all that apply.</qti-prompt>
             <qti-simple-choice identifier="A"><img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzQxIiBoZWlnaHQ9IjM0MSIgdmlld0JveD0iLTIxIC0yMSAzNDEgMzQxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSI3NSIgaGVpZ2h0PSIxNTAiIGZpbGw9IiM0Mjg1RjQ4MCIgc3Ryb2tlPSIjZTBlMGUwIiBzdHJva2Utd2lkdGg9IjEiIGZpbGwtb3BhY2l0eT0iMC41Ii8+PHJlY3QgeD0iNzUiIHk9IjAiIHdpZHRoPSI3NSIgaGVpZ2h0PSIxNTAiIGZpbGw9IiM0Mjg1RjQ4MCIgc3Ryb2tlPSIjZTBlMGUwIiBzdHJva2Utd2lkdGg9IjEiIGZpbGwtb3BhY2l0eT0iMC41Ii8+PHJlY3QgeD0iMTUwIiB5PSIwIiB3aWR0aD0iNzUiIGhlaWdodD0iMTUwIiBmaWxsPSIjNDI4NUY0ODAiIHN0cm9rZT0iI2UwZTBlMCIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsLW9wYWNpdHk9IjAuNSIvPjxyZWN0IHg9IjIyNSIgeT0iMCIgd2lkdGg9Ijc1IiBoZWlnaHQ9IjE1MCIgZmlsbD0iIzQyODVGNDgwIiBzdHJva2U9IiNlMGUwZTAiIHN0cm9rZS13aWR0aD0iMSIgZmlsbC1vcGFjaXR5PSIwLjUiLz48cmVjdCB4PSIwIiB5PSIxNTAiIHdpZHRoPSI3NSIgaGVpZ2h0PSIxNTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2UwZTBlMCIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsLW9wYWNpdHk9IjEiLz48cmVjdCB4PSI3NSIgeT0iMTUwIiB3aWR0aD0iNzUiIGhlaWdodD0iMTUwIiBmaWxsPSJub25lIiBzdHJva2U9IiNlMGUwZTAiIHN0cm9rZS13aWR0aD0iMSIgZmlsbC1vcGFjaXR5PSIxIi8+PHJlY3QgeD0iMTUwIiB5PSIxNTAiIHdpZHRoPSI3NSIgaGVpZ2h0PSIxNTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2UwZTBlMCIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsLW9wYWNpdHk9IjEiLz48cmVjdCB4PSIyMjUiIHk9IjE1MCIgd2lkdGg9Ijc1IiBoZWlnaHQ9IjE1MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZTBlMGUwIiBzdHJva2Utd2lkdGg9IjEiIGZpbGwtb3BhY2l0eT0iMSIvPjwvc3ZnPg==" alt="Widget visualization" /></qti-simple-choice>
             <qti-simple-choice identifier="B"><img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzQxIiBoZWlnaHQ9IjM0MSIgdmlld0JveD0iLTIxIC0yMSAzNDEgMzQxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSIxNTAiIGhlaWdodD0iMTUwIiBmaWxsPSIjNDI4NUY0ODAiIHN0cm9rZT0iI2UwZTBlMCIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsLW9wYWNpdHk9IjAuNSIvPjxyZWN0IHg9IjE1MCIgeT0iMCIgd2lkdGg9IjE1MCIgaGVpZ2h0PSIxNTAiIGZpbGw9IiM0Mjg1RjQ4MCIgc3Ryb2tlPSIjZTBlMGUwIiBzdHJva2Utd2lkdGg9IjEiIGZpbGwtb3BhY2l0eT0iMC41Ii8+PHJlY3QgeD0iMCIgeT0iMTUwIiB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZTBlMGUwIiBzdHJva2Utd2lkdGg9IjEiIGZpbGwtb3BhY2l0eT0iMSIvPjxyZWN0IHg9IjE1MCIgeT0iMTUwIiB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZTBlMGUwIiBzdHJva2Utd2lkdGg9IjEiIGZpbGwtb3BhY2l0eT0iMSIvPjwvc3ZnPg==" alt="Widget visualization" /></qti-simple-choice>
             <qti-simple-choice identifier="C"><img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzQxIiBoZWlnaHQ9IjM0MSIgdmlld0JveD0iLTIxIC0yMSAzNDEgMzQxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSIxNTAiIGhlaWdodD0iMTUwIiBmaWxsPSIjNDI4NUY0ODAiIHN0cm9rZT0iI2UwZTBlMCIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsLW9wYWNpdHk9IjAuNSIvPjxyZWN0IHg9IjE1MCIgeT0iMCIgd2lkdGg9IjE1MCIgaGVpZ2h0PSIxNTAiIGZpbGw9IiM0Mjg1RjQ4MCIgc3Ryb2tlPSIjZTBlMGUwIiBzdHJva2Utd2lkdGg9IjEiIGZpbGwtb3BhY2l0eT0iMC41Ii8+PHJlY3QgeD0iMCIgeT0iMTUwIiB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgZmlsbD0iIzQyODVGNDgwIiBzdHJva2U9IiNlMGUwZTAiIHN0cm9rZS13aWR0aD0iMSIgZmlsbC1vcGFjaXR5PSIwLjUiLz48cmVjdCB4PSIxNTAiIHk9IjE1MCIgd2lkdGg9IjE1MCIgaGVpZ2h0PSIxNTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2UwZTBlMCIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsLW9wYWNpdHk9IjEiLz48L3N2Zz4=" alt="Widget visualization" /></qti-simple-choice>
         </qti-choice-interaction></div>
-        <qti-feedback-block outcome-identifier="FEEDBACK__RESPONSE" identifier="A" show-hide="show">
-            <qti-content-body><p>Excellent choice! This rectangle demonstrates perfect equivalent fraction understanding.</p>
-        <p>You correctly identified that this rectangle has <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>4</mn></math> out of <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>8</mn></math> parts shaded, which equals <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>4</mn><mn>8</mn></mfrac></math>.</p>
-        <p>Here's why this works: <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>4</mn><mn>8</mn></mfrac></math> = <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>1</mn><mn>2</mn></mfrac></math> = <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>3</mn><mn>6</mn></mfrac></math> because we can multiply or divide both numerator and denominator by the same number!</p>
-        <table style="border-collapse: collapse; width: 100%;"><thead><tr><th style="border: 1px solid #ddd; padding: 8px 12px; text-align: left; vertical-align: top;">Fraction</th><th style="border: 1px solid #ddd; padding: 8px 12px; text-align: left; vertical-align: top;">Simplified</th><th style="border: 1px solid #ddd; padding: 8px 12px; text-align: left; vertical-align: top;">Decimal</th></tr></thead><tbody><tr><td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;"><math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>3</mn><mn>6</mn></mfrac></math></td><td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;"><math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>1</mn><mn>2</mn></mfrac></math></td><td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;"><math xmlns="http://www.w3.org/1998/Math/MathML"><mn>0.5</mn></math></td></tr><tr><td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;"><math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>4</mn><mn>8</mn></mfrac></math></td><td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;"><math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>1</mn><mn>2</mn></mfrac></math></td><td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;"><math xmlns="http://www.w3.org/1998/Math/MathML"><mn>0.5</mn></math></td></tr><tr><td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;"><math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>2</mn><mn>4</mn></mfrac></math></td><td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;"><math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>1</mn><mn>2</mn></mfrac></math></td><td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;"><math xmlns="http://www.w3.org/1998/Math/MathML"><mn>0.5</mn></math></td></tr></tbody></table>
-        <p>This understanding of equivalent fractions is essential for adding fractions, converting between fractions and decimals, and solving proportion problems!</p></qti-content-body>
+        <qti-feedback-block outcome-identifier="FEEDBACK__OVERALL" identifier="FB__RESPONSE_CORRECT" show-hide="show">
+            <qti-content-body><p>Excellent! You correctly identified that both rectangles A (<math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>4</mn><mn>8</mn></mfrac></math>) and B (<math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>2</mn><mn>4</mn></mfrac></math>) are equivalent to <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>3</mn><mn>6</mn></mfrac></math>, as they all simplify to <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>1</mn><mn>2</mn></mfrac></math>.</p></qti-content-body>
         </qti-feedback-block>
-        <qti-feedback-block outcome-identifier="FEEDBACK__RESPONSE" identifier="B" show-hide="show">
-            <qti-content-body><p>Another excellent choice! You found a different rectangle that also shows exactly <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>3</mn><mn>6</mn></mfrac></math> shaded.</p>
-        <p>This rectangle has <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>2</mn></math> out of <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>4</mn></math> parts shaded, giving us <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>2</mn><mn>4</mn></mfrac></math>.</p>
-        <p>The magic of equivalent fractions: <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>2</mn><mn>4</mn></mfrac></math> = <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>1</mn><mn>2</mn></mfrac></math> = <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>3</mn><mn>6</mn></mfrac></math> - they all represent the same amount!</p>
-        <p>You're seeing that the same fraction can look different depending on how we divide the shape, but the actual amount shaded stays the same.</p></qti-content-body>
-        </qti-feedback-block>
-        <qti-feedback-block outcome-identifier="FEEDBACK__RESPONSE" identifier="C" show-hide="show">
-            <qti-content-body><p>I can see why you might choose this! Let's examine this rectangle together and compare it to our target fraction.</p>
-        <p>This rectangle has <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>3</mn></math> out of <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>4</mn></math> parts shaded, which gives us <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>3</mn><mn>4</mn></mfrac></math>.</p>
-        <p>Now let's check if <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>3</mn><mn>4</mn></mfrac></math> equals <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>3</mn><mn>6</mn></mfrac></math>. We can simplify <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>3</mn><mn>6</mn></mfrac></math> by dividing both top and bottom by <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>3</mn></math>:</p>
-        <p><math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>3</mn><mn>6</mn></mfrac><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac></math>, but <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>3</mn><mn>4</mn></mfrac></math> cannot be simplified to <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>1</mn><mn>2</mn></mfrac></math></p>
-        <p>Remember: To check if fractions are equivalent, simplify both to their lowest terms and see if they match!</p></qti-content-body>
+        <qti-feedback-block outcome-identifier="FEEDBACK__OVERALL" identifier="FB__RESPONSE_INCORRECT" show-hide="show">
+            <qti-content-body><p>Not quite. Remember to simplify each fraction to its lowest terms. Both the original fraction (<math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>3</mn><mn>6</mn></mfrac></math>) and the correct choices simplify to <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>1</mn><mn>2</mn></mfrac></math>. Rectangle C shows <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>3</mn><mn>4</mn></mfrac></math>, which is not equivalent.</p></qti-content-body>
         </qti-feedback-block>
     </qti-item-body>
     <qti-response-processing>
         
-    <qti-set-outcome-value identifier="FEEDBACK__RESPONSE">
-        <qti-variable identifier="RESPONSE"/>
-    </qti-set-outcome-value>
+    <qti-response-condition>
+        <qti-response-if>
+            <qti-match>
+                <qti-variable identifier="RESPONSE"/>
+                <qti-correct identifier="RESPONSE"/>
+            </qti-match>
+            <qti-set-outcome-value identifier="FEEDBACK__OVERALL">
+                <qti-base-value base-type="identifier">FB__RESPONSE_CORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-if>
+        <qti-response-else>
+            <qti-set-outcome-value identifier="FEEDBACK__OVERALL">
+                <qti-base-value base-type="identifier">FB__RESPONSE_INCORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-else>
+    </qti-response-condition>
     <qti-response-condition>
         <qti-response-if>
             <qti-and>
@@ -623,15 +770,10 @@ exports[`QTI Compiler End-to-End Tests should produce consistent XML output for 
     <qti-outcome-declaration identifier="SCORE" cardinality="single" base-type="float">
         <qti-default-value><qti-value>0</qti-value></qti-default-value>
     </qti-outcome-declaration>
-    <qti-outcome-declaration identifier="FEEDBACK__RESPONSE_REACT_C" cardinality="single" base-type="identifier"/>
-    <qti-outcome-declaration identifier="FEEDBACK__RESPONSE_AMT_C" cardinality="single" base-type="identifier"/>
-    <qti-outcome-declaration identifier="FEEDBACK__RESPONSE_REACT_D" cardinality="single" base-type="identifier"/>
-    <qti-outcome-declaration identifier="FEEDBACK__RESPONSE_AMT_D" cardinality="single" base-type="identifier"/>
-    <qti-outcome-declaration identifier="FEEDBACK__RESPONSE_REACT_E" cardinality="single" base-type="identifier"/>
-    <qti-outcome-declaration identifier="FEEDBACK__RESPONSE_AMT_E" cardinality="single" base-type="identifier"/>
+    <qti-outcome-declaration identifier="FEEDBACK__OVERALL" cardinality="single" base-type="identifier"/>
     <qti-item-body>
         <p>Use the data provided to identify the reactant and amount that caused each temperature change. Each option is only used once.</p>
-        <table style="border-collapse: collapse; width: 100%;"><thead><tr><th style="border: 1px solid #ddd; padding: 8px 12px; text-align: left; vertical-align: top;">Experiment</th><th style="border: 1px solid #ddd; padding: 8px 12px; text-align: left; vertical-align: top;">Reactant</th><th style="border: 1px solid #ddd; padding: 8px 12px; text-align: left; vertical-align: top;">Amount of reactant (grams)</th><th style="border: 1px solid #ddd; padding: 8px 12px; text-align: left; vertical-align: top;">Temperature change</th></tr></thead><tbody><tr><td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;">A</td><td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;"><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>N</mi><msub><mi>H</mi><mn>4</mn></msub><mi>Cl</mi></mrow></math></td><td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;"><math xmlns="http://www.w3.org/1998/Math/MathML"><mn>6.0</mn><mtext> grams</mtext></math></td><td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;"><math xmlns="http://www.w3.org/1998/Math/MathML"><mo>-</mo><mn>3.6</mn><mo>°</mo><mi>C</mi></math></td></tr><tr><td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;">B</td><td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;"><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Mg</mi><mi>S</mi><msub><mi>O</mi><mn>4</mn></msub></mrow></math></td><td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;"><math xmlns="http://www.w3.org/1998/Math/MathML"><mn>5.0</mn><mtext> grams</mtext></math></td><td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;"><math xmlns="http://www.w3.org/1998/Math/MathML"><mo>+</mo><mn>1.0</mn><mo>°</mo><mi>C</mi></math></td></tr><tr><td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;">C</td><td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;"><qti-inline-choice-interaction response-identifier="RESPONSE_REACT_C" shuffle="true">
+        <table style="border-collapse: collapse; width: 100%;"><thead><tr><th style="border: 1px solid #ddd; padding: 8px 12px; text-align: left; vertical-align: top;">Experiment</th><th style="border: 1px solid #ddd; padding: 8px 12px; text-align: left; vertical-align: top;">Reactant</th><th style="border: 1px solid #ddd; padding: 8px 12px; text-align: left; vertical-align: top;">Amount (grams)</th><th style="border: 1px solid #ddd; padding: 8px 12px; text-align: left; vertical-align: top;">Temp. change</th></tr></thead><tbody><tr><td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;">A</td><td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;"><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>N</mi><msub><mi>H</mi><mn>4</mn></msub><mi>Cl</mi></mrow></math></td><td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;"><math xmlns="http://www.w3.org/1998/Math/MathML"><mn>6.0</mn></math></td><td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;"><math xmlns="http://www.w3.org/1998/Math/MathML"><mo>-</mo><mn>3.6</mn><mo>°</mo><mi>C</mi></math></td></tr><tr><td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;">B</td><td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;"><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Mg</mi><mi>S</mi><msub><mi>O</mi><mn>4</mn></msub></mrow></math></td><td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;"><math xmlns="http://www.w3.org/1998/Math/MathML"><mn>5.0</mn></math></td><td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;"><math xmlns="http://www.w3.org/1998/Math/MathML"><mo>+</mo><mn>1.0</mn><mo>°</mo><mi>C</mi></math></td></tr><tr><td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;">C</td><td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;"><qti-inline-choice-interaction response-identifier="RESPONSE_REACT_C" shuffle="true">
                 <qti-inline-choice identifier="NH4CL"><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>N</mi><msub><mi>H</mi><mn>4</mn></msub><mi>Cl</mi></mrow></math></qti-inline-choice>
                 <qti-inline-choice identifier="MGSO4"><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Mg</mi><mi>S</mi><msub><mi>O</mi><mn>4</mn></msub></mrow></math></qti-inline-choice>
                 <qti-inline-choice identifier="CACL2"><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Ca</mi><msub><mi>Cl</mi><mn>2</mn></msub></mrow></math></qti-inline-choice>
@@ -656,232 +798,36 @@ exports[`QTI Compiler End-to-End Tests should produce consistent XML output for 
                 <qti-inline-choice identifier="AMT_3_0"><math xmlns="http://www.w3.org/1998/Math/MathML"><mn>3.0</mn></math></qti-inline-choice>
                 <qti-inline-choice identifier="AMT_8_0"><math xmlns="http://www.w3.org/1998/Math/MathML"><mn>8.0</mn></math></qti-inline-choice>
             </qti-inline-choice-interaction></td><td style="border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;"><math xmlns="http://www.w3.org/1998/Math/MathML"><mo>+</mo><mn>3.2</mn><mo>°</mo><mi>C</mi></math></td></tr></tbody></table>
-        <p>Select the reactant and amount for rows C, D, and E directly in the table.</p>
         <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTg5IiBoZWlnaHQ9IjQ4MSIgdmlld0JveD0iLTgwIC05IDU4OSA0ODEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiPjxkZWZzPjxjbGlwUGF0aCBpZD0iY2xpcC0wIj48cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iNTAwIiBoZWlnaHQ9IjQwMCIvPjwvY2xpcFBhdGg+PC9kZWZzPjxsaW5lIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSI0MDAiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48bGluZSB4MT0iLTUiIHkxPSI0MDAiIHgyPSIwIiB5Mj0iNDAwIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PHRleHQgeD0iLTgiIHk9IjQwNCIgZm9udC1zaXplPSIxMiIgdGV4dC1hbmNob3I9ImVuZCIgZmlsbD0iIzMzMzMzMyI+LTQ8L3RleHQ+PGxpbmUgeDE9IjAiIHkxPSI0MDAiIHgyPSI1MDAiIHkyPSI0MDAiIHN0cm9rZT0iI2UwZTBlMCIgc3Ryb2tlLXdpZHRoPSIxIi8+PGxpbmUgeDE9Ii01IiB5MT0iMzUwIiB4Mj0iMCIgeTI9IjM1MCIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjx0ZXh0IHg9Ii04IiB5PSIzNTQiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJlbmQiIGZpbGw9IiMzMzMzMzMiPi0zPC90ZXh0PjxsaW5lIHgxPSIwIiB5MT0iMzUwIiB4Mj0iNTAwIiB5Mj0iMzUwIiBzdHJva2U9IiNlMGUwZTAiIHN0cm9rZS13aWR0aD0iMSIvPjxsaW5lIHgxPSItNSIgeTE9IjMwMCIgeDI9IjAiIHkyPSIzMDAiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48dGV4dCB4PSItOCIgeT0iMzA0IiBmb250LXNpemU9IjEyIiB0ZXh0LWFuY2hvcj0iZW5kIiBmaWxsPSIjMzMzMzMzIj4tMjwvdGV4dD48bGluZSB4MT0iMCIgeTE9IjMwMCIgeDI9IjUwMCIgeTI9IjMwMCIgc3Ryb2tlPSIjZTBlMGUwIiBzdHJva2Utd2lkdGg9IjEiLz48bGluZSB4MT0iLTUiIHkxPSIyNTAiIHgyPSIwIiB5Mj0iMjUwIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PHRleHQgeD0iLTgiIHk9IjI1NCIgZm9udC1zaXplPSIxMiIgdGV4dC1hbmNob3I9ImVuZCIgZmlsbD0iIzMzMzMzMyI+LTE8L3RleHQ+PGxpbmUgeDE9IjAiIHkxPSIyNTAiIHgyPSI1MDAiIHkyPSIyNTAiIHN0cm9rZT0iI2UwZTBlMCIgc3Ryb2tlLXdpZHRoPSIxIi8+PGxpbmUgeDE9Ii01IiB5MT0iMjAwIiB4Mj0iMCIgeTI9IjIwMCIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjx0ZXh0IHg9Ii04IiB5PSIyMDQiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJlbmQiIGZpbGw9IiMzMzMzMzMiPjA8L3RleHQ+PGxpbmUgeDE9IjAiIHkxPSIyMDAiIHgyPSI1MDAiIHkyPSIyMDAiIHN0cm9rZT0iI2UwZTBlMCIgc3Ryb2tlLXdpZHRoPSIxIi8+PGxpbmUgeDE9Ii01IiB5MT0iMTUwIiB4Mj0iMCIgeTI9IjE1MCIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjx0ZXh0IHg9Ii04IiB5PSIxNTQiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJlbmQiIGZpbGw9IiMzMzMzMzMiPjE8L3RleHQ+PGxpbmUgeDE9IjAiIHkxPSIxNTAiIHgyPSI1MDAiIHkyPSIxNTAiIHN0cm9rZT0iI2UwZTBlMCIgc3Ryb2tlLXdpZHRoPSIxIi8+PGxpbmUgeDE9Ii01IiB5MT0iMTAwIiB4Mj0iMCIgeTI9IjEwMCIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjx0ZXh0IHg9Ii04IiB5PSIxMDQiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJlbmQiIGZpbGw9IiMzMzMzMzMiPjI8L3RleHQ+PGxpbmUgeDE9IjAiIHkxPSIxMDAiIHgyPSI1MDAiIHkyPSIxMDAiIHN0cm9rZT0iI2UwZTBlMCIgc3Ryb2tlLXdpZHRoPSIxIi8+PGxpbmUgeDE9Ii01IiB5MT0iNTAiIHgyPSIwIiB5Mj0iNTAiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48dGV4dCB4PSItOCIgeT0iNTQiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJlbmQiIGZpbGw9IiMzMzMzMzMiPjM8L3RleHQ+PGxpbmUgeDE9IjAiIHkxPSI1MCIgeDI9IjUwMCIgeTI9IjUwIiBzdHJva2U9IiNlMGUwZTAiIHN0cm9rZS13aWR0aD0iMSIvPjxsaW5lIHgxPSItNSIgeTE9IjAiIHgyPSIwIiB5Mj0iMCIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjx0ZXh0IHg9Ii04IiB5PSI0IiBmb250LXNpemU9IjEyIiB0ZXh0LWFuY2hvcj0iZW5kIiBmaWxsPSIjMzMzMzMzIj40PC90ZXh0PjxsaW5lIHgxPSIwIiB5MT0iMCIgeDI9IjUwMCIgeTI9IjAiIHN0cm9rZT0iI2UwZTBlMCIgc3Ryb2tlLXdpZHRoPSIxIi8+PHRleHQgeD0iLTYxLjYiIHk9IjIwMCIgZm9udC1zaXplPSIxNiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzMzMzMzMyIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdHJhbnNmb3JtPSJyb3RhdGUoLTkwLCAtNjEuNiwgMjAwKSI+PHRzcGFuIHg9Ii02MS42IiBkeT0iMGVtIj5UZW1wZXJhdHVyZSBDaGFuZ2UgKMKwQyk8L3RzcGFuPjwvdGV4dD48bGluZSB4MT0iMCIgeTE9IjQwMCIgeDI9IjUwMCIgeTI9IjQwMCIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjxsaW5lIHgxPSI1MCIgeTE9IjQwMCIgeDI9IjUwIiB5Mj0iNDA1IiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PHRleHQgeD0iNTAiIHk9IjQxMyIgZm9udC1zaXplPSIxMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9ImhhbmdpbmciIGZpbGw9IiMzMzMzMzMiPkE8L3RleHQ+PGxpbmUgeDE9IjE1MCIgeTE9IjQwMCIgeDI9IjE1MCIgeTI9IjQwNSIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjx0ZXh0IHg9IjE1MCIgeT0iNDEzIiBmb250LXNpemU9IjEyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0iaGFuZ2luZyIgZmlsbD0iIzMzMzMzMyI+QjwvdGV4dD48bGluZSB4MT0iMjUwIiB5MT0iNDAwIiB4Mj0iMjUwIiB5Mj0iNDA1IiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PHRleHQgeD0iMjUwIiB5PSI0MTMiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJoYW5naW5nIiBmaWxsPSIjMzMzMzMzIj5DPC90ZXh0PjxsaW5lIHgxPSIzNTAiIHkxPSI0MDAiIHgyPSIzNTAiIHkyPSI0MDUiIHN0cm9rZT0iIzMzMzMzMyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48dGV4dCB4PSIzNTAiIHk9IjQxMyIgZm9udC1zaXplPSIxMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9ImhhbmdpbmciIGZpbGw9IiMzMzMzMzMiPkQ8L3RleHQ+PGxpbmUgeDE9IjQ1MCIgeTE9IjQwMCIgeDI9IjQ1MCIgeTI9IjQwNSIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjEuNSIvPjx0ZXh0IHg9IjQ1MCIgeT0iNDEzIiBmb250LXNpemU9IjEyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0iaGFuZ2luZyIgZmlsbD0iIzMzMzMzMyI+RTwvdGV4dD48dGV4dCB4PSIyNTAiIHk9IjQ0NyIgZm9udC1zaXplPSIxNiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzMzMzMzMyI+PHRzcGFuIHg9IjI1MCIgZHk9IjBlbSI+RXhwZXJpbWVudDwvdHNwYW4+PC90ZXh0PjxsaW5lIHgxPSIwIiB5MT0iNDAwIiB4Mj0iNTAwIiB5Mj0iNDAwIiBzdHJva2U9IiNFMEUwRTAiIHN0cm9rZS13aWR0aD0iMSIvPjxsaW5lIHgxPSIwIiB5MT0iMzUwIiB4Mj0iNTAwIiB5Mj0iMzUwIiBzdHJva2U9IiNFMEUwRTAiIHN0cm9rZS13aWR0aD0iMSIvPjxsaW5lIHgxPSIwIiB5MT0iMzAwIiB4Mj0iNTAwIiB5Mj0iMzAwIiBzdHJva2U9IiNFMEUwRTAiIHN0cm9rZS13aWR0aD0iMSIvPjxsaW5lIHgxPSIwIiB5MT0iMjUwIiB4Mj0iNTAwIiB5Mj0iMjUwIiBzdHJva2U9IiNFMEUwRTAiIHN0cm9rZS13aWR0aD0iMSIvPjxsaW5lIHgxPSIwIiB5MT0iMTUwIiB4Mj0iNTAwIiB5Mj0iMTUwIiBzdHJva2U9IiNFMEUwRTAiIHN0cm9rZS13aWR0aD0iMSIvPjxsaW5lIHgxPSIwIiB5MT0iMTAwIiB4Mj0iNTAwIiB5Mj0iMTAwIiBzdHJva2U9IiNFMEUwRTAiIHN0cm9rZS13aWR0aD0iMSIvPjxsaW5lIHgxPSIwIiB5MT0iNTAiIHgyPSI1MDAiIHkyPSI1MCIgc3Ryb2tlPSIjRTBFMEUwIiBzdHJva2Utd2lkdGg9IjEiLz48bGluZSB4MT0iMCIgeTE9IjAiIHgyPSI1MDAiIHkyPSIwIiBzdHJva2U9IiNFMEUwRTAiIHN0cm9rZS13aWR0aD0iMSIvPjxsaW5lIHgxPSIwIiB5MT0iMjAwIiB4Mj0iNTAwIiB5Mj0iMjAwIiBzdHJva2U9IiMzMzMzMzMiIHN0cm9rZS13aWR0aD0iMiIvPjxnIGNsaXAtcGF0aD0idXJsKCNjbGlwLTApIj48cmVjdCB4PSIyMCIgeT0iMjAwIiB3aWR0aD0iNjAiIGhlaWdodD0iMTgwIiBmaWxsPSIjNEE5MEUyIi8+PHJlY3QgeD0iMTIwIiB5PSIxNTAiIHdpZHRoPSI2MCIgaGVpZ2h0PSI1MCIgZmlsbD0iI0U3NEMzQyIvPjxyZWN0IHg9IjIyMCIgeT0iMTc1IiB3aWR0aD0iNjAiIGhlaWdodD0iMjUiIGZpbGw9IiNFNzRDM0MiLz48cmVjdCB4PSIzMjAiIHk9IjIwMCIgd2lkdGg9IjYwIiBoZWlnaHQ9IjkwIiBmaWxsPSIjNEE5MEUyIi8+PHJlY3QgeD0iNDIwIiB5PSI0MCIgd2lkdGg9IjYwIiBoZWlnaHQ9IjE2MCIgZmlsbD0iI0U3NEMzQyIvPjwvZz48L3N2Zz4=" alt="Widget visualization" />
-        <qti-feedback-block outcome-identifier="FEEDBACK__RESPONSE_REACT_C" identifier="MGSO4" show-hide="show">
-            <qti-content-body><p>Correct! <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Mg</mi><mi>S</mi><msub><mi>O</mi><mn>4</mn></msub></mrow></math> produces a small positive temperature change because it releases heat when dissolving (exothermic).</p></qti-content-body>
+        <qti-feedback-block outcome-identifier="FEEDBACK__OVERALL" identifier="CORRECT" show-hide="show">
+            <qti-content-body><p>Correct! You successfully matched all reactants and amounts to their corresponding temperature changes by analyzing the patterns in the data.</p></qti-content-body>
         </qti-feedback-block>
-        <qti-feedback-block outcome-identifier="FEEDBACK__RESPONSE_REACT_C" identifier="NH4CL" show-hide="show">
-            <qti-content-body><p>Not quite. <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>N</mi><msub><mi>H</mi><mn>4</mn></msub><mi>Cl</mi></mrow></math> causes cooling (negative temperature change), but experiment C shows a positive change.</p></qti-content-body>
-        </qti-feedback-block>
-        <qti-feedback-block outcome-identifier="FEEDBACK__RESPONSE_REACT_C" identifier="CACL2" show-hide="show">
-            <qti-content-body><p>Not quite. While <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Ca</mi><msub><mi>Cl</mi><mn>2</mn></msub></mrow></math> does cause heating, it produces a much larger temperature change than the small <math xmlns="http://www.w3.org/1998/Math/MathML"><mo>+</mo><mn>0.5</mn><mo>°</mo><mi>C</mi></math> observed.</p></qti-content-body>
-        </qti-feedback-block>
-        <qti-feedback-block outcome-identifier="FEEDBACK__RESPONSE_AMT_C" identifier="AMT_2_5" show-hide="show">
-            <qti-content-body><p>Correct! <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>2.5</mn></math> grams produces the small temperature change observed.</p></qti-content-body>
-        </qti-feedback-block>
-        <qti-feedback-block outcome-identifier="FEEDBACK__RESPONSE_AMT_C" identifier="AMT_3_0" show-hide="show">
-            <qti-content-body><p>This amount would produce a slightly larger temperature change than observed.</p></qti-content-body>
-        </qti-feedback-block>
-        <qti-feedback-block outcome-identifier="FEEDBACK__RESPONSE_AMT_C" identifier="AMT_8_0" show-hide="show">
-            <qti-content-body><p>This large amount would produce a much stronger temperature change than the small <math xmlns="http://www.w3.org/1998/Math/MathML"><mo>+</mo><mn>0.5</mn><mo>°</mo><mi>C</mi></math> observed.</p></qti-content-body>
-        </qti-feedback-block>
-        <qti-feedback-block outcome-identifier="FEEDBACK__RESPONSE_REACT_D" identifier="NH4CL" show-hide="show">
-            <qti-content-body><p>Correct! <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>N</mi><msub><mi>H</mi><mn>4</mn></msub><mi>Cl</mi></mrow></math> absorbs heat when dissolving, causing the negative temperature change.</p></qti-content-body>
-        </qti-feedback-block>
-        <qti-feedback-block outcome-identifier="FEEDBACK__RESPONSE_REACT_D" identifier="MGSO4" show-hide="show">
-            <qti-content-body><p>Not quite. <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Mg</mi><mi>S</mi><msub><mi>O</mi><mn>4</mn></msub></mrow></math> causes heating (positive change), but experiment D shows cooling.</p></qti-content-body>
-        </qti-feedback-block>
-        <qti-feedback-block outcome-identifier="FEEDBACK__RESPONSE_REACT_D" identifier="CACL2" show-hide="show">
-            <qti-content-body><p>Not quite. <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Ca</mi><msub><mi>Cl</mi><mn>2</mn></msub></mrow></math> causes heating (positive change), but experiment D shows cooling.</p></qti-content-body>
-        </qti-feedback-block>
-        <qti-feedback-block outcome-identifier="FEEDBACK__RESPONSE_AMT_D" identifier="AMT_3_0" show-hide="show">
-            <qti-content-body><p>Correct! <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>3.0</mn></math> grams produces the moderate cooling effect observed.</p></qti-content-body>
-        </qti-feedback-block>
-        <qti-feedback-block outcome-identifier="FEEDBACK__RESPONSE_AMT_D" identifier="AMT_2_5" show-hide="show">
-            <qti-content-body><p>This smaller amount would produce less cooling than the <math xmlns="http://www.w3.org/1998/Math/MathML"><mo>-</mo><mn>1.8</mn><mo>°</mo><mi>C</mi></math> observed.</p></qti-content-body>
-        </qti-feedback-block>
-        <qti-feedback-block outcome-identifier="FEEDBACK__RESPONSE_AMT_D" identifier="AMT_8_0" show-hide="show">
-            <qti-content-body><p>This large amount would produce much stronger cooling than observed.</p></qti-content-body>
-        </qti-feedback-block>
-        <qti-feedback-block outcome-identifier="FEEDBACK__RESPONSE_REACT_E" identifier="CACL2" show-hide="show">
-            <qti-content-body><p>Correct! <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Ca</mi><msub><mi>Cl</mi><mn>2</mn></msub></mrow></math> is highly exothermic and produces significant heating when dissolved.</p></qti-content-body>
-        </qti-feedback-block>
-        <qti-feedback-block outcome-identifier="FEEDBACK__RESPONSE_REACT_E" identifier="NH4CL" show-hide="show">
-            <qti-content-body><p>Not quite. <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>N</mi><msub><mi>H</mi><mn>4</mn></msub><mi>Cl</mi></mrow></math> causes cooling, but experiment E shows significant heating.</p></qti-content-body>
-        </qti-feedback-block>
-        <qti-feedback-block outcome-identifier="FEEDBACK__RESPONSE_REACT_E" identifier="MGSO4" show-hide="show">
-            <qti-content-body><p>While <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Mg</mi><mi>S</mi><msub><mi>O</mi><mn>4</mn></msub></mrow></math> does cause heating, it produces a much smaller temperature change than the <math xmlns="http://www.w3.org/1998/Math/MathML"><mo>+</mo><mn>3.2</mn><mo>°</mo><mi>C</mi></math> observed.</p></qti-content-body>
-        </qti-feedback-block>
-        <qti-feedback-block outcome-identifier="FEEDBACK__RESPONSE_AMT_E" identifier="AMT_8_0" show-hide="show">
-            <qti-content-body><p>Correct! <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>8.0</mn></math> grams of <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Ca</mi><msub><mi>Cl</mi><mn>2</mn></msub></mrow></math> produces the large temperature increase observed.</p></qti-content-body>
-        </qti-feedback-block>
-        <qti-feedback-block outcome-identifier="FEEDBACK__RESPONSE_AMT_E" identifier="AMT_2_5" show-hide="show">
-            <qti-content-body><p>This small amount would produce much less heating than the large <math xmlns="http://www.w3.org/1998/Math/MathML"><mo>+</mo><mn>3.2</mn><mo>°</mo><mi>C</mi></math> change observed.</p></qti-content-body>
-        </qti-feedback-block>
-        <qti-feedback-block outcome-identifier="FEEDBACK__RESPONSE_AMT_E" identifier="AMT_3_0" show-hide="show">
-            <qti-content-body><p>This moderate amount would still produce less heating than observed.</p></qti-content-body>
+        <qti-feedback-block outcome-identifier="FEEDBACK__OVERALL" identifier="INCORRECT" show-hide="show">
+            <qti-content-body><p>Not quite. Remember that exothermic reactions release heat (positive temperature change) and endothermic reactions absorb heat (negative change). Also, a larger amount of reactant will cause a larger temperature change.</p></qti-content-body>
         </qti-feedback-block>
     </qti-item-body>
     <qti-response-processing>
-        <qti-response-condition>
+        
+    <qti-response-condition>
         <qti-response-if>
-            <qti-match>
-                <qti-variable identifier="RESPONSE_REACT_C"/>
-                <qti-base-value base-type="identifier">NH4CL</qti-base-value>
-            </qti-match>
-            <qti-set-outcome-value identifier="FEEDBACK__RESPONSE_REACT_C">
-                <qti-base-value base-type="identifier">NH4CL</qti-base-value>
+            <qti-and>
+                    <qti-match><qti-variable identifier="RESPONSE_REACT_C"/><qti-correct identifier="RESPONSE_REACT_C"/></qti-match>
+                        <qti-match><qti-variable identifier="RESPONSE_AMT_C"/><qti-correct identifier="RESPONSE_AMT_C"/></qti-match>
+                        <qti-match><qti-variable identifier="RESPONSE_REACT_D"/><qti-correct identifier="RESPONSE_REACT_D"/></qti-match>
+                        <qti-match><qti-variable identifier="RESPONSE_AMT_D"/><qti-correct identifier="RESPONSE_AMT_D"/></qti-match>
+                        <qti-match><qti-variable identifier="RESPONSE_REACT_E"/><qti-correct identifier="RESPONSE_REACT_E"/></qti-match>
+                        <qti-match><qti-variable identifier="RESPONSE_AMT_E"/><qti-correct identifier="RESPONSE_AMT_E"/></qti-match>
+                </qti-and>
+            <qti-set-outcome-value identifier="FEEDBACK__OVERALL">
+                <qti-base-value base-type="identifier">CORRECT</qti-base-value>
             </qti-set-outcome-value>
         </qti-response-if>
-        <qti-response-else-if>
-            <qti-match>
-                <qti-variable identifier="RESPONSE_REACT_C"/>
-                <qti-base-value base-type="identifier">MGSO4</qti-base-value>
-            </qti-match>
-            <qti-set-outcome-value identifier="FEEDBACK__RESPONSE_REACT_C">
-                <qti-base-value base-type="identifier">MGSO4</qti-base-value>
+        <qti-response-else>
+            <qti-set-outcome-value identifier="FEEDBACK__OVERALL">
+                <qti-base-value base-type="identifier">INCORRECT</qti-base-value>
             </qti-set-outcome-value>
-        </qti-response-else-if>
-        <qti-response-else-if>
-            <qti-match>
-                <qti-variable identifier="RESPONSE_REACT_C"/>
-                <qti-base-value base-type="identifier">CACL2</qti-base-value>
-            </qti-match>
-            <qti-set-outcome-value identifier="FEEDBACK__RESPONSE_REACT_C">
-                <qti-base-value base-type="identifier">CACL2</qti-base-value>
-            </qti-set-outcome-value>
-        </qti-response-else-if></qti-response-condition>
-<qti-response-condition>
-        <qti-response-if>
-            <qti-match>
-                <qti-variable identifier="RESPONSE_AMT_C"/>
-                <qti-base-value base-type="identifier">AMT_2_5</qti-base-value>
-            </qti-match>
-            <qti-set-outcome-value identifier="FEEDBACK__RESPONSE_AMT_C">
-                <qti-base-value base-type="identifier">AMT_2_5</qti-base-value>
-            </qti-set-outcome-value>
-        </qti-response-if>
-        <qti-response-else-if>
-            <qti-match>
-                <qti-variable identifier="RESPONSE_AMT_C"/>
-                <qti-base-value base-type="identifier">AMT_3_0</qti-base-value>
-            </qti-match>
-            <qti-set-outcome-value identifier="FEEDBACK__RESPONSE_AMT_C">
-                <qti-base-value base-type="identifier">AMT_3_0</qti-base-value>
-            </qti-set-outcome-value>
-        </qti-response-else-if>
-        <qti-response-else-if>
-            <qti-match>
-                <qti-variable identifier="RESPONSE_AMT_C"/>
-                <qti-base-value base-type="identifier">AMT_8_0</qti-base-value>
-            </qti-match>
-            <qti-set-outcome-value identifier="FEEDBACK__RESPONSE_AMT_C">
-                <qti-base-value base-type="identifier">AMT_8_0</qti-base-value>
-            </qti-set-outcome-value>
-        </qti-response-else-if></qti-response-condition>
-<qti-response-condition>
-        <qti-response-if>
-            <qti-match>
-                <qti-variable identifier="RESPONSE_REACT_D"/>
-                <qti-base-value base-type="identifier">NH4CL</qti-base-value>
-            </qti-match>
-            <qti-set-outcome-value identifier="FEEDBACK__RESPONSE_REACT_D">
-                <qti-base-value base-type="identifier">NH4CL</qti-base-value>
-            </qti-set-outcome-value>
-        </qti-response-if>
-        <qti-response-else-if>
-            <qti-match>
-                <qti-variable identifier="RESPONSE_REACT_D"/>
-                <qti-base-value base-type="identifier">MGSO4</qti-base-value>
-            </qti-match>
-            <qti-set-outcome-value identifier="FEEDBACK__RESPONSE_REACT_D">
-                <qti-base-value base-type="identifier">MGSO4</qti-base-value>
-            </qti-set-outcome-value>
-        </qti-response-else-if>
-        <qti-response-else-if>
-            <qti-match>
-                <qti-variable identifier="RESPONSE_REACT_D"/>
-                <qti-base-value base-type="identifier">CACL2</qti-base-value>
-            </qti-match>
-            <qti-set-outcome-value identifier="FEEDBACK__RESPONSE_REACT_D">
-                <qti-base-value base-type="identifier">CACL2</qti-base-value>
-            </qti-set-outcome-value>
-        </qti-response-else-if></qti-response-condition>
-<qti-response-condition>
-        <qti-response-if>
-            <qti-match>
-                <qti-variable identifier="RESPONSE_AMT_D"/>
-                <qti-base-value base-type="identifier">AMT_2_5</qti-base-value>
-            </qti-match>
-            <qti-set-outcome-value identifier="FEEDBACK__RESPONSE_AMT_D">
-                <qti-base-value base-type="identifier">AMT_2_5</qti-base-value>
-            </qti-set-outcome-value>
-        </qti-response-if>
-        <qti-response-else-if>
-            <qti-match>
-                <qti-variable identifier="RESPONSE_AMT_D"/>
-                <qti-base-value base-type="identifier">AMT_3_0</qti-base-value>
-            </qti-match>
-            <qti-set-outcome-value identifier="FEEDBACK__RESPONSE_AMT_D">
-                <qti-base-value base-type="identifier">AMT_3_0</qti-base-value>
-            </qti-set-outcome-value>
-        </qti-response-else-if>
-        <qti-response-else-if>
-            <qti-match>
-                <qti-variable identifier="RESPONSE_AMT_D"/>
-                <qti-base-value base-type="identifier">AMT_8_0</qti-base-value>
-            </qti-match>
-            <qti-set-outcome-value identifier="FEEDBACK__RESPONSE_AMT_D">
-                <qti-base-value base-type="identifier">AMT_8_0</qti-base-value>
-            </qti-set-outcome-value>
-        </qti-response-else-if></qti-response-condition>
-<qti-response-condition>
-        <qti-response-if>
-            <qti-match>
-                <qti-variable identifier="RESPONSE_REACT_E"/>
-                <qti-base-value base-type="identifier">NH4CL</qti-base-value>
-            </qti-match>
-            <qti-set-outcome-value identifier="FEEDBACK__RESPONSE_REACT_E">
-                <qti-base-value base-type="identifier">NH4CL</qti-base-value>
-            </qti-set-outcome-value>
-        </qti-response-if>
-        <qti-response-else-if>
-            <qti-match>
-                <qti-variable identifier="RESPONSE_REACT_E"/>
-                <qti-base-value base-type="identifier">MGSO4</qti-base-value>
-            </qti-match>
-            <qti-set-outcome-value identifier="FEEDBACK__RESPONSE_REACT_E">
-                <qti-base-value base-type="identifier">MGSO4</qti-base-value>
-            </qti-set-outcome-value>
-        </qti-response-else-if>
-        <qti-response-else-if>
-            <qti-match>
-                <qti-variable identifier="RESPONSE_REACT_E"/>
-                <qti-base-value base-type="identifier">CACL2</qti-base-value>
-            </qti-match>
-            <qti-set-outcome-value identifier="FEEDBACK__RESPONSE_REACT_E">
-                <qti-base-value base-type="identifier">CACL2</qti-base-value>
-            </qti-set-outcome-value>
-        </qti-response-else-if></qti-response-condition>
-<qti-response-condition>
-        <qti-response-if>
-            <qti-match>
-                <qti-variable identifier="RESPONSE_AMT_E"/>
-                <qti-base-value base-type="identifier">AMT_2_5</qti-base-value>
-            </qti-match>
-            <qti-set-outcome-value identifier="FEEDBACK__RESPONSE_AMT_E">
-                <qti-base-value base-type="identifier">AMT_2_5</qti-base-value>
-            </qti-set-outcome-value>
-        </qti-response-if>
-        <qti-response-else-if>
-            <qti-match>
-                <qti-variable identifier="RESPONSE_AMT_E"/>
-                <qti-base-value base-type="identifier">AMT_3_0</qti-base-value>
-            </qti-match>
-            <qti-set-outcome-value identifier="FEEDBACK__RESPONSE_AMT_E">
-                <qti-base-value base-type="identifier">AMT_3_0</qti-base-value>
-            </qti-set-outcome-value>
-        </qti-response-else-if>
-        <qti-response-else-if>
-            <qti-match>
-                <qti-variable identifier="RESPONSE_AMT_E"/>
-                <qti-base-value base-type="identifier">AMT_8_0</qti-base-value>
-            </qti-match>
-            <qti-set-outcome-value identifier="FEEDBACK__RESPONSE_AMT_E">
-                <qti-base-value base-type="identifier">AMT_8_0</qti-base-value>
-            </qti-set-outcome-value>
-        </qti-response-else-if></qti-response-condition>
+        </qti-response-else>
+    </qti-response-condition>
     <qti-response-condition>
         <qti-response-if>
             <qti-and>
@@ -891,6 +837,77 @@ exports[`QTI Compiler End-to-End Tests should produce consistent XML output for 
                         <qti-match><qti-variable identifier="RESPONSE_AMT_D"/><qti-correct identifier="RESPONSE_AMT_D"/></qti-match>
                         <qti-match><qti-variable identifier="RESPONSE_REACT_E"/><qti-correct identifier="RESPONSE_REACT_E"/></qti-match>
                         <qti-match><qti-variable identifier="RESPONSE_AMT_E"/><qti-correct identifier="RESPONSE_AMT_E"/></qti-match>
+            </qti-and>
+            <qti-set-outcome-value identifier="SCORE"><qti-base-value base-type="float">1.0</qti-base-value></qti-set-outcome-value>
+        </qti-response-if>
+        <qti-response-else>
+            <qti-set-outcome-value identifier="SCORE"><qti-base-value base-type="float">0.0</qti-base-value></qti-set-outcome-value>
+        </qti-response-else>
+    </qti-response-condition>
+    </qti-response-processing>
+</qti-assessment-item>"
+`;
+
+exports[`QTI Compiler End-to-End Tests should produce consistent XML output for "order-planets-from-sun" 1`] = `
+"<?xml version="1.0" encoding="UTF-8"?>
+<qti-assessment-item
+    xmlns="http://www.imsglobal.org/xsd/imsqtiasi_v3p0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqtiasi_v3p0 https://purl.imsglobal.org/spec/qti/v3p0/schema/xsd/imsqti_asiv3p0p1_v1p0.xsd http://www.w3.org/1998/Math/MathML https://purl.imsglobal.org/spec/mathml/v3p0/schema/xsd/mathml3.xsd"
+    identifier="order-planets-from-sun"
+    title="Order planets by distance from the Sun"
+    time-dependent="false"
+    xml:lang="en-US">
+    <qti-response-declaration identifier="RESPONSE" cardinality="ordered" base-type="identifier">
+        <qti-correct-response>
+            <qti-value>MERCURY</qti-value>
+            <qti-value>VENUS</qti-value>
+            <qti-value>EARTH</qti-value>
+            <qti-value>MARS</qti-value>
+        </qti-correct-response>
+    </qti-response-declaration>
+    <qti-outcome-declaration identifier="SCORE" cardinality="single" base-type="float">
+        <qti-default-value><qti-value>0</qti-value></qti-default-value>
+    </qti-outcome-declaration>
+    <qti-outcome-declaration identifier="FEEDBACK__OVERALL" cardinality="single" base-type="identifier"/>
+    <qti-item-body>
+        <p>The diagram shows the four inner planets of our solar system.</p>
+        <div><qti-order-interaction response-identifier="RESPONSE" shuffle="true" orientation="vertical">
+            <qti-prompt>Arrange these planets by their distance from the Sun, from least to greatest (top to bottom):</qti-prompt>
+            <qti-simple-choice identifier="EARTH"><p>Earth</p></qti-simple-choice>
+            <qti-simple-choice identifier="MARS"><p>Mars</p></qti-simple-choice>
+            <qti-simple-choice identifier="VENUS"><p>Venus</p></qti-simple-choice>
+            <qti-simple-choice identifier="MERCURY"><p>Mercury</p></qti-simple-choice>
+        </qti-order-interaction></div>
+        <qti-feedback-block outcome-identifier="FEEDBACK__OVERALL" identifier="FB__RESPONSE_CORRECT" show-hide="show">
+            <qti-content-body><p>Correct! The order of the inner planets from the Sun is Mercury, Venus, Earth, and Mars.</p></qti-content-body>
+        </qti-feedback-block>
+        <qti-feedback-block outcome-identifier="FEEDBACK__OVERALL" identifier="FB__RESPONSE_INCORRECT" show-hide="show">
+            <qti-content-body><p>Not quite. A good mnemonic to remember the order is 'My Very Educated Mother Just Served Us Noodles'.</p></qti-content-body>
+        </qti-feedback-block>
+    </qti-item-body>
+    <qti-response-processing>
+        
+    <qti-response-condition>
+        <qti-response-if>
+            <qti-match>
+                <qti-variable identifier="RESPONSE"/>
+                <qti-correct identifier="RESPONSE"/>
+            </qti-match>
+            <qti-set-outcome-value identifier="FEEDBACK__OVERALL">
+                <qti-base-value base-type="identifier">FB__RESPONSE_CORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-if>
+        <qti-response-else>
+            <qti-set-outcome-value identifier="FEEDBACK__OVERALL">
+                <qti-base-value base-type="identifier">FB__RESPONSE_INCORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-else>
+    </qti-response-condition>
+    <qti-response-condition>
+        <qti-response-if>
+            <qti-and>
+                <qti-match><qti-variable identifier="RESPONSE"/><qti-correct identifier="RESPONSE"/></qti-match>
             </qti-and>
             <qti-set-outcome-value identifier="SCORE"><qti-base-value base-type="float">1.0</qti-base-value></qti-set-outcome-value>
         </qti-response-if>
@@ -929,9 +946,9 @@ exports[`QTI Compiler End-to-End Tests should produce consistent XML output for 
     <qti-outcome-declaration identifier="SCORE" cardinality="single" base-type="float">
         <qti-default-value><qti-value>0</qti-value></qti-default-value>
     </qti-outcome-declaration>
-    <qti-outcome-declaration identifier="FEEDBACK__RESPONSE" cardinality="multiple" base-type="identifier"/>
+    <qti-outcome-declaration identifier="FEEDBACK__OVERALL" cardinality="single" base-type="identifier"/>
     <qti-item-body>
-        <p>Photosynthesis is the process by which plants convert light energy into chemical energy. Complete the balanced chemical equation by dragging the correct formulas into the gaps.</p>
+        <p>Photosynthesis converts light energy into chemical energy. Complete the balanced chemical equation by dragging the correct formulas into the gaps.</p>
         <qti-gap-match-interaction response-identifier="RESPONSE" shuffle="true" max-associations="4">
             <qti-gap-text identifier="FORMULA_CO2" match-max="1"><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>C</mi><msub><mi>O</mi><mn>2</mn></msub></mrow></math></qti-gap-text>
             <qti-gap-text identifier="FORMULA_H2O" match-max="1"><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>H</mi><mn>2</mn></msub><mi>O</mi></mrow></math></qti-gap-text>
@@ -941,15 +958,13 @@ exports[`QTI Compiler End-to-End Tests should produce consistent XML output for 
             <p><math xmlns="http://www.w3.org/1998/Math/MathML"><mn>6</mn></math><qti-gap identifier="GAP_1"/> + <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>6</mn></math><qti-gap identifier="GAP_2"/> → <qti-gap identifier="GAP_3"/> + <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>6</mn></math><qti-gap identifier="GAP_4"/></p>
         
         </qti-gap-match-interaction>
-        <qti-feedback-block outcome-identifier="FEEDBACK__RESPONSE" identifier="CORRECT" show-hide="show">
-            <qti-content-body><p>Excellent! You correctly completed the photosynthesis equation:</p>
-        <p><math xmlns="http://www.w3.org/1998/Math/MathML"><mn>6</mn><mrow><mi>C</mi><msub><mi>O</mi><mn>2</mn></msub></mrow></math> + <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>6</mn><mrow><msub><mi>H</mi><mn>2</mn></msub><mi>O</mi></mrow></math> → <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>C</mi><mn>6</mn></msub><msub><mi>H</mi><mn>12</mn></msub><msub><mi>O</mi><mn>6</mn></msub></mrow></math> + <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>6</mn><mrow><msub><mi>O</mi><mn>2</mn></msub></mrow></math></p>
-        <p>This shows that plants use carbon dioxide and water to produce glucose (sugar) and oxygen, powered by sunlight!</p></qti-content-body>
+        <qti-feedback-block outcome-identifier="FEEDBACK__OVERALL" identifier="FB__RESPONSE_CORRECT" show-hide="show">
+            <qti-content-body><p>Excellent! You correctly completed the photosynthesis equation.</p>
+        <p>This shows that plants use carbon dioxide (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>C</mi><msub><mi>O</mi><mn>2</mn></msub></mrow></math>) and water (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>H</mi><mn>2</mn></msub><mi>O</mi></mrow></math>) to produce glucose (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>C</mi><mn>6</mn></msub><msub><mi>H</mi><mn>12</mn></msub><msub><mi>O</mi><mn>6</mn></msub></mrow></math>) and oxygen (<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>O</mi><mn>2</mn></msub></mrow></math>).</p></qti-content-body>
         </qti-feedback-block>
-        <qti-feedback-block outcome-identifier="FEEDBACK__RESPONSE" identifier="INCORRECT" show-hide="show">
-            <qti-content-body><p>Let's review the photosynthesis equation step by step!</p>
-        <ul><li><p>Reactants (left side): Plants take in <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>C</mi><msub><mi>O</mi><mn>2</mn></msub></mrow></math> from air and <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>H</mi><mn>2</mn></msub><mi>O</mi></mrow></math> from soil</p></li><li><p>Products (right side): They produce <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>C</mi><mn>6</mn></msub><msub><mi>H</mi><mn>12</mn></msub><msub><mi>O</mi><mn>6</mn></msub></mrow></math> (glucose) for energy and release <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>O</mi><mn>2</mn></msub></mrow></math> into the atmosphere</p></li></ul>
-        <p>Remember: The equation must be balanced - count the atoms on each side!</p></qti-content-body>
+        <qti-feedback-block outcome-identifier="FEEDBACK__OVERALL" identifier="FB__RESPONSE_INCORRECT" show-hide="show">
+            <qti-content-body><p>Not quite. Remember the key components of photosynthesis:</p>
+        <ul><li><p>Reactants (inputs): Carbon Dioxide and Water.</p></li><li><p>Products (outputs): Glucose and Oxygen.</p></li></ul></qti-content-body>
         </qti-feedback-block>
     </qti-item-body>
     <qti-response-processing>
@@ -960,13 +975,13 @@ exports[`QTI Compiler End-to-End Tests should produce consistent XML output for 
                 <qti-variable identifier="RESPONSE"/>
                 <qti-correct identifier="RESPONSE"/>
             </qti-match>
-            <qti-set-outcome-value identifier="FEEDBACK__RESPONSE">
-                <qti-base-value base-type="identifier">CORRECT</qti-base-value>
+            <qti-set-outcome-value identifier="FEEDBACK__OVERALL">
+                <qti-base-value base-type="identifier">FB__RESPONSE_CORRECT</qti-base-value>
             </qti-set-outcome-value>
         </qti-response-if>
         <qti-response-else>
-            <qti-set-outcome-value identifier="FEEDBACK__RESPONSE">
-                <qti-base-value base-type="identifier">INCORRECT</qti-base-value>
+            <qti-set-outcome-value identifier="FEEDBACK__OVERALL">
+                <qti-base-value base-type="identifier">FB__RESPONSE_INCORRECT</qti-base-value>
             </qti-set-outcome-value>
         </qti-response-else>
     </qti-response-condition>

@@ -24,18 +24,18 @@ describe("Compiler: code blocks", () => {
 			interactions: {
 				TE_INT: { type: "textEntryInteraction", responseIdentifier: "RESPONSE_TE", expectedLength: null }
 			},
-			feedbackBlocks: [
-				{
-					identifier: "CORRECT",
-					outcomeIdentifier: "FEEDBACK__RESPONSE_TE",
-					content: [{ type: "paragraph", content: [{ type: "text", content: "Correct" }] }]
-				},
-				{
-					identifier: "INCORRECT",
-					outcomeIdentifier: "FEEDBACK__RESPONSE_TE",
-					content: [{ type: "paragraph", content: [{ type: "text", content: "Incorrect" }] }]
-				}
-			]
+			feedbackPlan: {
+				mode: "combo",
+				dimensions: [{ responseIdentifier: "RESPONSE_TE", kind: "binary" }],
+				combinations: [
+					{ id: "FB__RESPONSE_TE_CORRECT", path: [{ responseIdentifier: "RESPONSE_TE", key: "CORRECT" }] },
+					{ id: "FB__RESPONSE_TE_INCORRECT", path: [{ responseIdentifier: "RESPONSE_TE", key: "INCORRECT" }] }
+				]
+			},
+			feedbackBlocks: {
+				FB__RESPONSE_TE_CORRECT: [{ type: "paragraph", content: [{ type: "text", content: "Correct" }] }],
+				FB__RESPONSE_TE_INCORRECT: [{ type: "paragraph", content: [{ type: "text", content: "Incorrect" }] }]
+			}
 		}
 		const xml = await compile(item, allWidgetsCollection)
 		expect(xml).toContain("<pre><code>")

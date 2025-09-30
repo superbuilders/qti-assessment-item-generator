@@ -8,13 +8,13 @@
 // Enforces consistent naming for response declarations and interactions
 export const RESPONSE_IDENTIFIER_REGEX = /^RESPONSE(?:_[A-Za-z0-9_]+)?$/
 
-// Outcome identifier pattern: strictly FEEDBACK__<responseId>
-// FEEDBACK__GLOBAL is deprecated and forbidden
-export const OUTCOME_IDENTIFIER_REGEX = /^FEEDBACK__[A-Za-z0-9_]+$/
+// Outcome identifier pattern: strictly FEEDBACK__OVERALL
+// Per-interaction feedback outcomes are now forbidden.
+export const OUTCOME_IDENTIFIER_REGEX = /^FEEDBACK__OVERALL$/
 
-// Feedback block identifier pattern: CORRECT, INCORRECT, or uppercase identifiers
-// Used for feedback block IDs that map to choice options
-export const FEEDBACK_BLOCK_IDENTIFIER_REGEX = /^(CORRECT|INCORRECT|[A-Z][A-Z0-9_]*)$/
+// Feedback block identifier pattern: CORRECT, INCORRECT, or the new derived format 'FB__...'
+// This supports both fallback mode and the combinatorial feedback model.
+export const FEEDBACK_BLOCK_IDENTIFIER_REGEX = /^(CORRECT|INCORRECT|FB(__[A-Z0-9_]+)+)$/
 
 // Choice/Gap/Item identifier pattern: uppercase alphanumeric with underscores
 // Used for choice options, gap IDs, draggable items, etc.

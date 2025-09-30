@@ -1,25 +1,23 @@
-import type { AnyInteraction, AssessmentItemShell } from "../../compiler/schemas"
+import type { AssessmentItemShell, FeedbackPlan } from "../../compiler/schemas"
 import type { WidgetCollection } from "../../widgets/collections/types"
-import type { enumerateFeedbackTargets } from "../feedback-targets"
 import { createCollectionScopedFeedbackSchema } from "../schemas"
 import type { AiContextEnvelope, ImageContext } from "../types"
 import { createWidgetSelectionPromptSection, formatUnifiedContextSections } from "./shared"
 
 /**
  * Creates a feedback generation prompt with a dynamically-generated Zod schema
- * that enforces the unified per-response feedback rule.
+ * that enforces the overall feedback outcome with a nested, exact-key structure.
  */
 export function createFeedbackPrompt(
 	envelope: AiContextEnvelope,
 	assessmentShell: AssessmentItemShell,
-	interactions: Record<string, AnyInteraction>,
-	feedbackTargets: ReturnType<typeof enumerateFeedbackTargets>,
+	feedbackPlan: FeedbackPlan,
 	imageContext: ImageContext,
 	widgetCollection: WidgetCollection
 ) {
-	const FeedbackSchema = createCollectionScopedFeedbackSchema(feedbackTargets, widgetCollection)
+	const FeedbackSchema = createCollectionScopedFeedbackSchema(feedbackPlan, widgetCollection)
 
-	const systemInstruction = `You are an expert in educational content and QTI standards. Your task is to generate comprehensive, high-quality feedback for all possible outcomes in an assessment item.
+	const systemInstruction = `You are an expert in educational content. Your task is to generate comprehensive feedback for all possible outcomes in an assessment item.
 
 **⚠️ CRITICAL: GRAMMATICAL ERROR CORRECTION ⚠️**
 WE MUST correct any grammatical errors found in the source Perseus content. This includes:
@@ -31,88 +29,40 @@ WE MUST correct any grammatical errors found in the source Perseus content. This
 
 The goal is to produce clean, professional educational content that maintains the original meaning while fixing any language errors present in the source material.
 
-**UNIFIED PER-RESPONSE FEEDBACK RULE (MANDATORY)**
-
-This is the single source of truth for feedback structure:
-
-**For Enumerated Responses (baseType: 'identifier')**:
-- Applies to: choiceInteraction, inlineChoiceInteraction
-- Feedback MUST be generated on a per-choice basis
-- The outcome identifier MUST be FEEDBACK__<responseIdentifier>
-- This outcome MUST contain one feedback block for each choiceIdentifier
-- It MUST NOT contain CORRECT or INCORRECT blocks
-
-**For Non-Enumerated Responses (baseType: string, integer, float, ordered, directedPair)**:
-- Applies to: textEntryInteraction, orderInteraction, gapMatchInteraction
-- Feedback MUST be generated on a correct/incorrect basis for the entire response
-- The outcome identifier MUST be FEEDBACK__<responseIdentifier>
-- This outcome MUST contain exactly two feedback blocks: one with identifier "CORRECT" and one with identifier "INCORRECT"
-- It MUST NOT contain blocks matching choice identifiers
+**FEEDBACK STRUCTURE**
+- The structured output schema enforces a nested object under "feedback" → "FEEDBACK__OVERALL".
+- For **single-select** multiple-choice: keys are choice identifiers (A, B, C, etc.).
+- For **all other questions** (numeric, ordering, multi-select, etc.): keys are "CORRECT" and "INCORRECT".
+- Each leaf node contains a "content" field with BlockContent.
+- The schema enforces completeness—every required key must be present.
 
 **FEEDBACK CONTENT REQUIREMENTS**
-
-1. **Educational Value**: Each feedback block must provide meaningful educational content that helps students understand the concept, not just "correct" or "incorrect"
-
-2. **Specificity**: For choice-specific feedback, explain why that particular choice is correct or incorrect, referencing specific aspects of the choice content
-
-3. **Constructive Guidance**: For incorrect responses, provide hints or explanations that guide students toward the correct understanding without giving away the answer
-
-4. **Content Structure**: Use the same BlockContent model as the assessment body - paragraphs, math, lists, etc. are all supported
-
-5. **No Interactions**: Feedback content must never contain interactive elements - only presentational content and widgets
-
-**CRITICAL CONSTRAINTS**
-
-- You MUST generate feedback for every target specified in the requirements
-- You MUST use the exact outcome and block identifiers provided
-- You MUST follow the content structure rules (BlockContent arrays)
-- You MUST NOT include any interactive elements in feedback content
-- You MUST maintain consistency with the assessment's educational context and difficulty level
-
-**QUALITY STANDARDS**
-
-- Feedback should be appropriate for the grade level and subject matter
-- Use clear, concise language that students can understand
-- Provide specific explanations rather than generic responses
-- For mathematical content, use proper MathML formatting
-- Maintain educational tone throughout`
+1. **Educational Value**: Each feedback block must provide meaningful content that helps students learn.
+2. **Specificity**: Explain why a particular combination of answers is correct or incorrect.
+3. **Constructive Guidance**: For incorrect combinations, guide students toward understanding.
+4. **Content Structure**: Use the BlockContent model (arrays of paragraphs, math, lists, etc.).
+5. **No Interactions**: Feedback content must never contain interactive elements.`
 
 	const widgetSelectionSection = createWidgetSelectionPromptSection(widgetCollection)
 
-	const userContent = `Generate comprehensive feedback for this assessment item based on the provided context and requirements.
+	const userContent = `Generate comprehensive feedback for this assessment item.
 
 ${formatUnifiedContextSections(envelope, imageContext)}
 
 ${widgetSelectionSection}
 
-## Assessment Shell (for context):
+## Assessment Shell & Feedback Plan (for context):
 \`\`\`json
-${JSON.stringify(assessmentShell, null, 2)}
+${JSON.stringify({ ...assessmentShell, feedbackPlan }, null, 2)}
 \`\`\`
-
-## Generated Interactions (for context):
-\`\`\`json
-${JSON.stringify(interactions, null, 2)}
-\`\`\`
-
-## Required Feedback Targets:
-You MUST generate feedback for exactly these targets:
-
-${feedbackTargets.map((t) => `- Outcome: ${t.outcomeIdentifier}, Block: ${t.blockIdentifier}`).join("\n")}
 
 ## Instructions:
+1. **Analyze the Assessment**: Understand the learning objectives.
+2. **Generate Complete Feedback**: The strict JSON schema will enforce the exact structure required.
+3. **Follow Structure Rules**: Each leaf must contain a "content" key with a valid BlockContent array.
+4. **Maintain Quality**: Provide educational, specific, and constructive feedback.
 
-1. **Analyze the Assessment**: Understand the learning objectives, content, and difficulty level from the context provided
-
-2. **Generate Complete Feedback**: Create feedback content for every required target listed above
-
-3. **Follow Structure Rules**: Each feedback block must use the BlockContent structure (arrays of paragraph, math, list, etc. objects)
-
-4. **Maintain Quality**: Provide educational, specific, and constructive feedback that helps students learn
-
-5. **Verify Completeness**: Ensure your response includes every required outcome identifier and block identifier
-
-Your response must be a JSON object with a single "feedback" key containing the complete feedback structure as specified by the schema.`
+Your response must conform to the structured output schema.`
 
 	return { systemInstruction, userContent, FeedbackSchema }
 }

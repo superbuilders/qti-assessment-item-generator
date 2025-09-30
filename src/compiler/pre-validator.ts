@@ -8,6 +8,7 @@ import {
 	checkNoMfencedElements,
 	checkNoPerseusArtifacts
 } from "../qti-validation/utils"
+import { deriveComboIdentifier, normalizeIdPart } from "./helpers"
 import type { AssessmentItemInput, BlockContent, InlineContent } from "./schemas"
 
 /**
@@ -280,16 +281,8 @@ export function validateAssessmentItemInput(item: AssessmentItemInput, logger: l
 		}
 		validateBlockContent(item.body, "item.body", logger)
 	}
-	if (!Array.isArray(item.feedbackBlocks)) {
-		logger.error("feedbackBlocks is not an array", {
-			identifier: item.identifier
-		})
-		throw errors.new("item.feedbackBlocks must be an array of feedback blocks")
-	}
-	for (let i = 0; i < item.feedbackBlocks.length; i++) {
-		const block = item.feedbackBlocks[i]
-		if (!block) continue
-		validateBlockContent(block.content, `item.feedbackBlocks[${i}].content`, logger)
+	for (const [blockId, content] of Object.entries(item.feedbackBlocks)) {
+		validateBlockContent(content, `item.feedbackBlocks[${blockId}]`, logger)
 	}
 
 	if (item.interactions) {
@@ -461,4 +454,179 @@ export function validateAssessmentItemInput(item: AssessmentItemInput, logger: l
 
 	// ADD THIS CALL to the new validation function at the end of validateAssessmentItemInput.
 	validateTextEntryCanonicalAnswerRules(item, logger)
+	validateFeedbackPlan(item, logger)
+}
+
+function validateFeedbackPlan(item: AssessmentItemInput, logger: logger.Logger): void {
+	const { feedbackPlan, responseDeclarations, interactions, feedbackBlocks } = item
+	const declMap = new Map(responseDeclarations.map((d) => [d.identifier, d]))
+	const interactionMap = new Map(Object.values(interactions ?? {}).map((i) => [i.responseIdentifier, i]))
+
+	// Check for duplicate responseIdentifiers across interactions FIRST (before feedbackPlan validation)
+	const responseIdOwners = new Map<string, string>()
+	if (interactions) {
+		for (const [interactionId, interaction] of Object.entries(interactions)) {
+			const existingOwner = responseIdOwners.get(interaction.responseIdentifier)
+			if (existingOwner) {
+				logger.error("duplicate response identifier found across multiple interactions", {
+					responseIdentifier: interaction.responseIdentifier,
+					firstOwner: existingOwner,
+					secondOwner: interactionId
+				})
+				throw errors.new("duplicate response identifier")
+			}
+			responseIdOwners.set(interaction.responseIdentifier, interactionId)
+		}
+	}
+
+	let combinationCount = 1
+
+	for (const dim of feedbackPlan.dimensions) {
+		if (!declMap.has(dim.responseIdentifier)) {
+			logger.error("feedbackPlan dimension references non-existent responseDeclaration", {
+				responseIdentifier: dim.responseIdentifier
+			})
+			throw errors.new("dimension references non-existent responseDeclaration")
+		}
+
+		const interaction = interactionMap.get(dim.responseIdentifier)
+		if (!interaction) {
+			logger.error("feedbackPlan dimension references responseIdentifier with no matching interaction", {
+				responseIdentifier: dim.responseIdentifier
+			})
+			throw errors.new("dimension references responseIdentifier with no matching interaction")
+		}
+
+		if (dim.kind === "enumerated") {
+			if (interaction.type !== "choiceInteraction" && interaction.type !== "inlineChoiceInteraction") {
+				logger.error("enumerated dimension must reference a choice or inlineChoice interaction", {
+					responseIdentifier: dim.responseIdentifier,
+					interactionType: interaction.type
+				})
+				throw errors.new("enumerated dimension must reference choice interaction")
+			}
+			if (
+				dim.keys.length !== interaction.choices.length ||
+				!dim.keys.every((key, i) => interaction.choices[i]?.identifier === key)
+			) {
+				logger.error("enumerated dimension keys do not match interaction choices exactly", {
+					responseIdentifier: dim.responseIdentifier,
+					planKeys: dim.keys,
+					interactionChoiceIds: interaction.choices.map((c) => c.identifier)
+				})
+				throw errors.new("enumerated dimension keys mismatch")
+			}
+			combinationCount *= dim.keys.length
+		} else {
+			combinationCount *= 2
+		}
+	}
+
+	if (feedbackPlan.mode === "combo" && (combinationCount <= 0 || combinationCount > 32)) {
+		logger.error("combo mode requires 1-32 combinations", { combinationCount })
+		throw errors.new("combo mode requires 1-32 combinations")
+	}
+	if (feedbackPlan.mode === "fallback" && combinationCount > 0 && combinationCount <= 32) {
+		logger.error("fallback mode is for > 32 combinations", { combinationCount })
+		throw errors.new("fallback mode requires > 32 combinations")
+	}
+
+	let derivedIdentifiers: Set<string>
+	if (feedbackPlan.mode === "fallback") {
+		derivedIdentifiers = new Set(["CORRECT", "INCORRECT"])
+	} else {
+		derivedIdentifiers = new Set<string>()
+		let paths: string[][] = [[]]
+		for (const dim of feedbackPlan.dimensions) {
+			const newPaths: string[][] = []
+			const keys = dim.kind === "enumerated" ? dim.keys : ["CORRECT", "INCORRECT"]
+			for (const path of paths) {
+				for (const key of keys) {
+					newPaths.push([...path, `${normalizeIdPart(dim.responseIdentifier)}_${normalizeIdPart(key)}`])
+				}
+			}
+			paths = newPaths
+		}
+		for (const path of paths) {
+			derivedIdentifiers.add(deriveComboIdentifier(path))
+		}
+	}
+
+	for (const combination of feedbackPlan.combinations) {
+		if (combination.path.length !== feedbackPlan.dimensions.length) {
+			logger.error("combination path length does not match dimension count", {
+				combinationId: combination.id,
+				pathLength: combination.path.length,
+				dimensionCount: feedbackPlan.dimensions.length
+			})
+			throw errors.new("combination path length mismatch")
+		}
+
+		for (let i = 0; i < combination.path.length; i++) {
+			const segment = combination.path[i]
+			const dim = feedbackPlan.dimensions[i]
+			if (segment.responseIdentifier !== dim.responseIdentifier) {
+				logger.error("combination path segment responseIdentifier does not match dimension", {
+					combinationId: combination.id,
+					segmentIndex: i,
+					segmentResponseId: segment.responseIdentifier,
+					dimResponseId: dim.responseIdentifier
+				})
+				throw errors.new("combination path responseIdentifier mismatch")
+			}
+
+			if (dim.kind === "enumerated") {
+				if (!dim.keys.includes(segment.key)) {
+					logger.error("combination path key not in enumerated dimension keys", {
+						combinationId: combination.id,
+						segmentIndex: i,
+						key: segment.key,
+						validKeys: dim.keys
+					})
+					throw errors.new("combination path key invalid for enumerated dimension")
+				}
+			} else {
+				if (segment.key !== "CORRECT" && segment.key !== "INCORRECT") {
+					logger.error("binary dimension must have CORRECT or INCORRECT key", {
+						combinationId: combination.id,
+						segmentIndex: i,
+						key: segment.key
+					})
+					throw errors.new("binary dimension requires CORRECT or INCORRECT")
+				}
+			}
+		}
+
+		const derivedId = deriveComboIdentifier(
+			combination.path.map((seg) => `${normalizeIdPart(seg.responseIdentifier)}_${normalizeIdPart(seg.key)}`)
+		)
+		if (derivedId !== combination.id) {
+			logger.error("combination id does not match derived identifier", {
+				combinationId: combination.id,
+				derivedId
+			})
+			throw errors.new("combination id mismatch")
+		}
+	}
+
+	const combinationIds = new Set(feedbackPlan.combinations.map((c) => c.id))
+	const actualBlockKeys = new Set(Object.keys(feedbackBlocks))
+
+	const setsAreEqual = (a: Set<string>, b: Set<string>) => a.size === b.size && [...a].every((item) => b.has(item))
+
+	if (!setsAreEqual(derivedIdentifiers, combinationIds)) {
+		logger.error("combination ids do not match full Cartesian product", {
+			derived: [...derivedIdentifiers].sort(),
+			actual: [...combinationIds].sort()
+		})
+		throw errors.new("combination ids incomplete or incorrect")
+	}
+
+	if (!setsAreEqual(combinationIds, actualBlockKeys)) {
+		logger.error("feedbackBlocks keys do not match combination ids", {
+			expected: [...combinationIds].sort(),
+			actual: [...actualBlockKeys].sort()
+		})
+		throw errors.new("feedbackBlocks map keys mismatch")
+	}
 }

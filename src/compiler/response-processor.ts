@@ -1,9 +1,7 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { escapeXmlAttribute } from "../utils/xml-utils"
-import type { AnyInteraction, AssessmentItem } from "./schemas"
-
-type ResponseDeclaration = AssessmentItem["responseDeclarations"][0]
+import type { AssessmentItem, FeedbackDimension } from "./schemas"
 
 export function compileResponseDeclarations(decls: AssessmentItem["responseDeclarations"]): string {
 	return decls
@@ -107,52 +105,106 @@ export function compileResponseDeclarations(decls: AssessmentItem["responseDecla
 		.join("")
 }
 
-function generateProcessingForInteraction(decl: ResponseDeclaration, interaction?: AnyInteraction): string {
-	const responseId = escapeXmlAttribute(decl.identifier)
-	const isEnumerated =
-		interaction && (interaction.type === "choiceInteraction" || interaction.type === "inlineChoiceInteraction")
+function generateComboModeProcessing(item: AssessmentItem): string {
+	const { dimensions, combinations } = item.feedbackPlan
 
-	if (isEnumerated) {
-		const outcomeId = `FEEDBACK__${responseId}`
-		if (decl.cardinality === "multiple") {
+	function buildConditionTree(dims: FeedbackDimension[], pathSegments: Array<{ responseIdentifier: string; key: string }>): string {
+		if (dims.length === 0) {
+			const matchingCombo = combinations.find((combo) => {
+				if (combo.path.length !== pathSegments.length) return false
+				return combo.path.every(
+					(seg, i) =>
+						seg.responseIdentifier === pathSegments[i].responseIdentifier && seg.key === pathSegments[i].key
+				)
+			})
+			if (!matchingCombo) {
+				logger.error("no combination found for path", { pathSegments })
+				throw errors.new("no combination found for path")
+			}
 			return `
-    <qti-set-outcome-value identifier="${outcomeId}">
-        <qti-variable identifier="${responseId}"/>
-    </qti-set-outcome-value>`
+            <qti-set-outcome-value identifier="FEEDBACK__OVERALL">
+                <qti-base-value base-type="identifier">${escapeXmlAttribute(matchingCombo.id)}</qti-base-value>
+            </qti-set-outcome-value>`
 		}
-		const conditions = interaction.choices
-			.map((choice, index) => {
-				const tag = index === 0 ? "qti-response-if" : "qti-response-else-if"
-				const choiceId = escapeXmlAttribute(choice.identifier)
-				return `
+
+		const [currentDim, ...restDims] = dims
+		if (!currentDim) {
+			logger.error("unexpected empty dimension in condition tree")
+			throw errors.new("unexpected empty dimension")
+		}
+		const responseId = escapeXmlAttribute(currentDim.responseIdentifier)
+
+		if (currentDim.kind === "enumerated") {
+			const conditions = currentDim.keys
+				.map((key, index) => {
+					const tag = index === 0 ? "qti-response-if" : "qti-response-else-if"
+					const choiceId = escapeXmlAttribute(key)
+					const newPathSegments = [...pathSegments, { responseIdentifier: currentDim.responseIdentifier, key }]
+					const innerContent = buildConditionTree(restDims, newPathSegments)
+
+					return `
         <${tag}>
             <qti-match>
                 <qti-variable identifier="${responseId}"/>
                 <qti-base-value base-type="identifier">${choiceId}</qti-base-value>
-            </qti-match>
-            <qti-set-outcome-value identifier="${outcomeId}">
-                <qti-base-value base-type="identifier">${choiceId}</qti-base-value>
-            </qti-set-outcome-value>
+            </qti-match>${innerContent}
         </${tag}>`
-			})
-			.join("")
-		return `<qti-response-condition>${conditions}</qti-response-condition>`
-	}
+				})
+				.join("")
+			return `
+    <qti-response-condition>${conditions}
+    </qti-response-condition>`
+		}
 
-	const outcomeId = `FEEDBACK__${responseId}`
-	return `
+		const correctPath = [...pathSegments, { responseIdentifier: currentDim.responseIdentifier, key: "CORRECT" }]
+		const incorrectPath = [...pathSegments, { responseIdentifier: currentDim.responseIdentifier, key: "INCORRECT" }]
+		const correctBranch = buildConditionTree(restDims, correctPath)
+		const incorrectBranch = buildConditionTree(restDims, incorrectPath)
+
+		return `
     <qti-response-condition>
         <qti-response-if>
             <qti-match>
                 <qti-variable identifier="${responseId}"/>
                 <qti-correct identifier="${responseId}"/>
-            </qti-match>
-            <qti-set-outcome-value identifier="${outcomeId}">
+            </qti-match>${correctBranch}
+        </qti-response-if>
+        <qti-response-else>${incorrectBranch}
+        </qti-response-else>
+    </qti-response-condition>`
+	}
+
+	return buildConditionTree(dimensions, [])
+}
+
+function generateFallbackModeProcessing(item: AssessmentItem): string {
+	if (item.feedbackPlan.dimensions.length === 0) {
+		logger.error("no dimensions for fallback mode processing", { itemIdentifier: item.identifier })
+		throw errors.new("fallback mode requires at least one dimension")
+	}
+
+	const matchConditions = item.feedbackPlan.dimensions.map(
+		(dim) =>
+			`<qti-match><qti-variable identifier="${escapeXmlAttribute(dim.responseIdentifier)}"/><qti-correct identifier="${escapeXmlAttribute(dim.responseIdentifier)}"/></qti-match>`
+	)
+
+	const allCorrectCondition =
+		matchConditions.length === 1
+			? matchConditions[0]
+			: `<qti-and>
+                    ${matchConditions.join("\n                        ")}
+                </qti-and>`
+
+	return `
+    <qti-response-condition>
+        <qti-response-if>
+            ${allCorrectCondition}
+            <qti-set-outcome-value identifier="FEEDBACK__OVERALL">
                 <qti-base-value base-type="identifier">CORRECT</qti-base-value>
             </qti-set-outcome-value>
         </qti-response-if>
         <qti-response-else>
-            <qti-set-outcome-value identifier="${outcomeId}">
+            <qti-set-outcome-value identifier="FEEDBACK__OVERALL">
                 <qti-base-value base-type="identifier">INCORRECT</qti-base-value>
             </qti-set-outcome-value>
         </qti-response-else>
@@ -161,16 +213,20 @@ function generateProcessingForInteraction(decl: ResponseDeclaration, interaction
 
 export function compileResponseProcessing(item: AssessmentItem): string {
 	const processingRules: string[] = []
+	const { feedbackPlan } = item
 
-	// 1. Generate feedback outcome logic for each interaction.
-	for (const decl of item.responseDeclarations) {
-		const interaction = Object.values(item.interactions ?? {}).find(
-			(inter) => inter.responseIdentifier === decl.identifier
-		)
-		processingRules.push(generateProcessingForInteraction(decl, interaction))
+	logger.info("compiling response processing", {
+		mode: feedbackPlan.mode,
+		itemIdentifier: item.identifier,
+		dimensionCount: feedbackPlan.dimensions.length
+	})
+
+	if (feedbackPlan.mode === "combo") {
+		processingRules.push(generateComboModeProcessing(item))
+	} else {
+		processingRules.push(generateFallbackModeProcessing(item))
 	}
 
-	// 2. Generate scoring logic based on the correctness of all interactions.
 	const scoreConditions = item.responseDeclarations
 		.map((decl) => {
 			const responseId = escapeXmlAttribute(decl.identifier)

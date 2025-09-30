@@ -6,7 +6,8 @@ import {
 	createAssessmentItemShellSchema,
 	createBlockContentSchema,
 	createDynamicAssessmentItemSchema,
-	createInlineContentSchema
+	createInlineContentSchema,
+	type FeedbackPlan
 } from "../compiler/schemas"
 import type { WidgetCollection } from "../widgets/collections/types"
 import { typedSchemas } from "../widgets/registry"
@@ -252,26 +253,34 @@ export function createCollectionScopedInteractionSchema(_interactionIds: string[
 
 /**
  * Creates a dynamic, collection-scoped Zod schema for generating feedback content.
+ * Builds the nested schema strictly from the provided feedbackPlan (no inference).
  */
-export function createCollectionScopedFeedbackSchema(
-	feedbackTargets: Array<{ outcomeIdentifier: string; blockIdentifier: string }>,
-	collection: WidgetCollection
-) {
+export function createCollectionScopedFeedbackSchema(feedbackPlan: FeedbackPlan, collection: WidgetCollection) {
 	const ScopedWidgetEnum = createWidgetTypeEnumFromCollection(collection)
 	const ScopedBlockContentSchema = createBlockContentSchema(ScopedWidgetEnum)
+	const LeafNodeSchema = z.object({ content: ScopedBlockContentSchema }).strict()
 
-	// Group targets by outcome identifier to build the schema shape
-	const outcomeGroups = new Map<string, string[]>()
-	for (const target of feedbackTargets) {
-		if (!outcomeGroups.has(target.outcomeIdentifier)) {
-			outcomeGroups.set(target.outcomeIdentifier, [])
+	let overallFeedbackShape: z.ZodType<unknown>
+	if (feedbackPlan.mode === "fallback") {
+		overallFeedbackShape = z.object({ CORRECT: LeafNodeSchema, INCORRECT: LeafNodeSchema }).strict()
+	} else {
+		let current: z.ZodType<unknown> = LeafNodeSchema
+		for (let i = feedbackPlan.dimensions.length - 1; i >= 0; i--) {
+			const dimension = feedbackPlan.dimensions[i]
+			const shapeEntries: Record<string, z.ZodType<unknown>> = {}
+			const keys = dimension.kind === "enumerated" ? dimension.keys : ["CORRECT", "INCORRECT"]
+			for (const key of keys) {
+				shapeEntries[key] = current
+			}
+			const inner = z.object(shapeEntries).strict()
+			current = z.object({ [dimension.responseIdentifier]: inner }).strict()
 		}
-		outcomeGroups.get(target.outcomeIdentifier)?.push(target.blockIdentifier)
+		overallFeedbackShape = current
 	}
 
-	// Build dynamic schema shape
-	const OutcomeSchema = z.record(z.string(), z.object({ content: ScopedBlockContentSchema }).strict())
-	return z.object({ feedback: z.record(z.string(), OutcomeSchema) }).strict()
+	const FeedbackMapSchema = z.object({ FEEDBACK__OVERALL: overallFeedbackShape }).strict()
+
+	return z.object({ feedback: FeedbackMapSchema }).strict()
 }
 
 /**

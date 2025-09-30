@@ -770,8 +770,8 @@ function collectRefs(item: AssessmentItemInput): { widgetRefs: Set<string>; inte
 
 	// Traverse all content areas
 	walkBlock(item.body)
-	for (const fb of item.feedbackBlocks) {
-		walkBlock(fb.content)
+	for (const content of Object.values(item.feedbackBlocks)) {
+		walkBlock(content)
 	}
 
 	if (item.interactions) {
@@ -937,49 +937,30 @@ export async function compile(itemData: AssessmentItemInput, widgetCollection: W
 	// Step 5: Render final body and feedback with the populated slots
 	const filledBody = enforcedItem.body ? renderBlockContent(enforcedItem.body, widgetSlots, interactionSlots) : ""
 
-	// NEW: Dynamically determine outcome declarations from feedbackBlocks
-	const outcomeDeclarations = new Map<string, "single" | "multiple">()
-	const responseCardinalityMap = new Map<string, "single" | "multiple" | "ordered">(
-		enforcedItem.responseDeclarations.map((rd) => [rd.identifier, rd.cardinality])
-	)
+	const outcomeDeclarationsXml =
+		'    <qti-outcome-declaration identifier="FEEDBACK__OVERALL" cardinality="single" base-type="identifier"/>'
 
-	for (const block of enforcedItem.feedbackBlocks) {
-		const match = /^FEEDBACK__([A-Za-z0-9_]+)$/.exec(block.outcomeIdentifier)
-		const responseId = match?.[1]
-
-		let cardinality: "single" | "multiple" = "single"
-		if (responseId) {
-			const responseCardinality = responseCardinalityMap.get(responseId)
-			if (responseCardinality === "multiple") {
-				cardinality = "multiple"
+	// NEW: Generate feedbackBlocks XML from map, ordered by feedbackPlan.combinations
+	const feedbackBlocksXml = enforcedItem.feedbackPlan.combinations
+		.map((combination) => {
+			const content = enforcedItem.feedbackBlocks[combination.id]
+			if (!content) {
+				logger.error("missing feedback content for expected identifier", { identifier: combination.id })
+				throw errors.new("ErrMissingFeedbackContent")
 			}
-		}
-		outcomeDeclarations.set(block.outcomeIdentifier, cardinality)
-	}
 
-	const outcomeDeclarationsXml = Array.from(outcomeDeclarations.entries())
-		.map(
-			([identifier, cardinality]) =>
-				`    <qti-outcome-declaration identifier="${escapeXmlAttribute(identifier)}" cardinality="${cardinality}" base-type="identifier"/>`
-		)
-		.join("\n")
-
-	// NEW: Generate feedbackBlocks XML with interactive widget validation
-	const feedbackBlocksXml = enforcedItem.feedbackBlocks
-		.map((block) => {
-			// Validate feedback content contains no interactions
 			const assertNoInteractions = (blocks: BlockContent | null): void => {
 				if (!blocks) return
 				for (const node of blocks) {
 					if (!node) continue
 					if (node.type === "interactionRef") {
-						logger.error("interaction ref found in feedback content", { blockId: block.identifier })
+						logger.error("interaction ref found in feedback content", { blockId: combination.id })
 						throw errors.new("interactions banned in feedback content")
 					}
 					if (node.type === "paragraph") {
 						for (const part of node.content) {
 							if (part && part.type === "inlineInteractionRef") {
-								logger.error("inline interaction ref found in feedback content", { blockId: block.identifier })
+								logger.error("inline interaction ref found in feedback content", { blockId: combination.id })
 								throw errors.new("interactions banned in feedback content")
 							}
 						}
@@ -988,7 +969,7 @@ export async function compile(itemData: AssessmentItemInput, widgetCollection: W
 						for (const inline of node.items) {
 							for (const part of inline) {
 								if (part && part.type === "inlineInteractionRef") {
-									logger.error("inline interaction ref found in feedback list content", { blockId: block.identifier })
+									logger.error("inline interaction ref found in feedback list content", { blockId: combination.id })
 									throw errors.new("interactions banned in feedback content")
 								}
 							}
@@ -1003,7 +984,7 @@ export async function compile(itemData: AssessmentItemInput, widgetCollection: W
 									for (const part of cell) {
 										if (part && part.type === "inlineInteractionRef") {
 											logger.error("inline interaction ref found in feedback table content", {
-												blockId: block.identifier
+												blockId: combination.id
 											})
 											throw errors.new("interactions banned in feedback content")
 										}
@@ -1016,9 +997,9 @@ export async function compile(itemData: AssessmentItemInput, widgetCollection: W
 					}
 				}
 			}
-			assertNoInteractions(block.content)
-			const contentXml = renderBlockContent(block.content, widgetSlots, interactionSlots)
-			return `        <qti-feedback-block outcome-identifier="${escapeXmlAttribute(block.outcomeIdentifier)}" identifier="${escapeXmlAttribute(block.identifier)}" show-hide="show">
+			assertNoInteractions(content)
+			const contentXml = renderBlockContent(content, widgetSlots, interactionSlots)
+			return `        <qti-feedback-block outcome-identifier="FEEDBACK__OVERALL" identifier="${escapeXmlAttribute(combination.id)}" show-hide="show">
             <qti-content-body>${contentXml}</qti-content-body>
         </qti-feedback-block>`
 		})

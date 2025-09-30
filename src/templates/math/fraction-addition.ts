@@ -156,6 +156,7 @@ export function generateFractionAdditionQuestion(props: z.input<typeof PropsSche
 	const correctChoiceIndex = finalChoices.findIndex((c) => c.isCorrect)
 
 	// --- 3d. Construct the Final AssessmentItemInput Object ---
+	// TODO: Update this template to use feedbackPlan + map structure
 	const assessmentItem: AssessmentItemInput = {
 		identifier: `fraction-addition-${f1.numerator}-${f1.denominator}-plus-${f2.numerator}-${f2.denominator}`,
 		title: `Fraction Addition: ${f1.numerator}/${f1.denominator} + ${f2.numerator}/${f2.denominator}`,
@@ -235,7 +236,15 @@ export function generateFractionAdditionQuestion(props: z.input<typeof PropsSche
 			}
 		],
 
-		feedbackBlocks: finalChoices.map((choice, index) => {
+		feedbackPlan: {
+			mode: "combo",
+			dimensions: [{ responseIdentifier: "RESPONSE", kind: "enumerated", keys: finalChoices.map((_, i) => `CHOICE_${i}`) }],
+			combinations: finalChoices.map((_, i) => ({
+				id: `FB__RESPONSE_CHOICE_${i}`,
+				path: [{ responseIdentifier: "RESPONSE", key: `CHOICE_${i}` }]
+			}))
+		},
+		feedbackBlocks: Object.fromEntries(finalChoices.map((choice, index) => {
 			let feedbackContent: BlockContent
 
 			// Helper to format the step-by-step solution
@@ -498,12 +507,8 @@ export function generateFractionAdditionQuestion(props: z.input<typeof PropsSche
 					]
 			}
 
-			return {
-				identifier: `CHOICE_${index}`,
-				outcomeIdentifier: "FEEDBACK__RESPONSE",
-				content: feedbackContent
-			}
-		}) satisfies AssessmentItemInput["feedbackBlocks"]
+			return [`FB__RESPONSE_CHOICE_${index}`, feedbackContent] as const
+		}))
 	}
 
 	return assessmentItem

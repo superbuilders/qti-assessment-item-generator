@@ -12,8 +12,8 @@ function isWidgetTypeKey(v: string): v is keyof typeof allWidgetSchemas {
 }
 
 import { collectWidgetRefs } from "./collector"
-import { feedbackMapToBlocks } from "./feedback-converter"
-import { enumerateFeedbackTargets } from "./feedback-targets"
+import { buildFeedbackPlanFromInteractions } from "./feedback-plan-builder"
+import { convertNestedFeedbackToBlocks } from "./feedback-converter"
 import { toJSONSchemaPromptSafe } from "./json-schema"
 import { createFeedbackPrompt } from "./prompts/feedback"
 import { createInteractionContentPrompt } from "./prompts/interactions"
@@ -351,19 +351,19 @@ export async function generateFromEnvelope(
 		generatedInteractionKeys: Object.keys(generatedInteractions)
 	})
 
-	// Shot 3 - Generate feedback
-	const feedbackTargets = enumerateFeedbackTargets(assessmentShell.responseDeclarations, generatedInteractions)
-	logger.debug("enumerated feedback targets", { targets: feedbackTargets })
+	// Build the explicit feedback plan from interactions (this is the ONLY place we infer)
+	const feedbackPlan = buildFeedbackPlanFromInteractions(generatedInteractions, assessmentShell.responseDeclarations)
+	logger.debug("built feedback plan", {
+		mode: feedbackPlan.mode,
+		dimensionCount: feedbackPlan.dimensions.length,
+		combinationCount: feedbackPlan.combinations.length
+	})
 
-	const {
-		systemInstruction: feedbackSystem,
-		userContent: feedbackUser,
-		FeedbackSchema
-	} = createFeedbackPrompt(
+	// Shot 3 - Generate feedback
+	const { systemInstruction: feedbackSystem, userContent: feedbackUser, FeedbackSchema } = createFeedbackPrompt(
 		envelope,
 		assessmentShell,
-		generatedInteractions,
-		feedbackTargets,
+		feedbackPlan,
 		imageContext,
 		widgetCollection
 	)
@@ -381,13 +381,13 @@ export async function generateFromEnvelope(
 			{ role: "user", content: feedbackUser }
 		],
 		response_format: {
-				type: "json_schema",
-				json_schema: {
-					name: "feedback_generator",
-					schema: feedbackJsonSchema as Record<string, unknown>,
-					strict: true
-				}
-			},
+			type: "json_schema",
+			json_schema: {
+				name: "feedback_generator",
+				schema: feedbackJsonSchema as Record<string, unknown>,
+				strict: true
+			}
+		},
 		stream: false
 	}
 	const feedbackResult = await errors.try(openai.chat.completions.create(feedbackParams))
@@ -416,21 +416,8 @@ export async function generateFromEnvelope(
 		throw errors.wrap(feedbackValidation.error, "feedback validation")
 	}
 
-	const feedbackBlocks = feedbackMapToBlocks(feedbackValidation.data.feedback)
-
-	// Validation: ensure all targets were addressed
-	const generatedOutcomes = new Set(feedbackBlocks.map((fb) => `${fb.outcomeIdentifier}::${fb.identifier}`))
-	const missingTargets = feedbackTargets.filter(
-		(t) => !generatedOutcomes.has(`${t.outcomeIdentifier}::${t.blockIdentifier}`)
-	)
-	if (missingTargets.length > 0) {
-		logger.error("feedback generation missed required targets", { missingTargets })
-		throw errors.new(
-			`feedback generation: missing targets: ${missingTargets.map((t) => `${t.outcomeIdentifier}::${t.blockIdentifier}`).join(", ")}`
-		)
-	}
-
-	logger.debug("shot 3 complete", { feedbackBlockCount: feedbackBlocks.length })
+	const feedbackBlocks = convertNestedFeedbackToBlocks(feedbackValidation.data.feedback, feedbackPlan)
+	logger.debug("shot 3 complete", { feedbackBlockCount: Object.keys(feedbackBlocks).length })
 
 	// Shot 4: Collect widget refs with types and generate widget content
 	const widgetRefs = collectWidgetRefs({
@@ -530,6 +517,7 @@ export async function generateFromEnvelope(
 		...assessmentShell,
 		interactions: generatedInteractions,
 		widgets: generatedWidgets,
+		feedbackPlan,
 		feedbackBlocks: feedbackBlocks
 	}
 }

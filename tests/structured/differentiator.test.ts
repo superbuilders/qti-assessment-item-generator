@@ -39,25 +39,25 @@ mock.module("openai", () => {
 													}
 												},
 												interactions: null,
+												feedbackPlan: {
+													mode: "fallback",
+													dimensions: { __sb_empty_array__: true },
+													combinations: {
+														__sb_idx__0: { id: "CORRECT", path: { __sb_empty_array__: true } },
+														__sb_idx__1: { id: "INCORRECT", path: { __sb_empty_array__: true } }
+													}
+												},
 												feedbackBlocks: {
-													__sb_idx__0: {
-														identifier: "CORRECT",
-														outcomeIdentifier: "FEEDBACK__GLOBAL",
-														content: {
-															__sb_idx__0: {
-																type: "paragraph",
-																content: { __sb_idx__0: { type: "text", content: "Correct!" } }
-															}
+													CORRECT: {
+														__sb_idx__0: {
+															type: "paragraph",
+															content: { __sb_idx__0: { type: "text", content: "Correct!" } }
 														}
 													},
-													__sb_idx__1: {
-														identifier: "INCORRECT",
-														outcomeIdentifier: "FEEDBACK__GLOBAL",
-														content: {
-															__sb_idx__0: {
-																type: "paragraph",
-																content: { __sb_idx__0: { type: "text", content: "Incorrect." } }
-															}
+													INCORRECT: {
+														__sb_idx__0: {
+															type: "paragraph",
+															content: { __sb_idx__0: { type: "text", content: "Incorrect." } }
 														}
 													}
 												}
@@ -103,18 +103,18 @@ describe("Differentiation Pipeline", () => {
 			],
 			widgets: null,
 			interactions: null,
-			feedbackBlocks: [
-				{
-					identifier: "CORRECT",
-					outcomeIdentifier: "FEEDBACK__GLOBAL",
-					content: [{ type: "paragraph", content: [{ type: "text", content: "Correct" }] }]
-				},
-				{
-					identifier: "INCORRECT",
-					outcomeIdentifier: "FEEDBACK__GLOBAL",
-					content: [{ type: "paragraph", content: [{ type: "text", content: "Incorrect" }] }]
-				}
-			]
+			feedbackPlan: {
+				mode: "fallback",
+				dimensions: [],
+				combinations: [
+					{ id: "CORRECT", path: [] },
+					{ id: "INCORRECT", path: [] }
+				]
+			},
+			feedbackBlocks: {
+				CORRECT: [{ type: "paragraph", content: [{ type: "text", content: "Correct" }] }],
+				INCORRECT: [{ type: "paragraph", content: [{ type: "text", content: "Incorrect" }] }]
+			}
 		}
 
 		const result = await errors.try(differentiateAssessmentItem(mockOpenAI, logger, originalItem, 1))

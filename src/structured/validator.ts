@@ -65,8 +65,8 @@ export function validateAndSanitizeHtmlFields(item: AssessmentItemInput, logger:
 
 	// Apply processing to all structured content fields
 	processBlockContent(sanitizedItem.body, logger)
-	for (const block of sanitizedItem.feedbackBlocks) {
-		processBlockContent(block.content, logger)
+	for (const content of Object.values(sanitizedItem.feedbackBlocks)) {
+		processBlockContent(content, logger)
 	}
 
 	if (sanitizedItem.interactions) {
