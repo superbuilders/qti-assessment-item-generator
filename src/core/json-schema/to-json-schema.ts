@@ -71,7 +71,7 @@ function stripPropertyNames(node: z.core.JSONSchema._JSONSchema): void {
     if (!isRecord(node)) return
 
     // Remove propertyNames if present at this level
-    node.propertyNames = undefined
+    delete node.propertyNames
 
     const props = node.properties
     if (isRecord(props)) {
