@@ -1,7 +1,7 @@
 import { z } from "zod"
+import type { WidgetGenerator } from "../types"
 import { createHeightSchema, createWidthSchema } from "../utils/schemas"
 import { theme } from "../utils/theme"
-import type { WidgetGenerator } from "../types"
 
 const MINUS_CHIP_COLOR = "#FADBD8"
 const PLUS_CHIP_COLOR = "#FEF9E7"

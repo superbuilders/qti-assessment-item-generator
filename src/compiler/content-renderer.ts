@@ -1,8 +1,8 @@
+import type { BlockContent, InlineContent } from "@core/content"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import { sanitizeXmlAttributeValue } from "./utils/xml-utils"
 import type { WidgetTypeTuple } from "../widgets/collections/types"
-import type { BlockContent, InlineContent } from "@core/content"
+import { sanitizeXmlAttributeValue } from "./utils/xml-utils"
 
 /**
  * Escapes text content for safe inclusion in XML PCDATA.
@@ -97,13 +97,19 @@ export function renderBlockContent<E extends WidgetTypeTuple = WidgetTypeTuple>(
 				}
 				case "unorderedList": {
 					const itemsXml = item.items
-						.map((inline: InlineContent<E>) => `<li><p>${renderInlineContent(inline, widgetSlots, interactionSlots)}</p></li>`)
+						.map(
+							(inline: InlineContent<E>) =>
+								`<li><p>${renderInlineContent(inline, widgetSlots, interactionSlots)}</p></li>`
+						)
 						.join("")
 					return `<ul>${itemsXml}</ul>`
 				}
 				case "orderedList": {
 					const itemsXml = item.items
-						.map((inline: InlineContent<E>) => `<li><p>${renderInlineContent(inline, widgetSlots, interactionSlots)}</p></li>`)
+						.map(
+							(inline: InlineContent<E>) =>
+								`<li><p>${renderInlineContent(inline, widgetSlots, interactionSlots)}</p></li>`
+						)
 						.join("")
 					return `<ol>${itemsXml}</ol>`
 				}

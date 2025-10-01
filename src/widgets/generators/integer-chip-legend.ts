@@ -1,6 +1,6 @@
 import { z } from "zod"
-import { theme } from "../utils/theme"
 import type { WidgetGenerator } from "../types"
+import { theme } from "../utils/theme"
 
 const MINUS_CHIP_COLOR = "#FADBD8"
 const PLUS_CHIP_COLOR = "#FEF9E7"

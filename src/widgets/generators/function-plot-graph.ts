@@ -1,4 +1,5 @@
 import { z } from "zod"
+import type { WidgetGenerator } from "../types"
 import { CanvasImpl } from "../utils/canvas-impl"
 import {
 	createAxisOptionsSchema,
@@ -11,7 +12,6 @@ import { AXIS_VIEWBOX_PADDING } from "../utils/constants"
 import { setupCoordinatePlaneV2 } from "../utils/coordinate-plane-v2"
 import { createHeightSchema, createWidthSchema } from "../utils/schemas"
 import { theme } from "../utils/theme"
-import type { WidgetGenerator } from "../types"
 
 // Use shared axis schema from utils
 

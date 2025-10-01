@@ -1,5 +1,5 @@
-import { z } from "zod"
-import { FeedbackDimensionSchema, FeedbackCombinationSchema, FeedbackPlanSchema } from "./schema"
+import type { z } from "zod"
+import type { FeedbackCombinationSchema, FeedbackDimensionSchema, FeedbackPlanSchema } from "./schema"
 
 export type FeedbackDimension = z.infer<typeof FeedbackDimensionSchema>
 export type FeedbackCombination = z.infer<typeof FeedbackCombinationSchema>

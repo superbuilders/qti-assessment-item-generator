@@ -1,12 +1,12 @@
+import type { AnyInteraction } from "@core/interactions"
+import type { AssessmentItemShell } from "@core/item"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import type { AssessmentItemShell } from "@core/item"
-import type { AnyInteraction } from "@core/interactions"
 import { widgetCollections } from "../widgets/collections"
+import type { WidgetTypeTuple } from "../widgets/collections/types"
 import { allWidgetSchemas } from "../widgets/registry"
 import { caretBanPromptSection } from "./caret"
 import type { ImageContext } from "./perseus-image-resolver"
-import { WidgetTypeTuple } from "../widgets/collections/types"
 
 export function createWidgetContentPrompt<E extends WidgetTypeTuple>(
 	perseusJson: string,

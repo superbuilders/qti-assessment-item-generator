@@ -1,9 +1,9 @@
 import { z } from "zod"
+import type { WidgetGenerator } from "../types"
 import { CanvasImpl } from "../utils/canvas-impl"
 import { PADDING } from "../utils/constants"
 import { createHeightSchema, createWidthSchema } from "../utils/schemas"
 import { theme } from "../utils/theme"
-import type { WidgetGenerator } from "../types"
 
 /**
  * Creates a diagram of an analog clock face showing a specific time.

@@ -1,6 +1,6 @@
 import { z } from "zod"
-import { theme } from "../utils/theme"
 import type { WidgetGenerator } from "../types"
+import { theme } from "../utils/theme"
 
 // Using factories to prevent Zod from creating schemas with $refs, which can cause issues with some tools.
 

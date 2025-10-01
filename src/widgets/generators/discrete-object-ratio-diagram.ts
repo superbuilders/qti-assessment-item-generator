@@ -1,12 +1,11 @@
 import { z } from "zod"
+import type { WidgetGenerator } from "../types"
 import { CanvasImpl } from "../utils/canvas-impl"
 import { drawChartTitle } from "../utils/chart-layout-utils"
 // PADDING intentionally unused; this widget uses tighter padding for visuals.
 import { abbreviateMonth } from "../utils/labels"
 import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-
 import { theme } from "../utils/theme"
-import type { WidgetGenerator } from "../types"
 
 // Defines a type of object to be rendered
 const ObjectTypeSchema = z

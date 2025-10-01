@@ -1,10 +1,10 @@
 import { z } from "zod"
+import type { WidgetGenerator } from "../types"
 import { CanvasImpl } from "../utils/canvas-impl"
 import { AXIS_VIEWBOX_PADDING } from "../utils/constants"
 import { setupCoordinatePlaneBaseV2 } from "../utils/coordinate-plane-utils"
 import { createHeightSchema, createWidthSchema } from "../utils/schemas"
 import { theme } from "../utils/theme"
-import type { WidgetGenerator } from "../types"
 
 const AnnotationSchema = z.object({
 	year: z.number().describe("The year on the x-axis that the annotation arrow should point to."),

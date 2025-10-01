@@ -2,8 +2,8 @@ import { describe, expect, test } from "bun:test"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
-import { toJSONSchemaPromptSafe } from "../../src/core/json-schema"
 import { createAssessmentItemShellSchema } from "../../src/core/item"
+import { toJSONSchemaPromptSafe } from "../../src/core/json-schema"
 import { allWidgetsCollection } from "../../src/widgets/collections/all"
 
 describe("JSON Schema Preflight", () => {

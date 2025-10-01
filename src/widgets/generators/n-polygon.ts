@@ -1,9 +1,9 @@
 import { z } from "zod"
+import type { WidgetGenerator } from "../types"
 import { CanvasImpl } from "../utils/canvas-impl"
 import { PADDING } from "../utils/constants"
 import { CSS_COLOR_PATTERN } from "../utils/css-color"
 import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import type { WidgetGenerator } from "../types"
 
 export const NPolygonPropsSchema = z
 	.object({

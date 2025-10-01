@@ -118,7 +118,9 @@ describe("Differentiation Pipeline", () => {
 			}
 		}
 
-		const result = await errors.try(differentiateAssessmentItem(mockOpenAI, logger, originalItem, 1, allWidgetsCollection))
+		const result = await errors.try(
+			differentiateAssessmentItem(mockOpenAI, logger, originalItem, 1, allWidgetsCollection)
+		)
 		expect(result.error).toBeFalsy()
 
 		const differentiated = result.data

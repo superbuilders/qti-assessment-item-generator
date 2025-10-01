@@ -4,7 +4,7 @@ import { compile } from "../src/compiler/compiler"
 import type { AssessmentItemInput } from "../src/core/item"
 import fractionAddition from "../src/templates/math/fraction-addition"
 import { allWidgetsCollection } from "../src/widgets/collections/all"
-import { WidgetTypeTuple } from "../src/widgets/collections/types"
+import type { WidgetTypeTuple } from "../src/widgets/collections/types"
 
 async function main() {
 	logger.info("starting template poc test", {

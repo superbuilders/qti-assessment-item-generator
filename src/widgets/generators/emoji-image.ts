@@ -1,7 +1,7 @@
 import { z } from "zod"
+import type { WidgetGenerator } from "../types"
 import { CanvasImpl } from "../utils/canvas-impl"
 import { PADDING } from "../utils/constants"
-import type { WidgetGenerator } from "../types"
 
 export const EmojiImagePropsSchema = z
 	.object({

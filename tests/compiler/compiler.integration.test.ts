@@ -8,7 +8,7 @@ import { allWidgetsCollection } from "../../src/widgets/collections/all"
 describe("Compiler Identifier Validation Integration Tests", () => {
 	test("should throw ErrDuplicateResponseIdentifier for duplicates across interactions", async () => {
 		const itemWithDuplicate: AssessmentItemInput<readonly []> = {
-			identifier: "test-duplicate-response",	
+			identifier: "test-duplicate-response",
 			title: "Test Duplicate Response",
 			body: [],
 			feedbackPlan: {
@@ -135,11 +135,15 @@ describe("Compiler Identifier Validation Integration Tests", () => {
 				]
 			},
 			feedbackBlocks: {
-				FB__RESPONSE_1_A__RESPONSE_TEXT_CORRECT: [{ type: "paragraph", content: [{ type: "text", content: "A + Correct" }] }],
+				FB__RESPONSE_1_A__RESPONSE_TEXT_CORRECT: [
+					{ type: "paragraph", content: [{ type: "text", content: "A + Correct" }] }
+				],
 				FB__RESPONSE_1_A__RESPONSE_TEXT_INCORRECT: [
 					{ type: "paragraph", content: [{ type: "text", content: "A + Incorrect" }] }
 				],
-				FB__RESPONSE_1_B__RESPONSE_TEXT_CORRECT: [{ type: "paragraph", content: [{ type: "text", content: "B + Correct" }] }],
+				FB__RESPONSE_1_B__RESPONSE_TEXT_CORRECT: [
+					{ type: "paragraph", content: [{ type: "text", content: "B + Correct" }] }
+				],
 				FB__RESPONSE_1_B__RESPONSE_TEXT_INCORRECT: [
 					{ type: "paragraph", content: [{ type: "text", content: "B + Incorrect" }] }
 				]

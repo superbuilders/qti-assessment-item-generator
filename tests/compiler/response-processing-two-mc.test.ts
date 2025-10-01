@@ -1,7 +1,7 @@
-import { describe, it, expect } from "bun:test"
+import { describe, expect, it } from "bun:test"
 import { compileResponseProcessing } from "../../src/compiler/response-processor"
-import type { AssessmentItem } from "../../src/core/item"
 import type { FeedbackPlan } from "../../src/core/feedback"
+import type { AssessmentItem } from "../../src/core/item"
 
 describe("Response Processing - two MC combo plan", () => {
 	it("emits FEEDBACK__OVERALL for all combinations", () => {
@@ -74,5 +74,3 @@ describe("Response Processing - two MC combo plan", () => {
 		expect(xml).toContain('<qti-base-value base-type="identifier">B</qti-base-value>')
 	})
 })
-
-

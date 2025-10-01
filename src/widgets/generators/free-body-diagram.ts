@@ -1,8 +1,8 @@
 import { z } from "zod"
+import type { WidgetGenerator } from "../types"
 import { CanvasImpl } from "../utils/canvas-impl"
 import { PADDING } from "../utils/constants"
 import { theme } from "../utils/theme"
-import type { WidgetGenerator } from "../types"
 
 // Defines the properties for the Free Body Diagram widget.
 export const FreeBodyDiagramPropsSchema = z

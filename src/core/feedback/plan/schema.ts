@@ -1,5 +1,5 @@
+import { CHOICE_IDENTIFIER_REGEX, RESPONSE_IDENTIFIER_REGEX } from "@compiler/qti-constants"
 import { z } from "zod"
-import { RESPONSE_IDENTIFIER_REGEX, CHOICE_IDENTIFIER_REGEX } from "@compiler/qti-constants"
 
 export const FeedbackDimensionSchema = z
 	.discriminatedUnion("kind", [
@@ -31,11 +31,7 @@ export const FeedbackCombinationSchema = z
 				z
 					.object({
 						responseIdentifier: z.string().regex(RESPONSE_IDENTIFIER_REGEX),
-						key: z.union([
-							z.literal("CORRECT"),
-							z.literal("INCORRECT"),
-							z.string().regex(CHOICE_IDENTIFIER_REGEX)
-						])
+						key: z.union([z.literal("CORRECT"), z.literal("INCORRECT"), z.string().regex(CHOICE_IDENTIFIER_REGEX)])
 					})
 					.strict()
 			)

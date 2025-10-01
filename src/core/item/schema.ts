@@ -1,13 +1,13 @@
-import * as errors from "@superbuilders/errors"
-import * as logger from "@superbuilders/slog"
-import { z } from "zod"
-import { typedSchemas } from "@widgets/registry"
-import type { WidgetTypeTuple } from "@widgets/collections/types"
 import { CHOICE_IDENTIFIER_REGEX, RESPONSE_IDENTIFIER_REGEX } from "@compiler/qti-constants"
 import { createBlockContentSchema } from "@core/content"
-import type { ResponseDeclaration, AssessmentItemShell, AssessmentItem } from "./types"
-import { createAnyInteractionSchema } from "@core/interactions"
 import { FeedbackPlanSchema } from "@core/feedback"
+import { createAnyInteractionSchema } from "@core/interactions"
+import * as errors from "@superbuilders/errors"
+import * as logger from "@superbuilders/slog"
+import type { WidgetTypeTuple } from "@widgets/collections/types"
+import { typedSchemas } from "@widgets/registry"
+import { z } from "zod"
+import type { AssessmentItem, AssessmentItemShell, ResponseDeclaration } from "./types"
 
 // Response Declaration Schema (shared across all dynamic schemas)
 function createResponseDeclarationSchema(): z.ZodType<ResponseDeclaration> {

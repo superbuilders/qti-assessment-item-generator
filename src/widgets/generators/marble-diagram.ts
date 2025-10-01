@@ -1,7 +1,7 @@
 import { z } from "zod"
+import type { WidgetGenerator } from "../types"
 import { CSS_COLOR_PATTERN } from "../utils/css-color"
 import { theme } from "../utils/theme"
-import type { WidgetGenerator } from "../types"
 
 // Factory for a color group of marbles schema (avoids pointer reuse/$ref)
 const createMarbleColorGroupSchema = () =>

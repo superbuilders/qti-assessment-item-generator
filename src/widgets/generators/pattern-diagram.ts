@@ -1,9 +1,9 @@
 import { z } from "zod"
+import type { WidgetGenerator } from "../types"
 import { CanvasImpl } from "../utils/canvas-impl"
 import { CSS_COLOR_PATTERN } from "../utils/css-color"
 import { createHeightSchema, createWidthSchema } from "../utils/schemas"
 import { theme } from "../utils/theme"
-import type { WidgetGenerator } from "../types"
 
 /**
  * Factory function to create the schema for a single shape item in the pattern.

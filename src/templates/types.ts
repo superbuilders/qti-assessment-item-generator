@@ -1,6 +1,6 @@
-import type { z } from "zod"
 import type { AssessmentItemInput } from "@core/item"
-import { WidgetTypeTuple } from "@widgets/collections/types"
+import type { WidgetTypeTuple } from "@widgets/collections/types"
+import type { z } from "zod"
 
 /**
  * Canonical template module interface for pluggable templates.
@@ -28,7 +28,10 @@ export type TemplateContext = {
 	}
 }
 
-export type TemplateModule<Schema extends z.ZodType<unknown> = z.ZodType<unknown>, E extends WidgetTypeTuple = WidgetTypeTuple> = {
+export type TemplateModule<
+	Schema extends z.ZodType<unknown> = z.ZodType<unknown>,
+	E extends WidgetTypeTuple = WidgetTypeTuple
+> = {
 	readonly templateId: string
 	readonly version: string
 	readonly propsSchema: Schema

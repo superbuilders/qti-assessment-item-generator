@@ -1,4 +1,5 @@
 import { z } from "zod"
+import type { WidgetGenerator } from "../types"
 import { CanvasImpl } from "../utils/canvas-impl"
 import { PADDING } from "../utils/constants"
 import { CSS_COLOR_PATTERN } from "../utils/css-color"
@@ -6,7 +7,6 @@ import { Path2D } from "../utils/path-builder"
 import { createHeightSchema, createWidthSchema } from "../utils/schemas"
 import { estimateWrappedTextDimensions } from "../utils/text"
 import { theme } from "../utils/theme"
-import type { WidgetGenerator } from "../types"
 
 /**
  * Creates a diagram of a circle with a central angle (sector) highlighted.

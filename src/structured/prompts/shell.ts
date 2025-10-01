@@ -1,13 +1,12 @@
 // imports kept minimal in this module; errors/logging handled by callers
 import type { AssessmentItemInput } from "@core/item"
+import type { WidgetCollection, WidgetTypeTuple } from "@widgets/collections/types"
 import { allExamples } from "../../examples"
-import type { WidgetCollection } from "@widgets/collections/types"
 // Note: do not validate example shells here; examples are illustrative only
 // import { createAssessmentItemShellSchema } from "@core/item"
 import type { AiContextEnvelope, ImageContext } from "../types"
 import { caretBanPromptSection } from "./caret"
 import { createWidgetSelectionPromptSection, formatUnifiedContextSections } from "./shared"
-import { WidgetTypeTuple } from "@widgets/collections/types"
 
 // Helper to convert a full AssessmentItemInput into a shell for prompt examples
 function createShellFromExample<const E extends WidgetTypeTuple>(item: AssessmentItemInput<E>) {
@@ -17,10 +16,10 @@ function createShellFromExample<const E extends WidgetTypeTuple>(item: Assessmen
 		identifier: item.identifier,
 		title: item.title,
 		responseDeclarations: item.responseDeclarations,
-    body: item.body ?? null
+		body: item.body ?? null
 	}
-  // Intentionally skip validation: examples are for guidance and must not block prompts
-  return shell
+	// Intentionally skip validation: examples are for guidance and must not block prompts
+	return shell
 }
 
 export function createAssessmentShellPrompt<const E extends WidgetTypeTuple>(

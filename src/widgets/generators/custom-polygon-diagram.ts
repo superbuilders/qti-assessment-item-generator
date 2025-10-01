@@ -1,11 +1,11 @@
 import { z } from "zod"
+// Path2D not needed after removing annotations
+import type { WidgetGenerator } from "../types"
 import { CanvasImpl } from "../utils/canvas-impl"
 import { PADDING } from "../utils/constants"
 import { CSS_COLOR_PATTERN } from "../utils/css-color"
 import { createHeightSchema, createWidthSchema } from "../utils/schemas"
 import { theme } from "../utils/theme"
-// Path2D not needed after removing annotations
-import type { WidgetGenerator } from "../types"
 
 // Factory to create a point schema. Using a factory prevents Zod from deduplicating
 // and emitting $ref in generated JSON schema, which breaks OpenAI schema consumers.

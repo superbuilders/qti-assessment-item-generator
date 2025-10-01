@@ -6,7 +6,8 @@
 		"./gritql/no-new-error.grit",
 		"./gritql/no-try.grit",
 		"./gritql/no-iife.grit",
-		"./gritql/require-logger-before-throw.grit"
+		"./gritql/require-logger-before-throw.grit",
+		"./gritql/no-relative-imports.grit"
 	],
 	"vcs": {
 		"enabled": false,

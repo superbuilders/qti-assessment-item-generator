@@ -1,12 +1,12 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
+import type { WidgetGenerator } from "../types"
 import { CanvasImpl } from "../utils/canvas-impl"
 import { PADDING } from "../utils/constants"
 import { abbreviateMonth } from "../utils/labels"
 import { createHeightSchema, createWidthSchema } from "../utils/schemas"
 import { type Theme, theme } from "../utils/theme"
-import type { WidgetGenerator } from "../types"
 
 export const ErrMismatchedTickCounts = errors.new("top and bottom lines must have the same number of ticks")
 

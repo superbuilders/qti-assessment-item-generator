@@ -10,7 +10,7 @@ export type WidgetTypeTuple = readonly AllWidgetKeys[]
 
 // Update the default generic for WidgetCollection to reflect the new, more flexible tuple.
 export type WidgetCollection<E extends WidgetTypeTuple = readonly AllWidgetKeys[]> = {
-    readonly name: string
-    readonly widgetTypeKeys: E
-    readonly schemas: { [K in E[number]]: z.ZodType<unknown> }
+	readonly name: string
+	readonly widgetTypeKeys: E
+	readonly schemas: { [K in E[number]]: z.ZodType<unknown> }
 }

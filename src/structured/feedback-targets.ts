@@ -1,6 +1,6 @@
-import type { AssessmentItemShell } from "@core/item"
 import type { AnyInteraction } from "@core/interactions"
-import { WidgetTypeTuple } from "../widgets/collections/types"
+import type { AssessmentItemShell } from "@core/item"
+import type { WidgetTypeTuple } from "../widgets/collections/types"
 
 export type FeedbackTarget = {
 	outcomeIdentifier: string

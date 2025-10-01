@@ -1,4 +1,5 @@
 import { z } from "zod"
+import type { WidgetGenerator } from "../types"
 import { CanvasImpl } from "../utils/canvas-impl"
 import { PADDING } from "../utils/constants"
 import { CSS_COLOR_PATTERN } from "../utils/css-color"
@@ -8,7 +9,6 @@ import { numberContentToInnerMathML } from "../utils/number-to-mathml"
 import { createHeightSchema, createWidthSchema } from "../utils/schemas"
 import { theme } from "../utils/theme"
 import { buildTicks } from "../utils/ticks"
-import type { WidgetGenerator } from "../types"
 
 // Additional overlays to subsume fraction-number-line without adding new tick modes
 const Segment = z

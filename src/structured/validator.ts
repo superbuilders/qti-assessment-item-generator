@@ -1,7 +1,7 @@
+import type { BlockContent, InlineContent } from "@core/content"
+import type { AssessmentItemInput } from "@core/item"
 import * as errors from "@superbuilders/errors"
 import type * as logger from "@superbuilders/slog"
-import type { AssessmentItemInput } from "@core/item"
-import type { BlockContent, InlineContent } from "@core/content"
 import {
 	checkNoLatex,
 	checkNoMfencedElements,
@@ -9,7 +9,7 @@ import {
 	sanitizeHtmlEntities,
 	sanitizeMathMLOperators
 } from "../qti-validation/utils"
-import { WidgetTypeTuple } from "../widgets/collections/types"
+import type { WidgetTypeTuple } from "../widgets/collections/types"
 
 // NEW: Recursive walker function for inline content
 function processInlineContent<E extends WidgetTypeTuple>(items: InlineContent<E> | null, logger: logger.Logger): void {
@@ -58,7 +58,10 @@ function processBlockContent<E extends WidgetTypeTuple>(items: BlockContent<E> |
 	}
 }
 
-export function validateAndSanitizeHtmlFields<E extends WidgetTypeTuple>(item: AssessmentItemInput<E>, logger: logger.Logger): AssessmentItemInput<E> {
+export function validateAndSanitizeHtmlFields<E extends WidgetTypeTuple>(
+	item: AssessmentItemInput<E>,
+	logger: logger.Logger
+): AssessmentItemInput<E> {
 	// Deep clone the object to avoid mutating the original
 	// Using JSON parse/stringify for deep cloning
 	const clonedData = JSON.parse(JSON.stringify(item))

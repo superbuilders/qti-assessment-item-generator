@@ -1,14 +1,14 @@
+import type { BlockContent } from "@core/content"
+import { createBlockContentSchema } from "@core/content"
+import type { AnyInteraction } from "@core/interactions"
+import type { ResponseDeclaration } from "@core/item"
+import { toJSONSchemaPromptSafe } from "@core/json-schema"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import { z } from "zod"
-import type { AnyInteraction } from "@core/interactions"
-import type { BlockContent } from "@core/content"
-import type { FeedbackPlan } from "../plan"
-import type { ResponseDeclaration } from "@core/item"
 import type { WidgetTypeTuple } from "@widgets/collections/types"
-import { createBlockContentSchema } from "@core/content"
+import { z } from "zod"
+import type { FeedbackPlan } from "../plan"
 import { buildFeedbackPlanFromInteractions } from "../plan"
-import { toJSONSchemaPromptSafe } from "@core/json-schema"
 
 // --- Error Constants ---
 
@@ -22,9 +22,9 @@ export const ErrFeedbackMissingLeaves = errors.new("feedback is missing required
 export const ErrFeedbackSchemaValidation = errors.new("feedback schema validation")
 
 import type {
+	AuthoringFeedbackOverall,
 	AuthoringNestedLeaf,
 	AuthoringNestedNode,
-	AuthoringFeedbackOverall,
 	NestedFeedbackAuthoring
 } from "./types"
 
@@ -39,9 +39,7 @@ export function createNestedFeedbackZodSchema<P extends FeedbackPlan, const E ex
 ): z.ZodType<NestedFeedbackAuthoring<P, E>> {
 	// Leaf schema is fully typed to AuthoringNestedLeaf<E>
 	const ScopedBlockContentSchema: z.ZodType<BlockContent<E>> = createBlockContentSchema(widgetTypeKeys)
-	const LeafNodeSchema: z.ZodType<AuthoringNestedLeaf<E>> = z
-		.object({ content: ScopedBlockContentSchema })
-		.strict()
+	const LeafNodeSchema: z.ZodType<AuthoringNestedLeaf<E>> = z.object({ content: ScopedBlockContentSchema }).strict()
 
 	// Build overall feedback shape imperatively without z.lazy
 	let OverallSchema: z.ZodType<AuthoringFeedbackOverall<P, E>>
@@ -64,7 +62,10 @@ export function createNestedFeedbackZodSchema<P extends FeedbackPlan, const E ex
 		for (let i = feedbackPlan.dimensions.length - 1; i >= 0; i--) {
 			const dimension = feedbackPlan.dimensions[i]
 			if (!dimension) {
-				logger.error("undefined dimension in feedback plan", { index: i, dimensionCount: feedbackPlan.dimensions.length })
+				logger.error("undefined dimension in feedback plan", {
+					index: i,
+					dimensionCount: feedbackPlan.dimensions.length
+				})
 				throw errors.new("undefined dimension in feedback plan")
 			}
 			const keys: readonly string[] = dimension.kind === "enumerated" ? dimension.keys : ["CORRECT", "INCORRECT"]
@@ -81,7 +82,7 @@ export function createNestedFeedbackZodSchema<P extends FeedbackPlan, const E ex
 			current = branch
 		}
 		// current is NodeT at this point by construction
-    // biome-ignore lint: this is fine
+		// biome-ignore lint: this is fine
 		OverallSchema = current as z.ZodType<NodeT>
 	}
 
@@ -96,34 +97,34 @@ export function createNestedFeedbackZodSchema<P extends FeedbackPlan, const E ex
 // Type guards are unnecessary when Zod schemas are precisely typed.
 
 function isNestedFeedbackAuthoring<E extends WidgetTypeTuple>(
-    val: unknown
+	val: unknown
 ): val is NestedFeedbackAuthoring<FeedbackPlan, E> {
-    if (typeof val !== "object" || val === null) return false
-    const feedback = Reflect.get(val, "feedback")
-    if (typeof feedback !== "object" || feedback === null) return false
-    const overall = Reflect.get(feedback, "FEEDBACK__OVERALL")
-    return typeof overall === "object" && overall !== null
+	if (typeof val !== "object" || val === null) return false
+	const feedback = Reflect.get(val, "feedback")
+	if (typeof feedback !== "object" || feedback === null) return false
+	const overall = Reflect.get(feedback, "FEEDBACK__OVERALL")
+	return typeof overall === "object" && overall !== null
 }
 
 export function validateNestedFeedback<P extends FeedbackPlan, const E extends WidgetTypeTuple>(
-    nested: unknown,
-    feedbackPlan: P,
-    widgetTypeKeys: E
+	nested: unknown,
+	feedbackPlan: P,
+	widgetTypeKeys: E
 ): NestedFeedbackAuthoring<P, E> {
-    const schema = createNestedFeedbackZodSchema(feedbackPlan, widgetTypeKeys)
-    const result = schema.safeParse(nested)
+	const schema = createNestedFeedbackZodSchema(feedbackPlan, widgetTypeKeys)
+	const result = schema.safeParse(nested)
 
-    if (!result.success) {
-        logger.error("feedback schema validation", { error: result.error })
-        throw errors.wrap(result.error, "feedback schema validation")
-    }
+	if (!result.success) {
+		logger.error("feedback schema validation", { error: result.error })
+		throw errors.wrap(result.error, "feedback schema validation")
+	}
 
-    const data = result.data
-    if (!isNestedFeedbackAuthoring<E>(data)) {
-        logger.error("feedback schema validation type guard failed")
-        throw errors.new("feedback schema validation type guard failed")
-    }
-    return data
+	const data = result.data
+	if (!isNestedFeedbackAuthoring<E>(data)) {
+		logger.error("feedback schema validation type guard failed")
+		throw errors.new("feedback schema validation type guard failed")
+	}
+	return data
 }
 
 /**
@@ -141,63 +142,63 @@ export function convertNestedFeedbackToBlocks<P extends FeedbackPlan, E extends 
 		throw ErrFeedbackOverallNotObject
 	}
 
-    // Local type helpers (no assertions; structural checks only)
-    type FallbackOverall = {
-        CORRECT: AuthoringNestedLeaf<E>
-        INCORRECT: AuthoringNestedLeaf<E>
-    }
-    const isLeaf = (node: unknown): node is AuthoringNestedLeaf<E> => {
-        if (typeof node !== "object" || node === null) return false
-        return Object.prototype.hasOwnProperty.call(node, "content")
-    }
-    const isFallbackOverall = (node: unknown): node is FallbackOverall => {
-        if (typeof node !== "object" || node === null) return false
-        const c = Reflect.get(node, "CORRECT")
-        const i = Reflect.get(node, "INCORRECT")
-        return isLeaf(c) && isLeaf(i)
-    }
-    const isNestedNode = (node: AuthoringFeedbackOverall<FeedbackPlan, E>): node is AuthoringNestedNode<FeedbackPlan, E> => {
-        return !("CORRECT" in node && "INCORRECT" in node)
-    }
+	// Local type helpers (no assertions; structural checks only)
+	type FallbackOverall = {
+		CORRECT: AuthoringNestedLeaf<E>
+		INCORRECT: AuthoringNestedLeaf<E>
+	}
+	const isLeaf = (node: unknown): node is AuthoringNestedLeaf<E> => {
+		if (typeof node !== "object" || node === null) return false
+		return Object.hasOwn(node, "content")
+	}
+	const isFallbackOverall = (node: unknown): node is FallbackOverall => {
+		if (typeof node !== "object" || node === null) return false
+		const c = Reflect.get(node, "CORRECT")
+		const i = Reflect.get(node, "INCORRECT")
+		return isLeaf(c) && isLeaf(i)
+	}
+	const isNestedNode = (
+		node: AuthoringFeedbackOverall<FeedbackPlan, E>
+	): node is AuthoringNestedNode<FeedbackPlan, E> => {
+		return !("CORRECT" in node && "INCORRECT" in node)
+	}
 
-    // Fallback mode: FEEDBACK__OVERALL holds CORRECT/INCORRECT leaves directly
-    if (feedbackPlan.mode === "fallback") {
-        if (!isFallbackOverall(overallFeedback)) {
-            logger.error("invalid overall feedback shape for fallback", { overallFeedback })
-            throw errors.new("invalid overall fallback feedback shape")
-        }
-        blocks["CORRECT"] = overallFeedback.CORRECT.content
-        blocks["INCORRECT"] = overallFeedback.INCORRECT.content
-        return blocks
-    }
+	// Fallback mode: FEEDBACK__OVERALL holds CORRECT/INCORRECT leaves directly
+	if (feedbackPlan.mode === "fallback") {
+		if (!isFallbackOverall(overallFeedback)) {
+			logger.error("invalid overall feedback shape for fallback", { overallFeedback })
+			throw errors.new("invalid overall fallback feedback shape")
+		}
+		blocks.CORRECT = overallFeedback.CORRECT.content
+		blocks.INCORRECT = overallFeedback.INCORRECT.content
+		return blocks
+	}
 
-    // Nested mode: recursively walk the object graph
-    const walk = (
-        node: AuthoringNestedNode<FeedbackPlan, E> | AuthoringNestedLeaf<E>,
-        path: Array<{ responseIdentifier: string; key: string }>
-    ): void => {
-        if (isLeaf(node)) {
-            if (path.length === 0) {
-                logger.error("leaf node found at root of feedback object", { node })
-                throw ErrFeedbackLeafAtRoot
-            }
-            const combination = feedbackPlan.combinations.find(
-                (c: FeedbackPlan["combinations"][number]) =>
-                    c.path.length === path.length &&
-                    c.path.every(
-                        (seg: FeedbackPlan["combinations"][number]["path"][number], i: number) =>
-                            path[i] !== undefined &&
-                            seg.responseIdentifier === path[i].responseIdentifier &&
-                            seg.key === path[i].key
-                    )
-            )
-            if (!combination) {
-                logger.error("no combination found for path", { pathSegments: path })
-                throw ErrFeedbackNoCombinationForPath
-            }
-            blocks[combination.id] = node.content
-            return
-        }
+	// Nested mode: recursively walk the object graph
+	const walk = (
+		node: AuthoringNestedNode<FeedbackPlan, E> | AuthoringNestedLeaf<E>,
+		path: Array<{ responseIdentifier: string; key: string }>
+	): void => {
+		if (isLeaf(node)) {
+			if (path.length === 0) {
+				logger.error("leaf node found at root of feedback object", { node })
+				throw ErrFeedbackLeafAtRoot
+			}
+			const combination = feedbackPlan.combinations.find(
+				(c: FeedbackPlan["combinations"][number]) =>
+					c.path.length === path.length &&
+					c.path.every(
+						(seg: FeedbackPlan["combinations"][number]["path"][number], i: number) =>
+							path[i] !== undefined && seg.responseIdentifier === path[i].responseIdentifier && seg.key === path[i].key
+					)
+			)
+			if (!combination) {
+				logger.error("no combination found for path", { pathSegments: path })
+				throw ErrFeedbackNoCombinationForPath
+			}
+			blocks[combination.id] = node.content
+			return
+		}
 
 		// Otherwise treat as branch: responseIdentifier -> keys -> child
 		const branch = node
@@ -252,26 +253,24 @@ export function convertNestedFeedbackToBlocks<P extends FeedbackPlan, E extends 
 export function buildEmptyNestedFeedback<P extends FeedbackPlan, E extends WidgetTypeTuple = WidgetTypeTuple>(
 	feedbackPlan: P
 ): NestedFeedbackAuthoring<FeedbackPlan, E> {
-	function buildNode(
-		dims: readonly FeedbackPlan["dimensions"][number][]
-	): AuthoringNestedNode<FeedbackPlan, E> {
-        if (dims.length === 0) {
-            // Should never happen for combo mode; guarded by caller
-            logger.error("no dimensions to build nested node")
-            throw errors.new("no dimensions to build nested node")
-        }
-        const [currentDim, ...restDims] = dims
-        const keys = currentDim.kind === "enumerated" ? currentDim.keys : ["CORRECT", "INCORRECT"]
+	function buildNode(dims: readonly FeedbackPlan["dimensions"][number][]): AuthoringNestedNode<FeedbackPlan, E> {
+		if (dims.length === 0) {
+			// Should never happen for combo mode; guarded by caller
+			logger.error("no dimensions to build nested node")
+			throw errors.new("no dimensions to build nested node")
+		}
+		const [currentDim, ...restDims] = dims
+		const keys = currentDim.kind === "enumerated" ? currentDim.keys : ["CORRECT", "INCORRECT"]
 		const childIsLeaf = restDims.length === 0
 		const child: AuthoringNestedLeaf<E> | AuthoringNestedNode<FeedbackPlan, E> = childIsLeaf
 			? { content: [] }
 			: buildNode(restDims)
-        const branch: Record<string, typeof child> = {}
-        for (const key of keys) {
-            branch[key] = child
-        }
-        return { [currentDim.responseIdentifier]: branch }
-    }
+		const branch: Record<string, typeof child> = {}
+		for (const key of keys) {
+			branch[key] = child
+		}
+		return { [currentDim.responseIdentifier]: branch }
+	}
 
 	const overallFeedback: AuthoringFeedbackOverall<FeedbackPlan, E> =
 		feedbackPlan.mode === "fallback"
@@ -319,7 +318,7 @@ export function buildFeedbackFromNestedForTemplate<const E extends WidgetTypeTup
 ): { feedbackPlan: FeedbackPlan; feedbackBlocks: Record<string, BlockContent<E>> } {
 	const plan = buildFeedbackPlanFromInteractions(interactions, responseDeclarations)
 	validateNestedFeedback(nested, plan, widgetTypeKeys) // Throws on failure
-    const blocks = convertNestedFeedbackToBlocks(nested, plan)
+	const blocks = convertNestedFeedbackToBlocks(nested, plan)
 
 	return { feedbackPlan: plan, feedbackBlocks: blocks }
 }

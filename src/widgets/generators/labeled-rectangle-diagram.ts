@@ -1,11 +1,11 @@
 import { z } from "zod"
+import type { WidgetGenerator } from "../types"
 import { CanvasImpl } from "../utils/canvas-impl"
 import { PADDING } from "../utils/constants"
 import { CSS_COLOR_PATTERN } from "../utils/css-color"
 import { MATHML_INNER_PATTERN } from "../utils/mathml"
 import { createHeightSchema, createWidthSchema } from "../utils/schemas"
 import { theme } from "../utils/theme"
-import type { WidgetGenerator } from "../types"
 
 /**
  * Creates a diagram of a rectangle with labeled sides and area.

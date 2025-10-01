@@ -1,5 +1,10 @@
+import type { BlockContent, InlineContent } from "@core/content"
+import type { FeedbackPlan } from "@core/feedback"
+import type { AnyInteraction } from "@core/interactions"
+import type { AssessmentItemInput, ResponseDeclaration } from "@core/item"
 import * as errors from "@superbuilders/errors"
 import type * as logger from "@superbuilders/slog"
+import type { WidgetTypeTuple } from "@widgets/collections/types"
 import { XMLParser, XMLValidator } from "fast-xml-parser"
 import {
 	checkNoCDataSections,
@@ -9,11 +14,6 @@ import {
 	checkNoPerseusArtifacts
 } from "../qti-validation/utils"
 import { deriveComboIdentifier, normalizeIdPart } from "./utils/helpers"
-import type { AssessmentItemInput, ResponseDeclaration } from "@core/item"
-import type { BlockContent, InlineContent } from "@core/content"
-import type { AnyInteraction } from "@core/interactions"
-import type { FeedbackPlan } from "@core/feedback"
-import { WidgetTypeTuple } from "@widgets/collections/types"
 
 /**
  * Validates that a MathML fragment is well-formed XML.
@@ -64,7 +64,11 @@ function validateMathMLWellFormed(mathml: string, context: string, logger: logge
 	}
 }
 
-function validateInlineContent<E extends WidgetTypeTuple>(items: InlineContent<E>, _context: string, logger: logger.Logger): void {
+function validateInlineContent<E extends WidgetTypeTuple>(
+	items: InlineContent<E>,
+	_context: string,
+	logger: logger.Logger
+): void {
 	if (!Array.isArray(items)) {
 		logger.error("inline content is not an array", { context: _context })
 		throw errors.new(`${_context} must be an array of inline items`)
@@ -211,7 +215,11 @@ function validateInlineContent<E extends WidgetTypeTuple>(items: InlineContent<E
 	}
 }
 
-function validateBlockContent<E extends WidgetTypeTuple>(items: BlockContent<E>, _context: string, logger: logger.Logger): void {
+function validateBlockContent<E extends WidgetTypeTuple>(
+	items: BlockContent<E>,
+	_context: string,
+	logger: logger.Logger
+): void {
 	if (!Array.isArray(items)) {
 		logger.error("block content is not an array", { context: _context })
 		throw errors.new(`${_context} must be an array of block items`)
@@ -229,7 +237,10 @@ function validateBlockContent<E extends WidgetTypeTuple>(items: BlockContent<E>,
  * Intentionally minimal: only enforce that numeric baseTypes are used with numeric values.
  * All formatting instructions and canonicalization guidance are handled in prompting, not here.
  */
-function validateTextEntryCanonicalAnswerRules<E extends WidgetTypeTuple>(item: AssessmentItemInput<E>, logger: logger.Logger): void {
+function validateTextEntryCanonicalAnswerRules<E extends WidgetTypeTuple>(
+	item: AssessmentItemInput<E>,
+	logger: logger.Logger
+): void {
 	if (!item.interactions || !item.responseDeclarations) {
 		return
 	}
@@ -266,7 +277,10 @@ function validateTextEntryCanonicalAnswerRules<E extends WidgetTypeTuple>(item: 
 	}
 }
 
-export function validateAssessmentItemInput<E extends WidgetTypeTuple>(item: AssessmentItemInput<E>, logger: logger.Logger): void {
+export function validateAssessmentItemInput<E extends WidgetTypeTuple>(
+	item: AssessmentItemInput<E>,
+	logger: logger.Logger
+): void {
 	// Require at least one response declaration to avoid generating empty response-processing blocks
 	if (!item.responseDeclarations || item.responseDeclarations.length === 0) {
 		logger.error("no response declarations present", {
@@ -446,7 +460,9 @@ export function validateAssessmentItemInput<E extends WidgetTypeTuple>(item: Ass
 function validateFeedbackPlan<E extends WidgetTypeTuple>(item: AssessmentItemInput<E>, logger: logger.Logger): void {
 	const { feedbackPlan, responseDeclarations, interactions, feedbackBlocks } = item
 	const declMap = new Map(responseDeclarations.map((d: ResponseDeclaration) => [d.identifier, d]))
-	const interactionMap = new Map(Object.values(interactions ?? {}).map((i: AnyInteraction<E>) => [i.responseIdentifier, i]))
+	const interactionMap = new Map(
+		Object.values(interactions ?? {}).map((i: AnyInteraction<E>) => [i.responseIdentifier, i])
+	)
 
 	// Check for duplicate responseIdentifiers across interactions FIRST (before feedbackPlan validation)
 	const responseIdOwners = new Map<string, string>()
@@ -584,7 +600,10 @@ function validateFeedbackPlan<E extends WidgetTypeTuple>(item: AssessmentItemInp
 		}
 
 		const derivedId = deriveComboIdentifier(
-			combination.path.map((seg: FeedbackPlan["combinations"][number]["path"][number]) => `${normalizeIdPart(seg.responseIdentifier)}_${normalizeIdPart(seg.key)}`)
+			combination.path.map(
+				(seg: FeedbackPlan["combinations"][number]["path"][number]) =>
+					`${normalizeIdPart(seg.responseIdentifier)}_${normalizeIdPart(seg.key)}`
+			)
 		)
 		if (derivedId !== combination.id) {
 			logger.error("combination id does not match derived identifier", {

@@ -1,12 +1,12 @@
+import { type AssessmentItemInput, createDynamicAssessmentItemSchema } from "@core/item"
+import { toJSONSchemaPromptSafe } from "@core/json-schema"
 import * as errors from "@superbuilders/errors"
 import type * as logger from "@superbuilders/slog"
+import type { WidgetCollection, WidgetTypeTuple } from "@widgets/collections/types"
+import { allWidgetSchemas, type Widget, WidgetSchema } from "@widgets/registry"
 import type OpenAI from "openai"
 import type { ChatCompletion, ChatCompletionCreateParamsNonStreaming } from "openai/resources/chat/completions"
 import { z } from "zod"
-import { type AssessmentItemInput, createDynamicAssessmentItemSchema } from "@core/item"
-import type { WidgetCollection, WidgetTypeTuple } from "@widgets/collections/types"
-import { allWidgetSchemas, type Widget, WidgetSchema } from "@widgets/registry"
-import { toJSONSchemaPromptSafe } from "@core/json-schema"
 import { transformArraysToObjects, transformObjectsToArrays } from "./utils/shape-helpers"
 import { generateZodSchemaFromObject } from "./utils/zod-runtime-generator"
 
@@ -18,7 +18,10 @@ const OPENAI_MODEL = "gpt-5"
  * dynamically generated schema based on the source item. It explicitly lacks
  * `widgets` and `identifier`.
  */
-export type ContentPlan<E extends WidgetTypeTuple = WidgetTypeTuple> = Omit<AssessmentItemInput<E>, "widgets" | "identifier">
+export type ContentPlan<E extends WidgetTypeTuple = WidgetTypeTuple> = Omit<
+	AssessmentItemInput<E>,
+	"widgets" | "identifier"
+>
 
 // Simple type guards for runtime narrowing
 function isRecord(value: unknown): value is Record<string, unknown> {

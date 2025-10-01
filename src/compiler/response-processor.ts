@@ -1,11 +1,13 @@
+import type { FeedbackDimension, FeedbackPlan } from "@core/feedback"
+import type { AssessmentItem } from "@core/item"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import { escapeXmlAttribute } from "./utils/xml-utils"
 import type { WidgetTypeTuple } from "../widgets/collections/types"
-import type { AssessmentItem } from "@core/item"
-import type { FeedbackDimension, FeedbackPlan } from "@core/feedback"
+import { escapeXmlAttribute } from "./utils/xml-utils"
 
-export function compileResponseDeclarations<E extends WidgetTypeTuple>(decls: AssessmentItem<E>["responseDeclarations"]): string {
+export function compileResponseDeclarations<E extends WidgetTypeTuple>(
+	decls: AssessmentItem<E>["responseDeclarations"]
+): string {
 	return decls
 		.map((decl): string => {
 			// Handle directedPair base type separately
@@ -91,7 +93,7 @@ export function compileResponseDeclarations<E extends WidgetTypeTuple>(decls: As
 				decl.cardinality === "single" &&
 				(decl.baseType === "string" || decl.baseType === "integer" || decl.baseType === "float")
 			if (isSingleResponse) {
-				 const mappingXml = correctValues
+				const mappingXml = correctValues
 					.map((v: unknown): string => {
 						const key = typeof v === "string" || typeof v === "number" ? String(v) : ""
 						return `\n            <qti-map-entry map-key="${escapeXmlAttribute(key)}" mapped-value="1"/>`
@@ -110,12 +112,15 @@ export function compileResponseDeclarations<E extends WidgetTypeTuple>(decls: As
 function generateComboModeProcessing<E extends WidgetTypeTuple>(item: AssessmentItem<E>): string {
 	const { dimensions, combinations } = item.feedbackPlan
 
-	function buildConditionTree(dims: FeedbackDimension[], pathSegments: Array<{ responseIdentifier: string; key: string }>): string {
+	function buildConditionTree(
+		dims: FeedbackDimension[],
+		pathSegments: Array<{ responseIdentifier: string; key: string }>
+	): string {
 		if (dims.length === 0) {
 			const matchingCombo = combinations.find((combo: FeedbackPlan["combinations"][number]): boolean => {
 				if (combo.path.length !== pathSegments.length) return false
-					return combo.path.every(
-						(seg: FeedbackPlan["combinations"][number]["path"][number], i: number): boolean =>
+				return combo.path.every(
+					(seg: FeedbackPlan["combinations"][number]["path"][number], i: number): boolean =>
 						seg.responseIdentifier === pathSegments[i].responseIdentifier && seg.key === pathSegments[i].key
 				)
 			})

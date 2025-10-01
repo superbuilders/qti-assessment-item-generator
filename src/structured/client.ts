@@ -1,27 +1,31 @@
+import type { BlockContent, InlineContent } from "@core/content"
+import type { AssessmentItemInput, ResponseDeclaration } from "@core/item"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
+import type { WidgetCollection, WidgetTypeTuple } from "@widgets/collections/types"
+import { allWidgetSchemas, type Widget, WidgetSchema } from "@widgets/registry"
 import type OpenAI from "openai"
 import type { ChatCompletion, ChatCompletionCreateParamsNonStreaming } from "openai/resources/chat/completions"
 import { z } from "zod"
-import type { AssessmentItemInput, ResponseDeclaration } from "@core/item"
-import type { BlockContent, InlineContent } from "@core/content"
-import type { WidgetCollection, WidgetTypeTuple } from "@widgets/collections/types"
-import { allWidgetSchemas, type Widget, WidgetSchema } from "@widgets/registry"
 
 function isWidgetTypeKey(v: string): v is keyof typeof allWidgetSchemas {
 	return v in allWidgetSchemas
 }
 
-import { collectWidgetRefs } from "./utils/collector"
-import { buildFeedbackPlanFromInteractions, validateNestedFeedback, convertNestedFeedbackToBlocks } from "@core/feedback"
+import {
+	buildFeedbackPlanFromInteractions,
+	convertNestedFeedbackToBlocks,
+	validateNestedFeedback
+} from "@core/feedback"
+import { createAnyInteractionSchema } from "@core/interactions"
+import { createAssessmentItemShellSchema } from "@core/item"
 import { toJSONSchemaPromptSafe } from "@core/json-schema"
 import { createFeedbackPrompt } from "./prompts/feedback"
 import { createInteractionContentPrompt } from "./prompts/interactions"
 import { createAssessmentShellPrompt } from "./prompts/shell"
 import { createWidgetContentPrompt } from "./prompts/widgets"
-import { createAssessmentItemShellSchema } from "@core/item"
-import { createAnyInteractionSchema } from "@core/interactions"
 import type { AiContextEnvelope, ImageContext } from "./types"
+import { collectWidgetRefs } from "./utils/collector"
 
 const OPENAI_MODEL = "gpt-5"
 const MAX_IMAGES_PER_REQUEST = 500
@@ -256,13 +260,13 @@ async function generateInteractionContent<const E extends WidgetTypeTuple>(
 			{ role: "user", content: messageContent }
 		],
 		response_format: {
-				type: "json_schema",
-				json_schema: {
-					name: "interaction_content_generator",
-					schema: jsonSchema as Record<string, unknown>,
-					strict: true
-				}
-			},
+			type: "json_schema",
+			json_schema: {
+				name: "interaction_content_generator",
+				schema: jsonSchema as Record<string, unknown>,
+				strict: true
+			}
+		},
 		stream: false
 	}
 	const response = await errors.try(openai.chat.completions.create(params))
@@ -362,13 +366,11 @@ export async function generateFromEnvelope<const E extends WidgetTypeTuple>(
 	})
 
 	// Shot 3 - Generate feedback
-	const { systemInstruction: feedbackSystem, userContent: feedbackUser, FeedbackSchema } = createFeedbackPrompt(
-		envelope,
-		assessmentShell,
-		feedbackPlan,
-		imageContext,
-		widgetCollection
-	)
+	const {
+		systemInstruction: feedbackSystem,
+		userContent: feedbackUser,
+		FeedbackSchema
+	} = createFeedbackPrompt(envelope, assessmentShell, feedbackPlan, imageContext, widgetCollection)
 
 	const feedbackJsonSchema = toJSONSchemaPromptSafe(FeedbackSchema)
 	logger.debug("generated json schema for openai", {
@@ -412,7 +414,11 @@ export async function generateFromEnvelope<const E extends WidgetTypeTuple>(
 		throw errors.wrap(feedbackParseResult.error, "json parse")
 	}
 
-	const validatedNestedFeedback = validateNestedFeedback(feedbackParseResult.data, feedbackPlan, widgetCollection.widgetTypeKeys)
+	const validatedNestedFeedback = validateNestedFeedback(
+		feedbackParseResult.data,
+		feedbackPlan,
+		widgetCollection.widgetTypeKeys
+	)
 	const feedbackBlocks = convertNestedFeedbackToBlocks(validatedNestedFeedback, feedbackPlan)
 	logger.debug("shot 3 complete", { feedbackBlockCount: Object.keys(feedbackBlocks).length })
 
@@ -461,13 +467,13 @@ export async function generateFromEnvelope<const E extends WidgetTypeTuple>(
 				{ role: "user", content: widgetPrompt.userContent }
 			],
 			response_format: {
-					type: "json_schema",
-					json_schema: {
-						name: "widget_content_generator",
-						schema: widgetJsonSchema as Record<string, unknown>,
-						strict: true
-					}
-				},
+				type: "json_schema",
+				json_schema: {
+					name: "widget_content_generator",
+					schema: widgetJsonSchema as Record<string, unknown>,
+					strict: true
+				}
+			},
 			stream: false
 		}
 		const widgetsResponse = await errors.try(openai.chat.completions.create(widgetParams))

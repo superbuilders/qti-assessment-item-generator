@@ -1,6 +1,7 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
+import type { WidgetGenerator } from "../types"
 import { CanvasImpl } from "../utils/canvas-impl"
 import { PADDING } from "../utils/constants"
 import { CSS_COLOR_PATTERN } from "../utils/css-color"
@@ -9,7 +10,6 @@ import { calculateXAxisLayout, selectAxisLabels } from "../utils/layout"
 import { createHeightSchema, createWidthSchema } from "../utils/schemas"
 import { theme } from "../utils/theme"
 import { buildTicks } from "../utils/ticks"
-import type { WidgetGenerator } from "../types"
 
 export const ErrInvalidDimensions = errors.new("invalid chart dimensions or axis range")
 

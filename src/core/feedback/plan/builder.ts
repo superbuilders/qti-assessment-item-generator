@@ -1,9 +1,9 @@
-import * as logger from "@superbuilders/slog"
-import { deriveComboIdentifier, normalizeIdPart } from "../utils"
 import type { AnyInteraction } from "@core/interactions"
-import type { FeedbackPlan } from "./types"
 import type { ResponseDeclaration } from "@core/item"
+import * as logger from "@superbuilders/slog"
 import type { WidgetTypeTuple } from "@widgets/collections/types"
+import { deriveComboIdentifier, normalizeIdPart } from "../utils"
+import type { FeedbackPlan } from "./types"
 
 /**
  * Derives an explicit FeedbackPlan from interactions and responseDeclarations.
@@ -14,17 +14,15 @@ export function buildFeedbackPlanFromInteractions<E extends WidgetTypeTuple>(
 	interactions: Record<string, AnyInteraction<E>>,
 	responseDeclarations: ResponseDeclaration[]
 ): FeedbackPlan {
-    const sortedInteractions: Array<AnyInteraction<E>> = Object.values(interactions).sort((a, b) => {
+	const sortedInteractions: Array<AnyInteraction<E>> = Object.values(interactions).sort((a, b) => {
 		if (a.responseIdentifier < b.responseIdentifier) return -1
 		if (a.responseIdentifier > b.responseIdentifier) return 1
 		return 0
 	})
 
-    const declMap: Map<string, ResponseDeclaration> = new Map(
-        responseDeclarations.map((d) => [d.identifier, d])
-    )
+	const declMap: Map<string, ResponseDeclaration> = new Map(responseDeclarations.map((d) => [d.identifier, d]))
 
-    const dimensions: FeedbackPlan["dimensions"] = []
+	const dimensions: FeedbackPlan["dimensions"] = []
 	for (const interaction of sortedInteractions) {
 		const decl = declMap.get(interaction.responseIdentifier)
 		if (!decl) continue
@@ -45,7 +43,7 @@ export function buildFeedbackPlanFromInteractions<E extends WidgetTypeTuple>(
 		})
 	}
 
-    const combinationCount = dimensions.reduce<number>(
+	const combinationCount = dimensions.reduce<number>(
 		(acc, dim) => acc * (dim.kind === "enumerated" ? dim.keys.length : 2),
 		1
 	)
@@ -53,17 +51,14 @@ export function buildFeedbackPlanFromInteractions<E extends WidgetTypeTuple>(
 
 	logger.info("built feedback plan", { mode, combinationCount, dimensionCount: dimensions.length })
 
-    const combinations: FeedbackPlan["combinations"] = []
+	const combinations: FeedbackPlan["combinations"] = []
 
 	if (mode === "fallback") {
-		combinations.push(
-			{ id: "CORRECT", path: [] },
-			{ id: "INCORRECT", path: [] }
-		)
+		combinations.push({ id: "CORRECT", path: [] }, { id: "INCORRECT", path: [] })
 	} else {
-        let paths: Array<Array<{ responseIdentifier: string; key: string }>> = [[]]
+		let paths: Array<Array<{ responseIdentifier: string; key: string }>> = [[]]
 		for (const dim of dimensions) {
-            const newPaths: Array<Array<{ responseIdentifier: string; key: string }>> = []
+			const newPaths: Array<Array<{ responseIdentifier: string; key: string }>> = []
 			const keys = dim.kind === "enumerated" ? dim.keys : ["CORRECT", "INCORRECT"]
 			for (const path of paths) {
 				for (const key of keys) {

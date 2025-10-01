@@ -1,11 +1,11 @@
 import { z } from "zod"
+import type { WidgetGenerator } from "../types"
 import { CanvasImpl } from "../utils/canvas-impl"
 import { AXIS_VIEWBOX_PADDING } from "../utils/constants"
 import { setupCoordinatePlaneBaseV2 } from "../utils/coordinate-plane-utils"
 import { CSS_COLOR_PATTERN } from "../utils/css-color"
 import { createHeightSchema, createWidthSchema } from "../utils/schemas"
 import { theme } from "../utils/theme"
-import type { WidgetGenerator } from "../types"
 
 // Factory functions to avoid schema instance reuse which causes $ref in JSON Schema
 function createPointSchema() {

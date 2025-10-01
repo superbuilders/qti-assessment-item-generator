@@ -1,7 +1,7 @@
-import type { AssessmentItemShell } from "@core/item"
 import type { FeedbackPlan } from "@core/feedback"
-import type { WidgetCollection, WidgetTypeTuple } from "@widgets/collections/types"
 import { createNestedFeedbackZodSchema } from "@core/feedback"
+import type { AssessmentItemShell } from "@core/item"
+import type { WidgetCollection, WidgetTypeTuple } from "@widgets/collections/types"
 import type { AiContextEnvelope, ImageContext } from "../types"
 import { createWidgetSelectionPromptSection, formatUnifiedContextSections } from "./shared"
 

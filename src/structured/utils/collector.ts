@@ -1,8 +1,8 @@
-import * as errors from "@superbuilders/errors"
-import * as logger from "@superbuilders/slog"
 import type { BlockContent, InlineContent } from "@core/content"
 import type { AnyInteraction } from "@core/interactions"
-import { WidgetTypeTuple } from "../../widgets/collections/types"
+import * as errors from "@superbuilders/errors"
+import * as logger from "@superbuilders/slog"
+import type { WidgetTypeTuple } from "../../widgets/collections/types"
 
 function walkInline<E extends WidgetTypeTuple>(inline: InlineContent<E> | null, out: Map<string, string>): void {
 	if (!inline) return
@@ -68,7 +68,10 @@ function walkBlock<E extends WidgetTypeTuple>(blocks: BlockContent<E> | null, ou
 	}
 }
 
-function walkInteractions<E extends WidgetTypeTuple>(interactions: Record<string, AnyInteraction<E>> | null, out: Map<string, string>): void {
+function walkInteractions<E extends WidgetTypeTuple>(
+	interactions: Record<string, AnyInteraction<E>> | null,
+	out: Map<string, string>
+): void {
 	if (!interactions) return
 	for (const interaction of Object.values(interactions)) {
 		switch (interaction.type) {

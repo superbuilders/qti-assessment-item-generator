@@ -1,8 +1,8 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
-import { theme } from "../utils/theme"
 import type { WidgetGenerator } from "../types"
+import { theme } from "../utils/theme"
 
 // Factory function to create subtraction with regrouping schema - avoids $ref in OpenAI JSON schema
 function createSubtractionWithRegroupingPropsSchema() {

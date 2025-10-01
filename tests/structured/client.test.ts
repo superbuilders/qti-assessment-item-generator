@@ -93,31 +93,31 @@ mock.module("openai", () => {
 							]
 						}
 					}
-				if (functionName === "feedback_generator") {
-					const feedbackData = {
-						feedback: {
-							FEEDBACK__OVERALL: {
-								RESPONSE: {
-									CORRECT: {
-										content: [
-											{
-												type: "paragraph",
-												content: [{ type: "text", content: "Correct! Well done." }]
-											}
-										]
-									},
-									INCORRECT: {
-										content: [
-											{
-												type: "paragraph",
-												content: [{ type: "text", content: "Not quite. Try again." }]
-											}
-										]
+					if (functionName === "feedback_generator") {
+						const feedbackData = {
+							feedback: {
+								FEEDBACK__OVERALL: {
+									RESPONSE: {
+										CORRECT: {
+											content: [
+												{
+													type: "paragraph",
+													content: [{ type: "text", content: "Correct! Well done." }]
+												}
+											]
+										},
+										INCORRECT: {
+											content: [
+												{
+													type: "paragraph",
+													content: [{ type: "text", content: "Not quite. Try again." }]
+												}
+											]
+										}
 									}
 								}
 							}
 						}
-					}
 						return {
 							choices: [
 								{

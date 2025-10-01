@@ -1,18 +1,18 @@
+import type { BlockContent, BlockContentItem, InlineContent } from "@core/content"
+import type { FeedbackPlan } from "@core/feedback"
+import type { AssessmentItem, AssessmentItemInput } from "@core/item"
+import { createDynamicAssessmentItemSchema } from "@core/item"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { ErrUnsupportedInteraction } from "../structured/client"
-import { escapeXmlAttribute } from "./utils/xml-utils"
 import type { WidgetCollection, WidgetTypeTuple } from "../widgets/collections/types"
 import { typedSchemas } from "../widgets/registry"
 import { generateWidget } from "../widgets/widget-generator"
 import { renderBlockContent } from "./content-renderer"
-import { encodeDataUri } from "./utils/helpers"
 import { compileInteraction } from "./interaction-compiler"
 import { validateAssessmentItemInput } from "./pre-validator"
 import { compileResponseDeclarations, compileResponseProcessing } from "./response-processor"
-import type { AssessmentItem, AssessmentItemInput } from "@core/item"
-import type { BlockContent, BlockContentItem, InlineContent } from "@core/content"
-import { createDynamicAssessmentItemSchema } from "@core/item"
+import { encodeDataUri } from "./utils/helpers"
 import {
 	convertHtmlEntities,
 	fixInequalityOperators,
@@ -20,7 +20,7 @@ import {
 	removeDoubleNewlines,
 	stripXmlComments
 } from "./utils/xml-fixes"
-import { FeedbackPlan } from "@core/feedback"
+import { escapeXmlAttribute } from "./utils/xml-utils"
 
 export const ErrDuplicateResponseIdentifier = errors.new("duplicate response identifier")
 export const ErrDuplicateChoiceIdentifier = errors.new("duplicate choice identifiers")
@@ -214,7 +214,9 @@ function dedupePromptTextFromBody<E extends WidgetTypeTuple>(item: AssessmentIte
 	const body = item.body
 
 	// Precompute normalized strings for all paragraph blocks
-	const paragraphNorms: string[] = body.map((b: BlockContentItem<E>) => (b.type === "paragraph" ? normalizeInline(b.content) : ""))
+	const paragraphNorms: string[] = body.map((b: BlockContentItem<E>) =>
+		b.type === "paragraph" ? normalizeInline(b.content) : ""
+	)
 
 	// Identify all indices in the body which are interaction refs we care about
 	const slotIndices: Array<{ index: number; interactionId: string }> = []
@@ -621,7 +623,10 @@ export async function compile<const E extends WidgetTypeTuple>(
 	}
 
 	// Use the collection's widgetTypeKeys tuple for validation
-	const { AssessmentItemSchema } = createDynamicAssessmentItemSchema(validatedWidgetMapping, widgetCollection.widgetTypeKeys)
+	const { AssessmentItemSchema } = createDynamicAssessmentItemSchema(
+		validatedWidgetMapping,
+		widgetCollection.widgetTypeKeys
+	)
 	const itemResult = AssessmentItemSchema.safeParse(itemData)
 	if (!itemResult.success) {
 		logger.error("schema enforcement failed", { error: itemResult.error })
@@ -660,7 +665,7 @@ export async function compile<const E extends WidgetTypeTuple>(
 	// enforceNoCaretsInChoiceInteraction(enforcedItem)
 	// enforceNoPipesInInlineChoiceInteraction(enforcedItem)
 	// enforceNoCaretsInInlineChoiceInteraction(enforcedItem)
-	
+
 	// Enforce identifier-only matching; no ad-hoc rewriting
 	// This function now includes checks for duplicate responseIdentifiers and choice Identifiers,
 	// Note: dataTable validation has been removed.

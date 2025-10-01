@@ -167,7 +167,9 @@ async function main() {
 	logger.info("generating variations", { count: numVariations })
 
 	// Run differentiation
-	const result = await errors.try(differentiateAssessmentItem(openai, logger, sourceItem, numVariations, allWidgetsCollection))
+	const result = await errors.try(
+		differentiateAssessmentItem(openai, logger, sourceItem, numVariations, allWidgetsCollection)
+	)
 
 	if (result.error) {
 		logger.error("differentiation failed", { error: result.error })

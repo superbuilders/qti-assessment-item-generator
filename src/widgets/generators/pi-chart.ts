@@ -1,4 +1,5 @@
 import { z } from "zod"
+import type { WidgetGenerator } from "../types"
 import { CanvasImpl } from "../utils/canvas-impl"
 import { drawChartTitle } from "../utils/chart-layout-utils"
 import { PADDING } from "../utils/constants"
@@ -7,7 +8,6 @@ import { abbreviateMonth } from "../utils/labels"
 import { Path2D } from "../utils/path-builder"
 import { createHeightSchema, createWidthSchema } from "../utils/schemas"
 import { theme } from "../utils/theme"
-import type { WidgetGenerator } from "../types"
 
 // Defines a single slice within a pie chart.
 const SliceSchema = z

@@ -1,6 +1,6 @@
 import { z } from "zod"
-import { theme } from "../utils/theme"
 import type { WidgetGenerator } from "../types"
+import { theme } from "../utils/theme"
 
 const Key = z
 	.object({

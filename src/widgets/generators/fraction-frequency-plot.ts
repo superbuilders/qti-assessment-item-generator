@@ -1,9 +1,9 @@
 import { z } from "zod"
+import type { WidgetGenerator } from "../types"
 import { CanvasImpl } from "../utils/canvas-impl"
 import { PADDING } from "../utils/constants"
 import { createHeightSchema, createWidthSchema } from "../utils/schemas"
 import { theme } from "../utils/theme"
-import type { WidgetGenerator } from "../types"
 
 // Discriminated union for label values: whole number, simple fraction, or mixed number
 const FractionLabelSchema = z.discriminatedUnion("type", [
