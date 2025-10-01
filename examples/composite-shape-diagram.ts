@@ -14,6 +14,8 @@ export const compositeShapeExample: CompositeShapeDiagramProps = {
 	type: "compositeShapeDiagram",
 	width: 500,
 	height: 340,
+	shapes: null,
+	fit: null,
 	vertices: [
 		{ x: 28.829, y: 2.883, id: "T" },
 		{ x: 28.829, y: 118.198, id: "L" },
@@ -138,6 +140,8 @@ export const circleWithRectangleExample: CompositeShapeDiagramProps = {
 	type: "compositeShapeDiagram",
 	width: 400,
 	height: 400,
+	shapes: null,
+	fit: null,
 	vertices: [
 		// Center and rectangle vertices
 		{ x: 0, y: 0, id: "O" },

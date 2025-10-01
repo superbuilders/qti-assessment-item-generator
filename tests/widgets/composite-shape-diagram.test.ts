@@ -44,6 +44,8 @@ describe("Widget: composite-shape-diagram", () => {
 			type: "compositeShapeDiagram",
 			width: 300,
 			height: 300,
+			shapes: null,
+			fit: null,
 			vertices: [
 				{ x: 130, y: 130, id: "center" },
 				{ x: 250, y: 130, id: "p0" },
@@ -149,6 +151,8 @@ describe("Widget: composite-shape-diagram", () => {
 			type: "compositeShapeDiagram",
 			width: 400,
 			height: 400,
+			shapes: null,
+			fit: null,
 			vertices: [
 				{ x: 0, y: 0, id: "O" },
 				{ x: -20, y: -30, id: "R1" },
@@ -262,6 +266,8 @@ describe("Widget: composite-shape-diagram", () => {
 			type: "compositeShapeDiagram",
 			width: 300,
 			height: 300,
+			shapes: null,
+			fit: null,
 			vertices: [
 				{ x: 260, y: 140, id: "C0" },
 				{ x: 243.923, y: 80, id: "C1" },
@@ -326,6 +332,8 @@ describe("Widget: composite-shape-diagram", () => {
 			type: "compositeShapeDiagram",
 			width: 300,
 			height: 300,
+			shapes: null,
+			fit: null,
 			vertices: [
 				{ x: 100, y: 100, id: "O" },
 				{ x: 70, y: 80, id: "R1" },
@@ -388,6 +396,8 @@ describe("Widget: composite-shape-diagram", () => {
 			type: "compositeShapeDiagram",
 			width: 400,
 			height: 320,
+			shapes: null,
+			fit: null,
 			vertices: [
 				{ x: 0, y: 0, id: "top" },
 				{ x: -6, y: 10, id: "left" },
@@ -427,6 +437,8 @@ describe("Widget: composite-shape-diagram", () => {
 			type: "compositeShapeDiagram",
 			width: 500,
 			height: 340,
+			shapes: null,
+			fit: null,
 			vertices: [
 				{ x: 28.829, y: 2.883, id: "T" },
 				{ x: 28.829, y: 118.198, id: "L" },
@@ -482,6 +494,8 @@ describe("Widget: composite-shape-diagram", () => {
 			type: "compositeShapeDiagram",
 			width: 480,
 			height: 360,
+			shapes: null,
+			fit: null,
 			vertices: [
 				{ x: 0, y: 9, id: "A" },
 				{ x: 9, y: 9, id: "B" },
@@ -519,6 +533,8 @@ describe("Widget: composite-shape-diagram", () => {
 			type: "compositeShapeDiagram",
 			width: 480,
 			height: 360,
+			shapes: null,
+			fit: null,
 			vertices: [
 				{ x: 0, y: 0, id: "A_topLeft" },
 				{ x: 9, y: 0, id: "B_topRight" },
@@ -588,6 +604,8 @@ describe("Widget: composite-shape-diagram", () => {
 			type: "compositeShapeDiagram",
 			width: 320,
 			height: 300,
+			shapes: null,
+			fit: null,
 			vertices: [
 				{ x: 1.975, y: 160, id: "A_leftBase" },
 				{ x: 160, y: 1.975, id: "B_apex" },
