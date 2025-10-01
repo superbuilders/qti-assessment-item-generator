@@ -90,8 +90,8 @@ function ensureEmptyProperties(node: unknown): void {
  */
 export function toJSONSchemaPromptSafe(schema: z.ZodType): BaseSchema {
 	// Define options with a self-referential override to unwrap transforms recursively
-	const options: Parameters<typeof z.toJSONSchema>[1] = {
-		target: "openapi-3.0",
+    const options: Parameters<typeof z.toJSONSchema>[1] = {
+        target: "draft-2020-12",
 		unrepresentable: "any",
 		override: (ctx) => {
 			const def = ctx?.zodSchema?._zod?.def
