@@ -44,10 +44,9 @@ export const GeometricPrimitiveDiagramPropsSchema = z
 						type: z.literal("segment").describe("A line segment with two defined endpoints."),
 						pointOne: createPointDefinitionSchema().describe("The starting point of the segment."),
 						pointTwo: createPointDefinitionSchema().describe("The ending point of the segment."),
-						rotation: z
-							.number()
-							.default(0)
-							.describe("The rotation of the segment in degrees. 0 is horizontal, 90 is vertical."),
+					rotation: z
+						.number()
+						.describe("The rotation of the segment in degrees. 0 is horizontal, 90 is vertical."),
 						length: z
 							.number()
 							.positive()
@@ -60,10 +59,9 @@ export const GeometricPrimitiveDiagramPropsSchema = z
 						type: z.literal("ray").describe("A ray starting at one point and extending through another."),
 						pointOne: createPointDefinitionSchema().describe("The starting point (endpoint) of the ray."),
 						pointTwo: createPointDefinitionSchema().describe("A second point that defines the direction of the ray."),
-						rotation: z
-							.number()
-							.default(0)
-							.describe("The rotation of the ray in degrees. 0 is horizontal, 90 is vertical."),
+					rotation: z
+						.number()
+						.describe("The rotation of the ray in degrees. 0 is horizontal, 90 is vertical."),
 						length: z
 							.number()
 							.positive()
@@ -80,7 +78,7 @@ export const GeometricPrimitiveDiagramPropsSchema = z
 							.describe("An infinite line passing through two points, with arrowheads on both ends."),
 						pointOne: createPointDefinitionSchema().describe("A first point that the line passes through."),
 						pointTwo: createPointDefinitionSchema().describe("A second point that the line passes through."),
-						rotation: z.number().default(0).describe("The rotation of the line in degrees."),
+						rotation: z.number().describe("The rotation of the line in degrees."),
 						length: z
 							.number()
 							.positive()
@@ -95,7 +93,7 @@ export const GeometricPrimitiveDiagramPropsSchema = z
 						type: z.literal("arc").describe("A curved arc segment."),
 						pointOne: createPointDefinitionSchema().describe("The starting point of the arc."),
 						pointTwo: createPointDefinitionSchema().describe("The ending point of the arc."),
-						rotation: z.number().default(0).describe("The rotation of the baseline of the arc in degrees."),
+						rotation: z.number().describe("The rotation of the baseline of the arc in degrees."),
 						length: z
 							.number()
 							.positive()
@@ -103,7 +101,6 @@ export const GeometricPrimitiveDiagramPropsSchema = z
 							.describe("The distance in pixels between the arc's endpoints. Defaults to 60% of canvas width."),
 						bulge: z
 							.number()
-							.default(0.5)
 							.describe(
 								"Controls the curvature. 0 is a straight line, positive values bow 'up', negative values bow 'down' relative to the rotation."
 							)

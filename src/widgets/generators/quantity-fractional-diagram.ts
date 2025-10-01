@@ -36,7 +36,7 @@ export const QuantityFractionalDiagramPropsSchema = z
 						.int()
 						.gte(3)
 						.describe("Number of sides for the regular polygon (e.g., 3 for triangle, 8 for octagon)."),
-					rotation: z.number().default(0).describe("Rotation angle in degrees to orient the polygon.")
+					rotation: z.number().describe("Rotation angle in degrees to orient the polygon.")
 				})
 			])
 			.describe("The geometric shape used for all models in the diagram."),

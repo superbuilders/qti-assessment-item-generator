@@ -68,11 +68,10 @@ const LineSchema = z
 			.describe("The ID of the vertex that defines the line's end point or direction."),
 		isRay: z
 			.boolean()
-			.default(false)
 			.describe(
 				"If true, the line starts at 'from' and extends infinitely in the direction of 'to'. If false, it is a finite segment connecting the two vertices."
 			),
-		style: z.enum(["solid", "dashed"]).default("solid").describe("The visual style of the line for rendering."),
+		style: z.enum(["solid", "dashed"]).describe("The visual style of the line for rendering."),
 		label: LabelSchema.describe("An optional structured label for the line, typically used to display its length.")
 	})
 	.strict()
@@ -82,7 +81,6 @@ const AngleVisualizationSchema = z
 	.object({
 		type: z
 			.enum(["arc", "right", "none"])
-			.default("arc")
 			.describe(
 				"The visual style for the angle marker: 'arc' for a curved line, 'right' for a square symbol (for 90° angles), or 'none' for no visual marker."
 			),
@@ -97,19 +95,16 @@ const AngleVisualizationSchema = z
 			.describe("The CSS color for the angle marker (arc or square) and its accompanying label."),
 		xAxisRotation: z
 			.number()
-			.default(0)
 			.describe(
 				"For 'arc' type, the rotation of the arc's ellipse in degrees. Typically 0 for a standard circular arc."
 			),
 		largeArcFlag: z
 			.literal(0)
 			.or(z.literal(1))
-			.default(0)
 			.describe("The SVG large-arc-flag: 0 for angles less than 180°, 1 for angles greater than 180°."),
 		sweepFlag: z
 			.literal(0)
 			.or(z.literal(1))
-			.default(1)
 			.describe(
 				"The SVG sweep-flag: 1 for clockwise direction (positive angle), 0 for counter-clockwise (negative angle)."
 			),
@@ -119,7 +114,6 @@ const AngleVisualizationSchema = z
 			.describe("The text label to display near the angle marker (e.g., '108°', 'θ'). If null, no label is rendered."),
 		labelPositionHint: z
 			.enum(["auto", "outside", "inside"])
-			.default("auto")
 			.describe(
 				"A hint for the renderer to place the label 'inside' or 'outside' the angle's polygon, or to decide automatically."
 			)
@@ -267,22 +261,20 @@ const ConstraintSchema = z
 					.array(z.string().regex(vertexIdRegex))
 					.min(3)
 					.describe("An ordered array of vertex IDs that form the vertices of the polygon."),
-				isRegular: z
-					.boolean()
-					.default(true)
-					.describe(
-						"If true, the solver will automatically generate the necessary 'equalLength' and 'equalAngle' sub-constraints to form a regular polygon."
-					),
+		isRegular: z
+			.boolean()
+			.describe(
+				"If true, the solver will automatically generate the necessary 'equalLength' and 'equalAngle' sub-constraints to form a regular polygon."
+			),
 				sideLength: z
 					.number()
 					.nullable()
 					.describe(
 						"An optional numeric value for the side length. If provided, all sides of the polygon will be set to this length."
 					),
-				closed: z
-					.boolean()
-					.default(true)
-					.describe("If true, the last vertex is connected to the first to form a closed shape.")
+		closed: z
+			.boolean()
+			.describe("If true, the last vertex is connected to the first to form a closed shape.")
 			})
 			.strict()
 			.describe(
@@ -303,12 +295,7 @@ const ShadedRegionSchema = z
 			.string()
 			.regex(CSS_COLOR_PATTERN)
 			.describe("The CSS fill color for the shaded area (e.g., '#FFE5CC', '#RRGGBBAA' for transparency)."),
-		opacity: z
-			.number()
-			.min(0)
-			.max(1)
-			.default(1)
-			.describe("The opacity of the fill color, from 0 (transparent) to 1 (opaque).")
+		// Opacity is not exposed; encode via alpha in fillColor (e.g., #RRGGBBAA)
 	})
 	.strict()
 	.describe("Defines a shaded polygonal area, specified by a sequence of vertices.")
@@ -1016,8 +1003,7 @@ export const generateConstraintGeometryDiagram = async (
 			const points = region.vertices.map((vid) => solvedPositions.get(vid)).filter((p): p is Point => !!p)
 			if (points.length >= 3)
 				canvas.drawPolygon(points, {
-					fill: region.fillColor,
-					fillOpacity: region.opacity
+					fill: region.fillColor
 				})
 		}
 	}

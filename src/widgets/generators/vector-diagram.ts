@@ -26,11 +26,7 @@ function createVectorSchema() {
 			color: z
 				.string()
 				.regex(CSS_COLOR_PATTERN, "invalid css color")
-				.default("#0066cc")
-				.describe("Color of the vector line and arrow"),
-			strokeWidth: z.number().positive().default(2).describe("Width of the vector line in pixels"),
-			showArrow: z.boolean().default(true).describe("Whether to show an arrowhead at the end of the vector"),
-			arrowSize: z.number().positive().default(8).describe("Size of the arrowhead in pixels")
+				.describe("Color of the vector line and arrow")
 		})
 		.strict()
 }
@@ -47,10 +43,9 @@ function createMarkerSchema() {
 				.describe("Position of the marker"),
 			shape: z
 				.enum(["circle", "square", "rightAngle"])
-				.default("circle")
 				.describe("Shape of the marker - rightAngle creates a 90-degree angle indicator"),
-			size: z.number().positive().default(6).describe("Size of the marker in pixels (or side length for rightAngle)"),
-			color: z.string().regex(CSS_COLOR_PATTERN, "invalid css color").default("#0066cc").describe("Color of the marker")
+			size: z.number().positive().describe("Size of the marker in pixels (or side length for rightAngle)"),
+			color: z.string().regex(CSS_COLOR_PATTERN, "invalid css color").describe("Color of the marker")
 		})
 		.strict()
 }
@@ -134,14 +129,19 @@ export const generateVectorDiagram: WidgetGenerator<typeof VectorDiagramPropsSch
 		}
 	}
 
+	// Standardized stroke/arrow derived from theme
+	const VECTOR_STROKE_WIDTH = theme.stroke.width.thick
+	const SHOW_ARROW = true
+	const ARROW_SIZE = VECTOR_STROKE_WIDTH * 4
+
 	// Create arrow markers for vectors
 	const arrowMarkers = new Set<string>()
 	for (const vector of vectors) {
-		if (vector.showArrow) {
+		if (SHOW_ARROW) {
 			const markerId = `arrow-${vector.id}`
 			if (!arrowMarkers.has(markerId)) {
 				canvas.addDef(
-					`<marker id="${markerId}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="${vector.arrowSize}" markerHeight="${vector.arrowSize}" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="${vector.color}"/></marker>`
+					`<marker id="${markerId}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="${ARROW_SIZE}" markerHeight="${ARROW_SIZE}" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="${vector.color}"/></marker>`
 				)
 				arrowMarkers.add(markerId)
 			}
@@ -150,11 +150,11 @@ export const generateVectorDiagram: WidgetGenerator<typeof VectorDiagramPropsSch
 
 	// Draw vectors (on top of markers)
 	for (const vector of vectors) {
-		const markerEnd = vector.showArrow ? `url(#arrow-${vector.id})` : undefined
+		const markerEnd = SHOW_ARROW ? `url(#arrow-${vector.id})` : undefined
 
 		canvas.drawLine(vector.start.x, vector.start.y, vector.end.x, vector.end.y, {
 			stroke: vector.color,
-			strokeWidth: vector.strokeWidth,
+			strokeWidth: VECTOR_STROKE_WIDTH,
 			markerEnd: markerEnd,
 			strokeLinecap: "round"
 		})

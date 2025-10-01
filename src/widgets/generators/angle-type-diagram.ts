@@ -72,7 +72,6 @@ export const AngleTypeDiagramPropsSchema = z
 			.describe("Angle classification with an explicit degree value and category-specific constraints."),
 		rotation: z
 			.number()
-			.default(0)
 			.describe(
 				"Overall rotation of the entire diagram in degrees. 0 degrees points the baseline ray to the right. Positive values rotate counter-clockwise."
 			),
@@ -90,11 +89,10 @@ export const AngleTypeDiagramPropsSchema = z
 			.describe(
 				"The labels for the three points defining the angle. Empty string and 'null'/'NULL' normalize to null."
 			),
-		showAngleArc: z.boolean().default(true).describe("Whether to show the arc indicating the angle."),
+		showAngleArc: z.boolean().describe("Whether to show the arc indicating the angle."),
 		sectorColor: z
 			.string()
 			.regex(CSS_COLOR_PATTERN, "Invalid CSS color format")
-			.default(theme.colors.highlightPrimary)
 			.describe("Color used for the angle sector fill and outline.")
 	})
 	.strict()

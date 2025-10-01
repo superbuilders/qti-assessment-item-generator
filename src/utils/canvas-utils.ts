@@ -221,7 +221,12 @@ export const createPolylineSchema = () =>
 						max: z.number().describe("Maximum x value for function evaluation.")
 					})
 					.describe("The x-range over which to evaluate and plot the function."),
-				// Resolution is an internal detail; not exposed to inputs to avoid bad values from LLMs
+				resolution: z
+					.number()
+					.int()
+					.min(10, "resolution must be at least 10 points")
+					.default(100)
+					.describe("Number of points to generate when plotting the function (default: 100)."),
 				color: z
 					.string()
 					.regex(
@@ -722,13 +727,12 @@ export function renderPolylines(
 					y: toSvgY(p.y)
 				}))
 			} else {
-				// function-based polyline: evaluate polynomial at an internal resolution
-				const { coefficients, xRange } = polyline
-				const INTERNAL_RESOLUTION = 100
-				const xStep = (xRange.max - xRange.min) / (INTERNAL_RESOLUTION - 1)
+				// function-based polyline: evaluate polynomial at resolution points
+				const { coefficients, xRange, resolution } = polyline
+				const xStep = (xRange.max - xRange.min) / (resolution - 1)
 				points = []
 
-				for (let i = 0; i < INTERNAL_RESOLUTION; i++) {
+				for (let i = 0; i < resolution; i++) {
 					const x = xRange.min + i * xStep
 					let y = 0
 					const degree = coefficients.length - 1

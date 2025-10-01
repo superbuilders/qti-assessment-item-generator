@@ -32,7 +32,7 @@ export async function generateWidget<
  * @deprecated Use generateWidget(collection, type, data) in production code.
  */
 export async function generateWidgetLegacy(widgetInput: WidgetInput): Promise<string> {
-	const widgetType = widgetInput.type as keyof typeof allWidgetsCollection.widgets & string
+	const widgetType = widgetInput.type
 	if (!hasWidget(allWidgetsCollection, widgetType)) {
 		logger.error("widget type not found in default collection", { widgetType })
 		throw errors.new("widget type not found in default collection")

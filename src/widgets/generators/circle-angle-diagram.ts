@@ -25,7 +25,6 @@ export const CircleAngleDiagramPropsSchema = z
 			.describe("The measure of the central angle in degrees, which determines the size of the shaded sector."),
 		rotation: z
 			.number()
-			.default(0)
 			.describe(
 				"The overall rotation of the angle diagram in degrees. 0 degrees orients the first ray horizontally to the right."
 			),
@@ -44,7 +43,6 @@ export const CircleAngleDiagramPropsSchema = z
 		shadeColor: z
 			.string()
 			.regex(CSS_COLOR_PATTERN, "invalid css color")
-			.default("#FFD700") // Default to gold/yellow
 			.describe("The CSS color for the shaded sector.")
 	})
 	.strict()

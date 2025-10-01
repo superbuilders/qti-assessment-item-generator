@@ -30,7 +30,6 @@ export const SymmetryDiagramPropsSchema = z
 		shapeColor: z
 			.string()
 			.regex(CSS_COLOR_PATTERN, "invalid css color")
-			.default(theme.colors.background)
 			.describe("The fill color for the shape.")
 	})
 	.strict()

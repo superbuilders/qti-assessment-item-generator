@@ -119,7 +119,6 @@ export const DivisionAreaDiagramPropsSchema = z
 		steps: z.array(createStepSchema()).describe("An array of calculation steps. Its length must match quotientParts."),
 		showFinalRemainderBox: z
 			.boolean()
-			.default(false)
 			.describe("If true, shows the final zero remainder with a box around it.")
 	})
 	.strict()

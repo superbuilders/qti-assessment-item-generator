@@ -24,7 +24,7 @@ const createBaseFractionModelSchema = () =>
 				z.object({
 					type: z.literal("polygon"),
 					sides: z.number().int().gte(3).describe("Number of sides for the regular polygon."),
-					rotation: z.number().default(0).describe("Rotation angle in degrees.")
+					rotation: z.number().describe("Rotation angle in degrees.")
 				})
 			])
 			.describe("The geometric shape and its partitioning style."),

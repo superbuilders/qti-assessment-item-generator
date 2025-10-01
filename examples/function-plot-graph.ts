@@ -163,7 +163,7 @@ export const functionPlotGraphExamples: FunctionPlotGraphProps[] = [
 				id: "polyline_cubic",
 				coefficients: [1, 0, -4, 0], // x³ - 4x
 				xRange: { min: -3, max: 3 },
-				resolution: 100,
+
 				color: "#dc2626",
 				style: "solid",
 				label: "y = x³ - 4x"
@@ -173,7 +173,7 @@ export const functionPlotGraphExamples: FunctionPlotGraphProps[] = [
 				id: "polyline_quadratic",
 				coefficients: [1, 0, 0], // x²
 				xRange: { min: -2.5, max: 2.5 },
-				resolution: 50,
+
 				color: "#2563eb",
 				style: "dashed",
 				label: "y = x²"
@@ -211,7 +211,7 @@ export const functionPlotGraphExamples: FunctionPlotGraphProps[] = [
 				id: "polyline_parabola_func",
 				coefficients: [0.5, 0, 0], // 0.5x²
 				xRange: { min: -4, max: 4 },
-				resolution: 80,
+
 				color: "#2563eb",
 				style: "solid",
 				label: "y = 0.5x²"
@@ -248,7 +248,7 @@ export const functionPlotGraphExamples: FunctionPlotGraphProps[] = [
 				id: "polyline_quadratic_func",
 				coefficients: [1, 0, 0], // x²
 				xRange: { min: -3, max: 3 },
-				resolution: 60,
+
 				color: "#7c3aed",
 				style: "solid",
 				label: "y = x²"

@@ -46,17 +46,14 @@ export const LabeledRectangleDiagramPropsSchema = z
 		fillColor: z
 			.string()
 			.regex(CSS_COLOR_PATTERN, "invalid css color")
-			.default("#FEF2E4")
 			.describe("The fill color of the rectangle."),
 		borderColor: z
 			.string()
 			.regex(CSS_COLOR_PATTERN, "invalid css color")
-			.default("#D27D2D")
 			.describe("The border color of the rectangle."),
 		textColor: z
 			.string()
 			.regex(CSS_COLOR_PATTERN, "invalid css color")
-			.default("#333333")
 			.describe("The color of the text labels.")
 	})
 	.strict()
