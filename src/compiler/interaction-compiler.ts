@@ -1,4 +1,4 @@
-import type { AnyInteraction } from "@core/interactions"
+import type { AnyInteraction } from "@/core/interactions"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import type { WidgetTypeTuple } from "../widgets/collections/types"

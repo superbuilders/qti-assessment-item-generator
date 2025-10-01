@@ -1,5 +1,5 @@
-import type { AnyInteraction } from "@core/interactions"
-import type { AssessmentItemShell } from "@core/item"
+import type { AnyInteraction } from "@/core/interactions"
+import type { AssessmentItemShell } from "@/core/item"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { widgetCollections } from "../widgets/collections"

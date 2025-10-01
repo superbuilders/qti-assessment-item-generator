@@ -1,6 +1,6 @@
-import { CHOICE_IDENTIFIER_REGEX, RESPONSE_IDENTIFIER_REGEX } from "@compiler/qti-constants"
-import { createBlockContentSchema, createInlineContentSchema } from "@core/content"
-import type { WidgetTypeTuple } from "@widgets/collections/types"
+import { CHOICE_IDENTIFIER_REGEX, RESPONSE_IDENTIFIER_REGEX } from "@/compiler/qti-constants"
+import { createBlockContentSchema, createInlineContentSchema } from "@/core/content"
+import type { WidgetTypeTuple } from "@/widgets/collections/types"
 import { z } from "zod"
 import type { AnyInteraction } from "./types"
 

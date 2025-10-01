@@ -1,4 +1,4 @@
-import type { WidgetTypeTuple } from "@widgets/collections/types"
+import type { WidgetTypeTuple } from "@/widgets/collections/types"
 
 export type InlineContentItem<E extends WidgetTypeTuple> =
 	| { type: "text"; content: string }

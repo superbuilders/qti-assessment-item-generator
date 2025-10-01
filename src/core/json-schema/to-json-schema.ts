@@ -4,6 +4,14 @@ import { z } from "zod"
 
 type BaseSchema = z.core.JSONSchema.BaseSchema
 
+function isBaseSchema(value: unknown): value is BaseSchema {
+	return (
+		value !== null &&
+		value !== undefined &&
+		(typeof value === "boolean" || (typeof value === "object" && !Array.isArray(value) && Object.keys(value).length > 0))
+	)
+}
+
 // Type guard for JSON Schema objects (non-boolean, non-array objects)
 type ObjectSchema = {
 	type?: unknown
@@ -99,14 +107,10 @@ export function toJSONSchemaPromptSafe(schema: z.ZodType): BaseSchema {
 		logger.error("json schema prompt-safe conversion", { error: result.error })
 		throw errors.wrap(result.error, "json schema prompt-safe conversion")
 	}
-	const json = result.data as BaseSchema
-	if (
-		!json ||
-		(typeof json !== "boolean" && typeof json !== "object") ||
-		(typeof json === "object" && Object.keys(json).length === 0)
-	) {
-		logger.error("json schema prompt-safe conversion produced empty")
-		throw errors.new("json schema conversion empty")
+	const json = result.data
+	if (!isBaseSchema(json)) {
+		logger.error("json schema prompt-safe conversion produced invalid schema")
+		throw errors.new("json schema conversion invalid")
 	}
 	ensureEmptyProperties(json)
 	return json

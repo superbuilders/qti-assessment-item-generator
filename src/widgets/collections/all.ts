@@ -1,9 +1,16 @@
-import { allWidgetSchemas } from "../registry"
-import type { WidgetCollection } from "./types"
+import type { WidgetCollection } from "@/widgets/collections/types"
+import { allWidgetSchemas } from "@/widgets/registry"
 
-const widgetTypeKeys = Object.keys(allWidgetSchemas) as Array<keyof typeof allWidgetSchemas>
+function isWidgetKey(key: string): key is keyof typeof allWidgetSchemas {
+	return key in allWidgetSchemas
+}
 
-export const allWidgetsCollection: WidgetCollection = {
+const widgetTypeKeys: Array<keyof typeof allWidgetSchemas> = []
+for (const k of Object.keys(allWidgetSchemas)) {
+	if (isWidgetKey(k)) widgetTypeKeys.push(k)
+}
+
+export const allWidgetsCollection: WidgetCollection<typeof widgetTypeKeys> = {
 	name: "all",
 	schemas: allWidgetSchemas,
 	widgetTypeKeys

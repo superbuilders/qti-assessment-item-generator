@@ -1,5 +1,5 @@
-import type { BlockContent } from "@core/content"
-import type { WidgetTypeTuple } from "@widgets/collections/types"
+import type { BlockContent } from "@/core/content"
+import type { WidgetTypeTuple } from "@/widgets/collections/types"
 import type { FeedbackPlan } from "../plan"
 
 export type ResponseIdentifierLiteral<P extends FeedbackPlan> = P["dimensions"][number]["responseIdentifier"]

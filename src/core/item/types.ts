@@ -1,8 +1,8 @@
-import type { BlockContent } from "@core/content"
-import type { FeedbackPlan } from "@core/feedback"
-import type { AnyInteraction } from "@core/interactions"
-import type { WidgetTypeTuple } from "@widgets/collections/types"
-import type { typedSchemas } from "@widgets/registry"
+import type { BlockContent } from "@/core/content"
+import type { FeedbackPlan } from "@/core/feedback"
+import type { AnyInteraction } from "@/core/interactions"
+import type { WidgetTypeTuple } from "@/widgets/collections/types"
+import type { typedSchemas } from "@/widgets/registry"
 import type { z } from "zod"
 
 export type Widget = z.infer<(typeof typedSchemas)[keyof typeof typedSchemas]>

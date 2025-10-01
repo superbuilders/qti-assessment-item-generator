@@ -1,9 +1,9 @@
-import type { BlockContent, InlineContent } from "@core/content"
-import type { AssessmentItemInput, ResponseDeclaration } from "@core/item"
+import type { BlockContent, InlineContent } from "@/core/content"
+import type { AssessmentItemInput, ResponseDeclaration } from "@/core/item"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import type { WidgetCollection, WidgetTypeTuple } from "@widgets/collections/types"
-import { allWidgetSchemas, type Widget, WidgetSchema } from "@widgets/registry"
+import type { WidgetCollection, WidgetTypeTuple } from "@/widgets/collections/types"
+import { allWidgetSchemas, type Widget, WidgetSchema } from "@/widgets/registry"
 import type OpenAI from "openai"
 import type { ChatCompletion, ChatCompletionCreateParamsNonStreaming } from "openai/resources/chat/completions"
 import { z } from "zod"
@@ -16,10 +16,10 @@ import {
 	buildFeedbackPlanFromInteractions,
 	convertNestedFeedbackToBlocks,
 	validateNestedFeedback
-} from "@core/feedback"
-import { createAnyInteractionSchema } from "@core/interactions"
-import { createAssessmentItemShellSchema } from "@core/item"
-import { toJSONSchemaPromptSafe } from "@core/json-schema"
+} from "@/core/feedback"
+import { createAnyInteractionSchema } from "@/core/interactions"
+import { createAssessmentItemShellSchema } from "@/core/item"
+import { toJSONSchemaPromptSafe } from "@/core/json-schema"
 import { createFeedbackPrompt } from "./prompts/feedback"
 import { createInteractionContentPrompt } from "./prompts/interactions"
 import { createAssessmentShellPrompt } from "./prompts/shell"

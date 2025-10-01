@@ -1,5 +1,5 @@
-import type { BlockContent, InlineContent } from "@core/content"
-import type { WidgetTypeTuple } from "@widgets/collections/types"
+import type { BlockContent, InlineContent } from "@/core/content"
+import type { WidgetTypeTuple } from "@/widgets/collections/types"
 
 export type AnyInteraction<E extends WidgetTypeTuple> =
 	| {

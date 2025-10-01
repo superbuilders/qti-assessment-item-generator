@@ -1,7 +1,7 @@
-import type { AnyInteraction } from "@core/interactions"
-import type { ResponseDeclaration } from "@core/item"
+import type { AnyInteraction } from "@/core/interactions"
+import type { ResponseDeclaration } from "@/core/item"
 import * as logger from "@superbuilders/slog"
-import type { WidgetTypeTuple } from "@widgets/collections/types"
+import type { WidgetTypeTuple } from "@/widgets/collections/types"
 import { deriveComboIdentifier, normalizeIdPart } from "../utils"
 import type { FeedbackPlan } from "./types"
 

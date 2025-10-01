@@ -3,13 +3,13 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import OpenAI from "openai"
-import { compile } from "../src/compiler/compiler"
-import type { AssessmentItemInput } from "../src/core/item"
-import { differentiateAssessmentItem } from "../src/structured/differentiator"
-import { allWidgetsCollection } from "../src/widgets/collections/all"
+import { compile } from "@/compiler/compiler"
+import type { AssessmentItemInput } from "@/core/item"
+import { differentiateAssessmentItem } from "@/structured/differentiator"
+import { allWidgetsCollection } from "@/widgets/collections/all"
 
 // Test input - plant and pot combinations
-const sourceItem: AssessmentItemInput<readonly ["boxPlot"]> = {
+const sourceItem: AssessmentItemInput<["boxPlot"]> = {
 	body: [
 		{
 			type: "paragraph",

@@ -12,7 +12,7 @@ describe("JSON Schema Preflight", () => {
 		const result = errors.trySync(() => z.toJSONSchema(Shell))
 		if (result.error) {
 			logger.error("shell schema json conversion", { error: result.error })
-			throw new Error(`shell json schema conversion failed: ${String(result.error)}`)
+			throw errors.wrap(result.error, "shell json schema conversion")
 		}
 		expect(result.error).toBeFalsy()
 	})
@@ -33,7 +33,8 @@ describe("JSON Schema Preflight", () => {
 		}
 		if (failures.length > 0) {
 			const breakdown = failures.map((f) => `${f.key}: ${f.message}`).join("\n")
-			throw new Error(`widget hack json schema conversion failures (count=${failures.length}):\n${breakdown}`)
+			logger.error("widget schema conversion failures", { count: failures.length, breakdown })
+			throw errors.new(`widget hack json schema conversion failures (count=${failures.length}):\n${breakdown}`)
 		}
 		expect(failures.length).toBe(0)
 	})

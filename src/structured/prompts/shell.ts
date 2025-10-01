@@ -1,6 +1,6 @@
 // imports kept minimal in this module; errors/logging handled by callers
-import type { AssessmentItemInput } from "@core/item"
-import type { WidgetCollection, WidgetTypeTuple } from "@widgets/collections/types"
+import type { AssessmentItemInput } from "@/core/item"
+import type { WidgetCollection, WidgetTypeTuple } from "@/widgets/collections/types"
 import { allExamples } from "../../examples"
 // Note: do not validate example shells here; examples are illustrative only
 // import { createAssessmentItemShellSchema } from "@core/item"

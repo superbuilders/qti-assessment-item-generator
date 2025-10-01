@@ -1,8 +1,9 @@
-import type { BlockContent, InlineContent } from "@core/content"
+import type { BlockContent, InlineContent } from "@/core/content"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import type { WidgetTypeTuple } from "../widgets/collections/types"
 import { sanitizeXmlAttributeValue } from "./utils/xml-utils"
+import { InlineContentItem } from "@/core/content"
 
 /**
  * Escapes text content for safe inclusion in XML PCDATA.
@@ -22,7 +23,7 @@ export function renderInlineContent<E extends WidgetTypeTuple = WidgetTypeTuple>
 ): string {
 	if (!inlineItems) return ""
 	return inlineItems
-		.map((item): string => {
+		.map((item: InlineContentItem<E>): string => {
 			switch (item.type) {
 				case "text":
 					return escapeXmlText(item.content)

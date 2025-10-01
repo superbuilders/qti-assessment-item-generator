@@ -5,10 +5,10 @@ import * as path from "node:path"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import OpenAI from "openai"
-import { compile } from "../src/compiler/compiler"
-import { generateFromEnvelope } from "../src/structured/client"
-import type { AiContextEnvelope } from "../src/structured/types"
-import { teksMath4Collection } from "../src/widgets/collections/teks-math-4"
+import { compile } from "@/compiler/compiler"
+import { generateFromEnvelope } from "@/structured/client"
+import type { AiContextEnvelope } from "@/structured/types"
+import { teksMath4Collection } from "@/widgets/collections/teks-math-4"
 
 // Enable debug logging for this script
 logger.setDefaultLogLevel(logger.DEBUG)

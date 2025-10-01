@@ -1,5 +1,5 @@
-import type { AssessmentItemInput } from "@core/item"
-import type { WidgetTypeTuple } from "@widgets/collections/types"
+import type { AssessmentItemInput } from "@/core/item"
+import type { WidgetTypeTuple } from "@/widgets/collections/types"
 import type { z } from "zod"
 
 /**

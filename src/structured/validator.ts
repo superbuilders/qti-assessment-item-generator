@@ -1,5 +1,5 @@
-import type { BlockContent, InlineContent } from "@core/content"
-import type { AssessmentItemInput } from "@core/item"
+import type { BlockContent, InlineContent } from "@/core/content"
+import type { AssessmentItemInput } from "@/core/item"
 import * as errors from "@superbuilders/errors"
 import type * as logger from "@superbuilders/slog"
 import {

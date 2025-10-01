@@ -1,8 +1,8 @@
-import { toJSONSchemaPromptSafe } from "@core/json-schema"
+import { toJSONSchemaPromptSafe } from "@/core/json-schema"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
-import type { WidgetCollection, WidgetTypeTuple } from "../../widgets/collections/types"
+import type { WidgetCollection, WidgetTypeTuple } from "@/widgets/collections/types"
 
 // Runtime type guard to ensure values are Zod schemas without using type assertions
 function isZodSchema(value: unknown): value is z.ZodType<unknown> {
@@ -13,26 +13,23 @@ function isZodSchema(value: unknown): value is z.ZodType<unknown> {
  * Generates the reusable markdown section for widget selection instructions.
  */
 export function createWidgetSelectionPromptSection<E extends WidgetTypeTuple>(collection: WidgetCollection<E>): string {
-	const allowedWidgetTypes = collection.widgetTypeKeys
-	const widgetSchemas: Record<string, object> = {}
+    const allowedWidgetTypes: E = collection.widgetTypeKeys
+    const widgetSchemas: Record<string, object> = {}
 
-	// Iterate using the allowed keys to ensure we only process what's in the collection's tuple.
-	for (const key of allowedWidgetTypes) {
-		// Access schema with proper type handling
-		const schemaEntry = collection.schemas[key as E[number]]
+    // Iterate over schemas directly to avoid generic index issues
+    for (const [key, schemaEntry] of Object.entries(collection.schemas)) {
+        if (!isZodSchema(schemaEntry)) {
+            logger.error("collection schema not a zod type", { key, collectionName: collection.name })
+            throw errors.new(`Schema for key '${key}' in collection '${collection.name}' is not a valid Zod schema.`)
+        }
 
-		if (!isZodSchema(schemaEntry)) {
-			logger.error("collection schema not a zod type", { key, collectionName: collection.name })
-			throw errors.new(`Schema for key '${key}' in collection '${collection.name}' is not a valid Zod schema.`)
-		}
-
-		const jsonResult = errors.trySync(() => toJSONSchemaPromptSafe(schemaEntry))
-		if (jsonResult.error) {
-			logger.error("widget schema json conversion", { key, error: jsonResult.error })
-			throw errors.wrap(jsonResult.error, "widget schema json conversion")
-		}
-		widgetSchemas[key] = jsonResult.data
-	}
+        const jsonResult = errors.trySync(() => toJSONSchemaPromptSafe(schemaEntry))
+        if (jsonResult.error) {
+            logger.error("widget schema json conversion", { key, error: jsonResult.error })
+            throw errors.wrap(jsonResult.error, "widget schema json conversion")
+        }
+        widgetSchemas[key] = jsonResult.data
+    }
 	const widgetSchemasJson = JSON.stringify(widgetSchemas, null, 2)
 
 	return `

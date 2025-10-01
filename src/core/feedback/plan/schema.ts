@@ -1,4 +1,4 @@
-import { CHOICE_IDENTIFIER_REGEX, RESPONSE_IDENTIFIER_REGEX } from "@compiler/qti-constants"
+import { CHOICE_IDENTIFIER_REGEX, RESPONSE_IDENTIFIER_REGEX } from "@/compiler/qti-constants"
 import { z } from "zod"
 
 export const FeedbackDimensionSchema = z

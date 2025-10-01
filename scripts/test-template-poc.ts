@@ -1,10 +1,10 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import { compile } from "../src/compiler/compiler"
-import type { AssessmentItemInput } from "../src/core/item"
-import fractionAddition from "../src/templates/math/fraction-addition"
-import { allWidgetsCollection } from "../src/widgets/collections/all"
-import type { WidgetTypeTuple } from "../src/widgets/collections/types"
+import { compile } from "@/compiler/compiler"
+import type { AssessmentItemInput } from "@/core/item"
+import fractionAddition from "@/templates/math/fraction-addition"
+import { allWidgetsCollection } from "@/widgets/collections/all"
+import type { WidgetTypeTuple } from "@/widgets/collections/types"
 
 async function main() {
 	logger.info("starting template poc test", {

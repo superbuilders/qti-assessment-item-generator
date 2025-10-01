@@ -1,10 +1,10 @@
-import type { BlockContent, InlineContent } from "@core/content"
-import type { FeedbackPlan } from "@core/feedback"
-import type { AnyInteraction } from "@core/interactions"
-import type { AssessmentItemInput, ResponseDeclaration } from "@core/item"
+import type { BlockContent, InlineContent } from "@/core/content"
+import type { FeedbackPlan } from "@/core/feedback"
+import type { AnyInteraction } from "@/core/interactions"
+import type { AssessmentItemInput, ResponseDeclaration } from "@/core/item"
 import * as errors from "@superbuilders/errors"
 import type * as logger from "@superbuilders/slog"
-import type { WidgetTypeTuple } from "@widgets/collections/types"
+import type { WidgetTypeTuple } from "@/widgets/collections/types"
 import { XMLParser, XMLValidator } from "fast-xml-parser"
 import {
 	checkNoCDataSections,

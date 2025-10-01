@@ -12,7 +12,7 @@ import {
 import { PERSEUS_SVG_CACHE } from "../fixtures/perseus-svgs/cache"
 
 // Mock fetch function that returns cached Perseus SVGs
-const mockFetchImpl = async (url: string | Request | URL, init?: RequestInit): Promise<Response> => {
+const mockFetch = async (url: string | Request | URL, init?: RequestInit): Promise<Response> => {
 	const urlString = url.toString()
 
 	// Handle HEAD requests - check if we have the SVG in cache
@@ -38,8 +38,6 @@ const mockFetchImpl = async (url: string | Request | URL, init?: RequestInit): P
 
 	return new Response(null, { status: 404, statusText: "Not Found" })
 }
-
-const mockFetch = mockFetchImpl as typeof fetch
 
 describe("Perseus E2E Regression Suite", () => {
 	// Test Case 1: Direct HTTPS URL for an SVG

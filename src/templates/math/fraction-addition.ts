@@ -4,8 +4,8 @@
 // input shape, and the core types it needs to produce from your library.
 // -----------------------------------------------------------------------------
 
-import type { BlockContent } from "@core/content"
-import type { AssessmentItemInput } from "@core/item"
+import type { BlockContent } from "@/core/content"
+import type { AssessmentItemInput } from "@/core/item"
 import { z } from "zod"
 import { FractionSchema } from "../schemas"
 import type { TemplateModule } from "../types"
