@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { theme } from "../../utils/theme"
+import { theme } from "../utils/theme"
 import type { WidgetGenerator } from "../types"
 
 // Factory function to create addition with regrouping schema - avoids $ref in OpenAI JSON schema

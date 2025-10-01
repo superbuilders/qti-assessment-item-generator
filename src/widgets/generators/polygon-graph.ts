@@ -1,16 +1,16 @@
 import { z } from "zod"
-import { CanvasImpl } from "../../utils/canvas-impl"
+import { CanvasImpl } from "../utils/canvas-impl"
 import {
 	createAxisOptionsSchema,
 	createPlotPointSchema,
 	createPolygonSchema,
 	renderPoints,
 	renderPolygons
-} from "../../utils/canvas-utils"
-import { AXIS_VIEWBOX_PADDING } from "../../utils/constants"
-import { setupCoordinatePlaneV2 } from "../../utils/coordinate-plane-v2"
-import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
-import { theme } from "../../utils/theme"
+} from "../utils/canvas-utils"
+import { AXIS_VIEWBOX_PADDING } from "../utils/constants"
+import { setupCoordinatePlaneV2 } from "../utils/coordinate-plane-v2"
+import { createHeightSchema, createWidthSchema } from "../utils/schemas"
+import { theme } from "../utils/theme"
 import type { WidgetGenerator } from "../types"
 
 export const PolygonGraphPropsSchema = z

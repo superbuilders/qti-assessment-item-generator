@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
+import { createHeightSchema, createWidthSchema } from "../utils/schemas"
 import type { WidgetGenerator } from "../types"
 
 function createEmojiSchema() {

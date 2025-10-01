@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test"
 import { compileResponseDeclarations } from "../../src/compiler/response-processor"
-import type { AssessmentItem } from "../../src/compiler/schemas"
+import type { AssessmentItem } from "../../src/core/item"
 
 describe("compileResponseDeclarations", () => {
 	test("emits directedPair correct-response and mapping", () => {

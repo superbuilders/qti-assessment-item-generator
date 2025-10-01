@@ -1,7 +1,8 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import type { AnyInteraction, BlockContent, InlineContent } from "../compiler/schemas"
-import { WidgetTypeTuple } from "../widgets/collections/types"
+import type { BlockContent, InlineContent } from "@core/content"
+import type { AnyInteraction } from "@core/interactions"
+import { WidgetTypeTuple } from "../../widgets/collections/types"
 
 function walkInline<E extends WidgetTypeTuple>(inline: InlineContent<E> | null, out: Map<string, string>): void {
 	if (!inline) return

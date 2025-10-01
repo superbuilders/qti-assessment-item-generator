@@ -1,10 +1,10 @@
 import { z } from "zod"
-import { CanvasImpl } from "../../utils/canvas-impl"
-import { PADDING } from "../../utils/constants"
-import { Path2D } from "../../utils/path-builder"
-import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
-import { estimateWrappedTextDimensions } from "../../utils/text"
-import { theme } from "../../utils/theme"
+import { CanvasImpl } from "../utils/canvas-impl"
+import { PADDING } from "../utils/constants"
+import { Path2D } from "../utils/path-builder"
+import { createHeightSchema, createWidthSchema } from "../utils/schemas"
+import { estimateWrappedTextDimensions } from "../utils/text"
+import { theme } from "../utils/theme"
 import type { WidgetGenerator } from "../types"
 
 // Factory functions for label schemas to avoid $ref in OpenAI JSON Schema

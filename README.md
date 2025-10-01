@@ -77,7 +77,7 @@ Generate unique variations of an existing assessment item using a robust, two-sh
 import OpenAI from "openai";
 import * as logger from "@superbuilders/slog";
 import { differentiateAssessmentItem } from "@superbuilders/qti-assessment-item-generator/structured/differentiator";
-import type { AssessmentItemInput } from "@superbuilders/qti-assessment-item-generator/compiler/schemas";
+import type { AssessmentItemInput } from "@superbuilders/qti-assessment-item-generator/core/item";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 
@@ -159,10 +159,29 @@ console.log(svgString);
 
 ### Widget Schemas and Types
 
-You can import individual Zod schemas and TypeScript `input` types for each widget, as well as a unified `WidgetInput` type for any valid widget object. This is ideal for programmatically creating or validating widget configurations.
+You can import individual Zod schemas and TypeScript types for each domain directly from the `@superbuilders/qti-assessment-item-generator/core` entry point. This is ideal for programmatically creating or validating configurations.
+
+**Breaking Change:**
+
+**Old Import:**
+```ts
+import { type AssessmentItemInput } from "@superbuilders/qti-assessment-item-generator/compiler/schemas";
+```
+
+**New Import:**
+```ts
+import { type AssessmentItemInput } from "@superbuilders/qti-assessment-item-generator/core/item";
+```
+
+You can also import content, feedback, and interaction types:
 
 ```ts
 import { generateWidget } from "@superbuilders/qti-assessment-item-generator/widgets/widget-generator";
+import { compile } from "@superbuilders/qti-assessment-item-generator/compiler";
+import {
+  type AssessmentItemInput,
+  createDynamicAssessmentItemSchema
+} from "@superbuilders/qti-assessment-item-generator/core/item";
 import {
   BarChartPropsSchema,
   type BarChartProps,

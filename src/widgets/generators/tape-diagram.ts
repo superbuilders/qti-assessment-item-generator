@@ -1,9 +1,9 @@
 import { z } from "zod"
-import { CanvasImpl } from "../../utils/canvas-impl"
-import { PADDING } from "../../utils/constants"
-import { CSS_COLOR_PATTERN } from "../../utils/css-color"
-import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
-import { theme } from "../../utils/theme"
+import { CanvasImpl } from "../utils/canvas-impl"
+import { PADDING } from "../utils/constants"
+import { CSS_COLOR_PATTERN } from "../utils/css-color"
+import { createHeightSchema, createWidthSchema } from "../utils/schemas"
+import { theme } from "../utils/theme"
 // Path2D import no longer needed since curly bracket was removed
 import type { WidgetGenerator } from "../types"
 

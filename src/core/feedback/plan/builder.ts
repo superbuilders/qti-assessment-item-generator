@@ -1,7 +1,9 @@
 import * as logger from "@superbuilders/slog"
-import { deriveComboIdentifier, normalizeIdPart } from "../compiler/helpers"
-import type { AnyInteraction, FeedbackPlan, ResponseDeclaration } from "../compiler/schemas"
-import type { WidgetTypeTuple } from "../widgets/collections/types"
+import { deriveComboIdentifier, normalizeIdPart } from "../utils"
+import type { AnyInteraction } from "@core/interactions"
+import type { FeedbackPlan } from "./types"
+import type { ResponseDeclaration } from "@core/item"
+import type { WidgetTypeTuple } from "@widgets/collections/types"
 
 /**
  * Derives an explicit FeedbackPlan from interactions and responseDeclarations.

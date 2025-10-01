@@ -1,24 +1,26 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { ErrUnsupportedInteraction } from "../structured/client"
-import { escapeXmlAttribute } from "../utils/xml-utils"
+import { escapeXmlAttribute } from "./utils/xml-utils"
 import type { WidgetCollection, WidgetTypeTuple } from "../widgets/collections/types"
 import { typedSchemas } from "../widgets/registry"
 import { generateWidget } from "../widgets/widget-generator"
 import { renderBlockContent } from "./content-renderer"
-import { encodeDataUri } from "./helpers"
+import { encodeDataUri } from "./utils/helpers"
 import { compileInteraction } from "./interaction-compiler"
 import { validateAssessmentItemInput } from "./pre-validator"
 import { compileResponseDeclarations, compileResponseProcessing } from "./response-processor"
-import type { AssessmentItem, AssessmentItemInput, BlockContent, InlineContent } from "./schemas"
-import { createDynamicAssessmentItemSchema } from "./schemas"
+import type { AssessmentItem, AssessmentItemInput } from "@core/item"
+import type { BlockContent, BlockContentItem, InlineContent } from "@core/content"
+import { createDynamicAssessmentItemSchema } from "@core/item"
 import {
 	convertHtmlEntities,
 	fixInequalityOperators,
 	fixMathMLOperators,
 	removeDoubleNewlines,
 	stripXmlComments
-} from "./xml-fixes"
+} from "./utils/xml-fixes"
+import { FeedbackPlan } from "@core/feedback"
 
 export const ErrDuplicateResponseIdentifier = errors.new("duplicate response identifier")
 export const ErrDuplicateChoiceIdentifier = errors.new("duplicate choice identifiers")
@@ -27,15 +29,6 @@ export const ErrDuplicateChoiceIdentifier = errors.new("duplicate choice identif
 function isValidWidgetType(type: string): type is keyof typeof typedSchemas {
 	return Object.keys(typedSchemas).includes(type)
 }
-
-// REMOVED: The following functions are no longer needed as their logic has been
-// moved into the Zod schemas for a single source of truth.
-// - enforceNoPipesInBody
-// - enforceNoCaretsInBody
-// - enforceNoPipesInChoiceInteraction
-// - enforceNoCaretsInChoiceInteraction
-// - enforceNoCaretsInInlineChoiceInteraction
-// - enforceNoPipesInInlineChoiceInteraction
 
 function dedupePromptTextFromBody<E extends WidgetTypeTuple>(item: AssessmentItem<E>): void {
 	if (!item.interactions || !item.body) return
@@ -221,7 +214,7 @@ function dedupePromptTextFromBody<E extends WidgetTypeTuple>(item: AssessmentIte
 	const body = item.body
 
 	// Precompute normalized strings for all paragraph blocks
-	const paragraphNorms: string[] = body.map((b) => (b.type === "paragraph" ? normalizeInline(b.content) : ""))
+	const paragraphNorms: string[] = body.map((b: BlockContentItem<E>) => (b.type === "paragraph" ? normalizeInline(b.content) : ""))
 
 	// Identify all indices in the body which are interaction refs we care about
 	const slotIndices: Array<{ index: number; interactionId: string }> = []
@@ -409,7 +402,7 @@ function dedupePromptTextFromBody<E extends WidgetTypeTuple>(item: AssessmentIte
 	if (toDelete.size === 0) return
 
 	const originalLength = body.length
-	item.body = body.filter((_, idx) => !toDelete.has(idx))
+	item.body = body.filter((_: unknown, idx: number) => !toDelete.has(idx))
 	const removedCount = originalLength - item.body.length
 	if (removedCount > 0) {
 		logger.debug("deduplicated prompt text from body", { count: removedCount })
@@ -734,7 +727,7 @@ export async function compile<const E extends WidgetTypeTuple>(
 
 	// NEW: Generate feedbackBlocks XML from map, ordered by feedbackPlan.combinations
 	const feedbackBlocksXml = enforcedItem.feedbackPlan.combinations
-		.map((combination) => {
+		.map((combination: FeedbackPlan["combinations"][number]) => {
 			const content = enforcedItem.feedbackBlocks[combination.id]
 			if (!content) {
 				logger.error("missing feedback content for expected identifier", { identifier: combination.id })

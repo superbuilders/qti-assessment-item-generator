@@ -1,4 +1,5 @@
-import type { AnyInteraction, AssessmentItemShell } from "../compiler/schemas"
+import type { AssessmentItemShell } from "@core/item"
+import type { AnyInteraction } from "@core/interactions"
 import { WidgetTypeTuple } from "../widgets/collections/types"
 
 export type FeedbackTarget = {

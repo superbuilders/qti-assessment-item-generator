@@ -9,7 +9,7 @@ import {
 	SVG_DIAGRAM_HEIGHT_MIN,
 	SVG_DIAGRAM_WIDTH_MAX,
 	SVG_DIAGRAM_WIDTH_MIN
-} from "../src/utils/constants"
+} from "../src/widgets/utils/constants"
 
 /**
  * Script to clamp all width/height values in example files to respect

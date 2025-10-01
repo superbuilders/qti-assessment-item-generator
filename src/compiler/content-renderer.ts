@@ -1,8 +1,8 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import { sanitizeXmlAttributeValue } from "../utils/xml-utils"
+import { sanitizeXmlAttributeValue } from "./utils/xml-utils"
 import type { WidgetTypeTuple } from "../widgets/collections/types"
-import type { BlockContent, InlineContent } from "./schemas"
+import type { BlockContent, InlineContent } from "@core/content"
 
 /**
  * Escapes text content for safe inclusion in XML PCDATA.

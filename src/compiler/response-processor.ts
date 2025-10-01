@@ -1,8 +1,9 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import { escapeXmlAttribute } from "../utils/xml-utils"
+import { escapeXmlAttribute } from "./utils/xml-utils"
 import type { WidgetTypeTuple } from "../widgets/collections/types"
-import type { AssessmentItem, FeedbackDimension } from "./schemas"
+import type { AssessmentItem } from "@core/item"
+import type { FeedbackDimension, FeedbackPlan } from "@core/feedback"
 
 export function compileResponseDeclarations<E extends WidgetTypeTuple>(decls: AssessmentItem<E>["responseDeclarations"]): string {
 	return decls
@@ -111,10 +112,10 @@ function generateComboModeProcessing<E extends WidgetTypeTuple>(item: Assessment
 
 	function buildConditionTree(dims: FeedbackDimension[], pathSegments: Array<{ responseIdentifier: string; key: string }>): string {
 		if (dims.length === 0) {
-			const matchingCombo = combinations.find((combo): boolean => {
+			const matchingCombo = combinations.find((combo: FeedbackPlan["combinations"][number]): boolean => {
 				if (combo.path.length !== pathSegments.length) return false
 					return combo.path.every(
-						(seg, i): boolean =>
+						(seg: FeedbackPlan["combinations"][number]["path"][number], i: number): boolean =>
 						seg.responseIdentifier === pathSegments[i].responseIdentifier && seg.key === pathSegments[i].key
 				)
 			})
@@ -185,7 +186,7 @@ function generateFallbackModeProcessing<E extends WidgetTypeTuple>(item: Assessm
 	}
 
 	const matchConditions = item.feedbackPlan.dimensions.map(
-		(dim): string =>
+		(dim: FeedbackDimension): string =>
 			`<qti-match><qti-variable identifier="${escapeXmlAttribute(dim.responseIdentifier)}"/><qti-correct identifier="${escapeXmlAttribute(dim.responseIdentifier)}"/></qti-match>`
 	)
 

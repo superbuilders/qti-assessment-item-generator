@@ -1,15 +1,15 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
-import { CanvasImpl } from "../../utils/canvas-impl"
-import { AXIS_VIEWBOX_PADDING } from "../../utils/constants"
-import { setupCoordinatePlaneBaseV2 } from "../../utils/coordinate-plane-utils"
-import { CSS_COLOR_PATTERN } from "../../utils/css-color"
-import { abbreviateMonth } from "../../utils/labels"
-import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
-import { estimateWrappedTextDimensions } from "../../utils/text" // ADD THIS IMPORT
-import { theme } from "../../utils/theme"
-import { buildTicks } from "../../utils/ticks" // ADD THIS IMPORT
+import { CanvasImpl } from "../utils/canvas-impl"
+import { AXIS_VIEWBOX_PADDING } from "../utils/constants"
+import { setupCoordinatePlaneBaseV2 } from "../utils/coordinate-plane-utils"
+import { CSS_COLOR_PATTERN } from "../utils/css-color"
+import { abbreviateMonth } from "../utils/labels"
+import { createHeightSchema, createWidthSchema } from "../utils/schemas"
+import { estimateWrappedTextDimensions } from "../utils/text" // ADD THIS IMPORT
+import { theme } from "../utils/theme"
+import { buildTicks } from "../utils/ticks" // ADD THIS IMPORT
 import type { WidgetGenerator } from "../types"
 
 export const ErrMismatchedDataLength = errors.new("series data must have the same length as x-axis categories")

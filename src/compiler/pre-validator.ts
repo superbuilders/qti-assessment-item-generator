@@ -8,9 +8,12 @@ import {
 	checkNoMfencedElements,
 	checkNoPerseusArtifacts
 } from "../qti-validation/utils"
-import { deriveComboIdentifier, normalizeIdPart } from "./helpers"
-import type { AssessmentItemInput, BlockContent, InlineContent } from "./schemas"
-import { WidgetTypeTuple } from "../widgets/collections/types"
+import { deriveComboIdentifier, normalizeIdPart } from "./utils/helpers"
+import type { AssessmentItemInput, ResponseDeclaration } from "@core/item"
+import type { BlockContent, InlineContent } from "@core/content"
+import type { AnyInteraction } from "@core/interactions"
+import type { FeedbackPlan } from "@core/feedback"
+import { WidgetTypeTuple } from "@widgets/collections/types"
 
 /**
  * Validates that a MathML fragment is well-formed XML.
@@ -442,8 +445,8 @@ export function validateAssessmentItemInput<E extends WidgetTypeTuple>(item: Ass
 
 function validateFeedbackPlan<E extends WidgetTypeTuple>(item: AssessmentItemInput<E>, logger: logger.Logger): void {
 	const { feedbackPlan, responseDeclarations, interactions, feedbackBlocks } = item
-	const declMap = new Map(responseDeclarations.map((d) => [d.identifier, d]))
-	const interactionMap = new Map(Object.values(interactions ?? {}).map((i) => [i.responseIdentifier, i]))
+	const declMap = new Map(responseDeclarations.map((d: ResponseDeclaration) => [d.identifier, d]))
+	const interactionMap = new Map(Object.values(interactions ?? {}).map((i: AnyInteraction<E>) => [i.responseIdentifier, i]))
 
 	// Check for duplicate responseIdentifiers across interactions FIRST (before feedbackPlan validation)
 	const responseIdOwners = new Map<string, string>()
@@ -490,12 +493,12 @@ function validateFeedbackPlan<E extends WidgetTypeTuple>(item: AssessmentItemInp
 			}
 			if (
 				dim.keys.length !== interaction.choices.length ||
-				!dim.keys.every((key, i) => interaction.choices[i]?.identifier === key)
+				!dim.keys.every((key: string, i: number) => interaction.choices[i]?.identifier === key)
 			) {
 				logger.error("enumerated dimension keys do not match interaction choices exactly", {
 					responseIdentifier: dim.responseIdentifier,
 					planKeys: dim.keys,
-					interactionChoiceIds: interaction.choices.map((c) => c.identifier)
+					interactionChoiceIds: interaction.choices.map((c: { identifier: string }) => c.identifier)
 				})
 				throw errors.new("enumerated dimension keys mismatch")
 			}
@@ -581,7 +584,7 @@ function validateFeedbackPlan<E extends WidgetTypeTuple>(item: AssessmentItemInp
 		}
 
 		const derivedId = deriveComboIdentifier(
-			combination.path.map((seg) => `${normalizeIdPart(seg.responseIdentifier)}_${normalizeIdPart(seg.key)}`)
+			combination.path.map((seg: FeedbackPlan["combinations"][number]["path"][number]) => `${normalizeIdPart(seg.responseIdentifier)}_${normalizeIdPart(seg.key)}`)
 		)
 		if (derivedId !== combination.id) {
 			logger.error("combination id does not match derived identifier", {
@@ -592,7 +595,7 @@ function validateFeedbackPlan<E extends WidgetTypeTuple>(item: AssessmentItemInp
 		}
 	}
 
-	const combinationIds = new Set(feedbackPlan.combinations.map((c) => c.id))
+	const combinationIds = new Set(feedbackPlan.combinations.map((c: FeedbackPlan["combinations"][number]) => c.id))
 	const actualBlockKeys = new Set(Object.keys(feedbackBlocks))
 
 	const setsAreEqual = (a: Set<string>, b: Set<string>) => a.size === b.size && [...a].every((item) => b.has(item))

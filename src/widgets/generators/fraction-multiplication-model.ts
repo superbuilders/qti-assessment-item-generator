@@ -1,10 +1,10 @@
 import { z } from "zod"
-import { CanvasImpl } from "../../utils/canvas-impl"
-import { PADDING } from "../../utils/constants"
-import { CSS_COLOR_PATTERN } from "../../utils/css-color"
-import { Path2D } from "../../utils/path-builder"
-import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
-import { theme } from "../../utils/theme"
+import { CanvasImpl } from "../utils/canvas-impl"
+import { PADDING } from "../utils/constants"
+import { CSS_COLOR_PATTERN } from "../utils/css-color"
+import { Path2D } from "../utils/path-builder"
+import { createHeightSchema, createWidthSchema } from "../utils/schemas"
+import { theme } from "../utils/theme"
 import type { WidgetGenerator } from "../types"
 
 // Defines the properties for a single fractional model used within the equation.

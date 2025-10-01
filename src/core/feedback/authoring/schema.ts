@@ -1,11 +1,14 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
-import type { AnyInteraction, BlockContent, FeedbackPlan, ResponseDeclaration } from "../compiler/schemas"
-import type { WidgetTypeTuple } from "../widgets/collections/types"
-import { createBlockContentSchema } from "./block-content-schema"
-import { buildFeedbackPlanFromInteractions } from "./feedback-plan-builder"
-import { toJSONSchemaPromptSafe } from "./json-schema"
+import type { AnyInteraction } from "@core/interactions"
+import type { BlockContent } from "@core/content"
+import type { FeedbackPlan } from "../plan"
+import type { ResponseDeclaration } from "@core/item"
+import type { WidgetTypeTuple } from "@widgets/collections/types"
+import { createBlockContentSchema } from "@core/content"
+import { buildFeedbackPlanFromInteractions } from "../plan"
+import { toJSONSchemaPromptSafe } from "@core/json-schema"
 
 // --- Error Constants ---
 
@@ -18,24 +21,12 @@ export const ErrFeedbackExtraKeys = errors.new("feedback contains extra keys")
 export const ErrFeedbackMissingLeaves = errors.new("feedback is missing required leaves")
 export const ErrFeedbackSchemaValidation = errors.new("feedback schema validation")
 
-// --- Strict Authoring Types (no `unknown`), parameterized by plan and content ---
-// NOTE: BlockContent is validated collection-scoped at runtime via Zod.
-// For static types, we keep ContentT defaulting to BlockContent with a widget type parameter.
-export type ResponseIdentifierLiteral<P extends FeedbackPlan> = P["dimensions"][number]["responseIdentifier"]
-export type AuthoringNestedLeaf<E extends WidgetTypeTuple = WidgetTypeTuple, ContentT = BlockContent<E>> = {
-	content: ContentT
-}
-export type AuthoringNestedNode<P extends FeedbackPlan, E extends WidgetTypeTuple = WidgetTypeTuple, ContentT = BlockContent<E>> = {
-	[responseIdentifier: string]: {
-		[key: string]: AuthoringNestedLeaf<E, ContentT> | AuthoringNestedNode<P, E, ContentT>
-	}
-}
-export type AuthoringFeedbackOverall<P extends FeedbackPlan, E extends WidgetTypeTuple = WidgetTypeTuple, ContentT = BlockContent<E>> =
-	| { CORRECT: AuthoringNestedLeaf<E, ContentT>; INCORRECT: AuthoringNestedLeaf<E, ContentT> }
-	| AuthoringNestedNode<P, E, ContentT>
-export type NestedFeedbackAuthoring<P extends FeedbackPlan, E extends WidgetTypeTuple = WidgetTypeTuple, ContentT = BlockContent<E>> = {
-	feedback: { FEEDBACK__OVERALL: AuthoringFeedbackOverall<P, E, ContentT> }
-}
+import type {
+	AuthoringNestedLeaf,
+	AuthoringNestedNode,
+	AuthoringFeedbackOverall,
+	NestedFeedbackAuthoring
+} from "./types"
 
 // --- Core Utilities ---
 
@@ -191,10 +182,10 @@ export function convertNestedFeedbackToBlocks<P extends FeedbackPlan, E extends 
                 throw ErrFeedbackLeafAtRoot
             }
             const combination = feedbackPlan.combinations.find(
-                (c) =>
+                (c: FeedbackPlan["combinations"][number]) =>
                     c.path.length === path.length &&
                     c.path.every(
-                        (seg, i) =>
+                        (seg: FeedbackPlan["combinations"][number]["path"][number], i: number) =>
                             path[i] !== undefined &&
                             seg.responseIdentifier === path[i].responseIdentifier &&
                             seg.key === path[i].key
@@ -230,7 +221,7 @@ export function convertNestedFeedbackToBlocks<P extends FeedbackPlan, E extends 
 	walk(overallFeedback, [])
 
 	const producedIds = new Set(Object.keys(blocks))
-	const expectedIds = new Set(feedbackPlan.combinations.map((c) => c.id))
+	const expectedIds = new Set(feedbackPlan.combinations.map((c: FeedbackPlan["combinations"][number]) => c.id))
 
 	if (producedIds.size > expectedIds.size) {
 		const extraKeys = [...producedIds].filter((id) => !expectedIds.has(id))
@@ -243,7 +234,7 @@ export function convertNestedFeedbackToBlocks<P extends FeedbackPlan, E extends 
 	}
 
 	if (producedIds.size < expectedIds.size) {
-		const missingKeys = [...expectedIds].filter((id) => !producedIds.has(id))
+		const missingKeys = [...expectedIds].filter((id: string) => !producedIds.has(id))
 		logger.error("feedback is missing required leaves", {
 			dimensionCount: feedbackPlan.dimensions.length,
 			combinationCount: feedbackPlan.combinations.length,

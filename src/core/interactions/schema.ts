@@ -1,52 +1,23 @@
-import * as errors from "@superbuilders/errors"
-import * as logger from "@superbuilders/slog"
 import { z } from "zod"
-import { CHOICE_IDENTIFIER_REGEX, RESPONSE_IDENTIFIER_REGEX } from "../compiler/qti-constants"
-import {
-	createAssessmentItemShellSchema,
-	createBlockContentSchema,
-	createDynamicAssessmentItemSchema,
-	createInlineContentSchema,
-	type FeedbackPlan,
-	type AssessmentItemShell,
-	type AnyInteraction,
-	type AssessmentItem
-} from "../compiler/schemas"
-import type { WidgetCollection, WidgetTypeTuple } from "../widgets/collections/types"
-import { typedSchemas } from "../widgets/registry"
+import { createBlockContentSchema, createInlineContentSchema } from "@core/content"
+import { CHOICE_IDENTIFIER_REGEX, RESPONSE_IDENTIFIER_REGEX } from "@compiler/qti-constants"
+import type { WidgetTypeTuple } from "@widgets/collections/types"
+import type { AnyInteraction } from "./types"
 
-
-/**
- * Creates a dynamic, collection-scoped Zod schema for the AssessmentItemShell.
- */
-export function createCollectionScopedShellSchema<const E extends WidgetTypeTuple>(
+// Returns the discriminated union of all interactions scoped to E
+export function createAnyInteractionSchema<const E extends WidgetTypeTuple>(
 	widgetTypeKeys: E
-): z.ZodType<AssessmentItemShell<E>> {
-	return createAssessmentItemShellSchema(widgetTypeKeys)
-}
+): z.ZodType<AnyInteraction<E>> {
+	const InlineSchema = createInlineContentSchema(widgetTypeKeys)
+	const BlockSchema = createBlockContentSchema(widgetTypeKeys)
 
-/**
- * Creates a dynamic, collection-scoped Zod schema for generating interaction content.
- *
- * NOTE FOR FUTURE DEVELOPERS:
- * If you add a new interaction type to `src/compiler/schemas.ts`, you MUST also
- * add its corresponding scoped definition here to ensure widgetType validation propagates.
- */
-export function createCollectionScopedInteractionSchema<const E extends WidgetTypeTuple>(
-	_interactionIds: string[],
-	widgetTypeKeys: E
-): z.ZodType<Record<string, AnyInteraction<E>>> {
-	const ScopedInlineContentSchema = createInlineContentSchema(widgetTypeKeys)
-	const ScopedBlockContentSchema = createBlockContentSchema(widgetTypeKeys)
-
-	// Rebuild all interaction types with scoped content schemas
 	const InlineChoiceSchema = z
 		.object({
 			identifier: z
 				.string()
 				.regex(CHOICE_IDENTIFIER_REGEX, "invalid identifier: must be uppercase")
 				.describe("Unique identifier for this inline choice option."),
-			content: ScopedInlineContentSchema.describe("The inline content displayed in the dropdown menu.")
+			content: InlineSchema.describe("The inline content displayed in the dropdown menu.")
 		})
 		.strict()
 		.describe("Represents a single option within an inline dropdown choice interaction.")
@@ -58,7 +29,7 @@ export function createCollectionScopedInteractionSchema<const E extends WidgetTy
 				.string()
 				.regex(RESPONSE_IDENTIFIER_REGEX, "invalid response identifier: must start with RESPONSE")
 				.describe("Links this interaction to its response declaration for scoring."),
-			prompt: ScopedInlineContentSchema.describe("The question or instruction presented to the user."),
+			prompt: InlineSchema.describe("The question or instruction presented to the user."),
 			choices: z
 				.array(
 					z
@@ -67,14 +38,15 @@ export function createCollectionScopedInteractionSchema<const E extends WidgetTy
 								.string()
 								.regex(CHOICE_IDENTIFIER_REGEX, "invalid identifier: must be uppercase")
 								.describe("Unique identifier for this choice option, used for response matching."),
-							content: ScopedBlockContentSchema.describe(
+							content: BlockSchema.describe(
 								"Rich content for this choice option, supporting text, math, and embedded widgets."
 							)
 						})
 						.strict()
-						.describe("A single choice option with content")
+						.describe("A single choice option with content and optional feedback")
 				)
-				.min(1)
+				// Enforce a minimum of 2 choices at the schema level.
+				.min(2)
 				.describe("Array of selectable choice options."),
 			shuffle: z.literal(true).describe("Whether to randomize the order of choices. Always true to ensure fairness."),
 			minChoices: z.number().int().min(0).describe("The minimum number of choices the user must select."),
@@ -115,7 +87,7 @@ export function createCollectionScopedInteractionSchema<const E extends WidgetTy
 				.string()
 				.regex(RESPONSE_IDENTIFIER_REGEX, "invalid response identifier: must start with RESPONSE")
 				.describe("Links this interaction to its response declaration for scoring."),
-			prompt: ScopedInlineContentSchema.describe(
+			prompt: InlineSchema.describe(
 				"Explicit instructions for arranging items that MUST: (1) name the sort property (e.g., density, size, value), (2) state the sort direction using unambiguous phrases like 'least to greatest' or 'greatest to least'."
 			),
 			choices: z
@@ -126,12 +98,13 @@ export function createCollectionScopedInteractionSchema<const E extends WidgetTy
 								.string()
 								.regex(CHOICE_IDENTIFIER_REGEX, "invalid identifier: must be uppercase")
 								.describe("Unique identifier for this choice option, used for response matching."),
-							content: ScopedBlockContentSchema.describe("Rich content for this orderable item.")
+							content: BlockSchema.describe("Rich content for this orderable item.")
 						})
 						.strict()
-						.describe("An orderable item with content")
+						.describe("An orderable item with content and optional feedback")
 				)
-				.min(1)
+				// Enforce a minimum of 2 choices at the schema level.
+				.min(2)
 				.describe("Array of items to be arranged in order."),
 			shuffle: z
 				.literal(true)
@@ -144,7 +117,7 @@ export function createCollectionScopedInteractionSchema<const E extends WidgetTy
 		})
 		.strict()
 		.describe(
-			"An interaction where users arrange items in a specific sequence or order. Prompts must specify the sort property and direction."
+			"An interaction where users arrange items in a specific sequence or order. Prompts must specify the sort property and the direction (ascending/descending using 'least to greatest'/'greatest to least')."
 		)
 
 	const GapMatchInteractionSchema = z
@@ -155,7 +128,7 @@ export function createCollectionScopedInteractionSchema<const E extends WidgetTy
 				.regex(RESPONSE_IDENTIFIER_REGEX, "invalid response identifier: must start with RESPONSE")
 				.describe("Links this interaction to its response declaration for scoring."),
 			shuffle: z.boolean().describe("Whether to shuffle the order of gap-text items (draggable tokens)."),
-			content: ScopedBlockContentSchema.nullable().describe(
+			content: BlockSchema.nullable().describe(
 				"Optional block content (e.g., <ul>/<li>/<p>) containing sentences with gap placeholders to render inside the interaction."
 			),
 			gapTexts: z
@@ -171,7 +144,7 @@ export function createCollectionScopedInteractionSchema<const E extends WidgetTy
 								.int()
 								.min(0)
 								.describe("Maximum times this item can be used. 0 = unlimited, 1 = use once only."),
-							content: ScopedInlineContentSchema.describe("The content of the draggable item (text or math).")
+							content: InlineSchema.describe("The content of the draggable item (text or math).")
 						})
 						.strict()
 						.describe("A draggable item that can be placed into gaps")
@@ -214,7 +187,7 @@ export function createCollectionScopedInteractionSchema<const E extends WidgetTy
 			"A placeholder for Perseus widgets that require interactive features not supported by the QTI schema, such as drawing or graphing."
 		)
 
-	const ScopedAnyInteractionSchema = z
+	return z
 		.discriminatedUnion("type", [
 			ChoiceInteractionSchema,
 			InlineChoiceInteractionSchema,
@@ -224,42 +197,4 @@ export function createCollectionScopedInteractionSchema<const E extends WidgetTy
 			UnsupportedInteractionSchema
 		])
 		.describe("A discriminated union representing any possible QTI interaction type supported by the system.")
-
-	// Use record to preserve value inference while we enforce required keys at call sites
-    return z.record(z.string(), ScopedAnyInteractionSchema)
-}
-
-// Import the centralized feedback schema builder
-import { createNestedFeedbackZodSchema } from "./feedback-nested-schema"
-
-/**
- * Creates a dynamic, collection-scoped Zod schema for generating feedback content.
- * @deprecated Use createNestedFeedbackZodSchema from feedback-nested-schema.ts instead.
- */
-export function createCollectionScopedFeedbackSchema<const E extends WidgetTypeTuple>(feedbackPlan: FeedbackPlan, widgetTypeKeys: E) {
-	// This function now just wraps the new centralized utility.
-	return createNestedFeedbackZodSchema(feedbackPlan, widgetTypeKeys)
-}
-
-/**
- * Creates a collection-scoped schema for the complete AssessmentItemInput
- * to be used for compiler validation
- */
-export function createCollectionScopedItemSchema<const E extends WidgetTypeTuple>(
-	collection: WidgetCollection<E>
-): z.ZodType<AssessmentItem<E>> {
-	// Build a widget mapping that includes all widgets from the collection
-	// This is used for the dynamic schema creation
-	const widgetMapping: Record<string, keyof typeof typedSchemas> = {}
-	for (const key of collection.widgetTypeKeys) {
-		if (!(key in typedSchemas)) {
-			logger.error("widget type not in registry", { key, collection: collection.name })
-			throw errors.new(`widget type '${key}' not found in typedSchemas`)
-		}
-		// Safe assertion: we verified key exists in typedSchemas above
-		widgetMapping[`_placeholder_${key}`] = key as keyof typeof typedSchemas
-	}
-
-	const { AssessmentItemSchema } = createDynamicAssessmentItemSchema(widgetMapping, collection.widgetTypeKeys)
-	return AssessmentItemSchema
 }

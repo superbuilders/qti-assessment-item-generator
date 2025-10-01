@@ -1,19 +1,19 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
-import { CanvasImpl } from "../../utils/canvas-impl"
+import { CanvasImpl } from "../utils/canvas-impl"
 import {
 	createAxisOptionsSchema,
 	createLineSchema,
 	createPlotPointSchema,
 	renderLines,
 	renderPoints
-} from "../../utils/canvas-utils"
-import { AXIS_VIEWBOX_PADDING } from "../../utils/constants"
-import { setupCoordinatePlaneV2 } from "../../utils/coordinate-plane-v2"
-import { CSS_COLOR_PATTERN } from "../../utils/css-color"
-import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
-import { theme } from "../../utils/theme"
+} from "../utils/canvas-utils"
+import { AXIS_VIEWBOX_PADDING } from "../utils/constants"
+import { setupCoordinatePlaneV2 } from "../utils/coordinate-plane-v2"
+import { CSS_COLOR_PATTERN } from "../utils/css-color"
+import { createHeightSchema, createWidthSchema } from "../utils/schemas"
+import { theme } from "../utils/theme"
 import type { WidgetGenerator } from "../types"
 
 export const ErrInvalidPolygon = errors.new("polygon must have at least 3 vertices")

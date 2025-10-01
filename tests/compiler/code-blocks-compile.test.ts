@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test"
 import { compile } from "../../src/compiler/compiler"
-import type { AssessmentItemInput } from "../../src/compiler/schemas"
+import type { AssessmentItemInput } from "../../src/core/item"
 import { allWidgetsCollection } from "../../src/widgets/collections/all"
 
 describe("Compiler: code blocks", () => {

@@ -1,13 +1,13 @@
 // imports kept minimal in this module; errors/logging handled by callers
-import type { AssessmentItemInput } from "../../compiler/schemas"
+import type { AssessmentItemInput } from "@core/item"
 import { allExamples } from "../../examples"
-import type { WidgetCollection } from "../../widgets/collections/types"
+import type { WidgetCollection } from "@widgets/collections/types"
 // Note: do not validate example shells here; examples are illustrative only
-// import { createCollectionScopedShellSchema } from "../schemas"
+// import { createAssessmentItemShellSchema } from "@core/item"
 import type { AiContextEnvelope, ImageContext } from "../types"
 import { caretBanPromptSection } from "./caret"
 import { createWidgetSelectionPromptSection, formatUnifiedContextSections } from "./shared"
-import { WidgetTypeTuple } from "../../widgets/collections/types"
+import { WidgetTypeTuple } from "@widgets/collections/types"
 
 // Helper to convert a full AssessmentItemInput into a shell for prompt examples
 function createShellFromExample<const E extends WidgetTypeTuple>(item: AssessmentItemInput<E>) {

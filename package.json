@@ -60,10 +60,6 @@
 			"types": "./dist/compiler/compiler.d.ts",
 			"import": "./dist/compiler/compiler.js"
 		},
-		"./compiler/schemas": {
-			"types": "./dist/compiler/schemas.d.ts",
-			"import": "./dist/compiler/schemas.js"
-		},
 		"./compiler/response-processor": {
 			"types": "./dist/compiler/response-processor.d.ts",
 			"import": "./dist/compiler/response-processor.js"
@@ -107,6 +103,26 @@
 		"./qti-validation/utils": {
 			"types": "./dist/qti-validation/utils.d.ts",
 			"import": "./dist/qti-validation/utils.js"
+		},
+		"./core": {
+			"types": "./dist/core/index.d.ts",
+			"import": "./dist/core/index.js"
+		},
+		"./core/content": {
+			"types": "./dist/core/content/index.d.ts",
+			"import": "./dist/core/content/index.js"
+		},
+		"./core/feedback": {
+			"types": "./dist/core/feedback/index.d.ts",
+			"import": "./dist/core/feedback/index.js"
+		},
+		"./core/interactions": {
+			"types": "./dist/core/interactions/index.d.ts",
+			"import": "./dist/core/interactions/index.js"
+		},
+		"./core/item": {
+			"types": "./dist/core/item/index.d.ts",
+			"import": "./dist/core/item/index.js"
 		}
 	}
 }

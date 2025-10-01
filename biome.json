@@ -93,6 +93,7 @@
 				"useKeyWithClickEvents": "off"
 			},
 			"performance": {
+				"noBarrelFile": "error",
 				"noImgElement": "error"
 			}
 		}

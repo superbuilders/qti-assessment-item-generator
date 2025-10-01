@@ -3,23 +3,24 @@ import * as logger from "@superbuilders/slog"
 import type OpenAI from "openai"
 import type { ChatCompletion, ChatCompletionCreateParamsNonStreaming } from "openai/resources/chat/completions"
 import { z } from "zod"
-import type { AssessmentItemInput, BlockContent, InlineContent, ResponseDeclaration } from "../compiler/schemas"
-import type { WidgetCollection, WidgetTypeTuple } from "../widgets/collections/types"
-import { allWidgetSchemas, type Widget, WidgetSchema } from "../widgets/registry"
+import type { AssessmentItemInput, ResponseDeclaration } from "@core/item"
+import type { BlockContent, InlineContent } from "@core/content"
+import type { WidgetCollection, WidgetTypeTuple } from "@widgets/collections/types"
+import { allWidgetSchemas, type Widget, WidgetSchema } from "@widgets/registry"
 
 function isWidgetTypeKey(v: string): v is keyof typeof allWidgetSchemas {
 	return v in allWidgetSchemas
 }
 
-import { collectWidgetRefs } from "./collector"
-import { buildFeedbackPlanFromInteractions } from "./feedback-plan-builder"
-import { validateNestedFeedback, convertNestedFeedbackToBlocks } from "./feedback-nested-schema"
-import { toJSONSchemaPromptSafe } from "./json-schema"
+import { collectWidgetRefs } from "./utils/collector"
+import { buildFeedbackPlanFromInteractions, validateNestedFeedback, convertNestedFeedbackToBlocks } from "@core/feedback"
+import { toJSONSchemaPromptSafe } from "@core/json-schema"
 import { createFeedbackPrompt } from "./prompts/feedback"
 import { createInteractionContentPrompt } from "./prompts/interactions"
 import { createAssessmentShellPrompt } from "./prompts/shell"
 import { createWidgetContentPrompt } from "./prompts/widgets"
-import { createCollectionScopedInteractionSchema, createCollectionScopedShellSchema } from "./schemas"
+import { createAssessmentItemShellSchema } from "@core/item"
+import { createAnyInteractionSchema } from "@core/interactions"
 import type { AiContextEnvelope, ImageContext } from "./types"
 
 const OPENAI_MODEL = "gpt-5"
@@ -84,7 +85,7 @@ async function generateAssessmentShell<const E extends WidgetTypeTuple>(
 ) {
 	const { systemInstruction, userContent } = createAssessmentShellPrompt(envelope, imageContext, widgetCollection)
 
-	const ShellSchema = createCollectionScopedShellSchema(widgetCollection.widgetTypeKeys)
+	const ShellSchema = createAssessmentItemShellSchema(widgetCollection.widgetTypeKeys)
 	const jsonSchema = toJSONSchemaPromptSafe(ShellSchema)
 
 	logger.debug("generated json schema for openai", {
@@ -231,7 +232,8 @@ async function generateInteractionContent<const E extends WidgetTypeTuple>(
 		widgetCollection
 	)
 
-	const InteractionSchema = createCollectionScopedInteractionSchema(interactionIds, widgetCollection.widgetTypeKeys)
+	const AnyInteraction = createAnyInteractionSchema(widgetCollection.widgetTypeKeys)
+	const InteractionSchema = z.record(z.string(), AnyInteraction)
 	const jsonSchema = toJSONSchemaPromptSafe(InteractionSchema)
 
 	logger.debug("generated json schema for openai", {

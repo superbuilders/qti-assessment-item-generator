@@ -2,13 +2,13 @@ import { describe, expect, test } from "bun:test"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
-import { toJSONSchemaPromptSafe } from "../../src/structured/json-schema"
-import { createCollectionScopedShellSchema } from "../../src/structured/schemas"
+import { toJSONSchemaPromptSafe } from "../../src/core/json-schema"
+import { createAssessmentItemShellSchema } from "../../src/core/item"
 import { allWidgetsCollection } from "../../src/widgets/collections/all"
 
 describe("JSON Schema Preflight", () => {
 	test("collection-scoped shell schema converts to JSON Schema", () => {
-		const Shell = createCollectionScopedShellSchema(allWidgetsCollection.widgetTypeKeys)
+		const Shell = createAssessmentItemShellSchema(allWidgetsCollection.widgetTypeKeys)
 		const result = errors.trySync(() => z.toJSONSchema(Shell))
 		if (result.error) {
 			logger.error("shell schema json conversion", { error: result.error })

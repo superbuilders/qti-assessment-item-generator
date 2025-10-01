@@ -2,7 +2,7 @@ import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
 import type { WidgetCollection, WidgetTypeTuple } from "../../widgets/collections/types"
-import { toJSONSchemaPromptSafe } from "../json-schema"
+import { toJSONSchemaPromptSafe } from "@core/json-schema"
 
 // Runtime type guard to ensure values are Zod schemas without using type assertions
 function isZodSchema(value: unknown): value is z.ZodType<unknown> {

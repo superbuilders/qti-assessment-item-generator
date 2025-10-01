@@ -7,7 +7,7 @@ import {
 	fixMathMLOperators,
 	removeDoubleNewlines,
 	stripXmlComments
-} from "../src/compiler/xml-fixes"
+} from "../src/compiler/utils/xml-fixes"
 
 describe("XML Fix Utilities", () => {
 	describe("convertHtmlEntities", () => {

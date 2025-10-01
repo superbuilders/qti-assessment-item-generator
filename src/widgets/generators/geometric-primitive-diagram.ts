@@ -1,9 +1,9 @@
 import { z } from "zod"
-import { CanvasImpl } from "../../utils/canvas-impl"
-import { PADDING } from "../../utils/constants"
-import { Path2D } from "../../utils/path-builder"
-import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
-import { theme } from "../../utils/theme"
+import { CanvasImpl } from "../utils/canvas-impl"
+import { PADDING } from "../utils/constants"
+import { Path2D } from "../utils/path-builder"
+import { createHeightSchema, createWidthSchema } from "../utils/schemas"
+import { theme } from "../utils/theme"
 import type { WidgetGenerator } from "../types"
 
 // Defines a point with an optional label. Coordinates are calculated automatically.

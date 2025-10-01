@@ -4,7 +4,7 @@ import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import OpenAI from "openai"
 import { compile } from "../src/compiler/compiler"
-import type { AssessmentItemInput } from "../src/compiler/schemas"
+import type { AssessmentItemInput } from "../src/core/item"
 import { differentiateAssessmentItem } from "../src/structured/differentiator"
 import { allWidgetsCollection } from "../src/widgets/collections/all"
 

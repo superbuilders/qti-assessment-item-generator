@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { compile, ErrDuplicateChoiceIdentifier, ErrDuplicateResponseIdentifier } from "../../src/compiler/compiler"
-import type { AssessmentItemInput } from "../../src/compiler/schemas"
+import type { AssessmentItemInput } from "../../src/core/item"
 import { allWidgetsCollection } from "../../src/widgets/collections/all"
 
 describe("Compiler Identifier Validation Integration Tests", () => {

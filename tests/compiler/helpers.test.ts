@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test"
-import { deriveComboIdentifier, normalizeIdPart } from "../../src/compiler/helpers"
+import { deriveComboIdentifier, normalizeIdPart } from "../../src/compiler/utils/helpers"
 
 describe("helpers", () => {
 	test("normalizeIdPart uppercases and strips invalids", () => {

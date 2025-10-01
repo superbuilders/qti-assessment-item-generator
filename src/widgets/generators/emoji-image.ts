@@ -1,6 +1,6 @@
 import { z } from "zod"
-import { CanvasImpl } from "../../utils/canvas-impl"
-import { PADDING } from "../../utils/constants"
+import { CanvasImpl } from "../utils/canvas-impl"
+import { PADDING } from "../utils/constants"
 import type { WidgetGenerator } from "../types"
 
 export const EmojiImagePropsSchema = z

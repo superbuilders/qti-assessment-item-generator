@@ -1,10 +1,10 @@
 import { z } from "zod"
-import { CanvasImpl } from "../../utils/canvas-impl"
-import { AXIS_VIEWBOX_PADDING } from "../../utils/constants"
-import { setupCoordinatePlaneBaseV2 } from "../../utils/coordinate-plane-utils"
-import { CSS_COLOR_PATTERN } from "../../utils/css-color"
-import { createHeightSchema, createWidthSchema } from "../../utils/schemas"
-import { theme } from "../../utils/theme"
+import { CanvasImpl } from "../utils/canvas-impl"
+import { AXIS_VIEWBOX_PADDING } from "../utils/constants"
+import { setupCoordinatePlaneBaseV2 } from "../utils/coordinate-plane-utils"
+import { CSS_COLOR_PATTERN } from "../utils/css-color"
+import { createHeightSchema, createWidthSchema } from "../utils/schemas"
+import { theme } from "../utils/theme"
 import type { WidgetGenerator } from "../types"
 
 // Factory helpers to avoid schema reuse and $ref generation

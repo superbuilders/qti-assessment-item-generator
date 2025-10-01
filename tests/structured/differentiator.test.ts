@@ -1,7 +1,7 @@
 import { describe, expect, mock, test } from "bun:test"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import type { AssessmentItemInput } from "../../src/compiler/schemas"
+import type { AssessmentItemInput } from "../../src/core/item"
 import { differentiateAssessmentItem } from "../../src/structured/differentiator"
 import { allWidgetsCollection } from "../../src/widgets/collections/all"
 

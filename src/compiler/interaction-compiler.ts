@@ -1,9 +1,9 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import { escapeXmlAttribute } from "../utils/xml-utils"
+import { escapeXmlAttribute } from "./utils/xml-utils"
 import type { WidgetTypeTuple } from "../widgets/collections/types"
 import { renderBlockContent, renderInlineContent } from "./content-renderer"
-import type { AnyInteraction } from "./schemas"
+import type { AnyInteraction } from "@core/interactions"
 
 export function compileInteraction<E extends WidgetTypeTuple = WidgetTypeTuple>(
 	interaction: AnyInteraction<E>,

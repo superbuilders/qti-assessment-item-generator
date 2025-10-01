@@ -1,6 +1,7 @@
 import { describe, it, expect } from "bun:test"
 import { compileResponseProcessing } from "../../src/compiler/response-processor"
-import type { AssessmentItem, FeedbackPlan } from "../../src/compiler/schemas"
+import type { AssessmentItem } from "../../src/core/item"
+import type { FeedbackPlan } from "../../src/core/feedback"
 
 describe("Response Processing - two MC combo plan", () => {
 	it("emits FEEDBACK__OVERALL for all combinations", () => {

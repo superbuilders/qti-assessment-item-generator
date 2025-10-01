@@ -1,7 +1,7 @@
 import { describe, it, expect } from "bun:test"
 import { compile } from "../../src/compiler/compiler"
 import { allWidgetsCollection } from "../../src/widgets/collections/all"
-import type { AssessmentItem } from "../../src/compiler/schemas"
+import type { AssessmentItem } from "../../src/core/item"
 
 describe("E2E compile: two MC with combo feedback", () => {
 	it("produces valid QTI with response processing and feedback blocks", async () => {

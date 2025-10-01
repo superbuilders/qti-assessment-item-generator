@@ -1,6 +1,7 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import type { AnyInteraction, AssessmentItemShell } from "../compiler/schemas"
+import type { AssessmentItemShell } from "@core/item"
+import type { AnyInteraction } from "@core/interactions"
 import { widgetCollections } from "../widgets/collections"
 import { allWidgetSchemas } from "../widgets/registry"
 import { caretBanPromptSection } from "./caret"
