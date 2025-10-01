@@ -3,6 +3,7 @@ import * as logger from "@superbuilders/slog"
 import { z } from "zod"
 
 type BaseSchema = z.core.JSONSchema.BaseSchema
+type $ZodTypes = z.core.$ZodTypes
 
 function isBaseSchema(value: unknown): value is BaseSchema {
 	return (
@@ -16,6 +17,52 @@ function isBaseSchema(value: unknown): value is BaseSchema {
 
 function isRecord(value: unknown): value is Record<string, unknown> {
     return typeof value === "object" && value !== null
+}
+
+// Narrow unknown to a generic object for safe property checks
+function isObject(value: unknown): value is Record<PropertyKey, unknown> {
+    return typeof value === "object" && value !== null
+}
+
+// Public ZodType guard without assertions
+function isPublicZodType(value: unknown): value is z.ZodType {
+    if (!isObject(value)) return false
+    const def = value["_def"]
+    const safeParse = value["safeParse"]
+    return isObject(def) && typeof safeParse === "function"
+}
+
+// Core ($ZodTypes) guard without assertions
+function isCoreZodType(value: unknown): value is $ZodTypes {
+    if (!isObject(value)) return false
+    const internals = value["_zod"]
+    if (!isObject(internals)) return false
+    const def = internals["def"]
+    return isObject(def) && typeof def["type"] === "string"
+}
+
+// ZodEffects (transform/refine) guard on public schema objects
+function isZodEffects(value: unknown): value is { _def: { typeName?: string }; schema: unknown } {
+    if (!isObject(value)) return false
+    const def = value["_def"]
+    if (!isObject(def)) return false
+    const typeName = def["typeName"]
+    return typeName === "ZodEffects" && "schema" in value
+}
+
+// Given a core ($ZodTypes) schema, return the input-side inner schema when the core node is an effect wrapper.
+// The returned schema is a public z.ZodType to satisfy z.toJSONSchema typing.
+function unwrapCoreInputSchema(schema: $ZodTypes): z.ZodType | null {
+    const def = schema._zod.def
+    const kind = def["type"]
+    // Only handle pipe explicitly; preserve nullable/optional and others to keep semantics intact
+    if (kind === "pipe") {
+        const inner = def.in
+        if (isPublicZodType(inner)) return inner
+        if (isCoreZodType(inner)) return unwrapCoreInputSchema(inner)
+        return null
+    }
+    return null
 }
 
 // Recursively remove 'propertyNames' which OpenAI's response_format rejects
@@ -150,10 +197,25 @@ export function toJSONSchemaPromptSafe(schema: z.ZodType): BaseSchema {
         target: "draft-2020-12",
 		unrepresentable: "any",
 		override: (ctx) => {
-			const def = ctx?.zodSchema?._zod?.def
-			if (def?.type === "transform" && "inner" in def && def.inner) {
-				// biome-ignore lint: this is fine
-				ctx.jsonSchema = z.toJSONSchema(def.inner as z.ZodType, options)
+			const schemaUnknown = ctx.zodSchema
+			// First, handle ZodEffects (public wrapper created by .transform/.refine)
+			if (isZodEffects(schemaUnknown)) {
+				const inner = schemaUnknown.schema
+				if (isPublicZodType(inner)) {
+					ctx.jsonSchema = z.toJSONSchema(inner, options)
+					return
+				}
+				if (isCoreZodType(inner)) {
+					const unwrapped = unwrapCoreInputSchema(inner)
+					if (unwrapped) ctx.jsonSchema = z.toJSONSchema(unwrapped, options)
+					return
+				}
+				return
+			}
+			// Next, handle core wrappers like pipe/default/catch/etc
+			if (isCoreZodType(schemaUnknown)) {
+				const unwrapped = unwrapCoreInputSchema(schemaUnknown)
+				if (unwrapped) ctx.jsonSchema = z.toJSONSchema(unwrapped, options)
 			}
 		}
 	}
