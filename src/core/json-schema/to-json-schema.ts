@@ -3,7 +3,6 @@ import * as logger from "@superbuilders/slog"
 import { z } from "zod"
 
 type BaseSchema = z.core.JSONSchema.BaseSchema
-type $ZodTypes = z.core.$ZodTypes
 
 function isBaseSchema(value: unknown): value is BaseSchema {
 	return (
@@ -17,16 +16,6 @@ function isBaseSchema(value: unknown): value is BaseSchema {
 
 function isRecord(value: unknown): value is Record<string, unknown> {
     return typeof value === "object" && value !== null
-}
-
-// v4 core pipe guard: narrows $ZodTypes to $ZodPipe (created by classic .transform() calls)
-function isCorePipe(schema: $ZodTypes): schema is z.core.$ZodPipe {
-    return schema._zod.def.type === "pipe"
-}
-
-// v4 core transform guard: narrows $ZodTypes to $ZodTransform
-function isCoreTransform(schema: $ZodTypes): schema is z.core.$ZodTransform {
-    return schema._zod.def.type === "transform"
 }
 
 // Recursively remove 'propertyNames' which OpenAI's response_format rejects
@@ -88,12 +77,18 @@ function stripPropertyNames(node: z.core.JSONSchema._JSONSchema): void {
     }
 }
 
-// Hoisted normalization helper: ensure every object has an explicit properties: {}
+// Hoisted normalization helper: ensure every object has an explicit properties: {} and additionalProperties: false
 function ensureEmptyProperties(node: BaseSchema): void {
 	if (!(typeof node === "object" && node !== null && !Array.isArray(node))) return
 
-	if (node.type === "object" && node.properties === undefined) {
-		node.properties = {}
+	// For object-type schemas, ensure properties exists and additionalProperties is false
+	if (node.type === "object") {
+		if (node.properties === undefined) {
+			node.properties = {}
+		}
+		if (node.additionalProperties === undefined) {
+			node.additionalProperties = false
+		}
 	}
 
 	// Recurse into properties
@@ -156,30 +151,12 @@ function ensureEmptyProperties(node: BaseSchema): void {
  * - Fails hard if conversion throws or produces an empty schema
  */
 export function toJSONSchemaPromptSafe(schema: z.ZodType): BaseSchema {
-	// Define options with a self-referential override to unwrap transforms recursively
+	// Define options for JSON Schema conversion
+	// io: "input" automatically unwraps transforms to their input schema
     const options: Parameters<typeof z.toJSONSchema>[1] = {
         target: "draft-2020-12",
         io: "input",
         unrepresentable: "any",
-        override: (ctx) => {
-            const s = ctx.zodSchema
-            // ctx.zodSchema is already typed as $ZodTypes (core schemas)
-            // Handle v4 core pipe (created by classic .transform() calls)
-            // Pipes wrap: in=original schema, out=ZodTransform
-            // For input-side schemas, use the 'in' schema
-            if (isCorePipe(s)) {
-                ctx.jsonSchema = z.toJSONSchema(s._zod.def.in, options)
-                return
-            }
-            // Handle standalone v4 core transform (rare, but fallback to parent if set)
-            if (isCoreTransform(s)) {
-                const parent = s._zod.parent
-                if (parent) {
-                    ctx.jsonSchema = z.toJSONSchema(parent, options)
-                    return
-                }
-            }
-        }
 	}
 
 	const result = errors.trySync(() => z.toJSONSchema(schema, options))
