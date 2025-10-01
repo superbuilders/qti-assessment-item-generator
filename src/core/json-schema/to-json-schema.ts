@@ -19,50 +19,14 @@ function isRecord(value: unknown): value is Record<string, unknown> {
     return typeof value === "object" && value !== null
 }
 
-// Narrow unknown to a generic object for safe property checks
-function isObject(value: unknown): value is Record<PropertyKey, unknown> {
-    return typeof value === "object" && value !== null
+// v4 core pipe guard: narrows $ZodTypes to $ZodPipe (created by classic .transform() calls)
+function isCorePipe(schema: $ZodTypes): schema is z.core.$ZodPipe {
+    return schema._zod.def.type === "pipe"
 }
 
-// Public ZodType guard without assertions
-function isPublicZodType(value: unknown): value is z.ZodType {
-    if (!isObject(value)) return false
-    const def = value["_def"]
-    const safeParse = value["safeParse"]
-    return isObject(def) && typeof safeParse === "function"
-}
-
-// Core ($ZodTypes) guard without assertions
-function isCoreZodType(value: unknown): value is $ZodTypes {
-    if (!isObject(value)) return false
-    const internals = value["_zod"]
-    if (!isObject(internals)) return false
-    const def = internals["def"]
-    return isObject(def) && typeof def["type"] === "string"
-}
-
-// ZodEffects (transform/refine) guard on public schema objects
-function isZodEffects(value: unknown): value is { _def: { typeName?: string }; schema: unknown } {
-    if (!isObject(value)) return false
-    const def = value["_def"]
-    if (!isObject(def)) return false
-    const typeName = def["typeName"]
-    return typeName === "ZodEffects" && "schema" in value
-}
-
-// Given a core ($ZodTypes) schema, return the input-side inner schema when the core node is an effect wrapper.
-// The returned schema is a public z.ZodType to satisfy z.toJSONSchema typing.
-function unwrapCoreInputSchema(schema: $ZodTypes): z.ZodType | null {
-    const def = schema._zod.def
-    const kind = def["type"]
-    // Only handle pipe explicitly; preserve nullable/optional and others to keep semantics intact
-    if (kind === "pipe") {
-        const inner = def.in
-        if (isPublicZodType(inner)) return inner
-        if (isCoreZodType(inner)) return unwrapCoreInputSchema(inner)
-        return null
-    }
-    return null
+// v4 core transform guard: narrows $ZodTypes to $ZodTransform
+function isCoreTransform(schema: $ZodTypes): schema is z.core.$ZodTransform {
+    return schema._zod.def.type === "transform"
 }
 
 // Recursively remove 'propertyNames' which OpenAI's response_format rejects
@@ -195,29 +159,27 @@ export function toJSONSchemaPromptSafe(schema: z.ZodType): BaseSchema {
 	// Define options with a self-referential override to unwrap transforms recursively
     const options: Parameters<typeof z.toJSONSchema>[1] = {
         target: "draft-2020-12",
-		unrepresentable: "any",
-		override: (ctx) => {
-			const schemaUnknown = ctx.zodSchema
-			// First, handle ZodEffects (public wrapper created by .transform/.refine)
-			if (isZodEffects(schemaUnknown)) {
-				const inner = schemaUnknown.schema
-				if (isPublicZodType(inner)) {
-					ctx.jsonSchema = z.toJSONSchema(inner, options)
-					return
-				}
-				if (isCoreZodType(inner)) {
-					const unwrapped = unwrapCoreInputSchema(inner)
-					if (unwrapped) ctx.jsonSchema = z.toJSONSchema(unwrapped, options)
-					return
-				}
-				return
-			}
-			// Next, handle core wrappers like pipe/default/catch/etc
-			if (isCoreZodType(schemaUnknown)) {
-				const unwrapped = unwrapCoreInputSchema(schemaUnknown)
-				if (unwrapped) ctx.jsonSchema = z.toJSONSchema(unwrapped, options)
-			}
-		}
+        io: "input",
+        unrepresentable: "any",
+        override: (ctx) => {
+            const s = ctx.zodSchema
+            // ctx.zodSchema is already typed as $ZodTypes (core schemas)
+            // Handle v4 core pipe (created by classic .transform() calls)
+            // Pipes wrap: in=original schema, out=ZodTransform
+            // For input-side schemas, use the 'in' schema
+            if (isCorePipe(s)) {
+                ctx.jsonSchema = z.toJSONSchema(s._zod.def.in, options)
+                return
+            }
+            // Handle standalone v4 core transform (rare, but fallback to parent if set)
+            if (isCoreTransform(s)) {
+                const parent = s._zod.parent
+                if (parent) {
+                    ctx.jsonSchema = z.toJSONSchema(parent, options)
+                    return
+                }
+            }
+        }
 	}
 
 	const result = errors.trySync(() => z.toJSONSchema(schema, options))
