@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { nestedShapeDiagramExamples } from "../../examples/nested-shape-diagram"
-import { generateWidget } from "../../src/widgets/widget-generator"
+import { generateWidgetLegacy } from "../../src/widgets/widget-generator"
 
 describe("nestedShapeDiagram widget tests", () => {
 	// Test each example from the examples file
@@ -43,7 +43,7 @@ describe("nestedShapeDiagram widget tests", () => {
 			: `nested-shape-diagram - Example ${index + 1}`
 
 		test(testName, async () => {
-			const result = await errors.try(generateWidget(example))
+			const result = await errors.try(generateWidgetLegacy(example))
 			if (result.error) {
 				logger.error("widget generation failed for nestedShapeDiagram", {
 					error: result.error,

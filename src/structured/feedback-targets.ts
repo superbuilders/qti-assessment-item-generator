@@ -1,6 +1,5 @@
 import type { AnyInteraction } from "@/core/interactions"
 import type { AssessmentItemShell } from "@/core/item"
-import type { WidgetTypeTuple } from "../widgets/collections/types"
 
 export type FeedbackTarget = {
 	outcomeIdentifier: string
@@ -18,7 +17,7 @@ export type FeedbackTarget = {
  * @param interactions - Generated interactions that reference these responses
  * @returns Array of feedback targets with outcome and block identifiers
  */
-export function enumerateFeedbackTargets<E extends WidgetTypeTuple>(
+export function enumerateFeedbackTargets<E extends readonly string[]>(
 	responseDeclarations: AssessmentItemShell<E>["responseDeclarations"],
 	interactions: Record<string, AnyInteraction<E>>
 ): FeedbackTarget[] {

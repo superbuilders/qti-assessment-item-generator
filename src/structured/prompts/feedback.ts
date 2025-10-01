@@ -1,7 +1,7 @@
 import type { FeedbackPlan } from "@/core/feedback"
 import { createNestedFeedbackZodSchema } from "@/core/feedback"
 import type { AssessmentItemShell } from "@/core/item"
-import type { WidgetCollection, WidgetTypeTuple } from "@/widgets/collections/types"
+import type { WidgetCollection, WidgetDefinition } from "@/widgets/collections/types"
 import type { AiContextEnvelope, ImageContext } from "../types"
 import { createWidgetSelectionPromptSection, formatUnifiedContextSections } from "./shared"
 
@@ -9,12 +9,14 @@ import { createWidgetSelectionPromptSection, formatUnifiedContextSections } from
  * Creates a feedback generation prompt with a dynamically-generated Zod schema
  * that enforces the overall feedback outcome with a nested, exact-key structure.
  */
-export function createFeedbackPrompt<E extends WidgetTypeTuple>(
+export function createFeedbackPrompt<
+	C extends WidgetCollection<Record<string, WidgetDefinition<unknown, unknown>>, readonly string[]>
+>(
 	envelope: AiContextEnvelope,
-	assessmentShell: AssessmentItemShell<E>,
+	assessmentShell: AssessmentItemShell<C["widgetTypeKeys"]>,
 	feedbackPlan: FeedbackPlan,
 	imageContext: ImageContext,
-	widgetCollection: WidgetCollection<E>
+	widgetCollection: C
 ) {
 	// Build the nested authoring schema inside the prompt helper, passing only the keys.
 	const FeedbackSchema = createNestedFeedbackZodSchema(feedbackPlan, widgetCollection.widgetTypeKeys)

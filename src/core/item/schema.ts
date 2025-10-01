@@ -4,10 +4,9 @@ import { FeedbackPlanSchema } from "@/core/feedback"
 import { createAnyInteractionSchema } from "@/core/interactions"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import type { WidgetTypeTuple } from "@/widgets/collections/types"
-import { typedSchemas } from "@/widgets/registry"
 import { z } from "zod"
 import type { AssessmentItem, AssessmentItemShell, ResponseDeclaration } from "./types"
+import type { Widget } from "@/widgets/registry"
 
 // Response Declaration Schema (shared across all dynamic schemas)
 function createResponseDeclarationSchema(): z.ZodType<ResponseDeclaration> {
@@ -64,7 +63,7 @@ function createResponseDeclarationSchema(): z.ZodType<ResponseDeclaration> {
 		)
 }
 
-export function createAssessmentItemShellSchema<const E extends WidgetTypeTuple>(
+export function createAssessmentItemShellSchema<const E extends readonly string[]>(
 	widgetTypeKeys: E
 ): z.ZodType<AssessmentItemShell<E>> {
 	const ResponseDeclarationSchema = createResponseDeclarationSchema()
@@ -82,27 +81,29 @@ export function createAssessmentItemShellSchema<const E extends WidgetTypeTuple>
 		.describe("Initial assessment item structure with ref placeholders from the first AI generation shot.")
 }
 
-export function createDynamicAssessmentItemSchema<const E extends WidgetTypeTuple>(
-	widgetMapping: Record<string, keyof typeof typedSchemas>,
-	widgetTypeKeys: E
+export function createDynamicAssessmentItemSchema<
+	const E extends readonly string[],
+	T extends Record<E[number], z.ZodType<unknown, unknown>>
+>(
+	widgetMapping: Record<string, E[number]>,
+	widgetTypeKeys: E,
+	widgetSchemas: T
 ) {
-	type WidgetSchema = (typeof typedSchemas)[keyof typeof typedSchemas]
-	const widgetShape: Record<string, WidgetSchema> = {}
+	const widgetShape: Record<string, z.ZodType<unknown, unknown>> = {}
 	for (const [slotName, widgetType] of Object.entries(widgetMapping)) {
-		const schema = typedSchemas[widgetType]
-		if (schema) {
-			widgetShape[slotName] = schema
-		} else {
+		const schema = widgetSchemas[widgetType]
+		if (!schema) {
 			logger.error("unknown widget type in mapping", {
 				slotName,
 				widgetType,
-				availableTypes: Object.keys(typedSchemas)
+				availableTypes: widgetTypeKeys
 			})
 			throw errors.new(`unknown widget type specified in mapping: ${widgetType}`)
 		}
+		widgetShape[slotName] = schema
 	}
 
-	const DynamicWidgetsSchema = z.object(widgetShape).describe("Map of widget slot IDs to their widget definitions")
+	const DynamicWidgetsSchema = z.object(widgetShape).describe("Map of widget slot IDs to their widget definitions") as z.ZodType<Record<string, Widget> | null>
 	const BlockSchema = createBlockContentSchema(widgetTypeKeys)
 	const AnyInteractionSchema = createAnyInteractionSchema(widgetTypeKeys)
 	const ResponseDeclarationSchema = createResponseDeclarationSchema()

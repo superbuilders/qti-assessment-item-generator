@@ -1,19 +1,20 @@
-import {
-	EmojiImagePropsSchema,
-	PeriodicTableWidgetPropsSchema,
-	UrlImageWidgetPropsSchema,
-	VennDiagramPropsSchema,
-	VideoPropsSchema
-} from "../registry"
+import type { WidgetCollection } from "@/widgets/collections/types"
+import { allWidgetDefinitions } from "@/widgets/definitions"
 
-export const simpleVisualCollection = {
+export const simpleVisualCollection: WidgetCollection<
+	Pick<
+		typeof allWidgetDefinitions,
+		"emojiImage" | "urlImage" | "vennDiagram" | "periodicTable" | "video"
+	>,
+	readonly ["emojiImage", "urlImage", "vennDiagram", "periodicTable", "video"]
+> = {
 	name: "simple-visual",
-	schemas: {
-		emojiImage: EmojiImagePropsSchema,
-		urlImage: UrlImageWidgetPropsSchema,
-		vennDiagram: VennDiagramPropsSchema,
-		periodicTable: PeriodicTableWidgetPropsSchema,
-		video: VideoPropsSchema
+	widgets: {
+		emojiImage: allWidgetDefinitions.emojiImage,
+		urlImage: allWidgetDefinitions.urlImage,
+		vennDiagram: allWidgetDefinitions.vennDiagram,
+		periodicTable: allWidgetDefinitions.periodicTable,
+		video: allWidgetDefinitions.video
 	},
-	widgetTypeKeys: ["emojiImage", "urlImage", "vennDiagram", "periodicTable", "video"] as const
+	widgetTypeKeys: ["emojiImage", "urlImage", "vennDiagram", "periodicTable", "video"]
 } as const

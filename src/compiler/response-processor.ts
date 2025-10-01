@@ -2,10 +2,9 @@ import type { FeedbackDimension, FeedbackPlan } from "@/core/feedback"
 import type { AssessmentItem } from "@/core/item"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import type { WidgetTypeTuple } from "../widgets/collections/types"
 import { escapeXmlAttribute } from "./utils/xml-utils"
 
-export function compileResponseDeclarations<E extends WidgetTypeTuple>(
+export function compileResponseDeclarations<E extends readonly string[]>(
 	decls: AssessmentItem<E>["responseDeclarations"]
 ): string {
 	return decls
@@ -109,7 +108,7 @@ export function compileResponseDeclarations<E extends WidgetTypeTuple>(
 		.join("")
 }
 
-function generateComboModeProcessing<E extends WidgetTypeTuple>(item: AssessmentItem<E>): string {
+function generateComboModeProcessing<E extends readonly string[]>(item: AssessmentItem<E>): string {
 	const { dimensions, combinations } = item.feedbackPlan
 
 	function buildConditionTree(
@@ -184,7 +183,7 @@ function generateComboModeProcessing<E extends WidgetTypeTuple>(item: Assessment
 	return buildConditionTree(dimensions, [])
 }
 
-function generateFallbackModeProcessing<E extends WidgetTypeTuple>(item: AssessmentItem<E>): string {
+function generateFallbackModeProcessing<E extends readonly string[]>(item: AssessmentItem<E>): string {
 	if (item.feedbackPlan.dimensions.length === 0) {
 		logger.error("no dimensions for fallback mode processing", { itemIdentifier: item.identifier })
 		throw errors.new("fallback mode requires at least one dimension")
@@ -218,7 +217,7 @@ function generateFallbackModeProcessing<E extends WidgetTypeTuple>(item: Assessm
     </qti-response-condition>`
 }
 
-export function compileResponseProcessing<E extends WidgetTypeTuple>(item: AssessmentItem<E>): string {
+export function compileResponseProcessing<E extends readonly string[]>(item: AssessmentItem<E>): string {
 	const processingRules: string[] = []
 	const { feedbackPlan } = item
 

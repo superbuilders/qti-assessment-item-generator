@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<qti-assessment-item xmlns="http://www.imsglobal.org/xsd/imsqtiasi_v3p0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqtiasi_v3p0 https://purl.imsglobal.org/spec/qti/v3p0/schema/xsd/imsqti_asiv3p0p1_v1p0.xsd"
+  identifier="guided-worked-example-strict-unlock" title="Multiply Numbers Using Equal Groups"
+  adaptive="true" time-dependent="false" xml:lang="en-US">
+
+  <!-- === RESPONSE DECLARATIONS FOR ALL BUTTONS AND THE FINAL ANSWER === -->
+  <qti-response-declaration identifier="SHOW_PART2" base-type="boolean" cardinality="single"/>
+  <qti-response-declaration identifier="REVEAL_QUICK_CHECK" base-type="boolean" cardinality="single"/>
+  <qti-response-declaration identifier="SHOW_PART3" base-type="boolean" cardinality="single"/>
+  <qti-response-declaration identifier="SHOW_PART4" base-type="boolean" cardinality="single"/>
+  <qti-response-declaration identifier="SHOW_PRACTICE_STEP1" base-type="boolean" cardinality="single"/>
+  <qti-response-declaration identifier="SHOW_PRACTICE_STEP2" base-type="boolean" cardinality="single"/>
+  <qti-response-declaration identifier="SHOW_PRACTICE_STEP3" base-type="boolean" cardinality="single"/>
+  <qti-response-declaration identifier="PRACTICE_ANSWER" base-type="integer" cardinality="single">
+    <qti-correct-response>
+      <qti-value>5</qti-value>
+    </qti-correct-response>
+  </qti-response-declaration>
+  
+  <!-- === OUTCOME DECLARATIONS TO CONTROL VISIBILITY AND SCORE === -->
+  <qti-outcome-declaration identifier="SCORE" cardinality="single" base-type="float">
+    <qti-default-value><qti-value>0</qti-value></qti-default-value>
+  </qti-outcome-declaration>
+  
+  <qti-outcome-declaration identifier="LESSON_STEP" cardinality="multiple" base-type="identifier">
+    <qti-default-value><qti-value>part1</qti-value></qti-default-value>
+  </qti-outcome-declaration>
+
+  <qti-outcome-declaration identifier="QUICK_CHECK_VISIBILITY" cardinality="single" base-type="identifier">
+      <qti-default-value><qti-value>hidden</qti-value></qti-default-value>
+  </qti-outcome-declaration>
+
+  <qti-outcome-declaration identifier="PRACTICE_STEP" cardinality="multiple" base-type="identifier">
+    <qti-default-value><qti-value>start</qti-value></qti-default-value>
+  </qti-outcome-declaration>
+
+  <qti-item-body>
+    <!-- === PART 1: INTRODUCTION (Visible by default) === -->
+    <qti-feedback-block outcome-identifier="LESSON_STEP" identifier="part1" show-hide="show">
+      <qti-content-body>
+        <h2>Today, you will learn how to...</h2>
+        <p>Multiply numbers using equal groups.</p>
+        <qti-end-attempt-interaction response-identifier="SHOW_PART2" title="Continue"/>
+      </qti-content-body>
+    </qti-feedback-block>
+
+    <!-- === PART 2: UNDERSTANDING EQUATIONS (Hidden until button is pressed) === -->
+    <qti-feedback-block outcome-identifier="LESSON_STEP" identifier="part2" show-hide="show">
+      <qti-content-body>
+        <h3>Understanding Multiplication Equations</h3>
+        <p>A multiplication equation has three parts:</p>
+        <ul>
+          <li>The first number tells us how many groups there are.</li>
+          <li>The second number tells us how many objects are in each group.</li>
+          <li>The answer tells the total number of objects.</li>
+        </ul>
+        <div class="qti-well">
+          <h4>Quick Check:</h4>
+          <p>Look at this multiplication equation: 4 × 3 = 12.</p>
+          <p>Which number tells you how many total objects there are?</p>
+          <qti-feedback-block outcome-identifier="QUICK_CHECK_VISIBILITY" identifier="hidden" show-hide="show">
+            <qti-end-attempt-interaction response-identifier="REVEAL_QUICK_CHECK" title="Click to see answer"/>
+          </qti-feedback-block>
+          <qti-feedback-block outcome-identifier="QUICK_CHECK_VISIBILITY" identifier="visible" show-hide="show">
+            <p><strong>Answer: 12</strong></p>
+            <qti-end-attempt-interaction response-identifier="SHOW_PART3" title="Continue"/>
+          </qti-feedback-block>
+        </div>
+      </qti-content-body>
+    </qti-feedback-block>
+    
+    <!-- === PART 3: FINDING MISSING NUMBERS (Hidden until button is pressed) === -->
+    <qti-feedback-block outcome-identifier="LESSON_STEP" identifier="part3" show-hide="show">
+      <qti-content-body>
+        <h3>Finding Missing Numbers in Multiplication Equations</h3>
+        <p>Sometimes a number is missing in a multiplication equation.</p>
+        <ol>
+          <li>First, look at the groups and objects.</li>
+          <li>Next, ask yourself:
+            <ul>
+              <li>Is the missing number how many groups there are?</li>
+              <li>Or is it how many objects are in each group?</li>
+            </ul>
+          </li>
+          <li>Then, count the groups or objects to find the missing number.</li>
+        </ol>
+        <qti-end-attempt-interaction response-identifier="SHOW_PART4" title="Show Practice Problem"/>
+      </qti-content-body>
+    </qti-feedback-block>
+
+    <!-- === PART 4: WORKED EXAMPLE & PRACTICE (Hidden until button is pressed) === -->
+    <qti-feedback-block outcome-identifier="LESSON_STEP" identifier="part4" show-hide="show">
+        <qti-content-body>
+            <p>Use the examples on the left to help you solve the practice problems on the right. Then, check your work!</p>
+            <div class="qti-layout-row">
+                <div class="qti-layout-col6 qti-well">
+                    <h4>Example</h4>
+                    <p>Find the missing number.<br/> 4 × ? = 12</p>
+                    <hr/>
+                    <qti-feedback-block outcome-identifier="PRACTICE_STEP" identifier="practice_step1_visible" show-hide="show"><p><strong>Step 1:</strong> There are 4 groups.</p></qti-feedback-block>
+                    <qti-feedback-block outcome-identifier="PRACTICE_STEP" identifier="practice_step2_visible" show-hide="show"><p><strong>Step 2:</strong> Each group has 3 objects.</p></qti-feedback-block>
+                    <qti-feedback-block outcome-identifier="PRACTICE_STEP" identifier="practice_step3_visible" show-hide="show"><p><strong>Step 3:</strong> 4 × 3 = 12</p></qti-feedback-block>
+                </div>
+                <div class="qti-layout-col6 qti-well">
+                    <h4>Practice</h4>
+                    <p>Find the missing number.<br/> 3 × <qti-text-entry-interaction response-identifier="PRACTICE_ANSWER" expected-length="3"/> = 15</p>
+                    <hr/>
+                    <qti-feedback-block outcome-identifier="PRACTICE_STEP" identifier="start" show-hide="show">
+                      <qti-end-attempt-interaction response-identifier="SHOW_PRACTICE_STEP1" title="Show Step 1"/>
+                    </qti-feedback-block>
+                    <qti-feedback-block outcome-identifier="PRACTICE_STEP" identifier="practice_step1_visible" show-hide="show">
+                        <p><strong>Step 1:</strong> There are 3 groups.</p>
+                        <qti-end-attempt-interaction response-identifier="SHOW_PRACTICE_STEP2" title="Show Step 2"/>
+                    </qti-feedback-block>
+                    <qti-feedback-block outcome-identifier="PRACTICE_STEP" identifier="practice_step2_visible" show-hide="show">
+                        <p><strong>Step 2:</strong> Each group has 5 objects.</p>
+                        <qti-end-attempt-interaction response-identifier="SHOW_PRACTICE_STEP3" title="Show Step 3"/>
+                    </qti-feedback-block>
+                    <qti-feedback-block outcome-identifier="PRACTICE_STEP" identifier="practice_step3_visible" show-hide="show">
+                        <p><strong>Step 3:</strong> 3 × 5 = 15</p>
+                        <p><em>Now enter your answer in the box above and submit.</em></p>
+                    </qti-feedback-block>
+                </div>
+            </div>
+        </qti-content-body>
+    </qti-feedback-block>
+  </qti-item-body>
+  
+  <qti-response-processing>
+    <!-- Check for final answer submission first -->
+    <qti-response-condition>
+      <qti-response-if>
+        <qti-not><qti-is-null><qti-variable identifier="PRACTICE_ANSWER"/></qti-is-null></qti-not>
+        <qti-response-condition>
+            <qti-response-if><qti-match><qti-variable identifier="PRACTICE_ANSWER"/><qti-correct identifier="PRACTICE_ANSWER"/></qti-match><qti-set-outcome-value identifier="SCORE"><qti-base-value base-type="float">1</qti-base-value></qti-set-outcome-value></qti-response-if>
+            <qti-response-else><qti-set-outcome-value identifier="SCORE"><qti-base-value base-type="float">0</qti-base-value></qti-set-outcome-value></qti-response-else>
+        </qti-response-condition>
+        <qti-set-outcome-value identifier="completionStatus"><qti-base-value base-type="identifier">completed</qti-base-value></qti-set-outcome-value>
+      </qti-response-if>
+      
+      <!-- Else, check for button presses in reverse order of appearance -->
+      <qti-response-else-if><qti-variable identifier="SHOW_PRACTICE_STEP3"/><qti-set-outcome-value identifier="PRACTICE_STEP"><qti-multiple><qti-variable identifier="PRACTICE_STEP"/><qti-base-value base-type="identifier">practice_step3_visible</qti-base-value></qti-multiple></qti-set-outcome-value></qti-response-else-if>
+      <qti-response-else-if><qti-variable identifier="SHOW_PRACTICE_STEP2"/><qti-set-outcome-value identifier="PRACTICE_STEP"><qti-multiple><qti-variable identifier="PRACTICE_STEP"/><qti-base-value base-type="identifier">practice_step2_visible</qti-base-value></qti-multiple></qti-set-outcome-value></qti-response-else-if>
+      <qti-response-else-if><qti-variable identifier="SHOW_PRACTICE_STEP1"/><qti-set-outcome-value identifier="PRACTICE_STEP"><qti-multiple><qti-variable identifier="PRACTICE_STEP"/><qti-base-value base-type="identifier">practice_step1_visible</qti-base-value></qti-multiple></qti-set-outcome-value></qti-response-else-if>
+      <qti-response-else-if><qti-variable identifier="SHOW_PART4"/><qti-set-outcome-value identifier="LESSON_STEP"><qti-multiple><qti-variable identifier="LESSON_STEP"/><qti-base-value base-type="identifier">part4</qti-base-value></qti-multiple></qti-set-outcome-value></qti-response-else-if>
+      <qti-response-else-if><qti-variable identifier="REVEAL_QUICK_CHECK"/><qti-set-outcome-value identifier="QUICK_CHECK_VISIBILITY"><qti-base-value base-type="identifier">visible</qti-base-value></qti-set-outcome-value></qti-response-else-if>
+      <qti-response-else-if><qti-variable identifier="SHOW_PART3"/><qti-set-outcome-value identifier="LESSON_STEP"><qti-multiple><qti-variable identifier="LESSON_STEP"/><qti-base-value base-type="identifier">part3</qti-base-value></qti-multiple></qti-set-outcome-value></qti-response-else-if>
+      <qti-response-else-if><qti-variable identifier="SHOW_PART2"/><qti-set-outcome-value identifier="LESSON_STEP"><qti-multiple><qti-variable identifier="LESSON_STEP"/><qti-base-value base-type="identifier">part2</qti-base-value></qti-multiple></qti-set-outcome-value></qti-response-else-if>
+    </qti-response-condition>
+  </qti-response-processing>
+</qti-assessment-item>

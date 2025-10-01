@@ -3,14 +3,14 @@ import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { numberLineExamples } from "../../examples/number-line"
 import type { WidgetInput } from "../../src/widgets/registry"
-import { generateWidget } from "../../src/widgets/widget-generator"
+import { generateWidgetLegacy } from "../../src/widgets/widget-generator"
 
 describe("Widget: number-line", () => {
 	const examples: WidgetInput[] = numberLineExamples
 
 	examples.forEach((props, index) => {
 		test(`should produce consistent output for example #${index + 1}`, async () => {
-			const result = await errors.try(generateWidget(props))
+			const result = await errors.try(generateWidgetLegacy(props))
 			if (result.error) {
 				logger.error("widget generation failed", { error: result.error, index })
 				throw result.error

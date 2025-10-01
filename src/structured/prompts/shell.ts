@@ -1,6 +1,6 @@
 // imports kept minimal in this module; errors/logging handled by callers
 import type { AssessmentItemInput } from "@/core/item"
-import type { WidgetCollection, WidgetTypeTuple } from "@/widgets/collections/types"
+import type { WidgetCollection, WidgetDefinition } from "@/widgets/collections/types"
 import { allExamples } from "../../examples"
 // Note: do not validate example shells here; examples are illustrative only
 // import { createAssessmentItemShellSchema } from "@core/item"
@@ -9,7 +9,7 @@ import { caretBanPromptSection } from "./caret"
 import { createWidgetSelectionPromptSection, formatUnifiedContextSections } from "./shared"
 
 // Helper to convert a full AssessmentItemInput into a shell for prompt examples
-function createShellFromExample<const E extends WidgetTypeTuple>(item: AssessmentItemInput<E>) {
+function createShellFromExample<const E extends readonly string[]>(item: AssessmentItemInput<E>) {
 	// The shell now derives widget/interaction usage from refs in content.
 	// Do NOT include legacy 'widgets' or 'interactions' arrays.
 	const shell = {
@@ -22,10 +22,12 @@ function createShellFromExample<const E extends WidgetTypeTuple>(item: Assessmen
 	return shell
 }
 
-export function createAssessmentShellPrompt<const E extends WidgetTypeTuple>(
+export function createAssessmentShellPrompt<
+	C extends WidgetCollection<Record<string, WidgetDefinition<unknown, unknown>>, readonly string[]>
+>(
 	envelope: AiContextEnvelope,
 	imageContext: ImageContext,
-	widgetCollection: WidgetCollection<E>
+	widgetCollection: C
 ): {
 	systemInstruction: string
 	userContent: string

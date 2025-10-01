@@ -2,7 +2,7 @@ import type { BlockContent, InlineContent } from "@/core/content"
 import type { AssessmentItemInput, ResponseDeclaration } from "@/core/item"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import type { WidgetCollection, WidgetTypeTuple } from "@/widgets/collections/types"
+import type { WidgetCollection, WidgetDefinition, WidgetTypeTupleFrom } from "@/widgets/collections/types"
 import { allWidgetSchemas, type Widget, WidgetSchema } from "@/widgets/registry"
 import type OpenAI from "openai"
 import type { ChatCompletion, ChatCompletionCreateParamsNonStreaming } from "openai/resources/chat/completions"
@@ -80,12 +80,14 @@ async function resolveRasterImages(envelope: AiContextEnvelope): Promise<ImageCo
 	return { imageUrls: finalImageUrls }
 }
 
-async function generateAssessmentShell<const E extends WidgetTypeTuple>(
+async function generateAssessmentShell<
+	C extends WidgetCollection<Record<string, WidgetDefinition<unknown, unknown>>, readonly string[]>
+>(
 	openai: OpenAI,
 	logger: logger.Logger,
 	envelope: AiContextEnvelope,
 	imageContext: ImageContext,
-	widgetCollection: WidgetCollection<E>
+	widgetCollection: C
 ) {
 	const { systemInstruction, userContent } = createAssessmentShellPrompt(envelope, imageContext, widgetCollection)
 
@@ -157,7 +159,7 @@ async function generateAssessmentShell<const E extends WidgetTypeTuple>(
 	return validation.data
 }
 
-function collectInteractionIdsFromShell<E extends WidgetTypeTuple>(shell: { body: BlockContent<E> | null }): string[] {
+function collectInteractionIdsFromShell<E extends readonly string[]>(shell: { body: BlockContent<E> | null }): string[] {
 	const ids = new Set<string>()
 
 	function walkInline(inline: InlineContent<E>): void {
@@ -215,14 +217,16 @@ function collectInteractionIdsFromShell<E extends WidgetTypeTuple>(shell: { body
 	return Array.from(ids)
 }
 
-async function generateInteractionContent<const E extends WidgetTypeTuple>(
+async function generateInteractionContent<
+	C extends WidgetCollection<Record<string, WidgetDefinition<unknown, unknown>>, readonly string[]>
+>(
 	openai: OpenAI,
 	logger: logger.Logger,
 	envelope: AiContextEnvelope,
-	assessmentShell: { body: BlockContent<E> | null; responseDeclarations: ResponseDeclaration[] },
+	assessmentShell: { body: BlockContent<WidgetTypeTupleFrom<C>> | null; responseDeclarations: ResponseDeclaration[] },
 	imageContext: ImageContext,
 	interactionIds: string[],
-	widgetCollection: WidgetCollection<E>
+	widgetCollection: C
 ) {
 	if (interactionIds.length === 0) {
 		logger.debug("no interactions to generate, skipping shot 2")
@@ -298,12 +302,14 @@ async function generateInteractionContent<const E extends WidgetTypeTuple>(
 	return validation.data
 }
 
-export async function generateFromEnvelope<const E extends WidgetTypeTuple>(
+export async function generateFromEnvelope<
+	C extends WidgetCollection<Record<string, WidgetDefinition<unknown, unknown>>, readonly string[]>
+>(
 	openai: OpenAI,
 	logger: logger.Logger,
 	envelope: AiContextEnvelope,
-	widgetCollection: WidgetCollection<E>
-): Promise<AssessmentItemInput<E>> {
+	widgetCollection: C
+): Promise<AssessmentItemInput<WidgetTypeTupleFrom<C>>> {
 	if (!envelope.primaryContent || envelope.primaryContent.trim() === "") {
 		logger.error("envelope validation failed", { reason: "primaryContent is empty" })
 		throw errors.new("primaryContent cannot be empty")

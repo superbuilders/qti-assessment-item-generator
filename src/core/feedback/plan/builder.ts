@@ -1,7 +1,6 @@
 import type { AnyInteraction } from "@/core/interactions"
 import type { ResponseDeclaration } from "@/core/item"
 import * as logger from "@superbuilders/slog"
-import type { WidgetTypeTuple } from "@/widgets/collections/types"
 import { deriveComboIdentifier, normalizeIdPart } from "../utils"
 import type { FeedbackPlan } from "./types"
 
@@ -10,7 +9,7 @@ import type { FeedbackPlan } from "./types"
  * This is the ONLY place we allow inference—before the compiler sees the data.
  * The compiler will validate this plan but never infer its own.
  */
-export function buildFeedbackPlanFromInteractions<E extends WidgetTypeTuple>(
+export function buildFeedbackPlanFromInteractions<E extends readonly string[]>(
 	interactions: Record<string, AnyInteraction<E>>,
 	responseDeclarations: ResponseDeclaration[]
 ): FeedbackPlan {

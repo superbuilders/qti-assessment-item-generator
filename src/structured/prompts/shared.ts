@@ -2,7 +2,7 @@ import { toJSONSchemaPromptSafe } from "@/core/json-schema"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
-import type { WidgetCollection, WidgetTypeTuple } from "@/widgets/collections/types"
+import type { WidgetCollection, WidgetDefinition } from "@/widgets/collections/types"
 
 // Runtime type guard to ensure values are Zod schemas without using type assertions
 function isZodSchema(value: unknown): value is z.ZodType<unknown> {
@@ -12,12 +12,15 @@ function isZodSchema(value: unknown): value is z.ZodType<unknown> {
 /**
  * Generates the reusable markdown section for widget selection instructions.
  */
-export function createWidgetSelectionPromptSection<E extends WidgetTypeTuple>(collection: WidgetCollection<E>): string {
-    const allowedWidgetTypes: E = collection.widgetTypeKeys
+export function createWidgetSelectionPromptSection<
+	C extends WidgetCollection<Record<string, WidgetDefinition<unknown, unknown>>, readonly string[]>
+>(collection: C): string {
+    const allowedWidgetTypes = collection.widgetTypeKeys
     const widgetSchemas: Record<string, object> = {}
 
-    // Iterate over schemas directly to avoid generic index issues
-    for (const [key, schemaEntry] of Object.entries(collection.schemas)) {
+    // Iterate over widget definitions to extract schemas
+    for (const key of collection.widgetTypeKeys) {
+        const schemaEntry = collection.widgets[key].schema
         if (!isZodSchema(schemaEntry)) {
             logger.error("collection schema not a zod type", { key, collectionName: collection.name })
             throw errors.new(`Schema for key '${key}' in collection '${collection.name}' is not a valid Zod schema.`)

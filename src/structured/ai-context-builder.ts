@@ -8,7 +8,7 @@ const IMAGE_URL_REGEX = /https?:\/\/[^\s"'()<>]+?\.(svg|png|jpeg|jpg|gif)/gi
 const FETCH_TIMEOUT_MS = 30000
 export async function buildPerseusEnvelope(
 	perseusJson: unknown,
-	fetchFn: typeof fetch = fetch
+	fetchFn: (url: string | URL | Request, init?: RequestInit) => Promise<Response> = fetch
 ): Promise<AiContextEnvelope> {
 	const primaryContent = JSON.stringify(perseusJson, null, 2)
 	const supplementaryContent: string[] = []
@@ -110,7 +110,7 @@ export async function buildPerseusEnvelope(
 export async function buildMathacademyEnvelope(
 	html: string,
 	screenshotUrl?: string,
-	fetchFn: typeof fetch = fetch
+	fetchFn: (url: string | URL | Request, init?: RequestInit) => Promise<Response> = fetch
 ): Promise<AiContextEnvelope> {
 	const primaryContent = html
 	const supplementaryContent: string[] = []

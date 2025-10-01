@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import type { WidgetInput } from "../../src/widgets/registry"
-import { generateWidget } from "../../src/widgets/widget-generator"
+import { generateWidgetLegacy } from "../../src/widgets/widget-generator"
 
 function makeSeededRandom(seed: number): () => number {
 	let s = seed >>> 0
@@ -55,7 +55,7 @@ describe("Widget: marble-diagram", () => {
 	examples.forEach((props, index) => {
 		test(`should produce consistent output for example #${index + 1}`, async () => {
 			await runWithSeed(12345 + index * 777, async () => {
-				const result = await errors.try(generateWidget(props))
+				const result = await errors.try(generateWidgetLegacy(props))
 				if (result.error) {
 					logger.error("widget generation failed", { error: result.error, index })
 					throw result.error

@@ -4,7 +4,6 @@ import type { AnyInteraction } from "@/core/interactions"
 import type { AssessmentItemInput, ResponseDeclaration } from "@/core/item"
 import * as errors from "@superbuilders/errors"
 import type * as logger from "@superbuilders/slog"
-import type { WidgetTypeTuple } from "@/widgets/collections/types"
 import { XMLParser, XMLValidator } from "fast-xml-parser"
 import {
 	checkNoCDataSections,
@@ -64,7 +63,7 @@ function validateMathMLWellFormed(mathml: string, context: string, logger: logge
 	}
 }
 
-function validateInlineContent<E extends WidgetTypeTuple>(
+function validateInlineContent<E extends readonly string[]>(
 	items: InlineContent<E>,
 	_context: string,
 	logger: logger.Logger
@@ -215,7 +214,7 @@ function validateInlineContent<E extends WidgetTypeTuple>(
 	}
 }
 
-function validateBlockContent<E extends WidgetTypeTuple>(
+function validateBlockContent<E extends readonly string[]>(
 	items: BlockContent<E>,
 	_context: string,
 	logger: logger.Logger
@@ -237,7 +236,7 @@ function validateBlockContent<E extends WidgetTypeTuple>(
  * Intentionally minimal: only enforce that numeric baseTypes are used with numeric values.
  * All formatting instructions and canonicalization guidance are handled in prompting, not here.
  */
-function validateTextEntryCanonicalAnswerRules<E extends WidgetTypeTuple>(
+function validateTextEntryCanonicalAnswerRules<E extends readonly string[]>(
 	item: AssessmentItemInput<E>,
 	logger: logger.Logger
 ): void {
@@ -277,7 +276,7 @@ function validateTextEntryCanonicalAnswerRules<E extends WidgetTypeTuple>(
 	}
 }
 
-export function validateAssessmentItemInput<E extends WidgetTypeTuple>(
+export function validateAssessmentItemInput<E extends readonly string[]>(
 	item: AssessmentItemInput<E>,
 	logger: logger.Logger
 ): void {
@@ -457,7 +456,7 @@ export function validateAssessmentItemInput<E extends WidgetTypeTuple>(
 	validateFeedbackPlan(item, logger)
 }
 
-function validateFeedbackPlan<E extends WidgetTypeTuple>(item: AssessmentItemInput<E>, logger: logger.Logger): void {
+function validateFeedbackPlan<E extends readonly string[]>(item: AssessmentItemInput<E>, logger: logger.Logger): void {
 	const { feedbackPlan, responseDeclarations, interactions, feedbackBlocks } = item
 	const declMap = new Map(responseDeclarations.map((d: ResponseDeclaration) => [d.identifier, d]))
 	const interactionMap = new Map(

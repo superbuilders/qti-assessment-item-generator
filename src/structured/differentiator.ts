@@ -2,7 +2,7 @@ import { type AssessmentItemInput, createDynamicAssessmentItemSchema } from "@/c
 import { toJSONSchemaPromptSafe } from "@/core/json-schema"
 import * as errors from "@superbuilders/errors"
 import type * as logger from "@superbuilders/slog"
-import type { WidgetCollection, WidgetTypeTuple } from "@/widgets/collections/types"
+import type { WidgetCollection, WidgetDefinition, WidgetTypeTupleFrom } from "@/widgets/collections/types"
 import { allWidgetSchemas, type Widget, WidgetSchema } from "@/widgets/registry"
 import type OpenAI from "openai"
 import type { ChatCompletion, ChatCompletionCreateParamsNonStreaming } from "openai/resources/chat/completions"
@@ -18,7 +18,7 @@ const OPENAI_MODEL = "gpt-5"
  * dynamically generated schema based on the source item. It explicitly lacks
  * `widgets` and `identifier`.
  */
-export type ContentPlan<E extends WidgetTypeTuple = WidgetTypeTuple> = Omit<
+export type ContentPlan<E extends readonly string[] = readonly string[]> = Omit<
 	AssessmentItemInput<E>,
 	"widgets" | "identifier"
 >
@@ -29,7 +29,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 // Type guard to verify an object is a ContentPlan
-function isContentPlan<E extends WidgetTypeTuple>(value: unknown): value is ContentPlan<E> {
+function isContentPlan<E extends readonly string[]>(value: unknown): value is ContentPlan<E> {
 	if (!isRecord(value)) return false
 	// ContentPlan must not have widgets or identifier
 	if ("widgets" in value || "identifier" in value) return false
@@ -55,7 +55,7 @@ function isWidgetTypeName(value: unknown): value is keyof typeof allWidgetSchema
  * Builds an informational section for Shot 1 that lists the fixed widget mapping (slot → type)
  * used in Shot 2. This is purely contextual so the planner avoids generating incompatible content.
  */
-function buildShot1WidgetInfoSection<E extends WidgetTypeTuple>(
+function buildShot1WidgetInfoSection<E extends readonly string[]>(
 	assessmentItem: AssessmentItemInput<E>,
 	logger: logger.Logger
 ): string {
@@ -135,7 +135,7 @@ function buildShot1WidgetInfoSection<E extends WidgetTypeTuple>(
  * identical to the source item's content fields.
  * @internal
  */
-async function planContentDifferentiation<const E extends WidgetTypeTuple>(
+async function planContentDifferentiation<const E extends readonly string[]>(
 	openai: OpenAI,
 	logger: logger.Logger,
 	assessmentItem: AssessmentItemInput<E>,
@@ -492,7 +492,7 @@ function buildWidgetsResponseSchema(
  * [SHOT 2 via LLM] Generate complete widget objects for a given content plan using the
  * authoritative widget schemas and the mapping derived from the source item.
  */
-async function regenerateWidgetsViaLLM<const E extends WidgetTypeTuple>(
+async function regenerateWidgetsViaLLM<const E extends readonly string[]>(
 	openai: OpenAI,
 	logger: logger.Logger,
 	sourceItem: AssessmentItemInput<E>,
@@ -603,13 +603,15 @@ async function regenerateWidgetsViaLLM<const E extends WidgetTypeTuple>(
  * public entry point for item differentiation. It is atomic: either all `n`
  * variations are generated successfully, or it throws an error.
  */
-export async function differentiateAssessmentItem<const E extends WidgetTypeTuple>(
+export async function differentiateAssessmentItem<
+	C extends WidgetCollection<Record<string, WidgetDefinition<unknown, unknown>>, readonly string[]>
+>(
 	openai: OpenAI,
 	logger: logger.Logger,
-	sourceItem: AssessmentItemInput<E>,
+	sourceItem: AssessmentItemInput<WidgetTypeTupleFrom<C>>,
 	n: number,
-	widgetCollection: WidgetCollection<E>
-): Promise<Array<AssessmentItemInput<E>>> {
+	widgetCollection: C
+): Promise<Array<AssessmentItemInput<WidgetTypeTupleFrom<C>>>> {
 	logger.info("starting differentiation", { identifier: sourceItem.identifier, variations: n })
 
 	// Shot 1: Generate UI-agnostic content plans (LLM prompt includes full original item for context).
@@ -638,7 +640,7 @@ export async function differentiateAssessmentItem<const E extends WidgetTypeTupl
 	}
 
 	// Shot 2: Generate widgets via LLM for each plan using authoritative schemas. This loop is all-or-nothing.
-	const finalItems: AssessmentItemInput<E>[] = []
+	const finalItems: AssessmentItemInput<WidgetTypeTupleFrom<C>>[] = []
 	for (let i = 0; i < plans.length; i++) {
 		const plan = plans[i]
 		const identifier = `${sourceItem.identifier}_${i + 1}`
@@ -662,12 +664,21 @@ export async function differentiateAssessmentItem<const E extends WidgetTypeTupl
 		}
 		const regeneratedWidgets = widgetsResult.data
 
-		const finalItem: AssessmentItemInput<E> = { ...plan, identifier, widgets: regeneratedWidgets }
+		const finalItem: AssessmentItemInput<WidgetTypeTupleFrom<C>> = { ...plan, identifier, widgets: regeneratedWidgets }
 
-		// Use the collection's widgetTypeKeys for validation
+		// Use the collection's widget schemas for validation
+		const widgetSchemasForCollection: Record<string, z.ZodType<unknown, unknown>> = {}
+		for (const k of widgetCollection.widgetTypeKeys) {
+			const schema = widgetCollection.widgets[k]?.schema
+			if (schema) {
+				widgetSchemasForCollection[k] = schema
+			}
+		}
+
 		const { AssessmentItemSchema: finalItemSchema } = createDynamicAssessmentItemSchema(
 			widgetTypes,
-			widgetCollection.widgetTypeKeys
+			widgetCollection.widgetTypeKeys,
+			widgetSchemasForCollection
 		)
 		const finalValidation = finalItemSchema.safeParse(finalItem)
 		if (!finalValidation.success) {

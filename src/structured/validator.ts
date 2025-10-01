@@ -9,10 +9,9 @@ import {
 	sanitizeHtmlEntities,
 	sanitizeMathMLOperators
 } from "../qti-validation/utils"
-import type { WidgetTypeTuple } from "../widgets/collections/types"
 
 // NEW: Recursive walker function for inline content
-function processInlineContent<E extends WidgetTypeTuple>(items: InlineContent<E> | null, logger: logger.Logger): void {
+function processInlineContent<E extends readonly string[]>(items: InlineContent<E> | null, logger: logger.Logger): void {
 	if (!items) return
 	for (const item of items) {
 		if (item.type === "text") {
@@ -41,7 +40,7 @@ function processInlineContent<E extends WidgetTypeTuple>(items: InlineContent<E>
 }
 
 // NEW: Recursive walker function for block content
-function processBlockContent<E extends WidgetTypeTuple>(items: BlockContent<E> | null, logger: logger.Logger): void {
+function processBlockContent<E extends readonly string[]>(items: BlockContent<E> | null, logger: logger.Logger): void {
 	if (!items) return
 	for (const item of items) {
 		if (item.type === "paragraph") {
@@ -58,7 +57,7 @@ function processBlockContent<E extends WidgetTypeTuple>(items: BlockContent<E> |
 	}
 }
 
-export function validateAndSanitizeHtmlFields<E extends WidgetTypeTuple>(
+export function validateAndSanitizeHtmlFields<E extends readonly string[]>(
 	item: AssessmentItemInput<E>,
 	logger: logger.Logger
 ): AssessmentItemInput<E> {

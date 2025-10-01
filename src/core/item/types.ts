@@ -1,7 +1,6 @@
 import type { BlockContent } from "@/core/content"
 import type { FeedbackPlan } from "@/core/feedback"
 import type { AnyInteraction } from "@/core/interactions"
-import type { WidgetTypeTuple } from "@/widgets/collections/types"
 import type { typedSchemas } from "@/widgets/registry"
 import type { z } from "zod"
 
@@ -28,14 +27,14 @@ export type ResponseDeclaration =
 			allowEmpty: boolean
 	  }
 
-export type AssessmentItemShell<E extends WidgetTypeTuple> = {
+export type AssessmentItemShell<E extends readonly string[]> = {
 	identifier: string
 	title: string
 	responseDeclarations: ResponseDeclaration[]
 	body: BlockContent<E> | null
 }
 
-export type AssessmentItem<E extends WidgetTypeTuple> = {
+export type AssessmentItem<E extends readonly string[]> = {
 	identifier: string
 	title: string
 	responseDeclarations: ResponseDeclaration[]
@@ -46,4 +45,4 @@ export type AssessmentItem<E extends WidgetTypeTuple> = {
 	feedbackBlocks: Record<string, BlockContent<E>>
 }
 
-export type AssessmentItemInput<E extends WidgetTypeTuple> = AssessmentItem<E>
+export type AssessmentItemInput<E extends readonly string[]> = AssessmentItem<E>

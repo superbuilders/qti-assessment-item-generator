@@ -1,11 +1,10 @@
 import type { AnyInteraction } from "@/core/interactions"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import type { WidgetTypeTuple } from "../widgets/collections/types"
 import { renderBlockContent, renderInlineContent } from "./content-renderer"
 import { escapeXmlAttribute } from "./utils/xml-utils"
 
-export function compileInteraction<E extends WidgetTypeTuple = WidgetTypeTuple>(
+export function compileInteraction<E extends readonly string[] = readonly string[]>(
 	interaction: AnyInteraction<E>,
 	widgetSlots: Map<string, string>,
 	interactionSlots: Map<string, string>

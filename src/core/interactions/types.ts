@@ -1,7 +1,6 @@
 import type { BlockContent, InlineContent } from "@/core/content"
-import type { WidgetTypeTuple } from "@/widgets/collections/types"
 
-export type AnyInteraction<E extends WidgetTypeTuple> =
+export type AnyInteraction<E extends readonly string[] = readonly string[]> =
 	| {
 			type: "choiceInteraction"
 			responseIdentifier: string

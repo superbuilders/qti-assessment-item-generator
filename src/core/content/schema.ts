@@ -1,5 +1,4 @@
 import { CHOICE_IDENTIFIER_REGEX, SLOT_IDENTIFIER_REGEX } from "@/compiler/qti-constants"
-import type { WidgetTypeTuple } from "@/widgets/collections/types"
 import { z } from "zod"
 import { MATHML_INNER_PATTERN } from "../../widgets/utils/mathml"
 import type { BlockContent, BlockContentItem, InlineContent, InlineContentItem } from "./types"
@@ -12,7 +11,7 @@ const SafeTextSchema = z.string().refine((val) => !BannedCharsRegex.test(val), {
 
 // LEVEL 2: INLINE CONTENT (for paragraphs, prompts, etc.)
 // Factory functions to create fresh schema instances (avoids $ref in JSON Schema)
-export function createInlineContentItemSchema<const E extends WidgetTypeTuple>(
+export function createInlineContentItemSchema<const E extends readonly string[]>(
 	widgetTypeKeys: E
 ): z.ZodType<InlineContentItem<E>> {
 	return z
@@ -69,7 +68,7 @@ export function createInlineContentItemSchema<const E extends WidgetTypeTuple>(
 		.describe("Union type representing any inline content element")
 }
 
-export function createInlineContentSchema<const E extends WidgetTypeTuple>(
+export function createInlineContentSchema<const E extends readonly string[]>(
 	widgetTypeKeys: E
 ): z.ZodType<InlineContent<E>> {
 	return z
@@ -79,7 +78,7 @@ export function createInlineContentSchema<const E extends WidgetTypeTuple>(
 
 // LEVEL 1: BLOCK CONTENT (for body, feedback, choice content, etc.)
 // Factory functions for block content
-export function createBlockContentItemSchema<const E extends WidgetTypeTuple>(
+export function createBlockContentItemSchema<const E extends readonly string[]>(
 	widgetTypeKeys: E
 ): z.ZodType<BlockContentItem<E>> {
 	const InlineSchema = createInlineContentSchema(widgetTypeKeys)
@@ -148,7 +147,7 @@ export function createBlockContentItemSchema<const E extends WidgetTypeTuple>(
 		.describe("Union type representing any block-level content element")
 }
 
-export function createBlockContentSchema<const E extends WidgetTypeTuple>(
+export function createBlockContentSchema<const E extends readonly string[]>(
 	widgetTypeKeys: E
 ): z.ZodType<BlockContent<E>> {
 	return z

@@ -5,7 +5,6 @@ import type { ResponseDeclaration } from "@/core/item"
 import { toJSONSchemaPromptSafe } from "@/core/json-schema"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import type { WidgetTypeTuple } from "@/widgets/collections/types"
 import { z } from "zod"
 import type { FeedbackPlan } from "../plan"
 import { buildFeedbackPlanFromInteractions } from "../plan"
@@ -33,7 +32,7 @@ import type {
 /**
  * Builds the nested exact-object Zod schema for feedback authoring strictly from a FeedbackPlan.
  */
-export function createNestedFeedbackZodSchema<P extends FeedbackPlan, const E extends WidgetTypeTuple>(
+export function createNestedFeedbackZodSchema<P extends FeedbackPlan, const E extends readonly string[]>(
 	feedbackPlan: P,
 	widgetTypeKeys: E
 ): z.ZodType<NestedFeedbackAuthoring<P, E>> {
@@ -96,7 +95,7 @@ export function createNestedFeedbackZodSchema<P extends FeedbackPlan, const E ex
  */
 // Type guards are unnecessary when Zod schemas are precisely typed.
 
-function isNestedFeedbackAuthoring<E extends WidgetTypeTuple>(
+function isNestedFeedbackAuthoring<E extends readonly string[]>(
 	val: unknown
 ): val is NestedFeedbackAuthoring<FeedbackPlan, E> {
 	if (typeof val !== "object" || val === null) return false
@@ -106,7 +105,7 @@ function isNestedFeedbackAuthoring<E extends WidgetTypeTuple>(
 	return typeof overall === "object" && overall !== null
 }
 
-export function validateNestedFeedback<P extends FeedbackPlan, const E extends WidgetTypeTuple>(
+export function validateNestedFeedback<P extends FeedbackPlan, const E extends readonly string[]>(
 	nested: unknown,
 	feedbackPlan: P,
 	widgetTypeKeys: E
@@ -130,7 +129,7 @@ export function validateNestedFeedback<P extends FeedbackPlan, const E extends W
 /**
  * Deterministically flattens a validated nested feedback object into the compiler's canonical block map.
  */
-export function convertNestedFeedbackToBlocks<P extends FeedbackPlan, E extends WidgetTypeTuple>(
+export function convertNestedFeedbackToBlocks<P extends FeedbackPlan, E extends readonly string[]>(
 	nested: NestedFeedbackAuthoring<FeedbackPlan, E>,
 	feedbackPlan: P
 ): Record<string, BlockContent<E>> {
@@ -250,7 +249,7 @@ export function convertNestedFeedbackToBlocks<P extends FeedbackPlan, E extends 
 /**
  * Produces an empty, structurally complete nested object for templating or UI initialization.
  */
-export function buildEmptyNestedFeedback<P extends FeedbackPlan, E extends WidgetTypeTuple = WidgetTypeTuple>(
+export function buildEmptyNestedFeedback<P extends FeedbackPlan, E extends readonly string[] = readonly string[]>(
 	feedbackPlan: P
 ): NestedFeedbackAuthoring<FeedbackPlan, E> {
 	function buildNode(dims: readonly FeedbackPlan["dimensions"][number][]): AuthoringNestedNode<FeedbackPlan, E> {
@@ -287,7 +286,7 @@ export function buildEmptyNestedFeedback<P extends FeedbackPlan, E extends Widge
 /**
  * Returns both the Zod schema and a prompt-safe JSON Schema for use in LLM calls.
  */
-export function createNestedFeedbackPromptArtifacts<P extends FeedbackPlan, const E extends WidgetTypeTuple>(
+export function createNestedFeedbackPromptArtifacts<P extends FeedbackPlan, const E extends readonly string[]>(
 	feedbackPlan: P,
 	widgetTypeKeys: E
 ): { FeedbackSchema: z.ZodType; jsonSchema: unknown } {
@@ -310,7 +309,7 @@ export function createNestedFeedbackPromptArtifacts<P extends FeedbackPlan, cons
 /**
  * Optional helper for templates: builds a complete feedback plan and block map from a nested object.
  */
-export function buildFeedbackFromNestedForTemplate<const E extends WidgetTypeTuple>(
+export function buildFeedbackFromNestedForTemplate<const E extends readonly string[]>(
 	interactions: Record<string, AnyInteraction<E>>,
 	responseDeclarations: ResponseDeclaration[],
 	nested: NestedFeedbackAuthoring<FeedbackPlan, E>,

@@ -1,7 +1,6 @@
 import type { BlockContent, InlineContent } from "@/core/content"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import type { WidgetTypeTuple } from "../widgets/collections/types"
 import { sanitizeXmlAttributeValue } from "./utils/xml-utils"
 import { InlineContentItem } from "@/core/content"
 
@@ -16,7 +15,7 @@ function escapeXmlText(text: string): string {
 		.replace(/>/g, "&gt;")
 }
 
-export function renderInlineContent<E extends WidgetTypeTuple = WidgetTypeTuple>(
+export function renderInlineContent<E extends readonly string[] = readonly string[]>(
 	inlineItems: InlineContent<E> | null,
 	widgetSlots: Map<string, string>,
 	interactionSlots: Map<string, string>
@@ -62,7 +61,7 @@ export function renderInlineContent<E extends WidgetTypeTuple = WidgetTypeTuple>
 		.join("")
 }
 
-export function renderBlockContent<E extends WidgetTypeTuple = WidgetTypeTuple>(
+export function renderBlockContent<E extends readonly string[] = readonly string[]>(
 	blockItems: BlockContent<E> | null,
 	widgetSlots: Map<string, string>,
 	interactionSlots: Map<string, string>

@@ -8,7 +8,8 @@ import { allWidgetsCollection } from "../../src/widgets/collections/all"
 
 describe("JSON Schema Preflight", () => {
 	test("collection-scoped shell schema converts to JSON Schema", () => {
-		const Shell = createAssessmentItemShellSchema(allWidgetsCollection.widgetTypeKeys)
+		const widgetTypeKeys = Object.keys(allWidgetsCollection.widgets) as readonly (keyof typeof allWidgetsCollection.widgets)[]
+		const Shell = createAssessmentItemShellSchema(widgetTypeKeys)
 		const result = errors.trySync(() => z.toJSONSchema(Shell))
 		if (result.error) {
 			logger.error("shell schema json conversion", { error: result.error })
@@ -19,10 +20,10 @@ describe("JSON Schema Preflight", () => {
 
 	test("widget schemas convert by unwrapping transforms to input schemas", () => {
 		const failures: Array<{ key: string; message: string }> = []
-		for (const key of allWidgetsCollection.widgetTypeKeys) {
-			const schema = allWidgetsCollection.schemas[key]
+		for (const [key, definition] of Object.entries(allWidgetsCollection.widgets)) {
+			const schema = definition.schema
 			if (!schema) {
-				failures.push({ key, message: "missing schema in collection.schemas" })
+				failures.push({ key, message: "missing schema in definition" })
 				continue
 			}
 			const res = errors.trySync(() => toJSONSchemaPromptSafe(schema))

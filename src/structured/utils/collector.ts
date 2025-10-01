@@ -2,9 +2,8 @@ import type { BlockContent, InlineContent } from "@/core/content"
 import type { AnyInteraction } from "@/core/interactions"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import type { WidgetTypeTuple } from "../../widgets/collections/types"
 
-function walkInline<E extends WidgetTypeTuple>(inline: InlineContent<E> | null, out: Map<string, string>): void {
+function walkInline<E extends readonly string[]>(inline: InlineContent<E> | null, out: Map<string, string>): void {
 	if (!inline) return
 	for (const node of inline) {
 		if (node.type === "inlineWidgetRef") {
@@ -22,7 +21,7 @@ function walkInline<E extends WidgetTypeTuple>(inline: InlineContent<E> | null, 
 	}
 }
 
-function walkBlock<E extends WidgetTypeTuple>(blocks: BlockContent<E> | null, out: Map<string, string>): void {
+function walkBlock<E extends readonly string[]>(blocks: BlockContent<E> | null, out: Map<string, string>): void {
 	if (!blocks) return
 	for (const node of blocks) {
 		switch (node.type) {
@@ -68,7 +67,7 @@ function walkBlock<E extends WidgetTypeTuple>(blocks: BlockContent<E> | null, ou
 	}
 }
 
-function walkInteractions<E extends WidgetTypeTuple>(
+function walkInteractions<E extends readonly string[]>(
 	interactions: Record<string, AnyInteraction<E>> | null,
 	out: Map<string, string>
 ): void {
@@ -107,7 +106,7 @@ function walkInteractions<E extends WidgetTypeTuple>(
  * @param item - An object conforming to the structure of an AssessmentItemInput.
  * @returns A Map from widgetId to widgetType. Throws if the same widgetId has conflicting types.
  */
-export function collectWidgetRefs<E extends WidgetTypeTuple>(item: {
+export function collectWidgetRefs<E extends readonly string[]>(item: {
 	body: BlockContent<E> | null
 	feedbackBlocks: Record<string, BlockContent<E>> | null
 	interactions: Record<string, AnyInteraction<E>> | null
@@ -128,7 +127,7 @@ export function collectWidgetRefs<E extends WidgetTypeTuple>(item: {
 /**
  * Legacy function for backward compatibility - collects just the IDs
  */
-export function collectAllWidgetSlotIds<E extends WidgetTypeTuple>(item: {
+export function collectAllWidgetSlotIds<E extends readonly string[]>(item: {
 	body: BlockContent<E> | null
 	feedbackBlocks: Record<string, BlockContent<E>> | null
 	interactions: Record<string, AnyInteraction<E>> | null

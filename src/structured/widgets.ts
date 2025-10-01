@@ -3,12 +3,11 @@ import type { AssessmentItemShell } from "@/core/item"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { widgetCollections } from "../widgets/collections"
-import type { WidgetTypeTuple } from "../widgets/collections/types"
 import { allWidgetSchemas } from "../widgets/registry"
 import { caretBanPromptSection } from "./caret"
 import type { ImageContext } from "./perseus-image-resolver"
 
-export function createWidgetContentPrompt<E extends WidgetTypeTuple>(
+export function createWidgetContentPrompt<E extends readonly string[]>(
 	perseusJson: string,
 	assessmentShell: AssessmentItemShell<E>,
 	widgetMapping: Record<string, keyof typeof allWidgetSchemas>,
@@ -24,8 +23,8 @@ export function createWidgetContentPrompt<E extends WidgetTypeTuple>(
 			logger.error("unknown widget collection", { widgetCollectionName })
 			throw errors.new(`unknown widget collection: ${widgetCollectionName}`)
 		}
-		const collection = widgetCollections[widgetCollectionName]
-		const sortedKeys = [...collection.widgetTypeKeys].sort()
+		const collection = widgetCollections[widgetCollectionName as keyof typeof widgetCollections]
+	const sortedKeys = Object.keys(collection.widgets).sort()
 		const lines: string[] = []
 		function hasDef(x: unknown): x is { _def?: { description?: unknown } } {
 			return typeof x === "object" && x !== null && "_def" in x

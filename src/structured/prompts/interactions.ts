@@ -1,13 +1,15 @@
-import type { WidgetCollection, WidgetTypeTuple } from "../../widgets/collections/types"
+import type { WidgetCollection, WidgetDefinition } from "@/widgets/collections/types"
 import type { AiContextEnvelope, ImageContext } from "../types"
 import { caretBanPromptSection } from "./caret"
 import { createWidgetSelectionPromptSection, formatUnifiedContextSections } from "./shared"
 
-export function createInteractionContentPrompt<E extends WidgetTypeTuple>(
+export function createInteractionContentPrompt<
+	C extends WidgetCollection<Record<string, WidgetDefinition<unknown, unknown>>, readonly string[]>
+>(
 	envelope: AiContextEnvelope,
 	assessmentShell: unknown,
 	imageContext: ImageContext,
-	widgetCollection: WidgetCollection<E>
+	widgetCollection: C
 ): {
 	systemInstruction: string
 	userContent: string

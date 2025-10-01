@@ -5,11 +5,13 @@ import { XMLValidator } from "fast-xml-parser"
 import { compile } from "../../src/compiler/compiler"
 import { allExamples } from "../../src/examples"
 import { allWidgetsCollection } from "../../src/widgets/collections/all"
+import type { AssessmentItemInput } from "../../src/core/item"
+import type { WidgetTypeTupleFrom } from "../../src/widgets/collections/types"
 
 describe("QTI Compiler End-to-End Tests", () => {
 	for (const example of allExamples) {
 		test(`should compile example "${example.identifier}" without errors`, async () => {
-			const result = await errors.try(compile(example, allWidgetsCollection))
+			const result = await errors.try(compile(example as AssessmentItemInput<WidgetTypeTupleFrom<typeof allWidgetsCollection>>, allWidgetsCollection))
 			if (result.error) {
 				logger.error("compilation failed for example", {
 					identifier: example.identifier,
@@ -31,7 +33,7 @@ describe("QTI Compiler End-to-End Tests", () => {
 	// Snapshot test for each example to catch any regression in XML output
 	for (const example of allExamples) {
 		test(`should produce consistent XML output for "${example.identifier}"`, async () => {
-			const result = await errors.try(compile(example, allWidgetsCollection))
+			const result = await errors.try(compile(example as AssessmentItemInput<WidgetTypeTupleFrom<typeof allWidgetsCollection>>, allWidgetsCollection))
 			expect(result.error).toBeFalsy()
 			if (result.error) {
 				logger.error("test setup failed", { error: result.error })

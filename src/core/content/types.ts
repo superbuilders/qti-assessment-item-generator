@@ -1,15 +1,14 @@
-import type { WidgetTypeTuple } from "@/widgets/collections/types"
 
-export type InlineContentItem<E extends WidgetTypeTuple> =
+export type InlineContentItem<E extends readonly string[] = readonly string[]> =
 	| { type: "text"; content: string }
 	| { type: "math"; mathml: string }
 	| { type: "inlineWidgetRef"; widgetId: string; widgetType: E[number] }
 	| { type: "inlineInteractionRef"; interactionId: string }
 	| { type: "gap"; gapId: string }
 
-export type InlineContent<E extends WidgetTypeTuple> = Array<InlineContentItem<E>>
+export type InlineContent<E extends readonly string[] = readonly string[]> = Array<InlineContentItem<E>>
 
-export type BlockContentItem<E extends WidgetTypeTuple> =
+export type BlockContentItem<E extends readonly string[] = readonly string[]> =
 	| { type: "paragraph"; content: InlineContent<E> }
 	| { type: "codeBlock"; code: string }
 	| { type: "unorderedList"; items: InlineContent<E>[] }
@@ -18,4 +17,4 @@ export type BlockContentItem<E extends WidgetTypeTuple> =
 	| { type: "widgetRef"; widgetId: string; widgetType: E[number] }
 	| { type: "interactionRef"; interactionId: string }
 
-export type BlockContent<E extends WidgetTypeTuple> = Array<BlockContentItem<E>>
+export type BlockContent<E extends readonly string[] = readonly string[]> = Array<BlockContentItem<E>>

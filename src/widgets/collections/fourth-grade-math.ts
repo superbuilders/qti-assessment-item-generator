@@ -1,69 +1,105 @@
-import {
-	AdditionWithRegroupingPropsSchema,
-	AngleTypeDiagramPropsSchema,
-	AreaModelMultiplicationPropsSchema,
-	BarChartPropsSchema,
-	BoxGridPropsSchema,
-	ClockDiagramPropsSchema,
-	CustomPolygonDiagramPropsSchema,
-	DivisionAreaDiagramPropsSchema,
-	DivisionModelDiagramPropsSchema,
-	EquivalentFractionModelPropsSchema,
-	FactorizationDiagramPropsSchema,
-	FractionFrequencyPlotPropsSchema,
-	FractionModelDiagramPropsSchema,
-	FractionMultiplicationModelPropsSchema,
-	FractionSumDiagramPropsSchema,
-	GeometricPrimitiveDiagramPropsSchema,
-	LabeledRectangleDiagramPropsSchema,
-	NPolygonPropsSchema,
-	NumberLinePropsSchema,
-	NumberLineWithActionPropsSchema,
-	PatternDiagramPropsSchema,
-	ProtractorAngleDiagramPropsSchema,
-	QuantityFractionalDiagramPropsSchema,
-	SimpleArrowPropsSchema,
-	SubtractionWithRegroupingPropsSchema,
-	TapeDiagramPropsSchema,
-	TransformationDiagramPropsSchema,
-	VectorDiagramPropsSchema,
-	VerticalArithmeticSetupPropsSchema,
-	WheelDiagramPropsSchema
-} from "../registry"
+import type { WidgetCollection } from "@/widgets/collections/types"
+import { allWidgetDefinitions } from "@/widgets/definitions"
 
-export const fourthGradeMathCollection = {
+export const fourthGradeMathCollection: WidgetCollection<
+	Pick<
+		typeof allWidgetDefinitions,
+		| "clockDiagram"
+		| "wheelDiagram"
+		| "geometricPrimitiveDiagram"
+		| "angleTypeDiagram"
+		| "tapeDiagram"
+		| "fractionModelDiagram"
+		| "fractionSumDiagram"
+		| "fractionMultiplicationModel"
+		| "fractionFrequencyPlot"
+		| "divisionAreaDiagram"
+		| "divisionModelDiagram"
+		| "factorizationDiagram"
+		| "numberLine"
+		| "numberLineWithAction"
+		| "protractorAngleDiagram"
+		| "quantityFractionalDiagram"
+		| "additionWithRegrouping"
+		| "subtractionWithRegrouping"
+		| "verticalArithmeticSetup"
+		| "boxGrid"
+		| "barChart"
+		| "equivalentFractionModel"
+		| "areaModelMultiplication"
+		| "simpleArrow"
+		| "vectorDiagram"
+		| "nPolygon"
+		| "patternDiagram"
+		| "transformationDiagram"
+		| "labeledRectangleDiagram"
+		| "customPolygonDiagram"
+	>,
+	readonly [
+		"clockDiagram",
+		"wheelDiagram",
+		"geometricPrimitiveDiagram",
+		"angleTypeDiagram",
+		"tapeDiagram",
+		"fractionModelDiagram",
+		"fractionSumDiagram",
+		"fractionMultiplicationModel",
+		"fractionFrequencyPlot",
+		"divisionAreaDiagram",
+		"divisionModelDiagram",
+		"factorizationDiagram",
+		"numberLine",
+		"numberLineWithAction",
+		"protractorAngleDiagram",
+		"quantityFractionalDiagram",
+		"additionWithRegrouping",
+		"subtractionWithRegrouping",
+		"verticalArithmeticSetup",
+		"boxGrid",
+		"barChart",
+		"equivalentFractionModel",
+		"areaModelMultiplication",
+		"simpleArrow",
+		"vectorDiagram",
+		"nPolygon",
+		"patternDiagram",
+		"transformationDiagram",
+		"labeledRectangleDiagram",
+		"customPolygonDiagram"
+	]
+> = {
 	name: "fourth-grade-math",
-	schemas: {
-		clockDiagram: ClockDiagramPropsSchema,
-		wheelDiagram: WheelDiagramPropsSchema,
-		geometricPrimitiveDiagram: GeometricPrimitiveDiagramPropsSchema,
-		angleTypeDiagram: AngleTypeDiagramPropsSchema,
-		tapeDiagram: TapeDiagramPropsSchema,
-		fractionModelDiagram: FractionModelDiagramPropsSchema,
-		fractionSumDiagram: FractionSumDiagramPropsSchema,
-		fractionMultiplicationModel: FractionMultiplicationModelPropsSchema,
-		fractionFrequencyPlot: FractionFrequencyPlotPropsSchema,
-		divisionAreaDiagram: DivisionAreaDiagramPropsSchema,
-		divisionModelDiagram: DivisionModelDiagramPropsSchema,
-		factorizationDiagram: FactorizationDiagramPropsSchema,
-		numberLine: NumberLinePropsSchema,
-		numberLineWithAction: NumberLineWithActionPropsSchema,
-		protractorAngleDiagram: ProtractorAngleDiagramPropsSchema,
-		quantityFractionalDiagram: QuantityFractionalDiagramPropsSchema,
-		additionWithRegrouping: AdditionWithRegroupingPropsSchema,
-		subtractionWithRegrouping: SubtractionWithRegroupingPropsSchema,
-		verticalArithmeticSetup: VerticalArithmeticSetupPropsSchema,
-		boxGrid: BoxGridPropsSchema,
-		barChart: BarChartPropsSchema,
-		equivalentFractionModel: EquivalentFractionModelPropsSchema,
-		areaModelMultiplication: AreaModelMultiplicationPropsSchema,
-		simpleArrow: SimpleArrowPropsSchema,
-		vectorDiagram: VectorDiagramPropsSchema,
-		nPolygon: NPolygonPropsSchema,
-		patternDiagram: PatternDiagramPropsSchema,
-		transformationDiagram: TransformationDiagramPropsSchema,
-		labeledRectangleDiagram: LabeledRectangleDiagramPropsSchema,
-		customPolygonDiagram: CustomPolygonDiagramPropsSchema
+	widgets: {
+		clockDiagram: allWidgetDefinitions.clockDiagram,
+		wheelDiagram: allWidgetDefinitions.wheelDiagram,
+		geometricPrimitiveDiagram: allWidgetDefinitions.geometricPrimitiveDiagram,
+		angleTypeDiagram: allWidgetDefinitions.angleTypeDiagram,
+		tapeDiagram: allWidgetDefinitions.tapeDiagram,
+		fractionModelDiagram: allWidgetDefinitions.fractionModelDiagram,
+		fractionSumDiagram: allWidgetDefinitions.fractionSumDiagram,
+		fractionMultiplicationModel: allWidgetDefinitions.fractionMultiplicationModel,
+		fractionFrequencyPlot: allWidgetDefinitions.fractionFrequencyPlot,
+		divisionAreaDiagram: allWidgetDefinitions.divisionAreaDiagram,
+		divisionModelDiagram: allWidgetDefinitions.divisionModelDiagram,
+		factorizationDiagram: allWidgetDefinitions.factorizationDiagram,
+		numberLine: allWidgetDefinitions.numberLine,
+		numberLineWithAction: allWidgetDefinitions.numberLineWithAction,
+		protractorAngleDiagram: allWidgetDefinitions.protractorAngleDiagram,
+		quantityFractionalDiagram: allWidgetDefinitions.quantityFractionalDiagram,
+		additionWithRegrouping: allWidgetDefinitions.additionWithRegrouping,
+		subtractionWithRegrouping: allWidgetDefinitions.subtractionWithRegrouping,
+		verticalArithmeticSetup: allWidgetDefinitions.verticalArithmeticSetup,
+		boxGrid: allWidgetDefinitions.boxGrid,
+		barChart: allWidgetDefinitions.barChart,
+		equivalentFractionModel: allWidgetDefinitions.equivalentFractionModel,
+		areaModelMultiplication: allWidgetDefinitions.areaModelMultiplication,
+		simpleArrow: allWidgetDefinitions.simpleArrow,
+		vectorDiagram: allWidgetDefinitions.vectorDiagram,
+		nPolygon: allWidgetDefinitions.nPolygon,
+		patternDiagram: allWidgetDefinitions.patternDiagram,
+		transformationDiagram: allWidgetDefinitions.transformationDiagram,
+		labeledRectangleDiagram: allWidgetDefinitions.labeledRectangleDiagram,
+		customPolygonDiagram: allWidgetDefinitions.customPolygonDiagram
 	},
 	widgetTypeKeys: [
 		"clockDiagram",
@@ -96,5 +132,5 @@ export const fourthGradeMathCollection = {
 		"transformationDiagram",
 		"labeledRectangleDiagram",
 		"customPolygonDiagram"
-	] as const
+	]
 } as const

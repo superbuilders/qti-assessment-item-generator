@@ -1,27 +1,19 @@
-import { SymmetryDiagramPropsSchema } from "../generators/symmetry-diagram"
-import {
-	DotPlotPropsSchema,
-	FractionModelDiagramPropsSchema,
-	NPolygonPropsSchema,
-	NumberLineWithActionPropsSchema,
-	ProtractorAngleDiagramPropsSchema,
-	QuantityFractionalDiagramPropsSchema,
-	TapeDiagramPropsSchema
-} from "../registry"
+import type { WidgetCollection } from "@/widgets/collections/types"
+import { allWidgetDefinitions } from "@/widgets/definitions"
 
-export const teksMath4Collection = {
-	name: "teks-math-4",
-	schemas: {
-		protractorAngleDiagram: ProtractorAngleDiagramPropsSchema,
-		nPolygon: NPolygonPropsSchema,
-		dotPlot: DotPlotPropsSchema,
-		tapeDiagram: TapeDiagramPropsSchema,
-		numberLineWithAction: NumberLineWithActionPropsSchema,
-		fractionModelDiagram: FractionModelDiagramPropsSchema,
-		quantityFractionalDiagram: QuantityFractionalDiagramPropsSchema,
-		symmetryDiagram: SymmetryDiagramPropsSchema
-	},
-	widgetTypeKeys: [
+export const teksMath4Collection: WidgetCollection<
+	Pick<
+		typeof allWidgetDefinitions,
+		| "protractorAngleDiagram"
+		| "nPolygon"
+		| "dotPlot"
+		| "tapeDiagram"
+		| "numberLineWithAction"
+		| "fractionModelDiagram"
+		| "quantityFractionalDiagram"
+		| "symmetryDiagram"
+	>,
+	readonly [
 		"protractorAngleDiagram",
 		"nPolygon",
 		"dotPlot",
@@ -30,5 +22,27 @@ export const teksMath4Collection = {
 		"fractionModelDiagram",
 		"quantityFractionalDiagram",
 		"symmetryDiagram"
-	] as const
+	]
+> = {
+    name: "teks-math-4",
+    widgets: {
+        protractorAngleDiagram: allWidgetDefinitions.protractorAngleDiagram,
+        nPolygon: allWidgetDefinitions.nPolygon,
+        dotPlot: allWidgetDefinitions.dotPlot,
+        tapeDiagram: allWidgetDefinitions.tapeDiagram,
+        numberLineWithAction: allWidgetDefinitions.numberLineWithAction,
+        fractionModelDiagram: allWidgetDefinitions.fractionModelDiagram,
+        quantityFractionalDiagram: allWidgetDefinitions.quantityFractionalDiagram,
+        symmetryDiagram: allWidgetDefinitions.symmetryDiagram
+    },
+    widgetTypeKeys: [
+        "protractorAngleDiagram",
+        "nPolygon",
+        "dotPlot",
+        "tapeDiagram",
+        "numberLineWithAction",
+        "fractionModelDiagram",
+        "quantityFractionalDiagram",
+        "symmetryDiagram"
+    ]
 } as const

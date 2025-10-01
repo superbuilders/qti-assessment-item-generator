@@ -3,14 +3,14 @@ import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { radiallyConstrainedAngleDiagramExamples } from "../../examples/radially-constrained-angle-diagram"
 import type { WidgetInput } from "../../src/widgets/registry"
-import { generateWidget } from "../../src/widgets/widget-generator"
+import { generateWidgetLegacy } from "../../src/widgets/widget-generator"
 
 describe("Widget: radially-constrained-angle-diagram", () => {
 	const examples: WidgetInput[] = radiallyConstrainedAngleDiagramExamples
 
 	examples.forEach((props, index) => {
 		test(`should produce consistent output for example #${index + 1}`, async () => {
-			const result = await errors.try(generateWidget(props))
+			const result = await errors.try(generateWidgetLegacy(props))
 			if (result.error) {
 				logger.error("widget generation failed", { error: result.error, index })
 				throw result.error
@@ -21,7 +21,7 @@ describe("Widget: radially-constrained-angle-diagram", () => {
 
 	test("throws error for invalid ray label reference", async () => {
 		const result = await errors.try(
-			generateWidget({
+			generateWidgetLegacy({
 				type: "radiallyConstrainedAngleDiagram",
 				width: 400,
 				height: 400,
@@ -35,7 +35,7 @@ describe("Widget: radially-constrained-angle-diagram", () => {
 
 	test("throws error for angles exceeding 360 degrees", async () => {
 		const result = await errors.try(
-			generateWidget({
+			generateWidgetLegacy({
 				type: "radiallyConstrainedAngleDiagram",
 				width: 400,
 				height: 400,
@@ -52,7 +52,7 @@ describe("Widget: radially-constrained-angle-diagram", () => {
 
 	test("throws error for invalid ray order", async () => {
 		const result = await errors.try(
-			generateWidget({
+			generateWidgetLegacy({
 				type: "radiallyConstrainedAngleDiagram",
 				width: 400,
 				height: 400,

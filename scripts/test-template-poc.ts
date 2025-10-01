@@ -4,7 +4,7 @@ import { compile } from "@/compiler/compiler"
 import type { AssessmentItemInput } from "@/core/item"
 import fractionAddition from "@/templates/math/fraction-addition"
 import { allWidgetsCollection } from "@/widgets/collections/all"
-import type { WidgetTypeTuple } from "@/widgets/collections/types"
+import type { WidgetTypeTupleFrom } from "@/widgets/collections/types"
 
 async function main() {
 	logger.info("starting template poc test", {
@@ -36,7 +36,7 @@ async function main() {
 		logger.error("template function failed", { error: itemInputResult.error })
 		throw errors.wrap(itemInputResult.error, "template generation")
 	}
-	const assessmentItemInput: AssessmentItemInput<WidgetTypeTuple> = itemInputResult.data
+	const assessmentItemInput = itemInputResult.data as AssessmentItemInput<WidgetTypeTupleFrom<typeof allWidgetsCollection>>
 	logger.info("successfully generated assessmentiteminput from template")
 
 	// 5. Pass the generated data structure to the compiler.

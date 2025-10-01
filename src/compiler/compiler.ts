@@ -5,9 +5,9 @@ import { createDynamicAssessmentItemSchema } from "@/core/item"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { ErrUnsupportedInteraction } from "../structured/client"
-import type { WidgetCollection, WidgetTypeTuple } from "../widgets/collections/types"
-import { typedSchemas } from "../widgets/registry"
-import { generateWidget } from "../widgets/widget-generator"
+import type { WidgetCollection, WidgetDefinition, WidgetTypeTupleFrom } from "../widgets/collections/types"
+import type { Widget } from "@/widgets/registry"
+import type { z } from "zod"
 import { renderBlockContent } from "./content-renderer"
 import { compileInteraction } from "./interaction-compiler"
 import { validateAssessmentItemInput } from "./pre-validator"
@@ -25,12 +25,18 @@ import { escapeXmlAttribute } from "./utils/xml-utils"
 export const ErrDuplicateResponseIdentifier = errors.new("duplicate response identifier")
 export const ErrDuplicateChoiceIdentifier = errors.new("duplicate choice identifiers")
 
-// Type guard to check if a string is a valid widget type
-function isValidWidgetType(type: string): type is keyof typeof typedSchemas {
-	return Object.keys(typedSchemas).includes(type)
+// Type guard to check if a string is a valid widget type in a collection
+function isValidWidgetTypeInCollection<
+	T extends Record<string, WidgetDefinition<unknown, unknown>>,
+	K extends ReadonlyArray<keyof T & string>
+>(
+	type: string,
+	collection: WidgetCollection<T, K>
+): type is keyof T & string {
+	return type in collection.widgets
 }
 
-function dedupePromptTextFromBody<E extends WidgetTypeTuple>(item: AssessmentItem<E>): void {
+function dedupePromptTextFromBody<E extends readonly string[]>(item: AssessmentItem<E>): void {
 	if (!item.interactions || !item.body) return
 
 	// --- normalization helpers ---
@@ -411,7 +417,7 @@ function dedupePromptTextFromBody<E extends WidgetTypeTuple>(item: AssessmentIte
 	}
 }
 
-function enforceIdentifierOnlyMatching<E extends WidgetTypeTuple>(item: AssessmentItem<E>): void {
+function enforceIdentifierOnlyMatching<E extends readonly string[]>(item: AssessmentItem<E>): void {
 	// Build allowed identifiers per responseIdentifier from interactions
 	const allowed: Record<string, Set<string>> = {}
 	const responseIdOwners = new Map<string, string>()
@@ -519,7 +525,7 @@ function enforceIdentifierOnlyMatching<E extends WidgetTypeTuple>(item: Assessme
 	}
 }
 
-function collectRefs<E extends WidgetTypeTuple>(
+function collectRefs<E extends readonly string[]>(
 	item: AssessmentItemInput<E>
 ): { widgetRefs: Set<string>; interactionRefs: Set<string> } {
 	const widgetRefs = new Set<string>()
@@ -586,16 +592,17 @@ function collectRefs<E extends WidgetTypeTuple>(
 	return { widgetRefs, interactionRefs }
 }
 
-function collectWidgetIds<E extends WidgetTypeTuple>(item: AssessmentItemInput<E>): Set<string> {
+function collectWidgetIds<E extends readonly string[]>(item: AssessmentItemInput<E>): Set<string> {
 	return collectRefs(item).widgetRefs
 }
 
-export async function compile<const E extends WidgetTypeTuple>(
-	itemData: AssessmentItemInput<E>,
-	widgetCollection: WidgetCollection<E>
+export async function compile<
+	C extends WidgetCollection<Record<string, WidgetDefinition<unknown, unknown>>, readonly string[]>
+>(
+	itemData: AssessmentItemInput<WidgetTypeTupleFrom<C>>,
+	widgetCollection: C
 ): Promise<string> {
-	// Step 0: Widget Type Derivation (Replaces AI mapping step)
-	// The widget mapping is now derived directly from the 'type' property of each widget definition.
+	// Step 0: Widget Type Derivation
 	const widgetMapping: Record<string, string> = {}
 	if (itemData.widgets) {
 		for (const [key, value] of Object.entries(itemData.widgets)) {
@@ -605,27 +612,33 @@ export async function compile<const E extends WidgetTypeTuple>(
 		}
 	}
 
-	// FIX: Add strict validation for widget types before creating the schema.
-	// Create a properly typed mapping object
-	const validatedWidgetMapping: Record<string, keyof typeof typedSchemas> = {}
-
+	// Validate widget types against the provided collection
+	type ValidWidgetType = WidgetTypeTupleFrom<C>[number]
+	const validatedWidgetMapping: Record<string, ValidWidgetType> = {}
 	for (const [key, type] of Object.entries(widgetMapping)) {
-		if (isValidWidgetType(type)) {
+		if (isValidWidgetTypeInCollection(type, widgetCollection)) {
 			validatedWidgetMapping[key] = type
 			continue
 		}
 		logger.error("invalid widget type in mapping", {
 			key,
 			type,
-			availableTypes: Object.keys(typedSchemas)
+			collectionName: widgetCollection.name,
+			availableTypes: widgetCollection.widgetTypeKeys
 		})
-		throw errors.new(`Invalid widget type "${type}" for slot "${key}" provided in mapping.`)
+		throw errors.new(`Invalid widget type "${type}" for slot "${key}" not in collection '${widgetCollection.name}'`)
 	}
 
-	// Use the collection's widgetTypeKeys tuple for validation
+	// Decouple schema creation from global registry - build schemas from widgetTypeKeys
+	const widgetSchemasForCollection: Record<string, z.ZodType<unknown, unknown>> = {}
+	for (const k of widgetCollection.widgetTypeKeys) {
+		widgetSchemasForCollection[k] = widgetCollection.widgets[k].schema
+	}
+
 	const { AssessmentItemSchema } = createDynamicAssessmentItemSchema(
 		validatedWidgetMapping,
-		widgetCollection.widgetTypeKeys
+		widgetCollection.widgetTypeKeys,
+		widgetSchemasForCollection
 	)
 	const itemResult = AssessmentItemSchema.safeParse(itemData)
 	if (!itemResult.success) {
@@ -685,12 +698,27 @@ export async function compile<const E extends WidgetTypeTuple>(
 	// Step 2: Generate content ONLY for the required widgets
 	if (enforcedItem.widgets) {
 		for (const widgetId of requiredWidgetIds) {
-			const widgetDef = enforcedItem.widgets[widgetId]
-			if (!widgetDef) {
+			const widgetData = enforcedItem.widgets[widgetId]
+			if (!widgetData) {
 				logger.error("content references widgetId not defined in widgets map", { widgetId })
 				throw errors.new("content references undefined widget")
 			}
-			const widgetHtml = await generateWidget(widgetDef)
+
+			const widgetType = widgetData.type
+			const definition = widgetCollection.widgets[widgetType]
+
+			if (!definition) {
+				logger.error("widget definition not found in provided collection", {
+					widgetId,
+					widgetType,
+					collectionName: widgetCollection.name
+				})
+				throw errors.new(`Widget type '${widgetType}' not found in collection '${widgetCollection.name}'`)
+			}
+
+			const generator = definition.generator as (data: Widget) => Promise<string>
+			const widgetHtml = await generator(widgetData)
+
 			if (widgetHtml.trim().startsWith("<svg")) {
 				widgetSlots.set(widgetId, `<img src="${encodeDataUri(widgetHtml)}" alt="Widget visualization" />`)
 			} else {
@@ -739,7 +767,7 @@ export async function compile<const E extends WidgetTypeTuple>(
 				throw errors.new("ErrMissingFeedbackContent")
 			}
 
-			const assertNoInteractions = (blocks: BlockContent<E> | null): void => {
+			const assertNoInteractions = (blocks: BlockContent<WidgetTypeTupleFrom<C>> | null): void => {
 				if (!blocks) return
 				for (const node of blocks) {
 					if (!node) continue
@@ -766,7 +794,7 @@ export async function compile<const E extends WidgetTypeTuple>(
 						}
 					}
 					if (node.type === "tableRich") {
-						const scanRows = (rows: Array<Array<InlineContent<E> | null>> | null) => {
+						const scanRows = (rows: Array<Array<InlineContent<WidgetTypeTupleFrom<C>> | null>> | null) => {
 							if (!rows) return
 							for (const row of rows) {
 								for (const cell of row) {
