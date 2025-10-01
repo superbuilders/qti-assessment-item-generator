@@ -8,31 +8,78 @@ function isBaseSchema(value: unknown): value is BaseSchema {
 	return (
 		value !== null &&
 		value !== undefined &&
-		(typeof value === "boolean" || (typeof value === "object" && !Array.isArray(value) && Object.keys(value).length > 0))
+		typeof value === "object" &&
+		!Array.isArray(value) &&
+		Object.keys(value).length > 0
 	)
 }
 
-// Type guard for JSON Schema objects (non-boolean, non-array objects)
-type ObjectSchema = {
-	type?: unknown
-	properties?: Record<string, BaseSchema>
-	items?: BaseSchema | BaseSchema[]
-	anyOf?: BaseSchema[]
-	allOf?: BaseSchema[]
-	oneOf?: BaseSchema[]
-	not?: BaseSchema
-	additionalProperties?: BaseSchema | boolean
-	definitions?: Record<string, BaseSchema>
-	$defs?: Record<string, BaseSchema>
-} & Record<string, unknown>
+function isRecord(value: unknown): value is Record<string, unknown> {
+    return typeof value === "object" && value !== null
+}
 
-function isObjectSchema(node: unknown): node is ObjectSchema {
-	return typeof node === "object" && node !== null && !Array.isArray(node)
+// Recursively remove 'propertyNames' which OpenAI's response_format rejects
+function stripPropertyNames(node: z.core.JSONSchema._JSONSchema): void {
+    if (node === true || node === false) return
+    if (!isRecord(node)) return
+
+    // Remove propertyNames if present at this level
+    node.propertyNames = undefined
+
+    const props = node.properties
+    if (isRecord(props)) {
+        for (const key of Object.keys(props)) {
+            const child = (props)[key]
+            if (child === true || child === false) continue
+            if (isRecord(child)) stripPropertyNames(child)
+        }
+    }
+
+    const items = node.items
+    if (Array.isArray(items)) {
+        for (const it of items) stripPropertyNames(it)
+        for (const it of items) {
+            if (it !== true && it !== false && isRecord(it)) stripPropertyNames(it)
+        }
+    } else if (items !== undefined) {
+        const it = items
+        if (it !== true && it !== false && isRecord(it)) stripPropertyNames(it)
+    }
+
+    const anyOf = node.anyOf
+    if (Array.isArray(anyOf)) for (const s of anyOf) stripPropertyNames(s)
+    const allOf = node.allOf
+    if (Array.isArray(allOf)) for (const s of allOf) stripPropertyNames(s)
+    const oneOf = node.oneOf
+    if (Array.isArray(oneOf)) for (const s of oneOf) stripPropertyNames(s)
+
+    const notSchema = node.not
+    if (notSchema !== undefined && notSchema !== true && notSchema !== false && isRecord(notSchema)) {
+        stripPropertyNames(notSchema)
+    }
+
+    const addl = node.additionalProperties
+    if (addl !== undefined && addl !== true && addl !== false && isRecord(addl)) stripPropertyNames(addl)
+
+    const defs = node.definitions
+    if (isRecord(defs)) {
+        for (const k of Object.keys(defs)) {
+            const d = (defs)[k]
+            if (isRecord(d)) stripPropertyNames(d)
+        }
+    }
+    const $defs = node.$defs
+    if (isRecord($defs)) {
+        for (const k of Object.keys($defs)) {
+            const d = ($defs)[k]
+            if (isRecord(d)) stripPropertyNames(d)
+        }
+    }
 }
 
 // Hoisted normalization helper: ensure every object has an explicit properties: {}
-function ensureEmptyProperties(node: unknown): void {
-	if (!isObjectSchema(node)) return
+function ensureEmptyProperties(node: BaseSchema): void {
+	if (!(typeof node === "object" && node !== null && !Array.isArray(node))) return
 
 	if (node.type === "object" && node.properties === undefined) {
 		node.properties = {}
@@ -41,15 +88,20 @@ function ensureEmptyProperties(node: unknown): void {
 	// Recurse into properties
 	if (node.properties) {
 		for (const key of Object.keys(node.properties)) {
-			ensureEmptyProperties(node.properties[key])
+			const child = node.properties[key]
+			if (child && typeof child === "object" && !Array.isArray(child)) {
+				ensureEmptyProperties(child)
+			}
 		}
 	}
 
 	// Recurse into items (single schema or tuple)
 	const items = node.items
 	if (Array.isArray(items)) {
-		for (const it of items) ensureEmptyProperties(it)
-	} else if (items) {
+		for (const it of items) {
+			if (it && typeof it === "object" && !Array.isArray(it)) ensureEmptyProperties(it)
+		}
+	} else if (items && typeof items === "object" && !Array.isArray(items)) {
 		ensureEmptyProperties(items)
 	}
 
@@ -62,7 +114,7 @@ function ensureEmptyProperties(node: unknown): void {
 	}
 
 	// Recurse into not
-	if (node.not) ensureEmptyProperties(node.not)
+	if (node.not && typeof node.not === "object" && !Array.isArray(node.not)) ensureEmptyProperties(node.not)
 
 	// Recurse into additionalProperties when it is a schema
 	if (node.additionalProperties && typeof node.additionalProperties === "object") {
@@ -70,14 +122,18 @@ function ensureEmptyProperties(node: unknown): void {
 	}
 
 	// Recurse into definitions / $defs
-	if (node.definitions) {
-		for (const key of Object.keys(node.definitions)) {
-			ensureEmptyProperties(node.definitions[key])
+	const defs = node.definitions
+	if (isRecord(defs)) {
+		for (const key of Object.keys(defs)) {
+			const d = defs[key]
+			if (isBaseSchema(d)) ensureEmptyProperties(d)
 		}
 	}
-	if (node.$defs) {
-		for (const key of Object.keys(node.$defs)) {
-			ensureEmptyProperties(node.$defs[key])
+	const defs2 = node.$defs
+	if (isRecord(defs2)) {
+		for (const key of Object.keys(defs2)) {
+			const d = defs2[key]
+			if (isBaseSchema(d)) ensureEmptyProperties(d)
 		}
 	}
 }
@@ -112,6 +168,9 @@ export function toJSONSchemaPromptSafe(schema: z.ZodType): BaseSchema {
 		logger.error("json schema prompt-safe conversion produced invalid schema")
 		throw errors.new("json schema conversion invalid")
 	}
+
+	// Remove propertyNames to satisfy OpenAI response_format validator
+	stripPropertyNames(json)
 	ensureEmptyProperties(json)
 	return json
 }
