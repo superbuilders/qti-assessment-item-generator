@@ -1,12 +1,12 @@
+import * as errors from "@superbuilders/errors"
+import * as logger from "@superbuilders/slog"
+import { z } from "zod"
 import { CHOICE_IDENTIFIER_REGEX, RESPONSE_IDENTIFIER_REGEX } from "@/compiler/qti-constants"
 import { createBlockContentSchema } from "@/core/content"
 import { FeedbackPlanSchema } from "@/core/feedback"
 import { createAnyInteractionSchema } from "@/core/interactions"
-import * as errors from "@superbuilders/errors"
-import * as logger from "@superbuilders/slog"
-import { z } from "zod"
+import { WidgetSchema } from "@/widgets/registry"
 import type { AssessmentItem, AssessmentItemShell, ResponseDeclaration } from "./types"
-import type { Widget } from "@/widgets/registry"
 
 // Response Declaration Schema (shared across all dynamic schemas)
 function createResponseDeclarationSchema(): z.ZodType<ResponseDeclaration> {
@@ -81,15 +81,11 @@ export function createAssessmentItemShellSchema<const E extends readonly string[
 		.describe("Initial assessment item structure with ref placeholders from the first AI generation shot.")
 }
 
-export function createDynamicAssessmentItemSchema<
-	const E extends readonly string[],
-	T extends Record<E[number], z.ZodType<unknown, unknown>>
->(
+export function createDynamicAssessmentItemSchema<const E extends readonly string[]>(
 	widgetMapping: Record<string, E[number]>,
 	widgetTypeKeys: E,
-	widgetSchemas: T
+	widgetSchemas: Record<E[number], z.ZodType<unknown, unknown>>
 ) {
-	const widgetShape: Record<string, z.ZodType<unknown, unknown>> = {}
 	for (const [slotName, widgetType] of Object.entries(widgetMapping)) {
 		const schema = widgetSchemas[widgetType]
 		if (!schema) {
@@ -100,10 +96,23 @@ export function createDynamicAssessmentItemSchema<
 			})
 			throw errors.new(`unknown widget type specified in mapping: ${widgetType}`)
 		}
-		widgetShape[slotName] = schema
 	}
 
-	const DynamicWidgetsSchema = z.object(widgetShape).describe("Map of widget slot IDs to their widget definitions") as z.ZodType<Record<string, Widget> | null>
+	// Narrow to only allowed widget schemas for this collection
+	const allowedTypeNames = new Set<string>(Object.keys(widgetSchemas))
+	const AllowedWidgetSchema = WidgetSchema.superRefine((val, ctx) => {
+		if (!allowedTypeNames.has(val.type)) {
+			ctx.addIssue({
+				code: "custom",
+				message: `widget type '${val.type}' is not allowed in this collection`,
+				path: ["type"]
+			})
+		}
+	})
+
+	const DynamicWidgetsSchema = z
+		.record(z.string(), AllowedWidgetSchema)
+		.describe("Map of widget slot IDs to their widget definitions")
 	const BlockSchema = createBlockContentSchema(widgetTypeKeys)
 	const AnyInteractionSchema = createAnyInteractionSchema(widgetTypeKeys)
 	const ResponseDeclarationSchema = createResponseDeclarationSchema()
@@ -127,7 +136,7 @@ export function createDynamicAssessmentItemSchema<
 			feedbackPlan: FeedbackPlanSchema,
 			feedbackBlocks: z
 				.record(z.string().min(1), BlockSchema)
-				.describe("A map of feedback identifiers to their rich content blocks.")
+				.describe("A flat map of feedback combination IDs to their rich content blocks.")
 		})
 		.strict()
 		.describe("A complete QTI 3.0 assessment item with content, interactions, and scoring rules.")

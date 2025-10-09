@@ -1,8 +1,8 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import type { z } from "zod"
-import type { WidgetCollection, WidgetDefinition } from "@/widgets/collections/types"
 import { allWidgetsCollection } from "@/widgets/collections/all"
+import type { WidgetCollection, WidgetDefinition } from "@/widgets/collections/types"
 import type { WidgetInput } from "@/widgets/registry"
 
 // Type guard to safely check if a key exists in a collection's widgets.
@@ -38,13 +38,14 @@ export async function generateWidgetLegacy(widgetInput: WidgetInput): Promise<st
 		throw errors.new("widget type not found in default collection")
 	}
 	const definition = allWidgetsCollection.widgets[widgetType]
-	
+
 	// Validate input against the schema to handle transforms (z.input -> z.output)
 	const parsed = definition.schema.safeParse(widgetInput)
 	if (!parsed.success) {
 		logger.error("widget validation failed", { widgetType, error: parsed.error })
 		throw errors.wrap(parsed.error, "widget validation")
 	}
-	
-	return await definition.generator(parsed.data as any)
+
+	// parsed.data is the schema's output type; ensure the generator accepts it by generic inference
+	return await definition.generator(parsed.data)
 }

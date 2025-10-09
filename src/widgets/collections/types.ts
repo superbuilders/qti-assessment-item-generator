@@ -32,7 +32,8 @@ export type WidgetCollection<
  * A helper type to infer a readonly tuple of widget type names from a collection.
  * This replaces the previous redundant `widgetTypeKeys` array.
  */
-export type WidgetTypeTupleFrom<C extends WidgetCollection<any>> = C["widgetTypeKeys"]
+export type WidgetTypeTupleFrom<C extends WidgetCollection<Record<string, WidgetDefinition<unknown, unknown>>>> =
+	C["widgetTypeKeys"]
 
 /**
  * Generic widget type tuple used by content/item generics.

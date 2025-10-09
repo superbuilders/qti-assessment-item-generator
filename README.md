@@ -128,7 +128,7 @@ if (!validationResult.success) {
 }
 
 // 3. Pass the validated data to the generator (Widget union type)
-const svgString = await generateWidget(validationResult.data as unknown as Widget);
+const svgString = await generateWidget(validationResult.data);
 
 console.log(svgString);
 ```
@@ -217,7 +217,7 @@ if (!validationResult.success) {
 }
 
 // The `generateWidget` function accepts a `Widget` (runtime-inferred union)
-const svg = await generateWidget(validationResult.data as unknown as Widget);
+const svg = await generateWidget(validationResult.data);
 ```
 
 ## Image and Content Policy
@@ -239,7 +239,7 @@ The `AiContextEnvelope` object separates content by type to ensure proper proces
 -   **`Error: Model returned no parsed content`**: The OpenAI API call succeeded but returned an empty or unparsable response. Check your API key, model access, and inspect the logs for more details.
 -   **`Error: Slot declaration mismatch detected...`**: This is an internal AI error where the generated plan is inconsistent with the generated content. This error is typically non-retriable for the given input.
 -   **`Error: ...must have at least 2 choices...`**: An interaction like a multiple-choice or ordering question was generated with fewer than two choices, which is invalid.
--   **`Error: pipe characters banned...` or `Error: caret characters banned...`**: The compiler detected a `|` or `^` in plain text. This is a strict rule. Use a `dataTable` widget to create tables, and use MathML (`<msup>`) for exponents.
+-   **`Error: pipe characters banned...` or `Error: caret characters banned...`**: The compiler detected a `|` or `^` in plain text. This is a strict rule. Use a `tableRich` content block to create tables, and use MathML (`<msup>`) for exponents.
 -   **`Error: duplicate response identifier found...`**: The compiler found the same `responseIdentifier` used for multiple interactions or input fields within the same item. All response identifiers must be unique.
 -   **`Error: duplicate choice identifiers within interaction...`**: The compiler found the same `identifier` used for multiple choices within a single interaction. Choice identifiers must be unique within their parent interaction.
 

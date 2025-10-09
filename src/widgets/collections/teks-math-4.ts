@@ -24,25 +24,25 @@ export const teksMath4Collection: WidgetCollection<
 		"symmetryDiagram"
 	]
 > = {
-    name: "teks-math-4",
-    widgets: {
-        protractorAngleDiagram: allWidgetDefinitions.protractorAngleDiagram,
-        nPolygon: allWidgetDefinitions.nPolygon,
-        dotPlot: allWidgetDefinitions.dotPlot,
-        tapeDiagram: allWidgetDefinitions.tapeDiagram,
-        numberLineWithAction: allWidgetDefinitions.numberLineWithAction,
-        fractionModelDiagram: allWidgetDefinitions.fractionModelDiagram,
-        quantityFractionalDiagram: allWidgetDefinitions.quantityFractionalDiagram,
-        symmetryDiagram: allWidgetDefinitions.symmetryDiagram
-    },
-    widgetTypeKeys: [
-        "protractorAngleDiagram",
-        "nPolygon",
-        "dotPlot",
-        "tapeDiagram",
-        "numberLineWithAction",
-        "fractionModelDiagram",
-        "quantityFractionalDiagram",
-        "symmetryDiagram"
-    ]
+	name: "teks-math-4",
+	widgets: {
+		protractorAngleDiagram: allWidgetDefinitions.protractorAngleDiagram,
+		nPolygon: allWidgetDefinitions.nPolygon,
+		dotPlot: allWidgetDefinitions.dotPlot,
+		tapeDiagram: allWidgetDefinitions.tapeDiagram,
+		numberLineWithAction: allWidgetDefinitions.numberLineWithAction,
+		fractionModelDiagram: allWidgetDefinitions.fractionModelDiagram,
+		quantityFractionalDiagram: allWidgetDefinitions.quantityFractionalDiagram,
+		symmetryDiagram: allWidgetDefinitions.symmetryDiagram
+	},
+	widgetTypeKeys: [
+		"protractorAngleDiagram",
+		"nPolygon",
+		"dotPlot",
+		"tapeDiagram",
+		"numberLineWithAction",
+		"fractionModelDiagram",
+		"quantityFractionalDiagram",
+		"symmetryDiagram"
+	]
 } as const

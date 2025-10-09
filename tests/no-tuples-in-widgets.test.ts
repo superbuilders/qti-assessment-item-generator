@@ -1,4 +1,4 @@
-import { describe, it, expect } from "bun:test"
+import { describe, expect, it } from "bun:test"
 import { z } from "zod"
 import { allWidgetSchemas } from "@/widgets/registry"
 
@@ -52,4 +52,3 @@ describe("Widgets: no usage of Zod tuples anywhere", () => {
 		}
 	})
 })
-

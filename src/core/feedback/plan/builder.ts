@@ -1,6 +1,6 @@
+import * as logger from "@superbuilders/slog"
 import type { AnyInteraction } from "@/core/interactions"
 import type { ResponseDeclaration } from "@/core/item"
-import * as logger from "@superbuilders/slog"
 import { deriveComboIdentifier, normalizeIdPart } from "../utils"
 import type { FeedbackPlan } from "./types"
 

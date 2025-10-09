@@ -1,4 +1,3 @@
-
 export type InlineContentItem<E extends readonly string[] = readonly string[]> =
 	| { type: "text"; content: string }
 	| { type: "math"; mathml: string }

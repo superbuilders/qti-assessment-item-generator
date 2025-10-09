@@ -1,13 +1,12 @@
+import * as errors from "@superbuilders/errors"
+import * as logger from "@superbuilders/slog"
+import type { z } from "zod"
 import type { BlockContent, BlockContentItem, InlineContent } from "@/core/content"
 import type { FeedbackPlan } from "@/core/feedback"
 import type { AssessmentItem, AssessmentItemInput } from "@/core/item"
 import { createDynamicAssessmentItemSchema } from "@/core/item"
-import * as errors from "@superbuilders/errors"
-import * as logger from "@superbuilders/slog"
 import { ErrUnsupportedInteraction } from "../structured/client"
 import type { WidgetCollection, WidgetDefinition, WidgetTypeTupleFrom } from "../widgets/collections/types"
-import type { Widget } from "@/widgets/registry"
-import type { z } from "zod"
 import { renderBlockContent } from "./content-renderer"
 import { compileInteraction } from "./interaction-compiler"
 import { validateAssessmentItemInput } from "./pre-validator"
@@ -29,10 +28,7 @@ export const ErrDuplicateChoiceIdentifier = errors.new("duplicate choice identif
 function isValidWidgetTypeInCollection<
 	T extends Record<string, WidgetDefinition<unknown, unknown>>,
 	K extends ReadonlyArray<keyof T & string>
->(
-	type: string,
-	collection: WidgetCollection<T, K>
-): type is keyof T & string {
+>(type: string, collection: WidgetCollection<T, K>): type is keyof T & string {
 	return type in collection.widgets
 }
 
@@ -484,8 +480,6 @@ function enforceIdentifierOnlyMatching<E extends readonly string[]>(item: Assess
 		}
 	}
 
-	// Note: dataTable widgets removed; no widget-owned responses are supported
-
 	// Validate response declarations for any responseIdentifier with allowed set
 	for (const decl of item.responseDeclarations) {
 		if (!decl) continue
@@ -587,8 +581,6 @@ function collectRefs<E extends readonly string[]>(
 		}
 	}
 
-	// dataTable support removed; no scanning within widget content
-
 	return { widgetRefs, interactionRefs }
 }
 
@@ -598,10 +590,7 @@ function collectWidgetIds<E extends readonly string[]>(item: AssessmentItemInput
 
 export async function compile<
 	C extends WidgetCollection<Record<string, WidgetDefinition<unknown, unknown>>, readonly string[]>
->(
-	itemData: AssessmentItemInput<WidgetTypeTupleFrom<C>>,
-	widgetCollection: C
-): Promise<string> {
+>(itemData: AssessmentItemInput<WidgetTypeTupleFrom<C>>, widgetCollection: C): Promise<string> {
 	// Step 0: Widget Type Derivation
 	const widgetMapping: Record<string, string> = {}
 	if (itemData.widgets) {
@@ -671,17 +660,8 @@ export async function compile<
 	dedupePromptTextFromBody(enforcedItem)
 	validateAssessmentItemInput(enforcedItem, logger)
 
-	// REMOVED: The following function calls are now redundant.
-	// enforceNoPipesInBody(enforcedItem)
-	// enforceNoCaretsInBody(enforcedItem)
-	// enforceNoPipesInChoiceInteraction(enforcedItem)
-	// enforceNoCaretsInChoiceInteraction(enforcedItem)
-	// enforceNoPipesInInlineChoiceInteraction(enforcedItem)
-	// enforceNoCaretsInInlineChoiceInteraction(enforcedItem)
-
 	// Enforce identifier-only matching; no ad-hoc rewriting
 	// This function now includes checks for duplicate responseIdentifiers and choice Identifiers,
-	// Note: dataTable validation has been removed.
 	enforceIdentifierOnlyMatching(enforcedItem)
 
 	const interactionSlots = new Map<string, string>()
@@ -716,8 +696,13 @@ export async function compile<
 				throw errors.new(`Widget type '${widgetType}' not found in collection '${widgetCollection.name}'`)
 			}
 
-			const generator = definition.generator as (data: Widget) => Promise<string>
-			const widgetHtml = await generator(widgetData)
+			// Validate widget data against its schema before generation to satisfy per-type contracts
+			const parsed = definition.schema.safeParse(widgetData)
+			if (!parsed.success) {
+				logger.error("widget validation failed before generation", { widgetId, widgetType, error: parsed.error })
+				throw errors.wrap(parsed.error, "widget validation")
+			}
+			const widgetHtml = await definition.generator(parsed.data)
 
 			if (widgetHtml.trim().startsWith("<svg")) {
 				widgetSlots.set(widgetId, `<img src="${encodeDataUri(widgetHtml)}" alt="Widget visualization" />`)

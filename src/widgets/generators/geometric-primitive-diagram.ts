@@ -44,9 +44,7 @@ export const GeometricPrimitiveDiagramPropsSchema = z
 						type: z.literal("segment").describe("A line segment with two defined endpoints."),
 						pointOne: createPointDefinitionSchema().describe("The starting point of the segment."),
 						pointTwo: createPointDefinitionSchema().describe("The ending point of the segment."),
-					rotation: z
-						.number()
-						.describe("The rotation of the segment in degrees. 0 is horizontal, 90 is vertical."),
+						rotation: z.number().describe("The rotation of the segment in degrees. 0 is horizontal, 90 is vertical."),
 						length: z
 							.number()
 							.positive()
@@ -59,9 +57,7 @@ export const GeometricPrimitiveDiagramPropsSchema = z
 						type: z.literal("ray").describe("A ray starting at one point and extending through another."),
 						pointOne: createPointDefinitionSchema().describe("The starting point (endpoint) of the ray."),
 						pointTwo: createPointDefinitionSchema().describe("A second point that defines the direction of the ray."),
-					rotation: z
-						.number()
-						.describe("The rotation of the ray in degrees. 0 is horizontal, 90 is vertical."),
+						rotation: z.number().describe("The rotation of the ray in degrees. 0 is horizontal, 90 is vertical."),
 						length: z
 							.number()
 							.positive()

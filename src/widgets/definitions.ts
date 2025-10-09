@@ -1,4 +1,3 @@
-import { allWidgetSchemas } from "@/widgets/registry"
 import { generateThreeDIntersectionDiagram } from "@/widgets/generators/3d-intersection-diagram"
 import { generateAdditionWithRegrouping } from "@/widgets/generators/addition-with-regrouping"
 import { generateAngleDiagram } from "@/widgets/generators/angle-diagram"
@@ -94,6 +93,7 @@ import { generateVennDiagram } from "@/widgets/generators/venn-diagram"
 import { generateVerticalArithmeticSetup } from "@/widgets/generators/vertical-arithmetic-setup"
 import { generateVideo } from "@/widgets/generators/video"
 import { generateWheelDiagram } from "@/widgets/generators/wheel-diagram"
+import { allWidgetSchemas } from "@/widgets/registry"
 
 /**
  * The single source of truth for all widget definitions. Each entry pairs a
@@ -269,4 +269,3 @@ export const allWidgetDefinitions = {
 // This type is inferred from the const object above and represents the complete,
 // strongly-typed set of all widget definitions.
 export type AllWidgetDefinitions = typeof allWidgetDefinitions
-

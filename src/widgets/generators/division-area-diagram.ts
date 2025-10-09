@@ -117,9 +117,7 @@ export const DivisionAreaDiagramPropsSchema = z
 			.array(createValueOrPlaceholderSchema())
 			.describe("An array of quotient parts displayed across the top."),
 		steps: z.array(createStepSchema()).describe("An array of calculation steps. Its length must match quotientParts."),
-		showFinalRemainderBox: z
-			.boolean()
-			.describe("If true, shows the final zero remainder with a box around it.")
+		showFinalRemainderBox: z.boolean().describe("If true, shows the final zero remainder with a box around it.")
 	})
 	.strict()
 	.describe("Creates a visual area model for long division, showing partial quotients and step-by-step subtraction.")

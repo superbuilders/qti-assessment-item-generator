@@ -1,12 +1,12 @@
-import { type AssessmentItemInput, createDynamicAssessmentItemSchema } from "@/core/item"
-import { toJSONSchemaPromptSafe } from "@/core/json-schema"
 import * as errors from "@superbuilders/errors"
 import type * as logger from "@superbuilders/slog"
-import type { WidgetCollection, WidgetDefinition, WidgetTypeTupleFrom } from "@/widgets/collections/types"
-import { allWidgetSchemas, type Widget, WidgetSchema } from "@/widgets/registry"
 import type OpenAI from "openai"
 import type { ChatCompletion, ChatCompletionCreateParamsNonStreaming } from "openai/resources/chat/completions"
 import { z } from "zod"
+import { type AssessmentItemInput, createDynamicAssessmentItemSchema } from "@/core/item"
+import { toJSONSchemaPromptSafe } from "@/core/json-schema"
+import type { WidgetCollection, WidgetDefinition, WidgetTypeTupleFrom } from "@/widgets/collections/types"
+import { allWidgetSchemas, type Widget, WidgetSchema } from "@/widgets/registry"
 import { transformArraysToObjects, transformObjectsToArrays } from "./utils/shape-helpers"
 import { generateZodSchemaFromObject } from "./utils/zod-runtime-generator"
 
@@ -370,7 +370,7 @@ async function planContentDifferentiation<const E extends readonly string[]>(
 			type: "json_schema",
 			json_schema: {
 				name: "differentiation_planner",
-				schema: jsonSchema as Record<string, unknown>,
+				schema: jsonSchema,
 				strict: true
 			}
 		},
@@ -382,7 +382,7 @@ async function planContentDifferentiation<const E extends readonly string[]>(
 		throw errors.wrap(result.error, "ai differentiation planning")
 	}
 
-	const completion = result.data as ChatCompletion
+	const completion: ChatCompletion = result.data
 	const choice = completion.choices[0]
 	if (!choice?.message?.content) {
 		logger.error("openai planning call returned no content")
@@ -556,7 +556,7 @@ async function regenerateWidgetsViaLLM<const E extends readonly string[]>(
 			type: "json_schema",
 			json_schema: {
 				name: "widgets_generator",
-				schema: jsonSchema as Record<string, unknown>,
+				schema: jsonSchema,
 				strict: true
 			}
 		},
@@ -569,7 +569,7 @@ async function regenerateWidgetsViaLLM<const E extends readonly string[]>(
 	}
 	logger.info("openai widget generation completed")
 
-	const completion = llmResult.data as ChatCompletion
+	const completion: ChatCompletion = llmResult.data
 	const choice = completion.choices[0]
 	if (!choice?.message?.content) {
 		logger.error("openai widget generation returned no content")

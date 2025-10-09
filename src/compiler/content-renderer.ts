@@ -1,8 +1,7 @@
-import type { BlockContent, InlineContent } from "@/core/content"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
+import type { BlockContent, InlineContent, InlineContentItem } from "@/core/content"
 import { sanitizeXmlAttributeValue } from "./utils/xml-utils"
-import { InlineContentItem } from "@/core/content"
 
 /**
  * Escapes text content for safe inclusion in XML PCDATA.

@@ -1,7 +1,7 @@
-import type { BlockContent, InlineContent } from "@/core/content"
-import type { AnyInteraction } from "@/core/interactions"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
+import type { BlockContent, InlineContent } from "@/core/content"
+import type { AnyInteraction } from "@/core/interactions"
 
 function walkInline<E extends readonly string[]>(inline: InlineContent<E> | null, out: Map<string, string>): void {
 	if (!inline) return

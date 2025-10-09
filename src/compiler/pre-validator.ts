@@ -1,10 +1,10 @@
+import * as errors from "@superbuilders/errors"
+import type * as logger from "@superbuilders/slog"
+import { XMLParser, XMLValidator } from "fast-xml-parser"
 import type { BlockContent, InlineContent } from "@/core/content"
 import type { FeedbackPlan } from "@/core/feedback"
 import type { AnyInteraction } from "@/core/interactions"
 import type { AssessmentItemInput, ResponseDeclaration } from "@/core/item"
-import * as errors from "@superbuilders/errors"
-import type * as logger from "@superbuilders/slog"
-import { XMLParser, XMLValidator } from "fast-xml-parser"
 import {
 	checkNoCDataSections,
 	checkNoInvalidXmlChars,
@@ -302,6 +302,56 @@ export function validateAssessmentItemInput<E extends readonly string[]>(
 		validateBlockContent(content, `item.feedbackBlocks[${blockId}]`, logger)
 	}
 
+	// NEW: Add validation to ensure no interactions are present in feedback blocks.
+	for (const [blockId, content] of Object.entries(item.feedbackBlocks)) {
+		const assertNoInteractions = (blocks: BlockContent<E> | null, context: string): void => {
+			if (!blocks) return
+			for (const node of blocks) {
+				if (node.type === "interactionRef") {
+					logger.error("interaction ref found in feedback content", { context })
+					throw errors.new("interactions are banned in feedback content")
+				}
+				if (node.type === "paragraph") {
+					for (const part of node.content) {
+						if (part.type === "inlineInteractionRef") {
+							logger.error("inline interaction ref found in feedback content", { context })
+							throw errors.new("interactions are banned in feedback content")
+						}
+					}
+				}
+				if (node.type === "unorderedList" || node.type === "orderedList") {
+					for (const item of node.items) {
+						for (const part of item) {
+							if (part.type === "inlineInteractionRef") {
+								logger.error("inline interaction ref found in list item of feedback content", { context })
+								throw errors.new("interactions are banned in feedback content")
+							}
+						}
+					}
+				}
+				if (node.type === "tableRich") {
+					const checkCells = (rows: Array<Array<InlineContent<E> | null>> | null) => {
+						if (!rows) return
+						for (const row of rows) {
+							for (const cell of row) {
+								if (!cell) continue
+								for (const part of cell) {
+									if (part.type === "inlineInteractionRef") {
+										logger.error("inline interaction ref found in table cell of feedback content", { context })
+										throw errors.new("interactions are banned in feedback content")
+									}
+								}
+							}
+						}
+					}
+					checkCells(node.header)
+					checkCells(node.rows)
+				}
+			}
+		}
+		assertNoInteractions(content, `item.feedbackBlocks[${blockId}]`)
+	}
+
 	if (item.interactions) {
 		for (const [key, interaction] of Object.entries(item.interactions)) {
 			switch (interaction.type) {
@@ -420,7 +470,6 @@ export function validateAssessmentItemInput<E extends readonly string[]>(
 	}
 
 	// Validate each response declaration has a corresponding interaction responseIdentifier
-	// Note: dataTable widgets have been removed
 	if (item.responseDeclarations.length > 0) {
 		// Guard: identifier base-type with single cardinality must have exactly one correct value
 		for (const decl of item.responseDeclarations) {

@@ -320,13 +320,13 @@ export const CompositeShapeDiagramPropsSchema = z
 				"Ordered sequence of edges forming the shape's outer perimeter. Each edge connects vertices and can have measurement labels. Use simple edges for single measurements or partitioned edges for multi-segment boundaries."
 			),
 
-	// Optional shapes for composed shading and circle support (transplanted from nested-shape-diagram)
-	shapes: z
-		.array(createCompositeShapeSchema())
-		.nullable()
-		.describe(
-			"Optional shapes collection supporting polygons and circles. Enables composed shaded regions and circle outlines. Use null when no shapes are needed."
-		),
+		// Optional shapes for composed shading and circle support (transplanted from nested-shape-diagram)
+		shapes: z
+			.array(createCompositeShapeSchema())
+			.nullable()
+			.describe(
+				"Optional shapes collection supporting polygons and circles. Enables composed shaded regions and circle outlines. Use null when no shapes are needed."
+			),
 
 		internalSegments: z
 			.array(createInternalSegmentSchema())
@@ -356,10 +356,10 @@ export const CompositeShapeDiagramPropsSchema = z
 				"Optional 90° angle indicators drawn as small squares at vertices. Specify the corner vertex and its two adjacent vertices to show perpendicular relationships."
 			),
 
-	// Rendering fit control to enable parity with nested-shape-diagram when needed
-	fit: z
-		.enum(["auto", "none"]) // no defaulting here to avoid schema-level silent fallbacks
-		.nullable()
+		// Rendering fit control to enable parity with nested-shape-diagram when needed
+		fit: z
+			.enum(["auto", "none"]) // no defaulting here to avoid schema-level silent fallbacks
+			.nullable()
 			.describe(
 				"Rendering fit mode. 'auto' scales and centers to the canvas; 'none' renders in data coordinates for snapshot parity with nested-shape-diagram."
 			)

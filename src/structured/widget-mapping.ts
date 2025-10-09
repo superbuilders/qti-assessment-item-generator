@@ -1,19 +1,19 @@
 import { z } from "zod"
-import { type WidgetCollectionName, widgetCollections } from "../widgets/collections"
-import { allWidgetSchemas } from "../widgets/registry"
+import { createWidgetSelectionPromptSection } from "@/structured/prompts/shared"
+import { type WidgetCollectionName, widgetCollections } from "@/widgets/collections"
 
 function createWidgetMappingSchema(slotNames: string[], allowedWidgetKeys: readonly string[]) {
-    const values = [...allowedWidgetKeys, "WIDGET_NOT_FOUND"]
-    const valueSchema = z.union(values.map((v) => z.literal(v)) as [z.ZodLiteral<string>, z.ZodLiteral<string>, ...z.ZodLiteral<string>[]])
-    const shape: Record<string, z.ZodType> = {}
-    for (const slotName of slotNames) {
-        shape[slotName] = valueSchema
-    }
-    return z.object({
-        widget_mapping: z
-            .object(shape)
-            .describe("A JSON object mapping each widget slot name to one of the allowed widget types or WIDGET_NOT_FOUND.")
-    })
+	const values = [...allowedWidgetKeys, "WIDGET_NOT_FOUND"] as const
+	const valueSchema = z.enum(values)
+	const shape: Record<string, z.ZodType> = {}
+	for (const slotName of slotNames) {
+		shape[slotName] = valueSchema
+	}
+	return z.object({
+		widget_mapping: z
+			.object(shape)
+			.describe("A JSON object mapping each widget slot name to one of the allowed widget types or WIDGET_NOT_FOUND.")
+	})
 }
 export function createWidgetMappingPrompt(
 	perseusJson: string,
@@ -23,23 +23,6 @@ export function createWidgetMappingPrompt(
 ) {
 	const collection = widgetCollections[widgetCollectionName]
 
-	function buildWidgetTypeDescriptions(): string {
-		// Use spread operator to convert readonly array to regular array
-		const sortedKeys = [...collection.widgetTypeKeys].sort()
-		return sortedKeys
-			.map((typeName) => {
-				// Type narrowing by iterating through the object
-				const schemaEntries = Object.entries(allWidgetSchemas)
-				const schemaEntry = schemaEntries.find(([key]) => key === typeName)
-				if (schemaEntry) {
-					const [, schema] = schemaEntry
-					const description = schema?._def.description ?? "No description available."
-					return `- ${typeName}: ${description}`
-				}
-				return `- ${typeName}: No description available.`
-			})
-			.join("\n")
-	}
 	// MODIFIED: Create a base instruction and then conditionally add the refined, collection-specific rule.
 	let systemInstruction = `You are an expert in educational content and QTI standards. Your task is to analyze an assessment item's body content and the original Perseus JSON to map widget slots to the most appropriate widget type from a given list.
 
@@ -83,7 +66,6 @@ Use "WIDGET_NOT_FOUND" if:
 
 - Prefer specific widgets over \`urlImage\`:
   - Graphs/charts/plots: choose graph/plot widgets (e.g., \`barChart\`, \`lineGraph\`, \`conceptualGraph\`, \`scatterPlot\`, \`populationBarChart\`, etc.)
-  - Tables: choose \`dataTable\`
   - Set comparisons: choose \`vennDiagram\`
   - Reference resources: choose specific resource widgets (e.g., \`periodicTable\`)
   - Emoji-only assets: choose \`emojiImage\`
@@ -138,8 +120,7 @@ Correct mapping when graph widgets are available:
   - NEVER return \`WIDGET_NOT_FOUND\` for these slots.
 - Choice-level visual widgets declared for multiple choice interactions (e.g., names ending with \`_choice_a\`, \`_choice_b\`, \`_choice_c\`) MUST be mapped to a concrete widget type, not \`WIDGET_NOT_FOUND\`. Inspect the scenario and choose the correct type from the allowed list.
 
-Widget Type Options:
-${[...collection.widgetTypeKeys].sort().join("\n")}`
+`
 
 	const userContent = `Based on the Perseus JSON and assessment body below, create a JSON object that maps each widget slot name to the most appropriate widget type.
 
@@ -153,13 +134,12 @@ Assessment Item Body (as structured JSON):
 ${assessmentBody}
 \`\`\`
 
+${createWidgetSelectionPromptSection(collection)}
+
  MANDATORY RULES FOR CHOICE-LEVEL VISUALS:
  - Some widget slot names may follow the convention \`<responseIdentifier>__<choiceLetter>__v<index>\`. These are widgets reserved for visuals that appear INSIDE interaction choices (e.g., images/diagrams in radio choices).
  - You MUST map these choice-level widget slots to the correct widget types by inspecting the Perseus JSON for the corresponding choice content.
  - Do NOT assume these appear in the top-level body; they are intentionally absent from body and will be inserted inside choices later.
-
-  Available Widget Types and Descriptions:
-${buildWidgetTypeDescriptions()}
 
 Your response must be a JSON object with a single key "widget_mapping", mapping every slot name from the list below to its type. If no suitable type is found, you MUST use the string "WIDGET_NOT_FOUND". However, for FBD slots (names starting with \`fbd_\`), you MUST map to \`freeBodyDiagram\` and MUST NOT use \`WIDGET_NOT_FOUND\`.
 

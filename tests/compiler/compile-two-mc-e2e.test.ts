@@ -15,7 +15,7 @@ describe("E2E compile: two MC with combo feedback", () => {
 			body: [
 				{ type: "paragraph", content: [{ type: "text", content: "Question stem." }] },
 				{ type: "interactionRef", interactionId: "int_1" },
-				{ type: "interactionRef", interactionId: "int_2" },
+				{ type: "interactionRef", interactionId: "int_2" }
 			],
 			widgets: null,
 			interactions: {

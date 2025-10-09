@@ -1,26 +1,22 @@
-import type { BlockContent, InlineContent } from "@/core/content"
-import type { AssessmentItemInput, ResponseDeclaration } from "@/core/item"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import type { WidgetCollection, WidgetDefinition, WidgetTypeTupleFrom } from "@/widgets/collections/types"
-import { allWidgetSchemas, type Widget, WidgetSchema } from "@/widgets/registry"
 import type OpenAI from "openai"
 import type { ChatCompletion, ChatCompletionCreateParamsNonStreaming } from "openai/resources/chat/completions"
 import { z } from "zod"
+import type { BlockContent, InlineContent } from "@/core/content"
+import type { AssessmentItemInput, ResponseDeclaration } from "@/core/item"
+import type { WidgetCollection, WidgetDefinition, WidgetTypeTupleFrom } from "@/widgets/collections/types"
+import { allWidgetSchemas, type Widget, WidgetSchema } from "@/widgets/registry"
 
 function isWidgetTypeKey(v: string): v is keyof typeof allWidgetSchemas {
 	return v in allWidgetSchemas
 }
 
-import {
-	buildFeedbackPlanFromInteractions,
-	convertNestedFeedbackToBlocks,
-	validateNestedFeedback
-} from "@/core/feedback"
+import { buildFeedbackPlanFromInteractions } from "@/core/feedback"
 import { createAnyInteractionSchema } from "@/core/interactions"
 import { createAssessmentItemShellSchema } from "@/core/item"
 import { toJSONSchemaPromptSafe } from "@/core/json-schema"
-import { createFeedbackPrompt } from "./prompts/feedback"
+import { createFlatFeedbackPrompt } from "./prompts/feedback"
 import { createInteractionContentPrompt } from "./prompts/interactions"
 import { createAssessmentShellPrompt } from "./prompts/shell"
 import { createWidgetContentPrompt } from "./prompts/widgets"
@@ -82,13 +78,7 @@ async function resolveRasterImages(envelope: AiContextEnvelope): Promise<ImageCo
 
 async function generateAssessmentShell<
 	C extends WidgetCollection<Record<string, WidgetDefinition<unknown, unknown>>, readonly string[]>
->(
-	openai: OpenAI,
-	logger: logger.Logger,
-	envelope: AiContextEnvelope,
-	imageContext: ImageContext,
-	widgetCollection: C
-) {
+>(openai: OpenAI, logger: logger.Logger, envelope: AiContextEnvelope, imageContext: ImageContext, widgetCollection: C) {
 	const { systemInstruction, userContent } = createAssessmentShellPrompt(envelope, imageContext, widgetCollection)
 
 	const ShellSchema = createAssessmentItemShellSchema(widgetCollection.widgetTypeKeys)
@@ -116,7 +106,7 @@ async function generateAssessmentShell<
 			type: "json_schema",
 			json_schema: {
 				name: "assessment_shell_generator",
-				schema: jsonSchema as Record<string, unknown>,
+				schema: jsonSchema,
 				strict: true
 			}
 		},
@@ -130,7 +120,7 @@ async function generateAssessmentShell<
 		throw errors.wrap(response.error, "ai shell generation")
 	}
 
-	const completion = response.data as ChatCompletion
+	const completion: ChatCompletion = response.data
 	const choice = completion.choices[0]
 	if (!choice) {
 		logger.error("openai returned no choices")
@@ -159,7 +149,9 @@ async function generateAssessmentShell<
 	return validation.data
 }
 
-function collectInteractionIdsFromShell<E extends readonly string[]>(shell: { body: BlockContent<E> | null }): string[] {
+function collectInteractionIdsFromShell<E extends readonly string[]>(shell: {
+	body: BlockContent<E> | null
+}): string[] {
 	const ids = new Set<string>()
 
 	function walkInline(inline: InlineContent<E>): void {
@@ -267,7 +259,7 @@ async function generateInteractionContent<
 			type: "json_schema",
 			json_schema: {
 				name: "interaction_content_generator",
-				schema: jsonSchema as Record<string, unknown>,
+				schema: jsonSchema,
 				strict: true
 			}
 		},
@@ -279,7 +271,7 @@ async function generateInteractionContent<
 		throw errors.wrap(response.error, "ai interaction generation")
 	}
 
-	const completion = response.data as ChatCompletion
+	const completion: ChatCompletion = response.data
 	const choice = completion.choices[0]
 	if (!choice?.message?.content) {
 		logger.error("openai interaction generation returned no content")
@@ -371,18 +363,20 @@ export async function generateFromEnvelope<
 		combinationCount: feedbackPlan.combinations.length
 	})
 
-	// Shot 3 - Generate feedback
+	// Shot 3 - Generate feedback using the new flat-key prompt and schema
 	const {
 		systemInstruction: feedbackSystem,
 		userContent: feedbackUser,
 		FeedbackSchema
-	} = createFeedbackPrompt(envelope, assessmentShell, feedbackPlan, imageContext, widgetCollection)
+	} = createFlatFeedbackPrompt(envelope, assessmentShell, feedbackPlan, imageContext, widgetCollection)
 
 	const feedbackJsonSchema = toJSONSchemaPromptSafe(FeedbackSchema)
-	logger.debug("generated json schema for openai", {
+
+	// OBSERVABILITY: Log key schema metrics.
+	const schemaByteLength = new TextEncoder().encode(JSON.stringify(feedbackJsonSchema)).length
+	logger.debug("generated json schema for openai feedback", {
 		functionName: "generateFeedback",
-		generatorName: "feedback_generator",
-		schema: feedbackJsonSchema
+		schemaByteLength
 	})
 	const feedbackParams: ChatCompletionCreateParamsNonStreaming = {
 		model: OPENAI_MODEL,
@@ -394,7 +388,7 @@ export async function generateFromEnvelope<
 			type: "json_schema",
 			json_schema: {
 				name: "feedback_generator",
-				schema: feedbackJsonSchema as Record<string, unknown>,
+				schema: feedbackJsonSchema,
 				strict: true
 			}
 		},
@@ -406,7 +400,7 @@ export async function generateFromEnvelope<
 		throw errors.wrap(feedbackResult.error, "generate feedback")
 	}
 
-	const feedbackCompletion = feedbackResult.data as ChatCompletion
+	const feedbackCompletion: ChatCompletion = feedbackResult.data
 	const feedbackChoice = feedbackCompletion.choices[0]
 	if (!feedbackChoice?.message?.content) {
 		logger.error("openai feedback generation returned no content")
@@ -420,12 +414,19 @@ export async function generateFromEnvelope<
 		throw errors.wrap(feedbackParseResult.error, "json parse")
 	}
 
-	const validatedNestedFeedback = validateNestedFeedback(
-		feedbackParseResult.data,
-		feedbackPlan,
-		widgetCollection.widgetTypeKeys
-	)
-	const feedbackBlocks = convertNestedFeedbackToBlocks(validatedNestedFeedback, feedbackPlan)
+	// SIMPLIFIED: Validate against the flat schema and directly use the validated flat map.
+	const validatedFeedbackResult = FeedbackSchema.safeParse(feedbackParseResult.data)
+	if (!validatedFeedbackResult.success) {
+		logger.error("flat feedback validation failed", { error: validatedFeedbackResult.error })
+		throw errors.wrap(validatedFeedbackResult.error, "flat feedback validation")
+	}
+
+	// Extract content from the validated flat map (each value is { content: BlockContent })
+	const feedbackBlocksRaw = validatedFeedbackResult.data.feedback.FEEDBACK__OVERALL
+	const feedbackBlocks: Record<string, BlockContent<WidgetTypeTupleFrom<C>>> = {}
+	for (const [key, value] of Object.entries(feedbackBlocksRaw)) {
+		feedbackBlocks[key] = value.content
+	}
 	logger.debug("shot 3 complete", { feedbackBlockCount: Object.keys(feedbackBlocks).length })
 
 	// Shot 4: Collect widget refs with types and generate widget content
@@ -476,7 +477,7 @@ export async function generateFromEnvelope<
 				type: "json_schema",
 				json_schema: {
 					name: "widget_content_generator",
-					schema: widgetJsonSchema as Record<string, unknown>,
+					schema: widgetJsonSchema,
 					strict: true
 				}
 			},
@@ -488,7 +489,7 @@ export async function generateFromEnvelope<
 			throw errors.wrap(widgetsResponse.error, "ai widget generation")
 		}
 
-		const widgetCompletion = widgetsResponse.data as ChatCompletion
+		const widgetCompletion: ChatCompletion = widgetsResponse.data
 		const wChoice = widgetCompletion.choices[0]
 		if (!wChoice?.message?.content) {
 			logger.error("widget generation returned no content")

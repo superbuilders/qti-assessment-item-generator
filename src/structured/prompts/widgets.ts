@@ -1,54 +1,23 @@
 import type { AnyInteraction } from "@/core/interactions"
 import type { AssessmentItemShell } from "@/core/item"
-import * as errors from "@superbuilders/errors"
-import * as logger from "@superbuilders/slog"
-import { widgetCollections } from "@/widgets/collections"
-import { allWidgetSchemas } from "@/widgets/registry"
+import { type WidgetCollectionName, widgetCollections } from "@/widgets/collections"
+import type { allWidgetSchemas } from "@/widgets/registry"
 import type { AiContextEnvelope, ImageContext } from "../types"
 import { caretBanPromptSection } from "./caret"
-import { formatUnifiedContextSections } from "./shared"
+import { createWidgetSelectionPromptSection, formatUnifiedContextSections } from "./shared"
 
 export function createWidgetContentPrompt<E extends readonly string[]>(
 	envelope: AiContextEnvelope,
 	assessmentShell: AssessmentItemShell<E>,
 	widgetMapping: Record<string, keyof typeof allWidgetSchemas>,
 	generatedInteractions: Record<string, AnyInteraction<E>>,
-	widgetCollectionName: string,
+	widgetCollectionName: WidgetCollectionName,
 	imageContext: ImageContext
 ): {
 	systemInstruction: string
 	userContent: string
 } {
-	function buildWidgetTypeDescriptionsForCollection(): string {
-		if (!(widgetCollectionName in widgetCollections)) {
-			logger.error("unknown widget collection", { widgetCollectionName })
-			throw errors.new(`unknown widget collection: ${widgetCollectionName}`)
-		}
-		const collection = widgetCollections[widgetCollectionName as keyof typeof widgetCollections]
-	const sortedKeys = Object.keys(collection.widgets).sort()
-		const lines: string[] = []
-		function hasDef(x: unknown): x is { _def?: { description?: unknown } } {
-			return typeof x === "object" && x !== null && "_def" in x
-		}
-		for (const typeName of sortedKeys) {
-			const schemaEntries = Object.entries(allWidgetSchemas)
-			const schemaEntry = schemaEntries.find(([key]) => key === typeName)
-			if (schemaEntry) {
-				const [, schema] = schemaEntry
-				let description = "No description available."
-				if (hasDef(schema)) {
-					const rawDescription = schema._def?.description
-					if (typeof rawDescription === "string" && rawDescription.trim() !== "") {
-						description = rawDescription.trim()
-					}
-				}
-				lines.push(`- ${typeName}: ${description}`)
-			} else {
-				lines.push(`- ${typeName}: No description available.`)
-			}
-		}
-		return lines.join("\n")
-	}
+	const collection = widgetCollections[widgetCollectionName]
 
 	const systemInstruction = `You are an expert in educational content conversion with vision capabilities, focused on generating widget content for QTI assessments. Your task is to generate ONLY the widget content objects based on the original Perseus JSON, an assessment shell, a mapping that specifies the exact widget type for each slot, and accompanying visual context.
 
@@ -152,8 +121,7 @@ This mapping tells you the required output type for each widget.
 ${JSON.stringify(widgetMapping, null, 2)}
 \`\`\`
 
-    ## Available Widget Types and Descriptions:
-    ${buildWidgetTypeDescriptionsForCollection()}
+${createWidgetSelectionPromptSection(collection)}
 
 ## Instructions:
 - **Analyze Images**: Use the raster images provided to your vision and the raw SVG content above to understand the visual components of widgets.

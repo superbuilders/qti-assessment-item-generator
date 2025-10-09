@@ -1,7 +1,7 @@
-import type { FeedbackDimension, FeedbackPlan } from "@/core/feedback"
-import type { AssessmentItem } from "@/core/item"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
+import type { FeedbackDimension, FeedbackPlan } from "@/core/feedback"
+import type { AssessmentItem } from "@/core/item"
 import { escapeXmlAttribute } from "./utils/xml-utils"
 
 export function compileResponseDeclarations<E extends readonly string[]>(

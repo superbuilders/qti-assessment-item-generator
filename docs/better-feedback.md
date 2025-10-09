@@ -89,6 +89,34 @@ For multi-dimensional feedback (e.g., two dimensions), the keys embed the entire
 }
 ```
 
+For fallback mode (large combination counts), the flat keys are exactly the two outcomes:
+
+```json
+{
+  "feedback": {
+    "FEEDBACK__OVERALL": {
+      "CORRECT": { "content": [ /* ... */ ] },
+      "INCORRECT": { "content": [ /* ... */ ] }
+    }
+  }
+}
+```
+Example (non-fallback, two binary dimensions):
+
+```json
+{
+  "feedback": {
+    "FEEDBACK__OVERALL": {
+      "FB__RESPONSE_1_CORRECT__RESPONSE_2_CORRECT":   { "content": [ { "type": "paragraph", "content": [ { "type": "text", "content": "Both parts correct — excellent." } ] } ] },
+      "FB__RESPONSE_1_CORRECT__RESPONSE_2_INCORRECT": { "content": [ { "type": "paragraph", "content": [ { "type": "text", "content": "First is correct; review the second part." } ] } ] },
+      "FB__RESPONSE_1_INCORRECT__RESPONSE_2_CORRECT": { "content": [ { "type": "paragraph", "content": [ { "type": "text", "content": "Second is correct; fix the first part." } ] } ] },
+      "FB__RESPONSE_1_INCORRECT__RESPONSE_2_INCORRECT": { "content": [ { "type": "paragraph", "content": [ { "type": "text", "content": "Neither part is correct — start by checking definitions." } ] } ] }
+    }
+  }
+}
+```
+
+
 ### Zod schema builder
 
 Introduce a flat feedback schema builder that enforces exact keys from the feedback plan and reuses a single leaf schema instance for all combinations (minimizes JSON Schema size):
@@ -231,32 +259,25 @@ CONTEXT:
 ## Implementation Plan (Step-by-Step)
 
 1) **Schema builder (core)**
-   - Add `createFlatFeedbackZodSchema(feedbackPlan, widgetTypeKeys)` alongside current nested builder
-   - Return Zod object with exact keys (combination IDs) and `LeafNodeSchema` reused per key
+   - Replace the nested builder with `createFlatFeedbackZodSchema(feedbackPlan, widgetTypeKeys)`
+   - Remove the nested builder, its validation, and conversion utilities
+   - Return a Zod object with exact keys (combination IDs) and a single `LeafNodeSchema` instance reused per key
 
 2) **Prompt (structured/prompts/feedback.ts)**
-   - Add a flat-mode builder that:
+   - Use the flat schema builder to:
      - Constructs the flat Zod schema
      - Builds the dimension inventory and key mapping table from `feedbackPlan`
      - Emits a clear SYSTEM + USER prompt including the mapping and all content rules
 
 3) **Client (structured/client.ts)**
-   - In shot 3 (feedback generation), switch to the flat feedback prompt & schema
+   - In shot 3 (feedback generation), use the flat feedback prompt & schema
    - Validate the model output against the flat schema
-   - Use the validated `feedback.FEEDBACK__OVERALL` map directly as `feedbackBlocks`
+   - Use the validated `feedback.FEEDBACK__OVERALL` map directly as `feedbackBlocks` (no nested-to-flat conversion)
 
 4) **Compiler (no change expected)**
    - Compiler already expects a flat `feedbackBlocks: Record<string, BlockContent>` keyed by `combination.id`
 
-5) **Tests**
-   - Add tests for:
-     - Flat schema generation (keys exactly match `feedbackPlan.combinations`)
-     - Model output validation for a synthetic multi-dimensional plan
-     - Snapshot for prompt text to ensure mapping table is present
-     - Regression for enum limits: generate JSON Schema for a medium-size plan and confirm it doesn’t exceed limits
-
-6) **Rollout & Safety**
-   - Feature-flag the flat schema path initially
+5) **Safety & Observability**
    - Emit logs: dimensionCount, combinationCount, and counts per batch (if batching)
    - On failure, log which required keys are missing from the model output
 
@@ -306,3 +327,23 @@ KEYS MAPPING
 ---
 
 This proposal retains strict key control, reduces schema complexity for OpenAI, provides clearer guidance to the model, and plugs directly into our existing compiler workflow with minimal code churn.
+
+## Tests to Add (Post-Migration)
+
+- Structured generator (shot 3) flat-output acceptance
+  - Mock OpenAI to return a flat map under `feedback.FEEDBACK__OVERALL` for a combo-mode plan (e.g., two binary dimensions) and assert the client accepts it without nested conversion and passes it through as `feedbackBlocks`.
+
+- FeedbackPlan/feedbackBlocks key equality enforcement
+  - Provide a `feedbackPlan.combinations` list and a mismatched `feedbackBlocks` (missing or extra key) and assert `validateAssessmentItemInput` throws with the logged diffs.
+
+- Compiler integration with flat `feedbackBlocks`
+  - Use an item similar to `tests/compiler/compile-two-mc-e2e.test.ts` but ensure `feedbackBlocks` keys come directly from a flat map; assert all four `qti-feedback-block` elements exist in the XML with the expected identifiers.
+
+- Content rules in feedback
+  - Verify feedback text rejects banned characters (`^`, `|`) and that currency/percent must be in MathML; assert pre-validator errors for violations (contexts include `item.feedbackBlocks[FB__...]`).
+
+- Fallback mode shape
+  - For a `fallback` plan, mock flat output with exactly `CORRECT` and `INCORRECT`; assert acceptance and equality check with `combinations = ["CORRECT","INCORRECT"]`.
+
+- Deterministic batching acceptance (if used)
+  - For larger plans, simulate two batches with disjoint strict key sets; assert merged `feedbackBlocks` equals the full set of `feedbackPlan.combinations` and that duplicates or gaps are detected.

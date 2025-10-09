@@ -137,13 +137,13 @@ describe("Differentiation Pipeline", () => {
 		expect(Array.isArray(item.body)).toBe(true)
 		if (item.body) {
 			expect(item.body.length).toBe(1)
-		const firstBodyBlock = item.body[0]
-		if (firstBodyBlock?.type === "paragraph") {
-			expect(Array.isArray(firstBodyBlock.content)).toBe(true)
-		} else {
-			logger.error("first body block validation failed", { type: firstBodyBlock?.type })
-			throw errors.new("First body block is not a paragraph")
-		}
+			const firstBodyBlock = item.body[0]
+			if (firstBodyBlock?.type === "paragraph") {
+				expect(Array.isArray(firstBodyBlock.content)).toBe(true)
+			} else {
+				logger.error("first body block validation failed", { type: firstBodyBlock?.type })
+				throw errors.new("First body block is not a paragraph")
+			}
 		}
 		expect(Array.isArray(item.responseDeclarations)).toBe(true)
 		expect(item.responseDeclarations.length).toBe(1)

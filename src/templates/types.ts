@@ -1,6 +1,6 @@
+import type { z } from "zod"
 import type { AssessmentItemInput } from "@/core/item"
 import type { WidgetTypeTuple } from "@/widgets/collections/types"
-import type { z } from "zod"
 
 /**
  * Canonical template module interface for pluggable templates.

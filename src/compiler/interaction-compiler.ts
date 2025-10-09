@@ -1,6 +1,6 @@
-import type { AnyInteraction } from "@/core/interactions"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
+import type { AnyInteraction } from "@/core/interactions"
 import { renderBlockContent, renderInlineContent } from "./content-renderer"
 import { escapeXmlAttribute } from "./utils/xml-utils"
 

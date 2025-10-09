@@ -36,7 +36,8 @@ async function main() {
 		logger.error("template function failed", { error: itemInputResult.error })
 		throw errors.wrap(itemInputResult.error, "template generation")
 	}
-	const assessmentItemInput = itemInputResult.data as AssessmentItemInput<WidgetTypeTupleFrom<typeof allWidgetsCollection>>
+	const assessmentItemInput: AssessmentItemInput<WidgetTypeTupleFrom<typeof allWidgetsCollection>> =
+		itemInputResult.data
 	logger.info("successfully generated assessmentiteminput from template")
 
 	// 5. Pass the generated data structure to the compiler.

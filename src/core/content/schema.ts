@@ -1,5 +1,5 @@
-import { CHOICE_IDENTIFIER_REGEX, SLOT_IDENTIFIER_REGEX } from "@/compiler/qti-constants"
 import { z } from "zod"
+import { CHOICE_IDENTIFIER_REGEX, SLOT_IDENTIFIER_REGEX } from "@/compiler/qti-constants"
 import { MATHML_INNER_PATTERN } from "../../widgets/utils/mathml"
 import type { BlockContent, BlockContentItem, InlineContent, InlineContentItem } from "./types"
 

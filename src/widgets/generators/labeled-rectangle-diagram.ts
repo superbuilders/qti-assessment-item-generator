@@ -43,18 +43,12 @@ export const LabeledRectangleDiagramPropsSchema = z
 			.regex(MATHML_INNER_PATTERN, "invalid mathml inner content")
 			.nullable()
 			.describe("MathML INNER content (no <math>) centered inside the rectangle."),
-		fillColor: z
-			.string()
-			.regex(CSS_COLOR_PATTERN, "invalid css color")
-			.describe("The fill color of the rectangle."),
+		fillColor: z.string().regex(CSS_COLOR_PATTERN, "invalid css color").describe("The fill color of the rectangle."),
 		borderColor: z
 			.string()
 			.regex(CSS_COLOR_PATTERN, "invalid css color")
 			.describe("The border color of the rectangle."),
-		textColor: z
-			.string()
-			.regex(CSS_COLOR_PATTERN, "invalid css color")
-			.describe("The color of the text labels.")
+		textColor: z.string().regex(CSS_COLOR_PATTERN, "invalid css color").describe("The color of the text labels.")
 	})
 	.strict()
 

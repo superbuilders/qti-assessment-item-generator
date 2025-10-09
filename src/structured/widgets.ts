@@ -1,18 +1,18 @@
-import type { AnyInteraction } from "@/core/interactions"
-import type { AssessmentItemShell } from "@/core/item"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import { widgetCollections } from "../widgets/collections"
-import { allWidgetSchemas } from "../widgets/registry"
-import { caretBanPromptSection } from "./caret"
-import type { ImageContext } from "./perseus-image-resolver"
+import type { AnyInteraction } from "@/core/interactions"
+import type { AssessmentItemShell } from "@/core/item"
+import { caretBanPromptSection } from "@/structured/caret"
+import type { ImageContext } from "@/structured/perseus-image-resolver"
+import { type WidgetCollectionName, widgetCollections } from "@/widgets/collections"
+import { allWidgetSchemas } from "@/widgets/registry"
 
 export function createWidgetContentPrompt<E extends readonly string[]>(
 	perseusJson: string,
 	assessmentShell: AssessmentItemShell<E>,
 	widgetMapping: Record<string, keyof typeof allWidgetSchemas>,
 	generatedInteractions: Record<string, AnyInteraction<E>>,
-	widgetCollectionName: string,
+	widgetCollectionName: WidgetCollectionName,
 	imageContext: ImageContext
 ): {
 	systemInstruction: string
@@ -23,8 +23,8 @@ export function createWidgetContentPrompt<E extends readonly string[]>(
 			logger.error("unknown widget collection", { widgetCollectionName })
 			throw errors.new(`unknown widget collection: ${widgetCollectionName}`)
 		}
-		const collection = widgetCollections[widgetCollectionName as keyof typeof widgetCollections]
-	const sortedKeys = Object.keys(collection.widgets).sort()
+		const collection = widgetCollections[widgetCollectionName]
+		const sortedKeys = Object.keys(collection.widgets).sort()
 		const lines: string[] = []
 		function hasDef(x: unknown): x is { _def?: { description?: unknown } } {
 			return typeof x === "object" && x !== null && "_def" in x

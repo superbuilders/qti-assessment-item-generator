@@ -441,7 +441,7 @@ export function createDynamicAssessmentItemSchema(widgetMapping: Record<string, 
 				"A map of widget identifiers to their full widget object definitions."
 			),
 			interactions: z
-				.record(AnyInteractionSchema)
+				.record(z.string(), AnyInteractionSchema)
 				.nullable()
 				.describe("A map of interaction identifiers to their full interaction object definitions."),
 			// REMOVED: The old binary `feedback` object is gone.

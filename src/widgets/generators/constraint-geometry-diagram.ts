@@ -261,20 +261,18 @@ const ConstraintSchema = z
 					.array(z.string().regex(vertexIdRegex))
 					.min(3)
 					.describe("An ordered array of vertex IDs that form the vertices of the polygon."),
-		isRegular: z
-			.boolean()
-			.describe(
-				"If true, the solver will automatically generate the necessary 'equalLength' and 'equalAngle' sub-constraints to form a regular polygon."
-			),
+				isRegular: z
+					.boolean()
+					.describe(
+						"If true, the solver will automatically generate the necessary 'equalLength' and 'equalAngle' sub-constraints to form a regular polygon."
+					),
 				sideLength: z
 					.number()
 					.nullable()
 					.describe(
 						"An optional numeric value for the side length. If provided, all sides of the polygon will be set to this length."
 					),
-		closed: z
-			.boolean()
-			.describe("If true, the last vertex is connected to the first to form a closed shape.")
+				closed: z.boolean().describe("If true, the last vertex is connected to the first to form a closed shape.")
 			})
 			.strict()
 			.describe(
@@ -294,7 +292,7 @@ const ShadedRegionSchema = z
 		fillColor: z
 			.string()
 			.regex(CSS_COLOR_PATTERN)
-			.describe("The CSS fill color for the shaded area (e.g., '#FFE5CC', '#RRGGBBAA' for transparency)."),
+			.describe("The CSS fill color for the shaded area (e.g., '#FFE5CC', '#RRGGBBAA' for transparency).")
 		// Opacity is not exposed; encode via alpha in fillColor (e.g., #RRGGBBAA)
 	})
 	.strict()

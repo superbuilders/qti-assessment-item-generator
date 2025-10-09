@@ -23,10 +23,7 @@ function createVectorSchema() {
 					y: z.number().describe("Ending y coordinate")
 				})
 				.describe("Ending point of the vector"),
-			color: z
-				.string()
-				.regex(CSS_COLOR_PATTERN, "invalid css color")
-				.describe("Color of the vector line and arrow")
+			color: z.string().regex(CSS_COLOR_PATTERN, "invalid css color").describe("Color of the vector line and arrow")
 		})
 		.strict()
 }

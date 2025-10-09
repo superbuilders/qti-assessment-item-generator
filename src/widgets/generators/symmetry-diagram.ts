@@ -27,10 +27,7 @@ export const SymmetryDiagramPropsSchema = z
 			.describe("The geometric shape to display."),
 		drawCorrectLines: z.boolean().describe("Whether to draw the correct lines of symmetry for the shape."),
 		drawIncorrectLines: z.boolean().describe("Whether to draw a common set of incorrect lines of symmetry."),
-		shapeColor: z
-			.string()
-			.regex(CSS_COLOR_PATTERN, "invalid css color")
-			.describe("The fill color for the shape.")
+		shapeColor: z.string().regex(CSS_COLOR_PATTERN, "invalid css color").describe("The fill color for the shape.")
 	})
 	.strict()
 	.describe(

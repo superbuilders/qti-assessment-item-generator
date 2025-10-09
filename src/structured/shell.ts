@@ -1,13 +1,13 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import type { AssessmentItemInput } from "../compiler/schemas"
-import { AssessmentItemShellSchema } from "../compiler/schemas"
+import type { AssessmentItemInput } from "@/core/item"
+import { createAssessmentItemShellSchema } from "@/core/item"
 import { allExamples } from "../examples"
 import { caretBanPromptSection } from "./caret"
 import type { ImageContext } from "./perseus-image-resolver"
 
 // Helper to convert a full AssessmentItemInput into a shell for prompt examples
-function createShellFromExample(item: AssessmentItemInput) {
+function createShellFromExample<const E extends readonly string[]>(item: AssessmentItemInput<E>) {
 	const shell = {
 		...item,
 		widgets: item.widgets ? Object.keys(item.widgets) : [],
@@ -15,7 +15,14 @@ function createShellFromExample(item: AssessmentItemInput) {
 	}
 	// Validate against the shell schema before returning
 	// Use safeParse to avoid throwing and to align with error handling policy
-	const result = AssessmentItemShellSchema.safeParse(shell)
+	const keys: string[] = []
+	if (item.widgets) {
+		for (const w of Object.values(item.widgets)) {
+			if (w && typeof w.type === "string" && !keys.includes(w.type)) keys.push(w.type)
+		}
+	}
+	const ShellSchema = createAssessmentItemShellSchema(keys)
+	const result = ShellSchema.safeParse(shell)
 	if (!result.success) {
 		// If an example shell fails validation, something is wrong with our example data
 		// Log the issue and throw an error instead of using type assertion
@@ -146,7 +153,7 @@ ${supportedInteractionTypes}
 - \`plotter\` - interactive plotting/drawing → convert to \`choiceInteraction\` with static visuals in choices
 - \`interactive-graph\` - interactive graphing → convert to \`choiceInteraction\` with static visuals
 - \`grapher\` - interactive function graphing → convert to \`choiceInteraction\` with static visuals
-- \`matcher\` - matching items → convert to a SINGLE \`dataTable\` widget with inline dropdowns in the right column (see CRITICAL rule below)
+- \`matcher\` - matching items → convert to a SINGLE \`tableRich\` content block with inline dropdowns in the right column (see CRITICAL rule below)
 - \`number-line\` - when used for plotting points (not just display) → convert to \`choiceInteraction\` with static visuals
 
 **Remember:** Perseus misleadingly calls interactive elements "widgets" in its JSON. IGNORE THIS. Reclassify based on whether user input is required, EXCEPT for tables which are ALWAYS widgets.
@@ -170,7 +177,7 @@ Example shell for matcher conversion:
 \`\`\`
 
 Notes for implementation:
-- The single \`data_table\` will be generated as a \`dataTable\` widget.
+- The single \`data_table\` will be generated as a \`tableRich\` content block.
 - Each right-column cell must be a dropdown rendered as an inlineChoiceInteraction (inline, not block).
 - The dropdown choices should be the full set from the matcher’s right side; correctness encoded in response declarations per row.
 - No per-choice visuals or per-choice tables are allowed for matcher conversions.

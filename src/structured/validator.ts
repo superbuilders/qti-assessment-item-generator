@@ -1,7 +1,7 @@
-import type { BlockContent, InlineContent } from "@/core/content"
-import type { AssessmentItemInput } from "@/core/item"
 import * as errors from "@superbuilders/errors"
 import type * as logger from "@superbuilders/slog"
+import type { BlockContent, InlineContent } from "@/core/content"
+import type { AssessmentItemInput } from "@/core/item"
 import {
 	checkNoLatex,
 	checkNoMfencedElements,
@@ -11,7 +11,10 @@ import {
 } from "../qti-validation/utils"
 
 // NEW: Recursive walker function for inline content
-function processInlineContent<E extends readonly string[]>(items: InlineContent<E> | null, logger: logger.Logger): void {
+function processInlineContent<E extends readonly string[]>(
+	items: InlineContent<E> | null,
+	logger: logger.Logger
+): void {
 	if (!items) return
 	for (const item of items) {
 		if (item.type === "text") {
