@@ -1,4 +1,5 @@
 import type { AssessmentItemInput } from "@/core/item"
-import type { WidgetTypeTuple } from "@/widgets/collections/types"
+import type { allWidgetsCollection } from "@/widgets/collections/all"
+import type { WidgetTypeTupleFrom } from "@/widgets/collections/types"
 
-export const allExamples: AssessmentItemInput<WidgetTypeTuple>[] = []
+export const allExamples: AssessmentItemInput<WidgetTypeTupleFrom<typeof allWidgetsCollection>>[] = []

@@ -1,53 +1,32 @@
-import * as errors from "@superbuilders/errors"
-import * as logger from "@superbuilders/slog"
 import type { AnyInteraction } from "@/core/interactions"
 import type { AssessmentItemShell } from "@/core/item"
-import { caretBanPromptSection } from "@/structured/caret"
-import type { ImageContext } from "@/structured/perseus-image-resolver"
-import { type WidgetCollectionName, widgetCollections } from "@/widgets/collections"
-import { allWidgetSchemas } from "@/widgets/registry"
+import { caretBanPromptSection } from "@/structured/prompts/caret"
+import { createWidgetSelectionPromptSection, formatUnifiedContextSections } from "@/structured/prompts/shared"
+import type { ImageContext } from "@/structured/types"
+import { createSubsetCollection } from "@/widgets/collections/subset"
+import type { WidgetCollection, WidgetDefinition } from "@/widgets/collections/types"
 
-export function createWidgetContentPrompt<E extends readonly string[]>(
+export function createWidgetContentPrompt<
+	E extends readonly string[],
+	C extends WidgetCollection<Record<string, WidgetDefinition<unknown, unknown>>, E>
+>(
 	perseusJson: string,
 	assessmentShell: AssessmentItemShell<E>,
-	widgetMapping: Record<string, keyof typeof allWidgetSchemas>,
+	widgetMapping: Record<string, E[number]>,
 	generatedInteractions: Record<string, AnyInteraction<E>>,
-	widgetCollectionName: WidgetCollectionName,
+	widgetCollection: C,
 	imageContext: ImageContext
 ): {
 	systemInstruction: string
 	userContent: string
 } {
-	function buildWidgetTypeDescriptionsForCollection(): string {
-		if (!(widgetCollectionName in widgetCollections)) {
-			logger.error("unknown widget collection", { widgetCollectionName })
-			throw errors.new(`unknown widget collection: ${widgetCollectionName}`)
-		}
-		const collection = widgetCollections[widgetCollectionName]
-		const sortedKeys = Object.keys(collection.widgets).sort()
-		const lines: string[] = []
-		function hasDef(x: unknown): x is { _def?: { description?: unknown } } {
-			return typeof x === "object" && x !== null && "_def" in x
-		}
-		for (const typeName of sortedKeys) {
-			const schemaEntries = Object.entries(allWidgetSchemas)
-			const schemaEntry = schemaEntries.find(([key]) => key === typeName)
-			if (schemaEntry) {
-				const [, schema] = schemaEntry
-				let description = "No description available."
-				if (hasDef(schema)) {
-					const rawDescription = schema._def?.description
-					if (typeof rawDescription === "string" && rawDescription.trim() !== "") {
-						description = rawDescription.trim()
-					}
-				}
-				lines.push(`- ${typeName}: ${description}`)
-			} else {
-				lines.push(`- ${typeName}: No description available.`)
-			}
-		}
-		return lines.join("\n")
+	// Extract unique widget types from the mapping to create a minimal subset
+	const uniqueWidgetTypes = new Set<E[number]>()
+	for (const typeName of Object.values(widgetMapping)) {
+		uniqueWidgetTypes.add(typeName)
 	}
+	const neededWidgetTypes: ReadonlyArray<E[number]> = Array.from(uniqueWidgetTypes)
+	const subsetCollection = createSubsetCollection(widgetCollection, neededWidgetTypes)
 
 	const systemInstruction = `You are an expert in educational content conversion with vision capabilities, focused on generating widget content for QTI assessments. Your task is to generate ONLY the widget content objects based on the original Perseus JSON, an assessment shell, a mapping that specifies the exact widget type for each slot, and accompanying visual context.
 
@@ -125,24 +104,7 @@ SCAN ALL text content in widgets (labels, captions, content) for '$' - these MUS
 
 	const userContent = `Generate widget content based on the following inputs. Use the provided image context to understand the visual components.
 
-## Image Context (for your analysis only)
-
-### Image URL Mappings
-Mapping of original image URLs to resolved URLs (includes both SVG and raster images).
-\`\`\`json
-${imageContext.resolvedUrlMap.size === 0 ? "{}" : JSON.stringify(Object.fromEntries(imageContext.resolvedUrlMap), null, 2)}
-\`\`\`
-
-### Raw SVG Content
-If any images are SVGs, their content is provided here for you to analyze.
-\`\`\`json
-${imageContext.svgContentMap.size === 0 ? "{}" : JSON.stringify(Object.fromEntries(imageContext.svgContentMap), null, 2)}
-\`\`\`
-
-## Original Perseus JSON:
-\`\`\`json
-${perseusJson}
-\`\`\`
+${formatUnifiedContextSections({ primaryContent: perseusJson, supplementaryContent: [] }, imageContext)}
 
 ## Assessment Shell (for context):
 \`\`\`json
@@ -161,8 +123,7 @@ This mapping tells you the required output type for each widget.
 ${JSON.stringify(widgetMapping, null, 2)}
 \`\`\`
 
-    ## Available Widget Types and Descriptions:
-    ${buildWidgetTypeDescriptionsForCollection()}
+${createWidgetSelectionPromptSection(subsetCollection)}
 
 ## Instructions:
 - **Analyze Images**: Use the raster images provided to your vision and the raw SVG content above to understand the visual components of widgets.

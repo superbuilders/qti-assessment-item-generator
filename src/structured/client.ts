@@ -441,11 +441,21 @@ export async function generateFromEnvelope<
 	let generatedWidgets: Record<string, Widget> = {}
 	if (widgetRefs.size > 0) {
 		// Build a typed mapping with runtime guard
-		const widgetMapping: Record<string, keyof typeof allWidgetSchemas> = {}
+		const widgetMapping: Record<string, WidgetTypeTupleFrom<C>[number]> = {}
 		for (const [id, typeName] of widgetRefs) {
 			if (!isWidgetTypeKey(typeName)) {
 				logger.error("unknown widget type in refs", { widgetId: id, typeName })
 				throw errors.new("unknown widget type in refs")
+			}
+			// Verify widget type exists in the provided collection
+			if (!widgetCollection.widgetTypeKeys.includes(typeName)) {
+				logger.error("widget type not in collection", {
+					widgetId: id,
+					typeName,
+					collectionName: widgetCollection.name,
+					availableTypes: widgetCollection.widgetTypeKeys
+				})
+				throw errors.new("widget type not in collection")
 			}
 			widgetMapping[id] = typeName
 		}
@@ -454,7 +464,7 @@ export async function generateFromEnvelope<
 			assessmentShell,
 			widgetMapping,
 			generatedInteractions,
-			widgetCollection.name,
+			widgetCollection,
 			imageContext
 		)
 

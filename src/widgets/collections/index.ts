@@ -18,6 +18,4 @@ export const widgetCollections: {
 	"teks-math-4": teksMath4Collection
 }
 
-export type WidgetCollectionName = keyof typeof widgetCollections
-
 export type { WidgetCollection } from "./types"

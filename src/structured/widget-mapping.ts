@@ -1,6 +1,6 @@
 import { z } from "zod"
 import { createWidgetSelectionPromptSection } from "@/structured/prompts/shared"
-import { type WidgetCollectionName, widgetCollections } from "@/widgets/collections"
+import type { WidgetCollection, WidgetDefinition } from "@/widgets/collections/types"
 
 function createWidgetMappingSchema(slotNames: string[], allowedWidgetKeys: readonly string[]) {
 	const values = [...allowedWidgetKeys, "WIDGET_NOT_FOUND"] as const
@@ -15,14 +15,10 @@ function createWidgetMappingSchema(slotNames: string[], allowedWidgetKeys: reado
 			.describe("A JSON object mapping each widget slot name to one of the allowed widget types or WIDGET_NOT_FOUND.")
 	})
 }
-export function createWidgetMappingPrompt(
-	perseusJson: string,
-	assessmentBody: string,
-	slotNames: string[],
-	widgetCollectionName: WidgetCollectionName
-) {
-	const collection = widgetCollections[widgetCollectionName]
 
+export function createWidgetMappingPrompt<
+	C extends WidgetCollection<Record<string, WidgetDefinition<unknown, unknown>>, readonly string[]>
+>(perseusJson: string, assessmentBody: string, slotNames: string[], widgetCollection: C) {
 	// MODIFIED: Create a base instruction and then conditionally add the refined, collection-specific rule.
 	let systemInstruction = `You are an expert in educational content and QTI standards. Your task is to analyze an assessment item's body content and the original Perseus JSON to map widget slots to the most appropriate widget type from a given list.
 
@@ -43,17 +39,8 @@ Use "WIDGET_NOT_FOUND" if:
 1.  There is no semantically appropriate widget type in the provided list for the given Perseus content.
 2.  A slot clearly represents an interactive element that was misclassified as a widget.`
 
-	// MODIFIED: Conditionally append the highly specific and clarified simple-visual instruction.
-	if (widgetCollectionName === "simple-visual") {
-		systemInstruction += `
-3.  **For this 'simple-visual' collection ONLY**: Your task is to map Perseus \`image\` widgets to our \`urlImage\` widget. To do this, you must look at the **original Perseus JSON** for the specific widget slot. If the corresponding Perseus \`image\` widget definition is **missing its \`url\` property** or the \`url\` is an empty string, you **MUST** output \`WIDGET_NOT_FOUND\`.
-    - **NOTE**: You will be provided a context map of working URLs. **Assume all URLs in that context map are valid and functional.** Your job is not to validate them, but to recognize when a URL is completely absent from the source Perseus JSON in the first place.
-
-4.  **Reference Resources Preference (periodic table, formula sheets)**: When the assessment body or Perseus JSON clearly indicates a standard reference resource (e.g., "periodic table", "periodic table of the elements"), and this collection includes a specific widget type for it (e.g., \`periodicTable\`), you **MUST** map the corresponding slot to that specific widget type rather than a generic \`urlImage\`. This ensures consistent rendering and behavior for reference materials.`
-	}
-
 	// Conditionally add widget selection rules when urlImage is available in the collection
-	const hasUrlImage = [...collection.widgetTypeKeys].includes("urlImage")
+	const hasUrlImage = widgetCollection.widgetTypeKeys.includes("urlImage")
 	if (hasUrlImage) {
 		systemInstruction += `
 
@@ -134,7 +121,7 @@ Assessment Item Body (as structured JSON):
 ${assessmentBody}
 \`\`\`
 
-${createWidgetSelectionPromptSection(collection)}
+${createWidgetSelectionPromptSection(widgetCollection)}
 
  MANDATORY RULES FOR CHOICE-LEVEL VISUALS:
  - Some widget slot names may follow the convention \`<responseIdentifier>__<choiceLetter>__v<index>\`. These are widgets reserved for visuals that appear INSIDE interaction choices (e.g., images/diagrams in radio choices).
@@ -146,7 +133,7 @@ Your response must be a JSON object with a single key "widget_mapping", mapping 
 Slot Names to Map:
 ${slotNames.join("\n")}`
 
-	const WidgetMappingSchema = createWidgetMappingSchema(slotNames, collection.widgetTypeKeys)
+	const WidgetMappingSchema = createWidgetMappingSchema(slotNames, widgetCollection.widgetTypeKeys)
 	// Resource mapping guidance (collection-aware): When Perseus includes reference resources
 	// such as periodic tables and the collection supports a corresponding widget type
 	// (e.g., 'periodicTable'), prefer mapping the slot to that type instead of bailing.

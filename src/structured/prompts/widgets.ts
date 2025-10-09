@@ -1,23 +1,32 @@
 import type { AnyInteraction } from "@/core/interactions"
 import type { AssessmentItemShell } from "@/core/item"
-import { type WidgetCollectionName, widgetCollections } from "@/widgets/collections"
-import type { allWidgetSchemas } from "@/widgets/registry"
+import { createSubsetCollection } from "@/widgets/collections/subset"
+import type { WidgetCollection, WidgetDefinition } from "@/widgets/collections/types"
 import type { AiContextEnvelope, ImageContext } from "../types"
 import { caretBanPromptSection } from "./caret"
 import { createWidgetSelectionPromptSection, formatUnifiedContextSections } from "./shared"
 
-export function createWidgetContentPrompt<E extends readonly string[]>(
+export function createWidgetContentPrompt<
+	E extends readonly string[],
+	C extends WidgetCollection<Record<string, WidgetDefinition<unknown, unknown>>, E>
+>(
 	envelope: AiContextEnvelope,
 	assessmentShell: AssessmentItemShell<E>,
-	widgetMapping: Record<string, keyof typeof allWidgetSchemas>,
+	widgetMapping: Record<string, E[number]>,
 	generatedInteractions: Record<string, AnyInteraction<E>>,
-	widgetCollectionName: WidgetCollectionName,
+	widgetCollection: C,
 	imageContext: ImageContext
 ): {
 	systemInstruction: string
 	userContent: string
 } {
-	const collection = widgetCollections[widgetCollectionName]
+	// Extract unique widget types from the mapping to create a minimal subset
+	const uniqueWidgetTypes = new Set<E[number]>()
+	for (const typeName of Object.values(widgetMapping)) {
+		uniqueWidgetTypes.add(typeName)
+	}
+	const neededWidgetTypes: ReadonlyArray<E[number]> = Array.from(uniqueWidgetTypes)
+	const subsetCollection = createSubsetCollection(widgetCollection, neededWidgetTypes)
 
 	const systemInstruction = `You are an expert in educational content conversion with vision capabilities, focused on generating widget content for QTI assessments. Your task is to generate ONLY the widget content objects based on the original Perseus JSON, an assessment shell, a mapping that specifies the exact widget type for each slot, and accompanying visual context.
 
@@ -121,7 +130,7 @@ This mapping tells you the required output type for each widget.
 ${JSON.stringify(widgetMapping, null, 2)}
 \`\`\`
 
-${createWidgetSelectionPromptSection(collection)}
+${createWidgetSelectionPromptSection(subsetCollection)}
 
 ## Instructions:
 - **Analyze Images**: Use the raster images provided to your vision and the raw SVG content above to understand the visual components of widgets.

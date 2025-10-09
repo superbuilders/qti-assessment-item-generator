@@ -46,6 +46,6 @@ export async function generateWidgetLegacy(widgetInput: WidgetInput): Promise<st
 		throw errors.wrap(parsed.error, "widget validation")
 	}
 
-	// parsed.data is the schema's output type; ensure the generator accepts it by generic inference
-	return await definition.generator(parsed.data)
+	// Use the type-safe dispatcher to ensure generator contract is satisfied
+	return await generateWidget(allWidgetsCollection, widgetType, parsed.data)
 }

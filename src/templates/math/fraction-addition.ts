@@ -534,7 +534,7 @@ export function generateFractionAdditionQuestion(
 export const templateId = "math.fraction-addition"
 export const version = "1.0.0"
 
-const templateModule: TemplateModule<typeof PropsSchema> = {
+const templateModule: TemplateModule<typeof PropsSchema, TemplateWidgets> = {
 	templateId,
 	version,
 	propsSchema: PropsSchema,

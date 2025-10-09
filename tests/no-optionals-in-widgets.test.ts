@@ -1,4 +1,5 @@
 import { describe, expect, it } from "bun:test"
+import * as errors from "@superbuilders/errors"
 import { z } from "zod"
 import { allWidgetSchemas } from "@/widgets/registry"
 
@@ -14,7 +15,7 @@ function findOptionalsInSchema(widgetKey: string, schema: $ZodType): Offender[] 
 	const offenders: Offender[] = []
 
 	// Use zod's JSON Schema traversal hook to visit every node and detect optional wrappers
-	try {
+	const conversionResult = errors.trySync(() =>
 		z.toJSONSchema(schema, {
 			target: "draft-2020-12",
 			io: "input",
@@ -27,7 +28,8 @@ function findOptionalsInSchema(widgetKey: string, schema: $ZodType): Offender[] 
 				}
 			}
 		})
-	} catch {
+	)
+	if (conversionResult.error) {
 		// If conversion fails for any reason, surface it as an offender for visibility
 		offenders.push({ widget: widgetKey, nodeType: "conversion_error", path: [] })
 	}
