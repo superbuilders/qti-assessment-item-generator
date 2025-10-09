@@ -148,7 +148,7 @@ export const generateSymmetryDiagram: WidgetGenerator<typeof SymmetryDiagramProp
 			break
 		}
 		case "isoscelesTriangle": {
-			const w = size
+			const w = size * 0.5
 			const h = size
 			const points = [
 				{ x: cx - w / 2, y: cy + h / 2 },

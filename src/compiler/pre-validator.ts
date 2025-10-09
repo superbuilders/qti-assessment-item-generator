@@ -603,6 +603,16 @@ function validateFeedbackPlan<E extends readonly string[]>(item: AssessmentItemI
 	}
 
 	for (const combination of feedbackPlan.combinations) {
+		if (feedbackPlan.mode === "fallback") {
+			// In fallback mode, path may be empty. Only enforce id to be CORRECT/INCORRECT.
+			if (combination.id !== "CORRECT" && combination.id !== "INCORRECT") {
+				logger.error("fallback combination id must be CORRECT or INCORRECT", { combinationId: combination.id })
+				throw errors.new("fallback combination id invalid")
+			}
+			continue
+		}
+
+		// combo mode validations
 		if (combination.path.length !== feedbackPlan.dimensions.length) {
 			logger.error("combination path length does not match dimension count", {
 				combinationId: combination.id,
@@ -667,12 +677,30 @@ function validateFeedbackPlan<E extends readonly string[]>(item: AssessmentItemI
 
 	const setsAreEqual = (a: Set<string>, b: Set<string>) => a.size === b.size && [...a].every((item) => b.has(item))
 
-	if (!setsAreEqual(derivedIdentifiers, combinationIds)) {
+	if (feedbackPlan.mode === "combo" && !setsAreEqual(derivedIdentifiers, combinationIds)) {
 		logger.error("combination ids do not match full Cartesian product", {
 			derived: [...derivedIdentifiers].sort(),
 			actual: [...combinationIds].sort()
 		})
 		throw errors.new("combination ids incomplete or incorrect")
+	}
+
+	if (feedbackPlan.mode === "fallback") {
+		// Must have exactly two combinations: CORRECT and INCORRECT
+		const expected = new Set(["CORRECT", "INCORRECT"])
+		if (!setsAreEqual(expected, combinationIds)) {
+			logger.error("fallback requires correct and incorrect combinations", {
+				expected: [...expected].sort(),
+				actual: [...combinationIds].sort()
+			})
+			throw errors.new("fallback requires CORRECT and INCORRECT")
+		}
+		if (feedbackPlan.combinations.length !== 2) {
+			logger.error("fallback combinations must be exactly two", {
+				combinationCount: feedbackPlan.combinations.length
+			})
+			throw errors.new("fallback requires exactly two combinations")
+		}
 	}
 
 	if (!setsAreEqual(combinationIds, actualBlockKeys)) {

@@ -35,7 +35,7 @@ export const FeedbackCombinationSchema = z
 					})
 					.strict()
 			)
-			.min(1)
+			.min(0)
 	})
 	.strict()
 
