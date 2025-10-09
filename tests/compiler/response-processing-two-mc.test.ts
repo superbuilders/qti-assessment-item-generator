@@ -56,10 +56,29 @@ describe("Response Processing - two MC combo plan", () => {
 			widgets: null,
 			interactions: null,
 			feedbackPlan,
-			feedbackBlocks: {}
+			feedback: {
+				FEEDBACK__OVERALL: {
+					RESPONSE_1: {
+						A: {
+							RESPONSE_2: {
+								A: { content: [] },
+								B: { content: [] }
+							}
+						},
+						B: {
+							RESPONSE_2: {
+								A: { content: [] },
+								B: { content: [] }
+							}
+						}
+					}
+				}
+			}
 		}
 
-		const xml = compileResponseProcessing(item)
+		// Create internal flat representation for response processor
+		const itemWithBlocks = { ...item, feedbackBlocks: {} }
+		const xml = compileResponseProcessing(itemWithBlocks)
 
 		// Ensure all combinations appear in FEEDBACK__OVERALL assignments
 		expect(xml).toContain('<qti-base-value base-type="identifier">FB_R1_A__R2_A</qti-base-value>')

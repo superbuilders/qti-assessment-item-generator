@@ -3,6 +3,7 @@ import * as logger from "@superbuilders/slog"
 import type { z } from "zod"
 import type { BlockContent, BlockContentItem, InlineContent } from "@/core/content"
 import type { FeedbackPlan } from "@/core/feedback"
+import { convertNestedFeedbackToBlocks, validateNestedFeedback } from "@/core/feedback"
 import type { AssessmentItem, AssessmentItemInput } from "@/core/item"
 import { createDynamicAssessmentItemSchema } from "@/core/item"
 import { ErrUnsupportedInteraction } from "../structured/client"
@@ -24,6 +25,11 @@ import { escapeXmlAttribute } from "./utils/xml-utils"
 export const ErrDuplicateResponseIdentifier = errors.new("duplicate response identifier")
 export const ErrDuplicateChoiceIdentifier = errors.new("duplicate choice identifiers")
 
+// Internal type used during compilation after nested feedback is flattened
+type AssessmentItemWithFlatFeedback<E extends readonly string[]> = Omit<AssessmentItem<E>, "feedback"> & {
+	feedbackBlocks: Record<string, BlockContent<E>>
+}
+
 // Type guard to check if a string is a valid widget type in a collection
 function isValidWidgetTypeInCollection<
 	T extends Record<string, WidgetDefinition<unknown, unknown>>,
@@ -32,7 +38,7 @@ function isValidWidgetTypeInCollection<
 	return type in collection.widgets
 }
 
-function dedupePromptTextFromBody<E extends readonly string[]>(item: AssessmentItem<E>): void {
+function dedupePromptTextFromBody<E extends readonly string[]>(item: AssessmentItemWithFlatFeedback<E>): void {
 	if (!item.interactions || !item.body) return
 
 	// --- normalization helpers ---
@@ -413,7 +419,7 @@ function dedupePromptTextFromBody<E extends readonly string[]>(item: AssessmentI
 	}
 }
 
-function enforceIdentifierOnlyMatching<E extends readonly string[]>(item: AssessmentItem<E>): void {
+function enforceIdentifierOnlyMatching<E extends readonly string[]>(item: AssessmentItemWithFlatFeedback<E>): void {
 	// Build allowed identifiers per responseIdentifier from interactions
 	const allowed: Record<string, Set<string>> = {}
 	const responseIdOwners = new Map<string, string>()
@@ -520,7 +526,7 @@ function enforceIdentifierOnlyMatching<E extends readonly string[]>(item: Assess
 }
 
 function collectRefs<E extends readonly string[]>(
-	item: AssessmentItemInput<E>
+	item: AssessmentItemWithFlatFeedback<E>
 ): { widgetRefs: Set<string>; interactionRefs: Set<string> } {
 	const widgetRefs = new Set<string>()
 	const interactionRefs = new Set<string>()
@@ -584,17 +590,39 @@ function collectRefs<E extends readonly string[]>(
 	return { widgetRefs, interactionRefs }
 }
 
-function collectWidgetIds<E extends readonly string[]>(item: AssessmentItemInput<E>): Set<string> {
+function collectWidgetIds<E extends readonly string[]>(item: AssessmentItemWithFlatFeedback<E>): Set<string> {
 	return collectRefs(item).widgetRefs
 }
 
 export async function compile<
 	C extends WidgetCollection<Record<string, WidgetDefinition<unknown, unknown>>, readonly string[]>
 >(itemData: AssessmentItemInput<WidgetTypeTupleFrom<C>>, widgetCollection: C): Promise<string> {
-	// Step 0: Widget Type Derivation
+	// Step 0: Nested feedback validation and normalization (internal conversion to flat blocks)
+	logger.debug("validating nested feedback", {
+		mode: itemData.feedbackPlan.mode,
+		dimensionCount: itemData.feedbackPlan.dimensions.length,
+		combinationCount: itemData.feedbackPlan.combinations.length
+	})
+	// Wrap the feedback in the expected validation envelope
+	const feedbackEnvelope = { feedback: itemData.feedback }
+	const validatedNested = validateNestedFeedback(
+		feedbackEnvelope,
+		itemData.feedbackPlan,
+		widgetCollection.widgetTypeKeys
+	)
+	const feedbackBlocks = convertNestedFeedbackToBlocks(validatedNested, itemData.feedbackPlan)
+	logger.debug("converted nested feedback to flat blocks", { blockCount: Object.keys(feedbackBlocks).length })
+
+	// Create a normalized item with flat feedbackBlocks for downstream processing
+	const normalizedItem: AssessmentItemWithFlatFeedback<WidgetTypeTupleFrom<C>> = {
+		...itemData,
+		feedbackBlocks
+	}
+
+	// Step 1: Widget Type Derivation
 	const widgetMapping: Record<string, string> = {}
-	if (itemData.widgets) {
-		for (const [key, value] of Object.entries(itemData.widgets)) {
+	if (normalizedItem.widgets) {
+		for (const [key, value] of Object.entries(normalizedItem.widgets)) {
 			if (value?.type) {
 				widgetMapping[key] = value.type
 			}
@@ -627,7 +655,8 @@ export async function compile<
 	const { AssessmentItemSchema } = createDynamicAssessmentItemSchema(
 		validatedWidgetMapping,
 		widgetCollection.widgetTypeKeys,
-		widgetSchemasForCollection
+		widgetSchemasForCollection,
+		normalizedItem.feedbackPlan
 	)
 	const itemResult = AssessmentItemSchema.safeParse(itemData)
 	if (!itemResult.success) {
@@ -657,23 +686,23 @@ export async function compile<
 
 	// Step 1: Prevalidation on schema-enforced data to catch QTI content model violations
 	// Manual deduplication of paragraphs that duplicate an interaction prompt
-	dedupePromptTextFromBody(enforcedItem)
-	validateAssessmentItemInput(enforcedItem, logger)
+	dedupePromptTextFromBody(normalizedItem)
+	validateAssessmentItemInput(normalizedItem, logger)
 
 	// Enforce identifier-only matching; no ad-hoc rewriting
 	// This function now includes checks for duplicate responseIdentifiers and choice Identifiers,
-	enforceIdentifierOnlyMatching(enforcedItem)
+	enforceIdentifierOnlyMatching(normalizedItem)
 
 	const interactionSlots = new Map<string, string>()
 	const widgetSlots = new Map<string, string>()
 
 	// Step 1: Derive the complete set of required widget IDs from ALL content
-	const requiredWidgetIds = collectWidgetIds(itemData)
+	const requiredWidgetIds = collectWidgetIds(normalizedItem)
 	logger.debug("derived required widget ids from content", {
 		count: requiredWidgetIds.size,
 		ids: Array.from(requiredWidgetIds)
 	})
-	logger.debug("available widget definitions", { availableWidgets: Object.keys(itemData.widgets || {}) })
+	logger.debug("available widget definitions", { availableWidgets: Object.keys(normalizedItem.widgets || {}) })
 
 	// Step 2: Generate content ONLY for the required widgets
 	if (enforcedItem.widgets) {
@@ -720,7 +749,7 @@ export async function compile<
 	}
 
 	// Step 4: Linker Pass - ensure all refs are resolved
-	const { widgetRefs, interactionRefs } = collectRefs(itemData)
+	const { widgetRefs, interactionRefs } = collectRefs(normalizedItem)
 	for (const id of widgetRefs) {
 		if (!widgetSlots.has(id)) {
 			logger.error("unresolved widget reference", { widgetId: id, availableSlots: Array.from(widgetSlots.keys()) })
@@ -744,9 +773,9 @@ export async function compile<
 		'    <qti-outcome-declaration identifier="FEEDBACK__OVERALL" cardinality="single" base-type="identifier"/>'
 
 	// NEW: Generate feedbackBlocks XML from map, ordered by feedbackPlan.combinations
-	const feedbackBlocksXml = enforcedItem.feedbackPlan.combinations
+	const feedbackBlocksXml = normalizedItem.feedbackPlan.combinations
 		.map((combination: FeedbackPlan["combinations"][number]) => {
-			const content = enforcedItem.feedbackBlocks[combination.id]
+			const content = feedbackBlocks[combination.id]
 			if (!content) {
 				logger.error("missing feedback content for expected identifier", { identifier: combination.id })
 				throw errors.new("ErrMissingFeedbackContent")
@@ -809,7 +838,7 @@ export async function compile<
 		.join("\n")
 
 	const responseDeclarations = compileResponseDeclarations(enforcedItem.responseDeclarations)
-	const responseProcessing = compileResponseProcessing(enforcedItem)
+	const responseProcessing = compileResponseProcessing(normalizedItem)
 
 	// MODIFIED: Assemble the final XML with dynamic declarations and blocks.
 	let finalXml = `<?xml version="1.0" encoding="UTF-8"?>

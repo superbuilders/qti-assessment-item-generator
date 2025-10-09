@@ -3,10 +3,10 @@ import * as logger from "@superbuilders/slog"
 import { z } from "zod"
 import { CHOICE_IDENTIFIER_REGEX, RESPONSE_IDENTIFIER_REGEX } from "@/compiler/qti-constants"
 import { createBlockContentSchema } from "@/core/content"
-import { FeedbackPlanSchema } from "@/core/feedback"
+import { createNestedFeedbackZodSchema, FeedbackPlanSchema } from "@/core/feedback"
 import { createAnyInteractionSchema } from "@/core/interactions"
 import { WidgetSchema } from "@/widgets/registry"
-import type { AssessmentItem, AssessmentItemShell, ResponseDeclaration } from "./types"
+import type { AssessmentItemShell, ResponseDeclaration } from "./types"
 
 // Response Declaration Schema (shared across all dynamic schemas)
 function createResponseDeclarationSchema(): z.ZodType<ResponseDeclaration> {
@@ -84,7 +84,8 @@ export function createAssessmentItemShellSchema<const E extends readonly string[
 export function createDynamicAssessmentItemSchema<const E extends readonly string[]>(
 	widgetMapping: Record<string, E[number]>,
 	widgetTypeKeys: E,
-	widgetSchemas: Record<E[number], z.ZodType<unknown, unknown>>
+	widgetSchemas: Record<E[number], z.ZodType<unknown, unknown>>,
+	feedbackPlan: z.infer<typeof FeedbackPlanSchema>
 ) {
 	for (const [slotName, widgetType] of Object.entries(widgetMapping)) {
 		const schema = widgetSchemas[widgetType]
@@ -117,29 +118,31 @@ export function createDynamicAssessmentItemSchema<const E extends readonly strin
 	const AnyInteractionSchema = createAnyInteractionSchema(widgetTypeKeys)
 	const ResponseDeclarationSchema = createResponseDeclarationSchema()
 
-	const AssessmentItemSchema: z.ZodType<AssessmentItem<E>> = z
-		.object({
-			identifier: z.string().describe("Unique identifier for this assessment item."),
-			title: z.string().describe("Human-readable title of the assessment item."),
-			responseDeclarations: z
-				.array(ResponseDeclarationSchema)
-				.min(1)
-				.describe("Defines correct answers and scoring for all interactions in this item."),
-			body: BlockSchema.nullable().describe("The main content of the item as structured blocks."),
-			widgets: DynamicWidgetsSchema.nullable().describe(
-				"A map of widget identifiers to their full widget object definitions."
-			),
-			interactions: z
-				.record(z.string(), AnyInteractionSchema)
-				.nullable()
-				.describe("A map of interaction identifiers to their full interaction object definitions."),
-			feedbackPlan: FeedbackPlanSchema,
-			feedbackBlocks: z
-				.record(z.string().min(1), BlockSchema)
-				.describe("A flat map of feedback combination IDs to their rich content blocks.")
-		})
-		.strict()
-		.describe("A complete QTI 3.0 assessment item with content, interactions, and scoring rules.")
+	// Create nested feedback schema tied to the feedbackPlan
+	const NestedAuthoringSchema = createNestedFeedbackZodSchema(feedbackPlan, widgetTypeKeys)
+
+	// Compose the full AssessmentItem schema by intersecting nested authoring with other fields
+	const AssessmentItemSchema = NestedAuthoringSchema.and(
+		z
+			.object({
+				identifier: z.string().describe("Unique identifier for this assessment item."),
+				title: z.string().describe("Human-readable title of the assessment item."),
+				responseDeclarations: z
+					.array(ResponseDeclarationSchema)
+					.min(1)
+					.describe("Defines correct answers and scoring for all interactions in this item."),
+				body: BlockSchema.nullable().describe("The main content of the item as structured blocks."),
+				widgets: DynamicWidgetsSchema.nullable().describe(
+					"A map of widget identifiers to their full widget object definitions."
+				),
+				interactions: z
+					.record(z.string(), AnyInteractionSchema)
+					.nullable()
+					.describe("A map of interaction identifiers to their full interaction object definitions."),
+				feedbackPlan: FeedbackPlanSchema
+			})
+			.strict()
+	).describe("A complete QTI 3.0 assessment item with content, interactions, and scoring rules.")
 
 	const AssessmentItemShellSchema = createAssessmentItemShellSchema(widgetTypeKeys)
 

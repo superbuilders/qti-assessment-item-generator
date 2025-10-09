@@ -48,17 +48,23 @@ mock.module("openai", () => {
 														__sb_idx__1: { id: "INCORRECT", path: { __sb_empty_array__: true } }
 													}
 												},
-												feedbackBlocks: {
-													CORRECT: {
-														__sb_idx__0: {
-															type: "paragraph",
-															content: { __sb_idx__0: { type: "text", content: "Correct!" } }
-														}
-													},
-													INCORRECT: {
-														__sb_idx__0: {
-															type: "paragraph",
-															content: { __sb_idx__0: { type: "text", content: "Incorrect." } }
+												feedback: {
+													FEEDBACK__OVERALL: {
+														CORRECT: {
+															content: {
+																__sb_idx__0: {
+																	type: "paragraph",
+																	content: { __sb_idx__0: { type: "text", content: "Correct!" } }
+																}
+															}
+														},
+														INCORRECT: {
+															content: {
+																__sb_idx__0: {
+																	type: "paragraph",
+																	content: { __sb_idx__0: { type: "text", content: "Incorrect." } }
+																}
+															}
 														}
 													}
 												}
@@ -112,9 +118,11 @@ describe("Differentiation Pipeline", () => {
 					{ id: "INCORRECT", path: [] }
 				]
 			},
-			feedbackBlocks: {
-				CORRECT: [{ type: "paragraph", content: [{ type: "text", content: "Correct" }] }],
-				INCORRECT: [{ type: "paragraph", content: [{ type: "text", content: "Incorrect" }] }]
+			feedback: {
+				FEEDBACK__OVERALL: {
+					CORRECT: { content: [{ type: "paragraph", content: [{ type: "text", content: "Correct" }] }] },
+					INCORRECT: { content: [{ type: "paragraph", content: [{ type: "text", content: "Incorrect" }] }] }
+				}
 			}
 		}
 

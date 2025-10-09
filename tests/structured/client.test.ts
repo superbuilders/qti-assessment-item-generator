@@ -97,21 +97,23 @@ mock.module("openai", () => {
 						const feedbackData = {
 							feedback: {
 								FEEDBACK__OVERALL: {
-									FB__RESPONSE_CORRECT: {
-										content: [
-											{
-												type: "paragraph",
-												content: [{ type: "text", content: "Correct! Well done." }]
-											}
-										]
-									},
-									FB__RESPONSE_INCORRECT: {
-										content: [
-											{
-												type: "paragraph",
-												content: [{ type: "text", content: "Not quite. Try again." }]
-											}
-										]
+									RESPONSE: {
+										CORRECT: {
+											content: [
+												{
+													type: "paragraph",
+													content: [{ type: "text", content: "Correct! Well done." }]
+												}
+											]
+										},
+										INCORRECT: {
+											content: [
+												{
+													type: "paragraph",
+													content: [{ type: "text", content: "Not quite. Try again." }]
+												}
+											]
+										}
 									}
 								}
 							}

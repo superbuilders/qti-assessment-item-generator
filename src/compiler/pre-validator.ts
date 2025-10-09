@@ -237,7 +237,7 @@ function validateBlockContent<E extends readonly string[]>(
  * All formatting instructions and canonicalization guidance are handled in prompting, not here.
  */
 function validateTextEntryCanonicalAnswerRules<E extends readonly string[]>(
-	item: AssessmentItemInput<E>,
+	item: AssessmentItemWithFeedbackBlocks<E>,
 	logger: logger.Logger
 ): void {
 	if (!item.interactions || !item.responseDeclarations) {
@@ -276,8 +276,13 @@ function validateTextEntryCanonicalAnswerRules<E extends readonly string[]>(
 	}
 }
 
+// Internal type for validation after nested feedback has been flattened
+type AssessmentItemWithFeedbackBlocks<E extends readonly string[]> = Omit<AssessmentItemInput<E>, "feedback"> & {
+	feedbackBlocks: Record<string, BlockContent<E>>
+}
+
 export function validateAssessmentItemInput<E extends readonly string[]>(
-	item: AssessmentItemInput<E>,
+	item: AssessmentItemWithFeedbackBlocks<E>,
 	logger: logger.Logger
 ): void {
 	// Require at least one response declaration to avoid generating empty response-processing blocks
@@ -505,7 +510,10 @@ export function validateAssessmentItemInput<E extends readonly string[]>(
 	validateFeedbackPlan(item, logger)
 }
 
-function validateFeedbackPlan<E extends readonly string[]>(item: AssessmentItemInput<E>, logger: logger.Logger): void {
+function validateFeedbackPlan<E extends readonly string[]>(
+	item: AssessmentItemWithFeedbackBlocks<E>,
+	logger: logger.Logger
+): void {
 	const { feedbackPlan, responseDeclarations, interactions, feedbackBlocks } = item
 	const declMap = new Map(responseDeclarations.map((d: ResponseDeclaration) => [d.identifier, d]))
 	const interactionMap = new Map(

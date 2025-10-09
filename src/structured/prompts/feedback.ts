@@ -1,16 +1,15 @@
 import type { FeedbackPlan } from "@/core/feedback"
-import { createFlatFeedbackZodSchema } from "@/core/feedback"
+import { createNestedFeedbackZodSchema } from "@/core/feedback"
 import type { AssessmentItemShell } from "@/core/item"
 import type { WidgetCollection, WidgetDefinition } from "@/widgets/collections/types"
 import type { AiContextEnvelope, ImageContext } from "../types"
 import { createWidgetSelectionPromptSection, formatUnifiedContextSections } from "./shared"
 
 /**
- * Creates a feedback generation prompt using the new flat-key schema architecture.
- * This prompt includes explicit dimension and key mapping tables to maximize clarity for the model.
- * Replaces the old createFeedbackPrompt function.
+ * Creates a feedback generation prompt with a dynamically-generated Zod schema
+ * that enforces the overall feedback outcome with a nested, exact-key structure.
  */
-export function createFlatFeedbackPrompt<
+export function createFeedbackPrompt<
 	C extends WidgetCollection<Record<string, WidgetDefinition<unknown, unknown>>, readonly string[]>
 >(
 	envelope: AiContextEnvelope,
@@ -19,8 +18,8 @@ export function createFlatFeedbackPrompt<
 	imageContext: ImageContext,
 	widgetCollection: C
 ) {
-	// 1. Build the flat Zod schema for the AI's response format.
-	const FeedbackSchema = createFlatFeedbackZodSchema(feedbackPlan, widgetCollection.widgetTypeKeys)
+	// Build the nested authoring schema inside the prompt helper, passing only the keys.
+	const FeedbackSchema = createNestedFeedbackZodSchema(feedbackPlan, widgetCollection.widgetTypeKeys)
 
 	// 2. Generate the Dimension Inventory section for the prompt.
 	const dimensionInventory =
@@ -48,22 +47,32 @@ ${feedbackPlan.combinations
 	.join("\n")}`
 
 	// 4. Concrete non-fallback example for the prompt.
-	const flatExample = `Example output for a non-fallback item with two binary dimensions:
+	const nestedExample = `Example nested output for a non-fallback item with two binary dimensions:
 \`\`\`json
 {
   "feedback": {
     "FEEDBACK__OVERALL": {
-      "FB__RESPONSE_1_CORRECT__RESPONSE_2_CORRECT":   { "content": [ { "type": "paragraph", "content": [ { "type": "text", "content": "Both parts correct — excellent." } ] } ] },
-      "FB__RESPONSE_1_CORRECT__RESPONSE_2_INCORRECT": { "content": [ { "type": "paragraph", "content": [ { "type": "text", "content": "First is correct; review the second part." } ] } ] },
-      "FB__RESPONSE_1_INCORRECT__RESPONSE_2_CORRECT": { "content": [ { "type": "paragraph", "content": [ { "type": "text", "content": "Second is correct; fix the first part." } ] } ] },
-      "FB__RESPONSE_1_INCORRECT__RESPONSE_2_INCORRECT": { "content": [ { "type": "paragraph", "content": [ { "type": "text", "content": "Neither part is correct — start by checking definitions." } ] } ] }
+      "RESPONSE_1": {
+        "CORRECT": {
+          "RESPONSE_2": {
+            "CORRECT": { "content": [ { "type": "paragraph", "content": [ { "type": "text", "content": "Both parts correct — excellent." } ] } ] },
+            "INCORRECT": { "content": [ { "type": "paragraph", "content": [ { "type": "text", "content": "First is correct; review the second part." } ] } ] }
+          }
+        },
+        "INCORRECT": {
+          "RESPONSE_2": {
+            "CORRECT": { "content": [ { "type": "paragraph", "content": [ { "type": "text", "content": "Second is correct; fix the first part." } ] } ] },
+            "INCORRECT": { "content": [ { "type": "paragraph", "content": [ { "type": "text", "content": "Neither part is correct — start by checking definitions." } ] } ] }
+          }
+        }
+      }
     }
   }
 }
 \`\`\``
 
 	// 5. Assemble the system and user prompts.
-	const systemInstruction = `You are an expert in educational content. Generate comprehensive, high-quality feedback for ALL combinations provided. Your response MUST be a JSON object that strictly adheres to the provided schema.
+	const systemInstruction = `You are an expert in educational content. Your task is to generate comprehensive feedback for all possible outcomes in an assessment item.
 
 **⚠️ CRITICAL: GRAMMATICAL ERROR CORRECTION ⚠️**
 WE MUST correct any grammatical errors found in the source Perseus content. This includes:
@@ -75,11 +84,12 @@ WE MUST correct any grammatical errors found in the source Perseus content. This
 
 The goal is to produce clean, professional educational content that maintains the original meaning while fixing any language errors present in the source material.
 
-STRUCTURE:
-- Return a single JSON object with a 'feedback' key.
-- Inside 'feedback', there must be a 'FEEDBACK__OVERALL' key.
-- The value of 'FEEDBACK__OVERALL' must be an object whose keys EXACTLY match the list in the 'KEYS MAPPING' section.
-- Each key must map to an object with a single 'content' property, which is an array of BlockContent items.
+**FEEDBACK STRUCTURE**
+- The structured output schema enforces a nested object under "feedback" → "FEEDBACK__OVERALL".
+- For single-select multiple-choice: keys are choice identifiers (A, B, C, etc.).
+- For all other questions (numeric, ordering, multi-select, etc.): keys are "CORRECT" and "INCORRECT".
+- Each leaf node contains a "content" field with BlockContent.
+- The schema enforces completeness—every required key must be present.
 
 QUALITY RUBRIC (for each feedback entry):
 1. Immediate Response: Acknowledge whether the student's answer combination was correct or incorrect.
@@ -87,16 +97,16 @@ QUALITY RUBRIC (for each feedback entry):
 3. Remedial Guidance: If incorrect, identify the likely misconception and provide clear steps to correct it.
 4. Learning Path: Suggest what the student should review or practice next.
 
-STRICT CONTENT RULES:
-- Use only the allowed BlockContent shapes for all 'content' fields (paragraph, math, lists, tableRich, widgetRef).
-- NO interactions of any kind are allowed inside feedback content.
-- NO LaTeX sequences (e.g., \\frac), no <mfenced> in MathML, and no CDATA sections.
-- Currency ($) and percent (%) symbols MUST be in MathML tokens (e.g., <mo>$</mo>, <mo>%</mo>).
-- The characters '^' and '|' are BANNED from all 'text' content. Use <msup> for exponents and tableRich for tables.`
+**FEEDBACK CONTENT REQUIREMENTS**
+1. **Educational Value**: Each feedback block must provide meaningful content that helps students learn.
+2. **Specificity**: Explain why a particular combination of answers is correct or incorrect.
+3. **Constructive Guidance**: For incorrect combinations, guide students toward understanding.
+4. **Content Structure**: Use the BlockContent model (arrays of paragraphs, math, lists, etc.).
+5. **No Interactions**: Feedback content must never contain interactive elements.`
 
 	const widgetSelectionSection = createWidgetSelectionPromptSection(widgetCollection)
 
-	const userContent = `Generate comprehensive feedback for every combination in this assessment item.
+	const userContent = `Generate comprehensive feedback for this assessment item.
 
 ${formatUnifiedContextSections(envelope, imageContext)}
 
@@ -111,13 +121,13 @@ ${dimensionInventory}
 
 ${keysMapping}
 
-${flatExample}
+${nestedExample}
 
 ## Instructions:
-1.  **Analyze the Item**: Understand the learning objective and the different response combinations.
-2.  **Generate Feedback**: Write feedback for EVERY key listed in the 'KEYS MAPPING' table.
-3.  **Adhere to Schema**: Your JSON output must validate against the strict schema, including all required keys.
-4.  **Follow Quality Rubric**: Ensure every feedback block is pedagogically valuable.
+1. **Analyze the Assessment**: Understand the learning objectives.
+2. **Generate Complete Feedback**: The strict JSON schema will enforce the exact structure required.
+3. **Follow Structure Rules**: Each leaf must contain a "content" key with a valid BlockContent array.
+4. **Maintain Quality**: Provide educational, specific, and constructive feedback.
 
 Your response must conform to the structured output schema.`
 

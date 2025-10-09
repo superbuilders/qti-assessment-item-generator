@@ -81,11 +81,23 @@ describe("E2E compile: two MC with combo feedback", () => {
 					}
 				]
 			},
-			feedbackBlocks: {
-				FB__RESPONSE_1_A__RESPONSE_2_A: [{ type: "paragraph", content: [{ type: "text", content: "A A" }] }],
-				FB__RESPONSE_1_A__RESPONSE_2_B: [{ type: "paragraph", content: [{ type: "text", content: "A B" }] }],
-				FB__RESPONSE_1_B__RESPONSE_2_A: [{ type: "paragraph", content: [{ type: "text", content: "B A" }] }],
-				FB__RESPONSE_1_B__RESPONSE_2_B: [{ type: "paragraph", content: [{ type: "text", content: "B B" }] }]
+			feedback: {
+				FEEDBACK__OVERALL: {
+					RESPONSE_1: {
+						A: {
+							RESPONSE_2: {
+								A: { content: [{ type: "paragraph", content: [{ type: "text", content: "A A" }] }] },
+								B: { content: [{ type: "paragraph", content: [{ type: "text", content: "A B" }] }] }
+							}
+						},
+						B: {
+							RESPONSE_2: {
+								A: { content: [{ type: "paragraph", content: [{ type: "text", content: "B A" }] }] },
+								B: { content: [{ type: "paragraph", content: [{ type: "text", content: "B B" }] }] }
+							}
+						}
+					}
+				}
 			}
 		}
 

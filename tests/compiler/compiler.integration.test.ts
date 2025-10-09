@@ -19,9 +19,11 @@ describe("Compiler Identifier Validation Integration Tests", () => {
 					{ id: "INCORRECT", path: [{ responseIdentifier: "RESPONSE_1", key: "INCORRECT" }] }
 				]
 			},
-			feedbackBlocks: {
-				CORRECT: [{ type: "paragraph", content: [{ type: "text", content: "Correct" }] }],
-				INCORRECT: [{ type: "paragraph", content: [{ type: "text", content: "Incorrect" }] }]
+			feedback: {
+				FEEDBACK__OVERALL: {
+					CORRECT: { content: [{ type: "paragraph", content: [{ type: "text", content: "Correct" }] }] },
+					INCORRECT: { content: [{ type: "paragraph", content: [{ type: "text", content: "Incorrect" }] }] }
+				}
 			},
 			interactions: {
 				interaction_1: {
@@ -69,8 +71,12 @@ describe("Compiler Identifier Validation Integration Tests", () => {
 					{ id: "FB__RESPONSE_1_A", path: [{ responseIdentifier: "RESPONSE_1", key: "A" }] }
 				]
 			},
-			feedbackBlocks: {
-				FB__RESPONSE_1_A: [{ type: "paragraph", content: [{ type: "text", content: "Choice A" }] }]
+			feedback: {
+				FEEDBACK__OVERALL: {
+					RESPONSE_1: {
+						A: { content: [{ type: "paragraph", content: [{ type: "text", content: "Choice A" }] }] }
+					}
+				}
 			},
 			interactions: {
 				interaction_1: {
@@ -134,19 +140,23 @@ describe("Compiler Identifier Validation Integration Tests", () => {
 					}
 				]
 			},
-			feedbackBlocks: {
-				FB__RESPONSE_1_A__RESPONSE_TEXT_CORRECT: [
-					{ type: "paragraph", content: [{ type: "text", content: "A + Correct" }] }
-				],
-				FB__RESPONSE_1_A__RESPONSE_TEXT_INCORRECT: [
-					{ type: "paragraph", content: [{ type: "text", content: "A + Incorrect" }] }
-				],
-				FB__RESPONSE_1_B__RESPONSE_TEXT_CORRECT: [
-					{ type: "paragraph", content: [{ type: "text", content: "B + Correct" }] }
-				],
-				FB__RESPONSE_1_B__RESPONSE_TEXT_INCORRECT: [
-					{ type: "paragraph", content: [{ type: "text", content: "B + Incorrect" }] }
-				]
+			feedback: {
+				FEEDBACK__OVERALL: {
+					RESPONSE_1: {
+						A: {
+							RESPONSE_TEXT: {
+								CORRECT: { content: [{ type: "paragraph", content: [{ type: "text", content: "A + Correct" }] }] },
+								INCORRECT: { content: [{ type: "paragraph", content: [{ type: "text", content: "A + Incorrect" }] }] }
+							}
+						},
+						B: {
+							RESPONSE_TEXT: {
+								CORRECT: { content: [{ type: "paragraph", content: [{ type: "text", content: "B + Correct" }] }] },
+								INCORRECT: { content: [{ type: "paragraph", content: [{ type: "text", content: "B + Incorrect" }] }] }
+							}
+						}
+					}
+				}
 			},
 			interactions: {
 				interaction_1: {

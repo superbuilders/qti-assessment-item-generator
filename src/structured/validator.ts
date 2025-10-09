@@ -72,8 +72,63 @@ export function validateAndSanitizeHtmlFields<E extends readonly string[]>(
 
 	// Apply processing to all structured content fields
 	processBlockContent(sanitizedItem.body, logger)
-	for (const content of Object.values(sanitizedItem.feedbackBlocks)) {
-		processBlockContent(content, logger)
+
+	// Process nested feedback content recursively
+	function processNestedFeedback(node: unknown): void {
+		if (!node || typeof node !== "object") return
+
+		function sanitizeParagraphUnknown(block: unknown): void {
+			if (!block || typeof block !== "object") return
+			const typeVal = Reflect.get(block, "type")
+			if (typeVal !== "paragraph") return
+			const inline = Reflect.get(block, "content")
+			if (!Array.isArray(inline)) return
+			for (const part of inline) {
+				if (!part || typeof part !== "object") continue
+				const pType = Reflect.get(part, "type")
+				if (pType === "text") {
+					const contentVal = Reflect.get(part, "content")
+					if (typeof contentVal === "string") {
+						const sanitized = sanitizeHtmlEntities(contentVal)
+						checkNoLatex(sanitized, logger)
+						checkNoPerseusArtifacts(sanitized, logger)
+						Reflect.set(part, "content", sanitized)
+					}
+				} else if (pType === "math") {
+					const mathVal = Reflect.get(part, "mathml")
+					if (typeof mathVal === "string") {
+						const sanitized = sanitizeMathMLOperators(mathVal)
+						checkNoMfencedElements(sanitized, logger)
+						Reflect.set(part, "mathml", sanitized)
+					}
+				}
+			}
+		}
+
+		const maybeContent = Reflect.get(node, "content")
+		if (Array.isArray(maybeContent)) {
+			for (const block of maybeContent) {
+				if (!block || typeof block !== "object") continue
+				const bType = Reflect.get(block, "type")
+				if (bType === "paragraph") {
+					sanitizeParagraphUnknown(block)
+				} else if (bType === "codeBlock") {
+					const codeVal = Reflect.get(block, "code")
+					if (typeof codeVal === "string") {
+						let sanitized = sanitizeHtmlEntities(codeVal)
+						checkNoPerseusArtifacts(sanitized, logger)
+						Reflect.set(block, "code", sanitized)
+					}
+				}
+			}
+			return
+		}
+		for (const value of Object.values(node)) {
+			processNestedFeedback(value)
+		}
+	}
+	if (sanitizedItem.feedback?.FEEDBACK__OVERALL) {
+		processNestedFeedback(sanitizedItem.feedback.FEEDBACK__OVERALL)
 	}
 
 	if (sanitizedItem.interactions) {

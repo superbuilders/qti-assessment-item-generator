@@ -32,9 +32,13 @@ describe("Compiler: code blocks", () => {
 					{ id: "FB__RESPONSE_TE_INCORRECT", path: [{ responseIdentifier: "RESPONSE_TE", key: "INCORRECT" }] }
 				]
 			},
-			feedbackBlocks: {
-				FB__RESPONSE_TE_CORRECT: [{ type: "paragraph", content: [{ type: "text", content: "Correct" }] }],
-				FB__RESPONSE_TE_INCORRECT: [{ type: "paragraph", content: [{ type: "text", content: "Incorrect" }] }]
+			feedback: {
+				FEEDBACK__OVERALL: {
+					RESPONSE_TE: {
+						CORRECT: { content: [{ type: "paragraph", content: [{ type: "text", content: "Correct" }] }] },
+						INCORRECT: { content: [{ type: "paragraph", content: [{ type: "text", content: "Incorrect" }] }] }
+					}
+				}
 			}
 		}
 		const xml = await compile(item, allWidgetsCollection)

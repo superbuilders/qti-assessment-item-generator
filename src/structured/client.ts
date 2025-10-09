@@ -16,7 +16,7 @@ import { buildFeedbackPlanFromInteractions } from "@/core/feedback"
 import { createAnyInteractionSchema } from "@/core/interactions"
 import { createAssessmentItemShellSchema } from "@/core/item"
 import { toJSONSchemaPromptSafe } from "@/core/json-schema"
-import { createFlatFeedbackPrompt } from "./prompts/feedback"
+import { createFeedbackPrompt } from "./prompts/feedback"
 import { createInteractionContentPrompt } from "./prompts/interactions"
 import { createAssessmentShellPrompt } from "./prompts/shell"
 import { createWidgetContentPrompt } from "./prompts/widgets"
@@ -363,12 +363,12 @@ export async function generateFromEnvelope<
 		combinationCount: feedbackPlan.combinations.length
 	})
 
-	// Shot 3 - Generate feedback using the new flat-key prompt and schema
+	// Shot 3 - Generate feedback using nested prompt and schema
 	const {
 		systemInstruction: feedbackSystem,
 		userContent: feedbackUser,
 		FeedbackSchema
-	} = createFlatFeedbackPrompt(envelope, assessmentShell, feedbackPlan, imageContext, widgetCollection)
+	} = createFeedbackPrompt(envelope, assessmentShell, feedbackPlan, imageContext, widgetCollection)
 
 	const feedbackJsonSchema = toJSONSchemaPromptSafe(FeedbackSchema)
 
@@ -414,25 +414,20 @@ export async function generateFromEnvelope<
 		throw errors.wrap(feedbackParseResult.error, "json parse")
 	}
 
-	// SIMPLIFIED: Validate against the flat schema and directly use the validated flat map.
-	const validatedFeedbackResult = FeedbackSchema.safeParse(feedbackParseResult.data)
-	if (!validatedFeedbackResult.success) {
-		logger.error("flat feedback validation failed", { error: validatedFeedbackResult.error })
-		throw errors.wrap(validatedFeedbackResult.error, "flat feedback validation")
+	// Validate nested feedback with the schema (compiler will handle conversion internally)
+	const feedbackValidation = FeedbackSchema.safeParse(feedbackParseResult.data)
+	if (!feedbackValidation.success) {
+		logger.error("nested feedback validation failed", { error: feedbackValidation.error })
+		throw errors.wrap(feedbackValidation.error, "nested feedback validation")
 	}
-
-	// Extract content from the validated flat map (each value is { content: BlockContent })
-	const feedbackBlocksRaw = validatedFeedbackResult.data.feedback.FEEDBACK__OVERALL
-	const feedbackBlocks: Record<string, BlockContent<WidgetTypeTupleFrom<C>>> = {}
-	for (const [key, value] of Object.entries(feedbackBlocksRaw)) {
-		feedbackBlocks[key] = value.content
-	}
-	logger.debug("shot 3 complete", { feedbackBlockCount: Object.keys(feedbackBlocks).length })
+	const validatedFeedback = feedbackValidation.data
+	logger.debug("shot 3 complete", { feedbackStructure: "nested" })
 
 	// Shot 4: Collect widget refs with types and generate widget content
+	// Note: widgets aren't allowed in feedback, so we only scan body and interactions
 	const widgetRefs = collectWidgetRefs({
 		body: assessmentShell.body,
-		feedbackBlocks: feedbackBlocks,
+		feedbackBlocks: null,
 		interactions: generatedInteractions
 	})
 
@@ -538,6 +533,6 @@ export async function generateFromEnvelope<
 		interactions: generatedInteractions,
 		widgets: generatedWidgets,
 		feedbackPlan,
-		feedbackBlocks: feedbackBlocks
+		feedback: validatedFeedback.feedback
 	}
 }

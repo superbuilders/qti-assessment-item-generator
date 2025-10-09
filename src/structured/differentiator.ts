@@ -678,7 +678,8 @@ export async function differentiateAssessmentItem<
 		const { AssessmentItemSchema: finalItemSchema } = createDynamicAssessmentItemSchema(
 			widgetTypes,
 			widgetCollection.widgetTypeKeys,
-			widgetSchemasForCollection
+			widgetSchemasForCollection,
+			finalItem.feedbackPlan
 		)
 		const finalValidation = finalItemSchema.safeParse(finalItem)
 		if (!finalValidation.success) {

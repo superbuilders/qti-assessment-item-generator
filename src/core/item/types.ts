@@ -1,6 +1,6 @@
 import type { z } from "zod"
 import type { BlockContent } from "@/core/content"
-import type { FeedbackPlan } from "@/core/feedback"
+import type { AuthoringFeedbackOverall, FeedbackPlan } from "@/core/feedback"
 import type { AnyInteraction } from "@/core/interactions"
 import type { typedSchemas } from "@/widgets/registry"
 
@@ -42,7 +42,9 @@ export type AssessmentItem<E extends readonly string[]> = {
 	widgets: Record<string, Widget> | null
 	interactions: Record<string, AnyInteraction<E>> | null
 	feedbackPlan: FeedbackPlan
-	feedbackBlocks: Record<string, BlockContent<E>>
+	feedback: {
+		FEEDBACK__OVERALL: AuthoringFeedbackOverall<FeedbackPlan, E>
+	}
 }
 
 export type AssessmentItemInput<E extends readonly string[]> = AssessmentItem<E>

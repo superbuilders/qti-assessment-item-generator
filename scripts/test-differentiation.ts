@@ -59,31 +59,37 @@ const sourceItem: AssessmentItemInput<["boxPlot"]> = {
 			{ id: "INCORRECT", path: [] }
 		]
 	},
-	feedbackBlocks: {
-		CORRECT: [
-			{
-				type: "paragraph",
+	feedback: {
+		FEEDBACK__OVERALL: {
+			CORRECT: {
 				content: [
 					{
-						type: "text",
-						content:
-							"Correct! The center of the Olympic final distribution is higher than the center of the U.S. qualifier distribution, so the Olympic final distances were greater on average."
+						type: "paragraph",
+						content: [
+							{
+								type: "text",
+								content:
+									"Correct! The center of the Olympic final distribution is higher than the center of the U.S. qualifier distribution, so the Olympic final distances were greater on average."
+							}
+						]
+					}
+				]
+			},
+			INCORRECT: {
+				content: [
+					{
+						type: "paragraph",
+						content: [
+							{
+								type: "text",
+								content:
+									"Not quite. The distributions overlap, so not all Olympic final distances are greater than all U.S. qualifier distances. Also, the spreads appear similar, and the U.S. qualifier box has a larger interquartile range."
+							}
+						]
 					}
 				]
 			}
-		],
-		INCORRECT: [
-			{
-				type: "paragraph",
-				content: [
-					{
-						type: "text",
-						content:
-							"Not quite. The distributions overlap, so not all Olympic final distances are greater than all U.S. qualifier distances. Also, the spreads appear similar, and the U.S. qualifier box has a larger interquartile range."
-					}
-				]
-			}
-		]
+		}
 	},
 	identifier: "olympic-discus-boxplots-interpretation",
 	interactions: {

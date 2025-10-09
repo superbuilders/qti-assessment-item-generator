@@ -254,273 +254,280 @@ export function generateFractionAdditionQuestion(
 				path: [{ responseIdentifier: "RESPONSE", key: `CHOICE_${i}` }]
 			}))
 		},
-		feedbackBlocks: Object.fromEntries(
-			finalChoices.map((choice, index) => {
-				let feedbackContent: BlockContent<TemplateWidgets> = []
+		feedback: {
+			FEEDBACK__OVERALL: {
+				RESPONSE: Object.fromEntries(
+					finalChoices.map((choice, index) => {
+						let feedbackContent: BlockContent<TemplateWidgets> = []
 
-				// Helper to format the step-by-step solution
-				const commonDenom = f1.denominator * f2.denominator
-				const num1Expanded = Math.abs(f1.numerator) * f2.denominator
-				const num2Expanded = Math.abs(f2.numerator) * f1.denominator
-				const sumNumerator = num1Expanded + num2Expanded
+						// Helper to format the step-by-step solution
+						const commonDenom = f1.denominator * f2.denominator
+						const num1Expanded = Math.abs(f1.numerator) * f2.denominator
+						const num2Expanded = Math.abs(f2.numerator) * f1.denominator
+						const sumNumerator = num1Expanded + num2Expanded
 
-				const workedExample: BlockContent<TemplateWidgets> = [
-					{
-						type: "paragraph",
-						content: [{ type: "text", content: "Complete step-by-step solution:" }]
-					},
-					{
-						type: "paragraph",
-						content: [
-							{ type: "text", content: "Step 1: Find the common denominator by multiplying the denominators: " },
+						const workedExample: BlockContent<TemplateWidgets> = [
 							{
-								type: "math",
-								mathml: `<mn>${f1.denominator}</mn><mo>×</mo><mn>${f2.denominator}</mn><mo>=</mo><mn>${commonDenom}</mn>`
-							}
-						]
-					},
-					{
-						type: "paragraph",
-						content: [{ type: "text", content: "Step 2: Convert each fraction to have the common denominator:" }]
-					},
-					{
-						type: "paragraph",
-						content: [
-							{ type: "text", content: "   • " },
-							{ type: "math", mathml: formatFractionMathML(f1) },
-							{ type: "text", content: " = " },
-							{
-								type: "math",
-								mathml: `<mfrac><mrow><mn>${Math.abs(f1.numerator)}</mn><mo>×</mo><mn>${f2.denominator}</mn></mrow><mrow><mn>${f1.denominator}</mn><mo>×</mo><mn>${f2.denominator}</mn></mrow></mfrac>`
+								type: "paragraph",
+								content: [{ type: "text", content: "Complete step-by-step solution:" }]
 							},
-							{ type: "text", content: " = " },
-							{ type: "math", mathml: `<mfrac><mn>${num1Expanded}</mn><mn>${commonDenom}</mn></mfrac>` }
-						]
-					},
-					{
-						type: "paragraph",
-						content: [
-							{ type: "text", content: "   • " },
-							{ type: "math", mathml: formatFractionMathML(f2) },
-							{ type: "text", content: " = " },
-							{
-								type: "math",
-								mathml: `<mfrac><mrow><mn>${Math.abs(f2.numerator)}</mn><mo>×</mo><mn>${f1.denominator}</mn></mrow><mrow><mn>${f2.denominator}</mn><mo>×</mo><mn>${f1.denominator}</mn></mrow></mfrac>`
-							},
-							{ type: "text", content: " = " },
-							{ type: "math", mathml: `<mfrac><mn>${num2Expanded}</mn><mn>${commonDenom}</mn></mfrac>` }
-						]
-					},
-					{
-						type: "paragraph",
-						content: [{ type: "text", content: "Step 3: Add the numerators and keep the common denominator:" }]
-					},
-					{
-						type: "paragraph",
-						content: [
-							{ type: "text", content: "   " },
-							{
-								type: "math",
-								mathml: `<mfrac><mn>${num1Expanded}</mn><mn>${commonDenom}</mn></mfrac><mo>+</mo><mfrac><mn>${num2Expanded}</mn><mn>${commonDenom}</mn></mfrac><mo>=</mo><mfrac><mrow><mn>${num1Expanded}</mn><mo>+</mo><mn>${num2Expanded}</mn></mrow><mn>${commonDenom}</mn></mfrac><mo>=</mo><mfrac><mn>${sumNumerator}</mn><mn>${commonDenom}</mn></mfrac>`
-							}
-						]
-					},
-					{
-						type: "paragraph",
-						content: [{ type: "text", content: "Step 4: Simplify the fraction by finding the GCD:" }]
-					},
-					{
-						type: "paragraph",
-						content: [
-							{ type: "text", content: "   " },
-							{ type: "math", mathml: `<mfrac><mn>${sumNumerator}</mn><mn>${commonDenom}</mn></mfrac>` },
-							{ type: "text", content: " = " },
-							{ type: "math", mathml: formatFractionMathML(correctAnswer) },
-							{ type: "text", content: ` (GCD = ${gcd(sumNumerator, commonDenom)})` }
-						]
-					}
-				]
-
-				switch (choice.type) {
-					case "CORRECT":
-						feedbackContent = [
 							{
 								type: "paragraph",
 								content: [
-									{ type: "text", content: "✓ Excellent! You correctly added the fractions and simplified the result." }
-								]
-							},
-							...workedExample
-						]
-						break
-
-					case "ADD_ACROSS":
-						feedbackContent = [
-							{
-								type: "paragraph",
-								content: [
-									{
-										type: "text",
-										content: "✗ This is incorrect. You added the numerators and denominators separately ("
-									},
+									{ type: "text", content: "Step 1: Find the common denominator by multiplying the denominators: " },
 									{
 										type: "math",
-										mathml: `<mfrac><mrow><mn>${f1.numerator}</mn><mo>+</mo><mn>${f2.numerator}</mn></mrow><mrow><mn>${f1.denominator}</mn><mo>+</mo><mn>${f2.denominator}</mn></mrow></mfrac>`
-									},
-									{ type: "text", content: ")." }
+										mathml: `<mn>${f1.denominator}</mn><mo>×</mo><mn>${f2.denominator}</mn><mo>=</mo><mn>${commonDenom}</mn>`
+									}
 								]
+							},
+							{
+								type: "paragraph",
+								content: [{ type: "text", content: "Step 2: Convert each fraction to have the common denominator:" }]
 							},
 							{
 								type: "paragraph",
 								content: [
-									{
-										type: "text",
-										content:
-											'Why this is wrong: Fractions represent parts of a whole. When you add denominators, you\'re changing what "whole" means. Think of it like this: 1/2 of a pizza plus 1/3 of a pizza is not 2/5 of a pizza!'
-									}
-								]
-							},
-							...workedExample,
-							{
-								type: "paragraph",
-								content: [
-									{
-										type: "text",
-										content:
-											"Next steps: Practice finding common denominators. Remember: the denominator tells you how many equal parts the whole is divided into, and it must stay the same when adding."
-									}
-								]
-							}
-						]
-						break
-
-					case "ADD_NUM_KEEP_DEN":
-						feedbackContent = [
-							{
-								type: "paragraph",
-								content: [
-									{ type: "text", content: "✗ This is incorrect. You added the numerators (" },
+									{ type: "text", content: "   • " },
+									{ type: "math", mathml: formatFractionMathML(f1) },
+									{ type: "text", content: " = " },
 									{
 										type: "math",
-										mathml: `<mn>${f1.numerator}</mn><mo>+</mo><mn>${f2.numerator}</mn><mo>=</mo><mn>${f1.numerator + f2.numerator}</mn>`
+										mathml: `<mfrac><mrow><mn>${Math.abs(f1.numerator)}</mn><mo>×</mo><mn>${f2.denominator}</mn></mrow><mrow><mn>${f1.denominator}</mn><mo>×</mo><mn>${f2.denominator}</mn></mrow></mfrac>`
 									},
-									{ type: "text", content: ") but kept the original denominator." }
+									{ type: "text", content: " = " },
+									{ type: "math", mathml: `<mfrac><mn>${num1Expanded}</mn><mn>${commonDenom}</mn></mfrac>` }
 								]
 							},
 							{
 								type: "paragraph",
 								content: [
-									{
-										type: "text",
-										content:
-											"Why this is wrong: You can only add numerators directly when the denominators are already the same. Since "
-									},
-									{ type: "math", mathml: `<mn>${f1.denominator}</mn><mo>≠</mo><mn>${f2.denominator}</mn>` },
-									{ type: "text", content: ", you must first convert to a common denominator." }
-								]
-							},
-							...workedExample,
-							{
-								type: "paragraph",
-								content: [
-									{
-										type: "text",
-										content:
-											"Next steps: Remember the rule: to add fractions with different denominators, first convert them to equivalent fractions with the same denominator."
-									}
-								]
-							}
-						]
-						break
-
-					case "MULTIPLY_DENOMINATORS_ONLY":
-						feedbackContent = [
-							{
-								type: "paragraph",
-								content: [
-									{
-										type: "text",
-										content:
-											"✗ This is incorrect. You found the common denominator correctly but didn't adjust the numerators."
-									}
-								]
-							},
-							{
-								type: "paragraph",
-								content: [
-									{
-										type: "text",
-										content:
-											"Why this is wrong: When you change a fraction's denominator, you must also change its numerator by the same factor to keep the value equivalent. You multiplied the denominators but added the original numerators."
-									}
-								]
-							},
-							...workedExample,
-							{
-								type: "paragraph",
-								content: [
-									{ type: "text", content: "Next steps: Remember that " },
+									{ type: "text", content: "   • " },
+									{ type: "math", mathml: formatFractionMathML(f2) },
+									{ type: "text", content: " = " },
 									{
 										type: "math",
-										mathml:
-											"<mfrac><mi>a</mi><mi>b</mi></mfrac><mo>=</mo><mfrac><mrow><mi>a</mi><mo>×</mo><mi>k</mi></mrow><mrow><mi>b</mi><mo>×</mo><mi>k</mi></mrow></mfrac>"
+										mathml: `<mfrac><mrow><mn>${Math.abs(f2.numerator)}</mn><mo>×</mo><mn>${f1.denominator}</mn></mrow><mrow><mn>${f2.denominator}</mn><mo>×</mo><mn>${f1.denominator}</mn></mrow></mfrac>`
 									},
-									{ type: "text", content: " for any non-zero k. Both parts must be multiplied!" }
+									{ type: "text", content: " = " },
+									{ type: "math", mathml: `<mfrac><mn>${num2Expanded}</mn><mn>${commonDenom}</mn></mfrac>` }
 								]
-							}
-						]
-						break
-
-					case "FORGOT_TO_SIMPLIFY":
-						feedbackContent = [
+							},
+							{
+								type: "paragraph",
+								content: [{ type: "text", content: "Step 3: Add the numerators and keep the common denominator:" }]
+							},
 							{
 								type: "paragraph",
 								content: [
+									{ type: "text", content: "   " },
 									{
-										type: "text",
-										content:
-											"✗ This is almost correct! You found the right sum but forgot to simplify it to lowest terms."
+										type: "math",
+										mathml: `<mfrac><mn>${num1Expanded}</mn><mn>${commonDenom}</mn></mfrac><mo>+</mo><mfrac><mn>${num2Expanded}</mn><mn>${commonDenom}</mn></mfrac><mo>=</mo><mfrac><mrow><mn>${num1Expanded}</mn><mo>+</mo><mn>${num2Expanded}</mn></mrow><mn>${commonDenom}</mn></mfrac><mo>=</mo><mfrac><mn>${sumNumerator}</mn><mn>${commonDenom}</mn></mfrac>`
 									}
 								]
 							},
 							{
 								type: "paragraph",
+								content: [{ type: "text", content: "Step 4: Simplify the fraction by finding the GCD:" }]
+							},
+							{
+								type: "paragraph",
 								content: [
-									{ type: "text", content: "Your answer " },
-									{ type: "math", mathml: formatFractionMathML(choice.fraction) },
-									{ type: "text", content: " equals " },
+									{ type: "text", content: "   " },
+									{ type: "math", mathml: `<mfrac><mn>${sumNumerator}</mn><mn>${commonDenom}</mn></mfrac>` },
+									{ type: "text", content: " = " },
 									{ type: "math", mathml: formatFractionMathML(correctAnswer) },
-									{ type: "text", content: " when simplified." }
-								]
-							},
-							...workedExample,
-							{
-								type: "paragraph",
-								content: [
-									{
-										type: "text",
-										content:
-											"Next steps: Always check if your final answer can be simplified by finding the GCD of the numerator and denominator. A fraction is in simplest form when the GCD is 1."
-									}
+									{ type: "text", content: ` (GCD = ${gcd(sumNumerator, commonDenom)})` }
 								]
 							}
 						]
-						break
 
-					default:
-						// Fallback for any other type
-						feedbackContent = [
-							{
-								type: "paragraph",
-								content: [{ type: "text", content: "✗ This is incorrect." }]
-							},
-							...workedExample
-						]
-				}
+						switch (choice.type) {
+							case "CORRECT":
+								feedbackContent = [
+									{
+										type: "paragraph",
+										content: [
+											{
+												type: "text",
+												content: "✓ Excellent! You correctly added the fractions and simplified the result."
+											}
+										]
+									},
+									...workedExample
+								]
+								break
 
-				return [`FB__RESPONSE_CHOICE_${index}`, feedbackContent] as const
-			})
-		)
+							case "ADD_ACROSS":
+								feedbackContent = [
+									{
+										type: "paragraph",
+										content: [
+											{
+												type: "text",
+												content: "✗ This is incorrect. You added the numerators and denominators separately ("
+											},
+											{
+												type: "math",
+												mathml: `<mfrac><mrow><mn>${f1.numerator}</mn><mo>+</mo><mn>${f2.numerator}</mn></mrow><mrow><mn>${f1.denominator}</mn><mo>+</mo><mn>${f2.denominator}</mn></mrow></mfrac>`
+											},
+											{ type: "text", content: ")." }
+										]
+									},
+									{
+										type: "paragraph",
+										content: [
+											{
+												type: "text",
+												content:
+													'Why this is wrong: Fractions represent parts of a whole. When you add denominators, you\'re changing what "whole" means. Think of it like this: 1/2 of a pizza plus 1/3 of a pizza is not 2/5 of a pizza!'
+											}
+										]
+									},
+									...workedExample,
+									{
+										type: "paragraph",
+										content: [
+											{
+												type: "text",
+												content:
+													"Next steps: Practice finding common denominators. Remember: the denominator tells you how many equal parts the whole is divided into, and it must stay the same when adding."
+											}
+										]
+									}
+								]
+								break
+
+							case "ADD_NUM_KEEP_DEN":
+								feedbackContent = [
+									{
+										type: "paragraph",
+										content: [
+											{ type: "text", content: "✗ This is incorrect. You added the numerators (" },
+											{
+												type: "math",
+												mathml: `<mn>${f1.numerator}</mn><mo>+</mo><mn>${f2.numerator}</mn><mo>=</mo><mn>${f1.numerator + f2.numerator}</mn>`
+											},
+											{ type: "text", content: ") but kept the original denominator." }
+										]
+									},
+									{
+										type: "paragraph",
+										content: [
+											{
+												type: "text",
+												content:
+													"Why this is wrong: You can only add numerators directly when the denominators are already the same. Since "
+											},
+											{ type: "math", mathml: `<mn>${f1.denominator}</mn><mo>≠</mo><mn>${f2.denominator}</mn>` },
+											{ type: "text", content: ", you must first convert to a common denominator." }
+										]
+									},
+									...workedExample,
+									{
+										type: "paragraph",
+										content: [
+											{
+												type: "text",
+												content:
+													"Next steps: Remember the rule: to add fractions with different denominators, first convert them to equivalent fractions with the same denominator."
+											}
+										]
+									}
+								]
+								break
+
+							case "MULTIPLY_DENOMINATORS_ONLY":
+								feedbackContent = [
+									{
+										type: "paragraph",
+										content: [
+											{
+												type: "text",
+												content:
+													"✗ This is incorrect. You found the common denominator correctly but didn't adjust the numerators."
+											}
+										]
+									},
+									{
+										type: "paragraph",
+										content: [
+											{
+												type: "text",
+												content:
+													"Why this is wrong: When you change a fraction's denominator, you must also change its numerator by the same factor to keep the value equivalent. You multiplied the denominators but added the original numerators."
+											}
+										]
+									},
+									...workedExample,
+									{
+										type: "paragraph",
+										content: [
+											{ type: "text", content: "Next steps: Remember that " },
+											{
+												type: "math",
+												mathml:
+													"<mfrac><mi>a</mi><mi>b</mi></mfrac><mo>=</mo><mfrac><mrow><mi>a</mi><mo>×</mo><mi>k</mi></mrow><mrow><mi>b</mi><mo>×</mo><mi>k</mi></mrow></mfrac>"
+											},
+											{ type: "text", content: " for any non-zero k. Both parts must be multiplied!" }
+										]
+									}
+								]
+								break
+
+							case "FORGOT_TO_SIMPLIFY":
+								feedbackContent = [
+									{
+										type: "paragraph",
+										content: [
+											{
+												type: "text",
+												content:
+													"✗ This is almost correct! You found the right sum but forgot to simplify it to lowest terms."
+											}
+										]
+									},
+									{
+										type: "paragraph",
+										content: [
+											{ type: "text", content: "Your answer " },
+											{ type: "math", mathml: formatFractionMathML(choice.fraction) },
+											{ type: "text", content: " equals " },
+											{ type: "math", mathml: formatFractionMathML(correctAnswer) },
+											{ type: "text", content: " when simplified." }
+										]
+									},
+									...workedExample,
+									{
+										type: "paragraph",
+										content: [
+											{
+												type: "text",
+												content:
+													"Next steps: Always check if your final answer can be simplified by finding the GCD of the numerator and denominator. A fraction is in simplest form when the GCD is 1."
+											}
+										]
+									}
+								]
+								break
+
+							default:
+								// Fallback for any other type
+								feedbackContent = [
+									{
+										type: "paragraph",
+										content: [{ type: "text", content: "✗ This is incorrect." }]
+									},
+									...workedExample
+								]
+						}
+
+						return [`CHOICE_${index}`, { content: feedbackContent }] as const
+					})
+				)
+			}
+		}
 	}
 
 	return assessmentItem
