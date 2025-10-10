@@ -281,10 +281,11 @@ export function createDynamicAssessmentItemSchema(widgetMapping: Record<string, 
 				.regex(RESPONSE_IDENTIFIER_REGEX, "invalid response identifier: must start with RESPONSE")
 				.describe("Links this interaction to its response declaration for scoring."),
 			shuffle: z.boolean().describe("Whether to shuffle the order of gap-text items (draggable tokens)."),
-			content: createBlockContentSchema()
-				.nullable()
+			content: z
+				.array(createBlockContentItemSchema())
+				.min(1)
 				.describe(
-					"Optional block content (e.g., <ul>/<li>/<p>) containing sentences with gap placeholders to render inside the interaction."
+					"Required block content (e.g., <p>) containing sentences with gap placeholders ({ type: 'gap', gapId: '...' }) to render inside the interaction. Must be non-empty."
 				),
 			gapTexts: z
 				.array(

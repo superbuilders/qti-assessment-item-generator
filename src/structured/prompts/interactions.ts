@@ -91,34 +91,108 @@ Positive examples — chemistry using MathML in dropdown choices:
 
 **GAP MATCH INTERACTION GENERATION**
 When the shell has classified a Perseus matcher as gapMatchInteraction:
-1. Extract draggable items from the Perseus left array - these become gapTexts
-2. The gaps themselves are NOT defined here - they're embedded in body content
-3. Generate the interaction object with gapTexts and gap definitions
-4. Use semantic identifiers like WORD_SOLAR, TERM_ORBIT for gapTexts
-5. Use GAP_1, GAP_2 for gap identifiers
+1. Extract draggable items from the Perseus left array - these become gapTexts.
+2. You MUST embed the gap-bearing sentence(s) inside the interaction's "content" array. Wherever a blank appears, insert { "type": "gap", "gapId": "GAP_*" } inline. The compiler renders <qti-gap> only from interaction.content.
+3. Generate the interaction object with gapTexts and gap definitions.
+4. Use semantic identifiers like WORD_SOLAR, TERM_ORBIT for gapTexts.
+5. Use GAP_1, GAP_2 for gap identifiers.
 
-Example gapMatchInteraction:
+---
+### Negative Examples (DO NOT GENERATE THESE PATTERNS)
+
+**A) Empty \`content\` array:**
+This is incorrect because the inline gap items are missing, which means no \`<qti-gap>\` tags will be rendered. The sentence(s) must be moved into \`interaction.content\`.
+
 \`\`\`json
 {
-  "gap_match_1": {
+  "gap_match_interaction": {
     "type": "gapMatchInteraction",
     "responseIdentifier": "RESPONSE",
     "shuffle": true,
+    "content": [],
     "gapTexts": [
       {
-        "identifier": "WORD_SOLAR",
+        "identifier": "CHOICE_34",
         "matchMax": 1,
-        "content": [{ "type": "text", "content": "solar" }]
+        "content": [ { "type": "text", "content": "34" } ]
       },
       {
-        "identifier": "WORD_ORBIT", 
+        "identifier": "CHOICE_46",
         "matchMax": 1,
-        "content": [{ "type": "text", "content": "orbit" }]
+        "content": [ { "type": "text", "content": "46" } ]
+      },
+      {
+        "identifier": "CHOICE_17",
+        "matchMax": 1,
+        "content": [ { "type": "text", "content": "17" } ]
       }
     ],
+    "gaps": [ { "identifier": "GAP_LENGTH" }, { "identifier": "GAP_PERIM" } ]
+  }
+}
+\`\`\`
+
+**B) Null \`content\` field:**
+This is incorrect for the same reason. The \`content\` array must contain the sentence(s) with inline gap placeholders.
+
+\`\`\`json
+{
+  "gap_match_interaction": {
+    "type": "gapMatchInteraction",
+    "responseIdentifier": "RESPONSE",
+    "shuffle": true,
+    "content": null,
+    "gapTexts": [
+      {
+        "identifier": "TEXT_84",
+        "matchMax": 1,
+        "content": [ { "type": "text", "content": "84" } ]
+      },
+      {
+        "identifier": "TEXT_9",
+        "matchMax": 1,
+        "content": [ { "type": "text", "content": "9" } ]
+      },
+      {
+        "identifier": "TEXT_10",
+        "matchMax": 1,
+        "content": [ { "type": "text", "content": "10" } ]
+      }
+    ],
+    "gaps": [ { "identifier": "GAP_WHOLE" }, { "identifier": "GAP_NUM" }, { "identifier": "GAP_DEN" } ]
+  }
+}
+\`\`\`
+---
+### Positive Example (CORRECT PATTERN)
+
+This is correct because the sentences and gap placeholders are located inside \`interaction.content\`.
+
+\`\`\`json
+{
+  "gap_match_interaction": {
+    "type": "gapMatchInteraction",
+    "responseIdentifier": "RESPONSE",
+    "shuffle": true,
+    "content": [
+      { "type": "paragraph", "content": [
+        { "type": "text", "content": "Complete: " },
+        { "type": "gap", "gapId": "GAP_WHOLE" },
+        { "type": "text", "content": " " },
+        { "type": "gap", "gapId": "GAP_NUM" },
+        { "type": "text", "content": "/" },
+        { "type": "gap", "gapId": "GAP_DEN" }
+      ]}
+    ],
+    "gapTexts": [
+      { "identifier": "TEXT_84", "matchMax": 1, "content": [{ "type": "text", "content": "84" }] },
+      { "identifier": "TEXT_9", "matchMax": 1, "content": [{ "type": "text", "content": "9" }] },
+      { "identifier": "TEXT_10", "matchMax": 1, "content": [{ "type": "text", "content": "10" }] }
+    ],
     "gaps": [
-      { "identifier": "GAP_1", "required": false },
-      { "identifier": "GAP_2", "required": false }
+      { "identifier": "GAP_WHOLE", "required": true },
+      { "identifier": "GAP_NUM",   "required": true },
+      { "identifier": "GAP_DEN",   "required": true }
     ]
   }
 }

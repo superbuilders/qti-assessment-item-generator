@@ -2,7 +2,7 @@ import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
 import type { BlockContent } from "@/core/content"
-import { createBlockContentSchema } from "@/core/content"
+import { createFeedbackContentSchema } from "@/core/content/contextual-schemas"
 import type { AnyInteraction } from "@/core/interactions"
 import type { ResponseDeclaration } from "@/core/item"
 import type { FeedbackPlan } from "../plan"
@@ -26,8 +26,8 @@ export function createFeedbackObjectSchema<P extends FeedbackPlan, const E exten
 	feedbackPlan: P,
 	widgetTypeKeys: E
 ): z.ZodType<{ FEEDBACK__OVERALL: AuthoringFeedbackOverall<P, E> }> {
-	const ScopedBlockContentSchema: z.ZodType<BlockContent<E>> = createBlockContentSchema(widgetTypeKeys)
-	const LeafNodeSchema: z.ZodType<AuthoringNestedLeaf<E>> = z.object({ content: ScopedBlockContentSchema }).strict()
+	const FeedbackContentSchema: z.ZodType<BlockContent<E>> = createFeedbackContentSchema(widgetTypeKeys)
+	const LeafNodeSchema: z.ZodType<AuthoringNestedLeaf<E>> = z.object({ content: FeedbackContentSchema }).strict()
 
 	let OverallSchema: z.ZodType<AuthoringFeedbackOverall<P, E>>
 	if (feedbackPlan.mode === "fallback") {

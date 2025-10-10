@@ -72,7 +72,28 @@ export function compileInteraction<E extends readonly string[] = readonly string
 			const innerContent = interaction.content
 				? `\n            ${renderBlockContent(interaction.content, widgetSlots, interactionSlots)}\n        `
 				: ""
-			interactionXml = `<qti-gap-match-interaction response-identifier="${escapeXmlAttribute(interaction.responseIdentifier)}" shuffle="${interaction.shuffle}" max-associations="${interaction.gaps.length}">
+
+			// NEW: Compile-time guard - defense in depth
+			if (innerContent.trim() === "") {
+				logger.error("gap match rendering: no content resulted in empty XML", {
+					responseIdentifier: interaction.responseIdentifier
+				})
+				throw errors.new("gap match rendering: no content")
+			}
+
+			const renderedGapCount = (innerContent.match(/<qti-gap/g) || []).length
+			if (renderedGapCount !== interaction.gaps.length) {
+				logger.error("gap match rendering: gap count mismatch after render", {
+					responseIdentifier: interaction.responseIdentifier,
+					expected: interaction.gaps.length,
+					found: renderedGapCount
+				})
+				throw errors.new("gap match rendering: gap count mismatch")
+			}
+
+			interactionXml = `<qti-gap-match-interaction response-identifier="${escapeXmlAttribute(
+				interaction.responseIdentifier
+			)}" shuffle="${interaction.shuffle}" max-associations="${interaction.gaps.length}">
             ${gapTextsXml}${innerContent}
         </qti-gap-match-interaction>`
 			break

@@ -1,0 +1,69 @@
+// Bun Snapshot v1, https://bun.sh/docs/test/snapshots
+
+exports[`Compiler: gapMatchInteraction validation should compile a valid gapMatchInteraction successfully 1`] = `
+"<?xml version="1.0" encoding="UTF-8"?>
+<qti-assessment-item
+    xmlns="http://www.imsglobal.org/xsd/imsqtiasi_v3p0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqtiasi_v3p0 https://purl.imsglobal.org/spec/qti/v3p0/schema/xsd/imsqti_asiv3p0p1_v1p0.xsd http://www.w3.org/1998/Math/MathML https://purl.imsglobal.org/spec/mathml/v3p0/schema/xsd/mathml3.xsd"
+    identifier="gap-match-validation-item"
+    title="Gap Match Validation"
+    time-dependent="false"
+    xml:lang="en-US">
+    <qti-response-declaration identifier="RESPONSE" cardinality="multiple" base-type="directedPair">
+        <qti-correct-response>
+            <qti-value>TOKEN_A GAP_1</qti-value>
+        </qti-correct-response>
+        <qti-mapping lower-bound="0" upper-bound="1" default-value="0">
+            <qti-map-entry map-key="TOKEN_A GAP_1" mapped-value="1"/>
+        </qti-mapping>
+    </qti-response-declaration>
+    <qti-outcome-declaration identifier="SCORE" cardinality="single" base-type="float">
+        <qti-default-value><qti-value>0</qti-value></qti-default-value>
+    </qti-outcome-declaration>
+    <qti-outcome-declaration identifier="FEEDBACK__OVERALL" cardinality="single" base-type="identifier"/>
+    <qti-item-body>
+        <qti-gap-match-interaction response-identifier="RESPONSE" shuffle="true" max-associations="1">
+            <qti-gap-text identifier="TOKEN_A" match-max="1">A</qti-gap-text>
+            <p>Fill blank: <qti-gap identifier="GAP_1"/></p>
+        
+        </qti-gap-match-interaction>
+        <qti-feedback-block outcome-identifier="FEEDBACK__OVERALL" identifier="FB__RESPONSE_CORRECT" show-hide="show">
+            <qti-content-body></qti-content-body>
+        </qti-feedback-block>
+        <qti-feedback-block outcome-identifier="FEEDBACK__OVERALL" identifier="FB__RESPONSE_INCORRECT" show-hide="show">
+            <qti-content-body></qti-content-body>
+        </qti-feedback-block>
+    </qti-item-body>
+    <qti-response-processing>
+        
+    <qti-response-condition>
+        <qti-response-if>
+            <qti-match>
+                <qti-variable identifier="RESPONSE"/>
+                <qti-correct identifier="RESPONSE"/>
+            </qti-match>
+            <qti-set-outcome-value identifier="FEEDBACK__OVERALL">
+                <qti-base-value base-type="identifier">FB__RESPONSE_CORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-if>
+        <qti-response-else>
+            <qti-set-outcome-value identifier="FEEDBACK__OVERALL">
+                <qti-base-value base-type="identifier">FB__RESPONSE_INCORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-else>
+    </qti-response-condition>
+    <qti-response-condition>
+        <qti-response-if>
+            <qti-and>
+                <qti-match><qti-variable identifier="RESPONSE"/><qti-correct identifier="RESPONSE"/></qti-match>
+            </qti-and>
+            <qti-set-outcome-value identifier="SCORE"><qti-base-value base-type="float">1.0</qti-base-value></qti-set-outcome-value>
+        </qti-response-if>
+        <qti-response-else>
+            <qti-set-outcome-value identifier="SCORE"><qti-base-value base-type="float">0.0</qti-base-value></qti-set-outcome-value>
+        </qti-response-else>
+    </qti-response-condition>
+    </qti-response-processing>
+</qti-assessment-item>"
+`;

@@ -29,7 +29,7 @@ export type AnyInteraction<E extends readonly string[] = readonly string[]> =
 			type: "gapMatchInteraction"
 			responseIdentifier: string
 			shuffle: boolean
-			content: BlockContent<E> | null
+			content: BlockContent<E>
 			gapTexts: Array<{ identifier: string; matchMax: number; content: InlineContent<E> }>
 			gaps: Array<{ identifier: string; required: boolean | null }>
 	  }

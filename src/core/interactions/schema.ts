@@ -1,14 +1,21 @@
 import { z } from "zod"
 import { CHOICE_IDENTIFIER_REGEX, RESPONSE_IDENTIFIER_REGEX } from "@/compiler/qti-constants"
-import { createBlockContentSchema, createInlineContentSchema } from "@/core/content"
+import {
+	createChoiceInteractionChoiceContentSchema,
+	createChoiceInteractionPromptSchema,
+	createGapMatchContentSchema,
+	createInlineChoiceContentSchema
+} from "@/core/content/contextual-schemas"
 import type { AnyInteraction } from "./types"
 
 // Returns the discriminated union of all interactions scoped to E
 export function createAnyInteractionSchema<const E extends readonly string[]>(
 	widgetTypeKeys: E
 ): z.ZodType<AnyInteraction<E>> {
-	const InlineSchema = createInlineContentSchema(widgetTypeKeys)
-	const BlockSchema = createBlockContentSchema(widgetTypeKeys)
+	const PromptSchema = createChoiceInteractionPromptSchema(widgetTypeKeys)
+	const ChoiceContentSchema = createChoiceInteractionChoiceContentSchema(widgetTypeKeys)
+	const InlineChoiceContentSchema = createInlineChoiceContentSchema(widgetTypeKeys)
+	const GapMatchContentSchema = createGapMatchContentSchema(widgetTypeKeys)
 
 	const InlineChoiceSchema = z
 		.object({
@@ -16,7 +23,7 @@ export function createAnyInteractionSchema<const E extends readonly string[]>(
 				.string()
 				.regex(CHOICE_IDENTIFIER_REGEX, "invalid identifier: must be uppercase")
 				.describe("Unique identifier for this inline choice option."),
-			content: InlineSchema.describe("The inline content displayed in the dropdown menu.")
+			content: InlineChoiceContentSchema.describe("The inline content displayed in the dropdown menu.")
 		})
 		.strict()
 		.describe("Represents a single option within an inline dropdown choice interaction.")
@@ -28,7 +35,7 @@ export function createAnyInteractionSchema<const E extends readonly string[]>(
 				.string()
 				.regex(RESPONSE_IDENTIFIER_REGEX, "invalid response identifier: must start with RESPONSE")
 				.describe("Links this interaction to its response declaration for scoring."),
-			prompt: InlineSchema.describe("The question or instruction presented to the user."),
+			prompt: PromptSchema.describe("The question or instruction presented to the user."),
 			choices: z
 				.array(
 					z
@@ -37,7 +44,7 @@ export function createAnyInteractionSchema<const E extends readonly string[]>(
 								.string()
 								.regex(CHOICE_IDENTIFIER_REGEX, "invalid identifier: must be uppercase")
 								.describe("Unique identifier for this choice option, used for response matching."),
-							content: BlockSchema.describe(
+							content: ChoiceContentSchema.describe(
 								"Rich content for this choice option, supporting text, math, and embedded widgets."
 							)
 						})
@@ -86,7 +93,7 @@ export function createAnyInteractionSchema<const E extends readonly string[]>(
 				.string()
 				.regex(RESPONSE_IDENTIFIER_REGEX, "invalid response identifier: must start with RESPONSE")
 				.describe("Links this interaction to its response declaration for scoring."),
-			prompt: InlineSchema.describe(
+			prompt: PromptSchema.describe(
 				"Explicit instructions for arranging items that MUST: (1) name the sort property (e.g., density, size, value), (2) state the sort direction using unambiguous phrases like 'least to greatest' or 'greatest to least'."
 			),
 			choices: z
@@ -97,7 +104,7 @@ export function createAnyInteractionSchema<const E extends readonly string[]>(
 								.string()
 								.regex(CHOICE_IDENTIFIER_REGEX, "invalid identifier: must be uppercase")
 								.describe("Unique identifier for this choice option, used for response matching."),
-							content: BlockSchema.describe("Rich content for this orderable item.")
+							content: ChoiceContentSchema.describe("Rich content for this orderable item.")
 						})
 						.strict()
 						.describe("An orderable item with content and optional feedback")
@@ -119,6 +126,8 @@ export function createAnyInteractionSchema<const E extends readonly string[]>(
 			"An interaction where users arrange items in a specific sequence or order. Prompts must specify the sort property and the direction (ascending/descending using 'least to greatest'/'greatest to least')."
 		)
 
+	const GapTextInlineContentSchema = createInlineChoiceContentSchema(widgetTypeKeys)
+
 	const GapMatchInteractionSchema = z
 		.object({
 			type: z.literal("gapMatchInteraction").describe("Identifies this as a gap match (drag-and-drop) interaction."),
@@ -127,8 +136,8 @@ export function createAnyInteractionSchema<const E extends readonly string[]>(
 				.regex(RESPONSE_IDENTIFIER_REGEX, "invalid response identifier: must start with RESPONSE")
 				.describe("Links this interaction to its response declaration for scoring."),
 			shuffle: z.boolean().describe("Whether to shuffle the order of gap-text items (draggable tokens)."),
-			content: BlockSchema.nullable().describe(
-				"Optional block content (e.g., <ul>/<li>/<p>) containing sentences with gap placeholders to render inside the interaction."
+			content: GapMatchContentSchema.describe(
+				"Required block content (e.g., <p>) containing sentences with gap placeholders ({ type: 'gap', gapId: '...' }) to render inside the interaction. Must be non-empty."
 			),
 			gapTexts: z
 				.array(
@@ -143,7 +152,7 @@ export function createAnyInteractionSchema<const E extends readonly string[]>(
 								.int()
 								.min(0)
 								.describe("Maximum times this item can be used. 0 = unlimited, 1 = use once only."),
-							content: InlineSchema.describe("The content of the draggable item (text or math).")
+							content: GapTextInlineContentSchema.describe("The content of the draggable item (text or math).")
 						})
 						.strict()
 						.describe("A draggable item that can be placed into gaps")
@@ -169,6 +178,69 @@ export function createAnyInteractionSchema<const E extends readonly string[]>(
 				)
 		})
 		.strict()
+		.superRefine((interaction, ctx) => {
+			// Collect all gap IDs used in content
+			const declaredGapIds = new Set(interaction.gaps.map((g) => g.identifier))
+			const usedGapIds: string[] = []
+
+			// biome-ignore lint: any needed for recursive traversal
+			const findGaps = (nodes: any): void => {
+				if (!nodes || !Array.isArray(nodes)) return
+				for (const node of nodes) {
+					if (!node) continue
+					if (node.type === "gap") {
+						usedGapIds.push(node.gapId)
+					} else if (node.type === "paragraph") {
+						findGaps(node.content)
+					} else if (node.type === "unorderedList" || node.type === "orderedList") {
+						if (Array.isArray(node.items)) {
+							for (const item of node.items) findGaps(item)
+						}
+					} else if (node.type === "tableRich") {
+						const scanRows = (rows: unknown) => {
+							if (!rows || !Array.isArray(rows)) return
+							for (const row of rows) {
+								if (!Array.isArray(row)) continue
+								for (const cell of row) findGaps(cell)
+							}
+						}
+						scanRows(node.header)
+						scanRows(node.rows)
+					}
+				}
+			}
+			findGaps(interaction.content)
+
+			// Validate gap count matches
+			if (usedGapIds.length !== declaredGapIds.size) {
+				ctx.addIssue({
+					code: z.ZodIssueCode.custom,
+					message: `gap match validation: gap count mismatch (declared ${declaredGapIds.size}, found ${usedGapIds.length})`,
+					path: ["content"]
+				})
+			}
+
+			// Validate no duplicate gapIds in content
+			const usedGapIdsSet = new Set(usedGapIds)
+			if (usedGapIdsSet.size !== usedGapIds.length) {
+				ctx.addIssue({
+					code: z.ZodIssueCode.custom,
+					message: "gap match validation: duplicate gapId found in content",
+					path: ["content"]
+				})
+			}
+
+			// Validate all used gapIds are declared
+			for (const usedId of usedGapIdsSet) {
+				if (!declaredGapIds.has(usedId)) {
+					ctx.addIssue({
+						code: z.ZodIssueCode.custom,
+						message: `gap match validation: undeclared gapId '${usedId}' found in content`,
+						path: ["content"]
+					})
+				}
+			}
+		})
 		.describe(
 			"A drag-and-drop interaction where users drag text/terms into gaps within sentences. Gaps are embedded in body content."
 		)

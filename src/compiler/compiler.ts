@@ -10,7 +10,6 @@ import { ErrUnsupportedInteraction } from "../structured/client"
 import type { WidgetCollection, WidgetDefinition, WidgetTypeTupleFrom } from "../widgets/collections/types"
 import { renderBlockContent } from "./content-renderer"
 import { compileInteraction } from "./interaction-compiler"
-import { validateAssessmentItemInput } from "./pre-validator"
 import { compileResponseDeclarations, compileResponseProcessing } from "./response-processor"
 import { encodeDataUri } from "./utils/helpers"
 import {
@@ -597,30 +596,10 @@ function collectWidgetIds<E extends readonly string[]>(item: AssessmentItemWithF
 export async function compile<
 	C extends WidgetCollection<Record<string, WidgetDefinition<unknown, unknown>>, readonly string[]>
 >(itemData: AssessmentItemInput<WidgetTypeTupleFrom<C>>, widgetCollection: C): Promise<string> {
-	// Step 0: Nested feedback validation and normalization (internal conversion to flat blocks)
-	logger.debug("validating nested feedback", {
-		mode: itemData.feedbackPlan.mode,
-		dimensionCount: itemData.feedbackPlan.dimensions.length,
-		combinationCount: itemData.feedbackPlan.combinations.length
-	})
-	const validatedFeedbackObject = validateFeedbackObject(
-		itemData.feedback,
-		itemData.feedbackPlan,
-		widgetCollection.widgetTypeKeys
-	)
-	const feedbackBlocks = convertFeedbackObjectToBlocks(validatedFeedbackObject, itemData.feedbackPlan)
-	logger.debug("converted nested feedback to flat blocks", { blockCount: Object.keys(feedbackBlocks).length })
-
-	// Create a normalized item with flat feedbackBlocks for downstream processing
-	const normalizedItem: AssessmentItemWithFlatFeedback<WidgetTypeTupleFrom<C>> = {
-		...itemData,
-		feedbackBlocks
-	}
-
 	// Step 1: Widget Type Derivation
 	const widgetMapping: Record<string, string> = {}
-	if (normalizedItem.widgets) {
-		for (const [key, value] of Object.entries(normalizedItem.widgets)) {
+	if (itemData.widgets) {
+		for (const [key, value] of Object.entries(itemData.widgets)) {
 			if (value?.type) {
 				widgetMapping[key] = value.type
 			}
@@ -654,7 +633,7 @@ export async function compile<
 		validatedWidgetMapping,
 		widgetCollection.widgetTypeKeys,
 		widgetSchemasForCollection,
-		normalizedItem.feedbackPlan
+		itemData.feedbackPlan
 	)
 	const itemResult = AssessmentItemSchema.safeParse(itemData)
 	if (!itemResult.success) {
@@ -662,6 +641,26 @@ export async function compile<
 		throw errors.wrap(itemResult.error, "schema enforcement")
 	}
 	const enforcedItem = itemResult.data
+
+	// Step 0: Nested feedback validation and normalization (internal conversion to flat blocks)
+	logger.debug("validating nested feedback", {
+		mode: enforcedItem.feedbackPlan.mode,
+		dimensionCount: enforcedItem.feedbackPlan.dimensions.length,
+		combinationCount: enforcedItem.feedbackPlan.combinations.length
+	})
+	const validatedFeedbackObject = validateFeedbackObject(
+		enforcedItem.feedback,
+		enforcedItem.feedbackPlan,
+		widgetCollection.widgetTypeKeys
+	)
+	const feedbackBlocks = convertFeedbackObjectToBlocks(validatedFeedbackObject, enforcedItem.feedbackPlan)
+	logger.debug("converted nested feedback to flat blocks", { blockCount: Object.keys(feedbackBlocks).length })
+
+	// Create a normalized item with flat feedbackBlocks for downstream processing
+	const normalizedItem: AssessmentItemWithFlatFeedback<WidgetTypeTupleFrom<C>> = {
+		...enforcedItem,
+		feedbackBlocks
+	}
 
 	// Pre-compile gate for unsupported interactions
 	if (enforcedItem.interactions) {
@@ -682,10 +681,8 @@ export async function compile<
 		}
 	}
 
-	// Step 1: Prevalidation on schema-enforced data to catch QTI content model violations
-	// Manual deduplication of paragraphs that duplicate an interaction prompt
+	// Step 1: Manual deduplication of paragraphs that duplicate an interaction prompt
 	dedupePromptTextFromBody(normalizedItem)
-	validateAssessmentItemInput(normalizedItem, logger)
 
 	// Enforce identifier-only matching; no ad-hoc rewriting
 	// This function now includes checks for duplicate responseIdentifiers and choice Identifiers,

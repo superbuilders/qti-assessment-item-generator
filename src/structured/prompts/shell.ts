@@ -587,7 +587,7 @@ ${supportedInteractionTypes}
 1) Create an interaction slot with type "gapMatchInteraction" 
 2) Each gap in text gets a unique identifier (GAP_1, GAP_2, etc.)
 3) Each draggable item gets an identifier (WORD_SOLAR, TERM_1, etc.)
-4) In the body content, embed gaps using { "type": "gap", "gapId": "GAP_1" } where blanks appear
+4) Embed all sentence text and gaps INSIDE the gapMatchInteraction's "content" array. For each blank, insert an inline item { "type": "gap", "gapId": "GAP_*" }. Do not place gap placeholders in the top-level body.
 5) Response declaration uses baseType "directedPair" with source->target pairs
 
 **CRITICAL: TABLE GENERATION**

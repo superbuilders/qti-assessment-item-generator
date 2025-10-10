@@ -2,7 +2,7 @@ import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
 import { CHOICE_IDENTIFIER_REGEX, RESPONSE_IDENTIFIER_REGEX } from "@/compiler/qti-constants"
-import { createBlockContentSchema } from "@/core/content"
+import { createBodyContentSchema } from "@/core/content/contextual-schemas"
 import { createFeedbackObjectSchema, FeedbackPlanSchema } from "@/core/feedback"
 import { createAnyInteractionSchema } from "@/core/interactions"
 import { WidgetSchema } from "@/widgets/registry"
@@ -67,6 +67,7 @@ export function createAssessmentItemShellSchema<const E extends readonly string[
 	widgetTypeKeys: E
 ): z.ZodType<AssessmentItemShell<E>> {
 	const ResponseDeclarationSchema = createResponseDeclarationSchema()
+	const BodySchema = createBodyContentSchema(widgetTypeKeys)
 
 	return z
 		.object({
@@ -75,7 +76,7 @@ export function createAssessmentItemShellSchema<const E extends readonly string[
 			responseDeclarations: z
 				.array(ResponseDeclarationSchema)
 				.describe("Defines correct answers and scoring for all interactions in this item."),
-			body: createBlockContentSchema(widgetTypeKeys).nullable().describe("The main content with ref placeholders.")
+			body: BodySchema.nullable().describe("The main content with ref placeholders.")
 		})
 		.strict()
 		.describe("Initial assessment item structure with ref placeholders from the first AI generation shot.")
@@ -114,7 +115,7 @@ export function createDynamicAssessmentItemSchema<const E extends readonly strin
 	const DynamicWidgetsSchema = z
 		.record(z.string(), AllowedWidgetSchema)
 		.describe("Map of widget slot IDs to their widget definitions")
-	const BlockSchema = createBlockContentSchema(widgetTypeKeys)
+	const BodySchema = createBodyContentSchema(widgetTypeKeys)
 	const AnyInteractionSchema = createAnyInteractionSchema(widgetTypeKeys)
 	const ResponseDeclarationSchema = createResponseDeclarationSchema()
 
@@ -130,7 +131,7 @@ export function createDynamicAssessmentItemSchema<const E extends readonly strin
 				.array(ResponseDeclarationSchema)
 				.min(1)
 				.describe("Defines correct answers and scoring for all interactions in this item."),
-			body: BlockSchema.nullable().describe("The main content of the item as structured blocks."),
+			body: BodySchema.nullable().describe("The main content of the item as structured blocks."),
 			widgets: DynamicWidgetsSchema.nullable().describe(
 				"A map of widget identifiers to their full widget object definitions."
 			),
@@ -144,6 +145,135 @@ export function createDynamicAssessmentItemSchema<const E extends readonly strin
 			)
 		})
 		.strict()
+		.superRefine((data, ctx) => {
+			// Cross-field validation for gapMatchInteraction
+			if (!data.interactions) return
+
+			for (const [interactionKey, interaction] of Object.entries(data.interactions)) {
+				if (interaction.type !== "gapMatchInteraction") continue
+
+				const decl = data.responseDeclarations.find((d) => d.identifier === interaction.responseIdentifier)
+				if (!decl) continue
+				if (decl.baseType !== "directedPair") continue
+
+				const gapTextIds = new Set(interaction.gapTexts.map((gt) => gt.identifier))
+				const declaredGapIds = new Set(interaction.gaps.map((g) => g.identifier))
+
+				// Validate correct response pairs
+				if (Array.isArray(decl.correct)) {
+					for (const pair of decl.correct) {
+						if (typeof pair === "object" && pair !== null) {
+							const sourceDesc = Object.getOwnPropertyDescriptor(pair, "source")
+							const targetDesc = Object.getOwnPropertyDescriptor(pair, "target")
+							if (!sourceDesc || !targetDesc) continue
+							const source = String(sourceDesc.value)
+							const target = String(targetDesc.value)
+
+							if (!gapTextIds.has(source)) {
+								ctx.addIssue({
+									code: z.ZodIssueCode.custom,
+									message: `gap match validation: correct pair source '${source}' not in gapTexts`,
+									path: ["interactions", interactionKey, "gapTexts"]
+								})
+							}
+							if (!declaredGapIds.has(target)) {
+								ctx.addIssue({
+									code: z.ZodIssueCode.custom,
+									message: `gap match validation: correct pair target '${target}' not in gaps`,
+									path: ["interactions", interactionKey, "gaps"]
+								})
+							}
+						}
+					}
+
+					// Validate matchMax multiplicity and duplicate pairs
+					const usageBySource = new Map<string, number>()
+					const seenPairs = new Set<string>()
+
+					for (const pair of decl.correct) {
+						if (typeof pair === "object" && pair !== null) {
+							const sourceDesc = Object.getOwnPropertyDescriptor(pair, "source")
+							const targetDesc = Object.getOwnPropertyDescriptor(pair, "target")
+							if (!sourceDesc || !targetDesc) continue
+							const source = String(sourceDesc.value)
+							const target = String(targetDesc.value)
+
+							// Check for duplicate pairs
+							const pairKey = `${source}→${target}`
+							if (seenPairs.has(pairKey)) {
+								ctx.addIssue({
+									code: z.ZodIssueCode.custom,
+									message: `gap match validation: duplicate correct pair '${pairKey}'`,
+									path: ["responseDeclarations"]
+								})
+							}
+							seenPairs.add(pairKey)
+
+							// Count usage
+							usageBySource.set(source, (usageBySource.get(source) ?? 0) + 1)
+						}
+					}
+
+					// Validate matchMax constraints
+					for (const [source, count] of usageBySource) {
+						const gapText = interaction.gapTexts.find((gt) => gt.identifier === source)
+						const matchMax = gapText?.matchMax ?? 1
+						if (matchMax !== 0 && count > matchMax) {
+							ctx.addIssue({
+								code: z.ZodIssueCode.custom,
+								message: `gap match validation: source '${source}' used ${count} times, exceeds matchMax ${matchMax}`,
+								path: ["responseDeclarations"]
+							})
+						}
+					}
+				}
+
+				// Validate cardinality policy for gap match
+				if (decl.cardinality !== "multiple") {
+					ctx.addIssue({
+						code: z.ZodIssueCode.custom,
+						message: `gap match validation: cardinality must be 'multiple', not '${decl.cardinality}'`,
+						path: ["responseDeclarations"]
+					})
+				}
+			}
+
+			// Validate no gaps in body or feedback (placement ban)
+			// biome-ignore lint: any needed for recursive traversal
+			const checkForGaps = (nodes: any, contextPath: string[]): void => {
+				if (!nodes || !Array.isArray(nodes)) return
+				for (const node of nodes) {
+					if (!node) continue
+					if (node.type === "gap") {
+						ctx.addIssue({
+							code: z.ZodIssueCode.custom,
+							message: "gap placeholders are only allowed inside gapMatchInteraction content",
+							path: contextPath
+						})
+					} else if (node.type === "paragraph") {
+						checkForGaps(node.content, contextPath)
+					} else if (node.type === "unorderedList" || node.type === "orderedList") {
+						if (Array.isArray(node.items)) {
+							for (const item of node.items) checkForGaps(item, contextPath)
+						}
+					} else if (node.type === "tableRich") {
+						const scanRows = (rows: unknown) => {
+							if (!rows || !Array.isArray(rows)) return
+							for (const row of rows) {
+								if (!Array.isArray(row)) continue
+								for (const cell of row) checkForGaps(cell, contextPath)
+							}
+						}
+						scanRows(node.header)
+						scanRows(node.rows)
+					}
+				}
+			}
+
+			if (data.body) {
+				checkForGaps(data.body, ["body"])
+			}
+		})
 		.describe("A complete QTI 3.0 assessment item with content, interactions, and scoring rules.")
 
 	const AssessmentItemShellSchema = createAssessmentItemShellSchema(widgetTypeKeys)
