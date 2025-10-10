@@ -1,9 +1,7 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import type { z } from "zod"
-import { allWidgetsCollection } from "@/widgets/collections/all"
 import type { WidgetCollection, WidgetDefinition } from "@/widgets/collections/types"
-import type { WidgetInput } from "@/widgets/registry"
 
 // Type guard to safely check if a key exists in a collection's widgets.
 function hasWidget<
@@ -26,26 +24,3 @@ export async function generateWidget<
 	return await definition.generator(data)
 }
 
-/**
- * Legacy wrapper for tests: accepts WidgetInput (pre or post transform) and dispatches using allWidgetsCollection.
- * Validates the input against the schema before calling the generator.
- * @deprecated Use generateWidget(collection, type, data) in production code.
- */
-export async function generateWidgetLegacy(widgetInput: WidgetInput): Promise<string> {
-	const widgetType = widgetInput.type
-	if (!hasWidget(allWidgetsCollection, widgetType)) {
-		logger.error("widget type not found in default collection", { widgetType })
-		throw errors.new("widget type not found in default collection")
-	}
-	const definition = allWidgetsCollection.widgets[widgetType]
-
-	// Validate input against the schema to handle transforms (z.input -> z.output)
-	const parsed = definition.schema.safeParse(widgetInput)
-	if (!parsed.success) {
-		logger.error("widget validation failed", { widgetType, error: parsed.error })
-		throw errors.wrap(parsed.error, "widget validation")
-	}
-
-	// Use the type-safe dispatcher to ensure generator contract is satisfied
-	return await generateWidget(allWidgetsCollection, widgetType, parsed.data)
-}

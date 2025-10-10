@@ -7,7 +7,7 @@ import {
 	compositeShapeExample
 } from "../../examples/composite-shape-diagram"
 import { type WidgetInput, WidgetSchema } from "../../src/widgets/registry"
-import { generateWidgetLegacy } from "../../src/widgets/widget-generator"
+import { generateWidgetForTest } from "../helpers/generateWidgetForTest"
 
 function ensureWidgetInput(input: unknown): WidgetInput {
 	const parsed = WidgetSchema.safeParse(input)
@@ -21,7 +21,7 @@ function ensureWidgetInput(input: unknown): WidgetInput {
 describe("Widget: composite-shape-diagram", () => {
 	// Test the examples from the examples file
 	test("should produce consistent output for compositeShapeExample", async () => {
-		const result = await errors.try(generateWidgetLegacy(ensureWidgetInput(compositeShapeExample)))
+		const result = await errors.try(generateWidgetForTest(ensureWidgetInput(compositeShapeExample)))
 		if (result.error) {
 			logger.error("widget generation failed", { error: result.error })
 			throw result.error
@@ -30,7 +30,7 @@ describe("Widget: composite-shape-diagram", () => {
 	})
 
 	test("should produce consistent output for circleWithRectangleExample", async () => {
-		const result = await errors.try(generateWidgetLegacy(ensureWidgetInput(circleWithRectangleExample)))
+		const result = await errors.try(generateWidgetForTest(ensureWidgetInput(circleWithRectangleExample)))
 		if (result.error) {
 			logger.error("widget generation failed", { error: result.error })
 			throw result.error
@@ -125,7 +125,7 @@ describe("Widget: composite-shape-diagram", () => {
 			rightAngleMarkers: null
 		})
 
-		const result = await errors.try(generateWidgetLegacy(input))
+		const result = await errors.try(generateWidgetForTest(input))
 		if (result.error) {
 			logger.error("widget generation failed for compositeShapeDiagram", { error: result.error, inputData: input })
 			throw errors.wrap(result.error, "widget generation")
@@ -137,7 +137,7 @@ describe("Widget: composite-shape-diagram", () => {
 	compositeFromNestedExamples.forEach((example, index) => {
 		test(`composite-shape-diagram migrated example #${index + 1}`, async () => {
 			const input = ensureWidgetInput(example)
-			const result = await errors.try(generateWidgetLegacy(input))
+			const result = await errors.try(generateWidgetForTest(input))
 			if (result.error) {
 				logger.error("widget generation failed for migrated composite example", { error: result.error, index })
 				throw errors.wrap(result.error, "widget generation")
@@ -253,7 +253,7 @@ describe("Widget: composite-shape-diagram", () => {
 			rightAngleMarkers: null
 		})
 
-		const result = await errors.try(generateWidgetLegacy(input))
+		const result = await errors.try(generateWidgetForTest(input))
 		if (result.error) {
 			logger.error("widget generation failed for compositeShapeDiagram", { error: result.error, inputData: input })
 			throw errors.wrap(result.error, "widget generation")
@@ -319,7 +319,7 @@ describe("Widget: composite-shape-diagram", () => {
 			rightAngleMarkers: null
 		})
 
-		const result = await errors.try(generateWidgetLegacy(input))
+		const result = await errors.try(generateWidgetForTest(input))
 		if (result.error) {
 			logger.error("widget generation failed for compositeShapeDiagram", { error: result.error, inputData: input })
 			throw errors.wrap(result.error, "widget generation")
@@ -383,7 +383,7 @@ describe("Widget: composite-shape-diagram", () => {
 			rightAngleMarkers: null
 		})
 
-		const result = await errors.try(generateWidgetLegacy(input))
+		const result = await errors.try(generateWidgetForTest(input))
 		if (result.error) {
 			logger.error("widget generation failed for compositeShapeDiagram", { error: result.error, inputData: input })
 			throw errors.wrap(result.error, "widget generation")
@@ -424,7 +424,7 @@ describe("Widget: composite-shape-diagram", () => {
 			rightAngleMarkers: null
 		})
 
-		const result = await errors.try(generateWidgetLegacy(input))
+		const result = await errors.try(generateWidgetForTest(input))
 		if (result.error) {
 			logger.error("widget generation failed for compositeShapeDiagram", { error: result.error, inputData: input })
 			throw errors.wrap(result.error, "widget generation")
@@ -481,7 +481,7 @@ describe("Widget: composite-shape-diagram", () => {
 			]
 		})
 
-		const result = await errors.try(generateWidgetLegacy(input))
+		const result = await errors.try(generateWidgetForTest(input))
 		if (result.error) {
 			logger.error("widget generation failed for compositeShapeDiagram", { error: result.error, inputData: input })
 			throw errors.wrap(result.error, "widget generation")
@@ -520,7 +520,7 @@ describe("Widget: composite-shape-diagram", () => {
 			rightAngleMarkers: [{ cornerVertexId: "midBase", adjacentVertex1Id: "apex", adjacentVertex2Id: "D" }]
 		})
 
-		const result = await errors.try(generateWidgetLegacy(input))
+		const result = await errors.try(generateWidgetForTest(input))
 		if (result.error) {
 			logger.error("widget generation failed for compositeShapeDiagram", { error: result.error, inputData: input })
 			throw errors.wrap(result.error, "widget generation")
@@ -591,7 +591,7 @@ describe("Widget: composite-shape-diagram", () => {
 			]
 		})
 
-		const result = await errors.try(generateWidgetLegacy(input))
+		const result = await errors.try(generateWidgetForTest(input))
 		if (result.error) {
 			logger.error("widget generation failed for compositeShapeDiagram", { error: result.error, inputData: input })
 			throw errors.wrap(result.error, "widget generation")
@@ -640,7 +640,7 @@ describe("Widget: composite-shape-diagram", () => {
 			rightAngleMarkers: null
 		})
 
-		const result = await errors.try(generateWidgetLegacy(input))
+		const result = await errors.try(generateWidgetForTest(input))
 		if (result.error) {
 			logger.error("widget generation failed for compositeShapeDiagram", { error: result.error, inputData: input })
 			throw errors.wrap(result.error, "widget generation")
