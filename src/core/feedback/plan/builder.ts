@@ -1,3 +1,4 @@
+import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import type { AnyInteraction } from "@/core/interactions"
 import type { ResponseDeclaration } from "@/core/item"
@@ -46,14 +47,17 @@ export function buildFeedbackPlanFromInteractions<E extends readonly string[]>(
 		(acc, dim) => acc * (dim.kind === "enumerated" ? dim.keys.length : 2),
 		1
 	)
-	const mode = combinationCount > 32 || combinationCount === 0 ? "fallback" : "combo"
+	const mode = combinationCount > 64 || dimensions.length === 0 ? "fallback" : "combo"
 
 	logger.info("built feedback plan", { mode, combinationCount, dimensionCount: dimensions.length })
 
 	const combinations: FeedbackPlan["combinations"] = []
+	const combinationIds = new Set<string>()
 
 	if (mode === "fallback") {
 		combinations.push({ id: "CORRECT", path: [] }, { id: "INCORRECT", path: [] })
+		combinationIds.add("CORRECT")
+		combinationIds.add("INCORRECT")
 	} else {
 		let paths: Array<Array<{ responseIdentifier: string; key: string }>> = [[]]
 		for (const dim of dimensions) {
@@ -70,6 +74,11 @@ export function buildFeedbackPlanFromInteractions<E extends readonly string[]>(
 			const derivedId = deriveComboIdentifier(
 				path.map((seg) => `${normalizeIdPart(seg.responseIdentifier)}_${normalizeIdPart(seg.key)}`)
 			)
+			if (combinationIds.has(derivedId)) {
+				logger.error("duplicate feedback combination id detected", { derivedId, path })
+				throw errors.new(`duplicate feedback combination id detected: ${derivedId}`)
+			}
+			combinationIds.add(derivedId)
 			combinations.push({ id: derivedId, path })
 		}
 	}

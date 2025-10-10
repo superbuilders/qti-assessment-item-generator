@@ -129,6 +129,40 @@ mock.module("openai", () => {
 							]
 						}
 					}
+					if (typeof functionName === "string" && functionName.startsWith("feedback_fb__response_")) {
+						const isCorrect = functionName.includes("_correct")
+						const feedbackData = {
+							feedback: {
+								FEEDBACK__OVERALL: {
+									RESPONSE: {
+										[isCorrect ? "CORRECT" : "INCORRECT"]: {
+											content: [
+												{
+													type: "paragraph",
+													content: [
+														{
+															type: "text",
+															content: isCorrect ? "Correct! Well done." : "Not quite. Try again."
+														}
+													]
+												}
+											]
+										}
+									}
+								}
+							}
+						}
+						return {
+							choices: [
+								{
+									message: {
+										content: JSON.stringify(feedbackData),
+										refusal: null
+									}
+								}
+							]
+						}
+					}
 					if (functionName === "widget_content_generator") {
 						const widgetData = {
 							image_widget: {

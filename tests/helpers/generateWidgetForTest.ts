@@ -1,8 +1,8 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { allWidgetsCollection } from "@/widgets/collections/all"
-import { generateWidget } from "@/widgets/widget-generator"
 import type { WidgetInput } from "@/widgets/registry"
+import { generateWidget } from "@/widgets/widget-generator"
 
 export async function generateWidgetForTest(input: WidgetInput): Promise<string> {
 	const type = input.type
@@ -28,4 +28,3 @@ export async function generateWidgetForTest(input: WidgetInput): Promise<string>
 
 	return result.data
 }
-

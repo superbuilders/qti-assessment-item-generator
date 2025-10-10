@@ -23,4 +23,3 @@ export async function generateWidget<
 	const definition = collection.widgets[widgetType]
 	return await definition.generator(data)
 }
-

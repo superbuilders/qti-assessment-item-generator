@@ -12,16 +12,17 @@ function isWidgetTypeKey(v: string): v is keyof typeof allWidgetSchemas {
 	return v in allWidgetSchemas
 }
 
-import { buildFeedbackPlanFromInteractions } from "@/core/feedback"
+import { buildFeedbackPlanFromInteractions, createFeedbackObjectSchema, type FeedbackPlan } from "@/core/feedback"
 import { createAnyInteractionSchema } from "@/core/interactions"
-import { createAssessmentItemShellSchema } from "@/core/item"
+import { type AssessmentItemShell, createAssessmentItemShellSchema } from "@/core/item"
 import { toJSONSchemaPromptSafe } from "@/core/json-schema"
-import { createFeedbackPrompt } from "./prompts/feedback"
+import { createPerOutcomeNestedFeedbackPrompt } from "./prompts/feedback-per-outcome"
 import { createInteractionContentPrompt } from "./prompts/interactions"
 import { createAssessmentShellPrompt } from "./prompts/shell"
 import { createWidgetContentPrompt } from "./prompts/widgets"
 import type { AiContextEnvelope, ImageContext } from "./types"
 import { collectWidgetRefs } from "./utils/collector"
+import { runWithConcurrency } from "./utils/concurrency"
 
 const OPENAI_MODEL = "gpt-5"
 const MAX_IMAGES_PER_REQUEST = 500
@@ -29,6 +30,79 @@ const MAX_IMAGE_PAYLOAD_BYTES_PER_REQUEST = 50 * 1024 * 1024
 export const ErrWidgetNotFound = errors.new("widget could not be mapped to a known type")
 
 export const ErrUnsupportedInteraction = errors.new("unsupported interaction type found")
+
+type Leaf<E extends readonly string[]> = { content: BlockContent<E> }
+interface NestedNode<E extends readonly string[]> {
+	[responseIdentifier: string]: {
+		[key: string]: Leaf<E> | NestedNode<E>
+	}
+}
+type Overall<E extends readonly string[]> = NestedNode<E> | { CORRECT: Leaf<E>; INCORRECT: Leaf<E> }
+type FeedbackPayload<E extends readonly string[]> = { feedback: { FEEDBACK__OVERALL: Overall<E> } }
+
+function isLeaf<E extends readonly string[]>(v: Leaf<E> | NestedNode<E>): v is Leaf<E> {
+	return Object.hasOwn(v, "content")
+}
+
+function isFallbackOverall<E extends readonly string[]>(v: Overall<E>): v is { CORRECT: Leaf<E>; INCORRECT: Leaf<E> } {
+	return typeof v === "object" && v !== null && Object.hasOwn(v, "CORRECT") && Object.hasOwn(v, "INCORRECT")
+}
+
+function extractLeafContentAtPath<E extends readonly string[]>(
+	data: FeedbackPayload<E>,
+	path: AssessmentItemInput<E>["feedbackPlan"]["combinations"][0]["path"],
+	combinationId: string
+): BlockContent<E> {
+	const overall = data.feedback.FEEDBACK__OVERALL
+	if (path.length === 0) {
+		if (!isFallbackOverall(overall)) {
+			logger.error("expected fallback overall shape", { combinationId, pathLength: path.length })
+			throw errors.new("expected fallback overall shape")
+		}
+		if (combinationId !== "CORRECT" && combinationId !== "INCORRECT") {
+			logger.error("invalid fallback combination id", { combinationId })
+			throw errors.new("invalid fallback combination id")
+		}
+		return overall[combinationId].content
+	}
+
+	if (isFallbackOverall(overall)) {
+		logger.error("unexpected fallback shape for combo path", { combinationId, pathLength: path.length })
+		throw errors.new("unexpected fallback shape for combo path")
+	}
+	let current: Leaf<E> | NestedNode<E> = overall
+	for (let i = 0; i < path.length; i++) {
+		const seg = path[i]
+		if (!seg) {
+			logger.error("invalid feedback path segment", { index: i, pathLength: path.length, combinationId })
+			throw errors.new("invalid feedback path segment")
+		}
+		if (isLeaf(current)) {
+			logger.error("leaf encountered before end of path", { index: i, combinationId })
+			throw errors.new("leaf encountered before end of path")
+		}
+		const branch: { [key: string]: Leaf<E> | NestedNode<E> } = current[seg.responseIdentifier]
+		if (!branch) {
+			logger.error("invalid feedback path segment", {
+				index: i,
+				responseIdentifier: seg.responseIdentifier,
+				combinationId
+			})
+			throw errors.new("invalid feedback path segment")
+		}
+		const next: Leaf<E> | NestedNode<E> = branch[seg.key]
+		if (!next) {
+			logger.error("invalid feedback path key", { index: i, key: seg.key, combinationId })
+			throw errors.new("invalid feedback path key")
+		}
+		current = next
+	}
+	if (!isLeaf(current)) {
+		logger.error("expected leaf at end of path", { combinationId, pathLength: path.length })
+		throw errors.new("expected leaf at end of path")
+	}
+	return current.content
+}
 
 async function resolveRasterImages(envelope: AiContextEnvelope): Promise<ImageContext> {
 	const finalImageUrls: string[] = []
@@ -294,6 +368,127 @@ async function generateInteractionContent<
 	return validation.data
 }
 
+async function generateFeedbackForOutcomeNested<
+	C extends WidgetCollection<Record<string, WidgetDefinition<unknown, unknown>>, readonly string[]>
+>(
+	openai: OpenAI,
+	logger: logger.Logger,
+	envelope: AiContextEnvelope,
+	assessmentShell: AssessmentItemShell<WidgetTypeTupleFrom<C>>,
+	widgetCollection: C,
+	feedbackPlan: FeedbackPlan,
+	combination: FeedbackPlan["combinations"][0],
+	imageContext: ImageContext
+): Promise<{ id: string; content: BlockContent<WidgetTypeTupleFrom<C>> }> {
+	const { systemInstruction, userContent, SinglePathSchema } = createPerOutcomeNestedFeedbackPrompt(
+		envelope,
+		assessmentShell,
+		feedbackPlan,
+		combination,
+		widgetCollection,
+		imageContext
+	)
+
+	const jsonSchema = toJSONSchemaPromptSafe(SinglePathSchema)
+	const schemaByteLength = new TextEncoder().encode(JSON.stringify(jsonSchema)).length
+	logger.debug("generated json schema for openai feedback (shard)", {
+		functionName: "generateFeedbackForOutcomeNested",
+		combinationId: combination.id,
+		schemaByteLength
+	})
+
+	const params: ChatCompletionCreateParamsNonStreaming = {
+		model: OPENAI_MODEL,
+		messages: [
+			{ role: "system", content: systemInstruction },
+			{ role: "user", content: userContent }
+		],
+		response_format: {
+			type: "json_schema",
+			json_schema: { name: `feedback_${combination.id.toLowerCase()}`, schema: jsonSchema, strict: true }
+		},
+		stream: false
+	}
+
+	const result = await errors.try(openai.chat.completions.create(params))
+	if (result.error) {
+		logger.error("generate feedback shard", { combinationId: combination.id, error: result.error })
+		throw errors.wrap(result.error, `generate feedback shard for ${combination.id}`)
+	}
+
+	const choice = result.data.choices[0]
+	if (!choice?.message?.content) {
+		logger.error("openai feedback shard returned no content", { combinationId: combination.id })
+		throw errors.new(`empty ai response for feedback shard ${combination.id}`)
+	}
+	const messageContent = choice.message.content
+
+	const parsedResult = errors.trySync(() => JSON.parse(messageContent))
+	if (parsedResult.error) {
+		logger.error("feedback shard json parse", { combinationId: combination.id, error: parsedResult.error })
+		throw errors.wrap(parsedResult.error, `feedback shard json parse for ${combination.id}`)
+	}
+	const validated = SinglePathSchema.safeParse(parsedResult.data)
+	if (!validated.success) {
+		logger.error("feedback shard validation failed", { combinationId: combination.id, error: validated.error })
+		throw errors.wrap(validated.error, `feedback shard validation for ${combination.id}`)
+	}
+
+	const parsedContent = extractLeafContentAtPath<WidgetTypeTupleFrom<C>>(
+		validated.data,
+		combination.path,
+		combination.id
+	)
+	if (parsedContent.length === 0) {
+		logger.warn("feedback shard returned empty content array", { combinationId: combination.id })
+	}
+
+	return { id: combination.id, content: parsedContent }
+}
+
+async function runShardedFeedbackNested<
+	C extends WidgetCollection<Record<string, WidgetDefinition<unknown, unknown>>, readonly string[]>
+>(
+	openai: OpenAI,
+	logger: logger.Logger,
+	envelope: AiContextEnvelope,
+	shell: AssessmentItemShell<WidgetTypeTupleFrom<C>>,
+	collection: C,
+	plan: FeedbackPlan,
+	imageContext: ImageContext
+): Promise<Record<string, BlockContent<WidgetTypeTupleFrom<C>>>> {
+	const envLimit = Number.parseInt(process.env.QTI_FEEDBACK_CONCURRENCY ?? "", 10)
+	const concurrencyLimit = Number.isFinite(envLimit) && envLimit > 0 ? envLimit : 4
+
+	const tasks = plan.combinations.map(
+		(combination) => () =>
+			generateFeedbackForOutcomeNested(openai, logger, envelope, shell, collection, plan, combination, imageContext)
+	)
+
+	const results = await runWithConcurrency(tasks, concurrencyLimit)
+
+	const rejected = results.filter((r) => r.status === "rejected")
+	if (rejected.length > 0) {
+		const failureReasons = rejected.map((r) => ("reason" in r ? String(r.reason) : "unknown"))
+		logger.error("some feedback shards failed", {
+			failureCount: rejected.length,
+			totalCount: results.length,
+			reasons: failureReasons.slice(0, 3)
+		})
+		throw errors.new("one or more feedback shards failed to generate")
+	}
+
+	function isFulfilled<T>(r: PromiseSettledResult<T>): r is PromiseFulfilledResult<T> {
+		return r.status === "fulfilled"
+	}
+	const fulfilled = results.filter(isFulfilled)
+	const feedbackMap: Record<string, BlockContent<WidgetTypeTupleFrom<C>>> = {}
+	for (const r of fulfilled) {
+		feedbackMap[r.value.id] = r.value.content
+	}
+	return feedbackMap
+}
+
 export async function generateFromEnvelope<
 	C extends WidgetCollection<Record<string, WidgetDefinition<unknown, unknown>>, readonly string[]>
 >(
@@ -355,7 +550,11 @@ export async function generateFromEnvelope<
 		generatedInteractionKeys: Object.keys(generatedInteractions)
 	})
 
-	// Build the explicit feedback plan from interactions (this is the ONLY place we infer)
+	if (!assessmentShell.responseDeclarations || assessmentShell.responseDeclarations.length === 0) {
+		logger.error("assessment shell has no response declarations", { identifier: assessmentShell.identifier })
+		throw errors.new("assessment shell must have at least one response declaration")
+	}
+
 	const feedbackPlan = buildFeedbackPlanFromInteractions(generatedInteractions, assessmentShell.responseDeclarations)
 	logger.debug("built feedback plan", {
 		mode: feedbackPlan.mode,
@@ -363,71 +562,94 @@ export async function generateFromEnvelope<
 		combinationCount: feedbackPlan.combinations.length
 	})
 
-	// Shot 3 - Generate feedback using nested prompt and schema
-	const {
-		systemInstruction: feedbackSystem,
-		userContent: feedbackUser,
-		FeedbackSchema
-	} = createFeedbackPrompt(envelope, assessmentShell, feedbackPlan, imageContext, widgetCollection)
-
-	const feedbackJsonSchema = toJSONSchemaPromptSafe(FeedbackSchema)
-
-	// OBSERVABILITY: Log key schema metrics.
-	const schemaByteLength = new TextEncoder().encode(JSON.stringify(feedbackJsonSchema)).length
-	logger.debug("generated json schema for openai feedback", {
-		functionName: "generateFeedback",
-		schemaByteLength
+	logger.info("starting sharded feedback generation", {
+		combinationCount: feedbackPlan.combinations.length,
+		mode: feedbackPlan.mode
 	})
-	const feedbackParams: ChatCompletionCreateParamsNonStreaming = {
-		model: OPENAI_MODEL,
-		messages: [
-			{ role: "system", content: feedbackSystem },
-			{ role: "user", content: feedbackUser }
-		],
-		response_format: {
-			type: "json_schema",
-			json_schema: {
-				name: "feedback_generator",
-				schema: feedbackJsonSchema,
-				strict: true
+	const shardedResult = await errors.try(
+		runShardedFeedbackNested(openai, logger, envelope, assessmentShell, widgetCollection, feedbackPlan, imageContext)
+	)
+	if (shardedResult.error) {
+		logger.error("sharded feedback generation failed", { error: shardedResult.error })
+		throw errors.wrap(shardedResult.error, "sharded feedback generation")
+	}
+	const feedbackBlocks = shardedResult.data
+	logger.debug("sharded feedback generation complete", {
+		feedbackBlockCount: Object.keys(feedbackBlocks).length
+	})
+
+	let nestedFeedbackObject: { feedback: { FEEDBACK__OVERALL: unknown } }
+
+	if (feedbackPlan.mode === "fallback") {
+		const correct = feedbackBlocks.CORRECT
+		const incorrect = feedbackBlocks.INCORRECT
+		if (!correct || !incorrect) {
+			logger.error("missing fallback feedback content", {
+				hasCorrect: Boolean(correct),
+				hasIncorrect: Boolean(incorrect)
+			})
+			throw errors.new("missing fallback feedback content")
+		}
+		nestedFeedbackObject = {
+			feedback: {
+				FEEDBACK__OVERALL: {
+					CORRECT: { content: correct },
+					INCORRECT: { content: incorrect }
+				}
 			}
-		},
-		stream: false
-	}
-	const feedbackResult = await errors.try(openai.chat.completions.create(feedbackParams))
-	if (feedbackResult.error) {
-		logger.error("generate feedback", { error: feedbackResult.error })
-		throw errors.wrap(feedbackResult.error, "generate feedback")
+		}
+	} else {
+		const root: NestedNode<WidgetTypeTupleFrom<C>> = {}
+
+		for (const combination of feedbackPlan.combinations) {
+			const content = feedbackBlocks[combination.id]
+			if (!content) {
+				logger.error("missing content for combination in final assembly", { combinationId: combination.id })
+				throw errors.new(`missing feedback content for combination ${combination.id}`)
+			}
+			let currentNode: NestedNode<WidgetTypeTupleFrom<C>> = root
+			for (let i = 0; i < combination.path.length; i++) {
+				const segment = combination.path[i]
+				if (!segment) {
+					logger.error("invalid combination path segment during assembly", { combinationId: combination.id, index: i })
+					throw errors.new("invalid combination path segment")
+				}
+				const isLast = i === combination.path.length - 1
+				const branch = currentNode[segment.responseIdentifier] || {}
+				currentNode[segment.responseIdentifier] = branch
+				if (isLast) {
+					branch[segment.key] = { content }
+				} else {
+					const nextNode = branch[segment.key]
+					if (nextNode) {
+						if (isLeaf(nextNode)) {
+							logger.error("leaf encountered before end of path", { combinationId: combination.id, index: i })
+							throw errors.new("invalid feedback tree shape during assembly")
+						}
+						currentNode = nextNode
+					} else {
+						const emptyNode: NestedNode<WidgetTypeTupleFrom<C>> = {}
+						branch[segment.key] = emptyNode
+						currentNode = emptyNode
+					}
+				}
+			}
+		}
+
+		nestedFeedbackObject = { feedback: { FEEDBACK__OVERALL: root } }
 	}
 
-	const feedbackCompletion: ChatCompletion = feedbackResult.data
-	const feedbackChoice = feedbackCompletion.choices[0]
-	if (!feedbackChoice?.message?.content) {
-		logger.error("openai feedback generation returned no content")
-		throw errors.new("empty ai response: no content for feedback generation")
-	}
-	const feedbackContent = feedbackChoice.message.content
-
-	const feedbackParseResult = errors.trySync(() => JSON.parse(feedbackContent))
-	if (feedbackParseResult.error) {
-		logger.error("json parse", { error: feedbackParseResult.error })
-		throw errors.wrap(feedbackParseResult.error, "json parse")
-	}
-
-	// Validate nested feedback with the schema (compiler will handle conversion internally)
-	const feedbackValidation = FeedbackSchema.safeParse(feedbackParseResult.data)
+	// Validate nested feedback against the official schema to satisfy AssessmentItem type
+	const FeedbackObjectSchema = createFeedbackObjectSchema(feedbackPlan, widgetCollection.widgetTypeKeys)
+	const feedbackValidation = FeedbackObjectSchema.safeParse(nestedFeedbackObject.feedback)
 	if (!feedbackValidation.success) {
 		logger.error("nested feedback validation failed", { error: feedbackValidation.error })
 		throw errors.wrap(feedbackValidation.error, "nested feedback validation")
 	}
-	const validatedFeedback = feedbackValidation.data
-	logger.debug("shot 3 complete", { feedbackStructure: "nested" })
 
-	// Shot 4: Collect widget refs with types and generate widget content
-	// Note: widgets aren't allowed in feedback, so we only scan body and interactions
 	const widgetRefs = collectWidgetRefs({
 		body: assessmentShell.body,
-		feedback: null,
+		feedback: { FEEDBACK__OVERALL: feedbackValidation.data.FEEDBACK__OVERALL },
 		interactions: generatedInteractions
 	})
 
@@ -533,6 +755,6 @@ export async function generateFromEnvelope<
 		interactions: generatedInteractions,
 		widgets: generatedWidgets,
 		feedbackPlan,
-		feedback: validatedFeedback.feedback
+		feedback: feedbackValidation.data
 	}
 }
