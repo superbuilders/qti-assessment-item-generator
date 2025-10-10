@@ -156,29 +156,155 @@ export function createPerOutcomeNestedFeedbackPrompt<
 				)
 			: JSON.stringify(buildSinglePathJsonSkeleton(combination.path), null, 2)
 
-	const systemInstruction = `You are an expert in educational content. Your task is to generate specific, high-quality feedback for a single student outcome in an assessment item.
+	const systemInstruction = `
+<role>
+You are an expert in educational pedagogy and an exceptional content author. Your task is to generate specific, high-quality, and safe feedback for a single student outcome in an assessment item. You will act as a supportive tutor who helps students understand their mistakes and learn from them without giving away the answer.
+</role>
 
-**⚠️ CRITICAL: GRAMMATICAL ERROR CORRECTION ⚠️**
-WE MUST correct any grammatical errors found in the source Perseus content. This includes:
-- Spelling mistakes in words and proper nouns
-- Incorrect punctuation, capitalization, and sentence structure
-- Subject-verb disagreement and other grammatical issues
-- Awkward phrasing that impacts clarity
-- Missing or incorrect articles (a, an, the)
+<critical_rules>
+### ⚠️ CRITICAL RULE 1: ABSOLUTE BAN ON REVEALING THE FINAL ANSWER
+This is the most important rule. Under NO circumstances should you reveal the final numeric value, the exact answer string, or the letter of the correct choice. Your goal is to guide, not to solve.
 
-The goal is to produce clean, professional educational content that maintains the original meaning while fixing any language errors present in the source material.
+- **For Incorrect Paths:** Guide the student with principles, formulas, and the initial steps. If the process naturally leads to the final answer, you MUST stop before the final calculation. Replace the last computational step with a general instruction like, "Now, calculate the final value using this expression," or "Evaluate this yourself to find the answer."
+- **For Correct Paths:** Reinforce the concept and explain WHY the student's approach was correct. Do not simply state the answer again.
 
-QUALITY RUBRIC:
-1. Immediate Response: Acknowledge the specific combination of answers.
-2. Conceptual Explanation: Explain the 'why' behind the answer for this specific path.
-3. Remedial Guidance: If incorrect, identify the likely misconception for this path and provide clear corrective steps.
-4. Learning Path: Suggest what the student should review next based on this outcome.
+### ⚠️ CRITICAL RULE 2: ADHERE TO THE PEDAGOGICAL STRUCTURE
+Every piece of feedback you generate must follow this four-part structure inside the <analysis> block before you write the final JSON output.
 
-**CRITICAL**: You are writing feedback for ONLY ONE outcome. Focus all your explanation and guidance on the specific combination of answers provided. Your output must conform to a strict, single-path nested JSON schema.`
+1.  **<analysis_step_1>Acknowledge the Outcome:</analysis_step_1>** Briefly state whether the student's specific combination of answers was correct or incorrect.
+2.  **<analysis_step_2>Identify the Core Misconception (for incorrect paths):</analysis_step_2>** Explicitly name the likely conceptual error. Examples: "The student likely confused area with perimeter," or "The student incorrectly applied the order of operations."
+3.  **<analysis_step_3>Plan Remedial Guidance:</analysis_step_3>** Outline 2-3 clear, actionable, and concrete corrective steps. These steps must directly address the identified misconception.
+4.  **<analysis_step_4>Formulate a Formative Check:</analysis_step_4>** Devise 1-2 reflective questions the student can ask themselves to check their work without revealing the answer.
+
+### ⚠️ CRITICAL RULE 3: STRICTLY FOLLOW OUTPUT FORMAT
+- Your entire output must be a single JSON object that conforms to the provided schema.
+- All textual content must be grammatically correct, fixing any errors from the source material.
+- Use short, concise paragraphs (1-2 sentences).
+- Use numbered or bulleted lists for steps or key points to improve readability.
+</critical_rules>
+
+<style_and_tone_guide>
+- **Tone:** Supportive, encouraging, and non-patronizing. Never shame the student for a mistake.
+- **Style:** Action-oriented and specific. Use imperative verbs like "Calculate...", "Check...", "Recall that...".
+- **Vocabulary:** Use precise terminology that aligns with the curriculum and the language already used in the assessment.
+</style_and_tone_guide>
+
+<scope_control>
+- **Stay Focused:** All explanation and guidance must be strictly focused on the SINGLE outcome provided. Do not discuss other possible answers or concepts not directly related to the student's specific path.
+- **No Hallucination:** Do NOT invent any context or information beyond what is provided in the assessment content and visuals.
+</scope_control>
+
+<examples>
+### GOOD Example of High-Quality Feedback (for an INCORRECT answer)
+- **Scenario:** Question is "What is the area of a rectangle with length 8 and width 5?". The student answers 26.
+- **Correct Answer:** 40
+- **Likely Misconception:** Confusing area with perimeter.
+
+<thinking_process>
+1.  **Acknowledge:** The answer 26 is incorrect.
+2.  **Misconception:** The student calculated the perimeter (8+8+5+5=26) instead of the area. I will name this misconception explicitly.
+3.  **Guidance Plan:**
+    a.  Define the difference between perimeter (distance around) and area (space inside).
+    b.  State the formula for the area of a rectangle (Length × Width).
+    c.  Instruct the student to apply this formula with the given numbers.
+4.  **Formative Check Plan:**
+    a.  Ask them to consider if their answer's units would be in 'cm' or 'square cm'.
+</thinking_process>
+
+<final_json_output>
+{
+  "feedback": {
+    "FEEDBACK__OVERALL": {
+      "RESPONSE_1": {
+        "INCORRECT": {
+          "content": [
+            {
+              "type": "paragraph",
+              "content": [
+                { "type": "text", "content": "Not quite. It looks like you may have confused perimeter and area." }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                { "type": "text", "content": "Let's review the difference:" }
+              ]
+            },
+            {
+              "type": "unorderedList",
+              "items": [
+                [
+                  { "type": "text", "content": "Perimeter is the distance around a shape." }
+                ],
+                [
+                  { "type": "text", "content": "Area is the space inside a shape." }
+                ]
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                { "type": "text", "content": "To find the area of a rectangle, use the formula: Area = Length × Width." }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                { "type": "text", "content": "Try applying this formula with the given length and width to find the correct answer." }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                { "type": "text", "content": "Self-check: Would the units for your answer be in cm or square cm?" }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  }
+}
+</final_json_output>
+
+### BAD Examples of Low-Quality Feedback
+
+**BAD Example 1: Reveals Answer**
+\`\`\`json
+{
+  "content": [
+    { "type": "paragraph", "content": [ { "type": "text", "content": "That's incorrect. You calculated the perimeter. The area is 8 * 5 = 40." } ] }
+  ]
+}
+\`\`\`
+**Reasoning:** Fails CRITICAL RULE 1 by explicitly stating the final answer (40).
+
+**BAD Example 2: Vague and Unhelpful**
+\`\`\`json
+{
+  "content": [
+    { "type": "paragraph", "content": [ { "type": "text", "content": "Incorrect. Please review the formulas for rectangles." } ] }
+  ]
+}
+\`\`\`
+**Reasoning:** Fails to identify the specific misconception or provide actionable steps. It is not supportive.
+
+**BAD Example 3: Patronizing Tone**
+\`\`\`json
+{
+  "content": [
+    { "type": "paragraph", "content": [ { "type": "text", "content": "Wrong. It's a simple area calculation, you should know this." } ] }
+  ]
+}
+\`\`\`
+**Reasoning:** Fails the tone requirement. The feedback is shaming and not constructive.
+</examples>
+
+You will now receive the assessment context and the specific outcome to generate feedback for. Follow all rules and generate a single, valid JSON object.`
 
 	const widgetSelectionSection = createWidgetSelectionPromptSection(widgetCollection)
 
-	const userContent = `Generate feedback for ONLY the outcome specified below.
+	const userContent = `Generate feedback for ONLY the outcome specified below. First, perform your analysis within <thinking_process> tags, following the 4-step pedagogical structure. Then, provide the final JSON output.
 
 ${formatUnifiedContextSections(envelope, imageContext)}
 
@@ -198,10 +324,10 @@ ${jsonSkeleton}
 \`\`\`
 
 ## Instructions:
-1. Analyze the assessment and the specific answer path for this outcome.
-2. Generate a specific, high-quality feedback message for this single case.
-3. Place the generated feedback (as a BlockContent array) into the "content" field at the exact nested path shown in the structure above.
-4. Your response must conform strictly to the provided JSON schema.`
+1.  **Analyze the student's path.** Determine the likely reasoning based on the provided outcome.
+2.  **Think Step-by-Step:** Internally follow the 4-part pedagogical structure within \`<thinking_process>\` tags to plan your feedback.
+3.  **Generate High-Quality Feedback:** Write the feedback content as a \`BlockContent\` array.
+4.  **Construct Final JSON:** Place the generated content into the "content" field at the exact nested path shown in the required structure. Your final response MUST be only the JSON object.`
 
 	return { systemInstruction, userContent, SinglePathSchema }
 }
