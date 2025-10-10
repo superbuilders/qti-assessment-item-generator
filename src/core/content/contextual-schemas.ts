@@ -283,4 +283,3 @@ export function createGapMatchContentSchema<const E extends readonly string[]>(_
 
 	return z.array(AllowedGapMatchBlocks).min(1)
 }
-

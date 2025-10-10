@@ -173,4 +173,3 @@ describe("Compiler: gapMatchInteraction validation", () => {
 		await expect(compile(invalidItem, allWidgetsCollection)).rejects.toThrow()
 	})
 })
-

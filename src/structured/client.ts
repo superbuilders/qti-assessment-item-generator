@@ -427,7 +427,7 @@ export async function generateFromEnvelope<
 	// Note: widgets aren't allowed in feedback, so we only scan body and interactions
 	const widgetRefs = collectWidgetRefs({
 		body: assessmentShell.body,
-		feedbackBlocks: null,
+		feedback: null,
 		interactions: generatedInteractions
 	})
 

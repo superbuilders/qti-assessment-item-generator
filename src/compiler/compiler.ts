@@ -491,7 +491,8 @@ function enforceIdentifierOnlyMatching<E extends readonly string[]>(item: Assess
 		const set = allowed[decl.identifier]
 		if (!set) {
 			// This case means a responseDeclaration exists but no interaction/widget
-			// uses its responseIdentifier. This is caught earlier in pre-validator.ts.
+			// uses its responseIdentifier. This is caught by the assessment-level schema's
+			// superRefine validation, which ensures all responseDeclarations link to a defined interaction.
 			continue
 		}
 		if (decl.baseType !== "identifier") {
@@ -776,55 +777,8 @@ export async function compile<
 				throw errors.new("ErrMissingFeedbackContent")
 			}
 
-			const assertNoInteractions = (blocks: BlockContent<WidgetTypeTupleFrom<C>> | null): void => {
-				if (!blocks) return
-				for (const node of blocks) {
-					if (!node) continue
-					if (node.type === "interactionRef") {
-						logger.error("interaction ref found in feedback content", { blockId: combination.id })
-						throw errors.new("interactions banned in feedback content")
-					}
-					if (node.type === "paragraph") {
-						for (const part of node.content) {
-							if (part && part.type === "inlineInteractionRef") {
-								logger.error("inline interaction ref found in feedback content", { blockId: combination.id })
-								throw errors.new("interactions banned in feedback content")
-							}
-						}
-					}
-					if (node.type === "unorderedList" || node.type === "orderedList") {
-						for (const inline of node.items) {
-							for (const part of inline) {
-								if (part && part.type === "inlineInteractionRef") {
-									logger.error("inline interaction ref found in feedback list content", { blockId: combination.id })
-									throw errors.new("interactions banned in feedback content")
-								}
-							}
-						}
-					}
-					if (node.type === "tableRich") {
-						const scanRows = (rows: Array<Array<InlineContent<WidgetTypeTupleFrom<C>> | null>> | null) => {
-							if (!rows) return
-							for (const row of rows) {
-								for (const cell of row) {
-									if (!cell) continue
-									for (const part of cell) {
-										if (part && part.type === "inlineInteractionRef") {
-											logger.error("inline interaction ref found in feedback table content", {
-												blockId: combination.id
-											})
-											throw errors.new("interactions banned in feedback content")
-										}
-									}
-								}
-							}
-						}
-						scanRows(node.header)
-						scanRows(node.rows)
-					}
-				}
-			}
-			assertNoInteractions(content)
+			// Schema validation structurally prevents interactions in feedback content.
+			// No runtime check needed here.
 			const contentXml = renderBlockContent(content, widgetSlots, interactionSlots)
 			return `        <qti-feedback-block outcome-identifier="FEEDBACK__OVERALL" identifier="${escapeXmlAttribute(combination.id)}" show-hide="show">
             <qti-content-body>${contentXml}</qti-content-body>

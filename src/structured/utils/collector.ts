@@ -1,6 +1,12 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import type { BlockContent, InlineContent } from "@/core/content"
+import type {
+	AuthoringFeedbackOverall,
+	AuthoringNestedLeaf,
+	AuthoringNestedNode
+} from "@/core/feedback/authoring/types"
+import type { FeedbackPlan } from "@/core/feedback/plan"
 import type { AnyInteraction } from "@/core/interactions"
 
 function walkInline<E extends readonly string[]>(inline: InlineContent<E> | null, out: Map<string, string>): void {
@@ -99,25 +105,70 @@ function walkInteractions<E extends readonly string[]>(
 	}
 }
 
+function isLeafNode<E extends readonly string[]>(
+	node: AuthoringNestedLeaf<E> | AuthoringNestedNode<FeedbackPlan, E>
+): node is AuthoringNestedLeaf<E> {
+	return "content" in node
+}
+
+function walkFeedbackNode<E extends readonly string[]>(
+	node: AuthoringNestedLeaf<E> | AuthoringNestedNode<FeedbackPlan, E>,
+	out: Map<string, string>
+): void {
+	if (isLeafNode(node)) {
+		walkBlock(node.content, out)
+		return
+	}
+
+	const branchNode = node
+	for (const responseNode of Object.values(branchNode)) {
+		for (const keyNode of Object.values(responseNode)) {
+			walkFeedbackNode(keyNode, out)
+		}
+	}
+}
+
+function isFallbackFeedback<E extends readonly string[]>(
+	overall: AuthoringFeedbackOverall<FeedbackPlan, E>
+): overall is { CORRECT: AuthoringNestedLeaf<E>; INCORRECT: AuthoringNestedLeaf<E> } {
+	return "CORRECT" in overall && "INCORRECT" in overall
+}
+
+function walkFeedbackOverall<E extends readonly string[]>(
+	overall: AuthoringFeedbackOverall<FeedbackPlan, E>,
+	out: Map<string, string>
+): void {
+	if (isFallbackFeedback(overall)) {
+		walkBlock(overall.CORRECT.content, out)
+		walkBlock(overall.INCORRECT.content, out)
+		return
+	}
+
+	const comboFeedback = overall
+	for (const responseNode of Object.values(comboFeedback)) {
+		for (const keyNode of Object.values(responseNode)) {
+			walkFeedbackNode(keyNode, out)
+		}
+	}
+}
+
 /**
  * Collects all widget references with their types from every location within an assessment item structure.
- * This includes the body, feedback blocks, interactions (prompts, choices, gap texts), and any nested inline content.
+ * This includes the body, nested feedback object, interactions (prompts, choices, gap texts), and any nested inline content.
  *
  * @param item - An object conforming to the structure of an AssessmentItemInput.
  * @returns A Map from widgetId to widgetType. Throws if the same widgetId has conflicting types.
  */
 export function collectWidgetRefs<E extends readonly string[]>(item: {
 	body: BlockContent<E> | null
-	feedbackBlocks: Record<string, BlockContent<E>> | null
+	feedback: { FEEDBACK__OVERALL: AuthoringFeedbackOverall<FeedbackPlan, E> } | null
 	interactions: Record<string, AnyInteraction<E>> | null
 }): Map<string, string> {
 	const out = new Map<string, string>()
 
 	walkBlock(item.body, out)
-	if (item.feedbackBlocks) {
-		for (const content of Object.values(item.feedbackBlocks)) {
-			walkBlock(content, out)
-		}
+	if (item.feedback) {
+		walkFeedbackOverall(item.feedback.FEEDBACK__OVERALL, out)
 	}
 	walkInteractions(item.interactions, out)
 
@@ -125,11 +176,11 @@ export function collectWidgetRefs<E extends readonly string[]>(item: {
 }
 
 /**
- * Legacy function for backward compatibility - collects just the IDs
+ * Collects just the widget IDs from an assessment item.
  */
 export function collectAllWidgetSlotIds<E extends readonly string[]>(item: {
 	body: BlockContent<E> | null
-	feedbackBlocks: Record<string, BlockContent<E>> | null
+	feedback: { FEEDBACK__OVERALL: AuthoringFeedbackOverall<FeedbackPlan, E> } | null
 	interactions: Record<string, AnyInteraction<E>> | null
 }): string[] {
 	const refs = collectWidgetRefs(item)

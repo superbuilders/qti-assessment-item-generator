@@ -135,7 +135,7 @@ ${createWidgetSelectionPromptSection(subsetCollection)}
 ## Instructions:
 - **Analyze Images**: Use the raster images provided to your vision and the raw SVG content above to understand the visual components of widgets.
 - For each entry in the widget mapping, generate a fully-formed widget object of the specified type.
-- **Note on Widget Usage**: Some widgets may be used only in feedbackBlocks rather than the main body. Generate these widgets identically to body widgets - the same quality standards and no-answer-leakage rules apply.
+- **Note on Widget Usage**: Some widgets may be used only in feedback (nested) rather than the main body. Generate these widgets identically to body widgets - the same quality standards and no-answer-leakage rules apply.
 - **Use Interaction Context**: You MUST use the "Interaction Content" object to understand the full question. This context is critical for generating correct data for widgets that appear within choices. For example, the interaction's prompt will tell you what the correct values on a number line widget should be.
 - Extract all relevant data from the Perseus JSON to populate the widget properties.
 - **CRITICAL: PRESERVE ALL LABELS AND VALUES FROM PERSEUS EXACTLY** - When Perseus describes labels, markers, values, or any visual properties (in alt text, descriptions, or widget options), you MUST copy them EXACTLY. Missing or changing labels can make questions impossible to answer.
