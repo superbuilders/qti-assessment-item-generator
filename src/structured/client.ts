@@ -39,38 +39,61 @@ interface NestedNode<E extends readonly string[]> {
 }
 type Overall<E extends readonly string[]> = NestedNode<E> | { CORRECT: Leaf<E>; INCORRECT: Leaf<E> }
 type FeedbackPayload<E extends readonly string[]> = { feedback: { FEEDBACK__OVERALL: Overall<E> } }
+// For fallback shards: exactly one key is present per shard (CORRECT or INCORRECT)
+type FallbackSinglePayload<E extends readonly string[]> = {
+	feedback: { FEEDBACK__OVERALL: { CORRECT?: Leaf<E>; INCORRECT?: Leaf<E> } }
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+	return typeof value === "object" && value !== null
+}
 
 function isLeaf<E extends readonly string[]>(v: Leaf<E> | NestedNode<E>): v is Leaf<E> {
 	return Object.hasOwn(v, "content")
 }
 
-function isFallbackOverall<E extends readonly string[]>(v: Overall<E>): v is { CORRECT: Leaf<E>; INCORRECT: Leaf<E> } {
-	return typeof v === "object" && v !== null && Object.hasOwn(v, "CORRECT") && Object.hasOwn(v, "INCORRECT")
+function isNestedNode<E extends readonly string[]>(v: unknown): v is NestedNode<E> {
+	if (!isRecord(v)) return false
+	if ("content" in v) return false
+	const keys = Object.keys(v)
+	// Consider it a nested node if it has at least one key that is not CORRECT/INCORRECT
+	return keys.some((k) => k !== "CORRECT" && k !== "INCORRECT")
 }
 
 function extractLeafContentAtPath<E extends readonly string[]>(
-	data: FeedbackPayload<E>,
+	data: FeedbackPayload<E> | FallbackSinglePayload<E>,
 	path: AssessmentItemInput<E>["feedbackPlan"]["combinations"][0]["path"],
 	combinationId: string
 ): BlockContent<E> {
 	const overall = data.feedback.FEEDBACK__OVERALL
 	if (path.length === 0) {
-		if (!isFallbackOverall(overall)) {
-			logger.error("expected fallback overall shape", { combinationId, pathLength: path.length })
-			throw errors.new("expected fallback overall shape")
-		}
+		// Fallback mode: require only the targeted key
 		if (combinationId !== "CORRECT" && combinationId !== "INCORRECT") {
 			logger.error("invalid fallback combination id", { combinationId })
 			throw errors.new("invalid fallback combination id")
 		}
-		return overall[combinationId].content
+		const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null
+		if (!isRecord(overall)) {
+			logger.error("fallback overall is not an object", { combinationId })
+			throw errors.new("expected fallback overall object")
+		}
+		const targeted = overall[combinationId]
+		const hasBlockContent = (v: unknown): v is { content: BlockContent<E> } => isRecord(v) && "content" in v
+		if (!hasBlockContent(targeted)) {
+			logger.error("missing targeted fallback key in shard response", {
+				combinationId,
+				availableKeys: Object.keys(overall)
+			})
+			throw errors.new("missing targeted fallback key")
+		}
+		return targeted.content
 	}
 
-	if (isFallbackOverall(overall)) {
+	if (!isNestedNode<E>(overall)) {
 		logger.error("unexpected fallback shape for combo path", { combinationId, pathLength: path.length })
 		throw errors.new("unexpected fallback shape for combo path")
 	}
-	let current: Leaf<E> | NestedNode<E> = overall
+	let current: NestedNode<E> | Leaf<E> = overall
 	for (let i = 0; i < path.length; i++) {
 		const seg = path[i]
 		if (!seg) {
@@ -446,6 +469,29 @@ async function generateFeedbackForOutcomeNested<
 	return { id: combination.id, content: parsedContent }
 }
 
+/**
+ * Promotes a partial record of feedback content to a total record, ensuring both
+ * CORRECT and INCORRECT keys are present. Throws an error if either is missing.
+ * This function acts as a strict type guard at the assembly stage.
+ */
+function promoteFallback<E extends readonly string[]>(
+	parts: Partial<Record<"CORRECT" | "INCORRECT", BlockContent<E>>>
+): Record<"CORRECT" | "INCORRECT", BlockContent<E>> {
+	const correct = parts.CORRECT
+	const incorrect = parts.INCORRECT
+
+	if (!correct || !incorrect) {
+		const context = {
+			hasCorrect: Boolean(correct),
+			hasIncorrect: Boolean(incorrect)
+		}
+		logger.error("missing required fallback feedback content", context)
+		throw errors.new("missing required fallback feedback content")
+	}
+
+	return { CORRECT: correct, INCORRECT: incorrect }
+}
+
 async function runShardedFeedbackNested<
 	C extends WidgetCollection<Record<string, WidgetDefinition<unknown, unknown>>, readonly string[]>
 >(
@@ -581,20 +627,13 @@ export async function generateFromEnvelope<
 	let nestedFeedbackObject: { feedback: { FEEDBACK__OVERALL: unknown } }
 
 	if (feedbackPlan.mode === "fallback") {
-		const correct = feedbackBlocks.CORRECT
-		const incorrect = feedbackBlocks.INCORRECT
-		if (!correct || !incorrect) {
-			logger.error("missing fallback feedback content", {
-				hasCorrect: Boolean(correct),
-				hasIncorrect: Boolean(incorrect)
-			})
-			throw errors.new("missing fallback feedback content")
-		}
+		// Use promoteFallback for typed promotion from partial to total
+		const promotedContent = promoteFallback(feedbackBlocks)
 		nestedFeedbackObject = {
 			feedback: {
 				FEEDBACK__OVERALL: {
-					CORRECT: { content: correct },
-					INCORRECT: { content: incorrect }
+					CORRECT: { content: promotedContent.CORRECT },
+					INCORRECT: { content: promotedContent.INCORRECT }
 				}
 			}
 		}

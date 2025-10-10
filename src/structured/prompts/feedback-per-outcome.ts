@@ -19,6 +19,11 @@ interface NestedNode<E extends readonly string[]> {
 type Overall<E extends readonly string[]> = NestedNode<E> | { CORRECT: Leaf<E>; INCORRECT: Leaf<E> }
 type FeedbackPayload<E extends readonly string[]> = { feedback: { FEEDBACK__OVERALL: Overall<E> } }
 
+// For fallback shards: exactly one key is present per shard (CORRECT or INCORRECT)
+type FallbackSinglePayload<E extends readonly string[]> = {
+	feedback: { FEEDBACK__OVERALL: { CORRECT?: Leaf<E>; INCORRECT?: Leaf<E> } }
+}
+
 /**
  * Builds a single-path nested Zod schema for a specific feedback combination.
  * This schema ONLY includes the target keys at each level, completely avoiding enum explosion.
@@ -107,25 +112,20 @@ export function createPerOutcomeNestedFeedbackPrompt<
 ): {
 	systemInstruction: string
 	userContent: string
-	SinglePathSchema: z.ZodType<FeedbackPayload<WidgetTypeTupleFrom<C>>>
+	SinglePathSchema: z.ZodType<FeedbackPayload<WidgetTypeTupleFrom<C>> | FallbackSinglePayload<WidgetTypeTupleFrom<C>>>
 } {
 	const ContentSchema: z.ZodType<BlockContent<WidgetTypeTupleFrom<C>>> = createFeedbackContentSchema(
 		widgetCollection.widgetTypeKeys
 	)
 
-	let SinglePathSchema: z.ZodType<FeedbackPayload<WidgetTypeTupleFrom<C>>>
+	let SinglePathSchema: z.ZodType<
+		FeedbackPayload<WidgetTypeTupleFrom<C>> | FallbackSinglePayload<WidgetTypeTupleFrom<C>>
+	>
 	if (feedbackPlan.mode === "fallback") {
 		const LeafSchema: z.ZodType<Leaf<WidgetTypeTupleFrom<C>>> = z.object({ content: ContentSchema }).strict()
-		const FallbackOverall: z.ZodType<{
-			CORRECT: Leaf<WidgetTypeTupleFrom<C>>
-			INCORRECT: Leaf<WidgetTypeTupleFrom<C>>
-		}> = z
-			.object({
-				CORRECT: LeafSchema,
-				INCORRECT: LeafSchema
-			})
-			.strict()
-		SinglePathSchema = z.object({ feedback: z.object({ FEEDBACK__OVERALL: FallbackOverall }).strict() }).strict()
+		// Single-key schema: only the targeted key (CORRECT or INCORRECT) is required per shard
+		const TargetedOverall = z.object({ [combination.id]: LeafSchema }).strict()
+		SinglePathSchema = z.object({ feedback: z.object({ FEEDBACK__OVERALL: TargetedOverall }).strict() }).strict()
 	} else {
 		const LeafSchema: z.ZodType<Leaf<WidgetTypeTupleFrom<C>>> = z.object({ content: ContentSchema }).strict()
 		const SinglePathOverall: z.ZodType<NestedNode<WidgetTypeTupleFrom<C>>> = buildSinglePathOverallSchema<

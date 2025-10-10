@@ -88,15 +88,13 @@ describe("Feedback Generation Sharding", () => {
 		mockResponses.feedback_correct = () => ({
 			feedback: {
 				FEEDBACK__OVERALL: {
-					CORRECT: { content: [{ type: "paragraph", content: [{ type: "text", content: "Correct" }] }] },
-					INCORRECT: { content: [] }
+					CORRECT: { content: [{ type: "paragraph", content: [{ type: "text", content: "Correct" }] }] }
 				}
 			}
 		})
 		mockResponses.feedback_incorrect = () => ({
 			feedback: {
 				FEEDBACK__OVERALL: {
-					CORRECT: { content: [] },
 					INCORRECT: { content: [{ type: "paragraph", content: [{ type: "text", content: "Incorrect" }] }] }
 				}
 			}
@@ -302,8 +300,7 @@ describe("Feedback Generation Sharding", () => {
 		mockResponses.feedback_correct = () => ({
 			feedback: {
 				FEEDBACK__OVERALL: {
-					CORRECT: { content: [{ type: "paragraph", content: [{ type: "text", content: "Correct" }] }] },
-					INCORRECT: { content: [] }
+					CORRECT: { content: [{ type: "paragraph", content: [{ type: "text", content: "Correct" }] }] }
 				}
 			}
 		})
@@ -311,7 +308,6 @@ describe("Feedback Generation Sharding", () => {
 		mockResponses.feedback_incorrect = () => ({
 			feedback: {
 				FEEDBACK__OVERALL: {
-					CORRECT: { content: [] },
 					INCORRECT: { content: [] }
 				}
 			}
