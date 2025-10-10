@@ -1,7 +1,3 @@
-Of course. Here is the revised `README.md` that removes the documentation for the helper builders and focuses exclusively on the direct `AiContextEnvelope` workflow, as requested.
-
----
-
 # @superbuilders/qti-assessment-item-generator
 
 A robust toolkit for generating and compiling QTI 3.0 assessment items from various sources using a structured AI pipeline.
