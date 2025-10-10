@@ -1,7 +1,7 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import type OpenAI from "openai"
-import type { ChatCompletion, ChatCompletionCreateParamsNonStreaming } from "openai/resources/chat/completions"
+import type { ChatCompletionCreateParamsNonStreaming } from "openai/resources/chat/completions"
 import { z } from "zod"
 import type { BlockContent, InlineContent } from "@/core/content"
 import type { AssessmentItemInput, ResponseDeclaration } from "@/core/item"
@@ -22,7 +22,7 @@ import { createAssessmentShellPrompt } from "./prompts/shell"
 import { createWidgetContentPrompt } from "./prompts/widgets"
 import type { AiContextEnvelope, ImageContext } from "./types"
 import { collectWidgetRefs } from "./utils/collector"
-import { runWithConcurrency } from "./utils/concurrency"
+import { callOpenAIWithRetry } from "./utils/openai"
 
 const OPENAI_MODEL = "gpt-5"
 const MAX_IMAGES_PER_REQUEST = 500
@@ -209,15 +209,9 @@ async function generateAssessmentShell<
 		},
 		stream: false
 	}
-	const response = await errors.try(openai.chat.completions.create(params))
-	if (response.error) {
-		logger.error("ai shell generation", {
-			error: response.error
-		})
-		throw errors.wrap(response.error, "ai shell generation")
-	}
-
-	const completion: ChatCompletion = response.data
+	const completion = await callOpenAIWithRetry("generateAssessmentShell", () =>
+		openai.chat.completions.create(params)
+	)
 	const choice = completion.choices[0]
 	if (!choice) {
 		logger.error("openai returned no choices")
@@ -362,13 +356,9 @@ async function generateInteractionContent<
 		},
 		stream: false
 	}
-	const response = await errors.try(openai.chat.completions.create(params))
-	if (response.error) {
-		logger.error("ai interaction generation", { error: response.error })
-		throw errors.wrap(response.error, "ai interaction generation")
-	}
-
-	const completion: ChatCompletion = response.data
+	const completion = await callOpenAIWithRetry("generateInteractionContent", () =>
+		openai.chat.completions.create(params)
+	)
 	const choice = completion.choices[0]
 	if (!choice?.message?.content) {
 		logger.error("openai interaction generation returned no content")
@@ -428,18 +418,16 @@ async function generateFeedbackForOutcomeNested<
 		],
 		response_format: {
 			type: "json_schema",
-			json_schema: { name: `feedback_${combination.id.toLowerCase()}`, schema: jsonSchema, strict: true }
+			json_schema: { name: "feedback", schema: jsonSchema, strict: true }
 		},
 		stream: false
 	}
 
-	const result = await errors.try(openai.chat.completions.create(params))
-	if (result.error) {
-		logger.error("generate feedback shard", { combinationId: combination.id, error: result.error })
-		throw errors.wrap(result.error, `generate feedback shard for ${combination.id}`)
-	}
+	const completion = await callOpenAIWithRetry("generateFeedbackForOutcomeNested", () =>
+		openai.chat.completions.create(params)
+	)
 
-	const choice = result.data.choices[0]
+	const choice = completion.choices[0]
 	if (!choice?.message?.content) {
 		logger.error("openai feedback shard returned no content", { combinationId: combination.id })
 		throw errors.new(`empty ai response for feedback shard ${combination.id}`)
@@ -503,36 +491,60 @@ async function runShardedFeedbackNested<
 	plan: FeedbackPlan,
 	imageContext: ImageContext
 ): Promise<Record<string, BlockContent<WidgetTypeTupleFrom<C>>>> {
-	const envLimit = Number.parseInt(process.env.QTI_FEEDBACK_CONCURRENCY ?? "", 10)
-	const concurrencyLimit = Number.isFinite(envLimit) && envLimit > 0 ? envLimit : 4
+	let combinationsToProcess = [...plan.combinations]
+	const successfulShards: Record<string, BlockContent<WidgetTypeTupleFrom<C>>> = {}
+	let pass = 0
 
-	const tasks = plan.combinations.map(
-		(combination) => () =>
-			generateFeedbackForOutcomeNested(openai, logger, envelope, shell, collection, plan, combination, imageContext)
-	)
-
-	const results = await runWithConcurrency(tasks, concurrencyLimit)
-
-	const rejected = results.filter((r) => r.status === "rejected")
-	if (rejected.length > 0) {
-		const failureReasons = rejected.map((r) => ("reason" in r ? String(r.reason) : "unknown"))
-		logger.error("some feedback shards failed", {
-			failureCount: rejected.length,
-			totalCount: results.length,
-			reasons: failureReasons.slice(0, 3)
+	while (combinationsToProcess.length > 0) {
+		pass++
+		logger.info("starting feedback shard generation pass", {
+			pass,
+			remaining: combinationsToProcess.length,
+			total: plan.combinations.length
 		})
-		throw errors.new("one or more feedback shards failed to generate")
+
+		const tasks = combinationsToProcess.map(
+			(combination) => () =>
+				generateFeedbackForOutcomeNested(openai, logger, envelope, shell, collection, plan, combination, imageContext)
+		)
+
+		const results = await Promise.allSettled(tasks.map((task) => task()))
+
+		const failedCombinations: typeof combinationsToProcess = []
+
+		for (let index = 0; index < results.length; index++) {
+			const result = results[index]
+			const combination = combinationsToProcess[index]
+			if (!combination) {
+				continue
+			}
+			if (result.status === "fulfilled") {
+				const { id, content } = result.value
+				if (content && content.length > 0) {
+					successfulShards[id] = content
+				} else {
+					logger.warn("feedback shard returned empty content, will retry", { combinationId: id, pass })
+					failedCombinations.push(combination)
+				}
+			} else {
+				logger.warn("feedback shard failed, scheduling for retry", {
+					combinationId: combination.id,
+					pass,
+					reason: result.reason
+				})
+				failedCombinations.push(combination)
+			}
+		}
+
+		if (failedCombinations.length > 0 && failedCombinations.length === combinationsToProcess.length) {
+			logger.warn("no progress in feedback shard generation pass, retrying all", { pass })
+		}
+
+		combinationsToProcess = failedCombinations
 	}
 
-	function isFulfilled<T>(r: PromiseSettledResult<T>): r is PromiseFulfilledResult<T> {
-		return r.status === "fulfilled"
-	}
-	const fulfilled = results.filter(isFulfilled)
-	const feedbackMap: Record<string, BlockContent<WidgetTypeTupleFrom<C>>> = {}
-	for (const r of fulfilled) {
-		feedbackMap[r.value.id] = r.value.content
-	}
-	return feedbackMap
+	logger.info("all feedback shards generated successfully", { totalPasses: pass })
+	return successfulShards
 }
 
 export async function generateFromEnvelope<
@@ -749,13 +761,9 @@ export async function generateFromEnvelope<
 			},
 			stream: false
 		}
-		const widgetsResponse = await errors.try(openai.chat.completions.create(widgetParams))
-		if (widgetsResponse.error) {
-			logger.error("generate widget content", { error: widgetsResponse.error })
-			throw errors.wrap(widgetsResponse.error, "ai widget generation")
-		}
-
-		const widgetCompletion: ChatCompletion = widgetsResponse.data
+		const widgetCompletion = await callOpenAIWithRetry("generateWidgetContent", () =>
+			openai.chat.completions.create(widgetParams)
+		)
 		const wChoice = widgetCompletion.choices[0]
 		if (!wChoice?.message?.content) {
 			logger.error("widget generation returned no content")

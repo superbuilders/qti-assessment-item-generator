@@ -1,7 +1,7 @@
 import * as errors from "@superbuilders/errors"
 import type * as logger from "@superbuilders/slog"
 import type OpenAI from "openai"
-import type { ChatCompletion, ChatCompletionCreateParamsNonStreaming } from "openai/resources/chat/completions"
+import type { ChatCompletionCreateParamsNonStreaming } from "openai/resources/chat/completions"
 import { z } from "zod"
 import { type AssessmentItemInput, createDynamicAssessmentItemSchema } from "@/core/item"
 import { toJSONSchemaPromptSafe } from "@/core/json-schema"
@@ -9,6 +9,7 @@ import type { WidgetCollection, WidgetDefinition, WidgetTypeTupleFrom } from "@/
 import { allWidgetSchemas, type Widget, WidgetSchema } from "@/widgets/registry"
 import { transformArraysToObjects, transformObjectsToArrays } from "./utils/shape-helpers"
 import { generateZodSchemaFromObject } from "./utils/zod-runtime-generator"
+import { callOpenAIWithRetry } from "./utils/openai"
 
 const OPENAI_MODEL = "gpt-5"
 
@@ -376,13 +377,9 @@ async function planContentDifferentiation<const E extends readonly string[]>(
 		},
 		stream: false
 	}
-	const result = await errors.try(openai.chat.completions.create(params))
-	if (result.error) {
-		logger.error("openai differentiation planning call failed", { error: result.error })
-		throw errors.wrap(result.error, "ai differentiation planning")
-	}
-
-	const completion: ChatCompletion = result.data
+	const completion = await callOpenAIWithRetry("planContentDifferentiation", () =>
+		openai.chat.completions.create(params)
+	)
 	const choice = completion.choices[0]
 	if (!choice?.message?.content) {
 		logger.error("openai planning call returned no content")
@@ -562,14 +559,10 @@ async function regenerateWidgetsViaLLM<const E extends readonly string[]>(
 		},
 		stream: false
 	}
-	const llmResult = await errors.try(openai.chat.completions.create(params))
-	if (llmResult.error) {
-		logger.error("openai widget generation call failed", { error: llmResult.error })
-		throw errors.wrap(llmResult.error, "ai widget generation")
-	}
+	const completion = await callOpenAIWithRetry("regenerateWidgetsViaLLM", () =>
+		openai.chat.completions.create(params)
+	)
 	logger.info("openai widget generation completed")
-
-	const completion: ChatCompletion = llmResult.data
 	const choice = completion.choices[0]
 	if (!choice?.message?.content) {
 		logger.error("openai widget generation returned no content")

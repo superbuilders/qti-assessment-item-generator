@@ -1,232 +1,136 @@
-# QTI AI Batch Generation Post‑Mortem (staar-batch-generate)
+## STAAR Batch Generation Post-Mortem (staar-batch-generate.ts)
 
-## Overview
+This document summarizes failures observed in `data/logs.txt` from a run of `scripts/staar-batch-generate.ts`, identifies root causes by reading the code paths, and lists concrete fixes.
 
-This report analyzes all errors emitted during the latest batch run of the `staar-batch-generate.ts` script, using evidence from `data/logs.txt`, and maps each error to root causes in code with precise citations. It concludes with a prioritized fix list.
+### Scope and Evidence
 
-## Error Inventory and Evidence
+- Script: `scripts/staar-batch-generate.ts`
+- Collection: `teks-math-4`
+- Inputs: `teks-staar-scrape/staar_test_scrape/question_XX/`
+- Outputs present in `data/`: compiled/structured for many items; missing for others.
+- Log excerpts indicate nine failures; representative lines:
+  - `generate assessment shell: ai shell generation: Request timed out.`
+  - `sharded feedback generation: one or more feedback shards failed to generate`
+  - `missing feedback content for combination FB__...`
+  - `generate feedback shard ... 400 Invalid 'response_format.json_schema.name': string too long ...`
 
-### 1) OpenAI structured output schema errors: widget_content_generator (400)
+### Failure Categories and Root Causes
 
-Representative log entries:
-```2556:2561:data/logs.txt
-DEBUG generated json schema for openai functionName=generateWidgetContent generatorName=widget_content_generator schema={...}
-ERROR generate widget content error=Error: 400 Invalid schema for response_format 'widget_content_generator': In context=('additionalProperties', 'anyOf', '0', 'anyOf', '14'), 'required' is required to be supplied and to be an array including every key in properties. Missing 'shapes'.
-ERROR failed to generate structured item from envelope questionDir=question_15 ... error=ai widget generation: 400 Invalid schema for response_format 'widget_content_generator': ... Missing 'shapes'.
-ERROR question processing failed questionDir=question_15 ... error=generate from envelope: ai widget generation: 400 Invalid schema ... Missing 'shapes'.
-```
-Additional occurrences for other questions:
-```2560:2561:data/logs.txt
-ERROR failed to generate structured item from envelope questionDir=question_15 ... Missing 'shapes'.
-```
-```2618:2619:data/logs.txt
-ERROR failed to generate structured item from envelope questionDir=question_29 ... Missing 'shapes'.
-ERROR question processing failed questionDir=question_29 ... Missing 'shapes'.
-```
-```2629:2630:data/logs.txt
-ERROR failed to generate structured item from envelope questionDir=question_23 ... Missing 'shapes'.
-ERROR question processing failed questionDir=question_23 ... Missing 'shapes'.
-```
-```2832:2833:data/logs.txt
-ERROR failed to generate structured item from envelope questionDir=question_06 ... Missing 'shapes'.
-ERROR question processing failed questionDir=question_06 ... Missing 'shapes'.
-```
-```2840:2841:data/logs.txt
-ERROR failed to generate structured item from envelope questionDir=question_02 ... Missing 'shapes'.
-ERROR question processing failed questionDir=question_02 ... Missing 'shapes'.
-```
-```2852:2853:data/logs.txt
-ERROR failed to generate structured item from envelope questionDir=question_08 ... Missing 'shapes'.
-ERROR question processing failed questionDir=question_08 ... Missing 'shapes'.
-```
-```2904:2912:data/logs.txt
-ERROR failed to generate structured item from envelope questionDir=question_12 ... Missing 'shapes'.
-ERROR failed to generate structured item from envelope questionDir=question_04 ... Missing 'shapes'.
-```
+1) OpenAI shell generation timeouts
+- Evidence (examples):
+  - `question_04`, `question_05`, `question_11`, `question_16`, `question_19` failed with `generate assessment shell: ai shell generation: Request timed out.`
+- Code path:
+  - `generateFromEnvelope` → `generateAssessmentShell` in `src/structured/client.ts` calls `openai.chat.completions.create(params)` with `response_format: json_schema` and no explicit timeout.
+  - `question_04` had extremely large input (`totalTextLength≈229,277; estimatedTokens≈57,319`), which increases model latency and risk of timeout.
+- Causes:
+  - Very large `Primary Content` and supplementary SVG text bloating the prompt.
+  - No per-request `timeout` or retry policy; no reduction/ablation of prompt size.
 
-Code path causing this:
-```431:485:src/structured/client.ts
-// Accept any widget id → widget union; enforce required ids below
-const WidgetCollectionSchema = z.record(z.string(), WidgetSchema)
-const widgetJsonSchema = toJSONSchemaPromptSafe(WidgetCollectionSchema)
-...
-const widgetParams: ChatCompletionCreateParamsNonStreaming = {
-  ...,
-  response_format: {
-    type: "json_schema",
-    json_schema: {
-      name: "widget_content_generator",
-      schema: widgetJsonSchema as Record<string, unknown>,
-      strict: true
-    }
-  }
-}
-```
-`WidgetSchema` includes widgets like `partitionedShape` which define a required `shapes` property in one branch:
-```132:156:src/widgets/generators/partitioned-shape.ts
-shapes: z.array(createPartitionShapeSchema()).describe("Shapes to display...")
-```
-Root cause: Our JSON Schema emitted for the union of all widgets under `additionalProperties.anyOf[...]` has at least one branch where `properties` includes `shapes`, but the top-level schema for that branch is missing a `required` array enumerating all keys, violating OpenAI response_format validator. `toJSONSchemaPromptSafe` enforces `additionalProperties=false` but does not synthesize a `required` array for every object node.
+2) Sharded feedback generation hard failures (all shards rejected)
+- Evidence (examples):
+  - `question_09` and `question_28`: `sharded feedback generation: one or more feedback shards failed to generate`.
+  - Logs also show many `generate feedback shard` errors with HTTP 400.
+- Code path:
+  - `runShardedFeedbackNested` builds one OpenAI request per feedback combination and calls `generateFeedbackForOutcomeNested` with `response_format.json_schema`.
+  - If any shard rejects (`PromiseSettledResult` rejected), code throws `one or more feedback shards failed to generate`.
+- Causes observed:
+  - OpenAI 400 due to `response_format.json_schema.name` exceeding 64 characters. We use `name: feedback_${combination.id.toLowerCase()}`. Some `combination.id` strings are very long (derived from response identifiers and keys), exceeding the API limit.
+  - Result: all shards for those items fail immediately with 400; the batch aborts that item.
 
-### 2) OpenAI structured output schema errors: feedback_generator (400)
+3) Missing feedback content for a required combination
+- Evidence (examples):
+  - `question_14`: `missing feedback content for combination FB__RESPONSE_RULE_NUM_N2__RESPONSE_RULE_OP_OP_ADD`
+  - `question_32`: `missing feedback content for combination FB__RESPONSE_KM_KM_0__RESPONSE_M_M_20`
+- Code path:
+  - In `generateFromEnvelope`, after sharded generation, we assemble a nested feedback object. If a combination is missing, we throw with context: `missing feedback content for combination <ID>`.
+  - Downstream in the compiler, we also guard for missing leaves (`ErrMissingFeedbackContent`) and extra keys.
+- Causes:
+  - Model failed to return content for at least one required combination. Reasons include: schema name 400s (see #2), validation failures, or the model producing an empty/incorrect path for one shard.
 
-Representative log entries:
-```2533:2536:data/logs.txt
-DEBUG generated json schema for openai ... generatorName=feedback_generator ...
-ERROR generate feedback error=Error: 400 Invalid schema for response_format 'feedback_generator': Expected at most 1000 enum values ... received 1008.
-ERROR failed to generate structured item from envelope questionDir=question_32 ... error=generate feedback: 400 Invalid schema ... received 1008.
-ERROR question processing failed questionDir=question_32 ... error=generate from envelope: generate feedback: 400 Invalid schema ... received 1008.
-```
-Also observed again for `question_28`.
+### Why specific questions were missing
 
-Code path causing this:
-```381:401:src/structured/client.ts
-const feedbackJsonSchema = toJSONSchemaPromptSafe(FeedbackSchema)
-...
-response_format: { type: "json_schema", json_schema: { name: "feedback_generator", schema: feedbackJsonSchema as Record<string, unknown>, strict: true } }
-```
-Feedback schema construction inflates enum counts via nested discriminated unions of `BlockContent` and `InlineContent` repeated across every leaf:
-```35:91:src/core/feedback/authoring/schema.ts
-export function createNestedFeedbackZodSchema(...) {
-  const ScopedBlockContentSchema = createBlockContentSchema(widgetTypeKeys)
-  const LeafNodeSchema = z.object({ content: ScopedBlockContentSchema }).strict()
-  // builds nested objects for every outcome path (A,B,C... and nested combos)
-}
-```
-Root cause: The prompt JSON Schema includes many duplicated discriminated unions (paragraph, codeBlock, etc.) for each feedback leaf, pushing OpenAI’s limit of "at most 1000 enum values in total" over the threshold (1008). This is cumulative across `anyOf` branches.
+- `question_04` (missing outputs): timeout during shell generation due to very large prompt size.
+- `question_05`, `question_11`, `question_16`, `question_19` (missing): shell timeouts, similar cause.
+- `question_09`, `question_28` (missing): feedback sharding failed because json_schema.name exceeded length limit, causing all shards to 400.
+- `question_14`, `question_32` (missing): at least one required feedback combination missing after sharding; in practice likely the same root as #2 for affected combinations, or a validation failure for a shard that caused it to be rejected.
 
-### 3) Upstream OpenAI transient failures (502 Bad Gateway)
+Note: The scrape listing shows `question_10` had structured-item.json but no compiled.xml in the scrape folder; however `data/` includes `question_10-compiled.xml`, indicating the script wrote outputs to `data/OUTPUT_DIR_ARG`. The current run’s missing items align with the nine failures logged above.
 
-Representative log entries:
-```2656:2669:data/logs.txt
-ERROR ai shell generation error=Error: 502 <html> ... cloudflare ...
-ERROR generate assessment shell error=ai shell generation: 502 <html> ...
-ERROR failed to generate structured item from envelope questionDir=question_18 ... 502 ...
-ERROR question processing failed questionDir=question_18 ... 502 ...
-```
-Code path:
-```108:131:src/structured/client.ts
-const response = await errors.try(openai.chat.completions.create(params))
-if (response.error) {
-  logger.error("ai shell generation", { error: response.error })
-  throw errors.wrap(response.error, "ai shell generation")
-}
-```
-Root cause: External service returned HTTP 502 (Cloudflare). Our code fails fast (correct), but we lack retry/backoff specifically for transient 5xx in this step.
+### Concrete Fixes
 
-### 4) QTI compilation rejects raw currency/percent in text (pre-validator)
+A) OpenAI request stability and timeouts
+- Add explicit client-side timeout and retry with backoff for `openai.chat.completions.create` across shell/interaction/feedback calls using `errors.try` + logging.
+- Reduce prompt size:
+  - Truncate or summarize massive `Primary Content` JSON (e.g., limit length, strip unused Perseus fields, collapse whitespace) before embedding in prompts.
+  - Trim/limit supplementary SVG text length, while still including essential vector info.
+  - Consider switching to `fourth-grade-math` collection when appropriate to reduce schema size in prompts, or dynamically include only schemas for widget types detected from the Perseus widgets used.
+- If token estimate exceeds a threshold (e.g., >20k chars), log and pre-ablate context before calling the model.
 
-Representative log entries:
-```2764:2767:data/logs.txt
-ERROR raw currency/percent in text content context=item.feedbackBlocks[FB__RESPONSE_A].paragraph text=... earns $15,106.
-ERROR failed to compile structured item to qti questionDir=question_31 error=currency and percent must be expressed in MathML, not raw text ...
-ERROR question processing failed questionDir=question_31 ... error=qti compilation: currency and percent must be expressed in MathML ...
-```
-```2894:2896:data/logs.txt
-ERROR raw currency/percent in text content context=item.feedbackBlocks[FB__RESPONSE_A].paragraph text=... Marta starts with $60.36 ...
-ERROR failed to compile structured item to qti questionDir=question_01 error=currency and percent must be expressed in MathML ...
-```
-Code enforcing this:
-```84:97:src/compiler/pre-validator.ts
-const hasDollarNumber = /\$(?=\s*\d)/.test(item.content)
-const hasNumberPercent = /\d\s*%/.test(item.content)
-if (hasCurrencySpan || hasDollarNumber || hasNumberPercent) {
-  logger.error("raw currency/percent in text content", { context: _context, text: item.content.substring(0, 120) })
-  throw errors.new("currency and percent must be expressed in MathML, not raw text ...")
-}
-```
-Root cause: The AI output included raw currency/percent in text nodes. Our widget prompt includes a currency ban, but feedback/shell prompts also need explicit guidance, and/or a sanitizer should convert `$` and `%` into MathML tokens before validation.
+B) json_schema.name length violation in feedback shards
+- Current code: `name: \
+  json_schema: { name: \`feedback_${combination.id.toLowerCase()}\`, schema: jsonSchema, strict: true }`
+- Fix: ensure the `name` is short and stable ≤64 chars. For example:
+  - Use a hashed or truncated name: `feedback_${hash(combination.id).slice(0,12)}` or `feedback_${i.toString(36)}` where `i` is the shard index.
+  - The `name` is only metadata; shortening it does not affect validation.
+- Also sanitize `name` to `[a-z0-9_\-]` and enforce the length limit before the API call.
 
-### 5) Feedback schema validation: banned caret/pipe characters in text
+C) Missing feedback for combination
+- Primary fix: after B) resolves the 400s, shards should succeed. Additionally:
+  - Add a single retry for any shard that fails validation or returns empty content, with a brief clarification message appended (e.g., “Return JSON exactly matching schema; do not include extra keys.”). Keep retries minimal to avoid cost/time blowups.
+  - In combo mode, keep `QTI_FEEDBACK_CONCURRENCY` at a moderate number (e.g., 2–4). Excessive concurrency can increase transient failures.
+  - Optionally implement partial salvage: if 1–2 shards fail, retry only those shards; only fail the item after the retry attempt.
 
-Representative log entries:
-```2768:2804:data/logs.txt
-ERROR feedback schema validation error=[ ... "message": "Text content cannot contain '^' or '|' characters." ... ]
-ERROR failed to generate structured item from envelope questionDir=question_17 ... error=feedback schema validation: [ ... ]
-ERROR question processing failed questionDir=question_17 ... error=generate from envelope: feedback schema validation: [ ... ]
-```
-Validation rule:
-```6:10:src/core/content/schema.ts
-const BannedCharsRegex = /[\^|]/
-const SafeTextSchema = z.string().refine((val) => !BannedCharsRegex.test(val), {
-  message: "Text content cannot contain '^' or '|' characters."
-})
-```
-Root cause: AI produced caret/pipe in plain text. Our prompts prohibit LaTeX and include a caret-ban section for widgets, but the feedback and shell prompts need the same ban and examples. A pre-sanitize step could also strip/replace these characters in text content.
+D) Guardrails for very large items (e.g., question_04)
+- Add a preflight size check prior to shell generation. If content is oversized:
+  - Strip non-referenced Perseus widget definitions (we already instruct the model to ignore unused, but we should remove them from the prompt proactively).
+  - Drop non-essential long text blocks (e.g., large HTML/SVG comments, duplicated textual artifacts).
+  - If still too large, split vector content to a summarized description for the shell shot while keeping full content for a later widget shot.
 
-## Tally of Error Types (from the run)
+### Exact Code Changes To Make
 
-- Widget content schema (Missing 'shapes'): observed in at least 8 question directories: `question_15`, `question_29`, `question_23`, `question_06`, `question_02`, `question_08`, `question_12`, `question_04`.
-- Feedback schema enum limit (1008 enums): observed in at least 2 question directories: `question_32`, `question_28`.
-- 502 Bad Gateway during shell generation: at least 1 question: `question_18`.
-- Currency/percent raw text rejection: at least 2 questions: `question_31`, `question_01`.
-- Caret/pipe text ban violations: at least 1 question prominently (`question_17`), multiple repeated validation messages in the log.
+1) Limit json_schema.name length (feedback shards)
+- File: `src/structured/client.ts` in `generateFeedbackForOutcomeNested`.
+- Replace dynamic name with a safe truncated slug or a short hash based on `combination.id`.
+  - Example approach (conceptual):
+    - Compute `const safeName = `feedback_${sha1(combination.id).slice(0, 16)}`;`
+    - Use `safeName` in `json_schema.name`.
+  - Also normalize to lowercase and `[a-z0-9_-]` and ensure ≤64 chars.
 
-Note: Counts reflect explicit matches shown above and may be lower bounds; the log indicates recurring patterns.
+2) Add request timeout and retry utility
+- File: `src/structured/utils/openai.ts` (new): implement `callWithRetry(createParams)` that:
+  - Accepts `timeoutMs` (e.g., 45–60s), `maxRetries` (e.g., 2), exponential backoff.
+  - Wraps with `errors.try` and logs at warn level on transient errors/timeouts.
+- Use this for shell, interaction, and feedback calls in `src/structured/client.ts`.
 
-## Root Cause Analysis and Code Citations
+3) Prompt ablation for large inputs
+- File: `scripts/staar-batch-generate.ts` before constructing `envelope`:
+  - Add a function that strips unused Perseus widget definitions (based on scanning `[[☃ ...]]` placeholders).
+  - Limit supplementary SVG total length (e.g., cap cumulative length to N chars with an ellipsis note).
+  - Log the pre/post lengths.
 
-- Widget generation JSON Schema formation relies on `toJSONSchemaPromptSafe`:
-```153:177:src/core/json-schema/to-json-schema.ts
-export function toJSONSchemaPromptSafe(schema: z.ZodType): BaseSchema {
-  const json = z.toJSONSchema(...)
-  stripPropertyNames(json)
-  ensureEmptyProperties(json)
-  return json
-}
-```
-This does not synthesize `required` arrays for object nodes; OpenAI validator expects `required` to list all property keys for strict schemas. The error pinpoints a specific nested union branch requiring `'shapes'`.
+4) Targeted retries for missing feedback combinations
+- File: `src/structured/client.ts` in `runShardedFeedbackNested`:
+  - After first pass, collect rejected shards; for each, perform one retry call (using the retry wrapper) before deciding failure.
+  - Keep `QTI_FEEDBACK_CONCURRENCY` honored for retries.
 
-- Feedback JSON Schema explosion is driven by repeating `BlockContent` unions for every leaf in `createNestedFeedbackZodSchema`, multiplied by the number of combinations in the feedback plan, culminating above OpenAI’s enum cap.
+5) Optional: dynamically narrow widget schemas included in prompts
+- File: `src/structured/prompts/shared.ts` `createWidgetSelectionPromptSection`:
+  - Instead of dumping all collection schemas, pre-compute likely needed widget types from the shell (e.g., from reserved `widgetRef`s) and include only those schemas to reduce prompt size.
 
-- Pre-validator guards correctly block unsafe content; the AI prompts need to better constrain outputs (and optionally a sanitizer pass before validation) to avoid rejections.
+### Operational Recommendations
 
-## Prioritized Fix Plan
+- Set `QTI_FEEDBACK_CONCURRENCY=3` for balanced throughput and stability.
+- Re-run failed questions individually after applying fixes to confirm resolution:
+  - Shell timeouts should drop dramatically with timeouts+retries and ablation.
+  - Feedback shard 400 errors should disappear once the `json_schema.name` is shortened.
+  - “Missing feedback content” should resolve as shards succeed or retry.
 
-1. High: Fix JSON Schema generation to include `required` arrays for object schemas used in response_format.
-   - Update `toJSONSchemaPromptSafe` to post-process every `type: "object"` node by setting `required = Object.keys(properties)` when `additionalProperties === false` and properties is present.
-   - Validate locally by converting `WidgetSchema` and checking for required arrays on properties like `shapes`.
+### Affected Questions Summary
 
-2. High: Reduce feedback schema enum count below 1000.
-   - Strategy A: Collapse repeated `BlockContent` definitions by refactoring feedback schema to reference a single shared definition (may not be supported by OpenAI validator if it rejects `$ref`).
-   - Strategy B: Reduce discriminant space: for feedback, replace nested per-dimension discriminated objects with a flat map keyed by combination IDs:
-     - Change the emitted prompt schema for feedback leaves from nested objects to: `{ feedback: { FEEDBACK__OVERALL: { "<COMBO_ID>": { content: BlockContent } ... } } }`.
-     - This avoids duplicating unions for each nested branch.
-   - Strategy C: Split generation into multiple calls per subset of combos to stay under limits, then merge and validate.
+- Shell timeouts (needs prompt ablation + retry): `04`, `05`, `11`, `16`, `19`.
+- Feedback shards 400 name too long (needs short `json_schema.name` + shard retry): `09`, `28`.
+- Missing feedback combination (likely fixed by shards fix): `14`, `32`.
 
-3. Med: Add robust retries with backoff for 5xx responses in OpenAI calls.
-   - Wrap `openai.chat.completions.create` with a retry utility (e.g., exponential backoff, jitter), only for idempotent generation steps.
+### Closing Notes
 
-4. Med: Harden prompts to prevent currency/percent and caret/pipe in all stages.
-   - Extend bans and examples from `createWidgetContentPrompt` to assessment shell and feedback prompts.
-   - Add a conservative pre-sanitize filter before validation: transform `$123` → MathML, and replace `|`/`^` with textual alternatives or escape within MathML as appropriate. Keep this opt-in or guarded by logs to avoid masking mistakes.
-
-5. Low: Add more granular logging of which widget types triggered schema complaints.
-   - Log the offending branch path when OpenAI rejects schema; optionally reduce the global widget union to only the types present in `widgetMapping` for the item, not `WidgetSchema` for all widgets.
-
-## Specific Code Changes Proposed (high level)
-
-- `src/core/json-schema/to-json-schema.ts`: augment `ensureEmptyProperties` with `ensureRequiredArrays(node)` to compute `required` for object nodes; apply recursively alongside the existing passes.
-- `src/structured/client.ts` (feedback shot): change FeedbackSchema structure to a flat map keyed by combination IDs or split the request by subset of combinations to remain under 1000 enums.
-- Retry wrapper utility around all OpenAI calls in `src/structured/client.ts` shots 1–4 and in `src/structured/differentiator.ts`.
-- Extend caret/pipe and currency/percent bans into `src/structured/prompts/feedback.ts` and `src/structured/prompts/shell.ts`; optionally add a sanitizer step pre-`compile`.
-
-## Additional Evidence Snippets
-
-- Feedback prompt construction site:
-```375:401:src/structured/client.ts
-... createFeedbackPrompt(...) -> toJSONSchemaPromptSafe(FeedbackSchema) -> response_format strict true
-```
-- Banned text characters enforcement:
-```6:10:src/core/content/schema.ts
-const BannedCharsRegex = /[\^|]/
-...
-```
-- Currency/percent guard:
-```84:97:src/compiler/pre-validator.ts
-if (hasCurrencySpan || hasDollarNumber || hasNumberPercent) throw errors.new("currency and percent must be expressed in MathML ...")
-```
-
-## Conclusion
-
-Most failures stem from OpenAI response_format schema compatibility: missing `required` arrays for object branches in the widget union and enum-count overflow in the feedback schema. Secondary issues are transient 5xx errors and strict content validation conflicts (currency/percent, caret/pipe). Implementing the schema post‑processing for `required`, reducing feedback schema complexity or splitting requests, and hardening prompts plus retries will eliminate the majority of failures in the next run.
+The errors were not due to local file I/O or missing inputs; the failures are upstream OpenAI API behaviors under large prompts and strict response format rules. The fixes above keep our strict error-handling stance (no fallbacks), improve robustness, and should address the most common failures observed in the logs without compromising safety or type guarantees.
