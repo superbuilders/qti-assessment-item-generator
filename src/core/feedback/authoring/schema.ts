@@ -5,15 +5,9 @@ import type { BlockContent } from "@/core/content"
 import { createBlockContentSchema } from "@/core/content"
 import type { AnyInteraction } from "@/core/interactions"
 import type { ResponseDeclaration } from "@/core/item"
-import { toJSONSchemaPromptSafe } from "@/core/json-schema"
 import type { FeedbackPlan } from "../plan"
 import { buildFeedbackPlanFromInteractions } from "../plan"
-import type {
-	AuthoringFeedbackOverall,
-	AuthoringNestedLeaf,
-	AuthoringNestedNode,
-	NestedFeedbackAuthoring
-} from "./types"
+import type { AuthoringFeedbackOverall, AuthoringNestedLeaf, AuthoringNestedNode } from "./types"
 
 // --- Error Constants ---
 
@@ -28,10 +22,10 @@ export const ErrFeedbackSchemaValidation = errors.new("feedback schema validatio
 
 // --- Nested Schema Builder ---
 
-export function createNestedFeedbackZodSchema<P extends FeedbackPlan, const E extends readonly string[]>(
+export function createFeedbackObjectSchema<P extends FeedbackPlan, const E extends readonly string[]>(
 	feedbackPlan: P,
 	widgetTypeKeys: E
-): z.ZodType<NestedFeedbackAuthoring<P, E>> {
+): z.ZodType<{ FEEDBACK__OVERALL: AuthoringFeedbackOverall<P, E> }> {
 	const ScopedBlockContentSchema: z.ZodType<BlockContent<E>> = createBlockContentSchema(widgetTypeKeys)
 	const LeafNodeSchema: z.ZodType<AuthoringNestedLeaf<E>> = z.object({ content: ScopedBlockContentSchema }).strict()
 
@@ -76,50 +70,34 @@ export function createNestedFeedbackZodSchema<P extends FeedbackPlan, const E ex
 		OverallSchema = current as z.ZodType<NodeT>
 	}
 
-	const FeedbackMapSchema = z.object({ FEEDBACK__OVERALL: OverallSchema }).strict()
-	const Schema = z.object({ feedback: FeedbackMapSchema }).strict()
-	return Schema
+	const FeedbackObjectSchema = z.object({ FEEDBACK__OVERALL: OverallSchema }).strict()
+	return FeedbackObjectSchema
 }
 
 // --- Validation and Conversion ---
 
-function isNestedFeedbackAuthoring<E extends readonly string[]>(
-	val: unknown
-): val is NestedFeedbackAuthoring<FeedbackPlan, E> {
-	if (typeof val !== "object" || val === null) return false
-	const feedback = Reflect.get(val, "feedback")
-	if (typeof feedback !== "object" || feedback === null) return false
-	const overall = Reflect.get(feedback, "FEEDBACK__OVERALL")
-	return typeof overall === "object" && overall !== null
-}
-
-export function validateNestedFeedback<P extends FeedbackPlan, const E extends readonly string[]>(
-	nested: unknown,
+export function validateFeedbackObject<P extends FeedbackPlan, const E extends readonly string[]>(
+	feedbackObject: unknown,
 	feedbackPlan: P,
 	widgetTypeKeys: E
-): NestedFeedbackAuthoring<P, E> {
-	const schema = createNestedFeedbackZodSchema(feedbackPlan, widgetTypeKeys)
-	const result = schema.safeParse(nested)
+): { FEEDBACK__OVERALL: AuthoringFeedbackOverall<P, E> } {
+	const schema = createFeedbackObjectSchema(feedbackPlan, widgetTypeKeys)
+	const result = schema.safeParse(feedbackObject)
 
 	if (!result.success) {
-		logger.error("feedback schema validation", { error: result.error })
-		throw errors.wrap(result.error, "feedback schema validation")
+		logger.error("feedback object validation", { error: result.error })
+		throw errors.wrap(result.error, "feedback object validation")
 	}
 
-	const data = result.data
-	if (!isNestedFeedbackAuthoring<E>(data)) {
-		logger.error("feedback schema validation type guard failed")
-		throw errors.new("feedback schema validation type guard failed")
-	}
-	return data
+	return result.data
 }
 
-export function convertNestedFeedbackToBlocks<P extends FeedbackPlan, E extends readonly string[]>(
-	nested: NestedFeedbackAuthoring<FeedbackPlan, E>,
+export function convertFeedbackObjectToBlocks<P extends FeedbackPlan, E extends readonly string[]>(
+	feedbackObject: { FEEDBACK__OVERALL: AuthoringFeedbackOverall<FeedbackPlan, E> },
 	feedbackPlan: P
 ): Record<string, BlockContent<E>> {
 	const blocks: Record<string, BlockContent<E>> = {}
-	const overallFeedback = nested.feedback.FEEDBACK__OVERALL
+	const overallFeedback = feedbackObject.FEEDBACK__OVERALL
 
 	if (!overallFeedback || typeof overallFeedback !== "object") {
 		logger.error("FEEDBACK__OVERALL is not an object during conversion", { overallFeedback })
@@ -227,7 +205,7 @@ export function convertNestedFeedbackToBlocks<P extends FeedbackPlan, E extends 
 
 export function buildEmptyNestedFeedback<P extends FeedbackPlan, E extends readonly string[] = readonly string[]>(
 	feedbackPlan: P
-): NestedFeedbackAuthoring<FeedbackPlan, E> {
+): { FEEDBACK__OVERALL: AuthoringFeedbackOverall<FeedbackPlan, E> } {
 	function buildNode(dims: readonly FeedbackPlan["dimensions"][number][]): AuthoringNestedNode<FeedbackPlan, E> {
 		if (dims.length === 0) {
 			logger.error("no dimensions to build nested node")
@@ -252,41 +230,19 @@ export function buildEmptyNestedFeedback<P extends FeedbackPlan, E extends reado
 			: buildNode(feedbackPlan.dimensions)
 
 	return {
-		feedback: {
-			FEEDBACK__OVERALL: overallFeedback
-		}
-	}
-}
-
-export function createNestedFeedbackPromptArtifacts<P extends FeedbackPlan, const E extends readonly string[]>(
-	feedbackPlan: P,
-	widgetTypeKeys: E
-): { FeedbackSchema: z.ZodType; jsonSchema: unknown } {
-	const FeedbackSchema = createNestedFeedbackZodSchema(feedbackPlan, widgetTypeKeys)
-	const jsonSchemaResult = errors.trySync(() => toJSONSchemaPromptSafe(FeedbackSchema))
-
-	if (jsonSchemaResult.error) {
-		logger.error("failed to create JSON schema for feedback prompt", {
-			error: jsonSchemaResult.error
-		})
-		throw errors.wrap(jsonSchemaResult.error, "json schema generation")
-	}
-
-	return {
-		FeedbackSchema,
-		jsonSchema: jsonSchemaResult.data
+		FEEDBACK__OVERALL: overallFeedback
 	}
 }
 
 export function buildFeedbackFromNestedForTemplate<const E extends readonly string[]>(
 	interactions: Record<string, AnyInteraction<E>>,
 	responseDeclarations: ResponseDeclaration[],
-	nested: NestedFeedbackAuthoring<FeedbackPlan, E>,
+	feedbackObject: { FEEDBACK__OVERALL: AuthoringFeedbackOverall<FeedbackPlan, E> },
 	widgetTypeKeys: E
 ): { feedbackPlan: FeedbackPlan; feedbackBlocks: Record<string, BlockContent<E>> } {
 	const plan = buildFeedbackPlanFromInteractions(interactions, responseDeclarations)
-	validateNestedFeedback(nested, plan, widgetTypeKeys)
-	const blocks = convertNestedFeedbackToBlocks(nested, plan)
+	validateFeedbackObject(feedbackObject, plan, widgetTypeKeys)
+	const blocks = convertFeedbackObjectToBlocks(feedbackObject, plan)
 
 	return { feedbackPlan: plan, feedbackBlocks: blocks }
 }

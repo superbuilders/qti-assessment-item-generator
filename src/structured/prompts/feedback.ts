@@ -1,5 +1,6 @@
+import { z } from "zod"
 import type { FeedbackPlan } from "@/core/feedback"
-import { createNestedFeedbackZodSchema } from "@/core/feedback"
+import { createFeedbackObjectSchema } from "@/core/feedback"
 import type { AssessmentItemShell } from "@/core/item"
 import type { WidgetCollection, WidgetDefinition } from "@/widgets/collections/types"
 import type { AiContextEnvelope, ImageContext } from "../types"
@@ -18,8 +19,9 @@ export function createFeedbackPrompt<
 	imageContext: ImageContext,
 	widgetCollection: C
 ) {
-	// Build the nested authoring schema inside the prompt helper, passing only the keys.
-	const FeedbackSchema = createNestedFeedbackZodSchema(feedbackPlan, widgetCollection.widgetTypeKeys)
+	// Build the feedback object schema and wrap it locally with the { feedback: ... } envelope
+	const FeedbackObjectSchema = createFeedbackObjectSchema(feedbackPlan, widgetCollection.widgetTypeKeys)
+	const FeedbackSchema = z.object({ feedback: FeedbackObjectSchema }).strict()
 
 	// 2. Generate the Dimension Inventory section for the prompt.
 	const dimensionInventory =

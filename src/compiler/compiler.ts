@@ -3,7 +3,7 @@ import * as logger from "@superbuilders/slog"
 import type { z } from "zod"
 import type { BlockContent, BlockContentItem, InlineContent } from "@/core/content"
 import type { FeedbackPlan } from "@/core/feedback"
-import { convertNestedFeedbackToBlocks, validateNestedFeedback } from "@/core/feedback"
+import { convertFeedbackObjectToBlocks, validateFeedbackObject } from "@/core/feedback"
 import type { AssessmentItem, AssessmentItemInput } from "@/core/item"
 import { createDynamicAssessmentItemSchema } from "@/core/item"
 import { ErrUnsupportedInteraction } from "../structured/client"
@@ -603,14 +603,12 @@ export async function compile<
 		dimensionCount: itemData.feedbackPlan.dimensions.length,
 		combinationCount: itemData.feedbackPlan.combinations.length
 	})
-	// Wrap the feedback in the expected validation envelope
-	const feedbackEnvelope = { feedback: itemData.feedback }
-	const validatedNested = validateNestedFeedback(
-		feedbackEnvelope,
+	const validatedFeedbackObject = validateFeedbackObject(
+		itemData.feedback,
 		itemData.feedbackPlan,
 		widgetCollection.widgetTypeKeys
 	)
-	const feedbackBlocks = convertNestedFeedbackToBlocks(validatedNested, itemData.feedbackPlan)
+	const feedbackBlocks = convertFeedbackObjectToBlocks(validatedFeedbackObject, itemData.feedbackPlan)
 	logger.debug("converted nested feedback to flat blocks", { blockCount: Object.keys(feedbackBlocks).length })
 
 	// Create a normalized item with flat feedbackBlocks for downstream processing
