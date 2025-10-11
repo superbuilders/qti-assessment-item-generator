@@ -7,8 +7,7 @@ import type { FeedbackCombination, FeedbackPlan } from "@/core/feedback"
 import type { AnyInteraction } from "@/core/interactions"
 import type { AssessmentItemShell } from "@/core/item"
 import type { WidgetCollection, WidgetDefinition, WidgetTypeTupleFrom } from "@/widgets/collections/types"
-import type { AiContextEnvelope, ImageContext } from "../types"
-import { createWidgetSelectionPromptSection, formatUnifiedContextSections } from "./shared"
+import { createMathmlComplianceSection } from "./shared/mathml"
 
 type ShallowFeedbackPayload<E extends readonly string[]> = {
 	content: BlockContent<E>
@@ -22,12 +21,10 @@ type ShallowFeedbackPayload<E extends readonly string[]> = {
 export function createPerOutcomeNestedFeedbackPrompt<
 	C extends WidgetCollection<Record<string, WidgetDefinition<unknown, unknown>>, readonly string[]>
 >(
-	envelope: AiContextEnvelope,
 	assessmentShell: AssessmentItemShell<WidgetTypeTupleFrom<C>>,
 	feedbackPlan: FeedbackPlan,
 	combination: FeedbackCombination,
 	widgetCollection: C,
-	imageContext: ImageContext,
 	interactions: Record<string, AnyInteraction<WidgetTypeTupleFrom<C>>>
 ): {
 	systemInstruction: string
@@ -68,19 +65,20 @@ export function createPerOutcomeNestedFeedbackPrompt<
 	}
 	const correctnessSummary = getCorrectnessSummary()
 
-	const interactionDetailsResult = errors.trySync(() => JSON.stringify({ interactions }))
-	if (interactionDetailsResult.error) {
-		logger.error("json stringify interactions", { error: interactionDetailsResult.error })
-		throw errors.wrap(interactionDetailsResult.error, "json stringify interactions")
+	const shellJson = JSON.stringify(assessmentShell)
+	const interactionsResult = errors.trySync(() => JSON.stringify(interactions))
+	if (interactionsResult.error) {
+		logger.error("json stringify interactions", { error: interactionsResult.error })
+		throw errors.wrap(interactionsResult.error, "json stringify interactions")
 	}
-	const interactionDetailsText = interactionDetailsResult.data
-
-	const jsonSkeleton = JSON.stringify({ content: [] })
+	const interactionsJson = interactionsResult.data
 
 	const systemInstruction = `
 <role>
 You are an expert in educational pedagogy and an exceptional content author. Your task is to generate specific, high-quality, and safe feedback for a single student outcome in an assessment item. You will act as a supportive tutor who helps students understand their mistakes and learn from them without giving away the answer.
 </role>
+
+${createMathmlComplianceSection()}
 
 <critical_rules>
 ### ⚠️ CRITICAL RULE 1: ABSOLUTE BAN ON REVEALING THE FINAL ANSWER
@@ -168,7 +166,8 @@ Every piece of feedback you generate must follow this four-part structure inside
             {
               "type": "paragraph",
               "content": [
-                { "type": "text", "content": "To find the area of a rectangle, use the formula: Area = Length × Width." }
+                { "type": "text", "content": "To find the area of a rectangle, use the formula: " },
+                { "type": "math", "mathml": "<mtext>Area</mtext><mo>=</mo><mtext>Length</mtext><mo>×</mo><mtext>Width</mtext>" }
               ]
             },
             {
@@ -226,17 +225,16 @@ Every piece of feedback you generate must follow this four-part structure inside
 
 You will now receive the assessment context and the specific outcome to generate feedback for. Follow all rules and generate a single, valid JSON object.`
 
-	const widgetSelectionSection = createWidgetSelectionPromptSection(widgetCollection)
+	const userContent = `Generate feedback ONLY for the single student outcome specified below.
 
-	const userContent = `Generate feedback ONLY for the single student outcome specified below. Your response MUST be a single JSON object matching the shallow schema exactly.
-
-${formatUnifiedContextSections(envelope, imageContext)}
-
-${widgetSelectionSection}
-
-## Assessment Context
+## Assessment Shell (Compact JSON)
 \`\`\`json
-${JSON.stringify(assessmentShell)}
+${shellJson}
+\`\`\`
+
+## Interactions (Compact JSON)
+\`\`\`json
+${interactionsJson}
 \`\`\`
 
 ## TARGET OUTCOME
@@ -248,20 +246,11 @@ ${outcomePathText}
 ### Outcome Correctness Summary:
 ${correctnessSummary}
 
-### Interactions (Raw JSON):
-${interactionDetailsText}
-
-
-## REQUIRED OUTPUT STRUCTURE (shallow schema)
-Your response must be a single JSON object matching this exact structure. No extra keys.
-\`\`\`json
-${jsonSkeleton}
-\`\`\`
-
 ## Instructions:
-1.  **Analyze the student's path and the detailed interaction info.**
-2.  **Generate High-Quality Feedback:** Write the feedback content as a \`BlockContent\` array.
-3.  **Construct Final JSON:** Place the content into the "content" field of the shallow JSON object.`
+1.  **Analyze the student's path** and the provided assessment context.
+2.  **Generate High-Quality Feedback:** Author the feedback content as a \`BlockContent\` array.
+3.  **Strictly follow the MathML rules** in the system instructions.
+4.  **Construct Final JSON:** Your response MUST be a single JSON object in the format \`{ "content": [...] }\`.`
 
 	return { systemInstruction, userContent, ShallowSchema }
 }

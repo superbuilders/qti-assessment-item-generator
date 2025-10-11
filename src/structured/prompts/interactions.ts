@@ -2,6 +2,7 @@ import type { WidgetCollection, WidgetDefinition } from "@/widgets/collections/t
 import type { AiContextEnvelope, ImageContext } from "../types"
 import { caretBanPromptSection } from "./caret"
 import { createWidgetSelectionPromptSection, formatUnifiedContextSections } from "./shared"
+import { createMathmlComplianceSection } from "./shared/mathml"
 
 export function createInteractionContentPrompt<
 	C extends WidgetCollection<Record<string, WidgetDefinition<unknown, unknown>>, readonly string[]>
@@ -27,6 +28,8 @@ WE MUST correct any grammatical errors found in the source Perseus content. This
 - Missing or incorrect articles (a, an, the)
 
 The goal is to produce clean, professional educational content that maintains the original meaning while fixing any language errors present in the source material.
+
+${createMathmlComplianceSection()}
 
 You must generate a JSON object where:
 - Each key is an interaction slot name from the shell.
@@ -340,8 +343,9 @@ ${JSON.stringify(assessmentShell, null, 2)}
 \`\`\`
 
 ## Instructions:
+- **Strictly follow the MathML rules** in the system instructions.
 - **Analyze Images**: Use the raster images provided to your vision and the raw SVG content above to understand the visual context of interactions.
-- For each interaction slot name name in the shell's 'interactions' array, generate a complete QTI interaction object.
+- For each interaction slot name in the shell's 'interactions' array, generate a complete QTI interaction object.
 - Extract all relevant data from the Perseus JSON to populate the interaction properties (prompt, choices, etc.).
 - Ensure all required properties for each interaction type are included.
 - **CRITICAL**: Preserve all MathML content exactly as it appears in the assessment shell body.

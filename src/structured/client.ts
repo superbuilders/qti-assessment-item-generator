@@ -301,21 +301,17 @@ async function generateFeedbackForOutcomeNested<
 >(
 	openai: OpenAI,
 	logger: logger.Logger,
-	envelope: AiContextEnvelope,
 	assessmentShell: AssessmentItemShell<WidgetTypeTupleFrom<C>>,
 	widgetCollection: C,
 	feedbackPlan: FeedbackPlan,
 	combination: FeedbackPlan["combinations"][0],
-	imageContext: ImageContext,
 	interactions: Record<string, import("@/core/interactions").AnyInteraction<WidgetTypeTupleFrom<C>>>
 ): Promise<{ id: string; content: BlockContent<WidgetTypeTupleFrom<C>> }> {
 	const { systemInstruction, userContent, ShallowSchema } = createPerOutcomeNestedFeedbackPrompt(
-		envelope,
 		assessmentShell,
 		feedbackPlan,
 		combination,
 		widgetCollection,
-		imageContext,
 		interactions
 	)
 
@@ -396,11 +392,9 @@ async function runShardedFeedbackNested<
 >(
 	openai: OpenAI,
 	logger: logger.Logger,
-	envelope: AiContextEnvelope,
 	shell: AssessmentItemShell<WidgetTypeTupleFrom<C>>,
 	collection: C,
 	plan: FeedbackPlan,
-	imageContext: ImageContext,
 	interactions: Record<string, import("@/core/interactions").AnyInteraction<WidgetTypeTupleFrom<C>>>
 ): Promise<Record<string, BlockContent<WidgetTypeTupleFrom<C>>>> {
 	let combinationsToProcess = [...plan.combinations]
@@ -417,7 +411,7 @@ async function runShardedFeedbackNested<
 
 		const tasks = combinationsToProcess.map(
 			(combination) => () =>
-				generateFeedbackForOutcomeNested(openai, logger, envelope, shell, collection, plan, combination, imageContext, interactions)
+				generateFeedbackForOutcomeNested(openai, logger, shell, collection, plan, combination, interactions)
 		)
 
 		const results = await Promise.allSettled(tasks.map((task) => task()))
@@ -537,7 +531,7 @@ export async function generateFromEnvelope<
 		mode: feedbackPlan.mode
 	})
 	const shardedResult = await errors.try(
-		runShardedFeedbackNested(openai, logger, envelope, assessmentShell, widgetCollection, feedbackPlan, imageContext, generatedInteractions)
+		runShardedFeedbackNested(openai, logger, assessmentShell, widgetCollection, feedbackPlan, generatedInteractions)
 	)
 	if (shardedResult.error) {
 		logger.error("sharded feedback generation failed", { error: shardedResult.error })

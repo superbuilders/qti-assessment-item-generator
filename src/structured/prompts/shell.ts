@@ -7,6 +7,7 @@ import { allExamples } from "../../examples"
 import type { AiContextEnvelope, ImageContext } from "../types"
 import { caretBanPromptSection } from "./caret"
 import { createWidgetSelectionPromptSection, formatUnifiedContextSections } from "./shared"
+import { createMathmlComplianceSection } from "./shared/mathml"
 
 // Helper to convert a full AssessmentItemInput into a shell for prompt examples
 function createShellFromExample<const E extends readonly string[]>(item: AssessmentItemInput<E>) {
@@ -63,53 +64,7 @@ WE MUST correct any grammatical errors found in the source Perseus content. This
 
 The goal is to produce clean, professional educational content that maintains the original meaning while fixing any language errors present in the source material.
 
-**⚠️ CRITICAL MATHML REQUIREMENT FOR CURRENCY AND PERCENTAGES ⚠️**
-ALWAYS express currency symbols and percentages in MathML, NEVER as raw text:
-- Currency: MUST use <math><mo>$</mo><mn>amount</mn></math> (e.g., <math><mo>$</mo><mn>5.50</mn></math>)
-- Percentages: MUST use <math><mn>number</mn><mo>%</mo></math> (e.g., <math><mn>75</mn><mo>%</mo></math>)
-- Raw text like "$5" or "75%" will cause IMMEDIATE REJECTION and compilation errors
-
-**⚠️ CRITICAL: CHEMISTRY NOTATION MUST BE MATHML — NEVER PLAIN TEXT ⚠️**
-All chemistry notation in the body (and anywhere inline content is used) MUST use MathML inline items, not plain text or HTML <sub>/<sup> tags. Use ONLY inner MathML (no outer <math> wrapper) inside the { "type": "math", "mathml": "..." } objects.
-
-- Formulas/ions: Use <msub> for subscripts and <msup> for charges.
-  - Example ions: Ca<sup>2+</sup> → <msup><mi>Ca</mi><mrow><mn>2</mn><mo>+</mo></mrow></msup>
-  - Example subscripts: NH4Cl → <mi>N</mi><msub><mi>H</mi><mn>4</mn></msub><mi>Cl</mi>
-- Reactions: Use MathML tokens for operators and coefficients.
-  - Coefficients as <mn>, plus as <mo>+</mo>, arrow as <mo>→</mo>, equilibrium as <mo>⇌</mo>
-  - Example: 2H2 + O2 → 2H2O → <mn>2</mn><mi>H</mi><msub><mi>2</mi><mn> </mn></msub> (build fully with proper tokens) — see positive example below
-- States/phase labels: (aq), (s), (l), (g) should be represented as text in MathML; wrap labels in <mtext> and surround with parentheses tokens, e.g., <mo>(</mo><mtext>aq</mtext><mo>)</mo>
-- BANNED: Plain text chemical formulas/reactions; HTML <sub>/<sup>; using arrows like "->" in text; outer <math> wrappers.
-
-Negative example (DO NOT OUTPUT) — chemistry as plain text in body paragraphs:
-\`\`\`json
-{
-  "body": [
-    { "type": "paragraph", "content": [
-      { "type": "text", "content": "Dissolving NH4Cl in water cools the solution." }
-    ] },
-    { "type": "paragraph", "content": [
-      { "type": "text", "content": "2H2 + O2 -> 2H2O" }
-    ] }
-  ]
-}
-\`\`\`
-
-Positive example — chemistry using MathML inline items (inner MathML only):
-\`\`\`json
-{
-  "body": [
-    { "type": "paragraph", "content": [
-      { "type": "text", "content": "Dissolving " },
-      { "type": "math", "mathml": "<mi>N</mi><msub><mi>H</mi><mn>4</mn></msub><mi>Cl</mi>" },
-      { "type": "text", "content": " in water cools the solution." }
-    ] },
-    { "type": "paragraph", "content": [
-      { "type": "math", "mathml": "<mn>2</mn><msub><mi>H</mi><mn>2</mn></msub><mo>+</mo><msub><mi>O</mi><mn>2</mn></msub><mo>→</mo><mn>2</mn><msub><mi>H</mi><mn>2</mn></msub><mi>O</mi>" }
-    ] }
-  ]
-}
-\`\`\`
+${createMathmlComplianceSection()}
 
 The shell should:
 1. Convert Perseus content into a structured 'body' field as a JSON array of block-level items.
@@ -1592,89 +1547,11 @@ Also:
 - Provide only the single canonical value in \`responseDeclarations.correct\`. Do not include alternates.
 - Never generate additional acceptable variants (fractions↔decimals, spacing changes, flipped equations, etc.).
 
-**CRITICAL: NO CURRENCY SLOTS - STRICT MATHML ENFORCEMENT.**
-Currency symbols and amounts MUST NOT be represented as slots (widget or interaction). Do not generate any slotId that indicates currency (for example, names containing "currency" or ending with "_feedback"). 
+**CRITICAL: NO CURRENCY SLOTS**
+Currency symbols and amounts MUST NOT be represented as slots (widget or interaction). Do not generate any slotId that indicates currency (for example, names containing "currency" or ending with "_feedback").
 
-**MANDATORY CURRENCY/PERCENT MATHML CONVERSION - COMPILATION WILL FAIL IF NOT FOLLOWED:**
-- Currency: ALWAYS use <mo>$</mo><mn>amount</mn> in MathML, NEVER raw text like "$5"
-- Percentages: ALWAYS use <mn>number</mn><mo>%</mo> in MathML, NEVER raw text like "50%"
-- Example: Convert "$5.50" to <math><mo>$</mo><mn>5.50</mn></math>
-- Example: Convert "75%" to <math><mn>75</mn><mo>%</mo></math>
-- Raw text currency/percent symbols will cause ERROR: "currency and percent must be expressed in MathML, not raw text"
-- This applies to ALL content fields: body, feedback, choice options, table cells, EVERYWHERE
-
-**Currency and Percent: Comprehensive Examples**
-
-Before finalizing, SCAN ALL inline text nodes for any "$" or "%" characters or \`<span class="currency">\`. 
-If found, REWRITE by splitting the text and inserting \`{ "type": "math", "mathml": ... }\` for each occurrence.
-
-**Single values:**
-- ❌ WRONG: { "type": "text", "content": "The cost is $5.50." }
-  ✅ CORRECT:
-  [
-    { "type": "text", "content": "The cost is " },
-    { "type": "math", "mathml": "<mo>$</mo><mn>5.50</mn>" },
-    { "type": "text", "content": "." }
-  ]
-
-- ❌ WRONG: { "type": "text", "content": "The discount is 25%!" }
-  ✅ CORRECT:
-  [
-    { "type": "text", "content": "The discount is " },
-    { "type": "math", "mathml": "<mn>25</mn><mo>%</mo>" },
-    { "type": "text", "content": "!" }
-  ]
-
-**Thousands/decimals:**
-- ❌ WRONG: "You paid $1,234.56 for it"
-  ✅ CORRECT: ["You paid ", { "type": "math", "mathml": "<mo>$</mo><mn>1,234.56</mn>" }, " for it"]
-
-**Signed values:**
-- ❌ WRONG: "Your balance is -$5"
-  ✅ CORRECT: ["Your balance is ", { "type": "math", "mathml": "<mo>-</mo><mo>$</mo><mn>5</mn>" }]
-
-**Ranges:**
-- ❌ WRONG: "A discount of 5%–10%"
-  ✅ CORRECT: [
-    "A discount of ",
-    { "type": "math", "mathml": "<mn>5</mn><mo>%</mo>" },
-    "–",
-    { "type": "math", "mathml": "<mn>10</mn><mo>%</mo>" }
-  ]
-
-**Pattern checklist you MUST handle:**
-- Dollar before number: /$(?=s*d)/
-- Number before percent: /ds*%/
-- Any \`<span class="currency">\` usage (BANNED)
-- Currency/percent inside parentheses
-- Ranges with hyphen/en dash
-
-After rewriting, there must be ZERO occurrences of "$" or "%" characters in any "text" item.
-
-⚠️ ABSOLUTELY BANNED CONTENT - ZERO TOLERANCE ⚠️
-The following are CATEGORICALLY FORBIDDEN in the output. ANY violation will result in IMMEDIATE REJECTION:
-
-1. **LATEX COMMANDS ARE BANNED** - Under NO circumstances may ANY LaTeX command appear in the output:
-   - NO backslash commands: \\sqrt, \\dfrac, \\sum, \\int, etc.
-   - NO LaTeX delimiters: \\(, \\), \\[, \\], \\begin, \\end
-   - NO color commands: \\blueD, \\maroonD, \\redE, \\greenC, etc.
-   - NO text commands: \\text, \\textbf, \\textit, etc.
-   - If you see ANY backslash followed by letters, you have FAILED.
-
-2. **LATEX DOLLAR SIGN DELIMITERS ARE BANNED** - The $ character when used for LaTeX is FORBIDDEN:
-   - NO inline math delimiters: $x + y$ (convert to \`<math>...</math>\`)
-   - NO display math delimiters: $$x + y$$ (convert to \`<math display="block">...</math>\`)
-   - NEVER use HTML for currency symbols. Currency and percent MUST be MathML, NOT HTML, NOT raw text.
-   - Remove $ when it's used as a LaTeX delimiter. For currency, ALWAYS use MathML: \`<mo>$</mo><mn>amount</mn>\`.
-
-3. **DEPRECATED MATHML IS BANNED** - The following MathML elements are OBSOLETE and FORBIDDEN:
-   - NO <mfenced> elements - use <mrow> with explicit <mo> delimiters instead
-   - NO deprecated attributes or elements
-\n4. **NO CDATA SECTIONS** - Never use \`<![CDATA[ ... ]]>\`. All content must be properly XML-encoded within elements.
-\n5. **NO INVALID XML CHARACTERS** - Do not include control characters or non-characters:
-   - Disallowed: U+0000–U+001F (except TAB U+0009, LF U+000A, CR U+000D), U+FFFE, U+FFFF, and unpaired surrogates.
-
-ALL mathematical content MUST be converted to valid, modern MathML. NO EXCEPTIONS.
+- **MathML Conversion (MANDATORY)**: You MUST convert ALL LaTeX expressions to standard MathML. PRESERVE all mathematical structures: fractions, exponents, roots, operators, and inequalities. Do NOT simplify or alter the mathematical content.
+- **Table Rule (MANDATORY)**: All tables MUST be generated as \`{ "type": "tableRich", ... }\` objects within the 'body'. Tables are for presentation ONLY. For any interactive cell (e.g., a dropdown or text input), you MUST place an \`inlineInteractionRef\` inside the cell's content array. The corresponding interaction must be declared in the top-level 'interactions' array. Do NOT repeat table rows below the table with separate inline inputs. Each \`responseIdentifier\` MUST be rendered exactly once.
 
 Any discrepancy will cause your output to be rejected. Review your work carefully to ensure the body's slots and the declaration arrays are perfectly synchronized.`
 
@@ -1698,6 +1575,7 @@ ${JSON.stringify(exampleShells, null, 2)}
 
 
   ## CRITICAL Instructions:
+- **Strictly follow the MathML rules** in the system instructions.
 - **Analyze Images**: Use the raster images provided to your vision to understand the visual components of the question. Any SVG content is provided directly in the 'Raw Source Input' blocks.
 - **\`body\` Field**: Create a 'body' field containing the main content as a structured JSON array (not an HTML string).
   - **ONLY REFERENCED WIDGETS (WITH CHOICE-LEVEL EXCEPTION)**: CRITICAL RULE - Only include widgets/interactions that are explicitly referenced in the Perseus content string via \`[[☃ widget_name]]\` placeholders. Perseus JSON may contain many widget definitions, but you MUST ignore any that aren't actually used in the content.
