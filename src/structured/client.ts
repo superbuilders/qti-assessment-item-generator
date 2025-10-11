@@ -14,6 +14,7 @@ function isWidgetTypeKey(v: string): v is keyof typeof allWidgetSchemas {
 
 import { buildFeedbackPlanFromInteractions, createFeedbackObjectSchema, type FeedbackPlan } from "@/core/feedback"
 import { createAnyInteractionSchema } from "@/core/interactions"
+import type { AnyInteraction } from "@/core/interactions"
 import { type AssessmentItemShell, createAssessmentItemShellSchema } from "@/core/item"
 import { toJSONSchemaPromptSafe } from "@/core/json-schema"
 import { createPerOutcomeNestedFeedbackPrompt } from "./prompts/feedback-per-outcome"
@@ -297,23 +298,23 @@ async function generateInteractionContent<
 }
 
 async function generateFeedbackForOutcomeNested<
-	C extends WidgetCollection<Record<string, WidgetDefinition<unknown, unknown>>, readonly string[]>
+    C extends WidgetCollection<Record<string, WidgetDefinition<unknown, unknown>>, readonly string[]>
 >(
-	openai: OpenAI,
-	logger: logger.Logger,
-	assessmentShell: AssessmentItemShell<WidgetTypeTupleFrom<C>>,
-	widgetCollection: C,
-	feedbackPlan: FeedbackPlan,
-	combination: FeedbackPlan["combinations"][0],
-	interactions: Record<string, import("@/core/interactions").AnyInteraction<WidgetTypeTupleFrom<C>>>
+    openai: OpenAI,
+    logger: logger.Logger,
+    assessmentShell: AssessmentItemShell<WidgetTypeTupleFrom<C>>,
+    widgetCollection: C,
+    feedbackPlan: FeedbackPlan,
+    combination: FeedbackPlan["combinations"][0],
+    interactions: Record<string, AnyInteraction<WidgetTypeTupleFrom<C>>>
 ): Promise<{ id: string; content: BlockContent<WidgetTypeTupleFrom<C>> }> {
-	const { systemInstruction, userContent, ShallowSchema } = createPerOutcomeNestedFeedbackPrompt(
-		assessmentShell,
-		feedbackPlan,
-		combination,
-		widgetCollection,
-		interactions
-	)
+    const { systemInstruction, userContent, ShallowSchema } = createPerOutcomeNestedFeedbackPrompt(
+        assessmentShell,
+        feedbackPlan,
+        combination,
+        widgetCollection,
+        interactions
+    )
 
 	const jsonSchema = toJSONSchemaPromptSafe(ShallowSchema)
 	logger.debug("generated shallow json schema for openai feedback (shard)", {
@@ -395,7 +396,7 @@ async function runShardedFeedbackNested<
 	shell: AssessmentItemShell<WidgetTypeTupleFrom<C>>,
 	collection: C,
 	plan: FeedbackPlan,
-	interactions: Record<string, import("@/core/interactions").AnyInteraction<WidgetTypeTupleFrom<C>>>
+    interactions: Record<string, AnyInteraction<WidgetTypeTupleFrom<C>>>
 ): Promise<Record<string, BlockContent<WidgetTypeTupleFrom<C>>>> {
 	let combinationsToProcess = [...plan.combinations]
 	const successfulShards: Record<string, BlockContent<WidgetTypeTupleFrom<C>>> = {}
@@ -530,9 +531,9 @@ export async function generateFromEnvelope<
 		combinationCount: feedbackPlan.combinations.length,
 		mode: feedbackPlan.mode
 	})
-	const shardedResult = await errors.try(
-		runShardedFeedbackNested(openai, logger, assessmentShell, widgetCollection, feedbackPlan, generatedInteractions)
-	)
+const shardedResult = await errors.try(
+	runShardedFeedbackNested(openai, logger, assessmentShell, widgetCollection, feedbackPlan, generatedInteractions)
+)
 	if (shardedResult.error) {
 		logger.error("sharded feedback generation failed", { error: shardedResult.error })
 		throw errors.wrap(shardedResult.error, "sharded feedback generation")
