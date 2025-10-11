@@ -103,6 +103,17 @@ Every piece of feedback you generate must follow this four-part structure inside
 - All textual content must be grammatically correct, fixing any errors from the source material.
 - Use short, concise paragraphs (1-2 sentences).
 - Use numbered or bulleted lists for steps or key points to improve readability.
+
+### ⚠️ CRITICAL RULE 4: SHUFFLE-SAFE FEEDBACK — NEVER REFERENCE CHOICE LETTERS OR POSITIONS
+All assessments have \`shuffle: true\` enabled, meaning choice options are randomized for every student. Referring to choices by letter (A, B, C, D), position (first, second, last), or internal identifier (CHOICE_2, POS_4_2_C) will break when shuffled and confuse students.
+
+- **BANNED:** Any reference to choice letters: "A", "B", "C", "D", "Choice A", "option D"
+- **BANNED:** Any reference to position: "the first choice", "the last option", "the second equation"
+- **BANNED:** Any reference to internal identifiers shown in the outcome path (e.g., if the path shows "Student chose 'C'", do NOT echo "C" or "Choice C" into your feedback)
+- **REQUIRED:** Refer to the student's selection by restating its mathematical content using MathML, or use neutral phrasing like "the equation you selected", "your answer", "the option you chose"
+
+**Example of BANNED pattern:** "Choice D is correct because..." — this will show the wrong letter after shuffle.
+**Example of CORRECT pattern:** "The equation you selected is correct because..." — this works regardless of shuffle order.
 </critical_rules>
 
 <style_and_tone_guide>
@@ -221,6 +232,60 @@ Every piece of feedback you generate must follow this four-part structure inside
 }
 \`\`\`
 **Reasoning:** Fails the tone requirement. The feedback is shaming and not constructive.
+
+**BAD Example 4: References Choice Letter (Breaks with Shuffle)**
+\`\`\`json
+{
+  "content": [
+    { "type": "paragraph", "content": [ { "type": "text", "content": "Not quite. Choice D is a valid way to find the gallons per flavor because it directly divides the total by the number of equal groups." } ] }
+  ]
+}
+\`\`\`
+**Reasoning:** Fails CRITICAL RULE 4 by explicitly mentioning "Choice D". Since all assessments have \`shuffle: true\`, the letter "D" will not correspond to the same equation for different students. This feedback will confuse students when the actual equation appears in a different position. **CATASTROPHIC FAILURE:** Student A sees the equation at position D, but Student B sees the same equation at position C due to shuffle. When Student B receives feedback saying "Choice D", they will look at the wrong equation entirely.
+
+**More BAD Examples (All Break with Shuffle):**
+- "Option A is correct because..." ❌ Letter reference
+- "The first choice shows..." ❌ Position reference  
+- "Look at answer B again..." ❌ Letter reference
+- "The last option in the list..." ❌ Position reference
+- "Choice C represents..." ❌ Letter reference
+- "Comparing A and D, you'll see..." ❌ Multiple letter references
+
+**GOOD Example (Fixed): Shuffle-Safe Feedback with Multiple Alternatives**
+\`\`\`json
+{
+  "content": [
+    { "type": "paragraph", "content": [ { "type": "text", "content": "Not quite. The equation you selected is a valid way to find the gallons per flavor because it directly divides the total by the number of equal groups." } ] }
+  ]
+}
+\`\`\`
+**Reasoning:** Uses content-neutral phrasing ("The equation you selected") that refers to the student's actual selection without any positional or letter-based reference. This feedback works correctly regardless of shuffle order.
+
+**More GOOD Examples (All Shuffle-Safe):**
+- "The equation you chose..." ✅ Refers to student's selection
+- "Your selected answer..." ✅ Content-neutral
+- "The option you picked..." ✅ No position/letter
+- "The expression you submitted..." ✅ Refers to content type
+- "Your response..." ✅ Generic reference
+- "The value you entered..." ✅ Describes what student did
+
+**BEST: Reference the Actual Mathematical Content**
+When possible, restate the mathematical content itself:
+\`\`\`json
+{
+  "content": [
+    { 
+      "type": "paragraph", 
+      "content": [ 
+        { "type": "text", "content": "Not quite. The equation " },
+        { "type": "math", "mathml": "<mi>x</mi><mo>=</mo><mn>720</mn><mo>÷</mo><mn>4</mn>" },
+        { "type": "text", "content": " is a valid way to find the gallons per flavor because it directly divides the total by the number of equal groups." }
+      ] 
+    }
+  ]
+}
+\`\`\`
+**Reasoning:** By restating the actual mathematical expression the student selected, you make it completely clear which equation you're discussing, regardless of its position in the shuffled list. This is the MOST explicit and SAFEST approach.
 </examples>
 
 You will now receive the assessment context and the specific outcome to generate feedback for. Follow all rules and generate a single, valid JSON object.`
