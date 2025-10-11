@@ -511,13 +511,13 @@ Additional negative example (DO NOT OUTPUT) – Secondary Succession:
 \`\`\`json
 {
   "body": [
-    {"type":"blockSlot","slotId":"choice_interaction"}
+    { "type": "interactionRef", "interactionId": "choice_interaction" }
   ],
-  "title":"Identify examples of secondary succession",
-  "widgets":{},
-  "feedback":{
-    "correct":[{"type":"paragraph","content":[{"type":"text","content":"Correct! Secondary succession occurs after a disturbance in an area that previously supported life and where soil remains."}]}],
-    "incorrect":[{"type":"paragraph","content":[{"type":"text","content":"Not quite. Secondary succession happens in habitats that were previously occupied and then disturbed (for example, after a storm or clear-cutting), with soil still present. Primary succession begins on newly formed surfaces without soil, such as bare rock or fresh sand dunes."}]}]
+  "title": "Identify examples of secondary succession",
+  "widgets": {},
+  "feedback": {
+    "correct": [{"type":"paragraph","content":[{"type":"text","content":"Correct! Secondary succession occurs after a disturbance in an area that previously supported life and where soil remains."}]}],
+    "incorrect": [{"type":"paragraph","content":[{"type":"text","content":"Not quite. Secondary succession happens in habitats that were previously occupied and then disturbed (for example, after a storm or clear-cutting), with soil still present. Primary succession begins on newly formed surfaces without soil, such as bare rock or fresh sand dunes."}]}]
   },
   "identifier":"secondary-succession-multiple-select",
   "interactions":{

@@ -679,13 +679,13 @@ ${supportedInteractionTypes}
 	      "content": [{ "type": "text", "content": "Drag each word to the sentence it best completes." }]
 	    },
 	    {
-	      "type": "blockSlot",
-	      "slotId": "GAP_MATCH"
+	      "type": "interactionRef",
+	      "interactionId": "gap_match_interaction"
 	    }
 	  ],
 	  "widgets": null,
 	  "interactions": {
-	    "GAP_MATCH": {
+	    "gap_match_interaction": {
 	      "type": "gapMatchInteraction",
 	      "responseIdentifier": "RESPONSE",
 	      "shuffle": true,
