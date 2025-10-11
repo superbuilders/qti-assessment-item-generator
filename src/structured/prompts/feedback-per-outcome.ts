@@ -1,3 +1,5 @@
+import * as errors from "@superbuilders/errors"
+import * as logger from "@superbuilders/slog"
 import { z } from "zod"
 import type { BlockContent } from "@/core/content"
 import { createFeedbackContentSchema } from "@/core/content"
@@ -66,41 +68,14 @@ export function createPerOutcomeNestedFeedbackPrompt<
 	}
 	const correctnessSummary = getCorrectnessSummary()
 
-	const getInteractionDetails = (): string => {
-		if (!interactions || combination.path.length === 0) {
-			return "No interaction details applicable."
-		}
-
-		return combination.path
-			.map((seg) => {
-				const interaction = Object.values(interactions).find(
-					(i) => i.responseIdentifier === seg.responseIdentifier
-				)
-				if (!interaction) return `Details for '${seg.responseIdentifier}': Not found.`
-
-				let details = `### Interaction: \`${seg.responseIdentifier}\`\n- **Type**: ${interaction.type}\n- **Student's Key**: ${seg.key}`
-
-				switch (interaction.type) {
-					case "choiceInteraction":
-					case "inlineChoiceInteraction":
-						details += `\n- **Choices**:\n${interaction.choices
-							.map((c) => `  - { identifier: "${c.identifier}" }`)
-							.join("\n")}`
-						break
-					case "textEntryInteraction":
-						details += `\n- **Constraints**: Expected length: ${interaction.expectedLength}`
-						break
-					case "orderInteraction":
-						details += `\n- **All Tokens**: ${interaction.choices.map((c) => c.identifier).join(", ")}`
-						break
-				}
-				return details
-			})
-			.join("\n\n")
+	const interactionDetailsResult = errors.trySync(() => JSON.stringify({ interactions }))
+	if (interactionDetailsResult.error) {
+		logger.error("json stringify interactions", { error: interactionDetailsResult.error })
+		throw errors.wrap(interactionDetailsResult.error, "json stringify interactions")
 	}
-	const interactionDetailsText = getInteractionDetails()
+	const interactionDetailsText = interactionDetailsResult.data
 
-	const jsonSkeleton = JSON.stringify({ content: [] }, null, 2)
+	const jsonSkeleton = JSON.stringify({ content: [] })
 
 	const systemInstruction = `
 <role>
@@ -261,7 +236,7 @@ ${widgetSelectionSection}
 
 ## Assessment Context
 \`\`\`json
-${JSON.stringify(assessmentShell, null, 2)}
+${JSON.stringify(assessmentShell)}
 \`\`\`
 
 ## TARGET OUTCOME
@@ -273,8 +248,7 @@ ${outcomePathText}
 ### Outcome Correctness Summary:
 ${correctnessSummary}
 
-### Interaction Details (Info Boost):
-This section provides exhaustive details for each interaction on the student's path, replacing the need for a nested response.
+### Interactions (Raw JSON):
 ${interactionDetailsText}
 
 
