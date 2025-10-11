@@ -37,94 +37,9 @@ interface NestedNode<E extends readonly string[]> {
 		[key: string]: Leaf<E> | NestedNode<E>
 	}
 }
-type Overall<E extends readonly string[]> = NestedNode<E> | { CORRECT: Leaf<E>; INCORRECT: Leaf<E> }
-type FeedbackPayload<E extends readonly string[]> = { feedback: { FEEDBACK__OVERALL: Overall<E> } }
-// For fallback shards: exactly one key is present per shard (CORRECT or INCORRECT)
-type FallbackSinglePayload<E extends readonly string[]> = {
-	feedback: { FEEDBACK__OVERALL: { CORRECT?: Leaf<E>; INCORRECT?: Leaf<E> } }
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-	return typeof value === "object" && value !== null
-}
 
 function isLeaf<E extends readonly string[]>(v: Leaf<E> | NestedNode<E>): v is Leaf<E> {
 	return Object.hasOwn(v, "content")
-}
-
-function isNestedNode<E extends readonly string[]>(v: unknown): v is NestedNode<E> {
-	if (!isRecord(v)) return false
-	if ("content" in v) return false
-	const keys = Object.keys(v)
-	// Consider it a nested node if it has at least one key that is not CORRECT/INCORRECT
-	return keys.some((k) => k !== "CORRECT" && k !== "INCORRECT")
-}
-
-function extractLeafContentAtPath<E extends readonly string[]>(
-	data: FeedbackPayload<E> | FallbackSinglePayload<E>,
-	path: AssessmentItemInput<E>["feedbackPlan"]["combinations"][0]["path"],
-	combinationId: string
-): BlockContent<E> {
-	const overall = data.feedback.FEEDBACK__OVERALL
-	if (path.length === 0) {
-		// Fallback mode: require only the targeted key
-		if (combinationId !== "CORRECT" && combinationId !== "INCORRECT") {
-			logger.error("invalid fallback combination id", { combinationId })
-			throw errors.new("invalid fallback combination id")
-		}
-		const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null
-		if (!isRecord(overall)) {
-			logger.error("fallback overall is not an object", { combinationId })
-			throw errors.new("expected fallback overall object")
-		}
-		const targeted = overall[combinationId]
-		const hasBlockContent = (v: unknown): v is { content: BlockContent<E> } => isRecord(v) && "content" in v
-		if (!hasBlockContent(targeted)) {
-			logger.error("missing targeted fallback key in shard response", {
-				combinationId,
-				availableKeys: Object.keys(overall)
-			})
-			throw errors.new("missing targeted fallback key")
-		}
-		return targeted.content
-	}
-
-	if (!isNestedNode<E>(overall)) {
-		logger.error("unexpected fallback shape for combo path", { combinationId, pathLength: path.length })
-		throw errors.new("unexpected fallback shape for combo path")
-	}
-	let current: NestedNode<E> | Leaf<E> = overall
-	for (let i = 0; i < path.length; i++) {
-		const seg = path[i]
-		if (!seg) {
-			logger.error("invalid feedback path segment", { index: i, pathLength: path.length, combinationId })
-			throw errors.new("invalid feedback path segment")
-		}
-		if (isLeaf(current)) {
-			logger.error("leaf encountered before end of path", { index: i, combinationId })
-			throw errors.new("leaf encountered before end of path")
-		}
-		const branch: { [key: string]: Leaf<E> | NestedNode<E> } = current[seg.responseIdentifier]
-		if (!branch) {
-			logger.error("invalid feedback path segment", {
-				index: i,
-				responseIdentifier: seg.responseIdentifier,
-				combinationId
-			})
-			throw errors.new("invalid feedback path segment")
-		}
-		const next: Leaf<E> | NestedNode<E> = branch[seg.key]
-		if (!next) {
-			logger.error("invalid feedback path key", { index: i, key: seg.key, combinationId })
-			throw errors.new("invalid feedback path key")
-		}
-		current = next
-	}
-	if (!isLeaf(current)) {
-		logger.error("expected leaf at end of path", { combinationId, pathLength: path.length })
-		throw errors.new("expected leaf at end of path")
-	}
-	return current.content
 }
 
 async function resolveRasterImages(envelope: AiContextEnvelope): Promise<ImageContext> {
@@ -391,23 +306,23 @@ async function generateFeedbackForOutcomeNested<
 	widgetCollection: C,
 	feedbackPlan: FeedbackPlan,
 	combination: FeedbackPlan["combinations"][0],
-	imageContext: ImageContext
+	imageContext: ImageContext,
+	interactions: Record<string, import("@/core/interactions").AnyInteraction<WidgetTypeTupleFrom<C>>>
 ): Promise<{ id: string; content: BlockContent<WidgetTypeTupleFrom<C>> }> {
-	const { systemInstruction, userContent, SinglePathSchema } = createPerOutcomeNestedFeedbackPrompt(
+	const { systemInstruction, userContent, ShallowSchema } = createPerOutcomeNestedFeedbackPrompt(
 		envelope,
 		assessmentShell,
 		feedbackPlan,
 		combination,
 		widgetCollection,
-		imageContext
+		imageContext,
+		interactions
 	)
 
-	const jsonSchema = toJSONSchemaPromptSafe(SinglePathSchema)
-	const schemaByteLength = new TextEncoder().encode(JSON.stringify(jsonSchema)).length
-	logger.debug("generated json schema for openai feedback (shard)", {
+	const jsonSchema = toJSONSchemaPromptSafe(ShallowSchema)
+	logger.debug("generated shallow json schema for openai feedback (shard)", {
 		functionName: "generateFeedbackForOutcomeNested",
-		combinationId: combination.id,
-		schemaByteLength
+		combinationId: combination.id
 	})
 
 	const params: ChatCompletionCreateParamsNonStreaming = {
@@ -439,17 +354,13 @@ async function generateFeedbackForOutcomeNested<
 		logger.error("feedback shard json parse", { combinationId: combination.id, error: parsedResult.error })
 		throw errors.wrap(parsedResult.error, `feedback shard json parse for ${combination.id}`)
 	}
-	const validated = SinglePathSchema.safeParse(parsedResult.data)
+	const validated = ShallowSchema.safeParse(parsedResult.data)
 	if (!validated.success) {
 		logger.error("feedback shard validation failed", { combinationId: combination.id, error: validated.error })
 		throw errors.wrap(validated.error, `feedback shard validation for ${combination.id}`)
 	}
 
-	const parsedContent = extractLeafContentAtPath<WidgetTypeTupleFrom<C>>(
-		validated.data,
-		combination.path,
-		combination.id
-	)
+	const parsedContent = validated.data.content
 	if (parsedContent.length === 0) {
 		logger.warn("feedback shard returned empty content array", { combinationId: combination.id })
 	}
@@ -489,7 +400,8 @@ async function runShardedFeedbackNested<
 	shell: AssessmentItemShell<WidgetTypeTupleFrom<C>>,
 	collection: C,
 	plan: FeedbackPlan,
-	imageContext: ImageContext
+	imageContext: ImageContext,
+	interactions: Record<string, import("@/core/interactions").AnyInteraction<WidgetTypeTupleFrom<C>>>
 ): Promise<Record<string, BlockContent<WidgetTypeTupleFrom<C>>>> {
 	let combinationsToProcess = [...plan.combinations]
 	const successfulShards: Record<string, BlockContent<WidgetTypeTupleFrom<C>>> = {}
@@ -505,7 +417,7 @@ async function runShardedFeedbackNested<
 
 		const tasks = combinationsToProcess.map(
 			(combination) => () =>
-				generateFeedbackForOutcomeNested(openai, logger, envelope, shell, collection, plan, combination, imageContext)
+				generateFeedbackForOutcomeNested(openai, logger, envelope, shell, collection, plan, combination, imageContext, interactions)
 		)
 
 		const results = await Promise.allSettled(tasks.map((task) => task()))
@@ -625,7 +537,7 @@ export async function generateFromEnvelope<
 		mode: feedbackPlan.mode
 	})
 	const shardedResult = await errors.try(
-		runShardedFeedbackNested(openai, logger, envelope, assessmentShell, widgetCollection, feedbackPlan, imageContext)
+		runShardedFeedbackNested(openai, logger, envelope, assessmentShell, widgetCollection, feedbackPlan, imageContext, generatedInteractions)
 	)
 	if (shardedResult.error) {
 		logger.error("sharded feedback generation failed", { error: shardedResult.error })

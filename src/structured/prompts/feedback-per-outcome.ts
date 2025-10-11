@@ -1,104 +1,21 @@
-import * as errors from "@superbuilders/errors"
-import * as logger from "@superbuilders/slog"
 import { z } from "zod"
 import type { BlockContent } from "@/core/content"
 import { createFeedbackContentSchema } from "@/core/content"
 import type { FeedbackCombination, FeedbackPlan } from "@/core/feedback"
+import type { AnyInteraction } from "@/core/interactions"
 import type { AssessmentItemShell } from "@/core/item"
 import type { WidgetCollection, WidgetDefinition, WidgetTypeTupleFrom } from "@/widgets/collections/types"
 import type { AiContextEnvelope, ImageContext } from "../types"
 import { createWidgetSelectionPromptSection, formatUnifiedContextSections } from "./shared"
 
-// Strong types for the payload we expect the model to return
-type Leaf<E extends readonly string[]> = { content: BlockContent<E> }
-interface NestedNode<E extends readonly string[]> {
-	[responseIdentifier: string]: {
-		[key: string]: Leaf<E> | NestedNode<E>
-	}
-}
-type Overall<E extends readonly string[]> = NestedNode<E> | { CORRECT: Leaf<E>; INCORRECT: Leaf<E> }
-type FeedbackPayload<E extends readonly string[]> = { feedback: { FEEDBACK__OVERALL: Overall<E> } }
-
-// For fallback shards: exactly one key is present per shard (CORRECT or INCORRECT)
-type FallbackSinglePayload<E extends readonly string[]> = {
-	feedback: { FEEDBACK__OVERALL: { CORRECT?: Leaf<E>; INCORRECT?: Leaf<E> } }
+type ShallowFeedbackPayload<E extends readonly string[]> = {
+	content: BlockContent<E>
 }
 
 /**
- * Builds a single-path nested Zod schema for a specific feedback combination.
- * This schema ONLY includes the target keys at each level, completely avoiding enum explosion.
- * Always returns a schema for a NestedNode<E> (not the leaf).
- */
-function buildSinglePathOverallSchema<E extends readonly string[]>(
-	dimensions: readonly FeedbackPlan["dimensions"][number][],
-	targetPath: readonly FeedbackCombination["path"][number][],
-	leafSchema: z.ZodType<Leaf<E>>
-): z.ZodType<NestedNode<E>> {
-	if (dimensions.length === 0) {
-		// This function is only called in combo mode where at least one dimension exists at entry.
-		// If we reach here, the caller logic is inconsistent.
-		logger.error("no dimensions for single-path builder")
-		throw errors.new("no dimensions for single-path builder")
-	}
-
-	if (dimensions.length === 1) {
-		const lastDim = dimensions[0]
-		const seg = targetPath[0]
-		if (!lastDim || !seg) {
-			logger.error("invalid single-path parameters", {
-				dimensionCount: dimensions.length,
-				targetPathLength: targetPath.length
-			})
-			throw errors.new("invalid single-path parameters")
-		}
-		const branch = z.object({ [seg.key]: leafSchema }).strict()
-		const response = z.object({ [lastDim.responseIdentifier]: branch }).strict()
-		return response
-	}
-
-	const currentDim = dimensions[0]
-	const targetSegment = targetPath[0]
-	if (!currentDim || !targetSegment) {
-		logger.error("invalid multi-segment parameters", {
-			dimensionCount: dimensions.length,
-			targetPathLength: targetPath.length
-		})
-		throw errors.new("invalid multi-segment parameters")
-	}
-	const inner = buildSinglePathOverallSchema<E>(dimensions.slice(1), targetPath.slice(1), leafSchema)
-	const branch = z.object({ [targetSegment.key]: inner }).strict()
-	const response = z.object({ [currentDim.responseIdentifier]: branch }).strict()
-	return response
-}
-
-/**
- * Builds a JSON skeleton showing the exact single path for the prompt example.
- */
-function buildSinglePathJsonSkeleton(
-	targetPath: readonly FeedbackCombination["path"][number][]
-): Record<string, unknown> {
-	const result: Record<string, unknown> = {}
-	let current: Record<string, unknown> = result
-
-	for (const segment of targetPath) {
-		const branch: Record<string, unknown> = {}
-		current[segment.responseIdentifier] = branch
-		const next: Record<string, unknown> = {}
-		branch[segment.key] = next
-		current = next
-	}
-	current.content = []
-
-	return {
-		feedback: {
-			FEEDBACK__OVERALL: result
-		}
-	}
-}
-
-/**
- * Creates a feedback generation prompt for a single outcome. The dynamically-generated
- * Zod schema enforces a nested structure with only one valid path to a leaf node.
+ * Creates a feedback generation prompt for a single outcome with a shallow schema.
+ * The schema is now a simple `{ content: BlockContent }` object, and all contextual
+ * information about the outcome is encoded directly into the prompt text.
  */
 export function createPerOutcomeNestedFeedbackPrompt<
 	C extends WidgetCollection<Record<string, WidgetDefinition<unknown, unknown>>, readonly string[]>
@@ -108,53 +25,82 @@ export function createPerOutcomeNestedFeedbackPrompt<
 	feedbackPlan: FeedbackPlan,
 	combination: FeedbackCombination,
 	widgetCollection: C,
-	imageContext: ImageContext
+	imageContext: ImageContext,
+	interactions: Record<string, AnyInteraction<WidgetTypeTupleFrom<C>>>
 ): {
 	systemInstruction: string
 	userContent: string
-	SinglePathSchema: z.ZodType<FeedbackPayload<WidgetTypeTupleFrom<C>> | FallbackSinglePayload<WidgetTypeTupleFrom<C>>>
+	ShallowSchema: z.ZodType<ShallowFeedbackPayload<WidgetTypeTupleFrom<C>>>
 } {
 	const ContentSchema: z.ZodType<BlockContent<WidgetTypeTupleFrom<C>>> = createFeedbackContentSchema(
 		widgetCollection.widgetTypeKeys
 	)
 
-	let SinglePathSchema: z.ZodType<
-		FeedbackPayload<WidgetTypeTupleFrom<C>> | FallbackSinglePayload<WidgetTypeTupleFrom<C>>
-	>
-	if (feedbackPlan.mode === "fallback") {
-		const LeafSchema: z.ZodType<Leaf<WidgetTypeTupleFrom<C>>> = z.object({ content: ContentSchema }).strict()
-		// Single-key schema: only the targeted key (CORRECT or INCORRECT) is required per shard
-		const TargetedOverall = z.object({ [combination.id]: LeafSchema }).strict()
-		SinglePathSchema = z.object({ feedback: z.object({ FEEDBACK__OVERALL: TargetedOverall }).strict() }).strict()
-	} else {
-		const LeafSchema: z.ZodType<Leaf<WidgetTypeTupleFrom<C>>> = z.object({ content: ContentSchema }).strict()
-		const SinglePathOverall: z.ZodType<NestedNode<WidgetTypeTupleFrom<C>>> = buildSinglePathOverallSchema<
-			WidgetTypeTupleFrom<C>
-		>(feedbackPlan.dimensions, combination.path, LeafSchema)
-		SinglePathSchema = z.object({ feedback: z.object({ FEEDBACK__OVERALL: SinglePathOverall }).strict() }).strict()
+	const ShallowSchema = z.object({ content: ContentSchema }).strict()
+
+	const outcomePathText =
+		combination.path.length > 0
+			? combination.path
+					.map(
+						(seg, i) =>
+							`  ${i + 1}. Interaction '${seg.responseIdentifier}': Student chose '${seg.key}'`
+					)
+					.join("\n")
+			: "N/A (Fallback Mode)"
+
+	const getCorrectnessSummary = (): string => {
+		if (feedbackPlan.mode === "fallback") {
+			return `Overall outcome: ${combination.id}`
+		}
+		for (const seg of combination.path) {
+			const decl = assessmentShell.responseDeclarations.find((d) => d.identifier === seg.responseIdentifier)
+			if (decl?.baseType === "identifier" && decl.cardinality === "single" && typeof decl.correct === "string") {
+				if (decl.correct !== seg.key) {
+					return "Overall outcome for this path: INCORRECT"
+				}
+			} else {
+				return "Overall outcome for this path: Mixed/Complex"
+			}
+		}
+		return "Overall outcome for this path: CORRECT"
 	}
+	const correctnessSummary = getCorrectnessSummary()
 
-	const nestedPathStr =
-		feedbackPlan.mode === "fallback"
-			? `Overall outcome: ${combination.id}`
-			: combination.path.map((seg) => `${seg.responseIdentifier} → ${seg.key}`).join(", ")
+	const getInteractionDetails = (): string => {
+		if (!interactions || combination.path.length === 0) {
+			return "No interaction details applicable."
+		}
 
-	const jsonSkeleton =
-		feedbackPlan.mode === "fallback"
-			? JSON.stringify(
-					{
-						feedback: {
-							FEEDBACK__OVERALL: {
-								[combination.id]: {
-									content: []
-								}
-							}
-						}
-					},
-					null,
-					2
+		return combination.path
+			.map((seg) => {
+				const interaction = Object.values(interactions).find(
+					(i) => i.responseIdentifier === seg.responseIdentifier
 				)
-			: JSON.stringify(buildSinglePathJsonSkeleton(combination.path), null, 2)
+				if (!interaction) return `Details for '${seg.responseIdentifier}': Not found.`
+
+				let details = `### Interaction: \`${seg.responseIdentifier}\`\n- **Type**: ${interaction.type}\n- **Student's Key**: ${seg.key}`
+
+				switch (interaction.type) {
+					case "choiceInteraction":
+					case "inlineChoiceInteraction":
+						details += `\n- **Choices**:\n${interaction.choices
+							.map((c) => `  - { identifier: "${c.identifier}" }`)
+							.join("\n")}`
+						break
+					case "textEntryInteraction":
+						details += `\n- **Constraints**: Expected length: ${interaction.expectedLength}`
+						break
+					case "orderInteraction":
+						details += `\n- **All Tokens**: ${interaction.choices.map((c) => c.identifier).join(", ")}`
+						break
+				}
+				return details
+			})
+			.join("\n\n")
+	}
+	const interactionDetailsText = getInteractionDetails()
+
+	const jsonSkeleton = JSON.stringify({ content: [] }, null, 2)
 
 	const systemInstruction = `
 <role>
@@ -177,7 +123,10 @@ Every piece of feedback you generate must follow this four-part structure inside
 4.  **<analysis_step_4>Formulate a Formative Check:</analysis_step_4>** Devise 1-2 reflective questions the student can ask themselves to check their work without revealing the answer.
 
 ### ⚠️ CRITICAL RULE 3: STRICTLY FOLLOW OUTPUT FORMAT
-- Your entire output must be a single JSON object that conforms to the provided schema.
+- Your entire output MUST be a single JSON object that conforms to the provided shallow schema: \`{ "content": BlockContent[] }\`.
+- **DO NOT** include any extra keys.
+- **DO NOT** add any explanations outside the JSON.
+- **DO NOT** use any nested structures within the top-level object.
 - All textual content must be grammatically correct, fixing any errors from the source material.
 - Use short, concise paragraphs (1-2 sentences).
 - Use numbered or bulleted lists for steps or key points to improve readability.
@@ -304,7 +253,7 @@ You will now receive the assessment context and the specific outcome to generate
 
 	const widgetSelectionSection = createWidgetSelectionPromptSection(widgetCollection)
 
-	const userContent = `Generate feedback for ONLY the outcome specified below. First, perform your analysis within <thinking_process> tags, following the 4-step pedagogical structure. Then, provide the final JSON output.
+	const userContent = `Generate feedback ONLY for the single student outcome specified below. Your response MUST be a single JSON object matching the shallow schema exactly.
 
 ${formatUnifiedContextSections(envelope, imageContext)}
 
@@ -315,19 +264,30 @@ ${widgetSelectionSection}
 ${JSON.stringify(assessmentShell, null, 2)}
 \`\`\`
 
-## TARGET OUTCOME NESTED PATH
-- ${nestedPathStr}
+## TARGET OUTCOME
+This feedback is for the specific outcome where the student's choices resulted in the following path:
 
-## REQUIRED OUTPUT STRUCTURE (fill content at the exact nested location)
+### Selected Outcome Path (in order):
+${outcomePathText}
+
+### Outcome Correctness Summary:
+${correctnessSummary}
+
+### Interaction Details (Info Boost):
+This section provides exhaustive details for each interaction on the student's path, replacing the need for a nested response.
+${interactionDetailsText}
+
+
+## REQUIRED OUTPUT STRUCTURE (shallow schema)
+Your response must be a single JSON object matching this exact structure. No extra keys.
 \`\`\`json
 ${jsonSkeleton}
 \`\`\`
 
 ## Instructions:
-1.  **Analyze the student's path.** Determine the likely reasoning based on the provided outcome.
-2.  **Think Step-by-Step:** Internally follow the 4-part pedagogical structure within \`<thinking_process>\` tags to plan your feedback.
-3.  **Generate High-Quality Feedback:** Write the feedback content as a \`BlockContent\` array.
-4.  **Construct Final JSON:** Place the generated content into the "content" field at the exact nested path shown in the required structure. Your final response MUST be only the JSON object.`
+1.  **Analyze the student's path and the detailed interaction info.**
+2.  **Generate High-Quality Feedback:** Write the feedback content as a \`BlockContent\` array.
+3.  **Construct Final JSON:** Place the content into the "content" field of the shallow JSON object.`
 
-	return { systemInstruction, userContent, SinglePathSchema }
+	return { systemInstruction, userContent, ShallowSchema }
 }
