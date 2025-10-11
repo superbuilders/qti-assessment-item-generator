@@ -8,6 +8,7 @@ import type { AiContextEnvelope, ImageContext } from "../types"
 import { caretBanPromptSection } from "./caret"
 import { createWidgetSelectionPromptSection, formatUnifiedContextSections } from "./shared"
 import { createMathmlComplianceSection } from "./shared/mathml"
+import { createEquationsInChoicesSection } from "./shared/equations-in-choices"
 
 // Helper to convert a full AssessmentItemInput into a shell for prompt examples
 function createShellFromExample<const E extends readonly string[]>(item: AssessmentItemInput<E>) {
@@ -65,6 +66,8 @@ WE MUST correct any grammatical errors found in the source Perseus content. This
 The goal is to produce clean, professional educational content that maintains the original meaning while fixing any language errors present in the source material.
 
 ${createMathmlComplianceSection()}
+
+${createEquationsInChoicesSection()}
 
 The shell should:
 1. Convert Perseus content into a structured 'body' field as a JSON array of block-level items.

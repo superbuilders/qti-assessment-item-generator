@@ -3,6 +3,7 @@ import type { AiContextEnvelope, ImageContext } from "../types"
 import { caretBanPromptSection } from "./caret"
 import { createWidgetSelectionPromptSection, formatUnifiedContextSections } from "./shared"
 import { createMathmlComplianceSection } from "./shared/mathml"
+import { createEquationsInChoicesSection } from "./shared/equations-in-choices"
 
 export function createInteractionContentPrompt<
 	C extends WidgetCollection<Record<string, WidgetDefinition<unknown, unknown>>, readonly string[]>
@@ -335,6 +336,10 @@ SCAN ALL text content (prompts, choices, feedback) for "$" or "%" - these MUST b
 
 ${formatUnifiedContextSections(envelope, imageContext)}
 
+${createMathmlComplianceSection()}
+
+${createEquationsInChoicesSection()}
+
 ${widgetSelectionSection}
 
 ## Assessment Shell (for context):
@@ -350,9 +355,9 @@ ${JSON.stringify(assessmentShell, null, 2)}
 - Ensure all required properties for each interaction type are included.
 - **CRITICAL**: Preserve all MathML content exactly as it appears in the assessment shell body.
   
-  - **MANDATORY: EMBED WIDGET SLOTS INSIDE CHOICES WHEN VISUALS ARE PRESENT**
-    - If the original Perseus choice content includes images/diagrams/graphie visuals, you MUST represent the choice's visual by inserting a block slot reference to the predeclared widget slot using the naming scheme \`<responseIdentifier>__<choiceLetter>__v<index>\`.
-    - Build each choice's \`content\` as structured block content that includes a \`blockSlot\` with the correct \`slotId\` for each visual in that choice, preserving any accompanying text.
+  - **MANDATORY: USE WIDGET SLOTS ONLY FOR NON-MATH VISUALS**
+    - If the original Perseus choice content includes non-math visuals (images, diagrams, graphie visuals), you MUST represent each visual by inserting a widgetRef to the predeclared widget slot using the naming scheme \`<responseIdentifier>__<choiceLetter>__v<index>\`.
+    - Build each choice's \`content\` as structured block content that includes a \`widgetRef\` with the correct \`widgetId\` and \`widgetType\` for each visual in that choice, preserving any accompanying text.
     - Never embed \`<img>\` or \`<svg>\` directly. Always reference the widget slot(s).
     - Use choice identifiers A, B, C, ... consistently with the response declaration plan; ensure the slot names match exactly.
 - Return ONLY a JSON object with interaction slot names as keys and interaction objects as values.
@@ -651,14 +656,14 @@ CORRECT: \`content: [{ "type": "paragraph", "content": [{ "type": "text", "conte
   }
   \`\`\`
 
-**⚠️ CRITICAL NEW SECTION: MANDATORY USE OF ALL DECLARED WIDGET SLOTS IN INTERACTIONS**
+**⚠️ CRITICAL NEW SECTION: WIDGET SLOT USAGE IN INTERACTIONS (NON-MATH VISUALS ONLY)**
 
-**ABSOLUTE REQUIREMENT: You MUST use ALL widget slots declared in the assessment shell that are not already used in the body.**
+Use all declared choice-level widget slots that correspond to non-math visuals and are not already used in the body.
 
-When the assessment shell declares widget slots (especially those following patterns like \\\`choice_a_visual\\\`, \\\`choice_b_visual\\\`, or \\\`RESPONSE__A__v1\\\`), these are widgets specifically reserved for embedding inside interaction choices. The pipeline has already:
-1. Identified these widgets in Shot 1
-2. Mapped them to specific widget types in Shot 2
-3. Reserved them for use in this interaction generation step
+When the assessment shell declares widget slots (especially those following patterns like \`choice_a_visual\`, \`choice_b_visual\`, or \`RESPONSE__A__v1\`), these are widgets specifically reserved for embedding inside interaction choices when the choice includes a diagram/image. The pipeline has already:
+   1. Identified these widgets in Shot 1
+   2. Mapped them to specific widget types in Shot 2
+   3. Reserved them for use in this interaction generation step
 
 **FAILURE TO USE DECLARED WIDGET SLOTS WILL CAUSE THEM TO BE PRUNED AND THE QUESTION TO FAIL.**
 
@@ -700,7 +705,7 @@ When the assessment shell declares widget slots (especially those following patt
   }
 }
 \`\`\`
-**Why this is WRONG:** The shell declared \\\`choice_a_visual\\\` and \\\`choice_b_visual\\\` widgets, but the interaction didn't use them. These widgets will be pruned as "unused" and never generated, breaking the question.
+**Why this is WRONG:** The shell declared \`choice_a_visual\` and \`choice_b_visual\` widgets, but the interaction didn't use them. These widgets will be pruned as "unused" and never generated, breaking the question.
 
 **CORRECT (Using the declared widget slots):**
 \`\`\`json
@@ -726,16 +731,19 @@ When the assessment shell declares widget slots (especially those following patt
 \`\`\`
 
 **MANDATORY CHECKLIST FOR INTERACTION GENERATION:**
-1. Check the assessment shell's \\\`widgets\\\` array for ALL declared widget slots
-2. Identify which widgets are already used in the \\\`body\\\` 
+1. Check the assessment shell's \`widgets\` array for ALL declared widget slots
+2. Identify which widgets are already used in the \`body\` 
 3. The remaining unused widgets MUST be embedded in your interaction choices
 4. Use the exact slotId from the shell - do not create new slot names
-5. For choice-level visuals (images, diagrams), ALWAYS use widgetRef, never create text representations
+5. For choice-level content:
+   - **Math-only equations/expressions → Use a paragraph with inline MathML nodes. NEVER \`widgetRef\`.**
+   - **Diagrams, charts, geometric figures → Use \`widgetRef\`.**
+   - **NEVER create textual descriptions of diagrams.**
 
 **Common Widget Slot Patterns to Watch For:**
-- \\\`choice_a_visual\\\`, \\\`choice_b_visual\\\`, etc. - Visuals for each choice
-- \\\`RESPONSE__A__v1\\\`, \\\`RESPONSE__B__v1\\\`, etc. - Visual widgets for choices
-- \\\`option_1_diagram\\\`, \\\`option_2_diagram\\\`, etc. - Diagrams for each choice
+- \`choice_a_visual\`, \`choice_b_visual\`, etc. - Visuals for each choice
+- \`RESPONSE__A__v1\`, \`RESPONSE__B__v1\`, etc. - Visual widgets for choices
+- \`option_1_diagram\`, \`option_2_diagram\`, etc. - Diagrams for each choice
 - Any widget slot not used in the body MUST be used in the interaction
 
 **REMEMBER:** The pipeline will DELETE any widget slots you don't reference. If the shell declares it, YOU MUST USE IT.

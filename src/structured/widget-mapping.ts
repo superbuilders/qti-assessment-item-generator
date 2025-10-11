@@ -124,9 +124,10 @@ ${assessmentBody}
 ${createWidgetSelectionPromptSection(widgetCollection)}
 
  MANDATORY RULES FOR CHOICE-LEVEL VISUALS:
- - Some widget slot names may follow the convention \`<responseIdentifier>__<choiceLetter>__v<index>\`. These are widgets reserved for visuals that appear INSIDE interaction choices (e.g., images/diagrams in radio choices).
+ - Some widget slot names may follow conventions like \`repl__choice_interaction__choice__a__visual__0\` or \`reponse__a__v1\`. These are widgets reserved for visuals that appear INSIDE interaction choices (e.g., images/diagrams in radio choices).
  - You MUST map these choice-level widget slots to the correct widget types by inspecting the Perseus JSON for the corresponding choice content.
- - Do NOT assume these appear in the top-level body; they are intentionally absent from body and will be inserted inside choices later.
+ - CRITICAL: If a choice contains ONLY a mathematical equation or expression with no diagram, that choice should NOT have a widget slot. Do NOT map equation-only choices to any widget type. The correct representation is inline MathML in the choice content.
+ - Do NOT assume these widgets appear in the top-level body; they are intentionally absent from the body and will be inserted inside choices later.
 
 Your response must be a JSON object with a single key "widget_mapping", mapping every slot name from the list below to its type. If no suitable type is found, you MUST use the string "WIDGET_NOT_FOUND". However, for FBD slots (names starting with \`fbd_\`), you MUST map to \`freeBodyDiagram\` and MUST NOT use \`WIDGET_NOT_FOUND\`.
 
