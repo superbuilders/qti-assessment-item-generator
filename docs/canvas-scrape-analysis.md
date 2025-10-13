@@ -100,6 +100,7 @@ Exact file locations (by pattern):
 
 ### Visual content
 - Per-question images are widespread (`question-*.png`); many prompts embed the essential question stem and options within the screenshot rather than text-only HTML.
+- Also present and useful: nested `_quiz/_images/*.png` (e.g., figures embedded in HTML), `_quiz/results.png`, `_quiz/quiz-overview.png`, `_quiz/quiz-full-page.png`, `_quiz/before-submit.png`, and page screenshots like `_quiz/page-*-screenshot.png`.
 - This favors a multimodal pipeline path: include images alongside text so the model can read the screenshots.
 
 ### Suitability for our pipeline
@@ -108,6 +109,7 @@ Our pipeline expects an `AiContextEnvelope` with:
 - `supplementaryContent`: string[]
 - `multimodalImageUrls`: string[] (http/https/data)
 - `multimodalImagePayloads`: raster payloads (ArrayBuffer + MIME)
+- `pdfPayloads`: PDF payloads (ArrayBuffer + name) — attached to Shot 1 as `input_file`
 
 Assessment of fitness:
 - **Primary content**: `quiz-page.html` (29/33) is an appropriate primary text source for quizzes. For unit tests that lack this, we can substitute a synthesized primary using `capture-*.html` (if present) or a concatenation of question texts from `quiz-data.json` (stringified) plus a textual summary.
@@ -116,18 +118,16 @@ Assessment of fitness:
   - Add `quiz-data.json` (stringified) as supplemental context (33/33) to provide structured options and normalized dropdowns/matching schemas.
   - Optionally include page-level `page.html`/`page-data.json` from the parent lesson for extra semantic context.
 - **Images**: 
-  - Attach `question-*.png` as `multimodalImagePayloads`. With 478 images across 33 assessments, typical payloads per assessment are well under the current caps (≤500 images, ≤50 MB total per request). Unit tests with ~30 images should still generally fit under 50 MB assuming typical PNG sizes (we will implement a per-assessment size check and, if necessary, downscale/compress or subset).
+  - Attach all `_quiz/question-*.png` as `multimodalImagePayloads` for every assessment. No local byte/image caps — we rely on provider-side limits. If the provider rejects due to size, we fail fast with clear diagnostics for an explicit operator decision.
   - Include `quiz-full-page.png`, `quiz-overview.png`, and `before-submit.png` as additional multimodal context where helpful.
 
 How envelopes are consumed (from pipeline code):
 - `generateFromEnvelope()`
   - Validates `primaryContent` non-empty.
-  - Resolves images via `resolveRasterImages`: accepts `multimodalImageUrls` (http/https/data) and inlines `multimodalImagePayloads` into data URLs; enforces caps: max 500 images, max ~50MB total payload.
-  - Shot 1: `createAssessmentShellPrompt(envelope, imageContext)` uses `formatUnifiedContextSections` to present:
-    - "Primary Content" (string) and "Supplementary Content" (each included verbatim)
-    - Visual context count for image URLs
-  - Shot 2: `createInteractionContentPrompt(envelope, assessmentShell, imageContext, collection)` similarly includes the unified sections.
-  - Shot 4: Widget generation prompt also includes unified sections plus interaction context and widget mapping.
+  - Resolves images via `resolveRasterImages`: accepts `multimodalImageUrls` (http/https/data) and inlines `multimodalImagePayloads` into data URLs. Local size caps were removed; provider limits apply.
+  - Shot 1: `createAssessmentShellPrompt(...)` formats unified sections; PDFs in `pdfPayloads` are attached as `input_file` parts; images are provided via `input_image` (URLs) and `input_file` (payloads). The prompt text states: "Raster images are attached as multimodal inputs for vision" (no explicit count).
+  - Shot 2: `createInteractionContentPrompt(...)` includes the unified sections and multimodal images (no PDFs attached here by design).
+  - Shot 4: Widget generation prompt includes the unified sections plus interaction context and widget mapping (images only).
 
 Implications for Canvas:
 - We can set `primaryContent` to the raw HTML of `quiz-page.html` when present; otherwise to combined relevant HTML or a JSON/text summary of `quiz-data.json` for tests without UI HTML.
@@ -157,25 +157,29 @@ For each `_quiz` directory:
      - `quiz-data.json` (stringified)
      - sibling `page.html` or `page-data.json.mainContent.html`
    - Images: all `question-*.png` plus `quiz-full-page.png`, `quiz-overview.png`, `before-submit.png` (when present).
-2. Build `AiContextEnvelope` from these sources; enforce image count/byte limits.
+2. Build `AiContextEnvelope` from these sources.
 3. Call `generateFromEnvelope(openai, logger, envelope, widgetCollections.all)`.
 4. Persist the structured JSON and compiled QTI XML per assessment, mirroring `scripts/staar-batch-generate.ts` output conventions.
 
 ### Exact envelope-building plan (Canvas)
 - primaryContent (string, in priority order):
   1) `<quizDir>/_quiz/quiz-page.html` text
-  2) First available `<quizDir>/_quiz/capture-*.html` concatenated
+  2) If missing: first available `<quizDir>/_quiz/page-*.html` or `<quizDir>/_quiz/capture-*.html` (concatenate if multiple but keep order)
   3) Sibling `<quizDir>/page-data.json.mainContent.html` or `<quizDir>/page.html`
   4) As last resort: a compact textual synthesis of `quiz-data.json` (questions, options)
 - supplementaryContent (string[]):
   - If exists: full text of `<quizDir>/_quiz/results.html`
   - Always: JSON.stringify of `<quizDir>/_quiz/quiz-data.json`
   - Optionally: sibling `page.html` (raw) or `page-data.json.mainContent.html` (cleaned)
+  - Optionally: include additional attempt context HTML from `<quizDir>/_quiz/page-*.html` or `<quizDir>/_quiz/capture-*.html` when not used as primary
   - Optionally: snippet of `score.json` and any `network.json` summary for provenance
 - multimodalImagePayloads (raster):
   - Load and attach all `<quizDir>/_quiz/question-*.png`
-  - Optionally attach overview/full-page/before-submit screenshots for context if size budget allows
-  - Guardrails: cap total payload bytes ≤ 50MB; if over, downscale or subset least-informative images first (overview/before-submit) and always keep per-question images
+  - Also attach: `<quizDir>/_quiz/_images/*.png`, `<quizDir>/_quiz/results.png`, `<quizDir>/_quiz/quiz-overview.png`, `<quizDir>/_quiz/quiz-full-page.png`, `<quizDir>/_quiz/before-submit.png`, and `<quizDir>/_quiz/page-*-screenshot.png` when present
+- pdfPayloads (PDFs):
+  - Discover relevant `_resources/*.pdf` for the lesson/quiz (title/author/topic keyword matching across `quiz-page.html`, `quiz-data.json`, and `page-data.json.mainContent.*`).
+  - Load each matched PDF as `ArrayBuffer` and include it in `pdfPayloads` (Shot 1 only).
+  - No local caps; rely on provider limits. On rejection (e.g., payload too large), fail fast with structured logs for explicit operator action.
 
 ### Answer availability by source
 - Primary: `quiz-data.json.answers` when populated (most quizzes) → direct authoritative key
@@ -258,13 +262,16 @@ Strategy per assessment (ordered by benefit vs budget):
    - Attach ALL `_quiz/question-*.png` for every assessment. No pre-trimming.
    - Also attach `_quiz/quiz-overview.png`, `_quiz/quiz-full-page.png`, and `_quiz/before-submit.png` when present.
 4) Extended context (aggressive mode):
-   - For quizzes referencing specific readings, include the reading itself from `_resources/*.pdf` as text in `supplementaryContent`.
-   - Implementation: extract PDF text verbatim (or page-ranged if needed by tooling) and include it in full for the exact referenced work(s). If multiple readings are referenced, include all of them.
-   - Linkage: detect references by title/author keywords in `quiz-page.html`, `quiz-data.json.questions[*].questionText`, and sibling `page-data.json.mainContent.text` to select the correct `_resources/*.pdf`.
+  - For quizzes referencing specific readings, attach the reading PDFs from `_resources/*.pdf` via `pdfPayloads` so the model can read the document in Shot 1.
+  - We do not extract PDF text by default; optionally include short excerpts in `supplementaryContent` only if separately available.
+  - Linkage: detect references by title/author keywords in `quiz-page.html`, `quiz-data.json.questions[*].questionText`, and sibling `page-data.json.mainContent.text` to select the correct `_resources/*.pdf`.
 
 Token approach:
-- Favor maximal relevant context. Include all per-question images and all directly referenced readings.
+- Favor maximal relevant context. Include all per-question images and attach directly referenced readings as PDFs (Shot 1).
 - Prefer `page-data.json.mainContent.html` over raw `page.html` when both exist (cleaner text) but include both if helpful.
+
+Exclusions for model input (kept for provenance only):
+- `_videos/*.webm`, `quiz-data.json.backup`, `network.json`, `network.log`, `metadata.json`.
 
 Why not “entire course content”?
 - We include everything directly relevant: the quiz UI, normalized JSON, results, the lesson page, and the full text of the referenced readings. Including unrelated units/pages adds noise without improving accuracy.
