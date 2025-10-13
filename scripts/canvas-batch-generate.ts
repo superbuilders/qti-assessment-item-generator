@@ -19,7 +19,7 @@ logger.info("canvas batch generator started with debug logging enabled")
 // --- Configuration ---
 const ROOT_DIR = "canvas-scrape/English 09, Part 1"
 const WIDGET_COLLECTION = simpleVisualCollection
-const CONCURRENCY_LIMIT = 100
+const CONCURRENCY_LIMIT = 200
 
 const OUTPUT_DIR_ARG = process.argv[2]
 if (!OUTPUT_DIR_ARG) {
