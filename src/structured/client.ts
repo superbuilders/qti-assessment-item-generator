@@ -17,6 +17,7 @@ import type { AnyInteraction } from "@/core/interactions"
 import { type AssessmentItemShell, createAssessmentItemShellSchema } from "@/core/item"
 import { toJSONSchemaPromptSafe } from "@/core/json-schema"
 import { createPerOutcomeNestedFeedbackPrompt } from "./prompts/feedback-per-outcome"
+import { formatUnifiedContextSections } from "./prompts/shared"
 import { createInteractionContentPrompt } from "./prompts/interactions"
 import { createAssessmentShellPrompt } from "./prompts/shell"
 import { createWidgetContentPrompt } from "./prompts/widgets"
@@ -117,9 +118,9 @@ async function generateAssessmentShell<
 		const base64 = Buffer.from(image.data).toString("base64")
 		const dataUrl = `data:${image.mimeType};base64,${base64}`
 		contentParts.push({
-			type: "input_file",
-			filename: `image.${image.mimeType.split("/")[1]}`,
-			file_data: dataUrl
+			type: "input_image",
+			detail: "high",
+			image_url: dataUrl
 		})
 	}
 
@@ -284,12 +285,22 @@ async function generateInteractionContent<
 		const base64 = Buffer.from(image.data).toString("base64")
 		const dataUrl = `data:${image.mimeType};base64,${base64}`
 		contentParts.push({
+			type: "input_image",
+			detail: "high",
+			image_url: dataUrl
+		})
+	}
+	// Include PDFs in Shot 2 for complete context
+	for (const pdf of envelope.pdfPayloads) {
+		const base64 = Buffer.from(pdf.data).toString("base64")
+		const dataUrl = `data:application/pdf;base64,${base64}`
+		const filename = pdf.name.endsWith(".pdf") ? pdf.name : `${pdf.name}.pdf`
+		contentParts.push({
 			type: "input_file",
-			filename: `image.${image.mimeType.split("/")[1]}`,
+			filename,
 			file_data: dataUrl
 		})
 	}
-	// NOTE: PDFs are intentionally NOT attached in Shot 2
 
 	logger.debug("calling openai for interaction content generation with multimodal input", { interactionIds })
 
@@ -341,7 +352,9 @@ async function generateFeedbackForOutcomeNested<
     widgetCollection: C,
     feedbackPlan: FeedbackPlan,
     combination: FeedbackPlan["combinations"][0],
-    interactions: Record<string, AnyInteraction<WidgetTypeTupleFrom<C>>>
+    interactions: Record<string, AnyInteraction<WidgetTypeTupleFrom<C>>>,
+    envelope: AiContextEnvelope,
+    imageContext: ImageContext
 ): Promise<{ id: string; content: BlockContent<WidgetTypeTupleFrom<C>> }> {
     const { systemInstruction, userContent, ShallowSchema } = createPerOutcomeNestedFeedbackPrompt(
         assessmentShell,
@@ -357,12 +370,33 @@ async function generateFeedbackForOutcomeNested<
 		combinationId: combination.id
 	})
 
-	// MODIFIED: API call migrated to Responses API
+	// MODIFIED: Switch feedback to multi-part content including images and PDFs
+    const feedbackParts: ExtendedContentPart[] = []
+    feedbackParts.push({ type: "input_text", text: userContent })
+    feedbackParts.push({ type: "input_text", text: formatUnifiedContextSections(envelope, imageContext) })
+
+	for (const imageUrl of imageContext.imageUrls) {
+		feedbackParts.push({ type: "input_image", detail: "high", image_url: imageUrl })
+	}
+
+	for (const image of envelope.multimodalImagePayloads) {
+		const base64 = Buffer.from(image.data).toString("base64")
+		const dataUrl = `data:${image.mimeType};base64,${base64}`
+		feedbackParts.push({ type: "input_image", detail: "high", image_url: dataUrl })
+	}
+
+	for (const pdf of envelope.pdfPayloads) {
+		const base64 = Buffer.from(pdf.data).toString("base64")
+		const dataUrl = `data:application/pdf;base64,${base64}`
+		const filename = pdf.name.endsWith(".pdf") ? pdf.name : `${pdf.name}.pdf`
+		feedbackParts.push({ type: "input_file", filename, file_data: dataUrl })
+	}
+
 	const response = await callOpenAIWithRetry("generateFeedbackForOutcomeNested", () =>
 		openai.responses.create({
 			model: OPENAI_MODEL,
 			instructions: systemInstruction,
-			input: userContent,
+			input: [{ role: "user", content: feedbackParts }],
 			text: {
 				format: {
 					type: "json_schema",
@@ -431,7 +465,9 @@ async function runShardedFeedbackNested<
 	shell: AssessmentItemShell<WidgetTypeTupleFrom<C>>,
 	collection: C,
 	plan: FeedbackPlan,
-    interactions: Record<string, AnyInteraction<WidgetTypeTupleFrom<C>>>
+    interactions: Record<string, AnyInteraction<WidgetTypeTupleFrom<C>>>,
+    envelope: AiContextEnvelope,
+    imageContext: ImageContext
 ): Promise<Record<string, BlockContent<WidgetTypeTupleFrom<C>>>> {
 	let combinationsToProcess = [...plan.combinations]
 	const successfulShards: Record<string, BlockContent<WidgetTypeTupleFrom<C>>> = {}
@@ -447,7 +483,7 @@ async function runShardedFeedbackNested<
 
 		const tasks = combinationsToProcess.map(
 			(combination) => () =>
-				generateFeedbackForOutcomeNested(openai, logger, shell, collection, plan, combination, interactions)
+                generateFeedbackForOutcomeNested(openai, logger, shell, collection, plan, combination, interactions, envelope, imageContext)
 		)
 
 		const results = await Promise.allSettled(tasks.map((task) => task()))
@@ -568,7 +604,7 @@ export async function generateFromEnvelope<
 		mode: feedbackPlan.mode
 	})
 const shardedResult = await errors.try(
-	runShardedFeedbackNested(openai, logger, assessmentShell, widgetCollection, feedbackPlan, generatedInteractions)
+    runShardedFeedbackNested(openai, logger, assessmentShell, widgetCollection, feedbackPlan, generatedInteractions, envelope, imageContext)
 )
 	if (shardedResult.error) {
 		logger.error("sharded feedback generation failed", { error: shardedResult.error })
@@ -688,7 +724,7 @@ const shardedResult = await errors.try(
 			schema: widgetJsonSchema
 		})
 
-		// MODIFIED: Construct multi-part content for Responses API (exclude PDFs in Shot 4)
+		// MODIFIED: Construct multi-part content for Responses API (INCLUDE PDFs in Shot 4)
 		const widgetContentParts: ExtendedContentPart[] = []
 		widgetContentParts.push({ type: "input_text", text: widgetPrompt.userContent })
 
@@ -700,12 +736,22 @@ const shardedResult = await errors.try(
 			const base64 = Buffer.from(image.data).toString("base64")
 			const dataUrl = `data:${image.mimeType};base64,${base64}`
 			widgetContentParts.push({
+				type: "input_image",
+				detail: "high",
+				image_url: dataUrl
+			})
+		}
+		// Include PDFs for widget generation as well
+		for (const pdf of envelope.pdfPayloads) {
+			const base64 = Buffer.from(pdf.data).toString("base64")
+			const dataUrl = `data:application/pdf;base64,${base64}`
+			const filename = pdf.name.endsWith(".pdf") ? pdf.name : `${pdf.name}.pdf`
+			widgetContentParts.push({
 				type: "input_file",
-				filename: `image.${image.mimeType.split("/")[1]}`,
+				filename,
 				file_data: dataUrl
 			})
 		}
-		// NOTE: PDFs are intentionally NOT attached in Shot 4
 
 		// MODIFIED: API call migrated to Responses API
 		const widgetResponse = await callOpenAIWithRetry("generateWidgetContent", () =>

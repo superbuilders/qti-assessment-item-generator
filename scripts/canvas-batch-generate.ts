@@ -646,6 +646,13 @@ async function processQuestion(
  */
 async function processAssessmentDir(dir: string, openai: OpenAI): Promise<void> {
 	const assessmentName = path.basename(dir)
+	
+	// Skip MANDATORY QUIZ (course rules, not actual content)
+	if (assessmentName.toLowerCase().includes("mandatory")) {
+		logger.info("skipping mandatory quiz (not content-related)", { assessmentName })
+		return
+	}
+	
 	const quizDir = path.join(dir, "_quiz")
 	const assessmentOutputDir = path.join(OUTPUT_DIR, toKebabCase(assessmentName))
 
