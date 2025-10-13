@@ -12,10 +12,14 @@ import { generateFromEnvelope } from "@/structured/client"
 import type { AiContextEnvelope, PdfPayload, RasterImagePayload } from "@/structured/types"
 import { simpleVisualCollection } from "@/widgets/collections/simple-visual"
 
+// Enable debug logging for this script
+logger.setDefaultLogLevel(logger.DEBUG)
+logger.info("canvas batch generator started with debug logging enabled")
+
 // --- Configuration ---
 const ROOT_DIR = "canvas-scrape/English 09, Part 1"
 const WIDGET_COLLECTION = simpleVisualCollection
-const CONCURRENCY_LIMIT = 5
+const CONCURRENCY_LIMIT = 100
 
 const OUTPUT_DIR_ARG = process.argv[2]
 if (!OUTPUT_DIR_ARG) {
@@ -258,8 +262,9 @@ async function resolveLessonDirsForQuiz(quizDir: string): Promise<{ lessonDirs: 
  * - For unit tests: includes all unit lessons (e.g., 2.1, 2.2, ..., 2.6 for Unit 2 Test)
  * - Includes unit and quiz metadata
  */
-async function gatherSupplementaryContent(quizDir: string): Promise<{ content: string[]; lessonDirs: string[]; unitDir?: string; quizRootDir: string }> {
+async function gatherSupplementaryContent(quizDir: string): Promise<{ content: string[]; lessonDirs: string[]; unitDir?: string; quizRootDir: string; filesIncluded: string[] }> {
     const content: string[] = []
+    const filesIncluded: string[] = []
     const resolved = await resolveLessonDirsForQuiz(quizDir)
     const quizRootDir = resolved.quizRootDir
     const unitDir = resolved.unitDir
@@ -277,7 +282,11 @@ async function gatherSupplementaryContent(quizDir: string): Promise<{ content: s
             } else {
                 if (parsed.data.mainContent && parsed.data.mainContent.html) {
                     const html = parsed.data.mainContent.html
-                    if (html.length > 0) content.push(html)
+                    if (html.length > 0) {
+                        content.push(html)
+                        filesIncluded.push(pageDataPath)
+                        logger.debug("included lesson page-data.json", { file: pageDataPath, htmlLength: html.length })
+                    }
                 }
             }
         }
@@ -286,6 +295,8 @@ async function gatherSupplementaryContent(quizDir: string): Promise<{ content: s
         const lessonMetaResult = await errors.try(Bun.file(lessonMetaPath).json())
         if (!lessonMetaResult.error) {
             content.push(`Lesson metadata:\n${JSON.stringify(lessonMetaResult.data, null, 2)}`)
+            filesIncluded.push(lessonMetaPath)
+            logger.debug("included lesson metadata.json", { file: lessonMetaPath })
         } else {
             logger.debug("no lesson metadata.json found or unreadable", { file: lessonMetaPath, error: lessonMetaResult.error })
         }
@@ -297,6 +308,8 @@ async function gatherSupplementaryContent(quizDir: string): Promise<{ content: s
         const unitMetaResult = await errors.try(Bun.file(unitMetaPath).json())
         if (!unitMetaResult.error) {
             content.push(`Unit metadata:\n${JSON.stringify(unitMetaResult.data, null, 2)}`)
+            filesIncluded.push(unitMetaPath)
+            logger.debug("included unit metadata.json", { file: unitMetaPath })
         } else {
             logger.debug("no unit metadata.json found or unreadable", { file: unitMetaPath, error: unitMetaResult.error })
         }
@@ -307,17 +320,58 @@ async function gatherSupplementaryContent(quizDir: string): Promise<{ content: s
     const quizMetaResult = await errors.try(Bun.file(quizMetaPath).json())
     if (!quizMetaResult.error) {
         content.push(`Quiz metadata:\n${JSON.stringify(quizMetaResult.data, null, 2)}`)
+        filesIncluded.push(quizMetaPath)
+        logger.debug("included quiz metadata.json", { file: quizMetaPath })
     } else {
         logger.debug("no quiz metadata.json found or unreadable", { file: quizMetaPath, error: quizMetaResult.error })
     }
 
-    return { content, lessonDirs, unitDir, quizRootDir }
+    return { content, lessonDirs, unitDir, quizRootDir, filesIncluded }
 }
 
 /**
  * Gathers strictly scoped image payloads for a single question.
  */
-// Image ingestion disabled; retain stub for potential future use
+/**
+ * Gathers raster image payloads from _images directory for a single question.
+ */
+async function gatherImagePayloads(quizDir: string, questionNumber: number): Promise<{ payloads: RasterImagePayload[]; filesIncluded: string[] }> {
+    const payloads: RasterImagePayload[] = []
+    const filesIncluded: string[] = []
+    const imagesDir = path.join(quizDir, "_images")
+    
+    const statResult = await errors.try(fs.stat(imagesDir))
+    if (statResult.error || !statResult.data.isDirectory()) {
+        logger.debug("_images directory not found, skipping image ingestion", { dir: imagesDir })
+        return { payloads, filesIncluded }
+    }
+    
+    const glob = new Glob(`q${questionNumber}-*.png`)
+    for await (const fileName of glob.scan(imagesDir)) {
+        const filePath = path.join(imagesDir, fileName)
+        const file = Bun.file(filePath)
+        if (!(await file.exists())) {
+            logger.debug("image not found, skipping", { file: filePath })
+            continue
+        }
+        const dataResult = await errors.try(file.arrayBuffer())
+        if (dataResult.error) {
+            logger.warn("failed to read image file", { file: filePath, error: dataResult.error })
+            continue
+        }
+        if (dataResult.data) {
+            const mimeType = file.type === "image/png" ? "image/png" : 
+                           file.type === "image/jpeg" ? "image/jpeg" :
+                           file.type === "image/webp" ? "image/webp" :
+                           file.type === "image/gif" ? "image/gif" : "image/png"
+            payloads.push({ data: dataResult.data, mimeType })
+            filesIncluded.push(filePath)
+            logger.debug("included image from _images", { file: filePath, mimeType, byteLength: dataResult.data.byteLength })
+        }
+    }
+    
+    return { payloads, filesIncluded }
+}
 
 /**
  * Deterministically discovers and loads referenced PDF reading passages.
@@ -358,16 +412,21 @@ async function discoverAndLoadPdfs(
             candidates.push({ path: pdfPath, name, phrase })
         }
     }
+    
+    logger.debug("discovered pdf candidates", { candidateCount: candidates.length, candidates: candidates.map(c => ({ name: c.name, phrase: c.phrase })) })
 
-	const matched: Array<{ path: string; name: string }> = []
-	for (const c of candidates) {
-		// Simple, deterministic containment check against question + lesson text
-		if (c.phrase.length >= 6 && textNormalized.includes(c.phrase)) {
-			matched.push({ path: c.path, name: c.name })
-		}
-	}
+    const matched: Array<{ path: string; name: string }> = []
+    for (const c of candidates) {
+        // Simple, deterministic containment check against question + lesson text
+        if (c.phrase.length >= 6 && textNormalized.includes(c.phrase)) {
+            matched.push({ path: c.path, name: c.name })
+            logger.debug("pdf matched via phrase containment", { name: c.name, phrase: c.phrase })
+        }
+    }
+    
+    logger.debug("pdf matching complete", { matchedCount: matched.length, matchedNames: matched.map(m => m.name) })
 
-	if (matched.length === 0) return []
+    if (matched.length === 0) return []
 
 	const payloads: PdfPayload[] = []
 	for (const m of matched) {
@@ -384,8 +443,10 @@ async function discoverAndLoadPdfs(
 		if (dataResult.data) {
 			// Preserve original filename exactly
 			payloads.push({ name: m.name, data: dataResult.data })
+			logger.debug("loaded pdf file", { name: m.name, byteLength: dataResult.data.byteLength })
 		}
 	}
+	logger.info("pdf loading complete", { pdfCount: payloads.length, pdfNames: payloads.map(p => p.name) })
 	return payloads
 }
 
@@ -408,6 +469,13 @@ async function processQuestion(
     const primaryContent = JSON.stringify(question, null, 2)
     const gathered = await gatherSupplementaryContent(assessmentDirs.quizDir)
     let supplementaryContent = gathered.content
+    
+    logger.info("gathered supplementary content for question", {
+        questionId,
+        lessonDirsCount: gathered.lessonDirs.length,
+        lessonDirs: gathered.lessonDirs.map(d => path.basename(d)),
+        filesIncluded: gathered.filesIncluded
+    })
 
     // Attach attempted answer context (do not assume correctness; only report attempt + flag)
     const questionKey = String(questionNumber)
@@ -448,7 +516,7 @@ async function processQuestion(
                     .map((p) => `${p.prompt} => ${p.answer}`)
                     .join(" | ")
                 attemptLines.push(`Selected: ${joined}`)
-            } else {
+		} else {
                 attemptLines.push("Selected: []")
             }
         }
@@ -462,7 +530,28 @@ async function processQuestion(
             "- The 'correct' boolean indicates whether that attempt is correct.",
             "- If correct is false, DO NOT choose the attempted selection(s). Determine the correct option(s)/mapping(s) from the question text and options.",
             "- If correct is true, the attempted selection is known correct.",
-            "- For dropdowns, the 'answers' array is in blank order; for matching, 'matches' pairs reflect attempted prompt -> option mappings."
+            "- For dropdowns, the 'answers' array is in blank order; for matching, 'matches' pairs reflect attempted prompt -> option mappings.",
+            "",
+            "CONCRETE EXAMPLES:",
+            "",
+            "Example 1 - WRONG attempt (correct=false):",
+            "Question: Which type of panels are below? Options: a) montage, b) image specific, c) word specific",
+            "Attempt: type=multiple-choice correct=false",
+            "Selected: a -> montage",
+            "❌ WRONG: Do NOT select 'a' or 'montage' as your answer.",
+            "✅ CORRECT: Analyze the question and determine the actual correct answer is 'b' or 'c'.",
+            "",
+            "Example 2 - CORRECT attempt (correct=true):",
+            "Question: Comics are sequential art. Options: a) sequential, b) dramatic",
+            "Attempt: type=dropdown correct=true",
+            "Selected: [\"sequential\", \"vessel (container)\"]",
+            "✅ CORRECT: Use these attempted selections as your answer keys; they are known correct.",
+            "",
+            "Example 3 - WRONG matching (correct=false):",
+            "Attempt: type=matching correct=false",
+            "Selected: Prompt A => Wrong Option | Prompt B => Wrong Option",
+            "❌ WRONG: Do NOT use these mappings.",
+            "✅ CORRECT: Re-map each prompt to the correct option from the available choices."
         ].join("\n")
         supplementaryContent.push([attemptLines.join("\n"), semanticsGuidance].join("\n\n"))
         logger.debug("included quiz-data attempt context", {
@@ -472,10 +561,18 @@ async function processQuestion(
         })
     }
 
-	// Disable image ingestion: images can be out of order and are redundant with markup
-	const multimodalImagePayloads: RasterImagePayload[] = []
+	const imageGatherResult = await gatherImagePayloads(assessmentDirs.quizDir, questionNumber)
+	const multimodalImagePayloads = imageGatherResult.payloads
+	if (imageGatherResult.filesIncluded.length > 0) {
+		logger.info("included images from _images directory", {
+			questionId,
+			imageCount: imageGatherResult.payloads.length,
+			imageFiles: imageGatherResult.filesIncluded
+		})
+	}
 
     const pdfSearchDirs: string[] = [...gathered.lessonDirs, gathered.quizRootDir]
+    logger.debug("searching for pdfs in directories", { questionId, pdfSearchDirs })
     const pdfPayloadsResult = await errors.try(discoverAndLoadPdfs(question, supplementaryContent, pdfSearchDirs))
 	if (pdfPayloadsResult.error) {
 		logger.error("failed to process pdfs for question, stopping this question", {
@@ -485,6 +582,16 @@ async function processQuestion(
 		return
 	}
 	const pdfPayloads = pdfPayloadsResult.data
+	
+	logger.info("prepared ai context for question", {
+		questionId,
+		primaryContentLength: primaryContent.length,
+		supplementaryContentCount: supplementaryContent.length,
+		imagePayloadCount: multimodalImagePayloads.length,
+		pdfPayloadCount: pdfPayloads.length,
+		pdfNames: pdfPayloads.map(p => p.name),
+		filesIncluded: [...gathered.filesIncluded, ...imageGatherResult.filesIncluded]
+	})
 
 	const envelope: AiContextEnvelope = {
 		primaryContent,
@@ -564,7 +671,8 @@ async function processAssessmentDir(dir: string, openai: OpenAI): Promise<void> 
 
 	await fs.mkdir(assessmentOutputDir, { recursive: true })
 
-    const questionTasks = quizDataParsed.data.questions.map(
+    const sortedQuestions = quizDataParsed.data.questions.sort((a, b) => a.questionNumber - b.questionNumber)
+    const questionTasks = sortedQuestions.map(
         (q: CanvasQuestion) => () => processQuestion(
             q,
             { quizDir, outputDir: assessmentOutputDir },
@@ -588,12 +696,33 @@ async function main() {
 	const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 	const assessmentDirs = new Set<string>()
 
-	const glob = new Glob(path.join(ROOT, "**", "_quiz"))
-	for await (const quizDirPath of glob.scan(".")) {
-		assessmentDirs.add(path.dirname(quizDirPath))
+	// Use fs.readdir recursively to find _quiz directories (Glob has issues with spaces in paths)
+	const findQuizDirs = async (dir: string): Promise<string[]> => {
+		const results: string[] = []
+		const direntsResult = await errors.try(fs.readdir(dir, { withFileTypes: true }))
+		if (direntsResult.error) {
+			logger.debug("failed reading directory", { dir, error: direntsResult.error })
+			return results
+		}
+		for (const dirent of direntsResult.data) {
+			if (!dirent.isDirectory()) continue
+			const fullPath = path.join(dir, dirent.name)
+			if (dirent.name === "_quiz") {
+				results.push(fullPath)
+			} else {
+				const nested = await findQuizDirs(fullPath)
+				results.push(...nested)
+			}
+		}
+		return results
 	}
 
-	const assessmentDirList = Array.from(assessmentDirs)
+	const quizDirs = await findQuizDirs(ROOT)
+	for (const quizDir of quizDirs) {
+		assessmentDirs.add(path.dirname(quizDir))
+	}
+
+	const assessmentDirList = Array.from(assessmentDirs).sort()
 	logger.info("starting canvas batch generation", {
 		count: assessmentDirList.length,
 		collection: WIDGET_COLLECTION.name,
