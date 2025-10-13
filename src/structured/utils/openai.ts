@@ -9,9 +9,27 @@ function sleep(ms: number): Promise<void> {
 }
 
 function classifyError(error: Error): { retriable: boolean; reason: string } {
-    const message = error.message
+    const message = error.message || ""
+
+    // Prefer structured status if present without using type assertions
+    let status: number | undefined
+    if (typeof error === "object" && error !== null) {
+        const st = Reflect.get(error, "status")
+        if (typeof st === "number") status = st
+    }
+
+    if (typeof status === "number" && [408, 429, 500, 502, 503, 504].includes(status)) {
+        return { retriable: true, reason: "http-transient" }
+    }
     if (/\b(408|429|500|502|503|504)\b/.test(message)) return { retriable: true, reason: "http-transient" }
-    if (/timeout|ETIMEDOUT|ENETUNREACH|ECONNRESET|EAI_AGAIN/i.test(message)) return { retriable: true, reason: "network-timeout" }
+
+    // Treat all timeout/network hiccups as retriable; broaden phrasing coverage
+    const timeoutLike = /(timeout|timed out|deadline exceeded|context deadline exceeded|gateway timeout|operation timed out)/i
+    const networkLike = /(ETIMEDOUT|ENETUNREACH|ECONNRESET|EAI_AGAIN|ECONNABORTED|ENETDOWN|EHOSTUNREACH|EPIPE)/i
+    if (timeoutLike.test(message) || networkLike.test(message) || error.name === "TimeoutError") {
+        return { retriable: true, reason: "network-timeout" }
+    }
+
     return { retriable: false, reason: "non-retriable" }
 }
 

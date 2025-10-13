@@ -3,6 +3,12 @@
 const ARRAY_KEY_PREFIX = "__sb_idx__"
 const ARRAY_EMPTY_SENTINEL = "__sb_empty_array__"
 
+function isPlainRecord(value: unknown): value is Record<string, unknown> {
+	if (typeof value !== "object" || value === null) return false
+	const proto = Object.getPrototypeOf(value)
+	return proto === Object.prototype || proto === null
+}
+
 /**
  * Recursively transforms arrays into objects using a safe, prefixed key.
  * This creates a rigid, unambiguous structure ideal for schema generation.
@@ -19,16 +25,12 @@ export function transformArraysToObjects(data: unknown): unknown {
 		}
 		return newObj
 	}
-	if (typeof data === "object" && data !== null) {
-		const newObj: Record<string, unknown> = {}
-		for (const key in data) {
-			if (Object.hasOwn(data, key)) {
-				// biome-ignore lint: Type assertion needed for recursive transformation
-				const dataRec = data as any
-				newObj[key] = transformArraysToObjects(dataRec[key])
-			}
+	if (isPlainRecord(data)) {
+		const record: Record<string, unknown> = {}
+		for (const [key, value] of Object.entries(data)) {
+			record[key] = transformArraysToObjects(value)
 		}
-		return newObj
+		return record
 	}
 	return data
 }
@@ -38,9 +40,8 @@ export function transformArraysToObjects(data: unknown): unknown {
  * This is the exact, safe inverse of transformArraysToObjects.
  */
 export function transformObjectsToArrays(data: unknown): unknown {
-	if (typeof data === "object" && data !== null) {
-		// biome-ignore lint: Type assertion needed for object transformation
-		const obj = data as any
+	if (isPlainRecord(data)) {
+		const obj = data
 		const keys = Object.keys(obj)
 
 		if (keys.length === 1 && keys[0] === ARRAY_EMPTY_SENTINEL && obj[ARRAY_EMPTY_SENTINEL] === true) {
