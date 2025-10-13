@@ -5,78 +5,80 @@ import type { AssessmentItemInput } from "../../src/core/item"
 import { differentiateAssessmentItem } from "../../src/structured/differentiator"
 import { allWidgetsCollection } from "../../src/widgets/collections/all"
 
-// Mock the OpenAI client
+// MODIFIED: Mock the OpenAI client for Responses API
 mock.module("openai", () => {
 	class MockOpenAI {
-		chat = {
-			completions: {
-				create: async () => {
-					// Return a pre-defined differentiated item with array-like objects
+		responses = {
+			create: async (params: { text?: { format?: { name?: string } } }) => {
+				// Differentiate mock response based on the generator name
+				if (params.text?.format?.name === "differentiation_planner") {
+					// Mock response for Shot 1 (planContentDifferentiation)
 					return {
-						choices: [
-							{
-								message: {
-									content: JSON.stringify({
-										plans: [
-											{
-												title: "Differentiated Item",
-												responseDeclarations: {
-													__sb_idx__0: {
-														identifier: "RESPONSE",
-														cardinality: "single",
-														baseType: "string",
-														correct: "100"
-													}
-												},
-												body: {
+						output_text: JSON.stringify({
+							plans: [
+								{
+									title: "Differentiated Item",
+									responseDeclarations: {
+										__sb_idx__0: {
+											identifier: "RESPONSE",
+											cardinality: "single",
+											baseType: "string",
+											correct: "100"
+										}
+									},
+									body: {
+										__sb_idx__0: {
+											type: "paragraph",
+											content: {
+												__sb_idx__0: {
+													type: "text",
+													content: "What is the new answer?"
+												}
+											}
+										}
+									},
+									interactions: null,
+									feedbackPlan: {
+										mode: "fallback",
+										dimensions: { __sb_empty_array__: true },
+										combinations: {
+											__sb_idx__0: { id: "CORRECT", path: { __sb_empty_array__: true } },
+											__sb_idx__1: { id: "INCORRECT", path: { __sb_empty_array__: true } }
+										}
+									},
+									feedback: {
+										FEEDBACK__OVERALL: {
+											CORRECT: {
+												content: {
 													__sb_idx__0: {
 														type: "paragraph",
-														content: {
-															__sb_idx__0: {
-																type: "text",
-																content: "What is the new answer?"
-															}
-														}
+														content: { __sb_idx__0: { type: "text", content: "Correct!" } }
 													}
-												},
-												interactions: null,
-												feedbackPlan: {
-													mode: "fallback",
-													dimensions: { __sb_empty_array__: true },
-													combinations: {
-														__sb_idx__0: { id: "CORRECT", path: { __sb_empty_array__: true } },
-														__sb_idx__1: { id: "INCORRECT", path: { __sb_empty_array__: true } }
-													}
-												},
-												feedback: {
-													FEEDBACK__OVERALL: {
-														CORRECT: {
-															content: {
-																__sb_idx__0: {
-																	type: "paragraph",
-																	content: { __sb_idx__0: { type: "text", content: "Correct!" } }
-																}
-															}
-														},
-														INCORRECT: {
-															content: {
-																__sb_idx__0: {
-																	type: "paragraph",
-																	content: { __sb_idx__0: { type: "text", content: "Incorrect." } }
-																}
-															}
-														}
+												}
+											},
+											INCORRECT: {
+												content: {
+													__sb_idx__0: {
+														type: "paragraph",
+														content: { __sb_idx__0: { type: "text", content: "Incorrect." } }
 													}
 												}
 											}
-										]
-									}),
-									refusal: null
+										}
+									}
 								}
-							}
-						]
+							]
+						})
 					}
 				}
+				// Mock for Shot 2 (regenerateWidgetsViaLLM)
+				if (params.text?.format?.name === "widgets_generator") {
+					return {
+						output_text: JSON.stringify({ widgets: {} })
+					}
+				}
+				// Default empty response
+				return { output_text: "{}" }
 			}
 		}
 	}

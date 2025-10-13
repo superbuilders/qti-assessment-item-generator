@@ -1,7 +1,6 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import type OpenAI from "openai"
-import type { ChatCompletionCreateParamsNonStreaming } from "openai/resources/chat/completions"
 import { z } from "zod"
 import type { BlockContent, InlineContent } from "@/core/content"
 import type { AssessmentItemInput, ResponseDeclaration } from "@/core/item"
@@ -29,7 +28,7 @@ const OPENAI_MODEL = "gpt-5"
 const MAX_IMAGES_PER_REQUEST = 500
 export const ErrWidgetNotFound = errors.new("widget could not be mapped to a known type")
 
-// NEW: Type definitions for new "Responses API" content parts
+// NEW: Type definitions for Responses API content parts matching SDK
 type InputTextContentPart = {
 	type: "input_text"
 	text: string
@@ -37,46 +36,17 @@ type InputTextContentPart = {
 
 type InputFileContentPart = {
 	type: "input_file"
-	filename: string
-	file_data: string
+	filename?: string
+	file_data?: string
 }
 
-type ExtendedContentPart = OpenAI.ChatCompletionContentPart | InputTextContentPart | InputFileContentPart
-
-// Extended params type for new "Responses API" pattern
-type ExtendedChatCompletionParams = Omit<ChatCompletionCreateParamsNonStreaming, "messages"> & {
-	messages: Array<{
-		role: "system" | "user" | "assistant"
-		content: string | ExtendedContentPart[]
-	}>
+type InputImageContentPart = {
+	type: "input_image"
+	detail: "high" | "low" | "auto"
+	image_url?: string
 }
 
-/**
- * Helper function to call OpenAI with extended content parts (input_text, input_file).
- * This bridges the gap between our extended API types and the current OpenAI SDK,
- * which will be updated to support these types in the future per the PRD.
- * 
- * Note: This function performs a runtime passthrough of the extended content parts.
- * The OpenAI API will handle these new content types even though the TypeScript
- * definitions haven't been updated yet.
- */
-function callOpenAIWithExtendedParams(
-	openai: OpenAI,
-	params: ExtendedChatCompletionParams
-): Promise<OpenAI.Chat.Completions.ChatCompletion> {
-	// The extended params are structurally compatible with the expected params
-	// at runtime. The API will handle the new content part types.
-	// We use a type-safe conversion through JSON serialization/deserialization
-	// to maintain runtime compatibility without using type assertions.
-	const serialized = JSON.stringify(params)
-	const parsedResult = errors.trySync(() => JSON.parse(serialized))
-	if (parsedResult.error) {
-		logger.error("params serialization", { error: parsedResult.error })
-		throw errors.wrap(parsedResult.error, "params serialization")
-	}
-	// The deserialized params will have the correct runtime structure
-	return openai.chat.completions.create(parsedResult.data)
-}
+type ExtendedContentPart = InputTextContentPart | InputFileContentPart | InputImageContentPart
 
 export const ErrUnsupportedInteraction = errors.new("unsupported interaction type found")
 
@@ -133,34 +103,34 @@ async function generateAssessmentShell<
 		schema: jsonSchema
 	})
 
-	// MODIFIED: Construct a multi-part content body for the new "Responses API"
+	// MODIFIED: Construct a multi-part content body for the Responses API
 	const contentParts: ExtendedContentPart[] = []
 	contentParts.push({ type: "input_text", text: userContent })
 
-	// Add image URLs as before
+	// Add image URLs using input_image type
 	for (const imageUrl of imageContext.imageUrls) {
-		contentParts.push({ type: "image_url", image_url: { url: imageUrl, detail: "high" } })
+		contentParts.push({ type: "input_image", detail: "high", image_url: imageUrl })
 	}
 
-	// NEW: Process raw image payloads into input_file parts
+	// NEW: Process raw image payloads into base64-encoded input_file parts
 	for (const image of envelope.multimodalImagePayloads) {
 		const base64 = Buffer.from(image.data).toString("base64")
 		const dataUrl = `data:${image.mimeType};base64,${base64}`
 		contentParts.push({
 			type: "input_file",
-			filename: `image.${image.mimeType.split('/')[1]}`, // e.g., image.png
+			filename: `image.${image.mimeType.split("/")[1]}`,
 			file_data: dataUrl
 		})
 	}
 
-	// NEW: Process raw PDF payloads into input_file parts
+	// NEW: Process raw PDF payloads into base64-encoded input_file parts (Shot 1 ONLY)
 	for (const pdf of envelope.pdfPayloads) {
 		const base64 = Buffer.from(pdf.data).toString("base64")
 		const dataUrl = `data:application/pdf;base64,${base64}`
 		const filename = pdf.name.endsWith(".pdf") ? pdf.name : `${pdf.name}.pdf`
 		contentParts.push({
 			type: "input_file",
-			filename: filename,
+			filename,
 			file_data: dataUrl
 		})
 	}
@@ -169,42 +139,29 @@ async function generateAssessmentShell<
 		partCount: contentParts.length
 	})
 
-	// MODIFIED: The API call is changed to use the new "Responses API" structure.
-	// This replaces the previous `openai.chat.completions.create` call.
-	const params: ExtendedChatCompletionParams = {
-		model: OPENAI_MODEL,
-		messages: [
-			{ role: "system", content: systemInstruction },
-			{ role: "user", content: contentParts }
-		],
-		response_format: {
-			type: "json_schema",
-			json_schema: {
-				name: "assessment_shell_generator",
-				schema: jsonSchema,
-				strict: true
+	// MODIFIED: API call migrated to Responses API
+	const response = await callOpenAIWithRetry("generateAssessmentShell", () =>
+		openai.responses.create({
+			model: OPENAI_MODEL,
+			instructions: systemInstruction,
+			input: [{ role: "user", content: contentParts }],
+			text: {
+				format: {
+					type: "json_schema",
+					name: "assessment_shell_generator",
+					schema: jsonSchema,
+					strict: true
+				}
 			}
-		},
-		stream: false
-	}
-	
-	// Assuming `callOpenAIWithRetry` is adapted to handle a different client method if needed.
-	// For this PRD, we assume the call signature remains compatible or will be updated.
-	const completion = await callOpenAIWithRetry("generateAssessmentShell", () =>
-		callOpenAIWithExtendedParams(openai, params)
+		})
 	)
-	const choice = completion.choices[0]
-	if (!choice) {
-		logger.error("openai returned no choices")
-		throw errors.new("openai returned no choices")
-	}
 
-	const message = choice.message
-	if (!message.content) {
+	// MODIFIED: Parse response from output_text
+	const content = response.output_text
+	if (!content) {
 		logger.error("openai returned no content")
 		throw errors.new("empty ai response: no content")
 	}
-	const content = message.content
 
 	const parseResult = errors.trySync(() => JSON.parse(content))
 	if (parseResult.error) {
@@ -315,37 +272,50 @@ async function generateInteractionContent<
 		schema: jsonSchema
 	})
 
-	const messageContent: OpenAI.ChatCompletionContentPart[] = [{ type: "text", text: userContent }]
+	// MODIFIED: Construct multi-part content for Responses API (exclude PDFs in Shot 2)
+	const contentParts: ExtendedContentPart[] = []
+	contentParts.push({ type: "input_text", text: userContent })
+
 	for (const imageUrl of imageContext.imageUrls) {
-		messageContent.push({ type: "image_url", image_url: { url: imageUrl, detail: "high" } })
+		contentParts.push({ type: "input_image", detail: "high", image_url: imageUrl })
 	}
 
-	logger.debug("calling openai for interaction content generation with multimodal input", { interactionIds })
-	const params: ChatCompletionCreateParamsNonStreaming = {
-		model: OPENAI_MODEL,
-		messages: [
-			{ role: "system", content: systemInstruction },
-			{ role: "user", content: messageContent }
-		],
-		response_format: {
-			type: "json_schema",
-			json_schema: {
-				name: "interaction_content_generator",
-				schema: jsonSchema,
-				strict: true
-			}
-		},
-		stream: false
+	for (const image of envelope.multimodalImagePayloads) {
+		const base64 = Buffer.from(image.data).toString("base64")
+		const dataUrl = `data:${image.mimeType};base64,${base64}`
+		contentParts.push({
+			type: "input_file",
+			filename: `image.${image.mimeType.split("/")[1]}`,
+			file_data: dataUrl
+		})
 	}
-	const completion = await callOpenAIWithRetry("generateInteractionContent", () =>
-		openai.chat.completions.create(params)
+	// NOTE: PDFs are intentionally NOT attached in Shot 2
+
+	logger.debug("calling openai for interaction content generation with multimodal input", { interactionIds })
+
+	// MODIFIED: API call migrated to Responses API
+	const response = await callOpenAIWithRetry("generateInteractionContent", () =>
+		openai.responses.create({
+			model: OPENAI_MODEL,
+			instructions: systemInstruction,
+			input: [{ role: "user", content: contentParts }],
+			text: {
+				format: {
+					type: "json_schema",
+					name: "interaction_content_generator",
+					schema: jsonSchema,
+					strict: true
+				}
+			}
+		})
 	)
-	const choice = completion.choices[0]
-	if (!choice?.message?.content) {
+
+	// MODIFIED: Parse response from output_text
+	const content = response.output_text
+	if (!content) {
 		logger.error("openai interaction generation returned no content")
 		throw errors.new("empty ai response: no content for interaction generation")
 	}
-	const content = choice.message.content
 
 	const parseResult = errors.trySync(() => JSON.parse(content))
 	if (parseResult.error) {
@@ -387,29 +357,29 @@ async function generateFeedbackForOutcomeNested<
 		combinationId: combination.id
 	})
 
-	const params: ChatCompletionCreateParamsNonStreaming = {
-		model: OPENAI_MODEL,
-		messages: [
-			{ role: "system", content: systemInstruction },
-			{ role: "user", content: userContent }
-		],
-		response_format: {
-			type: "json_schema",
-			json_schema: { name: "feedback", schema: jsonSchema, strict: true }
-		},
-		stream: false
-	}
-
-	const completion = await callOpenAIWithRetry("generateFeedbackForOutcomeNested", () =>
-		openai.chat.completions.create(params)
+	// MODIFIED: API call migrated to Responses API
+	const response = await callOpenAIWithRetry("generateFeedbackForOutcomeNested", () =>
+		openai.responses.create({
+			model: OPENAI_MODEL,
+			instructions: systemInstruction,
+			input: userContent,
+			text: {
+				format: {
+					type: "json_schema",
+					name: "feedback",
+					schema: jsonSchema,
+					strict: true
+				}
+			}
+		})
 	)
 
-	const choice = completion.choices[0]
-	if (!choice?.message?.content) {
+	// MODIFIED: Parse response from output_text
+	const messageContent = response.output_text
+	if (!messageContent) {
 		logger.error("openai feedback shard returned no content", { combinationId: combination.id })
 		throw errors.new(`empty ai response for feedback shard ${combination.id}`)
 	}
-	const messageContent = choice.message.content
 
 	const parsedResult = errors.trySync(() => JSON.parse(messageContent))
 	if (parsedResult.error) {
@@ -718,31 +688,48 @@ const shardedResult = await errors.try(
 			schema: widgetJsonSchema
 		})
 
-		const widgetParams: ChatCompletionCreateParamsNonStreaming = {
-			model: OPENAI_MODEL,
-			messages: [
-				{ role: "system", content: widgetPrompt.systemInstruction },
-				{ role: "user", content: widgetPrompt.userContent }
-			],
-			response_format: {
-				type: "json_schema",
-				json_schema: {
-					name: "widget_content_generator",
-					schema: widgetJsonSchema,
-					strict: true
-				}
-			},
-			stream: false
+		// MODIFIED: Construct multi-part content for Responses API (exclude PDFs in Shot 4)
+		const widgetContentParts: ExtendedContentPart[] = []
+		widgetContentParts.push({ type: "input_text", text: widgetPrompt.userContent })
+
+		for (const imageUrl of imageContext.imageUrls) {
+			widgetContentParts.push({ type: "input_image", detail: "high", image_url: imageUrl })
 		}
-		const widgetCompletion = await callOpenAIWithRetry("generateWidgetContent", () =>
-			openai.chat.completions.create(widgetParams)
+
+		for (const image of envelope.multimodalImagePayloads) {
+			const base64 = Buffer.from(image.data).toString("base64")
+			const dataUrl = `data:${image.mimeType};base64,${base64}`
+			widgetContentParts.push({
+				type: "input_file",
+				filename: `image.${image.mimeType.split("/")[1]}`,
+				file_data: dataUrl
+			})
+		}
+		// NOTE: PDFs are intentionally NOT attached in Shot 4
+
+		// MODIFIED: API call migrated to Responses API
+		const widgetResponse = await callOpenAIWithRetry("generateWidgetContent", () =>
+			openai.responses.create({
+				model: OPENAI_MODEL,
+				instructions: widgetPrompt.systemInstruction,
+				input: [{ role: "user", content: widgetContentParts }],
+				text: {
+					format: {
+						type: "json_schema",
+						name: "widget_content_generator",
+						schema: widgetJsonSchema,
+						strict: true
+					}
+				}
+			})
 		)
-		const wChoice = widgetCompletion.choices[0]
-		if (!wChoice?.message?.content) {
+
+		// MODIFIED: Parse response from output_text
+		const widgetContent = widgetResponse.output_text
+		if (!widgetContent) {
 			logger.error("widget generation returned no content")
 			throw errors.new("empty ai response: no content for widget generation")
 		}
-		const widgetContent = wChoice.message.content
 
 		const widgetParseResult = errors.trySync(() => JSON.parse(widgetContent))
 		if (widgetParseResult.error) {

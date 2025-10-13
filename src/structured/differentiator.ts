@@ -1,7 +1,6 @@
 import * as errors from "@superbuilders/errors"
 import type * as logger from "@superbuilders/slog"
 import type OpenAI from "openai"
-import type { ChatCompletionCreateParamsNonStreaming } from "openai/resources/chat/completions"
 import { z } from "zod"
 import { type AssessmentItemInput, createDynamicAssessmentItemSchema } from "@/core/item"
 import { toJSONSchemaPromptSafe } from "@/core/json-schema"
@@ -361,31 +360,29 @@ async function planContentDifferentiation<const E extends readonly string[]>(
 
 	const jsonSchema = toJSONSchemaPromptSafe(ContentPlanResponseSchema)
 
-	const params: ChatCompletionCreateParamsNonStreaming = {
-		model: OPENAI_MODEL,
-		messages: [
-			{ role: "system", content: systemInstruction },
-			{ role: "user", content: userContent }
-		],
-		response_format: {
-			type: "json_schema",
-			json_schema: {
-				name: "differentiation_planner",
-				schema: jsonSchema,
-				strict: true
+	// MODIFIED: API call migrated to Responses API
+	const response = await callOpenAIWithRetry("planContentDifferentiation", () =>
+		openai.responses.create({
+			model: OPENAI_MODEL,
+			instructions: systemInstruction,
+			input: userContent,
+			text: {
+				format: {
+					type: "json_schema",
+					name: "differentiation_planner",
+					schema: jsonSchema,
+					strict: true
+				}
 			}
-		},
-		stream: false
-	}
-	const completion = await callOpenAIWithRetry("planContentDifferentiation", () =>
-		openai.chat.completions.create(params)
+		})
 	)
-	const choice = completion.choices[0]
-	if (!choice?.message?.content) {
+
+	// MODIFIED: Parse response from output_text
+	const content = response.output_text
+	if (!content) {
 		logger.error("openai planning call returned no content")
 		throw errors.new("empty ai response: no content for differentiation plan")
 	}
-	const content = choice.message.content
 
 	const parseResult = errors.trySync(() => JSON.parse(content))
 	if (parseResult.error) {
@@ -543,32 +540,30 @@ async function regenerateWidgetsViaLLM<const E extends readonly string[]>(
 		userChars: userLen
 	})
 
-	const params: ChatCompletionCreateParamsNonStreaming = {
-		model: OPENAI_MODEL,
-		messages: [
-			{ role: "system", content: systemInstruction },
-			{ role: "user", content: userContent }
-		],
-		response_format: {
-			type: "json_schema",
-			json_schema: {
-				name: "widgets_generator",
-				schema: jsonSchema,
-				strict: true
+	// MODIFIED: API call migrated to Responses API
+	const response = await callOpenAIWithRetry("regenerateWidgetsViaLLM", () =>
+		openai.responses.create({
+			model: OPENAI_MODEL,
+			instructions: systemInstruction,
+			input: userContent,
+			text: {
+				format: {
+					type: "json_schema",
+					name: "widgets_generator",
+					schema: jsonSchema,
+					strict: true
+				}
 			}
-		},
-		stream: false
-	}
-	const completion = await callOpenAIWithRetry("regenerateWidgetsViaLLM", () =>
-		openai.chat.completions.create(params)
+		})
 	)
 	logger.info("openai widget generation completed")
-	const choice = completion.choices[0]
-	if (!choice?.message?.content) {
+
+	// MODIFIED: Parse response from output_text
+	const content = response.output_text
+	if (!content) {
 		logger.error("openai widget generation returned no content")
 		throw errors.new("empty ai response: no content for widgets")
 	}
-	const content = choice.message.content
 
 	const parseResult = errors.trySync(() => JSON.parse(content))
 	if (parseResult.error) {
