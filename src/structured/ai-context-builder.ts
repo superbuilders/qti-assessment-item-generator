@@ -103,7 +103,8 @@ export async function buildPerseusEnvelope(
 		primaryContent,
 		supplementaryContent,
 		multimodalImageUrls: Array.from(multimodalImageUrls).sort(),
-		multimodalImagePayloads: []
+		multimodalImagePayloads: [],
+		pdfPayloads: []
 	}
 }
 
@@ -184,6 +185,7 @@ export async function buildMathacademyEnvelope(
 		primaryContent,
 		supplementaryContent,
 		multimodalImageUrls: Array.from(multimodalImageUrls).sort(),
-		multimodalImagePayloads: []
+		multimodalImagePayloads: [],
+		pdfPayloads: []
 	}
 }

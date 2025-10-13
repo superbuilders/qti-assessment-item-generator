@@ -10,6 +10,7 @@ ignore_patterns:
   - "src/widgets/generators/**"
   - "examples/**"
   - "teks-staar-scrape/**"
+  - "canvas-scrape/**"
   - "docs/**"
   - "data/**"
 priority_rules:

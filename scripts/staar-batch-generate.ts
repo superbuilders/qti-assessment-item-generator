@@ -129,7 +129,8 @@ async function processQuestionDir(dir: string, openai: OpenAI): Promise<void> {
 		primaryContent: html,
 		supplementaryContent,
 		multimodalImageUrls: [],
-		multimodalImagePayloads: []
+		multimodalImagePayloads: [],
+		pdfPayloads: []
 	}
 
 	const totalTextLength = html.length + supplementaryContent.reduce((sum, content) => sum + content.length, 0)
