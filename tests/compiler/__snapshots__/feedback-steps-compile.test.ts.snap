@@ -27,28 +27,28 @@ exports[`Compiler: feedback-as-steps should render preamble + steps with correct
             <qti-simple-choice identifier="B"><p>5</p></qti-simple-choice>
         </qti-choice-interaction></div>
         <qti-feedback-block outcome-identifier="FEEDBACK__OVERALL" identifier="FB__RESPONSE_CORRECT" show-hide="show">
-            <qti-content-body><div class="qti-feedback-preamble" data-correctness="correct" style="border:1px solid #A7F3D0; background:#ECFDF5; color:#065F46; border-radius:12px; padding:12px 16px; margin-bottom:16px;">
-      <p style="margin:0; font-weight:700;">Correct! Fantastic work.</p>
-      <p style="margin:8px 0 0 0;">You identified the sum correctly.</p>
-    </div><ol class="qti-steps" style="margin:16px 0; padding:0; list-style:none; counter-reset: qti-step;"><li class="qti-step" style="position:relative; margin:16px 0; padding:16px 16px 16px 56px; border:1px solid #BFDBFE; border-left:6px solid #2563EB; border-radius:12px; background:#EFF6FF; box-shadow:0 1px 2px rgba(0,0,0,0.04);">
+            <qti-content-body><div class="qti-feedback-preamble" data-correctness="correct" style="margin-bottom:16px;">
+      <p style="margin:0; font-weight:700; color:#047857;">Correct! Fantastic work.</p>
+      <p style="margin:8px 0 0 0; color:#111827;">You identified the sum correctly.</p>
+    </div><ol class="qti-steps" style="margin:16px 0; padding:0; list-style:none; counter-reset: qti-step;"><li class="qti-step" style="position:relative; margin:16px 0; padding:16px 16px 16px 56px; border:1px solid #E5E7EB; border-left:6px solid #2563EB; border-radius:12px; background:#F9FAFB; box-shadow:0 1px 2px rgba(0,0,0,0.04);">
         <span class="qti-step-index" style="position:absolute; left:16px; top:16px; width:28px; height:28px; border-radius:9999px; background:#2563EB; color:#FFFFFF; display:inline-flex; align-items:center; justify-content:center; font-weight:700; font-size:14px;">1</span>
         <p class="qti-step-title" style="margin:0 0 8px 0; font-weight:700; font-size:16px; color:#111827;">Understand Addition</p>
         <p>2 + 2 means combining two groups of 2.</p>
-      </li><li class="qti-step" style="position:relative; margin:16px 0; padding:16px 16px 16px 56px; border:1px solid #A7F3D0; border-left:6px solid #059669; border-radius:12px; background:#ECFDF5; box-shadow:0 1px 2px rgba(0,0,0,0.04);">
+      </li><li class="qti-step" style="position:relative; margin:16px 0; padding:16px 16px 16px 56px; border:1px solid #E5E7EB; border-left:6px solid #059669; border-radius:12px; background:#F9FAFB; box-shadow:0 1px 2px rgba(0,0,0,0.04);">
         <span class="qti-step-index" style="position:absolute; left:16px; top:16px; width:28px; height:28px; border-radius:9999px; background:#059669; color:#FFFFFF; display:inline-flex; align-items:center; justify-content:center; font-weight:700; font-size:14px;">2</span>
         <p class="qti-step-title" style="margin:0 0 8px 0; font-weight:700; font-size:16px; color:#111827;">Confirm the Result</p>
         <p>The total is <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>4</mn></math>.</p>
       </li></ol></qti-content-body>
         </qti-feedback-block>
         <qti-feedback-block outcome-identifier="FEEDBACK__OVERALL" identifier="FB__RESPONSE_INCORRECT" show-hide="show">
-            <qti-content-body><div class="qti-feedback-preamble" data-correctness="incorrect" style="border:1px solid #FECACA; background:#FEF2F2; color:#991B1B; border-radius:12px; padding:12px 16px; margin-bottom:16px;">
-      <p style="margin:0; font-weight:700;">Not quite! Try again.</p>
-      <p style="margin:8px 0 0 0;">The sum of 2 + 2 is not 5.</p>
-    </div><ol class="qti-steps" style="margin:16px 0; padding:0; list-style:none; counter-reset: qti-step;"><li class="qti-step" style="position:relative; margin:16px 0; padding:16px 16px 16px 56px; border:1px solid #BFDBFE; border-left:6px solid #2563EB; border-radius:12px; background:#EFF6FF; box-shadow:0 1px 2px rgba(0,0,0,0.04);">
+            <qti-content-body><div class="qti-feedback-preamble" data-correctness="incorrect" style="margin-bottom:16px;">
+      <p style="margin:0; font-weight:700; color:#B91C1C;">Not quite! Try again.</p>
+      <p style="margin:8px 0 0 0; color:#111827;">The sum of 2 + 2 is not 5.</p>
+    </div><ol class="qti-steps" style="margin:16px 0; padding:0; list-style:none; counter-reset: qti-step;"><li class="qti-step" style="position:relative; margin:16px 0; padding:16px 16px 16px 56px; border:1px solid #E5E7EB; border-left:6px solid #2563EB; border-radius:12px; background:#F9FAFB; box-shadow:0 1px 2px rgba(0,0,0,0.04);">
         <span class="qti-step-index" style="position:absolute; left:16px; top:16px; width:28px; height:28px; border-radius:9999px; background:#2563EB; color:#FFFFFF; display:inline-flex; align-items:center; justify-content:center; font-weight:700; font-size:14px;">1</span>
         <p class="qti-step-title" style="margin:0 0 8px 0; font-weight:700; font-size:16px; color:#111827;">Review Addition</p>
         <p>When adding, count all items together.</p>
-      </li><li class="qti-step" style="position:relative; margin:16px 0; padding:16px 16px 16px 56px; border:1px solid #A7F3D0; border-left:6px solid #059669; border-radius:12px; background:#ECFDF5; box-shadow:0 1px 2px rgba(0,0,0,0.04);">
+      </li><li class="qti-step" style="position:relative; margin:16px 0; padding:16px 16px 16px 56px; border:1px solid #E5E7EB; border-left:6px solid #059669; border-radius:12px; background:#F9FAFB; box-shadow:0 1px 2px rgba(0,0,0,0.04);">
         <span class="qti-step-index" style="position:absolute; left:16px; top:16px; width:28px; height:28px; border-radius:9999px; background:#059669; color:#FFFFFF; display:inline-flex; align-items:center; justify-content:center; font-weight:700; font-size:14px;">2</span>
         <p class="qti-step-title" style="margin:0 0 8px 0; font-weight:700; font-size:16px; color:#111827;">Find the Correct Answer</p>
         <p>2 + 2 = <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>4</mn></math></p>

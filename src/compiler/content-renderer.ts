@@ -155,24 +155,22 @@ export function renderFeedbackContent<E extends readonly string[]>(
 ): string {
 	if (!feedback) return ""
 
-	const preambleCorrectness = feedback.preamble.correctness
-	const preambleBg = preambleCorrectness === "correct" ? "#ECFDF5" : "#FEF2F2"
-	const preambleBorder = preambleCorrectness === "correct" ? "#A7F3D0" : "#FECACA"
-	const preambleColor = preambleCorrectness === "correct" ? "#065F46" : "#991B1B"
-	const preambleHeadline = preambleCorrectness === "correct" ? "Correct! Fantastic work." : "Not quite! Try again."
+    const preambleCorrectness = feedback.preamble.correctness
+    const preambleColor = preambleCorrectness === "correct" ? "#047857" : "#B91C1C"
+    const preambleHeadline = preambleCorrectness === "correct" ? "Correct! Fantastic work." : "Not quite! Try again."
 
 	const preambleSummary = renderInlineContent(feedback.preamble.summary, widgetSlots, interactionSlots)
-	const preambleHtml = `<div class="qti-feedback-preamble" data-correctness="${preambleCorrectness}" style="border:1px solid ${preambleBorder}; background:${preambleBg}; color:${preambleColor}; border-radius:12px; padding:12px 16px; margin-bottom:16px;">
-      <p style="margin:0; font-weight:700;">${preambleHeadline}</p>
-      <p style="margin:8px 0 0 0;">${preambleSummary}</p>
+    const preambleHtml = `<div class="qti-feedback-preamble" data-correctness="${preambleCorrectness}" style="margin-bottom:16px;">
+      <p style="margin:0; font-weight:700; color:${preambleColor};">${preambleHeadline}</p>
+      <p style="margin:8px 0 0 0; color:#111827;">${preambleSummary}</p>
     </div>`
 
 	const palette = [
-		{ accent: "#2563EB", bg: "#EFF6FF", border: "#BFDBFE" },
-		{ accent: "#059669", bg: "#ECFDF5", border: "#A7F3D0" },
-		{ accent: "#F59E0B", bg: "#FFFBEB", border: "#FDE68A" },
-		{ accent: "#8B5CF6", bg: "#F5F3FF", border: "#DDD6FE" },
-		{ accent: "#EF4444", bg: "#FEF2F2", border: "#FECACA" }
+		{ accent: "#2563EB" },
+		{ accent: "#059669" },
+		{ accent: "#F59E0B" },
+		{ accent: "#8B5CF6" },
+		{ accent: "#EF4444" }
 	]
 
 	const stepItems = feedback.steps
@@ -180,7 +178,7 @@ export function renderFeedbackContent<E extends readonly string[]>(
 			const colors = palette[idx % palette.length]
 			const title = renderInlineContent(step.title, widgetSlots, interactionSlots)
 			const content = renderBlockContent(step.content, widgetSlots, interactionSlots)
-			return `<li class="qti-step" style="position:relative; margin:16px 0; padding:16px 16px 16px 56px; border:1px solid ${colors.border}; border-left:6px solid ${colors.accent}; border-radius:12px; background:${colors.bg}; box-shadow:0 1px 2px rgba(0,0,0,0.04);">
+			return `<li class="qti-step" style="position:relative; margin:16px 0; padding:16px 16px 16px 56px; border:1px solid #E5E7EB; border-left:6px solid ${colors.accent}; border-radius:12px; background:#F9FAFB; box-shadow:0 1px 2px rgba(0,0,0,0.04);">
         <span class="qti-step-index" style="position:absolute; left:16px; top:16px; width:28px; height:28px; border-radius:9999px; background:${colors.accent}; color:#FFFFFF; display:inline-flex; align-items:center; justify-content:center; font-weight:700; font-size:14px;">${idx + 1}</span>
         <p class="qti-step-title" style="margin:0 0 8px 0; font-weight:700; font-size:16px; color:#111827;">${title}</p>
         ${content}
