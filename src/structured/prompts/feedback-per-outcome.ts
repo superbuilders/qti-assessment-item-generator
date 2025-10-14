@@ -95,7 +95,10 @@ Every piece of feedback you generate must follow this four-part structure inside
 3.  **<analysis_step_3>Plan Remedial Guidance:</analysis_step_3>** Outline 2-3 clear, actionable, and concrete corrective steps. These steps must directly address the identified misconception.
 4.  **<analysis_step_4>Formulate a Formative Check:</analysis_step_4>** Devise 1-2 reflective questions the student can ask themselves to check their work without revealing the answer.
 
-### ⚠️ CRITICAL RULE 3: STRICTLY FOLLOW OUTPUT FORMAT
+### ⚠️ CRITICAL RULE 3: PREAMBLE SUMMARY MUST NOT DUPLICATE VERDICT
+Do NOT include verdict phrases like "Correct!" or "Not quite!" in the preamble summary. The system renders that headline separately. The summary MUST only contain the reasoning in 1–2 sentences (no verdict words).
+
+### ⚠️ CRITICAL RULE 4: STRICTLY FOLLOW OUTPUT FORMAT
 - Your entire output MUST be a single JSON object that conforms to the provided shallow schema: \`{ "content": BlockContent[] }\`.
 - **DO NOT** include any extra keys.
 - **DO NOT** add any explanations outside the JSON.
@@ -104,7 +107,7 @@ Every piece of feedback you generate must follow this four-part structure inside
 - Use short, concise paragraphs (1-2 sentences).
 - Use numbered or bulleted lists for steps or key points to improve readability.
 
-### ⚠️ CRITICAL RULE 4: SHUFFLE-SAFE FEEDBACK — NEVER REFERENCE CHOICE LETTERS OR POSITIONS
+### ⚠️ CRITICAL RULE 5: SHUFFLE-SAFE FEEDBACK — NEVER REFERENCE CHOICE LETTERS OR POSITIONS
 All assessments have \`shuffle: true\` enabled, meaning choice options are randomized for every student. Referring to choices by letter (A, B, C, D), position (first, second, last), or internal identifier (CHOICE_2, POS_4_2_C) will break when shuffled and confuse students.
 
 - **BANNED:** Any reference to choice letters: "A", "B", "C", "D", "Choice A", "option D"
@@ -241,7 +244,7 @@ All assessments have \`shuffle: true\` enabled, meaning choice options are rando
   ]
 }
 \`\`\`
-**Reasoning:** Fails CRITICAL RULE 4 by explicitly mentioning "Choice D". Since all assessments have \`shuffle: true\`, the letter "D" will not correspond to the same equation for different students. This feedback will confuse students when the actual equation appears in a different position. **CATASTROPHIC FAILURE:** Student A sees the equation at position D, but Student B sees the same equation at position C due to shuffle. When Student B receives feedback saying "Choice D", they will look at the wrong equation entirely.
+**Reasoning:** Fails CRITICAL RULE 5 by explicitly mentioning "Choice D". Since all assessments have \`shuffle: true\`, the letter "D" will not correspond to the same equation for different students. This feedback will confuse students when the actual equation appears in a different position. **CATASTROPHIC FAILURE:** Student A sees the equation at position D, but Student B sees the same equation at position C due to shuffle. When Student B receives feedback saying "Choice D", they will look at the wrong equation entirely.
 
 **More BAD Examples (All Break with Shuffle):**
 - "Option A is correct because..." ❌ Letter reference

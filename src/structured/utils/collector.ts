@@ -49,9 +49,6 @@ function walkBlock<E extends readonly string[]>(blocks: BlockContent<E> | null, 
 				break
 			case "blockquote":
 				walkInline(node.content, out)
-				if (node.attribution) {
-					walkInline(node.attribution, out)
-				}
 				break
 			case "unorderedList":
 			case "orderedList":

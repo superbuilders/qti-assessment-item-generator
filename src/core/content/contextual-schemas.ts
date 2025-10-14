@@ -138,15 +138,13 @@ function createTableRichBlockSchema<TInline extends z.ZodTypeAny>(allowedInlines
 function createBlockQuoteBlockSchema<TInline extends z.ZodTypeAny>(allowedInlinesSchema: TInline) {
 	return z
 		.object({
-			type: z.literal("blockquote").describe("Identifies a quoted callout area"),
-			content: z.array(allowedInlinesSchema).describe("The main quoted content"),
-			attribution: z
-				.array(allowedInlinesSchema)
-                .nullable()
-				.describe("Optional attribution for the quote")
+            type: z.literal("blockquote").describe("A semantic block quotation. Use ONLY for direct quotations of source text."),
+            content: z
+                .array(allowedInlinesSchema)
+                .describe("Directly quoted inline content from a source. Do not invent or paraphrase.")
 		})
 		.strict()
-		.describe("A blockquote for semantic quoting with optional attribution")
+        .describe("A blockquote used strictly for direct quotes.")
 }
 
 // ---[ CONTEXT-SPECIFIC SCHEMA FACTORIES ]---
@@ -192,12 +190,7 @@ export function createFeedbackContentSchema<const E extends readonly string[]>(w
 	const ParagraphBlockSchema = createParagraphBlockSchema(AllowedFeedbackInlines).describe(
 		"Paragraph of inline content within feedback steps. Use for sentences and brief explanations."
 	)
-	const UnorderedListBlockSchema = createUnorderedListBlockSchema(AllowedFeedbackInlines).describe(
-		"Bulleted list used to organize hints, tips, or self-check items in a step."
-	)
-	const OrderedListBlockSchema = createOrderedListBlockSchema(AllowedFeedbackInlines).describe(
-		"Numbered list used to present sequenced sub-steps inside a step."
-	)
+    // Lists are intentionally not constructed for steps to prevent list usage inside steps
 	const TableRichBlockSchema = createTableRichBlockSchema(AllowedFeedbackInlines).describe(
 		"Table for structured information in a step (no interactions)."
 	)
@@ -207,28 +200,22 @@ export function createFeedbackContentSchema<const E extends readonly string[]>(w
 
 	const BlockQuoteBlockSchema = z
 		.object({
-			type: z.literal("blockquote").describe("Identifies a quoted callout area in the step content."),
+            type: z.literal("blockquote").describe("A semantic block quotation. Use ONLY for direct quotations of source text."),
 			content: z
 				.array(AllowedFeedbackInlines)
-				.describe("Quoted inline content that emphasizes a key idea or reminder."),
-			attribution: z
-				.array(AllowedFeedbackInlines)
-                .nullable()
-				.describe("Optional attribution for the quote, e.g., 'Teacher's tip'.")
+                .describe("Directly quoted inline content from a source. Do not invent or paraphrase.")
 		})
 		.strict()
-		.describe("A quoted callout to emphasize a key idea, hint, or reminder within a step.")
+        .describe("A blockquote used strictly for direct quotes within a step. No attribution field.")
 
-	const AllowedFeedbackBlocks = z
-		.discriminatedUnion("type", [
-			ParagraphBlockSchema,
-			UnorderedListBlockSchema,
-			OrderedListBlockSchema,
-			TableRichBlockSchema,
-			WidgetRefBlockSchema,
-			BlockQuoteBlockSchema
-		])
-		.describe("Blocks permitted inside feedback steps.")
+    const AllowedFeedbackBlocks = z
+        .discriminatedUnion("type", [
+            ParagraphBlockSchema,
+            TableRichBlockSchema,
+            WidgetRefBlockSchema,
+            BlockQuoteBlockSchema
+        ])
+        .describe("Blocks permitted inside feedback steps: paragraphs, tables, widgets, blockquotes.")
 
 	const StepBlockSchema = z
 		.object({
@@ -254,7 +241,9 @@ export function createFeedbackContentSchema<const E extends readonly string[]>(w
 			summary: z
 				.array(AllowedFeedbackInlines)
 				.min(1)
-				.describe("A short 1–2 sentence explanation stating why the answer is right/wrong before showing steps.")
+				.describe(
+					"A short 1–2 sentence explanation of the reasoning ONLY. Do NOT include verdict phrases like 'Correct!' or 'Not quite' here; those are rendered separately."
+				)
 		})
 		.strict()
 		.describe("A mandatory preamble that communicates the verdict and a succinct rationale.")

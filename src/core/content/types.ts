@@ -8,9 +8,8 @@ export type InlineContentItem<E extends readonly string[] = readonly string[]> =
 export type InlineContent<E extends readonly string[] = readonly string[]> = Array<InlineContentItem<E>>
 
 export type BlockQuoteBlockItem<E extends readonly string[] = readonly string[]> = {
-	type: "blockquote"
-	content: InlineContent<E>
-	attribution?: InlineContent<E> | null
+    type: "blockquote"
+    content: InlineContent<E>
 }
 
 export type BlockContentItem<E extends readonly string[] = readonly string[]> =

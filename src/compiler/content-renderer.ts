@@ -73,11 +73,7 @@ export function renderBlockContent<E extends readonly string[] = readonly string
 					return `<p>${renderInlineContent(item.content, widgetSlots, interactionSlots)}</p>`
 				case "blockquote": {
 					const inline = renderInlineContent(item.content, widgetSlots, interactionSlots)
-					const attr = item.attribution ? renderInlineContent(item.attribution, widgetSlots, interactionSlots) : ""
-					const footer = attr
-						? `<footer class="qti-blockquote-footer" style="margin-top:6px; color:#6B7280; font-style:italic;">${attr}</footer>`
-						: ""
-					return `<blockquote class="qti-blockquote" style="margin:12px 0; padding:12px 16px; border-left:4px solid #D1D5DB; background:#F9FAFB; color:#111827;">${inline}${footer}</blockquote>`
+					return `<blockquote class="qti-blockquote" style="margin:12px 0; padding:12px 16px; border-left:4px solid #D1D5DB; background:#F9FAFB; color:#111827;">${inline}</blockquote>`
 				}
 				case "tableRich": {
 					const tableStyle = "border-collapse: collapse; width: 100%;"

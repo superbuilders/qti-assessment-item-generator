@@ -19,11 +19,7 @@ describe("Compiler: blockquote", () => {
 			],
 			body: [
 				{ type: "paragraph", content: [{ type: "text", content: "Consider this quote:" }] },
-				{
-					type: "blockquote",
-					content: [{ type: "text", content: "To be or not to be, that is the question." }],
-					attribution: [{ type: "text", content: "Shakespeare" }]
-				}
+				{ type: "blockquote", content: [{ type: "text", content: "To be or not to be, that is the question." }] }
 			],
 			widgets: null,
 			interactions: {
@@ -49,8 +45,8 @@ describe("Compiler: blockquote", () => {
 		const xml = await compile(item, allWidgetsCollection)
 		expect(xml).toContain("<blockquote")
 		expect(xml).toContain("To be or not to be")
-		expect(xml).toContain("<footer")
-		expect(xml).toContain("Shakespeare")
+		// Attribution removed from schema; ensure no footer renders
+		expect(xml).not.toContain("<footer")
 		expect(xml).toMatchSnapshot()
 	})
 
@@ -67,11 +63,7 @@ describe("Compiler: blockquote", () => {
 				}
 			],
 				body: [
-					{
-						type: "blockquote",
-						content: [{ type: "text", content: "Remember to find the common denominator first!" }],
-						attribution: null
-					}
+					{ type: "blockquote", content: [{ type: "text", content: "Remember to find the common denominator first!" }] }
 				],
 			widgets: null,
 			interactions: {

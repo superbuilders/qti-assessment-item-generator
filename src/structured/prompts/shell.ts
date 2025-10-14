@@ -164,7 +164,7 @@ The Perseus JSON may contain hints or feedback, but you MUST NOT copy it word-fo
 Each feedback block MUST contain these four pedagogical elements:
 
 1. **Immediate Response**: Quick acknowledgment (e.g., "That's correct!" or "Not quite right")
-2. **Conceptual Explanation**: WHY the answer is correct/incorrect with mathematical reasoning
+2. **Conceptual Explanation**: WHY the answer is correct/incorrect with mathematical reasoning. Do NOT include verdict phrases like "Correct!" or "Not quite!" in any summary sentence; the system renders those separately.
 3. **Remedial Guidance**: Step-by-step correction of misconceptions
 4. **Learning Path**: What to study or practice next
 

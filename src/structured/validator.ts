@@ -51,9 +51,6 @@ function processBlockContent<E extends readonly string[]>(items: BlockContent<E>
 		}
 		if (item.type === "blockquote") {
 			processInlineContent(item.content, logger)
-			if (item.attribution) {
-				processInlineContent(item.attribution, logger)
-			}
 		}
 	}
 }
