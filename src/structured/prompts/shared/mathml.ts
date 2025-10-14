@@ -185,6 +185,41 @@ Note: Use HTML entities for < and > inside MathML: &lt; and &gt;
   { "type": "text", "content": "." }
 ]
 
+#### 16. Spacing Between Text and Math (Units and Adjacent Math)
+// ❌ BAD: Missing spaces around units yields hard-to-read output like "4km20m"
+[
+  { "type": "text", "content": "Keira walks " },
+  { "type": "math", "mathml": "<mn>4</mn>" },
+  { "type": "text", "content": "km" },
+  { "type": "math", "mathml": "<mn>20</mn>" },
+  { "type": "text", "content": "m during those three days." }
+]
+
+// ✅ GOOD: Insert spaces in surrounding text (preferred)
+[
+  { "type": "text", "content": "Keira walks " },
+  { "type": "math", "mathml": "<mn>4</mn>" },
+  { "type": "text", "content": " km " },
+  { "type": "math", "mathml": "<mn>20</mn>" },
+  { "type": "text", "content": " m during those three days." }
+]
+
+// ❌ BAD: Number glued to unit, e.g., "12miles"
+[
+  { "type": "text", "content": "The total distance is " },
+  { "type": "math", "mathml": "<mn>12</mn>" },
+  { "type": "text", "content": "miles." }
+]
+
+// ✅ GOOD: Ensure a space before the unit text
+[
+  { "type": "text", "content": "The total distance is " },
+  { "type": "math", "mathml": "<mn>12</mn>" },
+  { "type": "text", "content": " miles." }
+]
+
+**MANDATORY RULE:** Whenever a text item is adjacent to a math item, include necessary leading/trailing spaces in the text items so the rendered sentence has natural spacing. Do NOT rely on the renderer to insert spaces.
+
 ---
 
 ### Pattern Recognition Checklist

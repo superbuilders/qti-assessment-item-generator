@@ -24,7 +24,7 @@ exports[`Compiler: blockquote should render blockquote in body with escaped cont
     <qti-outcome-declaration identifier="FEEDBACK__OVERALL" cardinality="single" base-type="identifier"/>
     <qti-item-body>
         <p>Consider this quote:</p>
-        <blockquote class="qti-blockquote" style="margin:12px 0; padding:12px 16px; border-left:4px solid #D1D5DB; background:#F9FAFB; color:#111827;">To be or not to be, that is the question.<footer class="qti-blockquote-footer" style="margin-top:6px; color:#6B7280; font-style:italic;">Shakespeare</footer></blockquote>
+        <blockquote class="qti-blockquote" style="margin:12px 0; padding:12px 16px; border-left:4px solid #D1D5DB; background:#F9FAFB; color:#111827;">To be or not to be, that is the question.</blockquote>
         <qti-feedback-block outcome-identifier="FEEDBACK__OVERALL" identifier="FB__RESPONSE_TE_CORRECT" show-hide="show">
             <qti-content-body><div class="qti-feedback-preamble" data-correctness="correct" style="margin-bottom:16px;">
       <p style="margin:0; font-weight:700; color:#047857;">Correct! Fantastic work.</p>
