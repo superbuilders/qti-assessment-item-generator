@@ -16,10 +16,13 @@ describe("Compiler: feedback-as-steps", () => {
 					correct: "A"
 				}
 			],
-			body: [{ type: "paragraph", content: [{ type: "text", content: "What is 2 + 2?" }] }],
+			body: [
+				{ type: "paragraph", content: [{ type: "text", content: "What is 2 + 2?" }] },
+				{ type: "interactionRef", interactionId: "ci" }
+			],
 			widgets: null,
 			interactions: {
-				CI: {
+				ci: {
 					type: "choiceInteraction",
 					responseIdentifier: "RESPONSE",
 					prompt: [{ type: "text", content: "Choose:" }],
@@ -150,7 +153,10 @@ describe("Compiler: feedback-as-steps", () => {
 					correct: "A"
 				}
 			],
-			body: [{ type: "paragraph", content: [{ type: "text", content: "Question" }] }],
+			body: [
+				{ type: "paragraph", content: [{ type: "text", content: "Question" }] },
+				{ type: "interactionRef", interactionId: "ci" }
+			],
 			widgets: null,
 			interactions: {
 				CI: {

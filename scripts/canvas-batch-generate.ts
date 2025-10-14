@@ -341,35 +341,34 @@ async function gatherImagePayloads(quizDir: string, questionNumber: number): Pro
     const imagesDir = path.join(quizDir, "_images")
     
     const statResult = await errors.try(fs.stat(imagesDir))
-    if (statResult.error || !statResult.data.isDirectory()) {
+    if (!statResult.error && statResult.data.isDirectory()) {
+        const glob = new Glob(`q${questionNumber}-*.png`)
+        for await (const fileName of glob.scan(imagesDir)) {
+            const filePath = path.join(imagesDir, fileName)
+            const file = Bun.file(filePath)
+            if (!(await file.exists())) {
+                logger.debug("image not found, skipping", { file: filePath })
+                continue
+            }
+            const dataResult = await errors.try(file.arrayBuffer())
+            if (dataResult.error) {
+                logger.warn("failed to read image file", { file: filePath, error: dataResult.error })
+                continue
+            }
+            if (dataResult.data) {
+                const mimeType = file.type === "image/png" ? "image/png" : 
+                               file.type === "image/jpeg" ? "image/jpeg" :
+                               file.type === "image/webp" ? "image/webp" :
+                               file.type === "image/gif" ? "image/gif" : "image/png"
+                payloads.push({ data: dataResult.data, mimeType })
+                filesIncluded.push(filePath)
+                logger.debug("included image from _images", { file: filePath, mimeType, byteLength: dataResult.data.byteLength })
+            }
+        }
+    } else {
         logger.debug("_images directory not found, skipping image ingestion", { dir: imagesDir })
-        return { payloads, filesIncluded }
     }
-    
-    const glob = new Glob(`q${questionNumber}-*.png`)
-    for await (const fileName of glob.scan(imagesDir)) {
-        const filePath = path.join(imagesDir, fileName)
-        const file = Bun.file(filePath)
-        if (!(await file.exists())) {
-            logger.debug("image not found, skipping", { file: filePath })
-            continue
-        }
-        const dataResult = await errors.try(file.arrayBuffer())
-        if (dataResult.error) {
-            logger.warn("failed to read image file", { file: filePath, error: dataResult.error })
-            continue
-        }
-        if (dataResult.data) {
-            const mimeType = file.type === "image/png" ? "image/png" : 
-                           file.type === "image/jpeg" ? "image/jpeg" :
-                           file.type === "image/webp" ? "image/webp" :
-                           file.type === "image/gif" ? "image/gif" : "image/png"
-            payloads.push({ data: dataResult.data, mimeType })
-            filesIncluded.push(filePath)
-            logger.debug("included image from _images", { file: filePath, mimeType, byteLength: dataResult.data.byteLength })
-        }
-    }
-    
+
     return { payloads, filesIncluded }
 }
 
@@ -563,6 +562,36 @@ async function processQuestion(
 
 	const imageGatherResult = await gatherImagePayloads(assessmentDirs.quizDir, questionNumber)
 	const multimodalImagePayloads = imageGatherResult.payloads
+
+	// Unit 1 Test fallback: if this question is a stub (added due to missing quiz-data.json entry),
+	// require the presence of _quiz/question-<N>.png and attach it. Hard-fail the entire run if missing.
+	const isUnit1TestAssessment = kebabCaseName === "unit-1-test"
+	const isFallbackStub =
+		!question.type &&
+		!question.questionText &&
+		(!question.options || question.options.length === 0) &&
+		(!question.blanks || question.blanks.length === 0) &&
+		(!question.pairs || question.pairs.length === 0)
+
+	if (isUnit1TestAssessment && isFallbackStub) {
+		const fallbackPng = path.join(assessmentDirs.quizDir, `question-${questionNumber}.png`)
+		const pngFile = Bun.file(fallbackPng)
+		if (!(await pngFile.exists())) {
+			logger.error("unit 1 test fallback screenshot missing", { questionId, file: fallbackPng })
+			throw errors.new("unit 1 test fallback screenshot missing")
+		}
+		const pngDataResult = await errors.try(pngFile.arrayBuffer())
+		if (pngDataResult.error) {
+			logger.error("unit 1 test fallback screenshot unreadable", { questionId, file: fallbackPng, error: pngDataResult.error })
+			throw errors.wrap(pngDataResult.error, "unit 1 test fallback screenshot read")
+		}
+		const mimeType = pngFile.type === "image/png" ? "image/png" :
+			pngFile.type === "image/jpeg" ? "image/jpeg" :
+			pngFile.type === "image/webp" ? "image/webp" :
+			pngFile.type === "image/gif" ? "image/gif" : "image/png"
+		multimodalImagePayloads.push({ data: pngDataResult.data, mimeType })
+		logger.info("included unit 1 test fallback screenshot", { questionId, file: fallbackPng })
+	}
 	if (imageGatherResult.filesIncluded.length > 0) {
 		logger.info("included images from _images directory", {
 			questionId,
@@ -679,16 +708,57 @@ async function processAssessmentDir(dir: string, openai: OpenAI): Promise<void> 
 	await fs.mkdir(assessmentOutputDir, { recursive: true })
 
     const sortedQuestions = quizDataParsed.data.questions.sort((a, b) => a.questionNumber - b.questionNumber)
-    const questionTasks = sortedQuestions.map(
+
+    // Special-case: Only for Unit 1 Test, supplement missing questions from per-question screenshots
+    let allQuestions: CanvasQuestion[] = [...sortedQuestions]
+    if (assessmentName === "Unit 1 Test") {
+        const existingNumbers = new Set<number>(allQuestions.map((q) => q.questionNumber))
+        const dirEntriesResult = await errors.try(fs.readdir(quizDir, { withFileTypes: true }))
+        if (dirEntriesResult.error) {
+            logger.debug("failed reading quiz directory for fallback discovery", { dir: quizDir, error: dirEntriesResult.error })
+        } else {
+            const imageQuestionNumbers: number[] = []
+            const re = /^question-(\d+)\.png$/
+            for (const de of dirEntriesResult.data) {
+                if (!de.isFile()) continue
+                const m = de.name.match(re)
+                if (m && m[1]) {
+                    const n = Number(m[1])
+                    if (Number.isFinite(n)) imageQuestionNumbers.push(n)
+                }
+            }
+            const missing = imageQuestionNumbers
+                .filter((n) => !existingNumbers.has(n))
+                .sort((a, b) => a - b)
+            if (missing.length > 0) {
+                logger.info("using screenshot fallback for missing questions", { assessmentName, missingCount: missing.length, questionNumbers: missing })
+                const fallbackQuestions: CanvasQuestion[] = missing.map((n) => ({ questionNumber: n }))
+                allQuestions = [...allQuestions, ...fallbackQuestions].sort((a, b) => a.questionNumber - b.questionNumber)
+            }
+        }
+    }
+
+    const questionTasks = allQuestions.map(
         (q: CanvasQuestion) => () => processQuestion(
             q,
             { quizDir, outputDir: assessmentOutputDir },
             openai,
+            // For Unit 1 Test fallback stubs (no JSON), there is no authoritative answer.
+            // We pass through the existing answers map (may be undefined or only partial) as-is.
             quizDataParsed.data.answers
         )
     )
 
-	await runWithConcurrency(questionTasks, CONCURRENCY_LIMIT)
+	const questionResults = await runWithConcurrency(questionTasks, CONCURRENCY_LIMIT)
+	const questionFailures = questionResults.filter((r): r is PromiseRejectedResult => r.status === "rejected")
+	if (questionFailures.length > 0) {
+		// If any question in Unit 1 Test failed due to missing fallback screenshot, hard-fail this assessment.
+		const unit1FallbackFailure = assessmentName === "Unit 1 Test" && questionFailures.some((f) => String(f.reason).includes("unit 1 test fallback screenshot missing"))
+		if (unit1FallbackFailure) {
+			logger.error("unit 1 test: aborting due to missing fallback screenshot", { failureCount: questionFailures.length })
+			throw errors.new("unit 1 test fallback screenshot missing")
+		}
+	}
 }
 
 /**
@@ -739,13 +809,18 @@ async function main() {
 	const tasks = assessmentDirList.map((dir) => () => processAssessmentDir(dir, openai))
 	const results = await runWithConcurrency(tasks, CONCURRENCY_LIMIT)
 
-    const failures = results.filter((r): r is PromiseRejectedResult => r.status === "rejected")
-    if (failures.length > 0) {
-        logger.error("some assessment directories failed to process", {
-            failureCount: failures.length,
-            reasons: failures.map((f) => f.reason)
-        })
-    }
+	const failures = results.filter((r): r is PromiseRejectedResult => r.status === "rejected")
+	if (failures.length > 0) {
+		logger.error("some assessment directories failed to process", {
+			failureCount: failures.length,
+			reasons: failures.map((f) => f.reason)
+		})
+		// Hard fail the entire script if any failure indicates the unit 1 test fallback condition
+		const hardFail = failures.some((f) => String(f.reason).includes("unit 1 test fallback screenshot missing"))
+		if (hardFail) {
+			throw errors.new("unit 1 test fallback screenshot missing")
+		}
+	}
 
 	logger.info("batch generation complete", {
 		total: assessmentDirList.length,
