@@ -4,6 +4,7 @@ import { caretBanPromptSection } from "./caret"
 import { createWidgetSelectionPromptSection, formatUnifiedContextSections } from "./shared"
 import { createMathmlComplianceSection } from "./shared/mathml"
 import { createEquationsInChoicesSection } from "./shared/equations-in-choices"
+import { createChoiceVisualsDisciplineSection } from "./shared/choice-visuals-discipline"
 
 export function createInteractionContentPrompt<
 	C extends WidgetCollection<Record<string, WidgetDefinition<unknown, unknown>>, readonly string[]>
@@ -334,6 +335,8 @@ SCAN ALL text content (prompts, choices, feedback) for "$" or "%" - these MUST b
 
 	const userContent = `Generate interaction content based on the following inputs. Use the provided context, including raster images for vision and vector images as text, to understand the content fully.
 
+${createChoiceVisualsDisciplineSection()}
+
 ${formatUnifiedContextSections(envelope, imageContext)}
 
 ${createMathmlComplianceSection()}
@@ -656,97 +659,6 @@ CORRECT: \`content: [{ "type": "paragraph", "content": [{ "type": "text", "conte
   }
   \`\`\`
 
-**⚠️ CRITICAL NEW SECTION: WIDGET SLOT USAGE IN INTERACTIONS (NON-MATH VISUALS ONLY)**
-
-Use all declared choice-level widget slots that correspond to non-math visuals and are not already used in the body.
-
-When the assessment shell declares widget slots (especially those following patterns like \`choice_a_visual\`, \`choice_b_visual\`, or \`RESPONSE__A__v1\`), these are widgets specifically reserved for embedding inside interaction choices when the choice includes a diagram/image. The pipeline has already:
-   1. Identified these widgets in Shot 1
-   2. Mapped them to specific widget types in Shot 2
-   3. Reserved them for use in this interaction generation step
-
-**FAILURE TO USE DECLARED WIDGET SLOTS WILL CAUSE THEM TO BE PRUNED AND THE QUESTION TO FAIL.**
-
-**Real Example of This Critical Error:**
-
-**Assessment Shell (showing declared but unused widget slots):**
-\`\`\`json
-{
-  "body": [
-    { "type": "widgetRef", "widgetId": "stimulus_dnl" },
-    { "type": "interactionRef", "interactionId": "choice_interaction" }
-  ]
-}
-\`\`\`
-
-**WRONG (Creating text representations instead of using widget slots):**
-\`\`\`json
-{
-  "choice_interaction": {
-    "type": "choiceInteraction",
-    "choices": [
-      {
-        "identifier": "A",
-        "content": [
-          { "type": "paragraph", "content": [{ "type": "text", "content": "Seconds | Meters" }] },
-          { "type": "paragraph", "content": [{ "type": "text", "content": "8 | 225" }] },
-          { "type": "paragraph", "content": [{ "type": "text", "content": "12 | 300" }] }
-        ]
-      },
-      {
-        "identifier": "B",
-        "content": [
-          { "type": "paragraph", "content": [{ "type": "text", "content": "Seconds | Meters" }] },
-          { "type": "paragraph", "content": [{ "type": "text", "content": "3 | 75" }] },
-          { "type": "paragraph", "content": [{ "type": "text", "content": "5 | 125" }] }
-        ]
-      }
-    ]
-  }
-}
-\`\`\`
-**Why this is WRONG:** The shell declared \`choice_a_visual\` and \`choice_b_visual\` widgets, but the interaction didn't use them. These widgets will be pruned as "unused" and never generated, breaking the question.
-
-**CORRECT (Using the declared widget slots):**
-\`\`\`json
-{
-  "choice_interaction": {
-    "type": "choiceInteraction",
-    "choices": [
-      {
-        "identifier": "A",
-        "content": [
-          { "type": "widgetRef", "widgetId": "choice_a_visual" }
-        ]
-      },
-      {
-        "identifier": "B",
-        "content": [
-          { "type": "widgetRef", "widgetId": "choice_b_visual" }
-        ]
-      }
-    ]
-  }
-}
-\`\`\`
-
-**MANDATORY CHECKLIST FOR INTERACTION GENERATION:**
-1. Check the assessment shell's \`widgets\` array for ALL declared widget slots
-2. Identify which widgets are already used in the \`body\` 
-3. The remaining unused widgets MUST be embedded in your interaction choices
-4. Use the exact slotId from the shell - do not create new slot names
-5. For choice-level content:
-   - **Math-only equations/expressions → Use a paragraph with inline MathML nodes. NEVER \`widgetRef\`.**
-   - **Diagrams, charts, geometric figures → Use \`widgetRef\`.**
-   - **NEVER create textual descriptions of diagrams.**
-
-**Common Widget Slot Patterns to Watch For:**
-- \`choice_a_visual\`, \`choice_b_visual\`, etc. - Visuals for each choice
-- \`RESPONSE__A__v1\`, \`RESPONSE__B__v1\`, etc. - Visual widgets for choices
-- \`option_1_diagram\`, \`option_2_diagram\`, etc. - Diagrams for each choice
-- Any widget slot not used in the body MUST be used in the interaction
-
-**REMEMBER:** The pipeline will DELETE any widget slots you don't reference. If the shell declares it, YOU MUST USE IT.
 
 ### POSITIVE EXAMPLE: Double Number Line Choice Interaction
 

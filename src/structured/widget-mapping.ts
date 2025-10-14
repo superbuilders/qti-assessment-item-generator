@@ -124,8 +124,8 @@ ${assessmentBody}
 ${createWidgetSelectionPromptSection(widgetCollection)}
 
  MANDATORY RULES FOR CHOICE-LEVEL VISUALS:
- - Some widget slot names may follow conventions like \`repl__choice_interaction__choice__a__visual__0\` or \`reponse__a__v1\`. These are widgets reserved for visuals that appear INSIDE interaction choices (e.g., images/diagrams in radio choices).
- - You MUST map these choice-level widget slots to the correct widget types by inspecting the Perseus JSON for the corresponding choice content.
+ - You will be given a list of slot names. Map **only** the \`widgetId\`s explicitly provided. Never invent, derive, or normalize slot names based on observed patterns. Focus on the semantic content of each widget to determine its type.
+ - Choice-level widget slots are reserved for visuals that appear INSIDE interaction choices (e.g., images/diagrams in radio choices).
  - CRITICAL: If a choice contains ONLY a mathematical equation or expression with no diagram, that choice should NOT have a widget slot. Do NOT map equation-only choices to any widget type. The correct representation is inline MathML in the choice content.
  - Do NOT assume these widgets appear in the top-level body; they are intentionally absent from the body and will be inserted inside choices later.
 

@@ -140,7 +140,7 @@ ${createWidgetSelectionPromptSection(subsetCollection)}
 - Extract all relevant data from the Perseus JSON to populate the widget properties.
 - **CRITICAL: PRESERVE ALL LABELS AND VALUES FROM PERSEUS EXACTLY** - When Perseus describes labels, markers, values, or any visual properties (in alt text, descriptions, or widget options), you MUST copy them EXACTLY. Missing or changing labels can make questions impossible to answer.
 - Ensure all required properties for each widget type are included.
-  - **MANDATORY: HONOR CHOICE-LEVEL SLOT NAMING**: For any widget slot name matching \`<responseIdentifier>__<choiceLetter>__v<index>\`, generate the widget corresponding to the visual content in that specific choice within the referenced interaction. Do not repurpose or collapse these slots; they must map 1:1 to the visuals per choice.
+  - **MANDATORY: HONOR CHOICE-LEVEL SLOT NAMING**: Each choice should have at most one visual. Generate a widget for each choice-level slot ID **that was actually used** in the final interaction content. If the interaction mistakenly contains multiple \`widgetRef\`s for a single choice, generate content for **only the one canonical slot declared by the shell** and completely IGNORE the others. Do not generate content for invented or hallucinated slot IDs.
 - Return ONLY a JSON object with widget slot names as keys and widget objects as values.
 
 Example output structure:
