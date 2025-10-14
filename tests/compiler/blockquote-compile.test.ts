@@ -66,12 +66,13 @@ describe("Compiler: blockquote", () => {
 					correct: "A"
 				}
 			],
-			body: [
-				{
-					type: "blockquote",
-					content: [{ type: "text", content: "Remember to find the common denominator first!" }]
-				}
-			],
+				body: [
+					{
+						type: "blockquote",
+						content: [{ type: "text", content: "Remember to find the common denominator first!" }],
+						attribution: null
+					}
+				],
 			widgets: null,
 			interactions: {
 				CI: {

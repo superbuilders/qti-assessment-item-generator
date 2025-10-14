@@ -142,8 +142,7 @@ function createBlockQuoteBlockSchema<TInline extends z.ZodTypeAny>(allowedInline
 			content: z.array(allowedInlinesSchema).describe("The main quoted content"),
 			attribution: z
 				.array(allowedInlinesSchema)
-				.nullable()
-				.optional()
+                .nullable()
 				.describe("Optional attribution for the quote")
 		})
 		.strict()
@@ -214,8 +213,7 @@ export function createFeedbackContentSchema<const E extends readonly string[]>(w
 				.describe("Quoted inline content that emphasizes a key idea or reminder."),
 			attribution: z
 				.array(AllowedFeedbackInlines)
-				.nullable()
-				.optional()
+                .nullable()
 				.describe("Optional attribution for the quote, e.g., 'Teacher's tip'.")
 		})
 		.strict()
