@@ -71,8 +71,6 @@ export function renderBlockContent<E extends readonly string[] = readonly string
 			switch (item.type) {
 				case "paragraph":
 					return `<p>${renderInlineContent(item.content, widgetSlots, interactionSlots)}</p>`
-				case "codeBlock":
-					return `<pre><code>${escapeXmlText(item.code)}</code></pre>`
 				case "tableRich": {
 					const tableStyle = "border-collapse: collapse; width: 100%;"
 					const thStyle = "border: 1px solid #ddd; padding: 8px 12px; text-align: left; vertical-align: top;"

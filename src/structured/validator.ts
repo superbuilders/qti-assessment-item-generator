@@ -48,14 +48,6 @@ function processBlockContent<E extends readonly string[]>(items: BlockContent<E>
 	for (const item of items) {
 		if (item.type === "paragraph") {
 			processInlineContent(item.content, logger)
-		} else if (item.type === "codeBlock") {
-			if (typeof item.code === "string") {
-				let sanitized = sanitizeHtmlEntities(item.code)
-				checkNoPerseusArtifacts(sanitized, logger)
-				item.code = sanitized
-			} else {
-				logger.warn("sanitizer skipping codeBlock with invalid 'code' field")
-			}
 		}
 	}
 }
@@ -112,13 +104,6 @@ export function validateAndSanitizeHtmlFields<E extends readonly string[]>(
 				const bType = Reflect.get(block, "type")
 				if (bType === "paragraph") {
 					sanitizeParagraphUnknown(block)
-				} else if (bType === "codeBlock") {
-					const codeVal = Reflect.get(block, "code")
-					if (typeof codeVal === "string") {
-						let sanitized = sanitizeHtmlEntities(codeVal)
-						checkNoPerseusArtifacts(sanitized, logger)
-						Reflect.set(block, "code", sanitized)
-					}
 				}
 			}
 			return

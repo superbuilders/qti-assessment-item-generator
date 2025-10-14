@@ -226,7 +226,6 @@ function collectInteractionIdsFromShell<E extends readonly string[]>(shell: {
 					}
 					break
 				case "widgetRef":
-				case "codeBlock":
 					// These don't contain interactions
 					break
 			}

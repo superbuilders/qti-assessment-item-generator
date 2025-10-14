@@ -66,7 +66,6 @@ function walkBlock<E extends readonly string[]>(blocks: BlockContent<E> | null, 
 				walkRows(node.rows)
 				break
 			}
-			case "codeBlock":
 			case "interactionRef":
 				break
 		}

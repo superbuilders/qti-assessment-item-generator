@@ -9,7 +9,6 @@ export type InlineContent<E extends readonly string[] = readonly string[]> = Arr
 
 export type BlockContentItem<E extends readonly string[] = readonly string[]> =
 	| { type: "paragraph"; content: InlineContent<E> }
-	| { type: "codeBlock"; code: string }
 	| { type: "unorderedList"; items: InlineContent<E>[] }
 	| { type: "orderedList"; items: InlineContent<E>[] }
 	| { type: "tableRich"; header: (InlineContent<E> | null)[][] | null; rows: (InlineContent<E> | null)[][] }

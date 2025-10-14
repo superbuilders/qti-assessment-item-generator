@@ -66,14 +66,6 @@ function createInlineWidgetRefSchema<const E extends readonly string[]>(widgetTy
 
 // ---[ MODULAR BUILDING BLOCKS (BLOCK) ]---
 
-const CodeBlockSchema = z
-	.object({
-		type: z.literal("codeBlock").describe("Identifies this as a preformatted code block"),
-		code: z.string().describe("Raw code or pseudocode text. Preserve newlines exactly.")
-	})
-	.strict()
-	.describe("A preformatted code block that must be rendered with <pre><code>")
-
 function createWidgetRefBlockSchema<const E extends readonly string[]>(widgetTypeKeys: E) {
 	return z
 		.object({
@@ -164,7 +156,6 @@ export function createBodyContentSchema<const E extends readonly string[]>(widge
 
 	const AllowedBodyBlocks = z.discriminatedUnion("type", [
 		ParagraphBlockSchema,
-		CodeBlockSchema,
 		UnorderedListBlockSchema,
 		OrderedListBlockSchema,
 		TableRichBlockSchema,
@@ -193,7 +184,6 @@ export function createFeedbackContentSchema<const E extends readonly string[]>(w
 
 	const AllowedFeedbackBlocks = z.discriminatedUnion("type", [
 		ParagraphBlockSchema,
-		CodeBlockSchema,
 		UnorderedListBlockSchema,
 		OrderedListBlockSchema,
 		TableRichBlockSchema,
@@ -235,7 +225,6 @@ export function createChoiceInteractionChoiceContentSchema<const E extends reado
 
 	const AllowedChoiceBlocks = z.discriminatedUnion("type", [
 		ParagraphBlockSchema,
-		CodeBlockSchema,
 		UnorderedListBlockSchema,
 		OrderedListBlockSchema,
 		TableRichBlockSchema,
