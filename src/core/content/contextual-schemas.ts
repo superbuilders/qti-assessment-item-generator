@@ -135,6 +135,21 @@ function createTableRichBlockSchema<TInline extends z.ZodTypeAny>(allowedInlines
 		.strict()
 }
 
+function createBlockQuoteBlockSchema<TInline extends z.ZodTypeAny>(allowedInlinesSchema: TInline) {
+	return z
+		.object({
+			type: z.literal("blockquote").describe("Identifies a quoted callout area"),
+			content: z.array(allowedInlinesSchema).describe("The main quoted content"),
+			attribution: z
+				.array(allowedInlinesSchema)
+				.nullable()
+				.optional()
+				.describe("Optional attribution for the quote")
+		})
+		.strict()
+		.describe("A blockquote for semantic quoting with optional attribution")
+}
+
 // ---[ CONTEXT-SPECIFIC SCHEMA FACTORIES ]---
 
 export function createBodyContentSchema<const E extends readonly string[]>(widgetTypeKeys: E) {
@@ -152,6 +167,7 @@ export function createBodyContentSchema<const E extends readonly string[]>(widge
 	const UnorderedListBlockSchema = createUnorderedListBlockSchema(AllowedBodyInlines)
 	const OrderedListBlockSchema = createOrderedListBlockSchema(AllowedBodyInlines)
 	const TableRichBlockSchema = createTableRichBlockSchema(AllowedBodyInlines)
+	const BlockQuoteBlockSchema = createBlockQuoteBlockSchema(AllowedBodyInlines)
 	const WidgetRefBlockSchema = createWidgetRefBlockSchema(widgetTypeKeys)
 
 	const AllowedBodyBlocks = z.discriminatedUnion("type", [
@@ -159,6 +175,7 @@ export function createBodyContentSchema<const E extends readonly string[]>(widge
 		UnorderedListBlockSchema,
 		OrderedListBlockSchema,
 		TableRichBlockSchema,
+		BlockQuoteBlockSchema,
 		WidgetRefBlockSchema,
 		InteractionRefBlockSchema
 	])
@@ -169,29 +186,93 @@ export function createBodyContentSchema<const E extends readonly string[]>(widge
 export function createFeedbackContentSchema<const E extends readonly string[]>(widgetTypeKeys: E) {
 	const InlineWidgetRefSchema = createInlineWidgetRefSchema(widgetTypeKeys)
 
-	const AllowedFeedbackInlines = z.discriminatedUnion("type", [
-		TextInlineSchema,
-		MathInlineSchema,
-		InlineWidgetRefSchema
-		// InlineInteractionRefSchema and GapInlineSchema are BANNED
-	])
+	const AllowedFeedbackInlines = z
+		.discriminatedUnion("type", [TextInlineSchema, MathInlineSchema, InlineWidgetRefSchema])
+		.describe("Inline items permitted in feedback (text, math, inline widget references). Interactions are banned.")
 
-	const ParagraphBlockSchema = createParagraphBlockSchema(AllowedFeedbackInlines)
-	const UnorderedListBlockSchema = createUnorderedListBlockSchema(AllowedFeedbackInlines)
-	const OrderedListBlockSchema = createOrderedListBlockSchema(AllowedFeedbackInlines)
-	const TableRichBlockSchema = createTableRichBlockSchema(AllowedFeedbackInlines)
-	const WidgetRefBlockSchema = createWidgetRefBlockSchema(widgetTypeKeys)
+	const ParagraphBlockSchema = createParagraphBlockSchema(AllowedFeedbackInlines).describe(
+		"Paragraph of inline content within feedback steps. Use for sentences and brief explanations."
+	)
+	const UnorderedListBlockSchema = createUnorderedListBlockSchema(AllowedFeedbackInlines).describe(
+		"Bulleted list used to organize hints, tips, or self-check items in a step."
+	)
+	const OrderedListBlockSchema = createOrderedListBlockSchema(AllowedFeedbackInlines).describe(
+		"Numbered list used to present sequenced sub-steps inside a step."
+	)
+	const TableRichBlockSchema = createTableRichBlockSchema(AllowedFeedbackInlines).describe(
+		"Table for structured information in a step (no interactions)."
+	)
+	const WidgetRefBlockSchema = createWidgetRefBlockSchema(widgetTypeKeys).describe(
+		"Embedded widget block used for diagrams or visuals that support the step."
+	)
 
-	const AllowedFeedbackBlocks = z.discriminatedUnion("type", [
-		ParagraphBlockSchema,
-		UnorderedListBlockSchema,
-		OrderedListBlockSchema,
-		TableRichBlockSchema,
-		WidgetRefBlockSchema
-		// InteractionRefBlockSchema is BANNED
-	])
+	const BlockQuoteBlockSchema = z
+		.object({
+			type: z.literal("blockquote").describe("Identifies a quoted callout area in the step content."),
+			content: z
+				.array(AllowedFeedbackInlines)
+				.describe("Quoted inline content that emphasizes a key idea or reminder."),
+			attribution: z
+				.array(AllowedFeedbackInlines)
+				.nullable()
+				.optional()
+				.describe("Optional attribution for the quote, e.g., 'Teacher's tip'.")
+		})
+		.strict()
+		.describe("A quoted callout to emphasize a key idea, hint, or reminder within a step.")
 
-	return z.array(AllowedFeedbackBlocks)
+	const AllowedFeedbackBlocks = z
+		.discriminatedUnion("type", [
+			ParagraphBlockSchema,
+			UnorderedListBlockSchema,
+			OrderedListBlockSchema,
+			TableRichBlockSchema,
+			WidgetRefBlockSchema,
+			BlockQuoteBlockSchema
+		])
+		.describe("Blocks permitted inside feedback steps.")
+
+	const StepBlockSchema = z
+		.object({
+			type: z.literal("step").describe("Identifies a pedagogical step in the feedback sequence."),
+			title: z
+				.array(AllowedFeedbackInlines)
+				.min(1)
+				.describe("Short, imperative title for the step (e.g., 'Find the value of the box')."),
+			content: z
+				.array(AllowedFeedbackBlocks)
+				.describe(
+					"The body of the step: paragraphs, lists, tables, widgets, and blockquotes that teach or demonstrate."
+				)
+		})
+		.strict()
+		.describe("A single feedback step with a concise title and explanatory body.")
+
+	const PreambleSchema = z
+		.object({
+			correctness: z
+				.enum(["correct", "incorrect"])
+				.describe("Verdict for this feedback block. Must match the outcome path (correct vs incorrect)."),
+			summary: z
+				.array(AllowedFeedbackInlines)
+				.min(1)
+				.describe("A short 1–2 sentence explanation stating why the answer is right/wrong before showing steps.")
+		})
+		.strict()
+		.describe("A mandatory preamble that communicates the verdict and a succinct rationale.")
+
+	return z
+		.object({
+			preamble: PreambleSchema,
+			steps: z
+				.array(StepBlockSchema)
+				.min(2)
+				.describe("Ordered list of teaching steps. Minimum two required; three recommended (identify, compute/derive, conclude).")
+		})
+		.strict()
+		.describe(
+			"Structured feedback containing a preamble (verdict + summary) followed by a sequenced set of pedagogy-first steps."
+		)
 }
 
 export function createChoiceInteractionPromptSchema<const E extends readonly string[]>(widgetTypeKeys: E) {
@@ -221,6 +302,7 @@ export function createChoiceInteractionChoiceContentSchema<const E extends reado
 	const UnorderedListBlockSchema = createUnorderedListBlockSchema(AllowedChoiceInlines)
 	const OrderedListBlockSchema = createOrderedListBlockSchema(AllowedChoiceInlines)
 	const TableRichBlockSchema = createTableRichBlockSchema(AllowedChoiceInlines)
+	const BlockQuoteBlockSchema = createBlockQuoteBlockSchema(AllowedChoiceInlines)
 	const WidgetRefBlockSchema = createWidgetRefBlockSchema(widgetTypeKeys)
 
 	const AllowedChoiceBlocks = z.discriminatedUnion("type", [
@@ -228,6 +310,7 @@ export function createChoiceInteractionChoiceContentSchema<const E extends reado
 		UnorderedListBlockSchema,
 		OrderedListBlockSchema,
 		TableRichBlockSchema,
+		BlockQuoteBlockSchema,
 		WidgetRefBlockSchema
 		// InteractionRefBlockSchema is BANNED
 	])
@@ -261,12 +344,14 @@ export function createGapMatchContentSchema<const E extends readonly string[]>(_
 	const UnorderedListBlockSchema = createUnorderedListBlockSchema(AllowedGapMatchInlines)
 	const OrderedListBlockSchema = createOrderedListBlockSchema(AllowedGapMatchInlines)
 	const TableRichBlockSchema = createTableRichBlockSchema(AllowedGapMatchInlines)
+	const BlockQuoteBlockSchema = createBlockQuoteBlockSchema(AllowedGapMatchInlines)
 
 	const AllowedGapMatchBlocks = z.discriminatedUnion("type", [
 		ParagraphBlockSchema,
 		UnorderedListBlockSchema,
 		OrderedListBlockSchema,
-		TableRichBlockSchema
+		TableRichBlockSchema,
+		BlockQuoteBlockSchema
 		// WidgetRefBlockSchema and InteractionRefBlockSchema are BANNED
 	])
 

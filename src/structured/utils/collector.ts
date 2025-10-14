@@ -1,6 +1,6 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import type { BlockContent, InlineContent } from "@/core/content"
+import type { BlockContent, FeedbackContent, InlineContent } from "@/core/content"
 import type {
 	AuthoringFeedbackOverall,
 	AuthoringNestedLeaf,
@@ -46,6 +46,12 @@ function walkBlock<E extends readonly string[]>(blocks: BlockContent<E> | null, 
 			}
 			case "paragraph":
 				walkInline(node.content, out)
+				break
+			case "blockquote":
+				walkInline(node.content, out)
+				if (node.attribution) {
+					walkInline(node.attribution, out)
+				}
 				break
 			case "unorderedList":
 			case "orderedList":
@@ -107,7 +113,7 @@ function walkInteractions<E extends readonly string[]>(
 function isLeafNode<E extends readonly string[]>(
 	node: AuthoringNestedLeaf<E> | AuthoringNestedNode<FeedbackPlan, E>
 ): node is AuthoringNestedLeaf<E> {
-	return "content" in node
+	return "content" in node && typeof node.content === "object" && node.content !== null && "steps" in node.content
 }
 
 function walkFeedbackNode<E extends readonly string[]>(
@@ -115,7 +121,12 @@ function walkFeedbackNode<E extends readonly string[]>(
 	out: Map<string, string>
 ): void {
 	if (isLeafNode(node)) {
-		walkBlock(node.content, out)
+		const feedbackContent = node.content as FeedbackContent<E>
+		walkInline(feedbackContent.preamble.summary, out)
+		for (const step of feedbackContent.steps) {
+			walkInline(step.title, out)
+			walkBlock(step.content, out)
+		}
 		return
 	}
 
@@ -138,8 +149,18 @@ function walkFeedbackOverall<E extends readonly string[]>(
 	out: Map<string, string>
 ): void {
 	if (isFallbackFeedback(overall)) {
-		walkBlock(overall.CORRECT.content, out)
-		walkBlock(overall.INCORRECT.content, out)
+		const correctContent = overall.CORRECT.content
+		const incorrectContent = overall.INCORRECT.content
+		walkInline(correctContent.preamble.summary, out)
+		for (const step of correctContent.steps) {
+			walkInline(step.title, out)
+			walkBlock(step.content, out)
+		}
+		walkInline(incorrectContent.preamble.summary, out)
+		for (const step of incorrectContent.steps) {
+			walkInline(step.title, out)
+			walkBlock(step.content, out)
+		}
 		return
 	}
 

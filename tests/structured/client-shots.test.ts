@@ -43,7 +43,28 @@ mock.module("openai", () => {
 					return { output_text: JSON.stringify({}) }
 				}
 				if (name === "feedback") {
-					return { output_text: JSON.stringify({ content: [ { type: "paragraph", content: [ { type: "text", content: "ok" } ] } ] }) }
+					return {
+						output_text: JSON.stringify({
+							content: {
+								preamble: {
+									correctness: "correct",
+									summary: [ { type: "text", content: "ok" } ]
+								},
+								steps: [
+									{
+										type: "step",
+										title: [ { type: "text", content: "Step 1" } ],
+										content: [ { type: "paragraph", content: [ { type: "text", content: "Do this." } ] } ]
+									},
+									{
+										type: "step",
+										title: [ { type: "text", content: "Step 2" } ],
+										content: [ { type: "paragraph", content: [ { type: "text", content: "Then this." } ] } ]
+									}
+								]
+							}
+						})
+					}
 				}
 				return { output_text: "{}" }
 			}

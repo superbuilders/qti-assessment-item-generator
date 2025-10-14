@@ -2,6 +2,7 @@ import { describe, expect, it } from "bun:test"
 import { compileResponseProcessing } from "../../src/compiler/response-processor"
 import type { FeedbackPlan } from "../../src/core/feedback"
 import type { AssessmentItem } from "../../src/core/item"
+import { MINIMAL_INCORRECT_FEEDBACK } from "../helpers/feedback-fixtures"
 
 describe("Response Processing - two MC combo plan", () => {
 	it("emits FEEDBACK__OVERALL for all combinations", () => {
@@ -61,14 +62,14 @@ describe("Response Processing - two MC combo plan", () => {
 					RESPONSE_1: {
 						A: {
 							RESPONSE_2: {
-								A: { content: [] },
-								B: { content: [] }
+								A: { content: MINIMAL_INCORRECT_FEEDBACK },
+								B: { content: MINIMAL_INCORRECT_FEEDBACK }
 							}
 						},
 						B: {
 							RESPONSE_2: {
-								A: { content: [] },
-								B: { content: [] }
+								A: { content: MINIMAL_INCORRECT_FEEDBACK },
+								B: { content: MINIMAL_INCORRECT_FEEDBACK }
 							}
 						}
 					}

@@ -1,6 +1,6 @@
 import * as errors from "@superbuilders/errors"
 import type * as logger from "@superbuilders/slog"
-import type { BlockContent, InlineContent } from "@/core/content"
+import type { BlockContent, FeedbackContent, InlineContent } from "@/core/content"
 import type { AssessmentItemInput } from "@/core/item"
 import {
 	checkNoLatex,
@@ -49,6 +49,24 @@ function processBlockContent<E extends readonly string[]>(items: BlockContent<E>
 		if (item.type === "paragraph") {
 			processInlineContent(item.content, logger)
 		}
+		if (item.type === "blockquote") {
+			processInlineContent(item.content, logger)
+			if (item.attribution) {
+				processInlineContent(item.attribution, logger)
+			}
+		}
+	}
+}
+
+function processFeedbackContent<E extends readonly string[]>(
+	feedback: FeedbackContent<E> | null,
+	logger: logger.Logger
+): void {
+	if (!feedback) return
+	processInlineContent(feedback.preamble.summary, logger)
+	for (const step of feedback.steps) {
+		processInlineContent(step.title, logger)
+		processBlockContent(step.content, logger)
 	}
 }
 
@@ -69,45 +87,12 @@ export function validateAndSanitizeHtmlFields<E extends readonly string[]>(
 	function processNestedFeedback(node: unknown): void {
 		if (!node || typeof node !== "object") return
 
-		function sanitizeParagraphUnknown(block: unknown): void {
-			if (!block || typeof block !== "object") return
-			const typeVal = Reflect.get(block, "type")
-			if (typeVal !== "paragraph") return
-			const inline = Reflect.get(block, "content")
-			if (!Array.isArray(inline)) return
-			for (const part of inline) {
-				if (!part || typeof part !== "object") continue
-				const pType = Reflect.get(part, "type")
-				if (pType === "text") {
-					const contentVal = Reflect.get(part, "content")
-					if (typeof contentVal === "string") {
-						const sanitized = sanitizeHtmlEntities(contentVal)
-						checkNoLatex(sanitized, logger)
-						checkNoPerseusArtifacts(sanitized, logger)
-						Reflect.set(part, "content", sanitized)
-					}
-				} else if (pType === "math") {
-					const mathVal = Reflect.get(part, "mathml")
-					if (typeof mathVal === "string") {
-						const sanitized = sanitizeMathMLOperators(mathVal)
-						checkNoMfencedElements(sanitized, logger)
-						Reflect.set(part, "mathml", sanitized)
-					}
-				}
-			}
-		}
-
 		const maybeContent = Reflect.get(node, "content")
-		if (Array.isArray(maybeContent)) {
-			for (const block of maybeContent) {
-				if (!block || typeof block !== "object") continue
-				const bType = Reflect.get(block, "type")
-				if (bType === "paragraph") {
-					sanitizeParagraphUnknown(block)
-				}
-			}
+		if (maybeContent && typeof maybeContent === "object" && "preamble" in maybeContent && "steps" in maybeContent) {
+			processFeedbackContent(maybeContent as FeedbackContent<E>, logger)
 			return
 		}
+
 		for (const value of Object.values(node)) {
 			processNestedFeedback(value)
 		}

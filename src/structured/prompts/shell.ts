@@ -48,8 +48,8 @@ These are the ONLY interaction types we support. Any Perseus widget that maps to
 	const systemInstruction = `You are an expert in educational content conversion. Your task is to analyze a Perseus JSON object and create a structured assessment shell in JSON format. Your primary goal is to accurately represent all content using a strict, nested object model.
 
 **CRITICAL: STRUCTURED CONTENT MODEL**
-Your entire output for any rich text field (like 'body' or 'feedbackBlocks') MUST be a JSON array of block-level items.
-- **Block Items**: Can be a paragraph \`{ "type": "paragraph", "content": [...] }\`, a widget reference \`{ "type": "widgetRef", "widgetId": "..." }\`, or an interaction reference \`{ "type": "interactionRef", "interactionId": "..." }\`.
+Your entire output for any rich text field (like 'body') MUST be a JSON array of block-level items.
+- **Block Items**: Can be a paragraph \`{ "type": "paragraph", "content": [...] }\`, a blockquote \`{ "type": "blockquote", "content": [...], "attribution": [...] }\`, a list, a table, a widget reference \`{ "type": "widgetRef", "widgetId": "..." }\`, or an interaction reference \`{ "type": "interactionRef", "interactionId": "..." }\`.
 - **Paragraph Content**: The 'content' array inside a paragraph consists of inline items.
 - **Inline Items**: Can be text \`{ "type": "text", "content": "..." }\`, math \`{ "type": "math", "mathml": "..." }\`, an inline widget reference \`{ "type": "inlineWidgetRef", "widgetId": "..." }\`, or an inline interaction reference \`{ "type": "inlineInteractionRef", "interactionId": "..." }\`.
 

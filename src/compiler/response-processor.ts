@@ -1,13 +1,13 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import type { BlockContent } from "@/core/content"
+import type { FeedbackContent } from "@/core/content"
 import type { FeedbackDimension, FeedbackPlan } from "@/core/feedback"
 import type { AssessmentItem } from "@/core/item"
 import { escapeXmlAttribute } from "./utils/xml-utils"
 
 // Internal type for compilation after nested feedback has been flattened
 type AssessmentItemWithFeedbackBlocks<E extends readonly string[]> = Omit<AssessmentItem<E>, "feedback"> & {
-	feedbackBlocks: Record<string, BlockContent<E>>
+	feedbackBlocks: Record<string, FeedbackContent<E>>
 }
 
 export function compileResponseDeclarations<E extends readonly string[]>(

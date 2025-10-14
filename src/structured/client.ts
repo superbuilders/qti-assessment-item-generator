@@ -2,7 +2,7 @@ import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import type OpenAI from "openai"
 import { z } from "zod"
-import type { BlockContent, InlineContent } from "@/core/content"
+import type { BlockContent, FeedbackContent, InlineContent } from "@/core/content"
 import type { AssessmentItemInput, ResponseDeclaration } from "@/core/item"
 import type { WidgetCollection, WidgetDefinition, WidgetTypeTupleFrom } from "@/widgets/collections/types"
 import { allWidgetSchemas, type Widget, WidgetSchema } from "@/widgets/registry"
@@ -51,7 +51,7 @@ type ExtendedContentPart = InputTextContentPart | InputFileContentPart | InputIm
 
 export const ErrUnsupportedInteraction = errors.new("unsupported interaction type found")
 
-type Leaf<E extends readonly string[]> = { content: BlockContent<E> }
+type Leaf<E extends readonly string[]> = { content: FeedbackContent<E> }
 interface NestedNode<E extends readonly string[]> {
 	[responseIdentifier: string]: {
 		[key: string]: Leaf<E> | NestedNode<E>
@@ -354,7 +354,7 @@ async function generateFeedbackForOutcomeNested<
     interactions: Record<string, AnyInteraction<WidgetTypeTupleFrom<C>>>,
     envelope: AiContextEnvelope,
     imageContext: ImageContext
-): Promise<{ id: string; content: BlockContent<WidgetTypeTupleFrom<C>> }> {
+): Promise<{ id: string; content: FeedbackContent<WidgetTypeTupleFrom<C>> }> {
     const { systemInstruction, userContent, ShallowSchema } = createPerOutcomeNestedFeedbackPrompt(
         assessmentShell,
         feedbackPlan,
@@ -426,8 +426,8 @@ async function generateFeedbackForOutcomeNested<
 	}
 
 	const parsedContent = validated.data.content
-	if (parsedContent.length === 0) {
-		logger.warn("feedback shard returned empty content array", { combinationId: combination.id })
+	if (parsedContent.steps.length === 0) {
+		logger.warn("feedback shard returned empty steps array", { combinationId: combination.id })
 	}
 
 	return { id: combination.id, content: parsedContent }
@@ -439,8 +439,8 @@ async function generateFeedbackForOutcomeNested<
  * This function acts as a strict type guard at the assembly stage.
  */
 function promoteFallback<E extends readonly string[]>(
-	parts: Partial<Record<"CORRECT" | "INCORRECT", BlockContent<E>>>
-): Record<"CORRECT" | "INCORRECT", BlockContent<E>> {
+	parts: Partial<Record<"CORRECT" | "INCORRECT", FeedbackContent<E>>>
+): Record<"CORRECT" | "INCORRECT", FeedbackContent<E>> {
 	const correct = parts.CORRECT
 	const incorrect = parts.INCORRECT
 
@@ -467,9 +467,9 @@ async function runShardedFeedbackNested<
     interactions: Record<string, AnyInteraction<WidgetTypeTupleFrom<C>>>,
     envelope: AiContextEnvelope,
     imageContext: ImageContext
-): Promise<Record<string, BlockContent<WidgetTypeTupleFrom<C>>>> {
+): Promise<Record<string, FeedbackContent<WidgetTypeTupleFrom<C>>>> {
 	let combinationsToProcess = [...plan.combinations]
-	const successfulShards: Record<string, BlockContent<WidgetTypeTupleFrom<C>>> = {}
+	const successfulShards: Record<string, FeedbackContent<WidgetTypeTupleFrom<C>>> = {}
 	let pass = 0
 
 	while (combinationsToProcess.length > 0) {
@@ -497,10 +497,10 @@ async function runShardedFeedbackNested<
 			}
 			if (result.status === "fulfilled") {
 				const { id, content } = result.value
-				if (content && content.length > 0) {
+				if (content && content.steps.length > 0) {
 					successfulShards[id] = content
 				} else {
-					logger.warn("feedback shard returned empty content, will retry", { combinationId: id, pass })
+					logger.warn("feedback shard returned empty steps, will retry", { combinationId: id, pass })
 					failedCombinations.push(combination)
 				}
 			} else {

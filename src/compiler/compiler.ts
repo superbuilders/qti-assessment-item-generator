@@ -1,14 +1,14 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import type { z } from "zod"
-import type { BlockContent, BlockContentItem, InlineContent } from "@/core/content"
+import type { BlockContent, BlockContentItem, FeedbackContent, InlineContent } from "@/core/content"
 import type { FeedbackPlan } from "@/core/feedback"
 import { convertFeedbackObjectToBlocks, validateFeedbackObject } from "@/core/feedback"
 import type { AssessmentItem, AssessmentItemInput } from "@/core/item"
 import { createDynamicAssessmentItemSchema } from "@/core/item"
 import { ErrUnsupportedInteraction } from "../structured/client"
 import type { WidgetCollection, WidgetDefinition, WidgetTypeTupleFrom } from "../widgets/collections/types"
-import { renderBlockContent } from "./content-renderer"
+import { renderBlockContent, renderFeedbackContent } from "./content-renderer"
 import { compileInteraction } from "./interaction-compiler"
 import { compileResponseDeclarations, compileResponseProcessing } from "./response-processor"
 import { encodeDataUri } from "./utils/helpers"
@@ -26,7 +26,7 @@ export const ErrDuplicateChoiceIdentifier = errors.new("duplicate choice identif
 
 // Internal type used during compilation after nested feedback is flattened
 type AssessmentItemWithFlatFeedback<E extends readonly string[]> = Omit<AssessmentItem<E>, "feedback"> & {
-	feedbackBlocks: Record<string, BlockContent<E>>
+	feedbackBlocks: Record<string, FeedbackContent<E>>
 }
 
 // Type guard to check if a string is a valid widget type in a collection
@@ -545,6 +545,10 @@ function collectRefs<E extends readonly string[]>(
 			if (node.type === "widgetRef") widgetRefs.add(node.widgetId)
 			if (node.type === "interactionRef") interactionRefs.add(node.interactionId)
 			if (node.type === "paragraph") walkInline(node.content)
+			if (node.type === "blockquote") {
+				walkInline(node.content)
+				if (node.attribution) walkInline(node.attribution)
+			}
 			if (node.type === "unorderedList" || node.type === "orderedList") node.items.forEach(walkInline)
 			if (node.type === "tableRich") {
 				const walkRows = (rows: Array<Array<InlineContent<E> | null>> | null) => {
@@ -561,8 +565,12 @@ function collectRefs<E extends readonly string[]>(
 
 	// Traverse all content areas
 	walkBlock(item.body)
-	for (const content of Object.values(item.feedbackBlocks)) {
-		walkBlock(content)
+	for (const feedbackContent of Object.values(item.feedbackBlocks)) {
+		walkInline(feedbackContent.preamble.summary)
+		for (const step of feedbackContent.steps) {
+			walkInline(step.title)
+			walkBlock(step.content)
+		}
 	}
 
 	if (item.interactions) {
@@ -779,7 +787,7 @@ export async function compile<
 
 			// Schema validation structurally prevents interactions in feedback content.
 			// No runtime check needed here.
-			const contentXml = renderBlockContent(content, widgetSlots, interactionSlots)
+			const contentXml = renderFeedbackContent(content, widgetSlots, interactionSlots)
 			return `        <qti-feedback-block outcome-identifier="FEEDBACK__OVERALL" identifier="${escapeXmlAttribute(combination.id)}" show-hide="show">
             <qti-content-body>${contentXml}</qti-content-body>
         </qti-feedback-block>`

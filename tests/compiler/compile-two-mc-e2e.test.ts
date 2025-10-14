@@ -2,6 +2,7 @@ import { describe, expect, it } from "bun:test"
 import { compile } from "../../src/compiler/compiler"
 import type { AssessmentItem } from "../../src/core/item"
 import { allWidgetsCollection } from "../../src/widgets/collections/all"
+import { MINIMAL_INCORRECT_FEEDBACK } from "../helpers/feedback-fixtures"
 
 describe("E2E compile: two MC with combo feedback", () => {
 	it("produces valid QTI with response processing and feedback blocks", async () => {
@@ -86,14 +87,14 @@ describe("E2E compile: two MC with combo feedback", () => {
 					RESPONSE_1: {
 						A: {
 							RESPONSE_2: {
-								A: { content: [{ type: "paragraph", content: [{ type: "text", content: "A A" }] }] },
-								B: { content: [{ type: "paragraph", content: [{ type: "text", content: "A B" }] }] }
+								A: { content: MINIMAL_INCORRECT_FEEDBACK },
+								B: { content: MINIMAL_INCORRECT_FEEDBACK }
 							}
 						},
 						B: {
 							RESPONSE_2: {
-								A: { content: [{ type: "paragraph", content: [{ type: "text", content: "B A" }] }] },
-								B: { content: [{ type: "paragraph", content: [{ type: "text", content: "B B" }] }] }
+								A: { content: MINIMAL_INCORRECT_FEEDBACK },
+								B: { content: MINIMAL_INCORRECT_FEEDBACK }
 							}
 						}
 					}

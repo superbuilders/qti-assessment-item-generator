@@ -1,84 +1,45 @@
 // Bun Snapshot v1, https://bun.sh/docs/test/snapshots
 
-exports[`E2E compile: two MC with combo feedback produces valid QTI with response processing and feedback blocks 1`] = `
+exports[`Compiler: blockquote should render blockquote in body with escaped content 1`] = `
 "<?xml version="1.0" encoding="UTF-8"?>
 <qti-assessment-item
     xmlns="http://www.imsglobal.org/xsd/imsqtiasi_v3p0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqtiasi_v3p0 https://purl.imsglobal.org/spec/qti/v3p0/schema/xsd/imsqti_asiv3p0p1_v1p0.xsd http://www.w3.org/1998/Math/MathML https://purl.imsglobal.org/spec/mathml/v3p0/schema/xsd/mathml3.xsd"
-    identifier="ITEM_TWO_MC"
-    title="Two MC E2E"
+    identifier="blockquote-item"
+    title="Blockquote Support"
     time-dependent="false"
     xml:lang="en-US">
-    <qti-response-declaration identifier="RESPONSE_1" cardinality="single" base-type="identifier">
+    <qti-response-declaration identifier="RESPONSE_TE" cardinality="single" base-type="string">
         <qti-correct-response>
-            <qti-value>A</qti-value>
+            <qti-value>ok</qti-value>
         </qti-correct-response>
-    </qti-response-declaration>
-    <qti-response-declaration identifier="RESPONSE_2" cardinality="single" base-type="identifier">
-        <qti-correct-response>
-            <qti-value>B</qti-value>
-        </qti-correct-response>
+        <qti-mapping default-value="0">
+            <qti-map-entry map-key="ok" mapped-value="1"/>
+        </qti-mapping>
     </qti-response-declaration>
     <qti-outcome-declaration identifier="SCORE" cardinality="single" base-type="float">
         <qti-default-value><qti-value>0</qti-value></qti-default-value>
     </qti-outcome-declaration>
     <qti-outcome-declaration identifier="FEEDBACK__OVERALL" cardinality="single" base-type="identifier"/>
     <qti-item-body>
-        <p>Question stem.</p>
-        <div><qti-choice-interaction response-identifier="RESPONSE_1" shuffle="true" min-choices="1" max-choices="1">
-            <qti-prompt>Pick A or B</qti-prompt>
-            <qti-simple-choice identifier="A"><p>A</p></qti-simple-choice>
-            <qti-simple-choice identifier="B"><p>B</p></qti-simple-choice>
-        </qti-choice-interaction></div>
-        <div><qti-choice-interaction response-identifier="RESPONSE_2" shuffle="true" min-choices="1" max-choices="1">
-            <qti-prompt>Pick A or B</qti-prompt>
-            <qti-simple-choice identifier="A"><p>A</p></qti-simple-choice>
-            <qti-simple-choice identifier="B"><p>B</p></qti-simple-choice>
-        </qti-choice-interaction></div>
-        <qti-feedback-block outcome-identifier="FEEDBACK__OVERALL" identifier="FB__RESPONSE_1_A__RESPONSE_2_A" show-hide="show">
-            <qti-content-body><div class="qti-feedback-preamble" data-correctness="incorrect" style="border:1px solid #FECACA; background:#FEF2F2; color:#991B1B; border-radius:12px; padding:12px 16px; margin-bottom:16px;">
-      <p style="margin:0; font-weight:700;">Not quite! Try again.</p>
-      <p style="margin:8px 0 0 0;">Your answer is incorrect.</p>
+        <p>Consider this quote:</p>
+        <blockquote class="qti-blockquote" style="margin:12px 0; padding:12px 16px; border-left:4px solid #D1D5DB; background:#F9FAFB; color:#111827;">To be or not to be, that is the question.<footer class="qti-blockquote-footer" style="margin-top:6px; color:#6B7280; font-style:italic;">Shakespeare</footer></blockquote>
+        <qti-feedback-block outcome-identifier="FEEDBACK__OVERALL" identifier="FB__RESPONSE_TE_CORRECT" show-hide="show">
+            <qti-content-body><div class="qti-feedback-preamble" data-correctness="correct" style="border:1px solid #A7F3D0; background:#ECFDF5; color:#065F46; border-radius:12px; padding:12px 16px; margin-bottom:16px;">
+      <p style="margin:0; font-weight:700;">Correct! Fantastic work.</p>
+      <p style="margin:8px 0 0 0;">Your answer is correct.</p>
     </div><ol class="qti-steps" style="margin:16px 0; padding:0; list-style:none; counter-reset: qti-step;"><li class="qti-step" style="position:relative; margin:16px 0; padding:16px 16px 16px 56px; border:1px solid #BFDBFE; border-left:6px solid #2563EB; border-radius:12px; background:#EFF6FF; box-shadow:0 1px 2px rgba(0,0,0,0.04);">
         <span class="qti-step-index" style="position:absolute; left:16px; top:16px; width:28px; height:28px; border-radius:9999px; background:#2563EB; color:#FFFFFF; display:inline-flex; align-items:center; justify-content:center; font-weight:700; font-size:14px;">1</span>
-        <p class="qti-step-title" style="margin:0 0 8px 0; font-weight:700; font-size:16px; color:#111827;">Identify Misconception</p>
-        <p>Let's review the concept.</p>
+        <p class="qti-step-title" style="margin:0 0 8px 0; font-weight:700; font-size:16px; color:#111827;">Confirmation</p>
+        <p>You have demonstrated understanding.</p>
       </li><li class="qti-step" style="position:relative; margin:16px 0; padding:16px 16px 16px 56px; border:1px solid #A7F3D0; border-left:6px solid #059669; border-radius:12px; background:#ECFDF5; box-shadow:0 1px 2px rgba(0,0,0,0.04);">
         <span class="qti-step-index" style="position:absolute; left:16px; top:16px; width:28px; height:28px; border-radius:9999px; background:#059669; color:#FFFFFF; display:inline-flex; align-items:center; justify-content:center; font-weight:700; font-size:14px;">2</span>
-        <p class="qti-step-title" style="margin:0 0 8px 0; font-weight:700; font-size:16px; color:#111827;">Worked Example</p>
-        <p>Here is how to solve it.</p>
+        <p class="qti-step-title" style="margin:0 0 8px 0; font-weight:700; font-size:16px; color:#111827;">Next Steps</p>
+        <p>Continue to the next question.</p>
       </li></ol></qti-content-body>
         </qti-feedback-block>
-        <qti-feedback-block outcome-identifier="FEEDBACK__OVERALL" identifier="FB__RESPONSE_1_A__RESPONSE_2_B" show-hide="show">
-            <qti-content-body><div class="qti-feedback-preamble" data-correctness="incorrect" style="border:1px solid #FECACA; background:#FEF2F2; color:#991B1B; border-radius:12px; padding:12px 16px; margin-bottom:16px;">
-      <p style="margin:0; font-weight:700;">Not quite! Try again.</p>
-      <p style="margin:8px 0 0 0;">Your answer is incorrect.</p>
-    </div><ol class="qti-steps" style="margin:16px 0; padding:0; list-style:none; counter-reset: qti-step;"><li class="qti-step" style="position:relative; margin:16px 0; padding:16px 16px 16px 56px; border:1px solid #BFDBFE; border-left:6px solid #2563EB; border-radius:12px; background:#EFF6FF; box-shadow:0 1px 2px rgba(0,0,0,0.04);">
-        <span class="qti-step-index" style="position:absolute; left:16px; top:16px; width:28px; height:28px; border-radius:9999px; background:#2563EB; color:#FFFFFF; display:inline-flex; align-items:center; justify-content:center; font-weight:700; font-size:14px;">1</span>
-        <p class="qti-step-title" style="margin:0 0 8px 0; font-weight:700; font-size:16px; color:#111827;">Identify Misconception</p>
-        <p>Let's review the concept.</p>
-      </li><li class="qti-step" style="position:relative; margin:16px 0; padding:16px 16px 16px 56px; border:1px solid #A7F3D0; border-left:6px solid #059669; border-radius:12px; background:#ECFDF5; box-shadow:0 1px 2px rgba(0,0,0,0.04);">
-        <span class="qti-step-index" style="position:absolute; left:16px; top:16px; width:28px; height:28px; border-radius:9999px; background:#059669; color:#FFFFFF; display:inline-flex; align-items:center; justify-content:center; font-weight:700; font-size:14px;">2</span>
-        <p class="qti-step-title" style="margin:0 0 8px 0; font-weight:700; font-size:16px; color:#111827;">Worked Example</p>
-        <p>Here is how to solve it.</p>
-      </li></ol></qti-content-body>
-        </qti-feedback-block>
-        <qti-feedback-block outcome-identifier="FEEDBACK__OVERALL" identifier="FB__RESPONSE_1_B__RESPONSE_2_A" show-hide="show">
-            <qti-content-body><div class="qti-feedback-preamble" data-correctness="incorrect" style="border:1px solid #FECACA; background:#FEF2F2; color:#991B1B; border-radius:12px; padding:12px 16px; margin-bottom:16px;">
-      <p style="margin:0; font-weight:700;">Not quite! Try again.</p>
-      <p style="margin:8px 0 0 0;">Your answer is incorrect.</p>
-    </div><ol class="qti-steps" style="margin:16px 0; padding:0; list-style:none; counter-reset: qti-step;"><li class="qti-step" style="position:relative; margin:16px 0; padding:16px 16px 16px 56px; border:1px solid #BFDBFE; border-left:6px solid #2563EB; border-radius:12px; background:#EFF6FF; box-shadow:0 1px 2px rgba(0,0,0,0.04);">
-        <span class="qti-step-index" style="position:absolute; left:16px; top:16px; width:28px; height:28px; border-radius:9999px; background:#2563EB; color:#FFFFFF; display:inline-flex; align-items:center; justify-content:center; font-weight:700; font-size:14px;">1</span>
-        <p class="qti-step-title" style="margin:0 0 8px 0; font-weight:700; font-size:16px; color:#111827;">Identify Misconception</p>
-        <p>Let's review the concept.</p>
-      </li><li class="qti-step" style="position:relative; margin:16px 0; padding:16px 16px 16px 56px; border:1px solid #A7F3D0; border-left:6px solid #059669; border-radius:12px; background:#ECFDF5; box-shadow:0 1px 2px rgba(0,0,0,0.04);">
-        <span class="qti-step-index" style="position:absolute; left:16px; top:16px; width:28px; height:28px; border-radius:9999px; background:#059669; color:#FFFFFF; display:inline-flex; align-items:center; justify-content:center; font-weight:700; font-size:14px;">2</span>
-        <p class="qti-step-title" style="margin:0 0 8px 0; font-weight:700; font-size:16px; color:#111827;">Worked Example</p>
-        <p>Here is how to solve it.</p>
-      </li></ol></qti-content-body>
-        </qti-feedback-block>
-        <qti-feedback-block outcome-identifier="FEEDBACK__OVERALL" identifier="FB__RESPONSE_1_B__RESPONSE_2_B" show-hide="show">
+        <qti-feedback-block outcome-identifier="FEEDBACK__OVERALL" identifier="FB__RESPONSE_TE_INCORRECT" show-hide="show">
             <qti-content-body><div class="qti-feedback-preamble" data-correctness="incorrect" style="border:1px solid #FECACA; background:#FEF2F2; color:#991B1B; border-radius:12px; padding:12px 16px; margin-bottom:16px;">
       <p style="margin:0; font-weight:700;">Not quite! Try again.</p>
       <p style="margin:8px 0 0 0;">Your answer is incorrect.</p>
@@ -98,62 +59,106 @@ exports[`E2E compile: two MC with combo feedback produces valid QTI with respons
     <qti-response-condition>
         <qti-response-if>
             <qti-match>
-                <qti-variable identifier="RESPONSE_1"/>
-                <qti-base-value base-type="identifier">A</qti-base-value>
-            </qti-match>
-    <qti-response-condition>
-        <qti-response-if>
-            <qti-match>
-                <qti-variable identifier="RESPONSE_2"/>
-                <qti-base-value base-type="identifier">A</qti-base-value>
+                <qti-variable identifier="RESPONSE_TE"/>
+                <qti-correct identifier="RESPONSE_TE"/>
             </qti-match>
             <qti-set-outcome-value identifier="FEEDBACK__OVERALL">
-                <qti-base-value base-type="identifier">FB__RESPONSE_1_A__RESPONSE_2_A</qti-base-value>
+                <qti-base-value base-type="identifier">FB__RESPONSE_TE_CORRECT</qti-base-value>
             </qti-set-outcome-value>
         </qti-response-if>
-        <qti-response-else-if>
-            <qti-match>
-                <qti-variable identifier="RESPONSE_2"/>
-                <qti-base-value base-type="identifier">B</qti-base-value>
-            </qti-match>
+        <qti-response-else>
             <qti-set-outcome-value identifier="FEEDBACK__OVERALL">
-                <qti-base-value base-type="identifier">FB__RESPONSE_1_A__RESPONSE_2_B</qti-base-value>
+                <qti-base-value base-type="identifier">FB__RESPONSE_TE_INCORRECT</qti-base-value>
             </qti-set-outcome-value>
-        </qti-response-else-if>
-    </qti-response-condition>
-        </qti-response-if>
-        <qti-response-else-if>
-            <qti-match>
-                <qti-variable identifier="RESPONSE_1"/>
-                <qti-base-value base-type="identifier">B</qti-base-value>
-            </qti-match>
-    <qti-response-condition>
-        <qti-response-if>
-            <qti-match>
-                <qti-variable identifier="RESPONSE_2"/>
-                <qti-base-value base-type="identifier">A</qti-base-value>
-            </qti-match>
-            <qti-set-outcome-value identifier="FEEDBACK__OVERALL">
-                <qti-base-value base-type="identifier">FB__RESPONSE_1_B__RESPONSE_2_A</qti-base-value>
-            </qti-set-outcome-value>
-        </qti-response-if>
-        <qti-response-else-if>
-            <qti-match>
-                <qti-variable identifier="RESPONSE_2"/>
-                <qti-base-value base-type="identifier">B</qti-base-value>
-            </qti-match>
-            <qti-set-outcome-value identifier="FEEDBACK__OVERALL">
-                <qti-base-value base-type="identifier">FB__RESPONSE_1_B__RESPONSE_2_B</qti-base-value>
-            </qti-set-outcome-value>
-        </qti-response-else-if>
-    </qti-response-condition>
-        </qti-response-else-if>
+        </qti-response-else>
     </qti-response-condition>
     <qti-response-condition>
         <qti-response-if>
             <qti-and>
-                <qti-match><qti-variable identifier="RESPONSE_1"/><qti-correct identifier="RESPONSE_1"/></qti-match>
-                        <qti-match><qti-variable identifier="RESPONSE_2"/><qti-correct identifier="RESPONSE_2"/></qti-match>
+                <qti-match><qti-variable identifier="RESPONSE_TE"/><qti-correct identifier="RESPONSE_TE"/></qti-match>
+            </qti-and>
+            <qti-set-outcome-value identifier="SCORE"><qti-base-value base-type="float">1.0</qti-base-value></qti-set-outcome-value>
+        </qti-response-if>
+        <qti-response-else>
+            <qti-set-outcome-value identifier="SCORE"><qti-base-value base-type="float">0.0</qti-base-value></qti-set-outcome-value>
+        </qti-response-else>
+    </qti-response-condition>
+    </qti-response-processing>
+</qti-assessment-item>"
+`;
+
+exports[`Compiler: blockquote should render blockquote without attribution 1`] = `
+"<?xml version="1.0" encoding="UTF-8"?>
+<qti-assessment-item
+    xmlns="http://www.imsglobal.org/xsd/imsqtiasi_v3p0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqtiasi_v3p0 https://purl.imsglobal.org/spec/qti/v3p0/schema/xsd/imsqti_asiv3p0p1_v1p0.xsd http://www.w3.org/1998/Math/MathML https://purl.imsglobal.org/spec/mathml/v3p0/schema/xsd/mathml3.xsd"
+    identifier="blockquote-no-attr"
+    title="Blockquote Without Attribution"
+    time-dependent="false"
+    xml:lang="en-US">
+    <qti-response-declaration identifier="RESPONSE" cardinality="single" base-type="identifier">
+        <qti-correct-response>
+            <qti-value>A</qti-value>
+        </qti-correct-response>
+    </qti-response-declaration>
+    <qti-outcome-declaration identifier="SCORE" cardinality="single" base-type="float">
+        <qti-default-value><qti-value>0</qti-value></qti-default-value>
+    </qti-outcome-declaration>
+    <qti-outcome-declaration identifier="FEEDBACK__OVERALL" cardinality="single" base-type="identifier"/>
+    <qti-item-body>
+        <blockquote class="qti-blockquote" style="margin:12px 0; padding:12px 16px; border-left:4px solid #D1D5DB; background:#F9FAFB; color:#111827;">Remember to find the common denominator first!</blockquote>
+        <qti-feedback-block outcome-identifier="FEEDBACK__OVERALL" identifier="FB__RESPONSE_CORRECT" show-hide="show">
+            <qti-content-body><div class="qti-feedback-preamble" data-correctness="correct" style="border:1px solid #A7F3D0; background:#ECFDF5; color:#065F46; border-radius:12px; padding:12px 16px; margin-bottom:16px;">
+      <p style="margin:0; font-weight:700;">Correct! Fantastic work.</p>
+      <p style="margin:8px 0 0 0;">Your answer is correct.</p>
+    </div><ol class="qti-steps" style="margin:16px 0; padding:0; list-style:none; counter-reset: qti-step;"><li class="qti-step" style="position:relative; margin:16px 0; padding:16px 16px 16px 56px; border:1px solid #BFDBFE; border-left:6px solid #2563EB; border-radius:12px; background:#EFF6FF; box-shadow:0 1px 2px rgba(0,0,0,0.04);">
+        <span class="qti-step-index" style="position:absolute; left:16px; top:16px; width:28px; height:28px; border-radius:9999px; background:#2563EB; color:#FFFFFF; display:inline-flex; align-items:center; justify-content:center; font-weight:700; font-size:14px;">1</span>
+        <p class="qti-step-title" style="margin:0 0 8px 0; font-weight:700; font-size:16px; color:#111827;">Confirmation</p>
+        <p>You have demonstrated understanding.</p>
+      </li><li class="qti-step" style="position:relative; margin:16px 0; padding:16px 16px 16px 56px; border:1px solid #A7F3D0; border-left:6px solid #059669; border-radius:12px; background:#ECFDF5; box-shadow:0 1px 2px rgba(0,0,0,0.04);">
+        <span class="qti-step-index" style="position:absolute; left:16px; top:16px; width:28px; height:28px; border-radius:9999px; background:#059669; color:#FFFFFF; display:inline-flex; align-items:center; justify-content:center; font-weight:700; font-size:14px;">2</span>
+        <p class="qti-step-title" style="margin:0 0 8px 0; font-weight:700; font-size:16px; color:#111827;">Next Steps</p>
+        <p>Continue to the next question.</p>
+      </li></ol></qti-content-body>
+        </qti-feedback-block>
+        <qti-feedback-block outcome-identifier="FEEDBACK__OVERALL" identifier="FB__RESPONSE_INCORRECT" show-hide="show">
+            <qti-content-body><div class="qti-feedback-preamble" data-correctness="incorrect" style="border:1px solid #FECACA; background:#FEF2F2; color:#991B1B; border-radius:12px; padding:12px 16px; margin-bottom:16px;">
+      <p style="margin:0; font-weight:700;">Not quite! Try again.</p>
+      <p style="margin:8px 0 0 0;">Your answer is incorrect.</p>
+    </div><ol class="qti-steps" style="margin:16px 0; padding:0; list-style:none; counter-reset: qti-step;"><li class="qti-step" style="position:relative; margin:16px 0; padding:16px 16px 16px 56px; border:1px solid #BFDBFE; border-left:6px solid #2563EB; border-radius:12px; background:#EFF6FF; box-shadow:0 1px 2px rgba(0,0,0,0.04);">
+        <span class="qti-step-index" style="position:absolute; left:16px; top:16px; width:28px; height:28px; border-radius:9999px; background:#2563EB; color:#FFFFFF; display:inline-flex; align-items:center; justify-content:center; font-weight:700; font-size:14px;">1</span>
+        <p class="qti-step-title" style="margin:0 0 8px 0; font-weight:700; font-size:16px; color:#111827;">Identify Misconception</p>
+        <p>Let's review the concept.</p>
+      </li><li class="qti-step" style="position:relative; margin:16px 0; padding:16px 16px 16px 56px; border:1px solid #A7F3D0; border-left:6px solid #059669; border-radius:12px; background:#ECFDF5; box-shadow:0 1px 2px rgba(0,0,0,0.04);">
+        <span class="qti-step-index" style="position:absolute; left:16px; top:16px; width:28px; height:28px; border-radius:9999px; background:#059669; color:#FFFFFF; display:inline-flex; align-items:center; justify-content:center; font-weight:700; font-size:14px;">2</span>
+        <p class="qti-step-title" style="margin:0 0 8px 0; font-weight:700; font-size:16px; color:#111827;">Worked Example</p>
+        <p>Here is how to solve it.</p>
+      </li></ol></qti-content-body>
+        </qti-feedback-block>
+    </qti-item-body>
+    <qti-response-processing>
+        
+    <qti-response-condition>
+        <qti-response-if>
+            <qti-match>
+                <qti-variable identifier="RESPONSE"/>
+                <qti-correct identifier="RESPONSE"/>
+            </qti-match>
+            <qti-set-outcome-value identifier="FEEDBACK__OVERALL">
+                <qti-base-value base-type="identifier">FB__RESPONSE_CORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-if>
+        <qti-response-else>
+            <qti-set-outcome-value identifier="FEEDBACK__OVERALL">
+                <qti-base-value base-type="identifier">FB__RESPONSE_INCORRECT</qti-base-value>
+            </qti-set-outcome-value>
+        </qti-response-else>
+    </qti-response-condition>
+    <qti-response-condition>
+        <qti-response-if>
+            <qti-and>
+                <qti-match><qti-variable identifier="RESPONSE"/><qti-correct identifier="RESPONSE"/></qti-match>
             </qti-and>
             <qti-set-outcome-value identifier="SCORE"><qti-base-value base-type="float">1.0</qti-base-value></qti-set-outcome-value>
         </qti-response-if>

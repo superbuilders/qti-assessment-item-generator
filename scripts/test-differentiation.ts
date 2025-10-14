@@ -62,33 +62,86 @@ const sourceItem: AssessmentItemInput<["boxPlot"]> = {
 	feedback: {
 		FEEDBACK__OVERALL: {
 			CORRECT: {
-				content: [
+		content: {
+			preamble: {
+				correctness: "correct",
+				summary: [
 					{
-						type: "paragraph",
-						content: [
-							{
-								type: "text",
-								content:
-									"Correct! The center of the Olympic final distribution is higher than the center of the U.S. qualifier distribution, so the Olympic final distances were greater on average."
-							}
-						]
+						type: "text",
+						content:
+							"The center of the Olympic final distribution is higher than the center of the U.S. qualifier distribution."
 					}
 				]
 			},
-			INCORRECT: {
-				content: [
+			steps: [
+				{
+					type: "step",
+					title: [{ type: "text", content: "Compare Centers" }],
+					content: [
+						{
+							type: "paragraph",
+							content: [{ type: "text", content: "The Olympic final center is higher on the dot plot scale." }]
+						}
+					]
+				},
+				{
+					type: "step",
+					title: [{ type: "text", content: "Conclusion" }],
+					content: [
+						{
+							type: "paragraph",
+							content: [{ type: "text", content: "The Olympic final distances were greater on average." }]
+						}
+					]
+				}
+			]
+		}
+			},
+		INCORRECT: {
+			content: {
+				preamble: {
+					correctness: "incorrect",
+					summary: [
+						{
+							type: "text",
+							content: "The distributions overlap, so not all Olympic final distances are greater."
+						}
+					]
+				},
+				steps: [
 					{
-						type: "paragraph",
+						type: "step",
+						title: [{ type: "text", content: "Check Overlap" }],
 						content: [
 							{
-								type: "text",
-								content:
-									"Not quite. The distributions overlap, so not all Olympic final distances are greater than all U.S. qualifier distances. Also, the spreads appear similar, and the U.S. qualifier box has a larger interquartile range."
+								type: "paragraph",
+								content: [
+									{
+										type: "text",
+										content: "The distributions overlap, indicating some U.S. qualifier distances exceed Olympic ones."
+									}
+								]
+							}
+						]
+					},
+					{
+						type: "step",
+						title: [{ type: "text", content: "Compare Spread" }],
+						content: [
+							{
+								type: "paragraph",
+								content: [
+									{
+										type: "text",
+										content: "The spreads appear similar, and the U.S. qualifier box has a larger interquartile range."
+									}
+								]
 							}
 						]
 					}
 				]
 			}
+		}
 		}
 	},
 	identifier: "olympic-discus-boxplots-interpretation",

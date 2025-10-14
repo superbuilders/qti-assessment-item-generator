@@ -1,7 +1,7 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
-import type { BlockContent } from "@/core/content"
+import type { FeedbackContent } from "@/core/content"
 import { createFeedbackContentSchema } from "@/core/content/contextual-schemas"
 import type { AnyInteraction } from "@/core/interactions"
 import type { ResponseDeclaration } from "@/core/item"
@@ -26,7 +26,7 @@ export function createFeedbackObjectSchema<P extends FeedbackPlan, const E exten
 	feedbackPlan: P,
 	widgetTypeKeys: E
 ): z.ZodType<{ FEEDBACK__OVERALL: AuthoringFeedbackOverall<P, E> }> {
-	const FeedbackContentSchema: z.ZodType<BlockContent<E>> = createFeedbackContentSchema(widgetTypeKeys)
+	const FeedbackContentSchema: z.ZodType<FeedbackContent<E>> = createFeedbackContentSchema(widgetTypeKeys)
 	const LeafNodeSchema: z.ZodType<AuthoringNestedLeaf<E>> = z.object({ content: FeedbackContentSchema }).strict()
 
 	let OverallSchema: z.ZodType<AuthoringFeedbackOverall<P, E>>
@@ -95,8 +95,8 @@ export function validateFeedbackObject<P extends FeedbackPlan, const E extends r
 export function convertFeedbackObjectToBlocks<P extends FeedbackPlan, E extends readonly string[]>(
 	feedbackObject: { FEEDBACK__OVERALL: AuthoringFeedbackOverall<FeedbackPlan, E> },
 	feedbackPlan: P
-): Record<string, BlockContent<E>> {
-	const blocks: Record<string, BlockContent<E>> = {}
+): Record<string, FeedbackContent<E>> {
+	const blocks: Record<string, FeedbackContent<E>> = {}
 	const overallFeedback = feedbackObject.FEEDBACK__OVERALL
 
 	if (!overallFeedback || typeof overallFeedback !== "object") {
@@ -215,7 +215,12 @@ export function buildEmptyNestedFeedback<P extends FeedbackPlan, E extends reado
 		const keys = currentDim.kind === "enumerated" ? currentDim.keys : ["CORRECT", "INCORRECT"]
 		const childIsLeaf = restDims.length === 0
 		const child: AuthoringNestedLeaf<E> | AuthoringNestedNode<FeedbackPlan, E> = childIsLeaf
-			? { content: [] }
+			? {
+					content: {
+						preamble: { correctness: "incorrect", summary: [] },
+						steps: []
+					}
+				}
 			: buildNode(restDims)
 		const branch: Record<string, typeof child> = {}
 		for (const key of keys) {
@@ -226,7 +231,10 @@ export function buildEmptyNestedFeedback<P extends FeedbackPlan, E extends reado
 
 	const overallFeedback: AuthoringFeedbackOverall<FeedbackPlan, E> =
 		feedbackPlan.mode === "fallback"
-			? { CORRECT: { content: [] }, INCORRECT: { content: [] } }
+			? {
+					CORRECT: { content: { preamble: { correctness: "correct", summary: [] }, steps: [] } },
+					INCORRECT: { content: { preamble: { correctness: "incorrect", summary: [] }, steps: [] } }
+				}
 			: buildNode(feedbackPlan.dimensions)
 
 	return {
@@ -239,7 +247,7 @@ export function buildFeedbackFromNestedForTemplate<const E extends readonly stri
 	responseDeclarations: ResponseDeclaration[],
 	feedbackObject: { FEEDBACK__OVERALL: AuthoringFeedbackOverall<FeedbackPlan, E> },
 	widgetTypeKeys: E
-): { feedbackPlan: FeedbackPlan; feedbackBlocks: Record<string, BlockContent<E>> } {
+): { feedbackPlan: FeedbackPlan; feedbackBlocks: Record<string, FeedbackContent<E>> } {
 	const plan = buildFeedbackPlanFromInteractions(interactions, responseDeclarations)
 	validateFeedbackObject(feedbackObject, plan, widgetTypeKeys)
 	const blocks = convertFeedbackObjectToBlocks(feedbackObject, plan)

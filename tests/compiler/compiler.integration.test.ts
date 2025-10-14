@@ -4,6 +4,7 @@ import * as logger from "@superbuilders/slog"
 import { compile, ErrDuplicateChoiceIdentifier, ErrDuplicateResponseIdentifier } from "@/compiler/compiler"
 import type { AssessmentItemInput } from "@/core/item"
 import { allWidgetsCollection } from "@/widgets/collections/all"
+import { MINIMAL_CORRECT_FEEDBACK, MINIMAL_INCORRECT_FEEDBACK } from "../helpers/feedback-fixtures"
 
 describe("Compiler Identifier Validation Integration Tests", () => {
 	test("should throw ErrDuplicateResponseIdentifier for duplicates across interactions", async () => {
@@ -21,8 +22,8 @@ describe("Compiler Identifier Validation Integration Tests", () => {
 			},
 			feedback: {
 				FEEDBACK__OVERALL: {
-					CORRECT: { content: [{ type: "paragraph", content: [{ type: "text", content: "Correct" }] }] },
-					INCORRECT: { content: [{ type: "paragraph", content: [{ type: "text", content: "Incorrect" }] }] }
+					CORRECT: { content: MINIMAL_CORRECT_FEEDBACK },
+					INCORRECT: { content: MINIMAL_INCORRECT_FEEDBACK }
 				}
 			},
 			interactions: {
@@ -74,7 +75,7 @@ describe("Compiler Identifier Validation Integration Tests", () => {
 			feedback: {
 				FEEDBACK__OVERALL: {
 					RESPONSE_1: {
-						A: { content: [{ type: "paragraph", content: [{ type: "text", content: "Choice A" }] }] }
+						A: { content: MINIMAL_INCORRECT_FEEDBACK }
 					}
 				}
 			},
@@ -145,14 +146,14 @@ describe("Compiler Identifier Validation Integration Tests", () => {
 					RESPONSE_1: {
 						A: {
 							RESPONSE_TEXT: {
-								CORRECT: { content: [{ type: "paragraph", content: [{ type: "text", content: "A + Correct" }] }] },
-								INCORRECT: { content: [{ type: "paragraph", content: [{ type: "text", content: "A + Incorrect" }] }] }
+								CORRECT: { content: MINIMAL_CORRECT_FEEDBACK },
+								INCORRECT: { content: MINIMAL_INCORRECT_FEEDBACK }
 							}
 						},
 						B: {
 							RESPONSE_TEXT: {
-								CORRECT: { content: [{ type: "paragraph", content: [{ type: "text", content: "B + Correct" }] }] },
-								INCORRECT: { content: [{ type: "paragraph", content: [{ type: "text", content: "B + Incorrect" }] }] }
+								CORRECT: { content: MINIMAL_CORRECT_FEEDBACK },
+								INCORRECT: { content: MINIMAL_INCORRECT_FEEDBACK }
 							}
 						}
 					}

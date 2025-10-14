@@ -1,7 +1,7 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
-import type { BlockContent } from "@/core/content"
+import type { FeedbackContent } from "@/core/content"
 import { createFeedbackContentSchema } from "@/core/content"
 import type { FeedbackCombination, FeedbackPlan } from "@/core/feedback"
 import type { AnyInteraction } from "@/core/interactions"
@@ -10,7 +10,7 @@ import type { WidgetCollection, WidgetDefinition, WidgetTypeTupleFrom } from "@/
 import { createMathmlComplianceSection } from "./shared/mathml"
 
 type ShallowFeedbackPayload<E extends readonly string[]> = {
-	content: BlockContent<E>
+	content: FeedbackContent<E>
 }
 
 /**
@@ -31,7 +31,7 @@ export function createPerOutcomeNestedFeedbackPrompt<
 	userContent: string
 	ShallowSchema: z.ZodType<ShallowFeedbackPayload<WidgetTypeTupleFrom<C>>>
 } {
-	const ContentSchema: z.ZodType<BlockContent<WidgetTypeTupleFrom<C>>> = createFeedbackContentSchema(
+	const ContentSchema: z.ZodType<FeedbackContent<WidgetTypeTupleFrom<C>>> = createFeedbackContentSchema(
 		widgetCollection.widgetTypeKeys
 	)
 

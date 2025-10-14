@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test"
 import { compile } from "@/compiler/compiler"
 import type { AssessmentItemInput } from "@/core/item"
 import { allWidgetsCollection } from "@/widgets/collections/all"
+import { MINIMAL_CORRECT_FEEDBACK, MINIMAL_INCORRECT_FEEDBACK } from "../helpers/feedback-fixtures"
 
 describe("Compiler: gapMatchInteraction validation", () => {
 	const baseValidItem: AssessmentItemInput<[]> = {
@@ -52,8 +53,8 @@ describe("Compiler: gapMatchInteraction validation", () => {
 		feedback: {
 			FEEDBACK__OVERALL: {
 				RESPONSE: {
-					CORRECT: { content: [] },
-					INCORRECT: { content: [] }
+					CORRECT: { content: MINIMAL_CORRECT_FEEDBACK },
+					INCORRECT: { content: MINIMAL_INCORRECT_FEEDBACK }
 				}
 			}
 		}

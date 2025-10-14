@@ -4,6 +4,7 @@ import * as logger from "@superbuilders/slog"
 import type { AssessmentItemInput } from "../../src/core/item"
 import { differentiateAssessmentItem } from "../../src/structured/differentiator"
 import { allWidgetsCollection } from "../../src/widgets/collections/all"
+import { MINIMAL_CORRECT_FEEDBACK, MINIMAL_INCORRECT_FEEDBACK } from "../helpers/feedback-fixtures"
 
 // MODIFIED: Mock the OpenAI client for Responses API
 mock.module("openai", () => {
@@ -46,26 +47,70 @@ mock.module("openai", () => {
 											__sb_idx__1: { id: "INCORRECT", path: { __sb_empty_array__: true } }
 										}
 									},
-									feedback: {
-										FEEDBACK__OVERALL: {
-											CORRECT: {
-												content: {
+								feedback: {
+									FEEDBACK__OVERALL: {
+										CORRECT: {
+											content: {
+												preamble: {
+													correctness: "correct",
+													summary: { __sb_idx__0: { type: "text", content: "Correct!" } }
+												},
+												steps: {
 													__sb_idx__0: {
-														type: "paragraph",
-														content: { __sb_idx__0: { type: "text", content: "Correct!" } }
+														type: "step",
+														title: { __sb_idx__0: { type: "text", content: "Step 1" } },
+														content: {
+															__sb_idx__0: {
+																type: "paragraph",
+																content: { __sb_idx__0: { type: "text", content: "Do this." } }
+															}
+														}
+													},
+													__sb_idx__1: {
+														type: "step",
+														title: { __sb_idx__0: { type: "text", content: "Step 2" } },
+														content: {
+															__sb_idx__0: {
+																type: "paragraph",
+																content: { __sb_idx__0: { type: "text", content: "Then this." } }
+															}
+														}
 													}
 												}
-											},
-											INCORRECT: {
-												content: {
+											}
+										},
+										INCORRECT: {
+											content: {
+												preamble: {
+													correctness: "incorrect",
+													summary: { __sb_idx__0: { type: "text", content: "Incorrect." } }
+												},
+												steps: {
 													__sb_idx__0: {
-														type: "paragraph",
-														content: { __sb_idx__0: { type: "text", content: "Incorrect." } }
+														type: "step",
+														title: { __sb_idx__0: { type: "text", content: "Hint" } },
+														content: {
+															__sb_idx__0: {
+																type: "paragraph",
+																content: { __sb_idx__0: { type: "text", content: "Review." } }
+															}
+														}
+													},
+													__sb_idx__1: {
+														type: "step",
+														title: { __sb_idx__0: { type: "text", content: "Example" } },
+														content: {
+															__sb_idx__0: {
+																type: "paragraph",
+																content: { __sb_idx__0: { type: "text", content: "Solve like this." } }
+															}
+														}
 													}
 												}
 											}
 										}
 									}
+								}
 								}
 							]
 						})
@@ -122,8 +167,8 @@ describe("Differentiation Pipeline", () => {
 			},
 			feedback: {
 				FEEDBACK__OVERALL: {
-					CORRECT: { content: [{ type: "paragraph", content: [{ type: "text", content: "Correct" }] }] },
-					INCORRECT: { content: [{ type: "paragraph", content: [{ type: "text", content: "Incorrect" }] }] }
+					CORRECT: { content: MINIMAL_CORRECT_FEEDBACK },
+					INCORRECT: { content: MINIMAL_INCORRECT_FEEDBACK }
 				}
 			}
 		}
