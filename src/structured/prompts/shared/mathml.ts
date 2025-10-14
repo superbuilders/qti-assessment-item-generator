@@ -218,6 +218,68 @@ Note: Use HTML entities for < and > inside MathML: &lt; and &gt;
   { "type": "text", "content": " miles." }
 ]
 
+// ❌ BAD: Missing space after colon before math ("Use the area formula:")
+[
+  { "type": "text", "content": "Use the area formula:" },
+  { "type": "math", "mathml": "<mi>A</mi><mo>=</mo><mi>l</mi><mo>×</mo><mi>w</mi>" }
+]
+
+// ✅ GOOD: Add a space after the colon before math
+[
+  { "type": "text", "content": "Use the area formula: " },
+  { "type": "math", "mathml": "<mi>A</mi><mo>=</mo><mi>l</mi><mo>×</mo><mi>w</mi>" }
+]
+
+// ❌ BAD: Missing space after colon before math ("Substitute the length and your width from Step 1:")
+[
+  { "type": "text", "content": "Substitute the length and your width from Step 1:" },
+  { "type": "math", "mathml": "<mi>A</mi><mo>=</mo><mn>23</mn><mo>×</mo><mi>w</mi>" }
+]
+
+// ✅ GOOD: Add a space after the colon before math
+[
+  { "type": "text", "content": "Substitute the length and your width from Step 1: " },
+  { "type": "math", "mathml": "<mi>A</mi><mo>=</mo><mn>23</mn><mo>×</mo><mi>w</mi>" }
+]
+
+// ❌ BAD: Missing trailing space before math at phrase boundary ("by checking")
+[
+  { "type": "text", "content": "Verify that the dimensions satisfy the given perimeter by checking" },
+  { "type": "math", "mathml": "<mn>2</mn><mo>(</mo><mi>l</mi><mo>+</mo><mi>w</mi><mo>)</mo><mo>=</mo><mn>80</mn>" },
+  { "type": "text", "content": "." }
+]
+
+// ✅ GOOD: Include a trailing space before math
+[
+  { "type": "text", "content": "Verify that the dimensions satisfy the given perimeter by checking " },
+  { "type": "math", "mathml": "<mn>2</mn><mo>(</mo><mi>l</mi><mo>+</mo><mi>w</mi><mo>)</mo><mo>=</mo><mn>80</mn>" },
+  { "type": "text", "content": "." }
+]
+
+// ❌ BAD: Missing leading space in text after math
+[
+  { "type": "math", "mathml": "<mi>A</mi><mo>=</mo><mn>23</mn><mo>×</mo><mi>w</mi>" },
+  { "type": "text", "content": "Evaluate this expression to confirm it matches the value you selected, in square feet." }
+]
+
+// ✅ GOOD: Start the following text with a leading space
+[
+  { "type": "math", "mathml": "<mi>A</mi><mo>=</mo><mn>23</mn><mo>×</mo><mi>w</mi>" },
+  { "type": "text", "content": " Evaluate this expression to confirm it matches the value you selected, in square feet." }
+]
+
+// ❌ BAD: Missing space before math after "to write"
+[
+  { "type": "text", "content": "to write" },
+  { "type": "math", "mathml": "<mi>w</mi><mo>=</mo><mfrac><mn>80</mn><mn>2</mn></mfrac><mo>−</mo><mn>23</mn>" }
+]
+
+// ✅ GOOD: Include a trailing space before math after "to write"
+[
+  { "type": "text", "content": "to write " },
+  { "type": "math", "mathml": "<mi>w</mi><mo>=</mo><mfrac><mn>80</mn><mn>2</mn></mfrac><mo>−</mo><mn>23</mn>" }
+]
+
 **MANDATORY RULE:** Whenever a text item is adjacent to a math item, include necessary leading/trailing spaces in the text items so the rendered sentence has natural spacing. Do NOT rely on the renderer to insert spaces.
 
 ---
