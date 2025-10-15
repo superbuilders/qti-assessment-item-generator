@@ -1,10 +1,10 @@
 #!/usr/bin/env bun
 
-import { Glob } from "bun"
 import * as fs from "node:fs/promises"
 import * as path from "node:path"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
+import { Glob } from "bun"
 import OpenAI from "openai"
 import { z } from "zod"
 import { compile } from "@/compiler/compiler"
@@ -51,14 +51,16 @@ async function runWithConcurrency<T>(
 
 		if (!task) return
 
-		const promise = (async () => {
+		async function runOne(): Promise<void> {
 			const res = await errors.try(task())
 			if (res.error) {
 				results[currentIndex] = { status: "rejected", reason: res.error }
 			} else {
 				results[currentIndex] = { status: "fulfilled", value: res.data }
 			}
-		})()
+		}
+
+		const promise = runOne()
 
 		executing.push(promise)
 		await promise
@@ -67,9 +69,7 @@ async function runWithConcurrency<T>(
 		await execute()
 	}
 
-	const initialPromises = Array(Math.min(limit, tasks.length))
-		.fill(null)
-		.map(execute)
+	const initialPromises = Array(Math.min(limit, tasks.length)).fill(null).map(execute)
 	await Promise.all(initialPromises)
 
 	return results
@@ -91,66 +91,66 @@ function toKebabCase(str: string): string {
 // ----------------------
 
 const CanvasOptionSchema = z.object({
-    label: z.string().optional(),
-    text: z.string().optional()
+	label: z.string().optional(),
+	text: z.string().optional()
 })
 
 const CanvasBlankSchema = z.object({
-    options: z.array(z.string()).optional()
+	options: z.array(z.string()).optional()
 })
 
 const CanvasPairSchema = z.object({
-    prompt: z.string(),
-    options: z.array(z.string()).optional(),
-    answer: z.string().optional()
+	prompt: z.string(),
+	options: z.array(z.string()).optional(),
+	answer: z.string().optional()
 })
 
 const CanvasQuestionSchema = z.object({
-    questionNumber: z.number(),
-    questionText: z.string().optional(),
-    type: z.string().optional(),
-    options: z.array(CanvasOptionSchema).optional(),
-    blanks: z.array(CanvasBlankSchema).optional(),
-    pairs: z.array(CanvasPairSchema).optional(),
-    groupName: z.string().optional(),
-    questionId: z.string().optional()
+	questionNumber: z.number(),
+	questionText: z.string().optional(),
+	type: z.string().optional(),
+	options: z.array(CanvasOptionSchema).optional(),
+	blanks: z.array(CanvasBlankSchema).optional(),
+	pairs: z.array(CanvasPairSchema).optional(),
+	groupName: z.string().optional(),
+	questionId: z.string().optional()
 })
 export type CanvasQuestion = z.infer<typeof CanvasQuestionSchema>
 
 // Attempted answers schema (answers map contains attempted selections with correctness flags)
 const AttemptMatchingPairSchema = z.object({
-    prompt: z.string(),
-    answer: z.string()
+	prompt: z.string(),
+	answer: z.string()
 })
 
 const AttemptAnswerBaseSchema = z.object({
-    type: z.enum(["multiple-choice", "dropdown", "matching"]),
-    reasoning: z.string().optional(),
-    correct: z.boolean().optional(),
-    state: z.string().optional(),
-    grade: z.string().optional()
+	type: z.enum(["multiple-choice", "dropdown", "matching"]),
+	reasoning: z.string().optional(),
+	correct: z.boolean().optional(),
+	state: z.string().optional(),
+	grade: z.string().optional()
 })
 
 const AttemptAnswerMultipleChoiceSchema = AttemptAnswerBaseSchema.extend({
-    type: z.literal("multiple-choice"),
-    // Attempt may be label (e.g., "c") or text (e.g., "True") depending on quiz
-    answer: z.string().optional()
+	type: z.literal("multiple-choice"),
+	// Attempt may be label (e.g., "c") or text (e.g., "True") depending on quiz
+	answer: z.string().optional()
 })
 
 const AttemptAnswerDropdownSchema = AttemptAnswerBaseSchema.extend({
-    type: z.literal("dropdown"),
-    answers: z.array(z.string()).optional()
+	type: z.literal("dropdown"),
+	answers: z.array(z.string()).optional()
 })
 
 const AttemptAnswerMatchingSchema = AttemptAnswerBaseSchema.extend({
-    type: z.literal("matching"),
-    matches: z.array(AttemptMatchingPairSchema).optional()
+	type: z.literal("matching"),
+	matches: z.array(AttemptMatchingPairSchema).optional()
 })
 
 const AttemptAnswerSchema = z.union([
-    AttemptAnswerMultipleChoiceSchema,
-    AttemptAnswerDropdownSchema,
-    AttemptAnswerMatchingSchema
+	AttemptAnswerMultipleChoiceSchema,
+	AttemptAnswerDropdownSchema,
+	AttemptAnswerMatchingSchema
 ])
 
 type AttemptAnswer = z.infer<typeof AttemptAnswerSchema>
@@ -158,19 +158,19 @@ type AttemptAnswer = z.infer<typeof AttemptAnswerSchema>
 const AnswersMapSchema = z.record(z.string(), AttemptAnswerSchema)
 
 const QuizDataSchema = z.object({
-    questions: z.array(CanvasQuestionSchema),
-    answers: AnswersMapSchema.optional(),
-    timestamp: z.string().optional(),
-    cleanedDropdowns: z.boolean().optional()
+	questions: z.array(CanvasQuestionSchema),
+	answers: AnswersMapSchema.optional(),
+	timestamp: z.string().optional(),
+	cleanedDropdowns: z.boolean().optional()
 })
 // Type inferred via safeParse usage; no explicit alias needed to avoid unused symbol
 
 const LessonPageDataSchema = z.object({
-    mainContent: z
-        .object({
-            html: z.string().optional()
-        })
-        .optional()
+	mainContent: z
+		.object({
+			html: z.string().optional()
+		})
+		.optional()
 })
 
 // Image MIME resolver unused after image ingestion removal
@@ -179,23 +179,23 @@ const LessonPageDataSchema = z.object({
  * Escape a string for safe embedding into RegExp.
  */
 function escapeForRegExp(input: string): string {
-    return input.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+	return input.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
 }
 
 /**
  * Extracts a quiz number like "1.1" from a directory name e.g. "Quiz 1.1".
  */
 function extractQuizNumberFromDirName(dirName: string): string | undefined {
-    const match = dirName.match(/\b(\d+\.\d+)\b/)
-    return match ? match[1] : undefined
+	const match = dirName.match(/\b(\d+\.\d+)\b/)
+	return match ? match[1] : undefined
 }
 
 /**
  * Extracts a unit number like "1" or "2" from a directory name e.g. "Unit 1 Test".
  */
 function extractUnitNumberFromDirName(dirName: string): string | undefined {
-    const match = dirName.match(/\bUnit\s+(\d+)\b/i)
-    return match ? match[1] : undefined
+	const match = dirName.match(/\bUnit\s+(\d+)\b/i)
+	return match ? match[1] : undefined
 }
 
 /**
@@ -204,54 +204,56 @@ function extractUnitNumberFromDirName(dirName: string): string | undefined {
  * - For unit tests (e.g., "Unit 1 Test"), collects all lessons matching "1.X ...".
  * - For other quizzes (e.g., "MANDATORY QUIZ"), returns empty.
  */
-async function resolveLessonDirsForQuiz(quizDir: string): Promise<{ lessonDirs: string[]; unitDir?: string; quizRootDir: string; quizDirName: string }> {
-    const quizRootDir = path.dirname(quizDir)
-    const unitDir = path.dirname(quizRootDir)
-    const quizDirName = path.basename(quizRootDir)
+async function resolveLessonDirsForQuiz(
+	quizDir: string
+): Promise<{ lessonDirs: string[]; unitDir?: string; quizRootDir: string; quizDirName: string }> {
+	const quizRootDir = path.dirname(quizDir)
+	const unitDir = path.dirname(quizRootDir)
+	const quizDirName = path.basename(quizRootDir)
 
-    const direntsResult = await errors.try(fs.readdir(unitDir, { withFileTypes: true }))
-    if (direntsResult.error) {
-        logger.debug("failed listing unit directory", { unitDir, error: direntsResult.error })
-        return { lessonDirs: [], unitDir, quizRootDir, quizDirName }
-    }
-    const dirents = direntsResult.data
+	const direntsResult = await errors.try(fs.readdir(unitDir, { withFileTypes: true }))
+	if (direntsResult.error) {
+		logger.debug("failed listing unit directory", { unitDir, error: direntsResult.error })
+		return { lessonDirs: [], unitDir, quizRootDir, quizDirName }
+	}
+	const dirents = direntsResult.data
 
-    // Check if this is a unit test (e.g., "Unit 1 Test")
-    const unitNum = extractUnitNumberFromDirName(quizDirName)
-    if (unitNum) {
-        // Collect all lessons matching "N.X ..." for the unit
-        const lessonDirs: string[] = []
-        const pattern = new RegExp(`^${escapeForRegExp(unitNum)}\\.(\\d+)(\\b|\\s|[-:_])`, "i")
-        for (const d of dirents) {
-            if (!d.isDirectory()) continue
-            if (pattern.test(d.name)) {
-                lessonDirs.push(path.join(unitDir, d.name))
-            }
-        }
-        logger.debug("resolved unit test lessons", { quizDirName, lessonCount: lessonDirs.length })
-        return { lessonDirs, unitDir, quizRootDir, quizDirName }
-    }
+	// Check if this is a unit test (e.g., "Unit 1 Test")
+	const unitNum = extractUnitNumberFromDirName(quizDirName)
+	if (unitNum) {
+		// Collect all lessons matching "N.X ..." for the unit
+		const lessonDirs: string[] = []
+		const pattern = new RegExp(`^${escapeForRegExp(unitNum)}\\.(\\d+)(\\b|\\s|[-:_])`, "i")
+		for (const d of dirents) {
+			if (!d.isDirectory()) continue
+			if (pattern.test(d.name)) {
+				lessonDirs.push(path.join(unitDir, d.name))
+			}
+		}
+		logger.debug("resolved unit test lessons", { quizDirName, lessonCount: lessonDirs.length })
+		return { lessonDirs, unitDir, quizRootDir, quizDirName }
+	}
 
-    // Check if this is a regular quiz (e.g., "Quiz 1.1")
-    const num = extractQuizNumberFromDirName(quizDirName)
-    if (num) {
-        const pattern = new RegExp(`^${escapeForRegExp(num)}(\\b|\\s|[-:_])`, "i")
-        for (const d of dirents) {
-            if (!d.isDirectory()) continue
-            if (d.name === quizDirName) continue
-            if (pattern.test(d.name)) {
-                const candidate = path.join(unitDir, d.name)
-                logger.debug("resolved lesson directory for quiz", { quizDirName, lessonDir: candidate })
-                return { lessonDirs: [candidate], unitDir, quizRootDir, quizDirName }
-            }
-        }
-        logger.debug("no sibling lesson directory matched quiz number", { quizDirName, num })
-        return { lessonDirs: [], unitDir, quizRootDir, quizDirName }
-    }
+	// Check if this is a regular quiz (e.g., "Quiz 1.1")
+	const num = extractQuizNumberFromDirName(quizDirName)
+	if (num) {
+		const pattern = new RegExp(`^${escapeForRegExp(num)}(\\b|\\s|[-:_])`, "i")
+		for (const d of dirents) {
+			if (!d.isDirectory()) continue
+			if (d.name === quizDirName) continue
+			if (pattern.test(d.name)) {
+				const candidate = path.join(unitDir, d.name)
+				logger.debug("resolved lesson directory for quiz", { quizDirName, lessonDir: candidate })
+				return { lessonDirs: [candidate], unitDir, quizRootDir, quizDirName }
+			}
+		}
+		logger.debug("no sibling lesson directory matched quiz number", { quizDirName, num })
+		return { lessonDirs: [], unitDir, quizRootDir, quizDirName }
+	}
 
-    // No pattern matched (e.g., MANDATORY QUIZ)
-    logger.debug("could not extract quiz or unit number from directory name", { quizDirName })
-    return { lessonDirs: [], quizRootDir, quizDirName }
+	// No pattern matched (e.g., MANDATORY QUIZ)
+	logger.debug("could not extract quiz or unit number from directory name", { quizDirName })
+	return { lessonDirs: [], quizRootDir, quizDirName }
 }
 
 // Metadata helper removed; we just JSON.stringify directly
@@ -262,71 +264,80 @@ async function resolveLessonDirsForQuiz(quizDir: string): Promise<{ lessonDirs: 
  * - For unit tests: includes all unit lessons (e.g., 2.1, 2.2, ..., 2.6 for Unit 2 Test)
  * - Includes unit and quiz metadata
  */
-async function gatherSupplementaryContent(quizDir: string): Promise<{ content: string[]; lessonDirs: string[]; unitDir?: string; quizRootDir: string; filesIncluded: string[] }> {
-    const content: string[] = []
-    const filesIncluded: string[] = []
-    const resolved = await resolveLessonDirsForQuiz(quizDir)
-    const quizRootDir = resolved.quizRootDir
-    const unitDir = resolved.unitDir
-    const lessonDirs = resolved.lessonDirs
+async function gatherSupplementaryContent(quizDir: string): Promise<{
+	content: string[]
+	lessonDirs: string[]
+	unitDir?: string
+	quizRootDir: string
+	filesIncluded: string[]
+}> {
+	const content: string[] = []
+	const filesIncluded: string[] = []
+	const resolved = await resolveLessonDirsForQuiz(quizDir)
+	const quizRootDir = resolved.quizRootDir
+	const unitDir = resolved.unitDir
+	const lessonDirs = resolved.lessonDirs
 
-    for (const lessonDir of lessonDirs) {
-        const pageDataPath = path.join(lessonDir, "page-data.json")
-        const pageDataResult = await errors.try(Bun.file(pageDataPath).json())
-        if (pageDataResult.error) {
-            logger.debug("no lesson page-data.json found or unreadable", { file: pageDataPath, error: pageDataResult.error })
-        } else {
-            const parsed = LessonPageDataSchema.safeParse(pageDataResult.data)
-            if (!parsed.success) {
-                logger.debug("lesson page-data.json did not match expected schema", { file: pageDataPath })
-            } else {
-                if (parsed.data.mainContent && parsed.data.mainContent.html) {
-                    const html = parsed.data.mainContent.html
-                    if (html.length > 0) {
-                        content.push(html)
-                        filesIncluded.push(pageDataPath)
-                        logger.debug("included lesson page-data.json", { file: pageDataPath, htmlLength: html.length })
-                    }
-                }
-            }
-        }
-        // lesson metadata
-        const lessonMetaPath = path.join(lessonDir, "metadata.json")
-        const lessonMetaResult = await errors.try(Bun.file(lessonMetaPath).json())
-        if (!lessonMetaResult.error) {
-            content.push(`Lesson metadata:\n${JSON.stringify(lessonMetaResult.data, null, 2)}`)
-            filesIncluded.push(lessonMetaPath)
-            logger.debug("included lesson metadata.json", { file: lessonMetaPath })
-        } else {
-            logger.debug("no lesson metadata.json found or unreadable", { file: lessonMetaPath, error: lessonMetaResult.error })
-        }
-    }
+	for (const lessonDir of lessonDirs) {
+		const pageDataPath = path.join(lessonDir, "page-data.json")
+		const pageDataResult = await errors.try(Bun.file(pageDataPath).json())
+		if (pageDataResult.error) {
+			logger.debug("no lesson page-data.json found or unreadable", { file: pageDataPath, error: pageDataResult.error })
+		} else {
+			const parsed = LessonPageDataSchema.safeParse(pageDataResult.data)
+			if (!parsed.success) {
+				logger.debug("lesson page-data.json did not match expected schema", { file: pageDataPath })
+			} else {
+				if (parsed.data.mainContent?.html) {
+					const html = parsed.data.mainContent.html
+					if (html.length > 0) {
+						content.push(html)
+						filesIncluded.push(pageDataPath)
+						logger.debug("included lesson page-data.json", { file: pageDataPath, htmlLength: html.length })
+					}
+				}
+			}
+		}
+		// lesson metadata
+		const lessonMetaPath = path.join(lessonDir, "metadata.json")
+		const lessonMetaResult = await errors.try(Bun.file(lessonMetaPath).json())
+		if (!lessonMetaResult.error) {
+			content.push(`Lesson metadata:\n${JSON.stringify(lessonMetaResult.data, null, 2)}`)
+			filesIncluded.push(lessonMetaPath)
+			logger.debug("included lesson metadata.json", { file: lessonMetaPath })
+		} else {
+			logger.debug("no lesson metadata.json found or unreadable", {
+				file: lessonMetaPath,
+				error: lessonMetaResult.error
+			})
+		}
+	}
 
-    // unit metadata (if available)
-    if (unitDir) {
-        const unitMetaPath = path.join(unitDir, "metadata.json")
-        const unitMetaResult = await errors.try(Bun.file(unitMetaPath).json())
-        if (!unitMetaResult.error) {
-            content.push(`Unit metadata:\n${JSON.stringify(unitMetaResult.data, null, 2)}`)
-            filesIncluded.push(unitMetaPath)
-            logger.debug("included unit metadata.json", { file: unitMetaPath })
-        } else {
-            logger.debug("no unit metadata.json found or unreadable", { file: unitMetaPath, error: unitMetaResult.error })
-        }
-    }
+	// unit metadata (if available)
+	if (unitDir) {
+		const unitMetaPath = path.join(unitDir, "metadata.json")
+		const unitMetaResult = await errors.try(Bun.file(unitMetaPath).json())
+		if (!unitMetaResult.error) {
+			content.push(`Unit metadata:\n${JSON.stringify(unitMetaResult.data, null, 2)}`)
+			filesIncluded.push(unitMetaPath)
+			logger.debug("included unit metadata.json", { file: unitMetaPath })
+		} else {
+			logger.debug("no unit metadata.json found or unreadable", { file: unitMetaPath, error: unitMetaResult.error })
+		}
+	}
 
-    // quiz metadata (quiz folder, one level above _quiz)
-    const quizMetaPath = path.join(quizRootDir, "metadata.json")
-    const quizMetaResult = await errors.try(Bun.file(quizMetaPath).json())
-    if (!quizMetaResult.error) {
-        content.push(`Quiz metadata:\n${JSON.stringify(quizMetaResult.data, null, 2)}`)
-        filesIncluded.push(quizMetaPath)
-        logger.debug("included quiz metadata.json", { file: quizMetaPath })
-    } else {
-        logger.debug("no quiz metadata.json found or unreadable", { file: quizMetaPath, error: quizMetaResult.error })
-    }
+	// quiz metadata (quiz folder, one level above _quiz)
+	const quizMetaPath = path.join(quizRootDir, "metadata.json")
+	const quizMetaResult = await errors.try(Bun.file(quizMetaPath).json())
+	if (!quizMetaResult.error) {
+		content.push(`Quiz metadata:\n${JSON.stringify(quizMetaResult.data, null, 2)}`)
+		filesIncluded.push(quizMetaPath)
+		logger.debug("included quiz metadata.json", { file: quizMetaPath })
+	} else {
+		logger.debug("no quiz metadata.json found or unreadable", { file: quizMetaPath, error: quizMetaResult.error })
+	}
 
-    return { content, lessonDirs, unitDir, quizRootDir, filesIncluded }
+	return { content, lessonDirs, unitDir, quizRootDir, filesIncluded }
 }
 
 /**
@@ -335,50 +346,70 @@ async function gatherSupplementaryContent(quizDir: string): Promise<{ content: s
 /**
  * Gathers raster image payloads from _images directory for a single question.
  */
-async function gatherImagePayloads(quizDir: string, questionNumber: number): Promise<{ payloads: RasterImagePayload[]; filesIncluded: string[] }> {
-    const payloads: RasterImagePayload[] = []
-    const filesIncluded: string[] = []
-    const imagesDir = path.join(quizDir, "_images")
-    
-    const statResult = await errors.try(fs.stat(imagesDir))
-    if (!statResult.error && statResult.data.isDirectory()) {
-        const glob = new Glob(`q${questionNumber}-*.png`)
-        for await (const fileName of glob.scan(imagesDir)) {
-            const filePath = path.join(imagesDir, fileName)
-            const file = Bun.file(filePath)
-            if (!(await file.exists())) {
-                logger.debug("image not found, skipping", { file: filePath })
-                continue
-            }
-            const dataResult = await errors.try(file.arrayBuffer())
-            if (dataResult.error) {
-                logger.warn("failed to read image file", { file: filePath, error: dataResult.error })
-                continue
-            }
-            if (dataResult.data) {
-                const mimeType = file.type === "image/png" ? "image/png" : 
-                               file.type === "image/jpeg" ? "image/jpeg" :
-                               file.type === "image/webp" ? "image/webp" :
-                               file.type === "image/gif" ? "image/gif" : "image/png"
-                payloads.push({ data: dataResult.data, mimeType })
-                filesIncluded.push(filePath)
-                logger.debug("included image from _images", { file: filePath, mimeType, byteLength: dataResult.data.byteLength })
-            }
-        }
-    } else {
-        logger.debug("_images directory not found, skipping image ingestion", { dir: imagesDir })
-    }
+async function gatherImagePayloads(
+	quizDir: string,
+	questionNumber: number
+): Promise<{ payloads: RasterImagePayload[]; filesIncluded: string[] }> {
+	const payloads: RasterImagePayload[] = []
+	const filesIncluded: string[] = []
+	const imagesDir = path.join(quizDir, "_images")
 
-    return { payloads, filesIncluded }
+	const statResult = await errors.try(fs.stat(imagesDir))
+	if (!statResult.error && statResult.data.isDirectory()) {
+		const glob = new Glob(`q${questionNumber}-*.png`)
+		for await (const fileName of glob.scan(imagesDir)) {
+			const filePath = path.join(imagesDir, fileName)
+			const file = Bun.file(filePath)
+			if (!(await file.exists())) {
+				logger.debug("image not found, skipping", { file: filePath })
+				continue
+			}
+			const dataResult = await errors.try(file.arrayBuffer())
+			if (dataResult.error) {
+				logger.warn("failed to read image file", { file: filePath, error: dataResult.error })
+				continue
+			}
+			if (dataResult.data) {
+				let mimeType: "image/png" | "image/jpeg" | "image/webp" | "image/gif"
+				switch (file.type) {
+					case "image/png":
+						mimeType = "image/png"
+						break
+					case "image/jpeg":
+						mimeType = "image/jpeg"
+						break
+					case "image/webp":
+						mimeType = "image/webp"
+						break
+					case "image/gif":
+						mimeType = "image/gif"
+						break
+					default:
+						mimeType = "image/png"
+				}
+				payloads.push({ data: dataResult.data, mimeType })
+				filesIncluded.push(filePath)
+				logger.debug("included image from _images", {
+					file: filePath,
+					mimeType,
+					byteLength: dataResult.data.byteLength
+				})
+			}
+		}
+	} else {
+		logger.debug("_images directory not found, skipping image ingestion", { dir: imagesDir })
+	}
+
+	return { payloads, filesIncluded }
 }
 
 /**
  * Deterministically discovers and loads referenced PDF reading passages.
  */
 async function discoverAndLoadPdfs(
-    question: CanvasQuestion,
-    supplementaryContent: string[],
-    resourceBaseDirs: string[]
+	question: CanvasQuestion,
+	supplementaryContent: string[],
+	resourceBaseDirs: string[]
 ): Promise<PdfPayload[]> {
 	const normalize = (s: string) =>
 		s
@@ -389,43 +420,46 @@ async function discoverAndLoadPdfs(
 
 	const textNormalized = normalize([JSON.stringify(question), ...supplementaryContent].join(" "))
 
-    // Discover PDFs at runtime from the actual scraped data in provided base dirs
-    const candidates: Array<{ path: string; name: string; phrase: string }> = []
-    for (const baseDir of resourceBaseDirs) {
-        const resourceDir = path.join(baseDir, "_resources")
-        const statResult = await errors.try(fs.stat(resourceDir))
-        if (statResult.error || !statResult.data.isDirectory()) {
-            logger.debug("resources directory not found, skipping", { dir: resourceDir })
-            continue
-        }
-        const pdfGlob = new Glob(path.join(resourceDir, "*.pdf"))
-        for await (const pdfPath of pdfGlob.scan(".")) {
-            const name = path.basename(pdfPath)
-            const base = name.replace(/\.pdf$/i, "")
-            // Derive a normalized phrase from filename: drop non-alphanumerics and standalone digits
-            const phraseTokens = normalize(base)
-                .split(" ")
-                .filter((t) => t.length > 0 && !/^\d+$/.test(t))
-            const phrase = phraseTokens.join(" ")
-            if (phrase.length === 0) continue
-            candidates.push({ path: pdfPath, name, phrase })
-        }
-    }
-    
-    logger.debug("discovered pdf candidates", { candidateCount: candidates.length, candidates: candidates.map(c => ({ name: c.name, phrase: c.phrase })) })
+	// Discover PDFs at runtime from the actual scraped data in provided base dirs
+	const candidates: Array<{ path: string; name: string; phrase: string }> = []
+	for (const baseDir of resourceBaseDirs) {
+		const resourceDir = path.join(baseDir, "_resources")
+		const statResult = await errors.try(fs.stat(resourceDir))
+		if (statResult.error || !statResult.data.isDirectory()) {
+			logger.debug("resources directory not found, skipping", { dir: resourceDir })
+			continue
+		}
+		const pdfGlob = new Glob(path.join(resourceDir, "*.pdf"))
+		for await (const pdfPath of pdfGlob.scan(".")) {
+			const name = path.basename(pdfPath)
+			const base = name.replace(/\.pdf$/i, "")
+			// Derive a normalized phrase from filename: drop non-alphanumerics and standalone digits
+			const phraseTokens = normalize(base)
+				.split(" ")
+				.filter((t) => t.length > 0 && !/^\d+$/.test(t))
+			const phrase = phraseTokens.join(" ")
+			if (phrase.length === 0) continue
+			candidates.push({ path: pdfPath, name, phrase })
+		}
+	}
 
-    const matched: Array<{ path: string; name: string }> = []
-    for (const c of candidates) {
-        // Simple, deterministic containment check against question + lesson text
-        if (c.phrase.length >= 6 && textNormalized.includes(c.phrase)) {
-            matched.push({ path: c.path, name: c.name })
-            logger.debug("pdf matched via phrase containment", { name: c.name, phrase: c.phrase })
-        }
-    }
-    
-    logger.debug("pdf matching complete", { matchedCount: matched.length, matchedNames: matched.map(m => m.name) })
+	logger.debug("discovered pdf candidates", {
+		candidateCount: candidates.length,
+		candidates: candidates.map((c) => ({ name: c.name, phrase: c.phrase }))
+	})
 
-    if (matched.length === 0) return []
+	const matched: Array<{ path: string; name: string }> = []
+	for (const c of candidates) {
+		// Simple, deterministic containment check against question + lesson text
+		if (c.phrase.length >= 6 && textNormalized.includes(c.phrase)) {
+			matched.push({ path: c.path, name: c.name })
+			logger.debug("pdf matched via phrase containment", { name: c.name, phrase: c.phrase })
+		}
+	}
+
+	logger.debug("pdf matching complete", { matchedCount: matched.length, matchedNames: matched.map((m) => m.name) })
+
+	if (matched.length === 0) return []
 
 	const payloads: PdfPayload[] = []
 	for (const m of matched) {
@@ -445,7 +479,7 @@ async function discoverAndLoadPdfs(
 			logger.debug("loaded pdf file", { name: m.name, byteLength: dataResult.data.byteLength })
 		}
 	}
-	logger.info("pdf loading complete", { pdfCount: payloads.length, pdfNames: payloads.map(p => p.name) })
+	logger.info("pdf loading complete", { pdfCount: payloads.length, pdfNames: payloads.map((p) => p.name) })
 	return payloads
 }
 
@@ -453,50 +487,51 @@ async function discoverAndLoadPdfs(
  * Processes a single question, creating its QTI files.
  */
 async function processQuestion(
-    question: CanvasQuestion,
-    assessmentDirs: { quizDir: string; outputDir: string },
-    openai: OpenAI,
-    answersMap?: Record<string, AttemptAnswer>
+	question: CanvasQuestion,
+	assessmentDirs: { quizDir: string; outputDir: string },
+	openai: OpenAI,
+	answersMap?: Record<string, AttemptAnswer>
 ): Promise<void> {
-
 	const questionNumber = question.questionNumber
 	const questionNumberStr = String(questionNumber).padStart(2, "0")
 	const kebabCaseName = path.basename(assessmentDirs.outputDir)
 	const questionId = `${kebabCaseName}-q${questionNumberStr}`
 	logger.info("processing question", { assessmentName: kebabCaseName, questionNumber: questionNumberStr })
 
-    const primaryContent = JSON.stringify(question, null, 2)
-    const gathered = await gatherSupplementaryContent(assessmentDirs.quizDir)
-    let supplementaryContent = gathered.content
-    
-    logger.info("gathered supplementary content for question", {
-        questionId,
-        lessonDirsCount: gathered.lessonDirs.length,
-        lessonDirs: gathered.lessonDirs.map(d => path.basename(d)),
-        filesIncluded: gathered.filesIncluded
-    })
+	const primaryContent = JSON.stringify(question, null, 2)
+	const gathered = await gatherSupplementaryContent(assessmentDirs.quizDir)
+	let supplementaryContent = gathered.content
 
-    // Attach attempted answer context (do not assume correctness; only report attempt + flag)
-    const questionKey = String(questionNumber)
-    const attempt = answersMap ? answersMap[questionKey] : undefined
-    if (attempt) {
-        // Build a concise, deterministic summary string for the attempt
-        const attemptLines: string[] = []
-        const correctFlag = attempt.correct === true ? "true" : attempt.correct === false ? "false" : "unknown"
-        attemptLines.push(`Attempt: type=${attempt.type} correct=${correctFlag}`)
+	logger.info("gathered supplementary content for question", {
+		questionId,
+		lessonDirsCount: gathered.lessonDirs.length,
+		lessonDirs: gathered.lessonDirs.map((d) => path.basename(d)),
+		filesIncluded: gathered.filesIncluded
+	})
 
-        if (attempt.type === "multiple-choice") {
-            const raw = attempt.answer
+	// Attach attempted answer context (do not assume correctness; only report attempt + flag)
+	const questionKey = String(questionNumber)
+	const attempt = answersMap ? answersMap[questionKey] : undefined
+	if (attempt) {
+		// Build a concise, deterministic summary string for the attempt
+		const attemptLines: string[] = []
+		let correctFlag = "unknown"
+		if (attempt.correct === true) correctFlag = "true"
+		else if (attempt.correct === false) correctFlag = "false"
+		attemptLines.push(`Attempt: type=${attempt.type} correct=${correctFlag}`)
+
+		if (attempt.type === "multiple-choice") {
+			const raw = attempt.answer
 			// Try to resolve label -> text if possible
 			let resolvedText: string | undefined
 			if (raw && question.options && question.options.length > 0) {
 				const byLabel = question.options.find((opt) => opt.label && opt.label === raw)
-                const byText = question.options.find((opt) => opt.text && opt.text === raw)
-                if (byLabel && typeof byLabel.text === "string") {
-                    resolvedText = byLabel.text
-                } else if (byText && typeof byText.text === "string") {
-                    resolvedText = byText.text
-                }
+				const byText = question.options.find((opt) => opt.text && opt.text === raw)
+				if (byLabel && typeof byLabel.text === "string") {
+					resolvedText = byLabel.text
+				} else if (byText && typeof byText.text === "string") {
+					resolvedText = byText.text
+				}
 			}
 			let selectedRendered = ""
 			if (typeof raw === "string" && raw.length > 0) {
@@ -505,60 +540,58 @@ async function processQuestion(
 				selectedRendered = "(no selection provided)"
 			}
 			attemptLines.push(`Selected: ${selectedRendered}`)
-        } else if (attempt.type === "dropdown") {
-            const raws = attempt.answers
-            attemptLines.push(`Selected: ${raws && raws.length > 0 ? JSON.stringify(raws) : "[]"}`)
-        } else if (attempt.type === "matching") {
-            const pairs = attempt.matches
-            if (pairs && pairs.length > 0) {
-                const joined = pairs
-                    .map((p) => `${p.prompt} => ${p.answer}`)
-                    .join(" | ")
-                attemptLines.push(`Selected: ${joined}`)
-		} else {
-                attemptLines.push("Selected: []")
-            }
-        }
-        if (attempt.reasoning && attempt.reasoning.trim().length > 0) {
-            attemptLines.push(`Reasoning: ${attempt.reasoning}`)
-        }
-        // Append semantics guidance so the model interprets attempts correctly
-        const semanticsGuidance = [
-            "Attempt semantics:",
-            "- The 'answer' / 'answers' fields shown here are the learner's attempted selection(s), not authoritative ground truth.",
-            "- The 'correct' boolean indicates whether that attempt is correct.",
-            "- If correct is false, DO NOT choose the attempted selection(s). Determine the correct option(s)/mapping(s) from the question text and options.",
-            "- If correct is true, the attempted selection is known correct.",
-            "- For dropdowns, the 'answers' array is in blank order; for matching, 'matches' pairs reflect attempted prompt -> option mappings.",
-            "",
-            "CONCRETE EXAMPLES:",
-            "",
-            "Example 1 - WRONG attempt (correct=false):",
-            "Question: Which type of panels are below? Options: a) montage, b) image specific, c) word specific",
-            "Attempt: type=multiple-choice correct=false",
-            "Selected: a -> montage",
-            "❌ WRONG: Do NOT select 'a' or 'montage' as your answer.",
-            "✅ CORRECT: Analyze the question and determine the actual correct answer is 'b' or 'c'.",
-            "",
-            "Example 2 - CORRECT attempt (correct=true):",
-            "Question: Comics are sequential art. Options: a) sequential, b) dramatic",
-            "Attempt: type=dropdown correct=true",
-            "Selected: [\"sequential\", \"vessel (container)\"]",
-            "✅ CORRECT: Use these attempted selections as your answer keys; they are known correct.",
-            "",
-            "Example 3 - WRONG matching (correct=false):",
-            "Attempt: type=matching correct=false",
-            "Selected: Prompt A => Wrong Option | Prompt B => Wrong Option",
-            "❌ WRONG: Do NOT use these mappings.",
-            "✅ CORRECT: Re-map each prompt to the correct option from the available choices."
-        ].join("\n")
-        supplementaryContent.push([attemptLines.join("\n"), semanticsGuidance].join("\n\n"))
-        logger.debug("included quiz-data attempt context", {
-            questionId,
-            correct: attempt.correct === true,
-            type: attempt.type
-        })
-    }
+		} else if (attempt.type === "dropdown") {
+			const raws = attempt.answers
+			attemptLines.push(`Selected: ${raws && raws.length > 0 ? JSON.stringify(raws) : "[]"}`)
+		} else if (attempt.type === "matching") {
+			const pairs = attempt.matches
+			if (pairs && pairs.length > 0) {
+				const joined = pairs.map((p) => `${p.prompt} => ${p.answer}`).join(" | ")
+				attemptLines.push(`Selected: ${joined}`)
+			} else {
+				attemptLines.push("Selected: []")
+			}
+		}
+		if (attempt.reasoning && attempt.reasoning.trim().length > 0) {
+			attemptLines.push(`Reasoning: ${attempt.reasoning}`)
+		}
+		// Append semantics guidance so the model interprets attempts correctly
+		const semanticsGuidance = [
+			"Attempt semantics:",
+			"- The 'answer' / 'answers' fields shown here are the learner's attempted selection(s), not authoritative ground truth.",
+			"- The 'correct' boolean indicates whether that attempt is correct.",
+			"- If correct is false, DO NOT choose the attempted selection(s). Determine the correct option(s)/mapping(s) from the question text and options.",
+			"- If correct is true, the attempted selection is known correct.",
+			"- For dropdowns, the 'answers' array is in blank order; for matching, 'matches' pairs reflect attempted prompt -> option mappings.",
+			"",
+			"CONCRETE EXAMPLES:",
+			"",
+			"Example 1 - WRONG attempt (correct=false):",
+			"Question: Which type of panels are below? Options: a) montage, b) image specific, c) word specific",
+			"Attempt: type=multiple-choice correct=false",
+			"Selected: a -> montage",
+			"❌ WRONG: Do NOT select 'a' or 'montage' as your answer.",
+			"✅ CORRECT: Analyze the question and determine the actual correct answer is 'b' or 'c'.",
+			"",
+			"Example 2 - CORRECT attempt (correct=true):",
+			"Question: Comics are sequential art. Options: a) sequential, b) dramatic",
+			"Attempt: type=dropdown correct=true",
+			'Selected: ["sequential", "vessel (container)"]',
+			"✅ CORRECT: Use these attempted selections as your answer keys; they are known correct.",
+			"",
+			"Example 3 - WRONG matching (correct=false):",
+			"Attempt: type=matching correct=false",
+			"Selected: Prompt A => Wrong Option | Prompt B => Wrong Option",
+			"❌ WRONG: Do NOT use these mappings.",
+			"✅ CORRECT: Re-map each prompt to the correct option from the available choices."
+		].join("\n")
+		supplementaryContent.push([attemptLines.join("\n"), semanticsGuidance].join("\n\n"))
+		logger.debug("included quiz-data attempt context", {
+			questionId,
+			correct: attempt.correct === true,
+			type: attempt.type
+		})
+	}
 
 	const imageGatherResult = await gatherImagePayloads(assessmentDirs.quizDir, questionNumber)
 	const multimodalImagePayloads = imageGatherResult.payloads
@@ -582,13 +615,30 @@ async function processQuestion(
 		}
 		const pngDataResult = await errors.try(pngFile.arrayBuffer())
 		if (pngDataResult.error) {
-			logger.error("unit 1 test fallback screenshot unreadable", { questionId, file: fallbackPng, error: pngDataResult.error })
+			logger.error("unit 1 test fallback screenshot unreadable", {
+				questionId,
+				file: fallbackPng,
+				error: pngDataResult.error
+			})
 			throw errors.wrap(pngDataResult.error, "unit 1 test fallback screenshot read")
 		}
-		const mimeType = pngFile.type === "image/png" ? "image/png" :
-			pngFile.type === "image/jpeg" ? "image/jpeg" :
-			pngFile.type === "image/webp" ? "image/webp" :
-			pngFile.type === "image/gif" ? "image/gif" : "image/png"
+		let mimeType: "image/png" | "image/jpeg" | "image/webp" | "image/gif"
+		switch (pngFile.type) {
+			case "image/png":
+				mimeType = "image/png"
+				break
+			case "image/jpeg":
+				mimeType = "image/jpeg"
+				break
+			case "image/webp":
+				mimeType = "image/webp"
+				break
+			case "image/gif":
+				mimeType = "image/gif"
+				break
+			default:
+				mimeType = "image/png"
+		}
 		multimodalImagePayloads.push({ data: pngDataResult.data, mimeType })
 		logger.info("included unit 1 test fallback screenshot", { questionId, file: fallbackPng })
 	}
@@ -600,9 +650,9 @@ async function processQuestion(
 		})
 	}
 
-    const pdfSearchDirs: string[] = [...gathered.lessonDirs, gathered.quizRootDir]
-    logger.debug("searching for pdfs in directories", { questionId, pdfSearchDirs })
-    const pdfPayloadsResult = await errors.try(discoverAndLoadPdfs(question, supplementaryContent, pdfSearchDirs))
+	const pdfSearchDirs: string[] = [...gathered.lessonDirs, gathered.quizRootDir]
+	logger.debug("searching for pdfs in directories", { questionId, pdfSearchDirs })
+	const pdfPayloadsResult = await errors.try(discoverAndLoadPdfs(question, supplementaryContent, pdfSearchDirs))
 	if (pdfPayloadsResult.error) {
 		logger.error("failed to process pdfs for question, stopping this question", {
 			questionId,
@@ -611,14 +661,14 @@ async function processQuestion(
 		return
 	}
 	const pdfPayloads = pdfPayloadsResult.data
-	
+
 	logger.info("prepared ai context for question", {
 		questionId,
 		primaryContentLength: primaryContent.length,
 		supplementaryContentCount: supplementaryContent.length,
 		imagePayloadCount: multimodalImagePayloads.length,
 		pdfPayloadCount: pdfPayloads.length,
-		pdfNames: pdfPayloads.map(p => p.name),
+		pdfNames: pdfPayloads.map((p) => p.name),
 		filesIncluded: [...gathered.filesIncluded, ...imageGatherResult.filesIncluded]
 	})
 
@@ -675,13 +725,13 @@ async function processQuestion(
  */
 async function processAssessmentDir(dir: string, openai: OpenAI): Promise<void> {
 	const assessmentName = path.basename(dir)
-	
+
 	// Skip MANDATORY QUIZ (course rules, not actual content)
 	if (assessmentName.toLowerCase().includes("mandatory")) {
 		logger.info("skipping mandatory quiz (not content-related)", { assessmentName })
 		return
 	}
-	
+
 	const quizDir = path.join(dir, "_quiz")
 	const assessmentOutputDir = path.join(OUTPUT_DIR, toKebabCase(assessmentName))
 
@@ -694,68 +744,78 @@ async function processAssessmentDir(dir: string, openai: OpenAI): Promise<void> 
 		return
 	}
 
-    const quizDataUnknown = errors.trySync(() => JSON.parse(quizDataJsonResult.data))
-    if (quizDataUnknown.error) {
-        logger.warn("failed to parse quiz-data.json, skipping", { assessmentName, error: quizDataUnknown.error })
-        return
-    }
-    const quizDataParsed = QuizDataSchema.safeParse(quizDataUnknown.data)
-    if (!quizDataParsed.success) {
-        logger.warn("quiz-data.json did not match expected schema, skipping", { assessmentName })
-        return
-    }
+	const quizDataUnknown = errors.trySync(() => JSON.parse(quizDataJsonResult.data))
+	if (quizDataUnknown.error) {
+		logger.warn("failed to parse quiz-data.json, skipping", { assessmentName, error: quizDataUnknown.error })
+		return
+	}
+	const quizDataParsed = QuizDataSchema.safeParse(quizDataUnknown.data)
+	if (!quizDataParsed.success) {
+		logger.warn("quiz-data.json did not match expected schema, skipping", { assessmentName })
+		return
+	}
 
 	await fs.mkdir(assessmentOutputDir, { recursive: true })
 
-    const sortedQuestions = quizDataParsed.data.questions.sort((a, b) => a.questionNumber - b.questionNumber)
+	const sortedQuestions = quizDataParsed.data.questions.sort((a, b) => a.questionNumber - b.questionNumber)
 
-    // Special-case: Only for Unit 1 Test, supplement missing questions from per-question screenshots
-    let allQuestions: CanvasQuestion[] = [...sortedQuestions]
-    if (assessmentName === "Unit 1 Test") {
-        const existingNumbers = new Set<number>(allQuestions.map((q) => q.questionNumber))
-        const dirEntriesResult = await errors.try(fs.readdir(quizDir, { withFileTypes: true }))
-        if (dirEntriesResult.error) {
-            logger.debug("failed reading quiz directory for fallback discovery", { dir: quizDir, error: dirEntriesResult.error })
-        } else {
-            const imageQuestionNumbers: number[] = []
-            const re = /^question-(\d+)\.png$/
-            for (const de of dirEntriesResult.data) {
-                if (!de.isFile()) continue
-                const m = de.name.match(re)
-                if (m && m[1]) {
-                    const n = Number(m[1])
-                    if (Number.isFinite(n)) imageQuestionNumbers.push(n)
-                }
-            }
-            const missing = imageQuestionNumbers
-                .filter((n) => !existingNumbers.has(n))
-                .sort((a, b) => a - b)
-            if (missing.length > 0) {
-                logger.info("using screenshot fallback for missing questions", { assessmentName, missingCount: missing.length, questionNumbers: missing })
-                const fallbackQuestions: CanvasQuestion[] = missing.map((n) => ({ questionNumber: n }))
-                allQuestions = [...allQuestions, ...fallbackQuestions].sort((a, b) => a.questionNumber - b.questionNumber)
-            }
-        }
-    }
+	// Special-case: Only for Unit 1 Test, supplement missing questions from per-question screenshots
+	let allQuestions: CanvasQuestion[] = [...sortedQuestions]
+	if (assessmentName === "Unit 1 Test") {
+		const existingNumbers = new Set<number>(allQuestions.map((q) => q.questionNumber))
+		const dirEntriesResult = await errors.try(fs.readdir(quizDir, { withFileTypes: true }))
+		if (dirEntriesResult.error) {
+			logger.debug("failed reading quiz directory for fallback discovery", {
+				dir: quizDir,
+				error: dirEntriesResult.error
+			})
+		} else {
+			const imageQuestionNumbers: number[] = []
+			const re = /^question-(\d+)\.png$/
+			for (const de of dirEntriesResult.data) {
+				if (!de.isFile()) continue
+				const m = de.name.match(re)
+				if (m?.[1]) {
+					const n = Number(m[1])
+					if (Number.isFinite(n)) imageQuestionNumbers.push(n)
+				}
+			}
+			const missing = imageQuestionNumbers.filter((n) => !existingNumbers.has(n)).sort((a, b) => a - b)
+			if (missing.length > 0) {
+				logger.info("using screenshot fallback for missing questions", {
+					assessmentName,
+					missingCount: missing.length,
+					questionNumbers: missing
+				})
+				const fallbackQuestions: CanvasQuestion[] = missing.map((n) => ({ questionNumber: n }))
+				allQuestions = [...allQuestions, ...fallbackQuestions].sort((a, b) => a.questionNumber - b.questionNumber)
+			}
+		}
+	}
 
-    const questionTasks = allQuestions.map(
-        (q: CanvasQuestion) => () => processQuestion(
-            q,
-            { quizDir, outputDir: assessmentOutputDir },
-            openai,
-            // For Unit 1 Test fallback stubs (no JSON), there is no authoritative answer.
-            // We pass through the existing answers map (may be undefined or only partial) as-is.
-            quizDataParsed.data.answers
-        )
-    )
+	const questionTasks = allQuestions.map(
+		(q: CanvasQuestion) => () =>
+			processQuestion(
+				q,
+				{ quizDir, outputDir: assessmentOutputDir },
+				openai,
+				// For Unit 1 Test fallback stubs (no JSON), there is no authoritative answer.
+				// We pass through the existing answers map (may be undefined or only partial) as-is.
+				quizDataParsed.data.answers
+			)
+	)
 
 	const questionResults = await runWithConcurrency(questionTasks, CONCURRENCY_LIMIT)
 	const questionFailures = questionResults.filter((r): r is PromiseRejectedResult => r.status === "rejected")
 	if (questionFailures.length > 0) {
 		// If any question in Unit 1 Test failed due to missing fallback screenshot, hard-fail this assessment.
-		const unit1FallbackFailure = assessmentName === "Unit 1 Test" && questionFailures.some((f) => String(f.reason).includes("unit 1 test fallback screenshot missing"))
+		const unit1FallbackFailure =
+			assessmentName === "Unit 1 Test" &&
+			questionFailures.some((f) => String(f.reason).includes("unit 1 test fallback screenshot missing"))
 		if (unit1FallbackFailure) {
-			logger.error("unit 1 test: aborting due to missing fallback screenshot", { failureCount: questionFailures.length })
+			logger.error("unit 1 test: aborting due to missing fallback screenshot", {
+				failureCount: questionFailures.length
+			})
 			throw errors.new("unit 1 test fallback screenshot missing")
 		}
 	}
@@ -818,6 +878,7 @@ async function main() {
 		// Hard fail the entire script if any failure indicates the unit 1 test fallback condition
 		const hardFail = failures.some((f) => String(f.reason).includes("unit 1 test fallback screenshot missing"))
 		if (hardFail) {
+			logger.error("unit 1 test: hard fail due to missing fallback screenshot")
 			throw errors.new("unit 1 test fallback screenshot missing")
 		}
 	}
@@ -835,4 +896,3 @@ if (result.error) {
 	logger.error("script failed to complete", { error: result.error })
 	process.exit(1)
 }
-

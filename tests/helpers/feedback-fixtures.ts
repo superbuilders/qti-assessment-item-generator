@@ -48,4 +48,3 @@ export const MINIMAL_INCORRECT_FEEDBACK = createMinimalFeedbackContent<[]>(
 	"Worked Example",
 	"Here is how to solve it."
 )
-

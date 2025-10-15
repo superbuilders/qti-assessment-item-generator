@@ -118,7 +118,7 @@ function walkFeedbackNode<E extends readonly string[]>(
 	out: Map<string, string>
 ): void {
 	if (isLeafNode(node)) {
-		const feedbackContent = node.content as FeedbackContent<E>
+		const feedbackContent: FeedbackContent<E> = node.content
 		walkInline(feedbackContent.preamble.summary, out)
 		for (const step of feedbackContent.steps) {
 			walkInline(step.title, out)

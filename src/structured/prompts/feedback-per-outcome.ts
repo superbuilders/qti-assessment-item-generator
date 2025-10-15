@@ -40,10 +40,7 @@ export function createPerOutcomeNestedFeedbackPrompt<
 	const outcomePathText =
 		combination.path.length > 0
 			? combination.path
-					.map(
-						(seg, i) =>
-							`  ${i + 1}. Interaction '${seg.responseIdentifier}': Student chose '${seg.key}'`
-					)
+					.map((seg, i) => `  ${i + 1}. Interaction '${seg.responseIdentifier}': Student chose '${seg.key}'`)
 					.join("\n")
 			: "N/A (Fallback Mode)"
 

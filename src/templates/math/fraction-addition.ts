@@ -339,7 +339,8 @@ export function generateFractionAdditionQuestion(
 										summary: [
 											{
 												type: "text",
-												content: "You added the numerators and denominators separately, which changes the fraction value."
+												content:
+													"You added the numerators and denominators separately, which changes the fraction value."
 											}
 										]
 									},
@@ -458,7 +459,10 @@ export function generateFractionAdditionQuestion(
 												{
 													type: "paragraph",
 													content: [
-														{ type: "text", content: "When changing denominator, multiply numerator by the same factor: " },
+														{
+															type: "text",
+															content: "When changing denominator, multiply numerator by the same factor: "
+														},
 														{
 															type: "math",
 															mathml:

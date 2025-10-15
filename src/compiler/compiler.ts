@@ -545,9 +545,9 @@ function collectRefs<E extends readonly string[]>(
 			if (node.type === "widgetRef") widgetRefs.add(node.widgetId)
 			if (node.type === "interactionRef") interactionRefs.add(node.interactionId)
 			if (node.type === "paragraph") walkInline(node.content)
-            if (node.type === "blockquote") {
-                walkInline(node.content)
-            }
+			if (node.type === "blockquote") {
+				walkInline(node.content)
+			}
 			if (node.type === "unorderedList" || node.type === "orderedList") node.items.forEach(walkInline)
 			if (node.type === "tableRich") {
 				const walkRows = (rows: Array<Array<InlineContent<E> | null>> | null) => {

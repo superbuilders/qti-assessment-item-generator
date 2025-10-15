@@ -21,10 +21,10 @@ export function createWidgetSelectionPromptSection<
 	// Iterate over widget definitions to extract schemas
 	for (const key of collection.widgetTypeKeys) {
 		const schemaEntry = collection.widgets[key].schema
-        if (!isZodSchema(schemaEntry)) {
-            logger.error("collection schema not a zod type", { key, collectionName: collection.name })
-            throw errors.new("invalid widget schema")
-        }
+		if (!isZodSchema(schemaEntry)) {
+			logger.error("collection schema not a zod type", { key, collectionName: collection.name })
+			throw errors.new("invalid widget schema")
+		}
 
 		const jsonResult = errors.trySync(() => toJSONSchemaPromptSafe(schemaEntry))
 		if (jsonResult.error) {
@@ -56,8 +56,8 @@ export function formatUnifiedContextSections(
 ): string {
 	const sections: string[] = []
 
-    sections.push("## Primary Content:")
-    sections.push("```")
+	sections.push("## Primary Content:")
+	sections.push("```")
 	sections.push(envelope.primaryContent)
 	sections.push("```")
 
@@ -71,11 +71,11 @@ export function formatUnifiedContextSections(
 		}
 	}
 
-    if (imageContext.imageUrls && imageContext.imageUrls.length > 0) {
-        sections.push("\n## Visual Context:")
-        sections.push("Raster images are attached as multimodal inputs for vision.")
-        sections.push("Use these images to understand visual content that will be represented by widgets.")
-    }
+	if (imageContext.imageUrls && imageContext.imageUrls.length > 0) {
+		sections.push("\n## Visual Context:")
+		sections.push("Raster images are attached as multimodal inputs for vision.")
+		sections.push("Use these images to understand visual content that will be represented by widgets.")
+	}
 
 	return sections.join("\n")
 }

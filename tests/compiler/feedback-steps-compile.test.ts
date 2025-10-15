@@ -118,14 +118,14 @@ describe("Compiler: feedback-as-steps", () => {
 			}
 		}
 		const xml = await compile(item, allWidgetsCollection)
-		
+
 		// Preamble checks
 		expect(xml).toContain("qti-feedback-preamble")
 		expect(xml).toContain("Correct! Fantastic work.")
 		expect(xml).toContain("You identified the sum correctly")
 		expect(xml).toContain("Not quite! Try again.")
 		expect(xml).toContain("The sum of 2 + 2 is not 5")
-		
+
 		// Steps checks
 		expect(xml).toContain("qti-steps")
 		expect(xml).toContain("qti-step")
@@ -133,11 +133,11 @@ describe("Compiler: feedback-as-steps", () => {
 		expect(xml).toContain("qti-step-title")
 		expect(xml).toContain("Understand Addition")
 		expect(xml).toContain("Review Addition")
-		
+
 		// Color palette checks (step 1 blue, step 2 emerald)
 		expect(xml).toContain("#2563EB") // blue
 		expect(xml).toContain("#059669") // emerald
-		
+
 		expect(xml).toMatchSnapshot()
 	})
 
@@ -175,7 +175,10 @@ describe("Compiler: feedback-as-steps", () => {
 			feedbackPlan: {
 				mode: "fallback",
 				dimensions: [{ responseIdentifier: "RESPONSE", kind: "binary" }],
-				combinations: [{ id: "CORRECT", path: [] }, { id: "INCORRECT", path: [] }]
+				combinations: [
+					{ id: "CORRECT", path: [] },
+					{ id: "INCORRECT", path: [] }
+				]
 			},
 			feedback: {
 				FEEDBACK__OVERALL: {
@@ -212,9 +215,8 @@ describe("Compiler: feedback-as-steps", () => {
 				}
 			}
 		}
-		
+
 		// Should throw due to schema validation (steps.min(2))
 		await expect(compile(itemWithOneStep, allWidgetsCollection)).rejects.toThrow()
 	})
 })
-

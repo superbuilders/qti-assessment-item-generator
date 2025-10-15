@@ -6,9 +6,9 @@ import { type AssessmentItemInput, createDynamicAssessmentItemSchema } from "@/c
 import { toJSONSchemaPromptSafe } from "@/core/json-schema"
 import type { WidgetCollection, WidgetDefinition, WidgetTypeTupleFrom } from "@/widgets/collections/types"
 import { allWidgetSchemas, type Widget, WidgetSchema } from "@/widgets/registry"
+import { callOpenAIWithRetry } from "./utils/openai"
 import { transformArraysToObjects, transformObjectsToArrays } from "./utils/shape-helpers"
 import { generateZodSchemaFromObject } from "./utils/zod-runtime-generator"
-import { callOpenAIWithRetry } from "./utils/openai"
 
 const OPENAI_MODEL = "gpt-5"
 

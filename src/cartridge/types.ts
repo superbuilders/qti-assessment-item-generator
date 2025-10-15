@@ -37,4 +37,3 @@ export type IndexV1 = {
 
 export type IntegrityEntry = { size: number; sha256: string }
 export type IntegrityManifest = { algorithm: "sha256"; files: Record<string, IntegrityEntry> }
-

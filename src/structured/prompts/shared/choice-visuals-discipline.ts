@@ -66,6 +66,3 @@ export function createChoiceVisualsDisciplineSection(): string {
 - **Output is INVALID** if any choice contains more than one \`widgetRef\` or references a \`widgetId\` not present in the shell's widgets list. If this occurs in your draft, correct it before returning the final output.
 `
 }
-
-
-

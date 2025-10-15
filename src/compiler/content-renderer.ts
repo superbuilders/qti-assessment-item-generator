@@ -151,12 +151,12 @@ export function renderFeedbackContent<E extends readonly string[]>(
 ): string {
 	if (!feedback) return ""
 
-    const preambleCorrectness = feedback.preamble.correctness
-    const preambleColor = preambleCorrectness === "correct" ? "#047857" : "#B91C1C"
-    const preambleHeadline = preambleCorrectness === "correct" ? "Correct! Fantastic work." : "Not quite! Try again."
+	const preambleCorrectness = feedback.preamble.correctness
+	const preambleColor = preambleCorrectness === "correct" ? "#047857" : "#B91C1C"
+	const preambleHeadline = preambleCorrectness === "correct" ? "Correct! Fantastic work." : "Not quite! Try again."
 
 	const preambleSummary = renderInlineContent(feedback.preamble.summary, widgetSlots, interactionSlots)
-    const preambleHtml = `<div class="qti-feedback-preamble" data-correctness="${preambleCorrectness}" style="margin-bottom:16px;">
+	const preambleHtml = `<div class="qti-feedback-preamble" data-correctness="${preambleCorrectness}" style="margin-bottom:16px;">
       <p style="margin:0; font-weight:700; color:${preambleColor};">${preambleHeadline}</p>
       <p style="margin:8px 0 0 0; color:#111827;">${preambleSummary}</p>
     </div>`

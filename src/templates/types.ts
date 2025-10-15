@@ -1,6 +1,8 @@
 import type { z } from "zod"
 import type { AssessmentItemInput } from "@/core/item"
+import type { FractionSchema, NumericValueSchema, RationalValueSchema } from "@/templates/schemas"
 import type { WidgetTypeTuple } from "@/widgets/collections/types"
+import type { PartitionedShapePropsSchema } from "@/widgets/registry"
 
 /**
  * Canonical template module interface for pluggable templates.
@@ -12,10 +14,10 @@ import type { WidgetTypeTuple } from "@/widgets/collections/types"
  * - generate: pure, deterministic function that transforms validated input into AssessmentItemInput.
  */
 // AssessmentItemSchema no longer exported - use AssessmentItemInput type instead
-type FractionSchemaT = typeof import("./schemas").FractionSchema
-type NumericValueSchemaT = typeof import("./schemas").NumericValueSchema
-type RationalValueSchemaT = typeof import("./schemas").RationalValueSchema
-type PartitionedShapePropsSchemaT = typeof import("../widgets/registry").PartitionedShapePropsSchema
+type FractionSchemaT = typeof FractionSchema
+type NumericValueSchemaT = typeof NumericValueSchema
+type RationalValueSchemaT = typeof RationalValueSchema
+type PartitionedShapePropsSchemaT = typeof PartitionedShapePropsSchema
 
 export type TemplateContext = {
 	valueSchemas: {

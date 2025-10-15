@@ -12,13 +12,13 @@ function isWidgetTypeKey(v: string): v is keyof typeof allWidgetSchemas {
 }
 
 import { buildFeedbackPlanFromInteractions, createFeedbackObjectSchema, type FeedbackPlan } from "@/core/feedback"
-import { createAnyInteractionSchema } from "@/core/interactions"
 import type { AnyInteraction } from "@/core/interactions"
+import { createAnyInteractionSchema } from "@/core/interactions"
 import { type AssessmentItemShell, createAssessmentItemShellSchema } from "@/core/item"
 import { toJSONSchemaPromptSafe } from "@/core/json-schema"
 import { createPerOutcomeNestedFeedbackPrompt } from "./prompts/feedback-per-outcome"
-import { formatUnifiedContextSections } from "./prompts/shared"
 import { createInteractionContentPrompt } from "./prompts/interactions"
+import { formatUnifiedContextSections } from "./prompts/shared"
 import { createAssessmentShellPrompt } from "./prompts/shell"
 import { createWidgetContentPrompt } from "./prompts/widgets"
 import type { AiContextEnvelope, ImageContext } from "./types"
@@ -343,25 +343,25 @@ async function generateInteractionContent<
 }
 
 async function generateFeedbackForOutcomeNested<
-    C extends WidgetCollection<Record<string, WidgetDefinition<unknown, unknown>>, readonly string[]>
+	C extends WidgetCollection<Record<string, WidgetDefinition<unknown, unknown>>, readonly string[]>
 >(
-    openai: OpenAI,
-    logger: logger.Logger,
-    assessmentShell: AssessmentItemShell<WidgetTypeTupleFrom<C>>,
-    widgetCollection: C,
-    feedbackPlan: FeedbackPlan,
-    combination: FeedbackPlan["combinations"][0],
-    interactions: Record<string, AnyInteraction<WidgetTypeTupleFrom<C>>>,
-    envelope: AiContextEnvelope,
-    imageContext: ImageContext
+	openai: OpenAI,
+	logger: logger.Logger,
+	assessmentShell: AssessmentItemShell<WidgetTypeTupleFrom<C>>,
+	widgetCollection: C,
+	feedbackPlan: FeedbackPlan,
+	combination: FeedbackPlan["combinations"][0],
+	interactions: Record<string, AnyInteraction<WidgetTypeTupleFrom<C>>>,
+	envelope: AiContextEnvelope,
+	imageContext: ImageContext
 ): Promise<{ id: string; content: FeedbackContent<WidgetTypeTupleFrom<C>> }> {
-    const { systemInstruction, userContent, ShallowSchema } = createPerOutcomeNestedFeedbackPrompt(
-        assessmentShell,
-        feedbackPlan,
-        combination,
-        widgetCollection,
-        interactions
-    )
+	const { systemInstruction, userContent, ShallowSchema } = createPerOutcomeNestedFeedbackPrompt(
+		assessmentShell,
+		feedbackPlan,
+		combination,
+		widgetCollection,
+		interactions
+	)
 
 	const jsonSchema = toJSONSchemaPromptSafe(ShallowSchema)
 	logger.debug("generated shallow json schema for openai feedback (shard)", {
@@ -370,9 +370,9 @@ async function generateFeedbackForOutcomeNested<
 	})
 
 	// MODIFIED: Switch feedback to multi-part content including images and PDFs
-    const feedbackParts: ExtendedContentPart[] = []
-    feedbackParts.push({ type: "input_text", text: userContent })
-    feedbackParts.push({ type: "input_text", text: formatUnifiedContextSections(envelope, imageContext) })
+	const feedbackParts: ExtendedContentPart[] = []
+	feedbackParts.push({ type: "input_text", text: userContent })
+	feedbackParts.push({ type: "input_text", text: formatUnifiedContextSections(envelope, imageContext) })
 
 	for (const imageUrl of imageContext.imageUrls) {
 		feedbackParts.push({ type: "input_image", detail: "high", image_url: imageUrl })
@@ -464,9 +464,9 @@ async function runShardedFeedbackNested<
 	shell: AssessmentItemShell<WidgetTypeTupleFrom<C>>,
 	collection: C,
 	plan: FeedbackPlan,
-    interactions: Record<string, AnyInteraction<WidgetTypeTupleFrom<C>>>,
-    envelope: AiContextEnvelope,
-    imageContext: ImageContext
+	interactions: Record<string, AnyInteraction<WidgetTypeTupleFrom<C>>>,
+	envelope: AiContextEnvelope,
+	imageContext: ImageContext
 ): Promise<Record<string, FeedbackContent<WidgetTypeTupleFrom<C>>>> {
 	let combinationsToProcess = [...plan.combinations]
 	const successfulShards: Record<string, FeedbackContent<WidgetTypeTupleFrom<C>>> = {}
@@ -482,7 +482,17 @@ async function runShardedFeedbackNested<
 
 		const tasks = combinationsToProcess.map(
 			(combination) => () =>
-                generateFeedbackForOutcomeNested(openai, logger, shell, collection, plan, combination, interactions, envelope, imageContext)
+				generateFeedbackForOutcomeNested(
+					openai,
+					logger,
+					shell,
+					collection,
+					plan,
+					combination,
+					interactions,
+					envelope,
+					imageContext
+				)
 		)
 
 		const results = await Promise.allSettled(tasks.map((task) => task()))
@@ -602,9 +612,18 @@ export async function generateFromEnvelope<
 		combinationCount: feedbackPlan.combinations.length,
 		mode: feedbackPlan.mode
 	})
-const shardedResult = await errors.try(
-    runShardedFeedbackNested(openai, logger, assessmentShell, widgetCollection, feedbackPlan, generatedInteractions, envelope, imageContext)
-)
+	const shardedResult = await errors.try(
+		runShardedFeedbackNested(
+			openai,
+			logger,
+			assessmentShell,
+			widgetCollection,
+			feedbackPlan,
+			generatedInteractions,
+			envelope,
+			imageContext
+		)
+	)
 	if (shardedResult.error) {
 		logger.error("sharded feedback generation failed", { error: shardedResult.error })
 		throw errors.wrap(shardedResult.error, "sharded feedback generation")

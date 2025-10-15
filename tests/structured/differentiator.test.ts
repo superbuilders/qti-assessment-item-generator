@@ -47,62 +47,63 @@ mock.module("openai", () => {
 											__sb_idx__1: { id: "INCORRECT", path: { __sb_empty_array__: true } }
 										}
 									},
-								feedback: {
-									FEEDBACK__OVERALL: {
-										CORRECT: {
-											content: {
-												preamble: {
-													correctness: "correct",
-													summary: { __sb_idx__0: { type: "text", content: "Correct!" } }
-												},
-												steps: {
-													__sb_idx__0: {
-														type: "step",
-														title: { __sb_idx__0: { type: "text", content: "Step 1" } },
-														content: {
-															__sb_idx__0: {
-																type: "paragraph",
-																content: { __sb_idx__0: { type: "text", content: "Do this." } }
-															}
-														}
+									feedback: {
+										FEEDBACK__OVERALL: {
+											CORRECT: {
+												content: {
+													preamble: {
+														correctness: "correct",
+														summary: { __sb_idx__0: { type: "text", content: "Correct!" } }
 													},
-													__sb_idx__1: {
-														type: "step",
-														title: { __sb_idx__0: { type: "text", content: "Step 2" } },
-														content: {
-															__sb_idx__0: {
-																type: "paragraph",
-																content: { __sb_idx__0: { type: "text", content: "Then this." } }
+													steps: {
+														__sb_idx__0: {
+															type: "step",
+															title: { __sb_idx__0: { type: "text", content: "Step 1" } },
+															content: {
+																__sb_idx__0: {
+																	type: "paragraph",
+																	content: { __sb_idx__0: { type: "text", content: "Do this." } }
+																}
+															}
+														},
+														__sb_idx__1: {
+															type: "step",
+															title: { __sb_idx__0: { type: "text", content: "Step 2" } },
+															content: {
+																__sb_idx__0: {
+																	type: "paragraph",
+																	content: { __sb_idx__0: { type: "text", content: "Then this." } }
+																}
 															}
 														}
 													}
 												}
-											}
-										},
-										INCORRECT: {
-											content: {
-												preamble: {
-													correctness: "incorrect",
-													summary: { __sb_idx__0: { type: "text", content: "Incorrect." } }
-												},
-												steps: {
-													__sb_idx__0: {
-														type: "step",
-														title: { __sb_idx__0: { type: "text", content: "Hint" } },
-														content: {
-															__sb_idx__0: {
-																type: "paragraph",
-																content: { __sb_idx__0: { type: "text", content: "Review." } }
-															}
-														}
+											},
+											INCORRECT: {
+												content: {
+													preamble: {
+														correctness: "incorrect",
+														summary: { __sb_idx__0: { type: "text", content: "Incorrect." } }
 													},
-													__sb_idx__1: {
-														type: "step",
-														title: { __sb_idx__0: { type: "text", content: "Example" } },
-														content: {
-															__sb_idx__0: {
-																type: "paragraph",
-																content: { __sb_idx__0: { type: "text", content: "Solve like this." } }
+													steps: {
+														__sb_idx__0: {
+															type: "step",
+															title: { __sb_idx__0: { type: "text", content: "Hint" } },
+															content: {
+																__sb_idx__0: {
+																	type: "paragraph",
+																	content: { __sb_idx__0: { type: "text", content: "Review." } }
+																}
+															}
+														},
+														__sb_idx__1: {
+															type: "step",
+															title: { __sb_idx__0: { type: "text", content: "Example" } },
+															content: {
+																__sb_idx__0: {
+																	type: "paragraph",
+																	content: { __sb_idx__0: { type: "text", content: "Solve like this." } }
+																}
 															}
 														}
 													}
@@ -110,7 +111,6 @@ mock.module("openai", () => {
 											}
 										}
 									}
-								}
 								}
 							]
 						})

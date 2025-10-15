@@ -2,9 +2,9 @@ import type { WidgetCollection, WidgetDefinition } from "@/widgets/collections/t
 import type { AiContextEnvelope, ImageContext } from "../types"
 import { caretBanPromptSection } from "./caret"
 import { createWidgetSelectionPromptSection, formatUnifiedContextSections } from "./shared"
-import { createMathmlComplianceSection } from "./shared/mathml"
-import { createEquationsInChoicesSection } from "./shared/equations-in-choices"
 import { createChoiceVisualsDisciplineSection } from "./shared/choice-visuals-discipline"
+import { createEquationsInChoicesSection } from "./shared/equations-in-choices"
+import { createMathmlComplianceSection } from "./shared/mathml"
 
 export function createInteractionContentPrompt<
 	C extends WidgetCollection<Record<string, WidgetDefinition<unknown, unknown>>, readonly string[]>

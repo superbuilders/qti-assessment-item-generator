@@ -47,14 +47,16 @@ async function runWithConcurrency<T>(
 
 		if (!task) return
 
-		const promise = (async () => {
+		async function runOne(): Promise<void> {
 			const res = await errors.try(task())
 			if (res.error) {
 				results[currentIndex] = { status: "rejected", reason: res.error }
 			} else {
 				results[currentIndex] = { status: "fulfilled", value: res.data }
 			}
-		})()
+		}
+
+		const promise = runOne()
 
 		executing.push(promise)
 		await promise
@@ -63,9 +65,7 @@ async function runWithConcurrency<T>(
 		await execute()
 	}
 
-	const initialPromises = Array(Math.min(limit, tasks.length))
-		.fill(null)
-		.map(execute)
+	const initialPromises = Array(Math.min(limit, tasks.length)).fill(null).map(execute)
 	await Promise.all(initialPromises)
 
 	return results
@@ -233,7 +233,10 @@ const PageDataSchema = z.object({
 async function processPage(pageJsonPath: string, outputRoot: string, rootDir: string): Promise<void> {
 	const dir = path.dirname(pageJsonPath)
 	const relFromRoot = path.relative(rootDir, dir)
-	const slugParts = relFromRoot.split(path.sep).map((p) => toKebabCase(p)).filter((p) => p.length > 0)
+	const slugParts = relFromRoot
+		.split(path.sep)
+		.map((p) => toKebabCase(p))
+		.filter((p) => p.length > 0)
 	const outDir = path.join(outputRoot, ...slugParts)
 
 	logger.info("processing page", { dir: relFromRoot })
@@ -342,5 +345,3 @@ if (result.error) {
 	logger.error("script failed to complete", { error: result.error })
 	process.exit(1)
 }
-
-

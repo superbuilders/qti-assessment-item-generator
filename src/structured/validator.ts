@@ -1,6 +1,12 @@
 import * as errors from "@superbuilders/errors"
 import type * as logger from "@superbuilders/slog"
 import type { BlockContent, FeedbackContent, InlineContent } from "@/core/content"
+import type {
+	AuthoringFeedbackOverall,
+	AuthoringNestedLeaf,
+	AuthoringNestedNode
+} from "@/core/feedback/authoring/types"
+import type { FeedbackPlan } from "@/core/feedback/plan"
 import type { AssessmentItemInput } from "@/core/item"
 import {
 	checkNoLatex,
@@ -80,22 +86,43 @@ export function validateAndSanitizeHtmlFields<E extends readonly string[]>(
 	// Apply processing to all structured content fields
 	processBlockContent(sanitizedItem.body, logger)
 
-	// Process nested feedback content recursively
-	function processNestedFeedback(node: unknown): void {
-		if (!node || typeof node !== "object") return
+	// Process nested feedback content recursively with precise types
+	function isLeafNode(
+		node: AuthoringNestedLeaf<E> | AuthoringNestedNode<FeedbackPlan, E>
+	): node is AuthoringNestedLeaf<E> {
+		return "content" in node
+	}
 
-		const maybeContent = Reflect.get(node, "content")
-		if (maybeContent && typeof maybeContent === "object" && "preamble" in maybeContent && "steps" in maybeContent) {
-			processFeedbackContent(maybeContent as FeedbackContent<E>, logger)
+	function processFeedbackNode(node: AuthoringNestedLeaf<E> | AuthoringNestedNode<FeedbackPlan, E>): void {
+		if (isLeafNode(node)) {
+			processFeedbackContent(node.content, logger)
 			return
 		}
-
-		for (const value of Object.values(node)) {
-			processNestedFeedback(value)
+		for (const responseId in node) {
+			const responseNode = node[responseId]
+			for (const key in responseNode) {
+				processFeedbackNode(responseNode[key])
+			}
 		}
 	}
+
+	function isFallbackFeedback(
+		overall: AuthoringFeedbackOverall<FeedbackPlan, E>
+	): overall is { CORRECT: AuthoringNestedLeaf<E>; INCORRECT: AuthoringNestedLeaf<E> } {
+		return "CORRECT" in overall && "INCORRECT" in overall
+	}
+
+	function processOverall(overall: AuthoringFeedbackOverall<FeedbackPlan, E>): void {
+		if (isFallbackFeedback(overall)) {
+			processFeedbackContent(overall.CORRECT.content, logger)
+			processFeedbackContent(overall.INCORRECT.content, logger)
+			return
+		}
+		processFeedbackNode(overall)
+	}
+
 	if (sanitizedItem.feedback?.FEEDBACK__OVERALL) {
-		processNestedFeedback(sanitizedItem.feedback.FEEDBACK__OVERALL)
+		processOverall(sanitizedItem.feedback.FEEDBACK__OVERALL)
 	}
 
 	if (sanitizedItem.interactions) {

@@ -5,7 +5,7 @@ import * as path from "node:path"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
-import { writeJsonStrict, computeIntegrityManifest, createTarBz2 } from "@/cartridge/build/helpers"
+import { buildCartridgeToFile, type CartridgeBuildInput, type GeneratorInfo } from "@/cartridge/build/builder"
 
 // Enable debug logging for this script
 logger.setDefaultLogLevel(logger.DEBUG)
@@ -20,39 +20,19 @@ if (!BASE_DIR_ARG) {
 	throw errors.new("base data directory must be provided as first argument (e.g., 'data')")
 }
 const DATA_DIR = path.resolve(process.cwd(), BASE_DIR_ARG)
-const OUT_DIR = path.resolve(DATA_DIR, "package-out")
-const OUT_CONTENT_DIR = path.join(OUT_DIR, "content")
-const OUT_QUIZZES_DIR = path.join(OUT_DIR, "quizzes")
-const OUT_TESTS_DIR = path.join(OUT_DIR, "tests")
-const OUT_UNITS_DIR = path.join(OUT_DIR, "units")
-const OUT_LESSONS_DIR = path.join(OUT_DIR, "lessons")
+const OUT_CARTRIDGE = path.resolve(DATA_DIR, "course-cartridge-v1.tar.bz2")
 // Excluded non-content groups to omit entirely from package
-const EXCLUDED_GROUPS = new Set([
-	"how-to-take-this-course",
-	"final-exam",
-	"course-completion--requesting-a-transcript",
-])
+const EXCLUDED_GROUPS = new Set(["how-to-take-this-course", "final-exam", "course-completion--requesting-a-transcript"])
 // ---
 
 // ----------------------
 // Canvas-Specific Validation Helpers
 // ----------------------
 
-function parseQuestionNumberFromFilename(p: string): number | undefined {
-	const m = p.match(/question-(\d{2})(-structured)?\./)
-	if (!m || !m[1]) return undefined
-	const n = Number(m[1])
-	return Number.isFinite(n) ? n : undefined
-}
+// removed unused validation helpers; packing now validated by Zod in builder
 
-function isSortedAscending<T>(arr: T[], proj: (x: T) => number): boolean {
-	for (let i = 1; i < arr.length; i++) {
-		if (proj(arr[i - 1]) > proj(arr[i])) return false
-	}
-	return true
-}
-
-function validateUnitRecord(u: {
+// removed: unit record validation helper no longer used here; builder performs schema validation
+/* function validateUnitRecord(u: {
 	unitId: string
 	unitNumber?: number
 	lessons: Array<{
@@ -113,7 +93,7 @@ function validateUnitRecord(u: {
 		if (!isSortedAscending(u.unitTest.questions, (q) => q.number))
 			throw errors.new("unit test questions not sorted")
 	}
-}
+} */
 
 // ----------------------
 // Utilities
@@ -137,14 +117,16 @@ async function runWithConcurrency<T>(
 
 		if (!task) return
 
-		const promise = (async () => {
+		async function runOne(): Promise<void> {
 			const res = await errors.try(task())
 			if (res.error) {
 				results[currentIndex] = { status: "rejected", reason: res.error }
 			} else {
 				results[currentIndex] = { status: "fulfilled", value: res.data }
 			}
-		})()
+		}
+
+		const promise = runOne()
 
 		executing.push(promise)
 		await promise
@@ -153,9 +135,7 @@ async function runWithConcurrency<T>(
 		await execute()
 	}
 
-	const initialPromises = Array(Math.min(limit, tasks.length))
-		.fill(null)
-		.map(execute)
+	const initialPromises = Array(Math.min(limit, tasks.length)).fill(null).map(execute)
 	await Promise.all(initialPromises)
 
 	return results
@@ -215,7 +195,7 @@ function sortTopGroups(a: string, b: string): number {
 const IndexQuestionSchema = z.object({
 	number: z.number(),
 	xml: z.string(),
-	json: z.string(),
+	json: z.string()
 })
 
 const IndexAssessmentSchema = z.object({
@@ -242,10 +222,10 @@ async function collectStimulus(): Promise<Array<{ group: string; pages: Array<{ 
 		logger.error("stimulus-out directory read", { dir: stimulusRoot, error: groupDirentsResult.error })
 		throw errors.wrap(groupDirentsResult.error, "directory read")
 	}
-    const groupDirs = groupDirentsResult.data
-        .filter((d) => d.isDirectory())
-        .map((d) => path.join(stimulusRoot, d.name))
-        .filter((full) => !EXCLUDED_GROUPS.has(path.basename(full)))
+	const groupDirs = groupDirentsResult.data
+		.filter((d) => d.isDirectory())
+		.map((d) => path.join(stimulusRoot, d.name))
+		.filter((full) => !EXCLUDED_GROUPS.has(path.basename(full)))
 	groupDirs.sort(sortTopGroups)
 
 	for (const groupDir of groupDirs) {
@@ -278,7 +258,10 @@ function extractQuestionNumber(fileName: string): number | undefined {
 	return Number.isFinite(n) ? n : undefined
 }
 
-async function collectAssessments(): Promise<{ quizzes: Array<z.infer<typeof IndexAssessmentSchema>>; tests: Array<z.infer<typeof IndexAssessmentSchema>> }> {
+async function collectAssessments(): Promise<{
+	quizzes: Array<z.infer<typeof IndexAssessmentSchema>>
+	tests: Array<z.infer<typeof IndexAssessmentSchema>>
+}> {
 	const direntsResult = await errors.try(fs.readdir(DATA_DIR, { withFileTypes: true }))
 	if (direntsResult.error) {
 		logger.error("failed to read data directory", { dir: DATA_DIR, error: direntsResult.error })
@@ -299,7 +282,6 @@ async function collectAssessments(): Promise<{ quizzes: Array<z.infer<typeof Ind
 		if (/^unit-\d+-test$/.test(name)) {
 			const a = await buildAssessment(path.join(DATA_DIR, name), path.join("tests", name))
 			tests.push(a)
-			continue
 		}
 	}
 
@@ -332,11 +314,11 @@ async function collectAssessments(): Promise<{ quizzes: Array<z.infer<typeof Ind
 async function buildAssessment(sourceDir: string, destRelBase: string): Promise<z.infer<typeof IndexAssessmentSchema>> {
 	const id = path.basename(sourceDir)
 	const questions: Array<z.infer<typeof IndexQuestionSchema>> = []
-    const direntsResult = await errors.try(fs.readdir(sourceDir, { withFileTypes: true }))
-    if (direntsResult.error) {
-        logger.error("assessment directory read", { dir: sourceDir, error: direntsResult.error })
-        throw errors.wrap(direntsResult.error, "directory read")
-    }
+	const direntsResult = await errors.try(fs.readdir(sourceDir, { withFileTypes: true }))
+	if (direntsResult.error) {
+		logger.error("assessment directory read", { dir: sourceDir, error: direntsResult.error })
+		throw errors.wrap(direntsResult.error, "directory read")
+	}
 	const files = direntsResult.data.filter((d) => d.isFile()).map((d) => d.name)
 	// Group by question number
 	const numbers = new Set<number>()
@@ -356,101 +338,103 @@ async function buildAssessment(sourceDir: string, destRelBase: string): Promise<
 				assessment: id,
 				questionNumber: n,
 				xmlExists,
-				jsonExists,
+				jsonExists
 			})
 			throw errors.new("question missing required xml or json")
 		}
 		questions.push({
 			number: n,
 			xml: path.join(destRelBase, xmlName),
-			json: path.join(destRelBase, jsonName),
+			json: path.join(destRelBase, jsonName)
 		})
 	}
 	return { id, path: destRelBase, questions }
 }
 
-async function ensureDir(dir: string): Promise<void> {
-	const mk = await errors.try(fs.mkdir(dir, { recursive: true }))
-	if (mk.error) {
-		logger.error("failed to create directory", { dir, error: mk.error })
-		throw errors.wrap(mk.error, "directory creation")
-	}
-}
+// removed file system copy helpers in favor of in-memory collection
 
-async function copyFileStrict(src: string, dest: string): Promise<void> {
-	const statRes = await errors.try(fs.stat(src))
-	if (statRes.error || !statRes.data.isFile()) {
-		logger.error("source file missing", { file: src, error: statRes.error })
-		throw errors.new("source file missing")
-	}
-	await ensureDir(path.dirname(dest))
-	const readRes = await errors.try(fs.readFile(src))
-	if (readRes.error) {
-		logger.error("failed to read source file", { file: src, error: readRes.error })
-		throw errors.wrap(readRes.error, "file read")
-	}
-	const writeRes = await errors.try(fs.writeFile(dest, readRes.data))
-	if (writeRes.error) {
-		logger.error("failed to write destination file", { file: dest, error: writeRes.error })
-		throw errors.wrap(writeRes.error, "file write")
-	}
-}
-
-async function copyStimulusToPackage(groups: Array<{ group: string; pages: Array<{ slug: string; path: string }> }>): Promise<void> {
+async function collectStimulusFiles(
+	groups: Array<{ group: string; pages: Array<{ slug: string; path: string }> }>
+): Promise<Record<string, Uint8Array>> {
+	const files: Record<string, Uint8Array> = {}
 	const tasks: Array<() => Promise<void>> = []
 	for (const g of groups) {
 		for (const p of g.pages) {
 			const src = path.join(DATA_DIR, "stimulus-out", g.group, p.slug, "stimulus.html")
-			const dest = path.join(OUT_CONTENT_DIR, g.group, p.slug, "stimulus.html")
-			tasks.push(() => copyFileStrict(src, dest))
+			const destRel = path.join("content", g.group, p.slug, "stimulus.html").split(path.sep).join("/")
+			tasks.push(async () => {
+				const rd = await errors.try(fs.readFile(src))
+				if (rd.error) {
+					logger.error("failed to read source file", { file: src, error: rd.error })
+					throw errors.wrap(rd.error, "file read")
+				}
+				files[destRel] = new Uint8Array(rd.data)
+			})
 		}
 	}
-    const results = await runWithConcurrency(tasks, CONCURRENCY_LIMIT)
-    const failures = results.filter((r) => r.status === "rejected")
-    if (failures.length > 0) {
-        logger.error("some stimulus files failed to copy", { failureCount: failures.length })
-        throw errors.new("stimulus copy failure")
-    }
+	const results = await runWithConcurrency(tasks, CONCURRENCY_LIMIT)
+	const failures = results.filter((r) => r.status === "rejected")
+	if (failures.length > 0) {
+		logger.error("some stimulus files failed to collect", { failureCount: failures.length })
+		throw errors.new("stimulus collect failure")
+	}
+	return files
 }
 
-async function copyAssessmentsToPackage(a: { quizzes: Array<z.infer<typeof IndexAssessmentSchema>>; tests: Array<z.infer<typeof IndexAssessmentSchema>> }): Promise<void> {
+async function collectAssessmentFiles(a: {
+	quizzes: Array<z.infer<typeof IndexAssessmentSchema>>
+	tests: Array<z.infer<typeof IndexAssessmentSchema>>
+}): Promise<Record<string, Uint8Array>> {
+	const files: Record<string, Uint8Array> = {}
 	const tasks: Array<() => Promise<void>> = []
 	for (const q of a.quizzes) {
 		for (const entry of q.questions) {
-			if (entry.xml) {
-				const src = path.join(DATA_DIR, path.basename(q.path), path.basename(entry.xml))
-				const dest = path.join(OUT_DIR, entry.xml)
-				tasks.push(() => copyFileStrict(src, dest))
-			}
-			if (entry.json) {
-				const src = path.join(DATA_DIR, path.basename(q.path), path.basename(entry.json))
-				const dest = path.join(OUT_DIR, entry.json)
-				tasks.push(() => copyFileStrict(src, dest))
-			}
+			tasks.push(async () => {
+				const xmlSrc = path.join(DATA_DIR, path.basename(q.path), path.basename(entry.xml))
+				const jsonSrc = path.join(DATA_DIR, path.basename(q.path), path.basename(entry.json))
+				const xr = await errors.try(fs.readFile(xmlSrc))
+				if (xr.error) {
+					logger.error("failed to read source file", { file: xmlSrc, error: xr.error })
+					throw errors.wrap(xr.error, "file read")
+				}
+				const jr = await errors.try(fs.readFile(jsonSrc))
+				if (jr.error) {
+					logger.error("failed to read source file", { file: jsonSrc, error: jr.error })
+					throw errors.wrap(jr.error, "file read")
+				}
+				files[entry.xml] = new Uint8Array(xr.data)
+				files[entry.json] = new Uint8Array(jr.data)
+			})
 		}
 	}
 	for (const t of a.tests) {
 		for (const entry of t.questions) {
-			if (entry.xml) {
-				const src = path.join(DATA_DIR, path.basename(t.path), path.basename(entry.xml))
-				const dest = path.join(OUT_DIR, entry.xml)
-				tasks.push(() => copyFileStrict(src, dest))
-			}
-			if (entry.json) {
-				const src = path.join(DATA_DIR, path.basename(t.path), path.basename(entry.json))
-				const dest = path.join(OUT_DIR, entry.json)
-				tasks.push(() => copyFileStrict(src, dest))
-			}
+			tasks.push(async () => {
+				const xmlSrc = path.join(DATA_DIR, path.basename(t.path), path.basename(entry.xml))
+				const jsonSrc = path.join(DATA_DIR, path.basename(t.path), path.basename(entry.json))
+				const xr = await errors.try(fs.readFile(xmlSrc))
+				if (xr.error) {
+					logger.error("failed to read source file", { file: xmlSrc, error: xr.error })
+					throw errors.wrap(xr.error, "file read")
+				}
+				const jr = await errors.try(fs.readFile(jsonSrc))
+				if (jr.error) {
+					logger.error("failed to read source file", { file: jsonSrc, error: jr.error })
+					throw errors.wrap(jr.error, "file read")
+				}
+				files[entry.xml] = new Uint8Array(xr.data)
+				files[entry.json] = new Uint8Array(jr.data)
+			})
 		}
 	}
-    const results = await runWithConcurrency(tasks, CONCURRENCY_LIMIT)
-    const failures = results.filter((r) => r.status === "rejected")
-    if (failures.length > 0) {
-        logger.error("some assessment files failed to copy", { failureCount: failures.length })
-        throw errors.new("assessment copy failure")
-    }
+	const results = await runWithConcurrency(tasks, CONCURRENCY_LIMIT)
+	const failures = results.filter((r) => r.status === "rejected")
+	if (failures.length > 0) {
+		logger.error("some assessment files failed to collect", { failureCount: failures.length })
+		throw errors.new("assessment collect failure")
+	}
+	return files
 }
-
 
 // ----------------------
 // Hierarchical Index Construction (Units → Lessons → Resources)
@@ -487,7 +471,7 @@ type UnitRecord = {
 
 function toUnitIdFromGroup(group: string): { unitId: string; unitNum?: number } {
 	const m = group.match(/^unit-(\d+)/)
-	if (m && m[1]) {
+	if (m?.[1]) {
 		const n = Number(m[1])
 		if (Number.isFinite(n)) return { unitId: `unit-${n}`, unitNum: n }
 	}
@@ -506,7 +490,10 @@ function toLessonId(unitNum: number | undefined, slug: string): { lessonId: stri
 
 function buildHierarchy(
 	stimGroups: Array<{ group: string; pages: Array<{ slug: string; path: string }> }>,
-	assessments: { quizzes: Array<z.infer<typeof IndexAssessmentSchema>>; tests: Array<z.infer<typeof IndexAssessmentSchema>> }
+	assessments: {
+		quizzes: Array<z.infer<typeof IndexAssessmentSchema>>
+		tests: Array<z.infer<typeof IndexAssessmentSchema>>
+	}
 ): UnitRecord[] {
 	const unitsMap = new Map<string, UnitRecord>()
 
@@ -528,7 +515,7 @@ function buildHierarchy(
 			lesson.resources.push({
 				id: `article-${g.group}-${p.slug}`.replace(/[^a-z0-9-]/g, "-"),
 				type: "article",
-				path: p.path,
+				path: p.path
 			})
 		}
 	}
@@ -551,7 +538,7 @@ function buildHierarchy(
 				unitId,
 				lessonId: `lesson-${unitNum}-${lessonNum}`,
 				lessonNumber: lessonNum,
-				resources: [],
+				resources: []
 			}
 			unit.lessons.push(lesson)
 		}
@@ -560,7 +547,7 @@ function buildHierarchy(
 			type: "quiz",
 			path: q.path,
 			questionCount: q.questions.length,
-			questions: q.questions,
+			questions: q.questions
 		})
 	}
 
@@ -594,15 +581,15 @@ function buildHierarchy(
 		}
 	}
 
-    // Sort units: numeric units first by number, then others lexicographically
-    let units = Array.from(unitsMap.values())
-    // Exclude non-content units entirely by explicit title match only
-    units = units.filter((u) => {
-    	const baseTitle = u.title
-    	if (baseTitle === undefined) return true
-    	const key = baseTitle.replace(/^unit-/, "")
-    	return !EXCLUDED_GROUPS.has(key)
-    })
+	// Sort units: numeric units first by number, then others lexicographically
+	let units = Array.from(unitsMap.values())
+	// Exclude non-content units entirely by explicit title match only
+	units = units.filter((u) => {
+		const baseTitle = u.title
+		if (baseTitle === undefined) return true
+		const key = baseTitle.replace(/^unit-/, "")
+		return !EXCLUDED_GROUPS.has(key)
+	})
 	units.sort((a, b) => {
 		const an = a.unitId.match(/^unit-(\d+)$/)
 		const bn = b.unitId.match(/^unit-(\d+)$/)
@@ -614,86 +601,30 @@ function buildHierarchy(
 	return units
 }
 
-function safeName(name: string): string {
-	return name.replace(/[^a-z0-9-]/g, "-")
-}
+// removed safeName helper; names are used as-is for in-memory paths
 
-async function writeHierarchy(units: UnitRecord[]): Promise<void> {
-	await ensureDir(OUT_UNITS_DIR)
-	await ensureDir(OUT_LESSONS_DIR)
-	for (const u of units) {
-		const unitDirName = safeName(u.unitId)
-		const unitLessonsDir = path.join(OUT_LESSONS_DIR, unitDirName)
-		await ensureDir(unitLessonsDir)
-		// Write lessons
-		const lessonRefs: Array<{ id: string; lessonNumber?: number; title?: string; path: string }> = []
-		for (const l of u.lessons) {
-			const lessonFile = `${safeName(l.lessonId)}.json`
-			const lessonPath = path.join(unitLessonsDir, lessonFile)
-			const relPath = path.relative(OUT_DIR, lessonPath).split(path.sep).join("/")
-			const lessonJson = {
+function toCartridgeInput(
+	units: UnitRecord[],
+	filePayloads: Record<string, Uint8Array>,
+	generator: GeneratorInfo
+): CartridgeBuildInput {
+	return {
+		generator,
+		units: units.map((u) => ({
+			id: u.unitId,
+			unitNumber: u.unitNumber,
+			title: u.title,
+			lessons: u.lessons.map((l) => ({
 				id: l.lessonId,
 				unitId: u.unitId,
 				lessonNumber: l.lessonNumber,
 				title: l.title,
-				resources: l.resources,
-			}
-			await writeJsonStrict(lessonPath, lessonJson)
-			lessonRefs.push({ id: l.lessonId, lessonNumber: l.lessonNumber, title: l.title, path: relPath })
-		}
-		
-		// Compute counts for this unit
-		const lessonCount = u.lessons.length
-		const resourceCount = u.lessons.reduce((sum, l) => sum + l.resources.length, 0)
-		const quizQuestionCount = u.lessons.reduce((sum, l) => {
-			const quizResources = l.resources.filter((r) => r.type === "quiz")
-			return sum + quizResources.reduce((qsum, qr) => qsum + qr.questionCount, 0)
-		}, 0)
-		const unitTestQuestionCount = u.unitTest ? u.unitTest.questionCount : 0
-		const questionCount = quizQuestionCount + unitTestQuestionCount
-
-		// Write unit json
-		const unitFile = `${unitDirName}.json`
-		const unitPath = path.join(OUT_UNITS_DIR, unitFile)
-		const unitJson = {
-			id: u.unitId,
-			unitNumber: u.unitNumber,
-			title: u.title,
-			lessons: lessonRefs,
-			unitTest: u.unitTest,
-			counts: { lessonCount, resourceCount, questionCount },
-		}
-		
-		// Validate before writing
-		validateUnitRecord(u)
-		
-		await writeJsonStrict(unitPath, unitJson)
+				resources: l.resources
+			})),
+			unitTest: u.unitTest
+		})),
+		files: filePayloads
 	}
-	
-	// Write top-level index.json with generator info
-	const unitRefs = units.map((u) => ({
-		id: u.unitId,
-		unitNumber: u.unitNumber,
-		title: u.title,
-		path: path.relative(OUT_DIR, path.join(OUT_UNITS_DIR, `${safeName(u.unitId)}.json`)).split(path.sep).join("/"),
-	}))
-	
-	// Read package.json for generator info
-	const pkgJsonPath = path.join(process.cwd(), "package.json")
-	const pkgRes = await errors.try(fs.readFile(pkgJsonPath, "utf8"))
-	let generator: { name: string; version: string; commit?: string } | undefined
-	if (!pkgRes.error) {
-		const pkgParsed = errors.trySync(() => JSON.parse(pkgRes.data))
-		if (!pkgParsed.error) {
-			const pkg = pkgParsed.data
-			if (typeof pkg.name === "string" && typeof pkg.version === "string") {
-				generator = { name: pkg.name, version: pkg.version }
-			}
-		}
-	}
-	
-	const index = { version: 1, generatedAt: new Date().toISOString(), generator, units: unitRefs }
-	await writeJsonStrict(path.join(OUT_DIR, "index.json"), index)
 }
 
 // ----------------------
@@ -713,36 +644,38 @@ async function main() {
 	logger.info("collecting assessments")
 	const assessments = await collectAssessments()
 
-	logger.info("copying files into package-out")
-	await ensureDir(OUT_CONTENT_DIR)
-	await ensureDir(OUT_QUIZZES_DIR)
-	await ensureDir(OUT_TESTS_DIR)
-	await copyStimulusToPackage(contentGroups)
-	await copyAssessmentsToPackage(assessments)
+	logger.info("collecting file payloads for in-memory build")
+	const stimulusFiles = await collectStimulusFiles(contentGroups)
+	const assessmentFiles = await collectAssessmentFiles(assessments)
+	const allFiles = { ...stimulusFiles, ...assessmentFiles }
 
 	// Build hierarchical Units → Lessons → Resources, and write split JSON files
 	const hierarchy = buildHierarchy(contentGroups, assessments)
-	await writeHierarchy(hierarchy)
 
-	// Generate and write integrity manifest (must be done AFTER all other files are written)
-	logger.info("computing integrity manifest")
-	const integrityManifest = await computeIntegrityManifest(OUT_DIR)
-	await writeJsonStrict(path.join(OUT_DIR, "integrity.json"), integrityManifest)
-	logger.info("integrity manifest written", { fileCount: Object.keys(integrityManifest.files).length })
+	// Read package.json for generator info
+	const pkgJsonPath = path.join(process.cwd(), "package.json")
+	const pkgRes = await errors.try(fs.readFile(pkgJsonPath, "utf8"))
+	let generator: GeneratorInfo | undefined
+	if (!pkgRes.error) {
+		const pkgParsed = errors.trySync(() => JSON.parse(pkgRes.data))
+		if (!pkgParsed.error) {
+			const pkg = pkgParsed.data
+			if (typeof pkg.name === "string" && typeof pkg.version === "string") {
+				generator = { name: pkg.name, version: pkg.version }
+			}
+		}
+	}
 
-	// Recompute integrity to include integrity.json itself
-	logger.info("recomputing integrity to include integrity.json")
-	const finalIntegrityManifest = await computeIntegrityManifest(OUT_DIR)
-	await writeJsonStrict(path.join(OUT_DIR, "integrity.json"), finalIntegrityManifest)
-	logger.info("final integrity manifest written", {
-		fileCount: Object.keys(finalIntegrityManifest.files).length,
-	})
+	if (!generator) {
+		logger.error("generator info missing in package.json")
+		throw errors.new("generator info missing")
+	}
+	const input = toCartridgeInput(hierarchy, allFiles, generator)
 
-	// Create tar.bz2 archive
-	logger.info("creating tar.bz2 archive")
-	const cartridgePath = path.join(DATA_DIR, "course-cartridge-v1.tar.bz2")
-	await createTarBz2(OUT_DIR, cartridgePath)
-	logger.info("package export complete", { outDir: OUT_DIR, cartridge: cartridgePath })
+	// Build tar.bz2 directly from memory (no temp files)
+	logger.info("building in-memory tar.bz2 cartridge")
+	await buildCartridgeToFile(input, OUT_CARTRIDGE)
+	logger.info("package export complete", { cartridge: OUT_CARTRIDGE })
 }
 
 const result = await errors.try(main())
@@ -750,5 +683,3 @@ if (result.error) {
 	logger.error("package export failed", { error: result.error })
 	process.exit(1)
 }
-
-

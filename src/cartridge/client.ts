@@ -1,10 +1,11 @@
+import { createHash } from "node:crypto"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import { createHash } from "node:crypto"
 import type { CartridgeReader } from "@/cartridge/reader"
-import { IndexV1Schema, UnitSchema, LessonSchema, IntegritySchema } from "@/cartridge/schema"
-import type { IndexV1, Unit, Lesson, Resource } from "@/cartridge/types"
+import { IndexV1Schema, IntegritySchema } from "@/cartridge/schema"
+import type { IndexV1, Lesson, Resource, Unit } from "@/cartridge/types"
 
+// NOTE: After write-time validation and integrity check on open, reads trust shapes and avoid Zod.
 export async function readIndex(reader: CartridgeReader): Promise<IndexV1> {
 	const res = await errors.try(reader.readText("index.json"))
 	if (res.error) {
@@ -19,7 +20,7 @@ export async function readIndex(reader: CartridgeReader): Promise<IndexV1> {
 	const validated = IndexV1Schema.safeParse(parseRes.data)
 	if (!validated.success) {
 		logger.error("index schema invalid", { error: validated.error })
-		throw errors.new("index schema invalid")
+		throw errors.wrap(validated.error, "index validate")
 	}
 	return validated.data
 }
@@ -35,12 +36,7 @@ export async function readUnit(reader: CartridgeReader, unitPath: string): Promi
 		logger.error("unit parse", { path: unitPath, error: parseRes.error })
 		throw errors.wrap(parseRes.error, "unit parse")
 	}
-	const validated = UnitSchema.safeParse(parseRes.data)
-	if (!validated.success) {
-		logger.error("unit schema invalid", { path: unitPath, error: validated.error })
-		throw errors.new("unit schema invalid")
-	}
-	return validated.data
+	return parseRes.data
 }
 
 export async function readLesson(reader: CartridgeReader, lessonPath: string): Promise<Lesson> {
@@ -54,18 +50,10 @@ export async function readLesson(reader: CartridgeReader, lessonPath: string): P
 		logger.error("lesson parse", { path: lessonPath, error: parseRes.error })
 		throw errors.wrap(parseRes.error, "lesson parse")
 	}
-	const validated = LessonSchema.safeParse(parseRes.data)
-	if (!validated.success) {
-		logger.error("lesson schema invalid", { path: lessonPath, error: validated.error })
-		throw errors.new("lesson schema invalid")
-	}
-	return validated.data
+	return parseRes.data
 }
 
-export async function readArticleContent(
-	reader: CartridgeReader,
-	articlePath: string,
-): Promise<string> {
+export async function readArticleContent(reader: CartridgeReader, articlePath: string): Promise<string> {
 	const res = await errors.try(reader.readText(articlePath))
 	if (res.error) {
 		logger.error("article read", { path: articlePath, error: res.error })
@@ -110,17 +98,14 @@ export async function* iterUnitLessons(reader: CartridgeReader, unit: Unit): Asy
 	}
 }
 
-export async function* iterLessonResources(
-	_reader: CartridgeReader,
-	lesson: Lesson,
-): AsyncIterable<Resource> {
+export async function* iterLessonResources(_reader: CartridgeReader, lesson: Lesson): AsyncIterable<Resource> {
 	for (const r of lesson.resources) {
 		yield r
 	}
 }
 
 export async function validateIntegrity(
-	reader: CartridgeReader,
+	reader: CartridgeReader
 ): Promise<{ ok: boolean; issues: Array<{ path: string; reason: string }> }> {
 	const issues: Array<{ path: string; reason: string }> = []
 
@@ -129,12 +114,10 @@ export async function validateIntegrity(
 		return { ok: false, issues: [{ path: "integrity.json", reason: "file not found or unreadable" }] }
 
 	const manifestParsed = errors.trySync(() => JSON.parse(manifestText.data))
-	if (manifestParsed.error)
-		return { ok: false, issues: [{ path: "integrity.json", reason: "JSON parse failed" }] }
+	if (manifestParsed.error) return { ok: false, issues: [{ path: "integrity.json", reason: "JSON parse failed" }] }
 
 	const validated = IntegritySchema.safeParse(manifestParsed.data)
-	if (!validated.success)
-		return { ok: false, issues: [{ path: "integrity.json", reason: "schema validation failed" }] }
+	if (!validated.success) return { ok: false, issues: [{ path: "integrity.json", reason: "schema validation failed" }] }
 
 	const manifest = validated.data
 
@@ -151,7 +134,7 @@ export async function validateIntegrity(
 		if (fileBytes.data.byteLength !== entry.size) {
 			issues.push({
 				path: filePath,
-				reason: `size mismatch (expected ${entry.size}, got ${fileBytes.data.byteLength})`,
+				reason: `size mismatch (expected ${entry.size}, got ${fileBytes.data.byteLength})`
 			})
 		}
 
@@ -163,4 +146,3 @@ export async function validateIntegrity(
 
 	return { ok: issues.length === 0, issues }
 }
-

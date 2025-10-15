@@ -83,4 +83,3 @@ When a choice option contains ONLY mathematical notation (equations, expressions
 **Edge Case Clarification:** If a choice contains a diagram that includes mathematical labels (e.g., a number line with points labeled, a geometric figure with side lengths), it is still considered a **diagram** and MUST use a \`widgetRef\`. The math-only rule applies only when the choice content consists *exclusively* of an equation or expression.
 `
 }
-

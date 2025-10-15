@@ -303,4 +303,3 @@ Before finalizing your output, SCAN ALL text nodes for these patterns and conver
 **ZERO TOLERANCE**: If ANY of these patterns appear in plain text nodes, your output will be REJECTED.
 `
 }
-

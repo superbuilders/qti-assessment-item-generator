@@ -7,8 +7,8 @@ import { allExamples } from "../../examples"
 import type { AiContextEnvelope, ImageContext } from "../types"
 import { caretBanPromptSection } from "./caret"
 import { createWidgetSelectionPromptSection, formatUnifiedContextSections } from "./shared"
-import { createMathmlComplianceSection } from "./shared/mathml"
 import { createEquationsInChoicesSection } from "./shared/equations-in-choices"
+import { createMathmlComplianceSection } from "./shared/mathml"
 
 // Helper to convert a full AssessmentItemInput into a shell for prompt examples
 function createShellFromExample<const E extends readonly string[]>(item: AssessmentItemInput<E>) {

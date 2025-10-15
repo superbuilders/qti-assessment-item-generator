@@ -62,86 +62,88 @@ const sourceItem: AssessmentItemInput<["boxPlot"]> = {
 	feedback: {
 		FEEDBACK__OVERALL: {
 			CORRECT: {
-		content: {
-			preamble: {
-				correctness: "correct",
-				summary: [
-					{
-						type: "text",
-						content:
-							"The center of the Olympic final distribution is higher than the center of the U.S. qualifier distribution."
-					}
-				]
-			},
-			steps: [
-				{
-					type: "step",
-					title: [{ type: "text", content: "Compare Centers" }],
-					content: [
-						{
-							type: "paragraph",
-							content: [{ type: "text", content: "The Olympic final center is higher on the dot plot scale." }]
-						}
-					]
-				},
-				{
-					type: "step",
-					title: [{ type: "text", content: "Conclusion" }],
-					content: [
-						{
-							type: "paragraph",
-							content: [{ type: "text", content: "The Olympic final distances were greater on average." }]
-						}
-					]
-				}
-			]
-		}
-			},
-		INCORRECT: {
-			content: {
-				preamble: {
-					correctness: "incorrect",
-					summary: [
-						{
-							type: "text",
-							content: "The distributions overlap, so not all Olympic final distances are greater."
-						}
-					]
-				},
-				steps: [
-					{
-						type: "step",
-						title: [{ type: "text", content: "Check Overlap" }],
-						content: [
+				content: {
+					preamble: {
+						correctness: "correct",
+						summary: [
 							{
-								type: "paragraph",
-								content: [
-									{
-										type: "text",
-										content: "The distributions overlap, indicating some U.S. qualifier distances exceed Olympic ones."
-									}
-								]
+								type: "text",
+								content:
+									"The center of the Olympic final distribution is higher than the center of the U.S. qualifier distribution."
 							}
 						]
 					},
-					{
-						type: "step",
-						title: [{ type: "text", content: "Compare Spread" }],
-						content: [
+					steps: [
+						{
+							type: "step",
+							title: [{ type: "text", content: "Compare Centers" }],
+							content: [
+								{
+									type: "paragraph",
+									content: [{ type: "text", content: "The Olympic final center is higher on the dot plot scale." }]
+								}
+							]
+						},
+						{
+							type: "step",
+							title: [{ type: "text", content: "Conclusion" }],
+							content: [
+								{
+									type: "paragraph",
+									content: [{ type: "text", content: "The Olympic final distances were greater on average." }]
+								}
+							]
+						}
+					]
+				}
+			},
+			INCORRECT: {
+				content: {
+					preamble: {
+						correctness: "incorrect",
+						summary: [
 							{
-								type: "paragraph",
-								content: [
-									{
-										type: "text",
-										content: "The spreads appear similar, and the U.S. qualifier box has a larger interquartile range."
-									}
-								]
+								type: "text",
+								content: "The distributions overlap, so not all Olympic final distances are greater."
 							}
 						]
-					}
-				]
+					},
+					steps: [
+						{
+							type: "step",
+							title: [{ type: "text", content: "Check Overlap" }],
+							content: [
+								{
+									type: "paragraph",
+									content: [
+										{
+											type: "text",
+											content:
+												"The distributions overlap, indicating some U.S. qualifier distances exceed Olympic ones."
+										}
+									]
+								}
+							]
+						},
+						{
+							type: "step",
+							title: [{ type: "text", content: "Compare Spread" }],
+							content: [
+								{
+									type: "paragraph",
+									content: [
+										{
+											type: "text",
+											content:
+												"The spreads appear similar, and the U.S. qualifier box has a larger interquartile range."
+										}
+									]
+								}
+							]
+						}
+					]
+				}
 			}
-		}
 		}
 	},
 	identifier: "olympic-discus-boxplots-interpretation",

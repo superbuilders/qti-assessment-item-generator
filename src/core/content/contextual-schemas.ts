@@ -138,13 +138,15 @@ function createTableRichBlockSchema<TInline extends z.ZodTypeAny>(allowedInlines
 function createBlockQuoteBlockSchema<TInline extends z.ZodTypeAny>(allowedInlinesSchema: TInline) {
 	return z
 		.object({
-            type: z.literal("blockquote").describe("A semantic block quotation. Use ONLY for direct quotations of source text."),
-            content: z
-                .array(allowedInlinesSchema)
-                .describe("Directly quoted inline content from a source. Do not invent or paraphrase.")
+			type: z
+				.literal("blockquote")
+				.describe("A semantic block quotation. Use ONLY for direct quotations of source text."),
+			content: z
+				.array(allowedInlinesSchema)
+				.describe("Directly quoted inline content from a source. Do not invent or paraphrase.")
 		})
 		.strict()
-        .describe("A blockquote used strictly for direct quotes.")
+		.describe("A blockquote used strictly for direct quotes.")
 }
 
 // ---[ CONTEXT-SPECIFIC SCHEMA FACTORIES ]---
@@ -190,7 +192,7 @@ export function createFeedbackContentSchema<const E extends readonly string[]>(w
 	const ParagraphBlockSchema = createParagraphBlockSchema(AllowedFeedbackInlines).describe(
 		"Paragraph of inline content within feedback steps. Use for sentences and brief explanations."
 	)
-    // Lists are intentionally not constructed for steps to prevent list usage inside steps
+	// Lists are intentionally not constructed for steps to prevent list usage inside steps
 	const TableRichBlockSchema = createTableRichBlockSchema(AllowedFeedbackInlines).describe(
 		"Table for structured information in a step (no interactions)."
 	)
@@ -200,22 +202,24 @@ export function createFeedbackContentSchema<const E extends readonly string[]>(w
 
 	const BlockQuoteBlockSchema = z
 		.object({
-            type: z.literal("blockquote").describe("A semantic block quotation. Use ONLY for direct quotations of source text."),
+			type: z
+				.literal("blockquote")
+				.describe("A semantic block quotation. Use ONLY for direct quotations of source text."),
 			content: z
 				.array(AllowedFeedbackInlines)
-                .describe("Directly quoted inline content from a source. Do not invent or paraphrase.")
+				.describe("Directly quoted inline content from a source. Do not invent or paraphrase.")
 		})
 		.strict()
-        .describe("A blockquote used strictly for direct quotes within a step. No attribution field.")
+		.describe("A blockquote used strictly for direct quotes within a step. No attribution field.")
 
-    const AllowedFeedbackBlocks = z
-        .discriminatedUnion("type", [
-            ParagraphBlockSchema,
-            TableRichBlockSchema,
-            WidgetRefBlockSchema,
-            BlockQuoteBlockSchema
-        ])
-        .describe("Blocks permitted inside feedback steps: paragraphs, tables, widgets, blockquotes.")
+	const AllowedFeedbackBlocks = z
+		.discriminatedUnion("type", [
+			ParagraphBlockSchema,
+			TableRichBlockSchema,
+			WidgetRefBlockSchema,
+			BlockQuoteBlockSchema
+		])
+		.describe("Blocks permitted inside feedback steps: paragraphs, tables, widgets, blockquotes.")
 
 	const StepBlockSchema = z
 		.object({
@@ -254,7 +258,9 @@ export function createFeedbackContentSchema<const E extends readonly string[]>(w
 			steps: z
 				.array(StepBlockSchema)
 				.min(2)
-				.describe("Ordered list of teaching steps. Minimum two required; three recommended (identify, compute/derive, conclude).")
+				.describe(
+					"Ordered list of teaching steps. Minimum two required; three recommended (identify, compute/derive, conclude)."
+				)
 		})
 		.strict()
 		.describe(
