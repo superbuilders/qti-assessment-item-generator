@@ -188,13 +188,15 @@ export async function buildCartridgeToBytes(input: CartridgeBuildInput): Promise
 		const unitTestQuestionCount = u.unitTest ? u.unitTest.questionCount : 0
 		const counts = { lessonCount, resourceCount, questionCount: quizQuestionCount + unitTestQuestionCount }
 
-		const unitJson = {
+		const unitJson: Record<string, unknown> = {
 			id: u.id,
-			unitNumber: "unitNumber" in u ? u.unitNumber : undefined,
 			title: u.title,
 			lessons: lessonRefs,
 			unitTest: u.unitTest,
 			counts
+		}
+		if ("unitNumber" in u) {
+			Object.assign(unitJson, { unitNumber: u.unitNumber })
 		}
 		const uv = UnitSchema.safeParse(unitJson)
 		if (!uv.success) {
@@ -205,16 +207,19 @@ export async function buildCartridgeToBytes(input: CartridgeBuildInput): Promise
 	}
 
 	// Index
-	const index = {
+	const index: Record<string, unknown> = {
 		version: 1 as const,
 		generatedAt: new Date().toISOString(),
 		generator: validated.generator,
-		units: validated.units.map((u) => ({
-			id: u.id,
-			unitNumber: "unitNumber" in u ? u.unitNumber : undefined,
-			title: u.title,
-			path: `units/${u.id}.json`
-		}))
+		units: validated.units.map((u) => {
+			const ref: Record<string, unknown> = {
+				id: u.id,
+				title: u.title,
+				path: `units/${u.id}.json`
+			}
+			if ("unitNumber" in u) Object.assign(ref, { unitNumber: u.unitNumber })
+			return ref
+		})
 	}
 	const iv = IndexV1Schema.safeParse(index)
 	if (!iv.success) {
@@ -369,16 +374,19 @@ export async function buildCartridgeToFile(input: CartridgeBuildInput, outFile: 
 		}
 
 		// Index
-		const index = {
+		const index: Record<string, unknown> = {
 			version: 1 as const,
 			generatedAt: new Date().toISOString(),
 			generator: validated.generator,
-			units: validated.units.map((u) => ({
-				id: u.id,
-				unitNumber: "unitNumber" in u ? u.unitNumber : undefined,
-				title: u.title,
-				path: `units/${u.id}.json`
-			}))
+			units: validated.units.map((u) => {
+				const ref: Record<string, unknown> = {
+					id: u.id,
+					title: u.title,
+					path: `units/${u.id}.json`
+				}
+				if ("unitNumber" in u) Object.assign(ref, { unitNumber: u.unitNumber })
+				return ref
+			})
 		}
 		const iv = IndexV1Schema.safeParse(index)
 		if (!iv.success) {
