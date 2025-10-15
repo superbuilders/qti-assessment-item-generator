@@ -14,19 +14,44 @@
 		"esModuleInterop": true,
 		"experimentalDecorators": true,
 		"emitDecoratorMetadata": true,
-		"lib": ["ESNext", "DOM"],
-		"types": ["bun-types"],
+		"lib": [
+			"ESNext",
+			"DOM"
+		],
+		"types": [
+			"bun-types"
+		],
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
 		"baseUrl": ".",
 		"paths": {
-			"@/templates/*": ["src/templates/*"],
-			"@/core/*": ["src/core/*"],
-			"@/structured/*": ["src/structured/*"],
-			"@/compiler/*": ["src/compiler/*"],
-			"@/widgets/*": ["src/widgets/*"]
+			"@/templates/*": [
+				"src/templates/*"
+			],
+			"@/core/*": [
+				"src/core/*"
+			],
+			"@/structured/*": [
+				"src/structured/*"
+			],
+			"@/compiler/*": [
+				"src/compiler/*"
+			],
+			"@/widgets/*": [
+				"src/widgets/*"
+			],
+			"@/cartridge/*": [
+				"src/cartridge/*"
+			]
 		}
 	},
-	"include": ["src/**/*", "tests/**/*", "scripts/**/*"],
-	"exclude": ["node_modules", "dist"]
+	"include": [
+		"src/**/*",
+		"tests/**/*",
+		"scripts/**/*"
+	],
+	"exclude": [
+		"node_modules",
+		"dist"
+	]
 }

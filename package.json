@@ -30,6 +30,8 @@
 	"devDependencies": {
 		"@types/bun": "1.2.23",
 		"@types/node": "^24.7.2",
+		"@types/tar-stream": "^3.1.4",
+		"@types/unbzip2-stream": "^1.4.3",
 		"dotenv": "^17.2.3",
 		"openai": "^6.3.0"
 	},
@@ -51,6 +53,8 @@
 		"fast-xml-parser": "5.2.5",
 		"glob": "^11.0.3",
 		"he": "1.2.0",
+		"tar-stream": "^3.1.7",
+		"unbzip2-stream": "^1.4.3",
 		"z3-solver": "4.15.3",
 		"zod": "^4.1.12"
 	},
