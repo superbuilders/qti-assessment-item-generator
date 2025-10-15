@@ -46,7 +46,7 @@
 		"access": "public"
 	},
 	"dependencies": {
-		"@biomejs/biome": "^2.2.6",
+		"@biomejs/biome": "^2.0.0-beta.6",
 		"@superbuilders/errors": "3.0.2",
 		"@superbuilders/slog": "4.0.0",
 		"@types/he": "1.2.3",
