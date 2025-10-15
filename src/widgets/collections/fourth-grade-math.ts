@@ -8,6 +8,7 @@ export const fourthGradeMathCollection: WidgetCollection<
 		| "wheelDiagram"
 		| "geometricPrimitiveDiagram"
 		| "angleTypeDiagram"
+		| "stripDiagram"
 		| "tapeDiagram"
 		| "fractionModelDiagram"
 		| "fractionSumDiagram"
@@ -40,6 +41,7 @@ export const fourthGradeMathCollection: WidgetCollection<
 		"wheelDiagram",
 		"geometricPrimitiveDiagram",
 		"angleTypeDiagram",
+		"stripDiagram",
 		"tapeDiagram",
 		"fractionModelDiagram",
 		"fractionSumDiagram",
@@ -74,6 +76,7 @@ export const fourthGradeMathCollection: WidgetCollection<
 		wheelDiagram: allWidgetDefinitions.wheelDiagram,
 		geometricPrimitiveDiagram: allWidgetDefinitions.geometricPrimitiveDiagram,
 		angleTypeDiagram: allWidgetDefinitions.angleTypeDiagram,
+		stripDiagram: allWidgetDefinitions.stripDiagram,
 		tapeDiagram: allWidgetDefinitions.tapeDiagram,
 		fractionModelDiagram: allWidgetDefinitions.fractionModelDiagram,
 		fractionSumDiagram: allWidgetDefinitions.fractionSumDiagram,
@@ -106,6 +109,7 @@ export const fourthGradeMathCollection: WidgetCollection<
 		"wheelDiagram",
 		"geometricPrimitiveDiagram",
 		"angleTypeDiagram",
+		"stripDiagram",
 		"tapeDiagram",
 		"fractionModelDiagram",
 		"fractionSumDiagram",
