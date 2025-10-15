@@ -25,13 +25,14 @@ import OpenAI from "openai";
 import * as logger from "@superbuilders/slog";
 import { generateFromEnvelope } from "@superbuilders/qti-assessment-item-generator/structured";
 import { compile } from "@superbuilders/qti-assessment-item-generator/compiler";
-import type { AiContextEnvelope, RasterImagePayload } from "@superbuilders/qti-assessment-item-generator/structured/types";
+import { widgetCollections } from "@superbuilders/qti-assessment-item-generator/widgets/collections";
 
 // ---
 // In an offline pipeline, you load all assets from a local, trusted source.
 // ---
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
+const WIDGETS = widgetCollections["fourth-grade-math"]; // Choose a collection
 
 // 1. Load primary HTML and supplementary SVG content from disk.
 const html = await fs.readFile("/abs/path/to/item.html", "utf8");
@@ -39,8 +40,8 @@ const svgText = await fs.readFile("/abs/path/to/diagram.svg", "utf8");
 
 // 2. Load a raster image (e.g., a screenshot) and create a payload.
 const screenshotBytes = await fs.readFile("/abs/path/to/screenshot.png");
-const screenshotPayload: RasterImagePayload = {
-  data: new Blob([screenshotBytes]), // Bun and Node provide Blob globally
+const screenshotPayload = {
+  data: await new Blob([screenshotBytes]).arrayBuffer(),
   mimeType: "image/png",
 };
 
@@ -49,18 +50,19 @@ const extraImageBytes = await fs.readFile("/path/to/figure.png");
 const extraImageDataUrl = `data:image/png;base64,${extraImageBytes.toString("base64")}`;
 
 // 3. Manually build the offline envelope. No network calls will be made by the library.
-const envelope: AiContextEnvelope = {
+const envelope = {
   primaryContent: html,
   supplementaryContent: [svgText], // Vector graphics go here as raw text
   multimodalImageUrls: [extraImageDataUrl], // Raster images can be data: URLs
   multimodalImagePayloads: [screenshotPayload], // Or raw binary payloads
+  pdfPayloads: []
 };
 
 // 4. Generate the structured item.
-const structuredItem = await generateFromEnvelope(openai, logger, envelope, "fourth-grade-math");
+const structuredItem = await generateFromEnvelope(openai, logger, envelope, WIDGETS);
 
 // 5. Compile to QTI XML.
-const xml = await compile(structuredItem);
+const xml = await compile(structuredItem, WIDGETS);
 
 console.log(xml);
 ```
@@ -72,16 +74,18 @@ Generate unique variations of an existing assessment item using a robust, two-sh
 ```ts
 import OpenAI from "openai";
 import * as logger from "@superbuilders/slog";
+import { widgetCollections } from "@superbuilders/qti-assessment-item-generator/widgets/collections";
 import { differentiateAssessmentItem } from "@superbuilders/qti-assessment-item-generator/structured/differentiator";
 import type { AssessmentItemInput } from "@superbuilders/qti-assessment-item-generator/core/item";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
+const WIDGETS = widgetCollections["fourth-grade-math"]; // choose a collection matching your item
 
 // Assume `sourceItem` is a valid AssessmentItemInput object you already have.
 const sourceItem: AssessmentItemInput = { /* ... */ };
 
 // To generate 3 new variations of the source item; Shot 2 will generate widgets via LLM using authoritative schemas:
-const items = await differentiateAssessmentItem(openai, logger, sourceItem, 3);
+const items = await differentiateAssessmentItem(openai, logger, sourceItem, 3, WIDGETS);
 // `items` is now an array of up to 3 valid AssessmentItemInput objects.
 console.log(`Generated ${items.length} new items with regenerated widgets.`);
 ```
@@ -92,9 +96,10 @@ Compile a widget configuration directly into an SVG or HTML string without using
 
 ```ts
 import { generateWidget } from "@superbuilders/qti-assessment-item-generator/widgets/widget-generator";
-import type { BarChartProps } from "@superbuilders/qti-assessment-item-generator/widgets/registry";
-import { BarChartPropsSchema } from "@superbuilders/qti-assessment-item-generator/widgets/registry";
-import type { Widget } from "@superbuilders/qti-assessment-item-generator/widgets/registry";
+import { widgetCollections } from "@superbuilders/qti-assessment-item-generator/widgets/collections";
+import { BarChartPropsSchema, type BarChartProps } from "@superbuilders/qti-assessment-item-generator/widgets/registry";
+
+const WIDGETS = widgetCollections["fourth-grade-math"]; // select a collection
 
 // 1. Define the properties for the widget you want to compile.
 const barChartProps: BarChartProps = {
@@ -123,8 +128,8 @@ if (!validationResult.success) {
   throw validationResult.error;
 }
 
-// 3. Pass the validated data to the generator (Widget union type)
-const svgString = await generateWidget(validationResult.data);
+// 3. Call the generator with a collection and a widget type key
+const svgString = await generateWidget(WIDGETS, "barChart", validationResult.data);
 
 console.log(svgString);
 ```
@@ -132,26 +137,38 @@ console.log(svgString);
 ## API Reference
 
 ### `structured`
+### `structured/ai-context-builder`
 
--   `generateFromEnvelope(openai, logger, envelope, widgetCollectionName) => Promise<AssessmentItemInput>`
-    -   The main entry point for the AI pipeline. Converts an `AiContextEnvelope` into a structured `AssessmentItemInput` object.
-    -   `widgetCollectionName` is **required** and specifies which set of widgets the AI can use.
+-   `buildPerseusEnvelope(perseusJson, fetch?) => Promise<AiContextEnvelope>`
+-   `buildMathacademyEnvelope(html, screenshotUrl?, fetch?) => Promise<AiContextEnvelope>`
+    -   Helpers to construct `AiContextEnvelope` objects from common content sources. Returned envelopes include `primaryContent`, `supplementaryContent`, `multimodalImageUrls`, `multimodalImagePayloads`, and `pdfPayloads` (empty by default).
+
+### `widgets/collections`
+
+-   `widgetCollections` — a map of built-in collections:
+    -   `"all"`, `"science"`, `"simple-visual"`, `"fourth-grade-math"`, `"teks-math-4"`
+    -   Each collection exposes `name`, `widgets`, and `widgetTypeKeys` used by the APIs above.
+
+
+-   `generateFromEnvelope(openai, logger, envelope, widgetCollection) => Promise<AssessmentItemInput>`
+    -   Converts an `AiContextEnvelope` into an `AssessmentItemInput` using the provided widget collection.
+    -   `widgetCollection` must be one of the exported collections from `widgets/collections`.
 
 ### `structured/differentiator`
 
--   `differentiateAssessmentItem(openai, logger, item, n) => Promise<AssessmentItemInput[]>`
-    -   The main entry point for the AI differentiation pipeline. Generates `n` new variations of a structured `AssessmentItemInput` using a two-shot process: content planning (Shot 1) and widget generation via LLM using authoritative schemas (Shot 2).
-    -   This function is completely independent of `AiContextEnvelope` and `widgetCollectionName`.
+-   `differentiateAssessmentItem(openai, logger, item, n, widgetCollection) => Promise<AssessmentItemInput[]>`
+    -   Generates `n` new variations of a structured `AssessmentItemInput` via a two-shot process (plan + widgets) using the provided `widgetCollection`.
+    -   Independent of `AiContextEnvelope`.
 
 ### `compiler`
 
--   `compile(item: AssessmentItemInput) => Promise<string>`
-    -   Compiles a structured `AssessmentItemInput` object into a valid QTI 3.0 XML string.
+-   `compile(item: AssessmentItemInput, widgetCollection) => Promise<string>`
+    -   Compiles a structured `AssessmentItemInput` into QTI 3.0 XML. A `widgetCollection` is required for schema enforcement and widget content generation.
 
 ### `widgets/widget-generator`
 
--   `generateWidget(widget: Widget) => Promise<string>`
-    -   Compiles a single widget's property object into an SVG or HTML string.
+-   `generateWidget(widgetCollection, widgetType, data) => Promise<string>`
+    -   Renders a single widget given a collection, a widget type key (e.g., `"barChart"`), and pre-validated data.
 
 ### Widget Schemas and Types
 
@@ -174,6 +191,7 @@ You can also import content, feedback, and interaction types:
 ```ts
 import { generateWidget } from "@superbuilders/qti-assessment-item-generator/widgets/widget-generator";
 import { compile } from "@superbuilders/qti-assessment-item-generator/compiler";
+import { widgetCollections } from "@superbuilders/qti-assessment-item-generator/widgets/collections";
 import {
   type AssessmentItemInput,
   createDynamicAssessmentItemSchema
@@ -212,8 +230,8 @@ if (!validationResult.success) {
   throw validationResult.error;
 }
 
-// The `generateWidget` function accepts a `Widget` (runtime-inferred union)
-const svg = await generateWidget(validationResult.data);
+const WIDGETS = widgetCollections["fourth-grade-math"];
+const svg = await generateWidget(WIDGETS, "barChart", validationResult.data);
 ```
 
 ## Image and Content Policy
@@ -223,7 +241,8 @@ The `AiContextEnvelope` object separates content by type to ensure proper proces
 -   **`primaryContent`**: The main HTML or Perseus JSON content for the assessment item.
 -   **`supplementaryContent`**: An array of strings, where each string is the full text content of a vector graphic (e.g., an entire `.svg` or `.xml` file).
 -   **`multimodalImageUrls`**: An array of strings for raster images. Each URL must be an absolute `http`/`https` URL or a `data:` URL.
--   **`multimodalImagePayloads`**: An array of `RasterImagePayload` objects for providing raster images as in-memory binary data. This is the recommended approach for fully offline workflows. Each payload must contain the raw `Blob` data and its corresponding MIME type (e.g., `image/png`, `image/jpeg`).
+-   **`multimodalImagePayloads`**: An array of `RasterImagePayload` objects for providing raster images as in-memory binary data. This is the recommended approach for fully offline workflows. Each payload must contain the raw `ArrayBuffer` data and its corresponding MIME type (e.g., `image/png`, `image/jpeg`).
+-   **`pdfPayloads`**: An array of PDF payloads `{ name: string; data: ArrayBuffer }` for including PDFs in the AI context. May be empty.
 
 ## Configuration
 
