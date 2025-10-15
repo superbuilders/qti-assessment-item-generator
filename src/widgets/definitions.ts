@@ -79,6 +79,7 @@ import { generateSimpleArrow } from "@/widgets/generators/simple-arrow"
 import { generateSinCosineWidget } from "@/widgets/generators/sin-cosine-widget"
 import { generateStackedItemsDiagram } from "@/widgets/generators/stacked-items-diagram"
 import { generateStickPlot } from "@/widgets/generators/stick-plot"
+import { generateStripDiagram } from "@/widgets/generators/strip-diagram"
 import { generateSubtractionWithRegrouping } from "@/widgets/generators/subtraction-with-regrouping"
 import { generateSymmetryDiagram } from "@/widgets/generators/symmetry-diagram"
 import { generateTapeDiagram } from "@/widgets/generators/tape-diagram"
@@ -213,6 +214,8 @@ export const allWidgetDefinitions = {
 	sinCosineWidget: { schema: allWidgetSchemas.sinCosineWidget, generator: generateSinCosineWidget },
 	scatterPlot: { schema: allWidgetSchemas.scatterPlot, generator: generateScatterPlot },
 	stackedItemsDiagram: { schema: allWidgetSchemas.stackedItemsDiagram, generator: generateStackedItemsDiagram },
+	stickPlot: { schema: allWidgetSchemas.stickPlot, generator: generateStickPlot },
+	stripDiagram: { schema: allWidgetSchemas.stripDiagram, generator: generateStripDiagram },
 	tapeDiagram: { schema: allWidgetSchemas.tapeDiagram, generator: generateTapeDiagram },
 	transformationDiagram: { schema: allWidgetSchemas.transformationDiagram, generator: generateTransformationDiagram },
 	transversalAngleDiagram: {
@@ -260,7 +263,6 @@ export const allWidgetDefinitions = {
 	customPolygonDiagram: { schema: allWidgetSchemas.customPolygonDiagram, generator: generateCustomPolygonDiagram },
 	lineDiagram: { schema: allWidgetSchemas.lineDiagram, generator: generateLineDiagram },
 	pesSpectrum: { schema: allWidgetSchemas.pesSpectrum, generator: generatePESSpectrum },
-	stickPlot: { schema: allWidgetSchemas.stickPlot, generator: generateStickPlot },
 	video: { schema: allWidgetSchemas.video, generator: generateVideo },
 	marbleDiagram: { schema: allWidgetSchemas.marbleDiagram, generator: generateMarbleDiagram },
 	symmetryDiagram: { schema: allWidgetSchemas.symmetryDiagram, generator: generateSymmetryDiagram }

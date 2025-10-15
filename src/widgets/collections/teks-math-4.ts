@@ -8,6 +8,7 @@ export const teksMath4Collection: WidgetCollection<
 		| "nPolygon"
 		| "dotPlot"
 		| "tapeDiagram"
+		| "stripDiagram"
 		| "numberLineWithAction"
 		| "fractionModelDiagram"
 		| "quantityFractionalDiagram"
@@ -18,6 +19,7 @@ export const teksMath4Collection: WidgetCollection<
 		"nPolygon",
 		"dotPlot",
 		"tapeDiagram",
+		"stripDiagram",
 		"numberLineWithAction",
 		"fractionModelDiagram",
 		"quantityFractionalDiagram",
@@ -30,6 +32,7 @@ export const teksMath4Collection: WidgetCollection<
 		nPolygon: allWidgetDefinitions.nPolygon,
 		dotPlot: allWidgetDefinitions.dotPlot,
 		tapeDiagram: allWidgetDefinitions.tapeDiagram,
+		stripDiagram: allWidgetDefinitions.stripDiagram,
 		numberLineWithAction: allWidgetDefinitions.numberLineWithAction,
 		fractionModelDiagram: allWidgetDefinitions.fractionModelDiagram,
 		quantityFractionalDiagram: allWidgetDefinitions.quantityFractionalDiagram,
@@ -40,6 +43,7 @@ export const teksMath4Collection: WidgetCollection<
 		"nPolygon",
 		"dotPlot",
 		"tapeDiagram",
+		"stripDiagram",
 		"numberLineWithAction",
 		"fractionModelDiagram",
 		"quantityFractionalDiagram",

@@ -83,6 +83,7 @@ import { SimpleArrowPropsSchema } from "./generators/simple-arrow"
 import { SinCosineWidgetPropsSchema } from "./generators/sin-cosine-widget"
 import { StackedItemsDiagramPropsSchema } from "./generators/stacked-items-diagram"
 import { StickPlotPropsSchema } from "./generators/stick-plot"
+import { StripDiagramPropsSchema } from "./generators/strip-diagram"
 import { SubtractionWithRegroupingPropsSchema } from "./generators/subtraction-with-regrouping"
 import { SymmetryDiagramPropsSchema } from "./generators/symmetry-diagram"
 import { TapeDiagramPropsSchema } from "./generators/tape-diagram"
@@ -165,6 +166,8 @@ export const allWidgetSchemas = {
 	sinCosineWidget: SinCosineWidgetPropsSchema,
 	scatterPlot: ScatterPlotPropsSchema,
 	stackedItemsDiagram: StackedItemsDiagramPropsSchema,
+	stickPlot: StickPlotPropsSchema,
+	stripDiagram: StripDiagramPropsSchema,
 	tapeDiagram: TapeDiagramPropsSchema,
 	transformationDiagram: TransformationDiagramPropsSchema,
 	transversalAngleDiagram: TransversalAngleDiagramPropsSchema,
@@ -191,7 +194,6 @@ export const allWidgetSchemas = {
 	customPolygonDiagram: CustomPolygonDiagramPropsSchema,
 	lineDiagram: LineDiagramPropsSchema,
 	pesSpectrum: PESSpectrumPropsSchema,
-	stickPlot: StickPlotPropsSchema,
 	video: VideoPropsSchema,
 	marbleDiagram: MarbleDiagramPropsSchema,
 	symmetryDiagram: SymmetryDiagramPropsSchema
@@ -275,6 +277,8 @@ export {
 	SimpleArrowPropsSchema,
 	SinCosineWidgetPropsSchema,
 	StackedItemsDiagramPropsSchema,
+	StickPlotPropsSchema,
+	StripDiagramPropsSchema,
 	SubtractionWithRegroupingPropsSchema,
 	TapeDiagramPropsSchema,
 	TransformationDiagramPropsSchema,
@@ -292,7 +296,6 @@ export {
 	CustomPolygonDiagramPropsSchema,
 	LineDiagramPropsSchema,
 	PESSpectrumPropsSchema,
-	StickPlotPropsSchema,
 	VideoPropsSchema,
 	MarbleDiagramPropsSchema,
 	SymmetryDiagramPropsSchema
@@ -373,6 +376,8 @@ export type ShapeTransformationGraphProps = z.input<typeof ShapeTransformationGr
 export type SimpleArrowProps = z.input<typeof SimpleArrowPropsSchema>
 export type SinCosineWidgetProps = z.input<typeof SinCosineWidgetPropsSchema>
 export type StackedItemsDiagramProps = z.input<typeof StackedItemsDiagramPropsSchema>
+export type StickPlotProps = z.input<typeof StickPlotPropsSchema>
+export type StripDiagramProps = z.input<typeof StripDiagramPropsSchema>
 export type SubtractionWithRegroupingProps = z.input<typeof SubtractionWithRegroupingPropsSchema>
 export type TapeDiagramProps = z.input<typeof TapeDiagramPropsSchema>
 export type TransformationDiagramProps = z.input<typeof TransformationDiagramPropsSchema>
@@ -390,7 +395,6 @@ export type LabeledRectangleDiagramProps = z.input<typeof LabeledRectangleDiagra
 export type CustomPolygonDiagramProps = z.input<typeof CustomPolygonDiagramPropsSchema>
 export type LineDiagramProps = z.input<typeof LineDiagramPropsSchema>
 export type PESSpectrumProps = z.input<typeof PESSpectrumPropsSchema>
-export type StickPlotProps = z.input<typeof StickPlotPropsSchema>
 export type VideoProps = z.input<typeof VideoPropsSchema>
 export type MarbleDiagramProps = z.input<typeof MarbleDiagramPropsSchema>
 
@@ -458,6 +462,8 @@ const widgetSchemasWithoutSpecialUnions = [
 	typedSchemas.sinCosineWidget,
 	typedSchemas.scatterPlot,
 	typedSchemas.stackedItemsDiagram,
+	typedSchemas.stickPlot,
+	typedSchemas.stripDiagram,
 	typedSchemas.tapeDiagram,
 	typedSchemas.transformationDiagram,
 	typedSchemas.transversalAngleDiagram,
@@ -484,7 +490,6 @@ const widgetSchemasWithoutSpecialUnions = [
 	typedSchemas.customPolygonDiagram,
 	typedSchemas.lineDiagram,
 	typedSchemas.pesSpectrum,
-	typedSchemas.stickPlot,
 	typedSchemas.video,
 	typedSchemas.marbleDiagram,
 	typedSchemas.symmetryDiagram
