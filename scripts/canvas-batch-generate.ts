@@ -21,12 +21,12 @@ const ROOT_DIR = "canvas-scrape/English 09, Part 1"
 const WIDGET_COLLECTION = simpleVisualCollection
 const CONCURRENCY_LIMIT = 250
 
-const OUTPUT_DIR_ARG = process.argv[2]
-if (!OUTPUT_DIR_ARG) {
-	logger.error("output directory not provided")
-	throw errors.new("output directory must be provided as first argument")
+const BASE_DIR_ARG = process.argv[2]
+if (!BASE_DIR_ARG) {
+	logger.error("base data directory not provided")
+	throw errors.new("base data directory must be provided as first argument (e.g., 'data')")
 }
-const OUTPUT_DIR = path.resolve(process.cwd(), OUTPUT_DIR_ARG)
+const OUTPUT_DIR = path.resolve(process.cwd(), BASE_DIR_ARG, "quiz-out")
 const ROOT = path.resolve(process.cwd(), ROOT_DIR)
 // ---
 
