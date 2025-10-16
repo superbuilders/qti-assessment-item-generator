@@ -26,8 +26,8 @@ export const LessonSchema = z
 	.object({
 		id: z.string(),
 		unitId: z.string(),
-		lessonNumber: z.number().optional(),
-		title: z.string().optional(),
+		lessonNumber: z.number(),
+		title: z.string(),
 		resources: z.array(ResourceSchema)
 	})
 	.strict()
@@ -35,14 +35,14 @@ export const LessonSchema = z
 export const UnitSchema = z
 	.object({
 		id: z.string(),
-		unitNumber: z.number().optional(),
-		title: z.string().optional(),
+		unitNumber: z.number(),
+		title: z.string(),
 		lessons: z.array(
 			z
 				.object({
 					id: z.string(),
-					lessonNumber: z.number().optional(),
-					title: z.string().optional(),
+					lessonNumber: z.number(),
+					title: z.string(),
 					path: z.string()
 				})
 				.strict()
@@ -56,10 +56,7 @@ export const UnitSchema = z
 			})
 			.strict()
 			.optional(),
-		counts: z
-			.object({ lessonCount: z.number(), resourceCount: z.number(), questionCount: z.number() })
-			.strict()
-			.optional()
+		counts: z.object({ lessonCount: z.number(), resourceCount: z.number(), questionCount: z.number() }).strict()
 	})
 	.strict()
 
@@ -67,13 +64,14 @@ export const IndexV1Schema = z
 	.object({
 		version: z.literal(1),
 		generatedAt: z.string(),
-		generator: z.object({ name: z.string(), version: z.string(), commit: z.string().optional() }).strict().optional(),
+		generator: z.object({ name: z.string(), version: z.string(), commit: z.string().optional() }).strict(),
+		course: z.object({ title: z.string(), subject: z.string() }).strict(),
 		units: z.array(
 			z
 				.object({
 					id: z.string(),
-					unitNumber: z.number().optional(),
-					title: z.string().optional(),
+					unitNumber: z.number(),
+					title: z.string(),
 					path: z.string()
 				})
 				.strict()

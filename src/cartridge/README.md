@@ -32,7 +32,7 @@ Cartridge (tar.zst archive)
 
 ### Hierarchy
 
-- **Index**: Root manifest listing all units
+- **Index**: Root manifest listing all units and required course metadata
 - **Unit**: Contains lessons and optional unit test
 - **Lesson**: Contains resources (articles and/or quizzes)
 - **Resource**: Either an article (HTML stimulus) or a quiz (collection of questions)
@@ -46,19 +46,20 @@ import { buildCartridgeToFile, buildCartridgeToBytes, type CartridgeBuildInput }
 
 const input: CartridgeBuildInput = {
   generator: { name: "qti-assessment-item-generator", version: "1.0.0" },
+  course: { title: "English 09, Part 1", subject: "English" },
   units: [
     {
       id: "unit-1",
       unitNumber: 1,
-      title: "Unit 1",
+      title: "Unit 1- Short Fiction - Literary Elements",
       lessons: [
         {
           id: "lesson-1-1",
           unitId: "unit-1",
           lessonNumber: 1,
-          title: "Introduction to Fractions",
+          title: "1.1 Plot Structure",
           resources: [
-            { id: "article-intro", type: "article", path: "content/unit-1/intro/stimulus.html" },
+            { id: "article-intro", type: "article", path: "content/unit-1--short-fiction---literary-elements/1-1-plot-structure/stimulus.html" },
             {
               id: "quiz-1-1",
               type: "quiz",
@@ -94,6 +95,8 @@ const bytes = await buildCartridgeToBytes(input)
 - Zod-validated writes for `lesson.json`, `unit.json`, and `index.json` (strict: unexpected fields are rejected)
 - Integrity manifest generated in-memory and included as `integrity.json`
 - No temp files or directory staging necessary
+- Deterministic ordering enforced via required `unitNumber` and `lessonNumber`
+- Required fields: `Lesson.title`, `Lesson.lessonNumber`, `Unit.title`, `Unit.unitNumber`, `Unit.counts`, `IndexV1.generator`, `IndexV1.course`
 
 ## Reading a Cartridge
 
@@ -180,7 +183,7 @@ const files = {
   "quizzes/quiz-1-1/question-02-structured.json": "/abs/quizzes/quiz-1-1/question-02-structured.json"
 }
 
-await buildCartridgeFromFileMap({ generator, units, files }, "./course-cartridge-v1.tar.zst")
+await buildCartridgeFromFileMap({ generator, course: { title: "English 09, Part 1", subject: "English" }, units, files }, "./course-cartridge-v1.tar.zst")
 ```
 
 ### Validation and Path Rules

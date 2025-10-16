@@ -14,6 +14,7 @@ export type GeneratorInfo = { name: string; version: string; commit?: string }
 
 // Runtime schemas for strict validation (no extra fields allowed)
 const GeneratorInfoSchema = z.object({ name: z.string(), version: z.string(), commit: z.string().optional() }).strict()
+const CourseInfoSchema = z.object({ title: z.string(), subject: z.string() }).strict()
 
 const UnitTestSchema = z
 	.object({
@@ -33,7 +34,7 @@ const BuildUnitNumericSchema = z
 	.object({
 		id: NumericUnitId,
 		unitNumber: z.number(),
-		title: z.string().optional(),
+		title: z.string(),
 		lessons: z.array(LessonSchema),
 		unitTest: UnitTestSchema.optional()
 	})
@@ -42,7 +43,8 @@ const BuildUnitNumericSchema = z
 const BuildUnitNonNumericSchema = z
 	.object({
 		id: NonNumericUnitId,
-		title: z.string().optional(),
+		unitNumber: z.number(),
+		title: z.string(),
 		lessons: z.array(LessonSchema),
 		unitTest: UnitTestSchema.optional()
 	})
@@ -58,6 +60,7 @@ const CartridgePathSchema = z
 export const CartridgeBuildInputSchema = z
 	.object({
 		generator: GeneratorInfoSchema,
+		course: CourseInfoSchema,
 		units: z.array(BuildUnitSchema).min(1),
 		files: z.record(CartridgePathSchema, z.instanceof(Uint8Array))
 	})
@@ -65,6 +68,7 @@ export const CartridgeBuildInputSchema = z
 
 export type CartridgeBuildInput = {
 	generator: GeneratorInfo
+	course: { title: string; subject: string }
 	units: BuildUnit[]
 	files: Record<string, Uint8Array<ArrayBufferLike>>
 }
@@ -190,13 +194,11 @@ export async function buildCartridgeToBytes(input: CartridgeBuildInput): Promise
 
 		const unitJson: Record<string, unknown> = {
 			id: u.id,
+			unitNumber: u.unitNumber,
 			title: u.title,
 			lessons: lessonRefs,
 			unitTest: u.unitTest,
 			counts
-		}
-		if ("unitNumber" in u) {
-			Object.assign(unitJson, { unitNumber: u.unitNumber })
 		}
 		const uv = UnitSchema.safeParse(unitJson)
 		if (!uv.success) {
@@ -211,15 +213,13 @@ export async function buildCartridgeToBytes(input: CartridgeBuildInput): Promise
 		version: 1 as const,
 		generatedAt: new Date().toISOString(),
 		generator: validated.generator,
-		units: validated.units.map((u) => {
-			const ref: Record<string, unknown> = {
-				id: u.id,
-				title: u.title,
-				path: `units/${u.id}.json`
-			}
-			if ("unitNumber" in u) Object.assign(ref, { unitNumber: u.unitNumber })
-			return ref
-		})
+		course: validated.course,
+		units: validated.units.map((u) => ({
+			id: u.id,
+			unitNumber: u.unitNumber,
+			title: u.title,
+			path: `units/${u.id}.json`
+		}))
 	}
 	const iv = IndexV1Schema.safeParse(index)
 	if (!iv.success) {
@@ -309,7 +309,7 @@ export async function buildCartridgeToFile(input: CartridgeBuildInput, outFile: 
 	}
 
 	// Reuse the validated build steps by calling buildCartridgeToBytes' preparation pieces
-	async function writeEntries(): Promise<true> {
+async function writeEntries(): Promise<true> {
 		// We duplicate minimal logic to avoid buffering the whole archive
 		const inputValidation = CartridgeBuildInputSchema.safeParse(input)
 		if (!inputValidation.success) {
@@ -359,7 +359,7 @@ export async function buildCartridgeToFile(input: CartridgeBuildInput, outFile: 
 			const counts = { lessonCount, resourceCount, questionCount: quizQuestionCount + unitTestQuestionCount }
 			const unitJson = {
 				id: u.id,
-				unitNumber: "unitNumber" in u ? u.unitNumber : undefined,
+				unitNumber: u.unitNumber,
 				title: u.title,
 				lessons: lessonRefs,
 				unitTest: u.unitTest,
@@ -378,15 +378,13 @@ export async function buildCartridgeToFile(input: CartridgeBuildInput, outFile: 
 			version: 1 as const,
 			generatedAt: new Date().toISOString(),
 			generator: validated.generator,
-			units: validated.units.map((u) => {
-				const ref: Record<string, unknown> = {
-					id: u.id,
-					title: u.title,
-					path: `units/${u.id}.json`
-				}
-				if ("unitNumber" in u) Object.assign(ref, { unitNumber: u.unitNumber })
-				return ref
-			})
+			course: validated.course,
+			units: validated.units.map((u) => ({
+				id: u.id,
+				unitNumber: u.unitNumber,
+				title: u.title,
+				path: `units/${u.id}.json`
+			}))
 		}
 		const iv = IndexV1Schema.safeParse(index)
 		if (!iv.success) {
@@ -475,7 +473,7 @@ async function copyWithHash(src: string, dest: string): Promise<{ size: number; 
 }
 
 export async function buildCartridgeFromFileMap(
-	plan: { generator: GeneratorInfo; units: BuildUnit[]; files: CartridgeFileMap },
+	plan: { generator: GeneratorInfo; course: { title: string; subject: string }; units: BuildUnit[]; files: CartridgeFileMap },
 	outFile: string
 ): Promise<void> {
 	// Validate plan
@@ -542,10 +540,9 @@ export async function buildCartridgeFromFileMap(
 		}, 0)
 		const unitTestQuestionCount = u.unitTest ? u.unitTest.questionCount : 0
 		const counts = { lessonCount, resourceCount, questionCount: quizQuestionCount + unitTestQuestionCount }
-		const unitNumber = "unitNumber" in u ? u.unitNumber : undefined
 		const uv = UnitSchema.safeParse({
 			id: u.id,
-			unitNumber,
+			unitNumber: u.unitNumber,
 			title: u.title,
 			lessons: lessonRefs,
 			unitTest: u.unitTest,
@@ -563,9 +560,10 @@ export async function buildCartridgeFromFileMap(
 		version: 1 as const,
 		generatedAt: new Date().toISOString(),
 		generator: plan.generator,
+		course: plan.course,
 		units: plan.units.map((u) => ({
 			id: u.id,
-			unitNumber: "unitNumber" in u ? u.unitNumber : undefined,
+			unitNumber: u.unitNumber,
 			title: u.title,
 			path: `units/${u.id}.json`
 		}))

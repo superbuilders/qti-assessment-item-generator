@@ -25,6 +25,76 @@ if (!BASE_DIR_ARG) {
 const DATA_DIR = path.resolve(process.cwd(), BASE_DIR_ARG)
 const OUT_CARTRIDGE = path.resolve(DATA_DIR, "course-cartridge-v1.tar.zst")
 const EXCLUDED_GROUPS = new Set(["how-to-take-this-course", "final-exam", "course-completion--requesting-a-transcript"])
+async function collectCourseInfo(): Promise<{ title: string; subject: string }> {
+	const scrapeRoot = path.resolve(process.cwd(), "canvas-scrape")
+	const direntsResult = await errors.try(fs.readdir(scrapeRoot, { withFileTypes: true }))
+	if (direntsResult.error) {
+		logger.error("canvas-scrape directory read", { dir: scrapeRoot, error: direntsResult.error })
+		throw errors.wrap(direntsResult.error, "directory read")
+	}
+	const candidates = direntsResult.data
+		.filter((d) => d.isDirectory())
+		.map((d) => d.name)
+		.filter((name) => !name.startsWith("_") && name.trim().length > 0)
+
+	if (candidates.length !== 1) {
+		logger.error("expected exactly one course directory in canvas-scrape", { count: candidates.length, entries: candidates })
+		throw errors.new("invalid canvas-scrape layout")
+	}
+	const title = candidates[0]
+	const subjMatch = title.match(/^[A-Za-z]+/)
+	const subject = subjMatch ? subjMatch[0] : title
+	return { title, subject }
+}
+
+function slugifyName(name: string): string {
+	const withoutApostrophes = name.replace(/[’']/g, "")
+	return withoutApostrophes
+		.toLowerCase()
+		.replace(/[^a-z0-9-]+/g, "-")
+}
+
+async function collectPrettyMaps(courseTitle: string): Promise<{
+	unitTitleBySlug: Record<string, string>
+	lessonTitleByGroupAndSlug: Record<string, Record<string, string>>
+}> {
+	const root = path.resolve(process.cwd(), "canvas-scrape", courseTitle)
+	const unitTitleBySlug: Record<string, string> = {}
+	const lessonTitleByGroupAndSlug: Record<string, Record<string, string>> = {}
+
+	const unitsDirents = await errors.try(fs.readdir(root, { withFileTypes: true }))
+	if (unitsDirents.error) {
+		logger.error("canvas course directory read", { dir: root, error: unitsDirents.error })
+		throw errors.wrap(unitsDirents.error, "directory read")
+	}
+	for (const u of unitsDirents.data) {
+		if (!u.isDirectory()) continue
+		const unitPretty = u.name
+		const unitSlug = slugifyName(unitPretty)
+		unitTitleBySlug[unitSlug] = unitPretty
+		const unitPath = path.join(root, unitPretty)
+		const pagesDirents = await errors.try(fs.readdir(unitPath, { withFileTypes: true }))
+		if (pagesDirents.error) continue
+		for (const p of pagesDirents.data) {
+			if (!p.isDirectory()) continue
+			const pagePretty = p.name
+			const pageSlug = slugifyName(pagePretty)
+			const metaPath = path.join(unitPath, pagePretty, "metadata.json")
+			const metaRead = await errors.try(fs.readFile(metaPath, "utf8"))
+			let pageTitle = pagePretty
+			if (!metaRead.error) {
+				const metaParse = errors.trySync(() => JSON.parse(metaRead.data) as { title?: string })
+				if (!metaParse.error && typeof metaParse.data.title === "string" && metaParse.data.title.trim().length > 0) {
+					pageTitle = metaParse.data.title
+				}
+			}
+			if (!lessonTitleByGroupAndSlug[unitSlug]) lessonTitleByGroupAndSlug[unitSlug] = {}
+			lessonTitleByGroupAndSlug[unitSlug][pageSlug] = pageTitle
+		}
+	}
+	return { unitTitleBySlug, lessonTitleByGroupAndSlug }
+}
+
 
 function numericTokens(str: string): number[] {
 	const tokens: number[] = []
@@ -251,8 +321,8 @@ type QuizResource = {
 type LessonRecord = {
 	unitId: string
 	lessonId: string
-	lessonNumber?: number
-	title?: string
+	lessonNumber: number
+	title: string
 	resources: Array<ArticleResource | QuizResource>
 }
 type UnitTestRecord = {
@@ -263,29 +333,35 @@ type UnitTestRecord = {
 }
 type UnitRecord = {
 	unitId: string
-	unitNumber?: number
-	title?: string
+	unitNumber: number
+	title: string
 	lessons: LessonRecord[]
 	unitTest?: UnitTestRecord
 }
 
-function toUnitIdFromGroup(group: string): { unitId: string; unitNum?: number } {
+function toUnitIdFromGroup(group: string): { unitId: string; unitNum: number } {
 	const m = group.match(/^unit-(\d+)/)
 	if (m?.[1]) {
 		const n = Number(m[1])
 		if (Number.isFinite(n)) return { unitId: `unit-${n}`, unitNum: n }
 	}
-	// Non-unit groups become their own units with stable ids
-	return { unitId: `unit-${group.replace(/[^a-z0-9-]/g, "-")}` }
+	logger.error("group name does not contain numeric unit prefix", { group })
+	throw errors.new("invalid unit group name; expected unit-<n>")
 }
 
-function toLessonId(unitNum: number | undefined, slug: string): { lessonId: string; lessonNumber?: number } {
+function toLessonId(unitNum: number, slug: string): { lessonId: string; lessonNumber: number } {
 	const nums = numericTokens(slug)
-	if (unitNum !== undefined && nums.length >= 2 && nums[0] === unitNum) {
+	if (nums.length >= 2 && nums[0] === unitNum) {
 		const lessonNum = nums[1]
 		return { lessonId: `lesson-${unitNum}-${lessonNum}`, lessonNumber: lessonNum }
 	}
-	return { lessonId: `lesson-${slug.replace(/[^a-z0-9-]/g, "-")}` }
+	// Handle non-numbered study guides deterministically: place before lesson 1 as 0
+	const sg = slug.match(/^unit-(\d+)-study-guide$/)
+	if (sg && Number(sg[1]) === unitNum) {
+		return { lessonId: `lesson-${unitNum}-0`, lessonNumber: 0 }
+	}
+	logger.error("page slug does not encode unit and lesson numbers", { unitNum, slug })
+	throw errors.new("invalid lesson slug; expected <unit>-<lesson> prefix")
 }
 
 function buildHierarchy(
@@ -293,7 +369,8 @@ function buildHierarchy(
 	assessments: {
 		quizzes: Array<z.infer<typeof IndexAssessmentSchema>>
 		tests: Array<z.infer<typeof IndexAssessmentSchema>>
-	}
+	},
+	pretty: { unitTitleBySlug: Record<string, string>; lessonTitleByGroupAndSlug: Record<string, Record<string, string>> }
 ): UnitRecord[] {
 	const unitsMap = new Map<string, UnitRecord>()
 
@@ -302,14 +379,24 @@ function buildHierarchy(
 		const { unitId, unitNum } = toUnitIdFromGroup(g.group)
 		let unit = unitsMap.get(unitId)
 		if (!unit) {
-			unit = { unitId, unitNumber: unitNum, title: g.group, lessons: [] }
+			const prettyUnitTitle = pretty.unitTitleBySlug[g.group]
+			if (!prettyUnitTitle) {
+				logger.error("missing pretty unit title", { groupSlug: g.group })
+				throw errors.new("missing pretty unit title")
+			}
+			unit = { unitId, unitNumber: unitNum, title: prettyUnitTitle, lessons: [] }
 			unitsMap.set(unitId, unit)
 		}
 		for (const p of g.pages) {
 			const { lessonId, lessonNumber } = toLessonId(unitNum, p.slug)
 			let lesson = unit.lessons.find((l) => l.lessonId === lessonId)
 			if (!lesson) {
-				lesson = { unitId, lessonId, lessonNumber, title: p.slug, resources: [] }
+				const prettyLessonTitle = pretty.lessonTitleByGroupAndSlug[g.group]?.[p.slug]
+				if (!prettyLessonTitle) {
+					logger.error("missing pretty lesson title", { groupSlug: g.group, pageSlug: p.slug })
+					throw errors.new("missing pretty lesson title")
+				}
+				lesson = { unitId, lessonId, lessonNumber, title: prettyLessonTitle, resources: [] }
 				unit.lessons.push(lesson)
 			}
 			lesson.resources.push({
@@ -329,17 +416,27 @@ function buildHierarchy(
 		const unitId = `unit-${unitNum}`
 		let unit = unitsMap.get(unitId)
 		if (!unit) {
-			unit = { unitId, unitNumber: unitNum, lessons: [] }
+			const unitSlugKey = Object.keys(pretty.unitTitleBySlug).find((k) => k.startsWith(`unit-${unitNum}`))
+			const prettyUnitTitle = unitSlugKey ? pretty.unitTitleBySlug[unitSlugKey] : undefined
+			if (!prettyUnitTitle) {
+				logger.error("missing pretty unit title for injected unit", { unitNum })
+				throw errors.new("missing pretty unit title")
+			}
+			unit = { unitId, unitNumber: unitNum, title: prettyUnitTitle, lessons: [] }
 			unitsMap.set(unitId, unit)
 		}
 		let lesson = unit.lessons.find((l) => l.lessonNumber === lessonNum)
 		if (!lesson) {
-			lesson = {
-				unitId,
-				lessonId: `lesson-${unitNum}-${lessonNum}`,
-				lessonNumber: lessonNum,
-				resources: []
+			const unitSlugKey = Object.keys(pretty.unitTitleBySlug).find((k) => k.startsWith(`unit-${unitNum}`))
+			const lessonMap = unitSlugKey ? pretty.lessonTitleByGroupAndSlug[unitSlugKey] : undefined
+			const targetPrefix = `${unitNum}-${lessonNum}-`
+			const pageKey = lessonMap ? Object.keys(lessonMap).find((k) => k.startsWith(targetPrefix)) : undefined
+			const prettyLessonTitle = pageKey ? lessonMap![pageKey] : undefined
+			if (!prettyLessonTitle) {
+				logger.error("missing pretty lesson title for injected lesson", { unitNum, lessonNum })
+				throw errors.new("missing pretty lesson title")
 			}
+			lesson = { unitId, lessonId: `lesson-${unitNum}-${lessonNum}`, lessonNumber: lessonNum, title: prettyLessonTitle, resources: [] }
 			unit.lessons.push(lesson)
 		}
 		lesson.resources.push({
@@ -359,7 +456,7 @@ function buildHierarchy(
 		const unitId = `unit-${unitNum}`
 		let unit = unitsMap.get(unitId)
 		if (!unit) {
-			unit = { unitId, unitNumber: unitNum, lessons: [] }
+			unit = { unitId, unitNumber: unitNum, title: `unit-${unitNum}`, lessons: [] }
 			unitsMap.set(unitId, unit)
 		}
 		unit.unitTest = { id: t.id, path: t.path, questionCount: t.questions.length, questions: t.questions }
@@ -367,12 +464,7 @@ function buildHierarchy(
 
 	// Sort lessons within units
 	for (const u of unitsMap.values()) {
-		u.lessons.sort((a, b) => {
-			if (a.lessonNumber !== undefined && b.lessonNumber !== undefined) return a.lessonNumber - b.lessonNumber
-			if (a.lessonNumber !== undefined) return -1
-			if (b.lessonNumber !== undefined) return 1
-			return a.lessonId.localeCompare(b.lessonId)
-		})
+		u.lessons.sort((a, b) => a.lessonNumber - b.lessonNumber)
 		for (const l of u.lessons) {
 			l.resources.sort((r1, r2) => {
 				if (r1.type !== r2.type) return r1.type === "article" ? -1 : 1
@@ -383,21 +475,7 @@ function buildHierarchy(
 
 	// Sort units: numeric units first by number, then others lexicographically
 	let units = Array.from(unitsMap.values())
-	// Exclude non-content units entirely by explicit title match only
-	units = units.filter((u) => {
-		const baseTitle = u.title
-		if (baseTitle === undefined) return true
-		const key = baseTitle.replace(/^unit-/, "")
-		return !EXCLUDED_GROUPS.has(key)
-	})
-	units.sort((a, b) => {
-		const an = a.unitId.match(/^unit-(\d+)$/)
-		const bn = b.unitId.match(/^unit-(\d+)$/)
-		if (an && bn) return Number(an[1]) - Number(bn[1])
-		if (an && !bn) return -1
-		if (!an && bn) return 1
-		return a.unitId.localeCompare(b.unitId)
-	})
+	units.sort((a, b) => a.unitNumber - b.unitNumber)
 	return units
 }
 
@@ -416,7 +494,11 @@ async function main() {
 		throw errors.new("data directory not found")
 	}
 
-	logger.info("collecting stimulus content")
+logger.info("collecting course metadata")
+const course = await collectCourseInfo()
+const prettyMaps = await collectPrettyMaps(course.title)
+
+logger.info("collecting stimulus content")
 	const contentGroups = await collectStimulus()
 
 	logger.info("collecting assessments")
@@ -425,13 +507,12 @@ async function main() {
 	logger.info("collecting file paths for on-disk staging")
 
 	// Build hierarchical Units → Lessons → Resources, and write split JSON files
-	const hierarchy = buildHierarchy(contentGroups, assessments)
+const hierarchy = buildHierarchy(contentGroups, assessments, prettyMaps)
 
 	// Convert UnitRecord (staging view) to BuildUnit (builder schema) shape
 	const buildUnits: BuildUnit[] = hierarchy.map((u) => ({
 		id: u.unitId,
-		// Only include unitNumber key for numeric units; otherwise non-numeric id stays without unitNumber
-		...(u.unitNumber !== undefined ? { unitNumber: u.unitNumber } : {}),
+		unitNumber: u.unitNumber,
 		title: u.title,
 		lessons: u.lessons.map((l) => ({
 			id: l.lessonId,
@@ -487,8 +568,8 @@ async function main() {
 		}
 	}
 
-	logger.info("building zstd-compressed cartridge (tar.zst) via on-disk staging")
-	await buildCartridgeFromFileMap({ generator, units: buildUnits, files: fileMap }, OUT_CARTRIDGE)
+    logger.info("building zstd-compressed cartridge (tar.zst) via on-disk staging")
+    await buildCartridgeFromFileMap({ generator, course, units: buildUnits, files: fileMap }, OUT_CARTRIDGE)
 	logger.info("package export complete", { cartridge: OUT_CARTRIDGE, compression: "zstd" })
 }
 
