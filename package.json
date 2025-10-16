@@ -1,6 +1,6 @@
 {
 	"name": "@superbuilders/qti-assessment-item-generator",
-  "version": "4.2.1",
+	"version": "4.2.2",
 	"description": "QTI 3.0 assessment item generator (compiler + AI pipeline)",
 	"type": "module",
 	"files": [
@@ -61,72 +61,72 @@
 	"exports": {
 		"./package.json": "./package.json",
 		"./compiler": {
-			"types": "./dist/compiler/compiler.d.ts",
-			"import": "./dist/compiler/compiler.js"
+			"types": "./dist/src/compiler/compiler.d.ts",
+			"import": "./dist/src/compiler/compiler.js"
 		},
 		"./compiler/response-processor": {
-			"types": "./dist/compiler/response-processor.d.ts",
-			"import": "./dist/compiler/response-processor.js"
+			"types": "./dist/src/compiler/response-processor.d.ts",
+			"import": "./dist/src/compiler/response-processor.js"
 		},
 		"./compiler/qti-constants": {
-			"types": "./dist/compiler/qti-constants.d.ts",
-			"import": "./dist/compiler/qti-constants.js"
+			"types": "./dist/src/compiler/qti-constants.d.ts",
+			"import": "./dist/src/compiler/qti-constants.js"
 		},
 		"./structured": {
-			"types": "./dist/structured/client.d.ts",
-			"import": "./dist/structured/client.js"
+			"types": "./dist/src/structured/client.d.ts",
+			"import": "./dist/src/structured/client.js"
 		},
 		"./structured/ai-context-builder": {
-			"types": "./dist/structured/ai-context-builder.d.ts",
-			"import": "./dist/structured/ai-context-builder.js"
+			"types": "./dist/src/structured/ai-context-builder.d.ts",
+			"import": "./dist/src/structured/ai-context-builder.js"
 		},
 		"./structured/differentiator": {
-			"types": "./dist/structured/differentiator.d.ts",
-			"import": "./dist/structured/differentiator.js"
+			"types": "./dist/src/structured/differentiator.d.ts",
+			"import": "./dist/src/structured/differentiator.js"
 		},
 		"./widgets/registry": {
-			"types": "./dist/widgets/registry.d.ts",
-			"import": "./dist/widgets/registry.js"
+			"types": "./dist/src/widgets/registry.d.ts",
+			"import": "./dist/src/widgets/registry.js"
 		},
 		"./widgets/collections": {
-			"types": "./dist/widgets/collections/index.d.ts",
-			"import": "./dist/widgets/collections/index.js"
+			"types": "./dist/src/widgets/collections/index.d.ts",
+			"import": "./dist/src/widgets/collections/index.js"
 		},
 		"./widgets/types": {
-			"types": "./dist/widgets/types.d.ts",
-			"import": "./dist/widgets/types.js"
+			"types": "./dist/src/widgets/types.d.ts",
+			"import": "./dist/src/widgets/types.js"
 		},
 		"./widgets/widget-generator": {
-			"types": "./dist/widgets/widget-generator.d.ts",
-			"import": "./dist/widgets/widget-generator.js"
+			"types": "./dist/src/widgets/widget-generator.d.ts",
+			"import": "./dist/src/widgets/widget-generator.js"
 		},
 		"./examples": {
-			"types": "./dist/examples.d.ts",
-			"import": "./dist/examples.js"
+			"types": "./dist/src/examples.d.ts",
+			"import": "./dist/src/examples.js"
 		},
 		"./qti-validation/utils": {
-			"types": "./dist/qti-validation/utils.d.ts",
-			"import": "./dist/qti-validation/utils.js"
+			"types": "./dist/src/qti-validation/utils.d.ts",
+			"import": "./dist/src/qti-validation/utils.js"
 		},
 		"./core": {
-			"types": "./dist/core/index.d.ts",
-			"import": "./dist/core/index.js"
+			"types": "./dist/src/core/index.d.ts",
+			"import": "./dist/src/core/index.js"
 		},
 		"./core/content": {
-			"types": "./dist/core/content/index.d.ts",
-			"import": "./dist/core/content/index.js"
+			"types": "./dist/src/core/content/index.d.ts",
+			"import": "./dist/src/core/content/index.js"
 		},
 		"./core/feedback": {
-			"types": "./dist/core/feedback/index.d.ts",
-			"import": "./dist/core/feedback/index.js"
+			"types": "./dist/src/core/feedback/index.d.ts",
+			"import": "./dist/src/core/feedback/index.js"
 		},
 		"./core/interactions": {
-			"types": "./dist/core/interactions/index.d.ts",
-			"import": "./dist/core/interactions/index.js"
+			"types": "./dist/src/core/interactions/index.d.ts",
+			"import": "./dist/src/core/interactions/index.js"
 		},
 		"./core/item": {
-			"types": "./dist/core/item/index.d.ts",
-			"import": "./dist/core/item/index.js"
+			"types": "./dist/src/core/item/index.d.ts",
+			"import": "./dist/src/core/item/index.js"
       },
       "./cartridge/readers/tarzst": {
         "types": "./dist/src/cartridge/readers/tarzst.d.ts",
