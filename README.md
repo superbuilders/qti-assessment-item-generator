@@ -136,6 +136,38 @@ console.log(svgString);
 
 ## API Reference
 
+### cartridge (course cartridge)
+
+Package subpath exports for the cartridge system:
+
+- `@superbuilders/qti-assessment-item-generator/cartridge/build/builder`
+  - Exports: `buildCartridgeToBytes`, `buildCartridgeToFile`, `buildCartridgeFromFileMap`
+  - Types: `GeneratorInfo`, `CartridgeBuildInput`, `BuildUnit`, `CartridgeFileMap`
+
+- `@superbuilders/qti-assessment-item-generator/cartridge/client`
+  - Exports: `iterUnits`, `iterUnitLessons`, `iterLessonResources`, `readIndex`, `readUnit`, `readLesson`, `readArticleContent`, `readQuestionXml`, `readQuestionJson`, `validateIntegrity`
+
+- `@superbuilders/qti-assessment-item-generator/cartridge/readers/tarzst`
+  - Exports: `openCartridgeTarZst`, `createTarZstReader`
+
+- `@superbuilders/qti-assessment-item-generator/cartridge/types`
+  - Types: `IndexV1`, `Unit`, `Lesson`, `Resource`, `UnitTest`, `IntegrityManifest`, `IntegrityEntry`
+
+- `@superbuilders/qti-assessment-item-generator/cartridge/schema`
+  - Schemas: `IndexV1Schema`, `UnitSchema`, `LessonSchema`, `ResourceSchema`, `ResourceArticleSchema`, `ResourceQuizSchema`, `QuestionRefSchema`, `IntegritySchema`
+
+- `@superbuilders/qti-assessment-item-generator/cartridge/reader`
+  - Types: `CartridgeReader`
+
+Example imports:
+
+```ts
+import { buildCartridgeFromFileMap } from "@superbuilders/qti-assessment-item-generator/cartridge/build/builder"
+import { openCartridgeTarZst } from "@superbuilders/qti-assessment-item-generator/cartridge/readers/tarzst"
+import { iterUnits, iterUnitLessons, readArticleContent } from "@superbuilders/qti-assessment-item-generator/cartridge/client"
+import type { IndexV1, Unit } from "@superbuilders/qti-assessment-item-generator/cartridge/types"
+```
+
 ### `structured`
 ### `structured/ai-context-builder`
 

@@ -42,7 +42,7 @@ Cartridge (tar.zst archive)
 Use the builder to validate and produce a tar.zst without temp files.
 
 ```ts
-import { buildCartridgeToFile, buildCartridgeToBytes, type CartridgeBuildInput } from "@/cartridge/build/builder"
+import { buildCartridgeToFile, buildCartridgeToBytes, type CartridgeBuildInput } from "@superbuilders/qti-assessment-item-generator/cartridge/build/builder"
 
 const input: CartridgeBuildInput = {
   generator: { name: "qti-assessment-item-generator", version: "1.0.0" },
@@ -103,7 +103,7 @@ const bytes = await buildCartridgeToBytes(input)
 ### Opening
 
 ```ts
-import { openCartridgeTarZst } from "@/cartridge/readers/tarzst"
+import { openCartridgeTarZst } from "@superbuilders/qti-assessment-item-generator/cartridge/readers/tarzst"
 
 const reader = await openCartridgeTarZst("./course-cartridge-v1.tar.zst")
 ```
@@ -120,7 +120,7 @@ import {
   readArticleContent,
   readQuestionXml,
   readQuestionJson
-} from "@/cartridge/client"
+} from "@superbuilders/qti-assessment-item-generator/cartridge/client"
 
 for await (const unit of iterUnits(reader)) {
   for await (const lesson of iterUnitLessons(reader, unit)) {
@@ -131,7 +131,7 @@ for await (const unit of iterUnits(reader)) {
 }
 
 // On-demand helpers
-const html = await readArticleContent(reader, "content/unit-1/intro/stimulus.html")
+const html = await readArticleContent(reader, "content/unit-1--short-fiction---literary-elements/1-1-plot-structure/stimulus.html")
 const xml = await readQuestionXml(reader, "quizzes/quiz-1-1/question-01.xml")
 const json = await readQuestionJson(reader, "quizzes/quiz-1-1/question-01-structured.json")
 ```
@@ -141,7 +141,7 @@ const json = await readQuestionJson(reader, "quizzes/quiz-1-1/question-01-struct
 If your content already exists on disk, use the file map builder to stream files into a cartridge without loading them all into memory:
 
 ```ts
-import { buildCartridgeFromFileMap, type GeneratorInfo, type BuildUnit } from "@/cartridge/build/builder"
+import { buildCartridgeFromFileMap, type GeneratorInfo, type BuildUnit } from "@superbuilders/qti-assessment-item-generator/cartridge/build/builder"
 
 const generator: GeneratorInfo = { name: "qti-assessment-item-generator", version: "1.0.0" }
 
@@ -199,7 +199,7 @@ await buildCartridgeFromFileMap({ generator, course: { title: "English 09, Part 
 
 - `buildCartridgeToBytes(input: CartridgeBuildInput): Promise<Uint8Array>`
 - `buildCartridgeToFile(input: CartridgeBuildInput, outFile: string): Promise<void>`
-- `buildCartridgeFromFileMap(plan: { generator: GeneratorInfo; units: BuildUnit[]; files: CartridgeFileMap }, outFile: string): Promise<void>`
+- `buildCartridgeFromFileMap(plan: { generator: GeneratorInfo; course: { title: string; subject: string }; units: BuildUnit[]; files: CartridgeFileMap }, outFile: string): Promise<void>`
 - Types: `GeneratorInfo`, `CartridgeBuildInput`, `BuildUnit`, `CartridgeFileMap`
 
 ### Reading (read-time)
@@ -211,10 +211,33 @@ await buildCartridgeFromFileMap({ generator, course: { title: "English 09, Part 
 - Direct content: `readIndex`, `readUnit`, `readLesson`, `readArticleContent`, `readQuestionXml`, `readQuestionJson`
 - Types: `CartridgeReader`, plus `IndexV1`, `Unit`, `Lesson`, `Resource` in `@/cartridge/types`
 
+### Package-level exports (Cartridge)
+
+These subpath exports are available from the published package for the cartridge system:
+
+- `@superbuilders/qti-assessment-item-generator/cartridge/build/builder`
+  - Exports: `buildCartridgeToBytes`, `buildCartridgeToFile`, `buildCartridgeFromFileMap`
+  - Types: `GeneratorInfo`, `CartridgeBuildInput`, `BuildUnit`, `CartridgeFileMap`
+
+- `@superbuilders/qti-assessment-item-generator/cartridge/client`
+  - Exports: `iterUnits`, `iterUnitLessons`, `iterLessonResources`, `readIndex`, `readUnit`, `readLesson`, `readArticleContent`, `readQuestionXml`, `readQuestionJson`, `validateIntegrity`
+
+- `@superbuilders/qti-assessment-item-generator/cartridge/readers/tarzst`
+  - Exports: `openCartridgeTarZst`, `createTarZstReader`
+
+- `@superbuilders/qti-assessment-item-generator/cartridge/types`
+  - Types: `IndexV1`, `Unit`, `Lesson`, `Resource`, `UnitTest`, `IntegrityManifest`, `IntegrityEntry`
+
+- `@superbuilders/qti-assessment-item-generator/cartridge/schema`
+  - Schemas: `IndexV1Schema`, `UnitSchema`, `LessonSchema`, `ResourceSchema`, `ResourceArticleSchema`, `ResourceQuizSchema`, `QuestionRefSchema`, `IntegritySchema`
+
+- `@superbuilders/qti-assessment-item-generator/cartridge/reader`
+  - Types: `CartridgeReader`
+
 ## Types and Schemas
 
-- Types: `@/cartridge/types`
-- Schemas: `@/cartridge/schema`
+- Types: `@superbuilders/qti-assessment-item-generator/cartridge/types`
+- Schemas: `@superbuilders/qti-assessment-item-generator/cartridge/schema`
 
 ## Design Principles
 
