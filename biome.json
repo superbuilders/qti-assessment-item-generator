@@ -10,7 +10,7 @@
 		"./gritql/require-logger-before-throw.grit"
 	],
 	"vcs": {
-		"enabled": true,
+		"enabled": false,
 		"clientKind": "git",
 		"defaultBranch": "main",
 		"useIgnoreFile": true
