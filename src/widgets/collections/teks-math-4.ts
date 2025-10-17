@@ -7,6 +7,7 @@ export const teksMath4Collection: WidgetCollection<
 		| "protractorAngleDiagram"
 		| "nPolygon"
 		| "dotPlot"
+		| "pictograph"
 		| "tapeDiagram"
 		| "numberLineWithAction"
 		| "fractionModelDiagram"
@@ -17,6 +18,7 @@ export const teksMath4Collection: WidgetCollection<
 		"protractorAngleDiagram",
 		"nPolygon",
 		"dotPlot",
+		"pictograph",
 		"tapeDiagram",
 		"numberLineWithAction",
 		"fractionModelDiagram",
@@ -29,6 +31,7 @@ export const teksMath4Collection: WidgetCollection<
 		protractorAngleDiagram: allWidgetDefinitions.protractorAngleDiagram,
 		nPolygon: allWidgetDefinitions.nPolygon,
 		dotPlot: allWidgetDefinitions.dotPlot,
+		pictograph: allWidgetDefinitions.pictograph,
 		tapeDiagram: allWidgetDefinitions.tapeDiagram,
 		numberLineWithAction: allWidgetDefinitions.numberLineWithAction,
 		fractionModelDiagram: allWidgetDefinitions.fractionModelDiagram,
@@ -39,6 +42,7 @@ export const teksMath4Collection: WidgetCollection<
 		"protractorAngleDiagram",
 		"nPolygon",
 		"dotPlot",
+		"pictograph",
 		"tapeDiagram",
 		"numberLineWithAction",
 		"fractionModelDiagram",
