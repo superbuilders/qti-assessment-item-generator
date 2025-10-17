@@ -12,6 +12,8 @@ import type { StimulusIssue, StimulusOptions } from "@/stimulus/types"
 
 const BOOLEAN_ATTRIBUTES = new Set(["allowfullscreen"])
 
+const DISALLOWED_ELEMENTS = new Set(["style", "script", "link", "input", "button"])
+
 const NODE_FILTER = {
 	SHOW_ELEMENT: 1,
 	SHOW_TEXT: 4,
@@ -31,8 +33,28 @@ export function sanitizeDocument(
 	}
 
 	stripComments(document)
+	stripDisallowedElements(document, issues)
 	stripDisallowedAttributes(document, issues)
 	collapseWhitespace(document.body)
+}
+
+function stripDisallowedElements(
+	document: Document,
+	issues: StimulusIssue[]
+) {
+	for (const tag of DISALLOWED_ELEMENTS) {
+		for (const element of Array.from(document.querySelectorAll(tag))) {
+			const parentTag = element.parentElement?.tagName.toLowerCase()
+			element.remove()
+			issues.push({
+				severity: "info",
+				code: "element-removed",
+				message: parentTag
+					? `Removed disallowed <${tag}> element from <${parentTag}>.`
+					: `Removed disallowed <${tag}> element.`
+			})
+		}
+	}
 }
 
 function stripComments(document: Document) {

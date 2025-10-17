@@ -18,6 +18,7 @@ export function normalizeStructure(
 	removeEmptyElements(sourceRoot)
 	fixParagraphChildren(sourceRoot, issues)
 	normalizeLists(sourceRoot, issues)
+	normalizeTableHeaders(sourceRoot, issues)
 	unwrapRedundantContainers(sourceRoot, issues)
 	normalizeIframes(sourceRoot)
 
@@ -165,6 +166,36 @@ function normalizeLists(root: Element, issues: StimulusIssue[]) {
 				message: "Normalized list structure to ensure valid HTML."
 			})
 		}
+	}
+}
+
+function normalizeTableHeaders(root: Element, issues: StimulusIssue[]) {
+	for (const th of Array.from(root.querySelectorAll("th"))) {
+		if (!isElementNode(th)) {
+			continue
+		}
+		if (th.hasAttribute("scope")) {
+			continue
+		}
+		const row = th.parentElement
+		const section = row?.parentElement
+		const sectionTag = section?.tagName.toLowerCase()
+		let scope: "row" | "col" = "col"
+		if (sectionTag === "tbody" && row) {
+			const firstCell = row.children.item(0)
+			if (firstCell === th) {
+				scope = "row"
+			}
+		}
+		if (sectionTag === "thead") {
+			scope = "col"
+		}
+		th.setAttribute("scope", scope)
+		issues.push({
+			severity: "info",
+			code: "th-scope-added",
+			message: `Added scope="${scope}" to <th>.`
+		})
 	}
 }
 

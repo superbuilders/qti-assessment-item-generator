@@ -3,6 +3,7 @@ import * as fs from "node:fs"
 import * as path from "node:path"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
+import { HtmlValidate } from "html-validate"
 import type { CanvasPageData } from "@/stimulus/builder"
 import { buildStimulusFromPageData } from "@/stimulus/builder"
 import { VOID_ELEMENTS } from "@/stimulus/constants"
@@ -67,6 +68,19 @@ function collectStimulusFixtures(): StimulusFixture[] {
 }
 
 const stimulusFixtures = collectStimulusFixtures()
+const htmlvalidate = new HtmlValidate({
+	extends: ["html-validate:recommended"],
+	root: true,
+	rules: {
+		// Allow rich text coming from source content while still catching structural issues
+		"long-title": "off",
+		"no-inline-style": "off",
+		"no-trailing-whitespace": "off",
+		"require-sri": "off",
+		"no-unknown-elements": "off",
+		"void-style": "off"
+	}
+})
 
 describe("Canvas stimulus HTML generation", () => {
 	test("discovered stimulus page-data fixtures", () => {
@@ -74,7 +88,7 @@ describe("Canvas stimulus HTML generation", () => {
 	})
 
 	for (const fixture of stimulusFixtures) {
-		test(`renders HTML for ${fixture.slugPath}`, () => {
+	test(`renders HTML for ${fixture.slugPath}`, async () => {
 			const result = buildStimulusFromPageData(fixture.page)
 			expect(result).toBeDefined()
 			if (!result) return
@@ -94,6 +108,28 @@ describe("Canvas stimulus HTML generation", () => {
 			expect(articleOpenIndex).toBe(0)
 			const articleCloseIndex = result.html.lastIndexOf("</article>")
 			expect(articleCloseIndex).toBeGreaterThan(articleOpenIndex)
+
+			const htmlDocument = `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8" /><title>stimulus</title></head><body>${result.html}</body></html>`
+			const report = await htmlvalidate.validateString(
+				htmlDocument,
+				`${fixture.slugPath}.html`
+			)
+			const messages = report.results
+				.flatMap((resultItem) => {
+					const file = resultItem.filePath ?? `${fixture.slugPath}.html`
+					return resultItem.messages.map((msg) => {
+						const line = msg.line ?? 0
+						const column = msg.column ?? 0
+						return `${file}:${line}:${column} [${msg.ruleId}] ${msg.message}`
+					})
+				})
+				.join("\n")
+			expect(
+				report.valid,
+				messages.length > 0
+					? `HTML validation errors:\n${messages}`
+					: "HTML validation failed with unknown error"
+			).toBeTrue()
 
 			for (const tag of VOID_ELEMENTS) {
 				const pattern = new RegExp(`<${tag}\\b[^>]*>`, "gi")
