@@ -1,6 +1,6 @@
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
+import type { WidgetGenerator } from "@/widgets/types"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
 
 function createEmojiSchema() {
 	return z
@@ -20,7 +20,9 @@ function createEmojiSchema() {
 			label: z
 				.string()
 				.nullable()
-				.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
+				.transform((val) =>
+					val === "null" || val === "NULL" || val === "" ? null : val
+				)
 				.describe(
 					"Accessibility label describing the emoji for screen readers (e.g., 'ice cream cone', 'scoop of ice cream', 'pancake', null). Optional; null means no label. Plaintext only; no markdown or HTML."
 				)
@@ -73,7 +75,9 @@ export const StackedItemsDiagramPropsSchema = z
 		"Creates visual representations of stacked items using emojis, perfect for word problems and counting exercises. Commonly used for ice cream scoops on cones, pancake stacks, book piles, or any scenario involving repeated items. The overlap parameter creates realistic-looking stacks."
 	)
 
-export type StackedItemsDiagramProps = z.infer<typeof StackedItemsDiagramPropsSchema>
+export type StackedItemsDiagramProps = z.infer<
+	typeof StackedItemsDiagramPropsSchema
+>
 
 /**
  * This template is designed to generate a simple, clear visual representation of a quantity
@@ -83,7 +87,16 @@ export type StackedItemsDiagramProps = z.infer<typeof StackedItemsDiagramPropsSc
 export const generateStackedItemsDiagram: WidgetGenerator<
 	typeof StackedItemsDiagramPropsSchema
 > = async (data) => {
-	const { width, height, altText, baseItem, stackedItem, count, orientation, overlap } = data
+	const {
+		width,
+		height,
+		altText,
+		baseItem,
+		stackedItem,
+		count,
+		orientation,
+		overlap
+	} = data
 	let html = `<div style="position: relative; width: ${width}px; height: ${height}px;" role="img" aria-label="${altText}">`
 
 	// Base item is aligned to the bottom-left corner of the container
@@ -103,7 +116,9 @@ export const generateStackedItemsDiagram: WidgetGenerator<
 			const step = stackedItem.size * (1 - overlap)
 			posStyle = `left: ${i * step}px; bottom: 0;`
 		}
-		const stackedLabel = stackedItem.label ? ` aria-label="${stackedItem.label}"` : ""
+		const stackedLabel = stackedItem.label
+			? ` aria-label="${stackedItem.label}"`
+			: ""
 		html += `<span style="position: absolute; font-size: ${stackedItem.size}px; line-height: 1; ${posStyle} z-index: ${i + 2};"${stackedLabel}>${stackedItem.emoji}</span>`
 	}
 

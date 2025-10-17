@@ -1,6 +1,6 @@
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { theme } from "@/widgets/utils/theme"
 
 // The main Zod schema for the verticalArithmeticSetup function
 export const VerticalArithmeticSetupPropsSchema = z
@@ -13,7 +13,9 @@ export const VerticalArithmeticSetupPropsSchema = z
 		title: z
 			.string()
 			.nullable()
-			.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
+			.transform((val) =>
+				val === "null" || val === "NULL" || val === "" ? null : val
+			)
 			.describe(
 				"Optional instruction or problem context displayed above the arithmetic (e.g., 'Calculate:', 'Find the product:', 'Solve:', null). Null means no title."
 			),
@@ -38,7 +40,9 @@ export const VerticalArithmeticSetupPropsSchema = z
 		"Creates a traditional vertical (column) arithmetic setup showing two numbers with an operation, ready for students to solve. Displays numbers aligned by place value with the operator symbol and a horizontal line where the answer would go. Perfect for teaching standard algorithms for addition, subtraction, and multiplication."
 	)
 
-export type VerticalArithmeticSetupProps = z.infer<typeof VerticalArithmeticSetupPropsSchema>
+export type VerticalArithmeticSetupProps = z.infer<
+	typeof VerticalArithmeticSetupPropsSchema
+>
 
 /**
  * This template is designed to generate a clear, standards-compliant visual representation

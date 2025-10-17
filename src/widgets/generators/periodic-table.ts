@@ -1,6 +1,6 @@
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { theme } from "@/widgets/utils/theme"
 
 export const PeriodicTableWidgetPropsSchema = z
 	.object({
@@ -8253,11 +8253,12 @@ const PERIODIC_TABLE_SVG = `
 </svg>
 `
 
-const PERIODIC_TABLE_SVG_BASE64 = Buffer.from(PERIODIC_TABLE_SVG).toString("base64")
+const PERIODIC_TABLE_SVG_BASE64 =
+	Buffer.from(PERIODIC_TABLE_SVG).toString("base64")
 
-export const generatePeriodicTable: WidgetGenerator<typeof PeriodicTableWidgetPropsSchema> = async (
-	props
-) => {
+export const generatePeriodicTable: WidgetGenerator<
+	typeof PeriodicTableWidgetPropsSchema
+> = async (props) => {
 	const { alt, caption } = props
 
 	const containerStyles = "display: inline-block; text-align: center;"
@@ -8268,9 +8269,13 @@ export const generatePeriodicTable: WidgetGenerator<typeof PeriodicTableWidgetPr
 	const dataUrl = `data:image/svg+xml;base64,${PERIODIC_TABLE_SVG_BASE64}`
 
 	const imgTag = `<img src="${dataUrl}" alt="${alt}" style="${imgStyles}" />`
-	const captionTag = caption ? `<div style="${captionStyles}">${caption}</div>` : ""
+	const captionTag = caption
+		? `<div style="${captionStyles}">${caption}</div>`
+		: ""
 
 	return `<div style="${containerStyles}">${imgTag}${captionTag}</div>`
 }
 
-export type PeriodicTableWidgetProps = z.infer<typeof PeriodicTableWidgetPropsSchema>
+export type PeriodicTableWidgetProps = z.infer<
+	typeof PeriodicTableWidgetPropsSchema
+>

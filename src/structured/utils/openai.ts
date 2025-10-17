@@ -18,7 +18,10 @@ function classifyError(error: Error): { retriable: boolean; reason: string } {
 		if (typeof st === "number") status = st
 	}
 
-	if (typeof status === "number" && [408, 429, 500, 502, 503, 504].includes(status)) {
+	if (
+		typeof status === "number" &&
+		[408, 429, 500, 502, 503, 504].includes(status)
+	) {
 		return { retriable: true, reason: "http-transient" }
 	}
 	if (/\b(408|429|500|502|503|504)\b/.test(message))
@@ -29,24 +32,36 @@ function classifyError(error: Error): { retriable: boolean; reason: string } {
 		/(timeout|timed out|deadline exceeded|context deadline exceeded|gateway timeout|operation timed out)/i
 	const networkLike =
 		/(ETIMEDOUT|ENETUNREACH|ECONNRESET|EAI_AGAIN|ECONNABORTED|ENETDOWN|EHOSTUNREACH|EPIPE)/i
-	if (timeoutLike.test(message) || networkLike.test(message) || error.name === "TimeoutError") {
+	if (
+		timeoutLike.test(message) ||
+		networkLike.test(message) ||
+		error.name === "TimeoutError"
+	) {
 		return { retriable: true, reason: "network-timeout" }
 	}
 
 	return { retriable: false, reason: "non-retriable" }
 }
 
-export async function callOpenAIWithRetry<T>(label: string, fn: () => Promise<T>): Promise<T> {
+export async function callOpenAIWithRetry<T>(
+	label: string,
+	fn: () => Promise<T>
+): Promise<T> {
 	let attempt = 0
 	while (true) {
 		attempt++
 		const result = await errors.try(fn())
 		if (!result.error) {
-			if (attempt > 1) logger.info("openai recovered after retries", { label, attempt })
+			if (attempt > 1)
+				logger.info("openai recovered after retries", { label, attempt })
 			return result.data
 		}
 		if (!(result.error instanceof Error)) {
-			logger.error("openai request failed with non-error", { label, attempt, error: result.error })
+			logger.error("openai request failed with non-error", {
+				label,
+				attempt,
+				error: result.error
+			})
 			throw result.error
 		}
 		const classification = classifyError(result.error)
@@ -57,10 +72,17 @@ export async function callOpenAIWithRetry<T>(label: string, fn: () => Promise<T>
 			error: result.error
 		})
 		if (!classification.retriable) {
-			logger.error("openai non-retriable error", { label, attempt, error: result.error })
+			logger.error("openai non-retriable error", {
+				label,
+				attempt,
+				error: result.error
+			})
 			throw result.error
 		}
-		const exp = Math.min(OPENAI_RETRY_MAX_SLEEP_MS, OPENAI_RETRY_BASE_MS * 2 ** (attempt - 1))
+		const exp = Math.min(
+			OPENAI_RETRY_MAX_SLEEP_MS,
+			OPENAI_RETRY_BASE_MS * 2 ** (attempt - 1)
+		)
 		const jitter = Math.max(0, Math.round(exp * (0.8 + Math.random() * 0.4)))
 		logger.info("backing off before retry", { label, attempt, delayMs: jitter })
 		await sleep(jitter)

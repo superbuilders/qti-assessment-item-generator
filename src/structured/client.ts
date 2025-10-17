@@ -2,7 +2,11 @@ import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import type OpenAI from "openai"
 import { z } from "zod"
-import type { BlockContent, FeedbackContent, InlineContent } from "@/core/content"
+import type {
+	BlockContent,
+	FeedbackContent,
+	InlineContent
+} from "@/core/content"
 import type { AssessmentItemInput, ResponseDeclaration } from "@/core/item"
 import type {
 	WidgetCollection,
@@ -22,20 +26,25 @@ import {
 } from "@/core/feedback"
 import type { AnyInteraction } from "@/core/interactions"
 import { createAnyInteractionSchema } from "@/core/interactions"
-import { type AssessmentItemShell, createAssessmentItemShellSchema } from "@/core/item"
+import {
+	type AssessmentItemShell,
+	createAssessmentItemShellSchema
+} from "@/core/item"
 import { toJSONSchemaPromptSafe } from "@/core/json-schema"
-import { createPerOutcomeNestedFeedbackPrompt } from "./prompts/feedback-per-outcome"
-import { createInteractionContentPrompt } from "./prompts/interactions"
-import { formatUnifiedContextSections } from "./prompts/shared"
-import { createAssessmentShellPrompt } from "./prompts/shell"
-import { createWidgetContentPrompt } from "./prompts/widgets"
-import type { AiContextEnvelope, ImageContext } from "./types"
-import { collectWidgetRefs } from "./utils/collector"
-import { callOpenAIWithRetry } from "./utils/openai"
+import { createPerOutcomeNestedFeedbackPrompt } from "@/structured/prompts/feedback-per-outcome"
+import { createInteractionContentPrompt } from "@/structured/prompts/interactions"
+import { formatUnifiedContextSections } from "@/structured/prompts/shared"
+import { createAssessmentShellPrompt } from "@/structured/prompts/shell"
+import { createWidgetContentPrompt } from "@/structured/prompts/widgets"
+import type { AiContextEnvelope, ImageContext } from "@/structured/types"
+import { collectWidgetRefs } from "@/structured/utils/collector"
+import { callOpenAIWithRetry } from "@/structured/utils/openai"
 
 const OPENAI_MODEL = "gpt-5"
 const MAX_IMAGES_PER_REQUEST = 500
-export const ErrWidgetNotFound = errors.new("widget could not be mapped to a known type")
+export const ErrWidgetNotFound = errors.new(
+	"widget could not be mapped to a known type"
+)
 
 // NEW: Type definitions for Responses API content parts matching SDK
 type InputTextContentPart = {
@@ -55,9 +64,14 @@ type InputImageContentPart = {
 	image_url?: string
 }
 
-type ExtendedContentPart = InputTextContentPart | InputFileContentPart | InputImageContentPart
+type ExtendedContentPart =
+	| InputTextContentPart
+	| InputFileContentPart
+	| InputImageContentPart
 
-export const ErrUnsupportedInteraction = errors.new("unsupported interaction type found")
+export const ErrUnsupportedInteraction = errors.new(
+	"unsupported interaction type found"
+)
 
 type Leaf<E extends readonly string[]> = { content: FeedbackContent<E> }
 interface NestedNode<E extends readonly string[]> {
@@ -66,22 +80,32 @@ interface NestedNode<E extends readonly string[]> {
 	}
 }
 
-function isLeaf<E extends readonly string[]>(v: Leaf<E> | NestedNode<E>): v is Leaf<E> {
+function isLeaf<E extends readonly string[]>(
+	v: Leaf<E> | NestedNode<E>
+): v is Leaf<E> {
 	return Object.hasOwn(v, "content")
 }
 
-async function resolveRasterImages(envelope: AiContextEnvelope): Promise<ImageContext> {
+async function resolveRasterImages(
+	envelope: AiContextEnvelope
+): Promise<ImageContext> {
 	const finalImageUrls: string[] = []
 
 	for (const url of envelope.multimodalImageUrls) {
 		const urlResult = errors.trySync(() => new URL(url))
 		if (urlResult.error) {
-			logger.error("invalid url in multimodalImageUrls", { url, error: urlResult.error })
+			logger.error("invalid url in multimodalImageUrls", {
+				url,
+				error: urlResult.error
+			})
 			throw errors.wrap(urlResult.error, "invalid image url")
 		}
 		const scheme = urlResult.data.protocol
 		if (scheme !== "http:" && scheme !== "https:" && scheme !== "data:") {
-			logger.error("unsupported url scheme in multimodalImageUrls", { url, scheme })
+			logger.error("unsupported url scheme in multimodalImageUrls", {
+				url,
+				scheme
+			})
 			throw errors.new("unsupported url scheme")
 		}
 		finalImageUrls.push(url)
@@ -99,7 +123,10 @@ async function resolveRasterImages(envelope: AiContextEnvelope): Promise<ImageCo
 }
 
 async function generateAssessmentShell<
-	C extends WidgetCollection<Record<string, WidgetDefinition<unknown, unknown>>, readonly string[]>
+	C extends WidgetCollection<
+		Record<string, WidgetDefinition<unknown, unknown>>,
+		readonly string[]
+	>
 >(
 	openai: OpenAI,
 	logger: logger.Logger,
@@ -113,7 +140,9 @@ async function generateAssessmentShell<
 		widgetCollection
 	)
 
-	const ShellSchema = createAssessmentItemShellSchema(widgetCollection.widgetTypeKeys)
+	const ShellSchema = createAssessmentItemShellSchema(
+		widgetCollection.widgetTypeKeys
+	)
 	const jsonSchema = toJSONSchemaPromptSafe(ShellSchema)
 
 	logger.debug("generated json schema for openai", {
@@ -128,7 +157,11 @@ async function generateAssessmentShell<
 
 	// Add image URLs using input_image type
 	for (const imageUrl of imageContext.imageUrls) {
-		contentParts.push({ type: "input_image", detail: "high", image_url: imageUrl })
+		contentParts.push({
+			type: "input_image",
+			detail: "high",
+			image_url: imageUrl
+		})
 	}
 
 	// NEW: Process raw image payloads into base64-encoded input_file parts
@@ -257,7 +290,10 @@ function collectInteractionIdsFromShell<E extends readonly string[]>(shell: {
 }
 
 async function generateInteractionContent<
-	C extends WidgetCollection<Record<string, WidgetDefinition<unknown, unknown>>, readonly string[]>
+	C extends WidgetCollection<
+		Record<string, WidgetDefinition<unknown, unknown>>,
+		readonly string[]
+	>
 >(
 	openai: OpenAI,
 	logger: logger.Logger,
@@ -282,7 +318,9 @@ async function generateInteractionContent<
 		widgetCollection
 	)
 
-	const AnyInteraction = createAnyInteractionSchema(widgetCollection.widgetTypeKeys)
+	const AnyInteraction = createAnyInteractionSchema(
+		widgetCollection.widgetTypeKeys
+	)
 	const InteractionSchema = z.record(z.string(), AnyInteraction)
 	const jsonSchema = toJSONSchemaPromptSafe(InteractionSchema)
 
@@ -298,7 +336,11 @@ async function generateInteractionContent<
 	contentParts.push({ type: "input_text", text: userContent })
 
 	for (const imageUrl of imageContext.imageUrls) {
-		contentParts.push({ type: "input_image", detail: "high", image_url: imageUrl })
+		contentParts.push({
+			type: "input_image",
+			detail: "high",
+			image_url: imageUrl
+		})
 	}
 
 	for (const image of envelope.multimodalImagePayloads) {
@@ -322,9 +364,12 @@ async function generateInteractionContent<
 		})
 	}
 
-	logger.debug("calling openai for interaction content generation with multimodal input", {
-		interactionIds
-	})
+	logger.debug(
+		"calling openai for interaction content generation with multimodal input",
+		{
+			interactionIds
+		}
+	)
 
 	// MODIFIED: API call migrated to Responses API
 	const response = await callOpenAIWithRetry("generateInteractionContent", () =>
@@ -366,7 +411,10 @@ async function generateInteractionContent<
 }
 
 async function generateFeedbackForOutcomeNested<
-	C extends WidgetCollection<Record<string, WidgetDefinition<unknown, unknown>>, readonly string[]>
+	C extends WidgetCollection<
+		Record<string, WidgetDefinition<unknown, unknown>>,
+		readonly string[]
+	>
 >(
 	openai: OpenAI,
 	logger: logger.Logger,
@@ -378,13 +426,14 @@ async function generateFeedbackForOutcomeNested<
 	envelope: AiContextEnvelope,
 	imageContext: ImageContext
 ): Promise<{ id: string; content: FeedbackContent<WidgetTypeTupleFrom<C>> }> {
-	const { systemInstruction, userContent, ShallowSchema } = createPerOutcomeNestedFeedbackPrompt(
-		assessmentShell,
-		feedbackPlan,
-		combination,
-		widgetCollection,
-		interactions
-	)
+	const { systemInstruction, userContent, ShallowSchema } =
+		createPerOutcomeNestedFeedbackPrompt(
+			assessmentShell,
+			feedbackPlan,
+			combination,
+			widgetCollection,
+			interactions
+		)
 
 	const jsonSchema = toJSONSchemaPromptSafe(ShallowSchema)
 	logger.debug("generated shallow json schema for openai feedback (shard)", {
@@ -401,13 +450,21 @@ async function generateFeedbackForOutcomeNested<
 	})
 
 	for (const imageUrl of imageContext.imageUrls) {
-		feedbackParts.push({ type: "input_image", detail: "high", image_url: imageUrl })
+		feedbackParts.push({
+			type: "input_image",
+			detail: "high",
+			image_url: imageUrl
+		})
 	}
 
 	for (const image of envelope.multimodalImagePayloads) {
 		const base64 = Buffer.from(image.data).toString("base64")
 		const dataUrl = `data:${image.mimeType};base64,${base64}`
-		feedbackParts.push({ type: "input_image", detail: "high", image_url: dataUrl })
+		feedbackParts.push({
+			type: "input_image",
+			detail: "high",
+			image_url: dataUrl
+		})
 	}
 
 	for (const pdf of envelope.pdfPayloads) {
@@ -417,26 +474,30 @@ async function generateFeedbackForOutcomeNested<
 		feedbackParts.push({ type: "input_file", filename, file_data: dataUrl })
 	}
 
-	const response = await callOpenAIWithRetry("generateFeedbackForOutcomeNested", () =>
-		openai.responses.create({
-			model: OPENAI_MODEL,
-			instructions: systemInstruction,
-			input: [{ role: "user", content: feedbackParts }],
-			text: {
-				format: {
-					type: "json_schema",
-					name: "feedback",
-					schema: jsonSchema,
-					strict: true
+	const response = await callOpenAIWithRetry(
+		"generateFeedbackForOutcomeNested",
+		() =>
+			openai.responses.create({
+				model: OPENAI_MODEL,
+				instructions: systemInstruction,
+				input: [{ role: "user", content: feedbackParts }],
+				text: {
+					format: {
+						type: "json_schema",
+						name: "feedback",
+						schema: jsonSchema,
+						strict: true
+					}
 				}
-			}
-		})
+			})
 	)
 
 	// MODIFIED: Parse response from output_text
 	const messageContent = response.output_text
 	if (!messageContent) {
-		logger.error("openai feedback shard returned no content", { combinationId: combination.id })
+		logger.error("openai feedback shard returned no content", {
+			combinationId: combination.id
+		})
 		throw errors.new(`empty ai response for feedback shard ${combination.id}`)
 	}
 
@@ -446,7 +507,10 @@ async function generateFeedbackForOutcomeNested<
 			combinationId: combination.id,
 			error: parsedResult.error
 		})
-		throw errors.wrap(parsedResult.error, `feedback shard json parse for ${combination.id}`)
+		throw errors.wrap(
+			parsedResult.error,
+			`feedback shard json parse for ${combination.id}`
+		)
 	}
 	const validated = ShallowSchema.safeParse(parsedResult.data)
 	if (!validated.success) {
@@ -454,12 +518,17 @@ async function generateFeedbackForOutcomeNested<
 			combinationId: combination.id,
 			error: validated.error
 		})
-		throw errors.wrap(validated.error, `feedback shard validation for ${combination.id}`)
+		throw errors.wrap(
+			validated.error,
+			`feedback shard validation for ${combination.id}`
+		)
 	}
 
 	const parsedContent = validated.data.content
 	if (parsedContent.steps.length === 0) {
-		logger.warn("feedback shard returned empty steps array", { combinationId: combination.id })
+		logger.warn("feedback shard returned empty steps array", {
+			combinationId: combination.id
+		})
 	}
 
 	return { id: combination.id, content: parsedContent }
@@ -489,7 +558,10 @@ function promoteFallback<E extends readonly string[]>(
 }
 
 async function runShardedFeedbackNested<
-	C extends WidgetCollection<Record<string, WidgetDefinition<unknown, unknown>>, readonly string[]>
+	C extends WidgetCollection<
+		Record<string, WidgetDefinition<unknown, unknown>>,
+		readonly string[]
+	>
 >(
 	openai: OpenAI,
 	logger: logger.Logger,
@@ -501,7 +573,10 @@ async function runShardedFeedbackNested<
 	imageContext: ImageContext
 ): Promise<Record<string, FeedbackContent<WidgetTypeTupleFrom<C>>>> {
 	let combinationsToProcess = [...plan.combinations]
-	const successfulShards: Record<string, FeedbackContent<WidgetTypeTupleFrom<C>>> = {}
+	const successfulShards: Record<
+		string,
+		FeedbackContent<WidgetTypeTupleFrom<C>>
+	> = {}
 	let pass = 0
 
 	while (combinationsToProcess.length > 0) {
@@ -562,18 +637,26 @@ async function runShardedFeedbackNested<
 			failedCombinations.length > 0 &&
 			failedCombinations.length === combinationsToProcess.length
 		) {
-			logger.warn("no progress in feedback shard generation pass, retrying all", { pass })
+			logger.warn(
+				"no progress in feedback shard generation pass, retrying all",
+				{ pass }
+			)
 		}
 
 		combinationsToProcess = failedCombinations
 	}
 
-	logger.info("all feedback shards generated successfully", { totalPasses: pass })
+	logger.info("all feedback shards generated successfully", {
+		totalPasses: pass
+	})
 	return successfulShards
 }
 
 export async function generateFromEnvelope<
-	C extends WidgetCollection<Record<string, WidgetDefinition<unknown, unknown>>, readonly string[]>
+	C extends WidgetCollection<
+		Record<string, WidgetDefinition<unknown, unknown>>,
+		readonly string[]
+	>
 >(
 	openai: OpenAI,
 	logger: logger.Logger,
@@ -581,7 +664,9 @@ export async function generateFromEnvelope<
 	widgetCollection: C
 ): Promise<AssessmentItemInput<WidgetTypeTupleFrom<C>>> {
 	if (!envelope.primaryContent || envelope.primaryContent.trim() === "") {
-		logger.error("envelope validation failed", { reason: "primaryContent is empty" })
+		logger.error("envelope validation failed", {
+			reason: "primaryContent is empty"
+		})
 		throw errors.new("primaryContent cannot be empty")
 	}
 
@@ -596,13 +681,21 @@ export async function generateFromEnvelope<
 
 	const resolvedImagesResult = await errors.try(resolveRasterImages(envelope))
 	if (resolvedImagesResult.error) {
-		logger.error("raster image resolution", { error: resolvedImagesResult.error })
+		logger.error("raster image resolution", {
+			error: resolvedImagesResult.error
+		})
 		throw errors.wrap(resolvedImagesResult.error, "raster image resolution")
 	}
 	const imageContext = resolvedImagesResult.data
 
 	const shellResult = await errors.try(
-		generateAssessmentShell(openai, logger, envelope, imageContext, widgetCollection)
+		generateAssessmentShell(
+			openai,
+			logger,
+			envelope,
+			imageContext,
+			widgetCollection
+		)
 	)
 	if (shellResult.error) {
 		logger.error("generate assessment shell", { error: shellResult.error })
@@ -626,19 +719,29 @@ export async function generateFromEnvelope<
 		)
 	)
 	if (interactionContentResult.error) {
-		logger.error("generate interaction content", { error: interactionContentResult.error })
-		throw errors.wrap(interactionContentResult.error, "generate interaction content")
+		logger.error("generate interaction content", {
+			error: interactionContentResult.error
+		})
+		throw errors.wrap(
+			interactionContentResult.error,
+			"generate interaction content"
+		)
 	}
 	const generatedInteractions = interactionContentResult.data
 	logger.debug("shot 2 complete", {
 		generatedInteractionKeys: Object.keys(generatedInteractions)
 	})
 
-	if (!assessmentShell.responseDeclarations || assessmentShell.responseDeclarations.length === 0) {
+	if (
+		!assessmentShell.responseDeclarations ||
+		assessmentShell.responseDeclarations.length === 0
+	) {
 		logger.error("assessment shell has no response declarations", {
 			identifier: assessmentShell.identifier
 		})
-		throw errors.new("assessment shell must have at least one response declaration")
+		throw errors.new(
+			"assessment shell must have at least one response declaration"
+		)
 	}
 
 	const feedbackPlan = buildFeedbackPlanFromInteractions(
@@ -668,7 +771,9 @@ export async function generateFromEnvelope<
 		)
 	)
 	if (shardedResult.error) {
-		logger.error("sharded feedback generation failed", { error: shardedResult.error })
+		logger.error("sharded feedback generation failed", {
+			error: shardedResult.error
+		})
 		throw errors.wrap(shardedResult.error, "sharded feedback generation")
 	}
 	const feedbackBlocks = shardedResult.data
@@ -698,7 +803,9 @@ export async function generateFromEnvelope<
 				logger.error("missing content for combination in final assembly", {
 					combinationId: combination.id
 				})
-				throw errors.new(`missing feedback content for combination ${combination.id}`)
+				throw errors.new(
+					`missing feedback content for combination ${combination.id}`
+				)
 			}
 			let currentNode: NestedNode<WidgetTypeTupleFrom<C>> = root
 			for (let i = 0; i < combination.path.length; i++) {
@@ -743,9 +850,13 @@ export async function generateFromEnvelope<
 		feedbackPlan,
 		widgetCollection.widgetTypeKeys
 	)
-	const feedbackValidation = FeedbackObjectSchema.safeParse(nestedFeedbackObject.feedback)
+	const feedbackValidation = FeedbackObjectSchema.safeParse(
+		nestedFeedbackObject.feedback
+	)
 	if (!feedbackValidation.success) {
-		logger.error("nested feedback validation failed", { error: feedbackValidation.error })
+		logger.error("nested feedback validation failed", {
+			error: feedbackValidation.error
+		})
 		throw errors.wrap(feedbackValidation.error, "nested feedback validation")
 	}
 
@@ -801,10 +912,17 @@ export async function generateFromEnvelope<
 
 		// MODIFIED: Construct multi-part content for Responses API (INCLUDE PDFs in Shot 4)
 		const widgetContentParts: ExtendedContentPart[] = []
-		widgetContentParts.push({ type: "input_text", text: widgetPrompt.userContent })
+		widgetContentParts.push({
+			type: "input_text",
+			text: widgetPrompt.userContent
+		})
 
 		for (const imageUrl of imageContext.imageUrls) {
-			widgetContentParts.push({ type: "input_image", detail: "high", image_url: imageUrl })
+			widgetContentParts.push({
+				type: "input_image",
+				detail: "high",
+				image_url: imageUrl
+			})
 		}
 
 		for (const image of envelope.multimodalImagePayloads) {
@@ -829,20 +947,22 @@ export async function generateFromEnvelope<
 		}
 
 		// MODIFIED: API call migrated to Responses API
-		const widgetResponse = await callOpenAIWithRetry("generateWidgetContent", () =>
-			openai.responses.create({
-				model: OPENAI_MODEL,
-				instructions: widgetPrompt.systemInstruction,
-				input: [{ role: "user", content: widgetContentParts }],
-				text: {
-					format: {
-						type: "json_schema",
-						name: "widget_content_generator",
-						schema: widgetJsonSchema,
-						strict: true
+		const widgetResponse = await callOpenAIWithRetry(
+			"generateWidgetContent",
+			() =>
+				openai.responses.create({
+					model: OPENAI_MODEL,
+					instructions: widgetPrompt.systemInstruction,
+					input: [{ role: "user", content: widgetContentParts }],
+					text: {
+						format: {
+							type: "json_schema",
+							name: "widget_content_generator",
+							schema: widgetJsonSchema,
+							strict: true
+						}
 					}
-				}
-			})
+				})
 		)
 
 		// MODIFIED: Parse response from output_text
@@ -858,9 +978,13 @@ export async function generateFromEnvelope<
 			throw errors.wrap(widgetParseResult.error, "json parse")
 		}
 
-		const widgetValidation = WidgetCollectionSchema.safeParse(widgetParseResult.data)
+		const widgetValidation = WidgetCollectionSchema.safeParse(
+			widgetParseResult.data
+		)
 		if (!widgetValidation.success) {
-			logger.error("widget validation failed", { error: widgetValidation.error })
+			logger.error("widget validation failed", {
+				error: widgetValidation.error
+			})
 			throw errors.wrap(widgetValidation.error, "widget validation")
 		}
 
@@ -871,15 +995,20 @@ export async function generateFromEnvelope<
 		const requiredIds = Array.from(widgetRefs.keys())
 		const missingContent = requiredIds.filter((id) => !generatedKeys.has(id))
 		if (missingContent.length > 0) {
-			logger.error("widget content generation did not produce all required widgets", {
-				missingContent
-			})
+			logger.error(
+				"widget content generation did not produce all required widgets",
+				{
+					missingContent
+				}
+			)
 			throw errors.new(
 				`widget content generation: missing content for slots: ${missingContent.join(", ")}`
 			)
 		}
 
-		logger.debug("shot 4 complete", { generatedWidgetKeys: Object.keys(generatedWidgets) })
+		logger.debug("shot 4 complete", {
+			generatedWidgetKeys: Object.keys(generatedWidgets)
+		})
 	}
 
 	return {

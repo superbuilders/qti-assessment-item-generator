@@ -1,12 +1,12 @@
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { PADDING } from "../utils/constants"
-import { CSS_COLOR_PATTERN } from "../utils/css-color"
-import { Path2D } from "../utils/path-builder"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { estimateWrappedTextDimensions } from "../utils/text"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { PADDING } from "@/widgets/utils/constants"
+import { CSS_COLOR_PATTERN } from "@/widgets/utils/css-color"
+import { Path2D } from "@/widgets/utils/path-builder"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { estimateWrappedTextDimensions } from "@/widgets/utils/text"
+import { theme } from "@/widgets/utils/theme"
 
 /**
  * Creates a diagram showing one of six types of angles: acute, right, obtuse, straight, reflex, or full (360°).
@@ -23,7 +23,9 @@ function createLabelValueSchema() {
 			if (["", "null", "NULL"].includes(value)) return null
 			return value
 		})
-		.describe("Label text or null. Empty string and 'null'/'NULL' are converted to null.")
+		.describe(
+			"Label text or null. Empty string and 'null'/'NULL' are converted to null."
+		)
 }
 export const AngleTypeDiagramPropsSchema = z
 	.object({
@@ -105,7 +107,9 @@ export const AngleTypeDiagramPropsSchema = z
 			.describe(
 				"The labels for the three points defining the angle. Empty string and 'null'/'NULL' normalize to null."
 			),
-		showAngleArc: z.boolean().describe("Whether to show the arc indicating the angle."),
+		showAngleArc: z
+			.boolean()
+			.describe("Whether to show the arc indicating the angle."),
 		sectorColor: z
 			.string()
 			.regex(CSS_COLOR_PATTERN, "Invalid CSS color format")
@@ -118,10 +122,18 @@ export type AngleTypeDiagramProps = z.infer<typeof AngleTypeDiagramPropsSchema>
 /**
  * Generates an SVG diagram for a specific type of angle.
  */
-export const generateAngleTypeDiagram: WidgetGenerator<typeof AngleTypeDiagramPropsSchema> = async (
-	props
-) => {
-	const { width, height, angleType, labels, showAngleArc, rotation, sectorColor } = props
+export const generateAngleTypeDiagram: WidgetGenerator<
+	typeof AngleTypeDiagramPropsSchema
+> = async (props) => {
+	const {
+		width,
+		height,
+		angleType,
+		labels,
+		showAngleArc,
+		rotation,
+		sectorColor
+	} = props
 
 	const canvas = new CanvasImpl({
 		chartArea: { left: 0, top: 0, width, height },
@@ -160,7 +172,10 @@ export const generateAngleTypeDiagram: WidgetGenerator<typeof AngleTypeDiagramPr
 	// Make A at half the baseline length, and C at the full baseline length (colinear).
 	if (angleType.type === "full") {
 		const halfLen = rayLength * 0.5
-		p1 = { x: cx + halfLen * Math.cos(ray2AngleRad), y: cy + halfLen * Math.sin(ray2AngleRad) } // A at half length
+		p1 = {
+			x: cx + halfLen * Math.cos(ray2AngleRad),
+			y: cy + halfLen * Math.sin(ray2AngleRad)
+		} // A at half length
 		p2Adjusted = {
 			x: cx + rayLength * Math.cos(ray2AngleRad),
 			y: cy + rayLength * Math.sin(ray2AngleRad)
@@ -198,11 +213,20 @@ export const generateAngleTypeDiagram: WidgetGenerator<typeof AngleTypeDiagramPr
 	})
 
 	// Build collision segments for label placement
-	const screenSegments: Array<{ a: { x: number; y: number }; b: { x: number; y: number } }> = []
+	const screenSegments: Array<{
+		a: { x: number; y: number }
+		b: { x: number; y: number }
+	}> = []
 	if (angleType.type !== "full") {
-		screenSegments.push({ a: { x: cx, y: cy }, b: { x: p1Arrow.x, y: p1Arrow.y } })
+		screenSegments.push({
+			a: { x: cx, y: cy },
+			b: { x: p1Arrow.x, y: p1Arrow.y }
+		})
 	}
-	screenSegments.push({ a: { x: cx, y: cy }, b: { x: p2Arrow.x, y: p2Arrow.y } })
+	screenSegments.push({
+		a: { x: cx, y: cy },
+		b: { x: p2Arrow.x, y: p2Arrow.y }
+	})
 
 	function segmentIntersectsRect(
 		A: { x: number; y: number },
@@ -372,7 +396,15 @@ export const generateAngleTypeDiagram: WidgetGenerator<typeof AngleTypeDiagramPr
 			const fillPath = new Path2D()
 				.moveTo(cx, cy)
 				.lineTo(startPoint.x, startPoint.y)
-				.arcTo(arcRadius, arcRadius, 0, largeArcFlag, sweepFlag, endPoint.x, endPoint.y)
+				.arcTo(
+					arcRadius,
+					arcRadius,
+					0,
+					largeArcFlag,
+					sweepFlag,
+					endPoint.x,
+					endPoint.y
+				)
 				.closePath()
 
 			canvas.drawPath(fillPath, {
@@ -383,7 +415,15 @@ export const generateAngleTypeDiagram: WidgetGenerator<typeof AngleTypeDiagramPr
 
 			const arcPath = new Path2D()
 				.moveTo(startPoint.x, startPoint.y)
-				.arcTo(arcRadius, arcRadius, 0, largeArcFlag, sweepFlag, endPoint.x, endPoint.y)
+				.arcTo(
+					arcRadius,
+					arcRadius,
+					0,
+					largeArcFlag,
+					sweepFlag,
+					endPoint.x,
+					endPoint.y
+				)
 
 			canvas.drawPath(arcPath, {
 				fill: "none",
@@ -425,13 +465,22 @@ export const generateAngleTypeDiagram: WidgetGenerator<typeof AngleTypeDiagramPr
 		]
 		for (const dist of [labelOffset + 2, labelOffset + 8, labelOffset + 14]) {
 			for (const ang of dirs) {
-				candidates.push({ x: point.x + dist * Math.cos(ang), y: point.y + dist * Math.sin(ang) })
+				candidates.push({
+					x: point.x + dist * Math.cos(ang),
+					y: point.y + dist * Math.sin(ang)
+				})
 			}
 		}
 		let best = candidates[0]
 		let minCollisions = Number.POSITIVE_INFINITY
 		for (const c of candidates) {
-			const rect = { x: c.x - halfW, y: c.y - halfH, width: w, height: h, pad: rectPad }
+			const rect = {
+				x: c.x - halfW,
+				y: c.y - halfH,
+				width: w,
+				height: h,
+				pad: rectPad
+			}
 			const collides =
 				rectIntersectsAnyObstacle(rect) ||
 				// also avoid overlapping the point itself
@@ -466,10 +515,16 @@ export const generateAngleTypeDiagram: WidgetGenerator<typeof AngleTypeDiagramPr
 
 	// Point 1 (on rotated ray or offset along baseline for full)
 	canvas.drawCircle(p1.x, p1.y, pointRadius, { fill: theme.colors.black })
-	placeLabelNear(p1, angleType.type === "full" ? ray2AngleRad : ray1AngleRad, labels.ray1Point)
+	placeLabelNear(
+		p1,
+		angleType.type === "full" ? ray2AngleRad : ray1AngleRad,
+		labels.ray1Point
+	)
 
 	// Point 2 (on baseline ray)
-	canvas.drawCircle(p2Adjusted.x, p2Adjusted.y, pointRadius, { fill: theme.colors.black })
+	canvas.drawCircle(p2Adjusted.x, p2Adjusted.y, pointRadius, {
+		fill: theme.colors.black
+	})
 	placeLabelNear(p2Adjusted, ray2AngleRad, labels.ray2Point)
 
 	// Vertex
@@ -491,8 +546,17 @@ export const generateAngleTypeDiagram: WidgetGenerator<typeof AngleTypeDiagramPr
 		const halfW = w / 2
 		const halfH = h / 2
 		let angle = vertexDefaultAngle
-		let result = { x: cx + labelOffset * Math.cos(angle), y: cy + labelOffset * Math.sin(angle) }
-		for (const extra of [0, Math.PI / 6, -Math.PI / 6, Math.PI / 4, -Math.PI / 4]) {
+		let result = {
+			x: cx + labelOffset * Math.cos(angle),
+			y: cy + labelOffset * Math.sin(angle)
+		}
+		for (const extra of [
+			0,
+			Math.PI / 6,
+			-Math.PI / 6,
+			Math.PI / 4,
+			-Math.PI / 4
+		]) {
 			const tx = cx + (labelOffset + 2) * Math.cos(vertexDefaultAngle + extra)
 			const ty = cy + (labelOffset + 2) * Math.sin(vertexDefaultAngle + extra)
 			const rect = { x: tx - halfW, y: ty - halfH, width: w, height: h, pad: 2 }
@@ -510,7 +574,13 @@ export const generateAngleTypeDiagram: WidgetGenerator<typeof AngleTypeDiagramPr
 			fontPx,
 			fontWeight: theme.font.weight.bold
 		})
-		placedLabelRects.push({ x: result.x - halfW, y: result.y - halfH, width: w, height: h, pad: 2 })
+		placedLabelRects.push({
+			x: result.x - halfW,
+			y: result.y - halfH,
+			width: w,
+			height: h,
+			pad: 2
+		})
 	}
 
 	const {

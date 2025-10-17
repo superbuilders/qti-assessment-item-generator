@@ -1,12 +1,12 @@
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { PADDING } from "../utils/constants"
-import { CSS_COLOR_PATTERN } from "../utils/css-color"
-import { abbreviateMonth } from "../utils/labels"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { estimateWrappedTextDimensions } from "../utils/text"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { PADDING } from "@/widgets/utils/constants"
+import { CSS_COLOR_PATTERN } from "@/widgets/utils/css-color"
+import { abbreviateMonth } from "@/widgets/utils/labels"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { estimateWrappedTextDimensions } from "@/widgets/utils/text"
+import { theme } from "@/widgets/utils/theme"
 
 const Point = z
 	.object({
@@ -59,7 +59,9 @@ const Figure = z
 				z
 					.string()
 					.nullable()
-					.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
+					.transform((val) =>
+						val === "null" || val === "NULL" || val === "" ? null : val
+					)
 			)
 			.describe(
 				"Labels for each edge of the polygon. Array length should match vertex count. First label is for edge from vertex[0] to vertex[1]. Null for no label on that edge."
@@ -123,7 +125,9 @@ export const FigureComparisonDiagramPropsSchema = z
 		"Creates a comparison view of multiple polygonal figures with comprehensive labeling options. Perfect for showing transformations, comparing shapes, demonstrating congruence/similarity, or analyzing different polygons. Each figure can have different styling and complete edge/vertex labeling."
 	)
 
-export type FigureComparisonDiagramProps = z.infer<typeof FigureComparisonDiagramPropsSchema>
+export type FigureComparisonDiagramProps = z.infer<
+	typeof FigureComparisonDiagramPropsSchema
+>
 
 /**
  * Generates diagrams for comparing multiple independent geometric figures.
@@ -214,7 +218,9 @@ export const generateFigureComparisonDiagram: WidgetGenerator<
 
 		// Add all points to the global collection for fit calculation
 		allPoints.push(...figureGeometry.vertices)
-		allPoints.push(...figureGeometry.sideLabels.map((label) => ({ x: label.x, y: label.y })))
+		allPoints.push(
+			...figureGeometry.sideLabels.map((label) => ({ x: label.x, y: label.y }))
+		)
 		allPoints.push({
 			x: figureGeometry.figureLabel.x,
 			y: figureGeometry.figureLabel.y
@@ -250,7 +256,12 @@ export const generateFigureComparisonDiagram: WidgetGenerator<
 	}
 
 	// Track all placed labels to prevent overlaps between side labels and figure labels
-	const placedLabelRects: Array<{ x: number; y: number; width: number; height: number }> = []
+	const placedLabelRects: Array<{
+		x: number
+		y: number
+		width: number
+		height: number
+	}> = []
 
 	// Render all figures with spacing applied in screen space
 	for (let i = 0; i < figureGeometries.length; i++) {
@@ -285,12 +296,13 @@ export const generateFigureComparisonDiagram: WidgetGenerator<
 
 			const labelFontPx = 14
 			const labelLineHeight = 1.2
-			const { maxWidth: textWidthPx, height: textHeightPx } = estimateWrappedTextDimensions(
-				sideLabel.text,
-				Number.POSITIVE_INFINITY,
-				labelFontPx,
-				labelLineHeight
-			)
+			const { maxWidth: textWidthPx, height: textHeightPx } =
+				estimateWrappedTextDimensions(
+					sideLabel.text,
+					Number.POSITIVE_INFINITY,
+					labelFontPx,
+					labelLineHeight
+				)
 
 			// Compute outward normal in screen space using polygon center
 			const edgeDx = projectedTo.x - projectedFrom.x
@@ -304,9 +316,11 @@ export const generateFigureComparisonDiagram: WidgetGenerator<
 			}
 
 			const polyCenterX =
-				transformedVertices.reduce((sum, v) => sum + v.x, 0) / transformedVertices.length
+				transformedVertices.reduce((sum, v) => sum + v.x, 0) /
+				transformedVertices.length
 			const polyCenterY =
-				transformedVertices.reduce((sum, v) => sum + v.y, 0) / transformedVertices.length
+				transformedVertices.reduce((sum, v) => sum + v.y, 0) /
+				transformedVertices.length
 			// Use edge midpoint for initial candidate placement
 			const midX = (projectedFrom.x + projectedTo.x) / 2
 			const midY = (projectedFrom.y + projectedTo.y) / 2
@@ -423,12 +437,13 @@ export const generateFigureComparisonDiagram: WidgetGenerator<
 		{
 			const figureFontPx = 16
 			const figureLineHeight = 1.2
-			const { maxWidth: figTextW, height: figTextH } = estimateWrappedTextDimensions(
-				figureGeom.figureLabel.text,
-				Number.POSITIVE_INFINITY,
-				figureFontPx,
-				figureLineHeight
-			)
+			const { maxWidth: figTextW, height: figTextH } =
+				estimateWrappedTextDimensions(
+					figureGeom.figureLabel.text,
+					Number.POSITIVE_INFINITY,
+					figureFontPx,
+					figureLineHeight
+				)
 			let flX = labelX
 			let flY = labelY
 			const halfW = figTextW / 2
@@ -470,7 +485,9 @@ export const generateFigureComparisonDiagram: WidgetGenerator<
 				}
 
 				// Check collision with polygon edges
-				if (polygonIntersectsRect(transformedVertices, { ...figureRect, pad: 1 })) {
+				if (
+					polygonIntersectsRect(transformedVertices, { ...figureRect, pad: 1 })
+				) {
 					return true
 				}
 
@@ -518,7 +535,11 @@ export const generateFigureComparisonDiagram: WidgetGenerator<
 /**
  * Helper: compute fit transform for all collected points
  */
-function computeFit(allPoints: Array<{ x: number; y: number }>, width: number, height: number) {
+function computeFit(
+	allPoints: Array<{ x: number; y: number }>,
+	width: number,
+	height: number
+) {
 	if (allPoints.length === 0) {
 		return {
 			scale: 1,
@@ -533,7 +554,10 @@ function computeFit(allPoints: Array<{ x: number; y: number }>, width: number, h
 	const maxY = Math.max(...allPoints.map((p) => p.y))
 	const rawW = maxX - minX
 	const rawH = maxY - minY
-	const scale = Math.min((width - 2 * PADDING) / (rawW || 1), (height - 2 * PADDING) / (rawH || 1))
+	const scale = Math.min(
+		(width - 2 * PADDING) / (rawW || 1),
+		(height - 2 * PADDING) / (rawH || 1)
+	)
 	const offsetX = (width - scale * rawW) / 2 - scale * minX
 	const offsetY = (height - scale * rawH) / 2 - scale * minY
 	const project = (p: { x: number; y: number }) => ({
@@ -580,7 +604,11 @@ function collectFigureGeometry(
 		edgeFrom: { x: number; y: number }
 		edgeTo: { x: number; y: number }
 	}> = []
-	for (let i = 0; i < Math.min(figure.sideLabels.length, transformedVertices.length); i++) {
+	for (
+		let i = 0;
+		i < Math.min(figure.sideLabels.length, transformedVertices.length);
+		i++
+	) {
 		const rawLabel = figure.sideLabels[i]
 		if (!rawLabel) continue
 		const label = abbreviateMonth(rawLabel)
@@ -602,9 +630,11 @@ function collectFigureGeometry(
 
 		// Determine outward direction
 		const centerX =
-			transformedVertices.reduce((sum, v) => sum + v.x, 0) / transformedVertices.length
+			transformedVertices.reduce((sum, v) => sum + v.x, 0) /
+			transformedVertices.length
 		const centerY =
-			transformedVertices.reduce((sum, v) => sum + v.y, 0) / transformedVertices.length
+			transformedVertices.reduce((sum, v) => sum + v.y, 0) /
+			transformedVertices.length
 		const toCenterX = centerX - midX
 		const toCenterY = centerY - midY
 		const dotProduct = normalX * toCenterX + normalY * toCenterY
@@ -709,7 +739,11 @@ function segmentIntersectsRect(
 	}
 
 	// If either endpoint inside the rect
-	if (pointInRect(A.x, A.y, rx, ry, rw, rh) || pointInRect(B.x, B.y, rx, ry, rw, rh)) return true
+	if (
+		pointInRect(A.x, A.y, rx, ry, rw, rh) ||
+		pointInRect(B.x, B.y, rx, ry, rw, rh)
+	)
+		return true
 
 	// Check intersection with each rectangle side
 	const r1 = { x: rx, y: ry }
@@ -741,7 +775,8 @@ function polygonIntersectsRect(
 		const a = poly[i]
 		const b = poly[(i + 1) % poly.length]
 		if (!a || !b) continue
-		if (segmentIntersectsRect(a, b, { x: rx, y: ry, width: rw, height: rh })) return true
+		if (segmentIntersectsRect(a, b, { x: rx, y: ry, width: rw, height: rh }))
+			return true
 	}
 
 	// Any polygon vertex inside rect
@@ -824,7 +859,8 @@ function pointInPolygon(
 		const xj = pj.x
 		const yj = pj.y
 		const intersect =
-			yi > point.y !== yj > point.y && point.x < ((xj - xi) * (point.y - yi)) / (yj - yi) + xi
+			yi > point.y !== yj > point.y &&
+			point.x < ((xj - xi) * (point.y - yi)) / (yj - yi) + xi
 		if (intersect) inside = !inside
 	}
 	return inside

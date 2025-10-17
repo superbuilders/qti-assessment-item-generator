@@ -1,7 +1,7 @@
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { PADDING } from "../utils/constants"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { PADDING } from "@/widgets/utils/constants"
 
 export const EmojiImagePropsSchema = z
 	.object({
@@ -34,7 +34,9 @@ export type EmojiImageProps = z.infer<typeof EmojiImagePropsSchema>
  * Generates an SVG image widget that displays an emoji at a specified size.
  * Can be used to replace various Perseus image widgets with emoji representations.
  */
-export const generateEmojiImage: WidgetGenerator<typeof EmojiImagePropsSchema> = async (data) => {
+export const generateEmojiImage: WidgetGenerator<
+	typeof EmojiImagePropsSchema
+> = async (data) => {
 	const { emoji, size } = data
 
 	const canvas = new CanvasImpl({

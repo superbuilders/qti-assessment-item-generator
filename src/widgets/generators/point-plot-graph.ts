@@ -1,11 +1,15 @@
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { createAxisOptionsSchema, createPlotPointSchema, renderPoints } from "../utils/canvas-utils"
-import { AXIS_VIEWBOX_PADDING } from "../utils/constants"
-import { setupCoordinatePlaneV2 } from "../utils/coordinate-plane-v2"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import {
+	createAxisOptionsSchema,
+	createPlotPointSchema,
+	renderPoints
+} from "@/widgets/utils/canvas-utils"
+import { AXIS_VIEWBOX_PADDING } from "@/widgets/utils/constants"
+import { setupCoordinatePlaneV2 } from "@/widgets/utils/coordinate-plane-v2"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
 
 export const PointPlotGraphPropsSchema = z
 	.object({
@@ -40,9 +44,9 @@ export const PointPlotGraphPropsSchema = z
 
 export type PointPlotGraphProps = z.infer<typeof PointPlotGraphPropsSchema>
 
-export const generatePointPlotGraph: WidgetGenerator<typeof PointPlotGraphPropsSchema> = async (
-	props
-) => {
+export const generatePointPlotGraph: WidgetGenerator<
+	typeof PointPlotGraphPropsSchema
+> = async (props) => {
 	const { width, height, xAxis, yAxis, showQuadrantLabels, points } = props
 
 	// 1. Call the base generator and get the body content and extents object

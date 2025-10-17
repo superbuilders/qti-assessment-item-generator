@@ -1,10 +1,10 @@
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { PADDING } from "../utils/constants"
-import { Path2D } from "../utils/path-builder"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { PADDING } from "@/widgets/utils/constants"
+import { Path2D } from "@/widgets/utils/path-builder"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
 
 // Defines a point with an optional label. Coordinates are calculated automatically.
 const createPointDefinitionSchema = () =>
@@ -39,18 +39,30 @@ export const GeometricPrimitiveDiagramPropsSchema = z
 					.object({
 						type: z
 							.literal("point")
-							.describe("A single, isolated point, always centered in the diagram."),
-						pointOne: createPointDefinitionSchema().describe("The point to be displayed.")
+							.describe(
+								"A single, isolated point, always centered in the diagram."
+							),
+						pointOne: createPointDefinitionSchema().describe(
+							"The point to be displayed."
+						)
 					})
 					.strict(),
 				z
 					.object({
-						type: z.literal("segment").describe("A line segment with two defined endpoints."),
-						pointOne: createPointDefinitionSchema().describe("The starting point of the segment."),
-						pointTwo: createPointDefinitionSchema().describe("The ending point of the segment."),
+						type: z
+							.literal("segment")
+							.describe("A line segment with two defined endpoints."),
+						pointOne: createPointDefinitionSchema().describe(
+							"The starting point of the segment."
+						),
+						pointTwo: createPointDefinitionSchema().describe(
+							"The ending point of the segment."
+						),
 						rotation: z
 							.number()
-							.describe("The rotation of the segment in degrees. 0 is horizontal, 90 is vertical."),
+							.describe(
+								"The rotation of the segment in degrees. 0 is horizontal, 90 is vertical."
+							),
 						length: z
 							.number()
 							.positive()
@@ -64,7 +76,9 @@ export const GeometricPrimitiveDiagramPropsSchema = z
 					.object({
 						type: z
 							.literal("ray")
-							.describe("A ray starting at one point and extending through another."),
+							.describe(
+								"A ray starting at one point and extending through another."
+							),
 						pointOne: createPointDefinitionSchema().describe(
 							"The starting point (endpoint) of the ray."
 						),
@@ -73,7 +87,9 @@ export const GeometricPrimitiveDiagramPropsSchema = z
 						),
 						rotation: z
 							.number()
-							.describe("The rotation of the ray in degrees. 0 is horizontal, 90 is vertical."),
+							.describe(
+								"The rotation of the ray in degrees. 0 is horizontal, 90 is vertical."
+							),
 						length: z
 							.number()
 							.positive()
@@ -96,7 +112,9 @@ export const GeometricPrimitiveDiagramPropsSchema = z
 						pointTwo: createPointDefinitionSchema().describe(
 							"A second point that the line passes through."
 						),
-						rotation: z.number().describe("The rotation of the line in degrees."),
+						rotation: z
+							.number()
+							.describe("The rotation of the line in degrees."),
 						length: z
 							.number()
 							.positive()
@@ -109,9 +127,15 @@ export const GeometricPrimitiveDiagramPropsSchema = z
 				z
 					.object({
 						type: z.literal("arc").describe("A curved arc segment."),
-						pointOne: createPointDefinitionSchema().describe("The starting point of the arc."),
-						pointTwo: createPointDefinitionSchema().describe("The ending point of the arc."),
-						rotation: z.number().describe("The rotation of the baseline of the arc in degrees."),
+						pointOne: createPointDefinitionSchema().describe(
+							"The starting point of the arc."
+						),
+						pointTwo: createPointDefinitionSchema().describe(
+							"The ending point of the arc."
+						),
+						rotation: z
+							.number()
+							.describe("The rotation of the baseline of the arc in degrees."),
 						length: z
 							.number()
 							.positive()
@@ -131,7 +155,9 @@ export const GeometricPrimitiveDiagramPropsSchema = z
 	})
 	.strict()
 
-export type GeometricPrimitiveDiagramProps = z.infer<typeof GeometricPrimitiveDiagramPropsSchema>
+export type GeometricPrimitiveDiagramProps = z.infer<
+	typeof GeometricPrimitiveDiagramPropsSchema
+>
 
 /**
  * Helper to draw a point marker and its label.
@@ -139,7 +165,11 @@ export type GeometricPrimitiveDiagramProps = z.infer<typeof GeometricPrimitiveDi
  * @param point The point's data including calculated coordinates.
  * @param awayFrom An optional second point to position the label away from.
  */
-const drawPointAndLabel = (canvas: CanvasImpl, point: Point, awayFrom?: Point) => {
+const drawPointAndLabel = (
+	canvas: CanvasImpl,
+	point: Point,
+	awayFrom?: Point
+) => {
 	canvas.drawCircle(point.x, point.y, theme.geometry.pointRadius.base, {
 		fill: theme.colors.black
 	})
@@ -187,7 +217,12 @@ const extendLineToBox = (
 	if (dx === 0 && dy === 0) return null
 
 	const intersections: Point[] = []
-	const checkIntersection = (x1: number, y1: number, x2: number, y2: number) => {
+	const checkIntersection = (
+		x1: number,
+		y1: number,
+		x2: number,
+		y2: number
+	) => {
 		const sx = x2 - x1
 		const sy = y2 - y1
 		const den = dx * sy - dy * sx
@@ -203,8 +238,18 @@ const extendLineToBox = (
 
 	checkIntersection(box.x, box.y, box.x + box.width, box.y) // Top
 	checkIntersection(box.x, box.y, box.x, box.y + box.height) // Left
-	checkIntersection(box.x + box.width, box.y, box.x + box.width, box.y + box.height) // Right
-	checkIntersection(box.x, box.y + box.height, box.x + box.width, box.y + box.height) // Bottom
+	checkIntersection(
+		box.x + box.width,
+		box.y,
+		box.x + box.width,
+		box.y + box.height
+	) // Right
+	checkIntersection(
+		box.x,
+		box.y + box.height,
+		box.x + box.width,
+		box.y + box.height
+	) // Bottom
 
 	if (intersections.length < 2) return null
 
@@ -265,7 +310,12 @@ export const generateGeometricPrimitiveDiagram: WidgetGenerator<
 		lineHeightDefault: 1.2
 	})
 
-	const BBOX = { x: PADDING, y: PADDING, width: width - 2 * PADDING, height: height - 2 * PADDING }
+	const BBOX = {
+		x: PADDING,
+		y: PADDING,
+		width: width - 2 * PADDING,
+		height: height - 2 * PADDING
+	}
 	const ARROW_ID = "primitive-arrow"
 	const degToRad = (deg: number) => (deg * Math.PI) / 180
 
@@ -318,12 +368,18 @@ export const generateGeometricPrimitiveDiagram: WidgetGenerator<
 			} else if (primitive.type === "line") {
 				const extended = extendLineToBox(p1, p2, BBOX)
 				if (extended) {
-					canvas.drawLine(extended.start.x, extended.start.y, extended.end.x, extended.end.y, {
-						stroke: theme.colors.black,
-						strokeWidth: theme.stroke.width.thick,
-						markerStart: `url(#${ARROW_ID})`,
-						markerEnd: `url(#${ARROW_ID})`
-					})
+					canvas.drawLine(
+						extended.start.x,
+						extended.start.y,
+						extended.end.x,
+						extended.end.y,
+						{
+							stroke: theme.colors.black,
+							strokeWidth: theme.stroke.width.thick,
+							markerStart: `url(#${ARROW_ID})`,
+							markerEnd: `url(#${ARROW_ID})`
+						}
+					)
 				}
 			} else if (primitive.type === "arc") {
 				const midX = (p1.x + p2.x) / 2

@@ -1,6 +1,9 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import type { WidgetCollection, WidgetDefinition } from "./types"
+import type {
+	WidgetCollection,
+	WidgetDefinition
+} from "@/widgets/collections/types"
 
 /**
  * Creates a subset WidgetCollection from a parent collection, filtered to include only
@@ -12,7 +15,10 @@ import type { WidgetCollection, WidgetDefinition } from "./types"
  * @returns A new WidgetCollection containing only the specified widgets.
  */
 export function createSubsetCollection<
-	C extends WidgetCollection<Record<string, WidgetDefinition<unknown, unknown>>, readonly string[]>
+	C extends WidgetCollection<
+		Record<string, WidgetDefinition<unknown, unknown>>,
+		readonly string[]
+	>
 >(
 	parentCollection: C,
 	widgetTypeNames: ReadonlyArray<C["widgetTypeKeys"][number]>
@@ -39,7 +45,9 @@ export function createSubsetCollection<
 	for (const typeName of widgetTypeNames) {
 		const widget = parentCollection.widgets[typeName]
 		if (!widget) {
-			logger.error("widget definition missing despite existence check", { typeName })
+			logger.error("widget definition missing despite existence check", {
+				typeName
+			})
 			throw errors.new("widget definition missing")
 		}
 		subsetWidgets[typeName] = widget

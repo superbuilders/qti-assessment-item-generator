@@ -1,8 +1,8 @@
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
 
 const PADDING = 20
 
@@ -30,10 +30,19 @@ export type SimpleArrowProps = z.infer<typeof SimpleArrowPropsSchema>
 /**
  * generates a simple arrow with configurable direction, optionally with circles along the line
  */
-export const generateSimpleArrow: WidgetGenerator<typeof SimpleArrowPropsSchema> = async (
-	props
-) => {
-	const { width, height, orientation, direction, color, strokeWidth, arrowSize, circles } = props
+export const generateSimpleArrow: WidgetGenerator<
+	typeof SimpleArrowPropsSchema
+> = async (props) => {
+	const {
+		width,
+		height,
+		orientation,
+		direction,
+		color,
+		strokeWidth,
+		arrowSize,
+		circles
+	} = props
 
 	const canvas = new CanvasImpl({
 		chartArea: { left: 0, top: 0, width, height },

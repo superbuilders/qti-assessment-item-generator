@@ -1,7 +1,9 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 
-const ErrUnsupportedInterval = errors.new("unsupported non-terminating tick interval")
+const ErrUnsupportedInterval = errors.new(
+	"unsupported non-terminating tick interval"
+)
 const MAX_TICKS = 10_000
 
 const EPSILON = 1e-12
@@ -91,7 +93,9 @@ export function computeDecimalScale(...nums: number[]): number {
 			const parts = s.split("e-")
 			const basePart = parts[0] || ""
 			const expPart = parts[1] || "0"
-			const baseFrac = basePart.includes(".") ? (basePart.split(".")[1] || "").length : 0
+			const baseFrac = basePart.includes(".")
+				? (basePart.split(".")[1] || "").length
+				: 0
 			fractionalDigits = baseFrac + Number.parseInt(expPart, 10)
 		} else if (s.includes(".")) {
 			fractionalDigits = (s.split(".")[1] || "").length
@@ -137,7 +141,11 @@ export function buildTicks(
 		const values: number[] = []
 		const labels: string[] = []
 
-		for (let vI = startI; vI <= maxI && values.length < MAX_TICKS; vI += stepI) {
+		for (
+			let vI = startI;
+			vI <= maxI && values.length < MAX_TICKS;
+			vI += stepI
+		) {
 			values.push(vI / scale)
 			labels.push(formatTickInt(vI, scale))
 		}
@@ -154,7 +162,10 @@ export function buildTicks(
 
 		const decimalScaleForMinMax =
 			10 **
-			Math.max((String(min).split(".")[1] || "").length, (String(max).split(".")[1] || "").length)
+			Math.max(
+				(String(min).split(".")[1] || "").length,
+				(String(max).split(".")[1] || "").length
+			)
 		const D = BigInt(baseDenominator * decimalScaleForMinMax)
 
 		const minBI = toGridInt(min, D)
@@ -168,7 +179,11 @@ export function buildTicks(
 		const values: number[] = []
 		const labels: string[] = []
 
-		for (let vBI = startBI; vBI <= maxBI && values.length < MAX_TICKS; vBI += stepBI) {
+		for (
+			let vBI = startBI;
+			vBI <= maxBI && values.length < MAX_TICKS;
+			vBI += stepBI
+		) {
 			values.push(Number(vBI) / Number(D))
 			// Render fractions for non-terminating decimals (denominators with primes other than 2 or 5)
 			const g = gcdBigInt(vBI < 0n ? -vBI : vBI, D)
@@ -226,7 +241,9 @@ export function buildTicks(
 				const v = k * matchedInterval
 				if (v < min - 1e-9 || v > max + 1e-9) continue
 				values.push(v)
-				labels.push(formatPiMultipleLabel(BigInt(k), BigInt(matchedP), BigInt(matchedQ)))
+				labels.push(
+					formatPiMultipleLabel(BigInt(k), BigInt(matchedP), BigInt(matchedQ))
+				)
 			}
 
 			return { values, labels }

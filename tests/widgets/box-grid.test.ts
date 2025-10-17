@@ -1,9 +1,9 @@
 import { describe, expect, test } from "bun:test"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import { boxGridExamples } from "../../examples/box-grid"
-import type { WidgetInput } from "../../src/widgets/registry"
-import { generateWidgetForTest } from "../helpers/generateWidgetForTest"
+import { boxGridExamples } from "@/examples/box-grid"
+import { generateWidgetForTest } from "@/testing/helpers/generateWidgetForTest"
+import type { WidgetInput } from "@/widgets/registry"
 
 describe("Widget: box-grid", () => {
 	const examples: WidgetInput[] = boxGridExamples

@@ -1,9 +1,9 @@
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { CSS_COLOR_PATTERN } from "../utils/css-color"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { CSS_COLOR_PATTERN } from "@/widgets/utils/css-color"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
 
 /**
  * Factory function to create the schema for a single shape item in the pattern.
@@ -39,7 +39,9 @@ function createShapeItemSchema() {
 function createPlaceholderItemSchema() {
 	return z
 		.object({
-			type: z.literal("placeholder").describe("An item that is a placeholder for a missing shape.")
+			type: z
+				.literal("placeholder")
+				.describe("An item that is a placeholder for a missing shape.")
 		})
 		.strict()
 }
@@ -55,7 +57,12 @@ export const PatternDiagramPropsSchema = z
 		width: createWidthSchema(),
 		height: createHeightSchema(),
 		items: z
-			.array(z.discriminatedUnion("type", [createShapeItemSchema(), createPlaceholderItemSchema()]))
+			.array(
+				z.discriminatedUnion("type", [
+					createShapeItemSchema(),
+					createPlaceholderItemSchema()
+				])
+			)
 			.describe(
 				"An array of items representing the pattern sequence. Each item can be a shape or a placeholder."
 			),
@@ -151,7 +158,13 @@ async function renderSingleShapeSvg(
 	}
 
 	// Do not add extra outer padding; the tile already provides spacing
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(0)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(0)
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg">${svgBody}</svg>`
 }
 
@@ -159,9 +172,9 @@ async function renderSingleShapeSvg(
  * Generates an HTML layout for a sequence of shapes and placeholders to illustrate a pattern.
  * This widget is a compositional tool that uses an internal SVG renderer for the shapes.
  */
-export const generatePatternDiagram: WidgetGenerator<typeof PatternDiagramPropsSchema> = async (
-	props
-) => {
+export const generatePatternDiagram: WidgetGenerator<
+	typeof PatternDiagramPropsSchema
+> = async (props) => {
 	const { width, height, items, shapeSize } = props
 
 	const containerStyle = `
@@ -195,7 +208,12 @@ export const generatePatternDiagram: WidgetGenerator<typeof PatternDiagramPropsS
 
 	for (const item of items) {
 		if (item.type === "shape") {
-			const shapeSvg = await renderSingleShapeSvg(shapeSize, shapeSize, item.shape, item.fillColor)
+			const shapeSvg = await renderSingleShapeSvg(
+				shapeSize,
+				shapeSize,
+				item.shape,
+				item.fillColor
+			)
 			html += `<div style="${itemContainerStyle}">${shapeSvg}</div>`
 		} else if (item.type === "placeholder") {
 			html += `<div style="${itemContainerStyle}${placeholderStyle}">?</div>`

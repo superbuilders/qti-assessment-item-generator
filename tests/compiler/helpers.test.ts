@@ -1,5 +1,8 @@
 import { describe, expect, test } from "bun:test"
-import { deriveComboIdentifier, normalizeIdPart } from "../../src/compiler/utils/helpers"
+import {
+	deriveComboIdentifier,
+	normalizeIdPart
+} from "@/compiler/utils/helpers"
 
 describe("helpers", () => {
 	test("normalizeIdPart uppercases and strips invalids", () => {
@@ -8,7 +11,9 @@ describe("helpers", () => {
 	})
 
 	test("deriveComboIdentifier joins parts with FB__ prefix", () => {
-		expect(deriveComboIdentifier(["RESPONSE_1_A"]).startsWith("FB__")).toBe(true)
+		expect(deriveComboIdentifier(["RESPONSE_1_A"]).startsWith("FB__")).toBe(
+			true
+		)
 		expect(deriveComboIdentifier(["RESPONSE_1_A"])).toBe("FB__RESPONSE_1_A")
 		expect(deriveComboIdentifier(["RESPONSE_1_A", "RESPONSE_2_CORRECT"])).toBe(
 			"FB__RESPONSE_1_A__RESPONSE_2_CORRECT"

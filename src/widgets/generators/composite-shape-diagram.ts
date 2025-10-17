@@ -1,14 +1,14 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { PADDING } from "../utils/constants"
-import { CSS_COLOR_PATTERN } from "../utils/css-color"
-import { Path2D } from "../utils/path-builder"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { estimateWrappedTextDimensions } from "../utils/text"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { PADDING } from "@/widgets/utils/constants"
+import { CSS_COLOR_PATTERN } from "@/widgets/utils/css-color"
+import { Path2D } from "@/widgets/utils/path-builder"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { estimateWrappedTextDimensions } from "@/widgets/utils/text"
+import { theme } from "@/widgets/utils/theme"
 
 // A simple, safe regex for identifiers.
 const identifierRegex = /^[A-Za-z0-9_]+$/
@@ -101,7 +101,9 @@ function createBoundaryEdgeSchema() {
 			.object({
 				type: z
 					.literal("simple")
-					.describe("Single straight line edge connecting two vertices directly."),
+					.describe(
+						"Single straight line edge connecting two vertices directly."
+					),
 				from: z
 					.string()
 					.regex(identifierRegex)
@@ -123,7 +125,9 @@ function createBoundaryEdgeSchema() {
 			.object({
 				type: z
 					.literal("partitioned")
-					.describe("Multi-segment edge path with individual labels for each segment."),
+					.describe(
+						"Multi-segment edge path with individual labels for each segment."
+					),
 				path: z
 					.array(z.string().regex(identifierRegex))
 					.min(3)
@@ -206,7 +210,9 @@ function createShadedPathRegionSchema() {
 			fillColor: z
 				.string()
 				.regex(CSS_COLOR_PATTERN)
-				.describe("CSS color for composed shading. Use rgba with alpha < 1.0 for transparency."),
+				.describe(
+					"CSS color for composed shading. Use rgba with alpha < 1.0 for transparency."
+				),
 			path: z
 				.array(
 					z
@@ -214,7 +220,9 @@ function createShadedPathRegionSchema() {
 							shapeId: z.string().describe("ID of a shape in the shapes array"),
 							pathType: z
 								.enum(["outer", "inner"])
-								.describe("whether to traverse this shape's outer or inner boundary")
+								.describe(
+									"whether to traverse this shape's outer or inner boundary"
+								)
 						})
 						.strict()
 				)
@@ -352,7 +360,9 @@ export const CompositeShapeDiagramPropsSchema = z
 			),
 
 		shadedRegions: z
-			.array(z.union([createShadedRegionSchema(), createShadedPathRegionSchema()]))
+			.array(
+				z.union([createShadedRegionSchema(), createShadedPathRegionSchema()])
+			)
 			.nullable()
 			.describe(
 				"Optional colored regions. Supports either polygonal regions (vertexIds) or composed regions across shapes via path with even-odd fill."
@@ -382,7 +392,9 @@ export const CompositeShapeDiagramPropsSchema = z
 	})
 	.strict()
 
-export type CompositeShapeDiagramProps = z.infer<typeof CompositeShapeDiagramPropsSchema>
+export type CompositeShapeDiagramProps = z.infer<
+	typeof CompositeShapeDiagramPropsSchema
+>
 type Point = { x: number; y: number }
 type Label = z.infer<ReturnType<typeof createLabelSchema>>
 
@@ -402,7 +414,9 @@ type ShadedPathRegion = {
 	path: Array<{ shapeId: string; pathType: "outer" | "inner" }>
 }
 function isShadedPolygonRegion(x: unknown): x is ShadedPolygonRegion {
-	return typeof x === "object" && x !== null && "vertexIds" in x && "fillColor" in x
+	return (
+		typeof x === "object" && x !== null && "vertexIds" in x && "fillColor" in x
+	)
 }
 function isShadedPathRegion(x: unknown): x is ShadedPathRegion {
 	return typeof x === "object" && x !== null && "path" in x && "fillColor" in x
@@ -415,7 +429,12 @@ function distance(a: Vec, b: Vec): number {
 	const dy = b.y - a.y
 	return Math.hypot(dx, dy)
 }
-function segmentIntersectionParamT(p: Vec, r: Vec, q: Vec, s: Vec): number | null {
+function segmentIntersectionParamT(
+	p: Vec,
+	r: Vec,
+	q: Vec,
+	s: Vec
+): number | null {
 	const rx = r.x - p.x
 	const ry = r.y - p.y
 	const sx = s.x - q.x
@@ -591,7 +610,9 @@ export const generateCompositeShapeDiagram: WidgetGenerator<
 	// Fit-to-canvas projection (uniform scale + centering)
 	const allPoints: Point[] = [
 		...vertices.map((v) => ({ x: v.x, y: v.y })),
-		...(regionLabels ? regionLabels.map((l) => ({ x: l.position.x, y: l.position.y })) : [])
+		...(regionLabels
+			? regionLabels.map((l) => ({ x: l.position.x, y: l.position.y }))
+			: [])
 	]
 
 	const computeFit = (points: Point[]) => {
@@ -603,10 +624,16 @@ export const generateCompositeShapeDiagram: WidgetGenerator<
 		const rawW = maxX - minX
 		const rawH = maxY - minY
 		if (!(rawW > 0) || !(rawH > 0)) {
-			logger.error("composite-shape: fit degenerate bounds", { width: rawW, height: rawH })
+			logger.error("composite-shape: fit degenerate bounds", {
+				width: rawW,
+				height: rawH
+			})
 			throw errors.new("composite-shape: fit degenerate bounds")
 		}
-		const scale = Math.min((width - 2 * PADDING) / rawW, (height - 2 * PADDING) / rawH)
+		const scale = Math.min(
+			(width - 2 * PADDING) / rawW,
+			(height - 2 * PADDING) / rawH
+		)
 		const offsetX = (width - scale * rawW) / 2 - scale * minX
 		const offsetY = (height - scale * rawH) / 2 - scale * minY
 		const project = (p: Point) => ({
@@ -645,31 +672,44 @@ export const generateCompositeShapeDiagram: WidgetGenerator<
 					.filter((p): p is Point => !!p)
 					.map(project)
 				if (regionPoints.length < 3) {
-					logger.error("composite-shape: shaded polygon insufficient vertices", {
-						count: regionPoints.length
-					})
-					throw errors.new("composite-shape: shaded polygon insufficient vertices")
+					logger.error(
+						"composite-shape: shaded polygon insufficient vertices",
+						{
+							count: regionPoints.length
+						}
+					)
+					throw errors.new(
+						"composite-shape: shaded polygon insufficient vertices"
+					)
 				}
 				canvas.drawPolygon(regionPoints, { fill: r.fillColor, stroke: "none" })
 			} else if (isShadedPathRegion(region)) {
 				// composed path requires shapes
 				if (!shapes || shapes.length === 0) {
 					logger.error("composite-shape: composed shaded region without shapes")
-					throw errors.new("composite-shape: composed shaded region without shapes")
+					throw errors.new(
+						"composite-shape: composed shaded region without shapes"
+					)
 				}
 				const r = region
 				const path2d = new Path2D()
 				for (const part of r.path) {
 					const shape = shapes.find((s) => s.id === part.shapeId)
 					if (!shape) {
-						logger.error("composite-shape: shaded path unknown shape", { shapeId: part.shapeId })
+						logger.error("composite-shape: shaded path unknown shape", {
+							shapeId: part.shapeId
+						})
 						throw errors.new("composite-shape: shaded path unknown shape")
 					}
 					if (shape.type === "polygon") {
 						const ids = shape.vertexIds
 						if (ids.length < 3) {
-							logger.error("composite-shape: polygon shape too few vertices", { shapeId: shape.id })
-							throw errors.new("composite-shape: polygon shape too few vertices")
+							logger.error("composite-shape: polygon shape too few vertices", {
+								shapeId: shape.id
+							})
+							throw errors.new(
+								"composite-shape: polygon shape too few vertices"
+							)
 						}
 						const first = vertexMap.get(ids[0])
 						if (!first) {
@@ -684,10 +724,13 @@ export const generateCompositeShapeDiagram: WidgetGenerator<
 						for (let i = 1; i < ids.length; i++) {
 							const p = vertexMap.get(ids[i])
 							if (!p) {
-								logger.error("composite-shape: polygon shading missing vertex", {
-									shapeId: shape.id,
-									vertexId: ids[i]
-								})
+								logger.error(
+									"composite-shape: polygon shading missing vertex",
+									{
+										shapeId: shape.id,
+										vertexId: ids[i]
+									}
+								)
 								throw errors.new("composite-shape: polygon missing vertex")
 							}
 							const q = project(p)
@@ -697,7 +740,9 @@ export const generateCompositeShapeDiagram: WidgetGenerator<
 					} else {
 						const c = vertexMap.get(shape.centerId)
 						if (!c) {
-							logger.error("composite-shape: circle shading missing center", { shapeId: shape.id })
+							logger.error("composite-shape: circle shading missing center", {
+								shapeId: shape.id
+							})
 							throw errors.new("composite-shape: circle center missing")
 						}
 						const center = project(c)
@@ -725,10 +770,13 @@ export const generateCompositeShapeDiagram: WidgetGenerator<
 							for (const id of shape.vertexIds) {
 								const v = vertexMap.get(id)
 								if (!v) {
-									logger.error("composite-shape: polygon outline missing vertex", {
-										vertexId: id,
-										shapeId: shape.id
-									})
+									logger.error(
+										"composite-shape: polygon outline missing vertex",
+										{
+											vertexId: id,
+											shapeId: shape.id
+										}
+									)
 									throw errors.new("composite-shape: polygon missing vertex")
 								}
 								pts.push(project(v))
@@ -790,10 +838,14 @@ export const generateCompositeShapeDiagram: WidgetGenerator<
 			// Partitioned edge
 			const pathPointsRaw = edge.path.map((id) => vertexMap.get(id))
 			if (pathPointsRaw.some((p) => !p)) {
-				logger.error("composite-shape: boundary partitioned path missing vertex")
+				logger.error(
+					"composite-shape: boundary partitioned path missing vertex"
+				)
 				throw errors.new("composite-shape: boundary partitioned missing vertex")
 			}
-			const pathPoints: Point[] = pathPointsRaw.filter((p): p is Point => Boolean(p))
+			const pathPoints: Point[] = pathPointsRaw.filter((p): p is Point =>
+				Boolean(p)
+			)
 
 			if (index === 0 && pathPoints[0]) {
 				const first = project(pathPoints[0])
@@ -815,12 +867,15 @@ export const generateCompositeShapeDiagram: WidgetGenerator<
 				const segment = edge.segments[i]
 				if (!from || !to || !segment) {
 					logger.error("composite-shape: boundary partitioned segment mismatch")
-					throw errors.new("composite-shape: boundary partitioned segment mismatch")
+					throw errors.new(
+						"composite-shape: boundary partitioned segment mismatch"
+					)
 				}
 
 				const p1 = project(from)
 				const p2 = project(to)
-				const dash = segment.style === "dashed" ? theme.stroke.dasharray.dashed : undefined
+				const dash =
+					segment.style === "dashed" ? theme.stroke.dasharray.dashed : undefined
 				canvas.drawLine(p1.x, p1.y, p2.x, p2.y, {
 					stroke: theme.colors.black,
 					strokeWidth: theme.stroke.width.base,
@@ -938,13 +993,19 @@ export const generateCompositeShapeDiagram: WidgetGenerator<
 			logger.error("composite-shape: partitioned edge label missing vertex")
 			throw errors.new("composite-shape: partitioned edge label missing vertex")
 		}
-		const pathPoints: Point[] = pathPointsRaw.filter((p): p is Point => Boolean(p))
+		const pathPoints: Point[] = pathPointsRaw.filter((p): p is Point =>
+			Boolean(p)
+		)
 		for (let i = 0; i < edge.segments.length; i++) {
 			const from = pathPoints[i]
 			const to = pathPoints[i + 1]
 			if (!from || !to) {
-				logger.error("composite-shape: partitioned edge label missing segment endpoints")
-				throw errors.new("composite-shape: partitioned edge label missing segment endpoints")
+				logger.error(
+					"composite-shape: partitioned edge label missing segment endpoints"
+				)
+				throw errors.new(
+					"composite-shape: partitioned edge label missing segment endpoints"
+				)
 			}
 			const labelText = formatLabel(edge.segments[i]?.label)
 			if (!labelText) continue
@@ -1051,7 +1112,10 @@ export const generateCompositeShapeDiagram: WidgetGenerator<
 			if (shapes) {
 				for (const shape of shapes) {
 					if (shape.type === "circle") {
-						if (shape.centerId === s.fromVertexId || shape.centerId === s.toVertexId) {
+						if (
+							shape.centerId === s.fromVertexId ||
+							shape.centerId === s.toVertexId
+						) {
 							isRadius = true
 							centerId = shape.centerId
 							break
@@ -1062,7 +1126,8 @@ export const generateCompositeShapeDiagram: WidgetGenerator<
 
 			const p1 = project(from)
 			const p2 = project(to)
-			const dash = s.style === "dashed" ? theme.stroke.dasharray.dashed : undefined
+			const dash =
+				s.style === "dashed" ? theme.stroke.dasharray.dashed : undefined
 			canvas.drawLine(p1.x, p1.y, p2.x, p2.y, {
 				stroke: isRadius ? "#ff0000" : theme.colors.black,
 				strokeWidth: theme.stroke.width.base,
@@ -1126,7 +1191,9 @@ export const generateCompositeShapeDiagram: WidgetGenerator<
 			const centerData = vertexMap.get(seg.centerId)
 			const endData = seg.fromId === seg.centerId ? seg.bData : seg.aData
 			if (!centerData) {
-				logger.error("composite-shape: radius label missing center", { centerId: seg.centerId })
+				logger.error("composite-shape: radius label missing center", {
+					centerId: seg.centerId
+				})
 				throw errors.new("composite-shape: radius label missing center")
 			}
 			const baseData = computeSafeBasePointForRadius(
@@ -1242,7 +1309,10 @@ export const generateCompositeShapeDiagram: WidgetGenerator<
 				return { x: a.x + t * abx, y: a.y + t * aby }
 			}
 
-			function computeAwayDirection(px: number, py: number): { dx: number; dy: number } {
+			function computeAwayDirection(
+				px: number,
+				py: number
+			): { dx: number; dy: number } {
 				let bestDist2 = Number.POSITIVE_INFINITY
 				let nearest: {
 					a: { x: number; y: number }
@@ -1318,7 +1388,9 @@ export const generateCompositeShapeDiagram: WidgetGenerator<
 				const d = placeFor(1, 0)
 				const e = placeFor(0, 1)
 				const f = placeFor(-1, 0)
-				chosen = [a, b, c, d, e, f].reduce((best, cur) => (cur.it < best.it ? cur : best))
+				chosen = [a, b, c, d, e, f].reduce((best, cur) =>
+					cur.it < best.it ? cur : best
+				)
 			}
 
 			canvas.drawText({
@@ -1374,7 +1446,10 @@ export const generateCompositeShapeDiagram: WidgetGenerator<
 			const q1 = project({ x: p1x, y: p1y })
 			const q2 = project({ x: p3x, y: p3y })
 			const q3 = project({ x: p2x, y: p2y })
-			const markerPath = new Path2D().moveTo(q1.x, q1.y).lineTo(q2.x, q2.y).lineTo(q3.x, q3.y)
+			const markerPath = new Path2D()
+				.moveTo(q1.x, q1.y)
+				.lineTo(q2.x, q2.y)
+				.lineTo(q3.x, q3.y)
 			canvas.drawPath(markerPath, {
 				fill: "none",
 				stroke: theme.colors.black,
@@ -1413,7 +1488,11 @@ function segmentIntersectsRect(
 		return false
 	}
 
-	if (pointInRect(A.x, A.y, rx, ry, rw, rh) || pointInRect(B.x, B.y, rx, ry, rw, rh)) return true
+	if (
+		pointInRect(A.x, A.y, rx, ry, rw, rh) ||
+		pointInRect(B.x, B.y, rx, ry, rw, rh)
+	)
+		return true
 
 	const r1 = { x: rx, y: ry }
 	const r2 = { x: rx + rw, y: ry }
@@ -1443,7 +1522,8 @@ function polygonIntersectsRect(
 		const a = poly[i]
 		const b = poly[(i + 1) % poly.length]
 		if (!a || !b) continue
-		if (segmentIntersectsRect(a, b, { x: rx, y: ry, width: rw, height: rh })) return true
+		if (segmentIntersectsRect(a, b, { x: rx, y: ry, width: rw, height: rh }))
+			return true
 	}
 
 	for (const p of poly) {
@@ -1524,7 +1604,8 @@ function pointInPolygon(
 		const xj = pj.x
 		const yj = pj.y
 		const intersect =
-			yi > point.y !== yj > point.y && point.x < ((xj - xi) * (point.y - yi)) / (yj - yi) + xi
+			yi > point.y !== yj > point.y &&
+			point.x < ((xj - xi) * (point.y - yi)) / (yj - yi) + xi
 		if (intersect) inside = !inside
 	}
 	return inside

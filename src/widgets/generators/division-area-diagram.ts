@@ -1,6 +1,6 @@
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { theme } from "@/widgets/utils/theme"
 
 // Using factories to prevent Zod from creating schemas with $refs, which can cause issues with some tools.
 
@@ -13,7 +13,9 @@ const createDigitTokenSchema = () =>
 			color: z
 				.string()
 				.nullable()
-				.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
+				.transform((val) =>
+					val === "null" || val === "NULL" || val === "" ? null : val
+				)
 		}),
 		z.object({
 			type: z.literal("boxedDigit"),
@@ -21,7 +23,9 @@ const createDigitTokenSchema = () =>
 			color: z
 				.string()
 				.nullable()
-				.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
+				.transform((val) =>
+					val === "null" || val === "NULL" || val === "" ? null : val
+				)
 		}),
 		z.object({ type: z.literal("emptyBox") }),
 		z.object({ type: z.literal("spacer") })
@@ -43,15 +47,21 @@ const createValueOrPlaceholderSchema = () =>
 		.discriminatedUnion("type", [
 			z.object({
 				type: z.literal("value").describe("A known numeric value."),
-				value: z.number().describe("The numeric value to display (e.g., 10, 7)."),
+				value: z
+					.number()
+					.describe("The numeric value to display (e.g., 10, 7)."),
 				color: z
 					.string()
 					.nullable()
-					.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
+					.transform((val) =>
+						val === "null" || val === "NULL" || val === "" ? null : val
+					)
 					.describe("Optional CSS color for this quotient part.")
 			}),
 			z.object({
-				type: z.literal("placeholder").describe("An unknown value represented by an empty box.")
+				type: z
+					.literal("placeholder")
+					.describe("An unknown value represented by an empty box.")
 			})
 		])
 		.describe("Represents either a known value or a placeholder box.")
@@ -68,7 +78,9 @@ const createStepSchema = () =>
 			subtrahend: z
 				.number()
 				.nullable()
-				.describe("The value being subtracted in this step (e.g., 30). Null to hide."),
+				.describe(
+					"The value being subtracted in this step (e.g., 30). Null to hide."
+				),
 			difference: z
 				.number()
 				.nullable()
@@ -122,14 +134,20 @@ type Step = {
 export const DivisionAreaDiagramPropsSchema = z
 	.object({
 		type: z.literal("divisionAreaDiagram"),
-		divisor: z.number().describe("The divisor, displayed on the left side of the model."),
-		dividend: z.number().describe("The initial dividend, displayed in the first column."),
+		divisor: z
+			.number()
+			.describe("The divisor, displayed on the left side of the model."),
+		dividend: z
+			.number()
+			.describe("The initial dividend, displayed in the first column."),
 		quotientParts: z
 			.array(createValueOrPlaceholderSchema())
 			.describe("An array of quotient parts displayed across the top."),
 		steps: z
 			.array(createStepSchema())
-			.describe("An array of calculation steps. Its length must match quotientParts."),
+			.describe(
+				"An array of calculation steps. Its length must match quotientParts."
+			),
 		showFinalRemainderBox: z
 			.boolean()
 			.describe("If true, shows the final zero remainder with a box around it.")
@@ -139,7 +157,9 @@ export const DivisionAreaDiagramPropsSchema = z
 		"Creates a visual area model for long division, showing partial quotients and step-by-step subtraction."
 	)
 
-export type DivisionAreaDiagramProps = z.infer<typeof DivisionAreaDiagramPropsSchema>
+export type DivisionAreaDiagramProps = z.infer<
+	typeof DivisionAreaDiagramPropsSchema
+>
 
 /**
  * Generates an HTML table representing a division area model.
@@ -150,7 +170,10 @@ export const generateDivisionAreaDiagram: WidgetGenerator<
 	let { divisor, dividend, quotientParts, steps, showFinalRemainderBox } = props
 
 	// Helper to render string content, optionally with a color.
-	const renderContent = (content: string | number | null, color?: string | null): string => {
+	const renderContent = (
+		content: string | number | null,
+		color?: string | null
+	): string => {
 		if (content === null) return " "
 		const text = typeof content === "number" ? String(content) : content
 		// Simple HTML escaping for numbers/operators
@@ -173,8 +196,12 @@ export const generateDivisionAreaDiagram: WidgetGenerator<
 		}
 		if (token.type === "boxedDigit") {
 			const color = token.color ? `color: ${token.color};` : ""
-			const left = opts?.leftBorder ? "border-left: 1.5px solid black;" : "border-left: 0;"
-			const right = opts?.rightBorder ? "border-right: 1.5px solid black;" : "border-right: 0;"
+			const left = opts?.leftBorder
+				? "border-left: 1.5px solid black;"
+				: "border-left: 0;"
+			const right = opts?.rightBorder
+				? "border-right: 1.5px solid black;"
+				: "border-right: 0;"
 			return `<span style="${baseSpan} border-top: 1.5px solid black; border-bottom: 1.5px solid black; ${left} ${right} padding: 2px 2px; ${color}">${renderContent(token.value, token.color)}</span>`
 		}
 		if (token.type === "spacer") {
@@ -219,7 +246,10 @@ export const generateDivisionAreaDiagram: WidgetGenerator<
 	}
 
 	// Convert a numeric value into digit tokens for uniform layout
-	const toDigitTokens = (value: number, color?: string | null): DigitToken[] => {
+	const toDigitTokens = (
+		value: number,
+		color?: string | null
+	): DigitToken[] => {
 		const str = String(value)
 		const tokens: DigitToken[] = []
 		for (const ch of str) {
@@ -232,9 +262,14 @@ export const generateDivisionAreaDiagram: WidgetGenerator<
 	}
 
 	// Pad tokens on the left to align by ones column
-	const leftPadTokens = (tokens: DigitToken[], totalSlots: number): DigitToken[] => {
+	const leftPadTokens = (
+		tokens: DigitToken[],
+		totalSlots: number
+	): DigitToken[] => {
 		const padCount = Math.max(0, totalSlots - tokens.length)
-		const pads: DigitToken[] = Array.from({ length: padCount }, () => ({ type: "spacer" }))
+		const pads: DigitToken[] = Array.from({ length: padCount }, () => ({
+			type: "spacer"
+		}))
 		return [...pads, ...tokens]
 	}
 
@@ -253,7 +288,8 @@ export const generateDivisionAreaDiagram: WidgetGenerator<
 	// Top-left corner spacer (no borders to avoid visible corner artifact)
 	html += `<td style="width: 40px; height: 40px; border: none; padding: 0;"></td>`
 	for (const part of quotientParts) {
-		const content = part.type === "value" ? renderContent(part.value) : renderPlaceholder()
+		const content =
+			part.type === "value" ? renderContent(part.value) : renderPlaceholder()
 		const style =
 			"width: 80px; height: 40px; background-color: #EBF5FB; text-align:center; padding: 10px;"
 		html += `<td style="${style}">${content}</td>`
@@ -330,7 +366,10 @@ export const generateDivisionAreaDiagram: WidgetGenerator<
 					paddedBox
 				)}</div></div>`
 			} else {
-				const padded = leftPadTokens(toDigitTokens(step.difference, step.differenceColor), 3)
+				const padded = leftPadTokens(
+					toDigitTokens(step.difference, step.differenceColor),
+					3
+				)
 				html += renderAlignedTokensWithGap(padded)
 			}
 			html += "</td></tr>"

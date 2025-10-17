@@ -1,13 +1,22 @@
-import type { WidgetCollection, WidgetDefinition } from "@/widgets/collections/types"
-import type { AiContextEnvelope, ImageContext } from "../types"
-import { caretBanPromptSection } from "./caret"
-import { createWidgetSelectionPromptSection, formatUnifiedContextSections } from "./shared"
-import { createChoiceVisualsDisciplineSection } from "./shared/choice-visuals-discipline"
-import { createEquationsInChoicesSection } from "./shared/equations-in-choices"
-import { createMathmlComplianceSection } from "./shared/mathml"
+import { caretBanPromptSection } from "@/structured/prompts/caret"
+import {
+	createWidgetSelectionPromptSection,
+	formatUnifiedContextSections
+} from "@/structured/prompts/shared"
+import { createChoiceVisualsDisciplineSection } from "@/structured/prompts/shared/choice-visuals-discipline"
+import { createEquationsInChoicesSection } from "@/structured/prompts/shared/equations-in-choices"
+import { createMathmlComplianceSection } from "@/structured/prompts/shared/mathml"
+import type { AiContextEnvelope, ImageContext } from "@/structured/types"
+import type {
+	WidgetCollection,
+	WidgetDefinition
+} from "@/widgets/collections/types"
 
 export function createInteractionContentPrompt<
-	C extends WidgetCollection<Record<string, WidgetDefinition<unknown, unknown>>, readonly string[]>
+	C extends WidgetCollection<
+		Record<string, WidgetDefinition<unknown, unknown>>,
+		readonly string[]
+	>
 >(
 	envelope: AiContextEnvelope,
 	assessmentShell: unknown,
@@ -331,7 +340,8 @@ SCAN ALL text content (prompts, choices, feedback) for "$" or "%" - these MUST b
    - NEVER include visual or textual cues that indicate the correct response
    - **ABSOLUTE RULE**: Answers are ONLY allowed in feedback fields. HARD STOP. NO EXCEPTIONS.`
 
-	const widgetSelectionSection = createWidgetSelectionPromptSection(widgetCollection)
+	const widgetSelectionSection =
+		createWidgetSelectionPromptSection(widgetCollection)
 
 	const userContent = `Generate interaction content based on the following inputs. Use the provided context, including raster images for vision and vector images as text, to understand the content fully.
 

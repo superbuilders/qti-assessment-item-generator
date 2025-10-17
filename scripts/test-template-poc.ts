@@ -28,13 +28,17 @@ async function main() {
 	// 3. Validate input props against the template's schema.
 	const validationResult = fractionAddition.propsSchema.safeParse(questionProps)
 	if (!validationResult.success) {
-		logger.error("template input validation failed", { error: validationResult.error })
+		logger.error("template input validation failed", {
+			error: validationResult.error
+		})
 		throw errors.wrap(validationResult.error, "template input validation")
 	}
 
 	// 4. Call the template's generate() to produce AssessmentItemInput.
 	// This is a synchronous, deterministic call.
-	const itemInputResult = errors.trySync(() => fractionAddition.generate(validationResult.data))
+	const itemInputResult = errors.trySync(() =>
+		fractionAddition.generate(validationResult.data)
+	)
 	if (itemInputResult.error) {
 		logger.error("template function failed", { error: itemInputResult.error })
 		throw errors.wrap(itemInputResult.error, "template generation")
@@ -43,7 +47,9 @@ async function main() {
 	logger.info("successfully generated assessmentiteminput from template")
 
 	// 5. Pass the generated data structure to the compiler.
-	const compileResult = await errors.try(compile(assessmentItemInput, templateCollection))
+	const compileResult = await errors.try(
+		compile(assessmentItemInput, templateCollection)
+	)
 	if (compileResult.error) {
 		logger.error("qti compilation failed", { error: compileResult.error })
 		throw errors.wrap(compileResult.error, "compilation")

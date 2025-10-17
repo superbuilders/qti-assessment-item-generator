@@ -77,7 +77,8 @@ export const fourthGradeMathCollection: WidgetCollection<
 		tapeDiagram: allWidgetDefinitions.tapeDiagram,
 		fractionModelDiagram: allWidgetDefinitions.fractionModelDiagram,
 		fractionSumDiagram: allWidgetDefinitions.fractionSumDiagram,
-		fractionMultiplicationModel: allWidgetDefinitions.fractionMultiplicationModel,
+		fractionMultiplicationModel:
+			allWidgetDefinitions.fractionMultiplicationModel,
 		fractionFrequencyPlot: allWidgetDefinitions.fractionFrequencyPlot,
 		divisionAreaDiagram: allWidgetDefinitions.divisionAreaDiagram,
 		divisionModelDiagram: allWidgetDefinitions.divisionModelDiagram,

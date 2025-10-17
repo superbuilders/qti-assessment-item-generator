@@ -1,11 +1,11 @@
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { PADDING } from "../utils/constants"
-import { CSS_COLOR_PATTERN } from "../utils/css-color"
-import { Path2D } from "../utils/path-builder"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { PADDING } from "@/widgets/utils/constants"
+import { CSS_COLOR_PATTERN } from "@/widgets/utils/css-color"
+import { Path2D } from "@/widgets/utils/path-builder"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
 
 // Defines the properties for a single fractional model used within the equation.
 // Use a factory to avoid JSON Schema $ref deduplication in downstream converters.
@@ -15,15 +15,29 @@ const createBaseFractionModelSchema = () =>
 			.discriminatedUnion("type", [
 				z.object({
 					type: z.literal("rectangle"),
-					rows: z.number().int().positive().describe("Number of rows in the grid partition."),
-					columns: z.number().int().positive().describe("Number of columns in the grid partition.")
+					rows: z
+						.number()
+						.int()
+						.positive()
+						.describe("Number of rows in the grid partition."),
+					columns: z
+						.number()
+						.int()
+						.positive()
+						.describe("Number of columns in the grid partition.")
 				}),
 				z.object({
-					type: z.literal("circle").describe("A circular shape partitioned into equal sectors.")
+					type: z
+						.literal("circle")
+						.describe("A circular shape partitioned into equal sectors.")
 				}),
 				z.object({
 					type: z.literal("polygon"),
-					sides: z.number().int().gte(3).describe("Number of sides for the regular polygon."),
+					sides: z
+						.number()
+						.int()
+						.gte(3)
+						.describe("Number of sides for the regular polygon."),
 					rotation: z.number().describe("Rotation angle in degrees.")
 				})
 			])
@@ -33,7 +47,11 @@ const createBaseFractionModelSchema = () =>
 			.int()
 			.positive()
 			.describe("The total number of equal parts (the denominator)."),
-		shadedParts: z.number().int().min(0).describe("The number of parts to shade (the numerator)."),
+		shadedParts: z
+			.number()
+			.int()
+			.min(0)
+			.describe("The number of parts to shade (the numerator)."),
 		shadeColor: z
 			.string()
 			.regex(CSS_COLOR_PATTERN, "invalid css color")
@@ -46,10 +64,16 @@ const createMiddleTermSchema = () =>
 	z.discriminatedUnion("type", [
 		z.object({
 			type: z.literal("number").describe("A numeric multiplier."),
-			value: z.number().int().positive().describe("The integer value to display.")
+			value: z
+				.number()
+				.int()
+				.positive()
+				.describe("The integer value to display.")
 		}),
 		z.object({
-			type: z.literal("placeholder").describe("A placeholder box for a missing number.")
+			type: z
+				.literal("placeholder")
+				.describe("A placeholder box for a missing number.")
 		})
 	])
 
@@ -95,8 +119,10 @@ function findRayPolygonIntersection(
 		const den = (p1.x - p2.x) * (p3.y - p4.y) - (p1.y - p2.y) * (p3.x - p4.x)
 		if (den === 0) continue
 
-		const t = ((p1.x - p3.x) * (p3.y - p4.y) - (p1.y - p3.y) * (p3.x - p4.x)) / den
-		const u = -((p1.x - p2.x) * (p1.y - p3.y) - (p1.y - p2.y) * (p1.x - p3.x)) / den
+		const t =
+			((p1.x - p3.x) * (p3.y - p4.y) - (p1.y - p3.y) * (p3.x - p4.x)) / den
+		const u =
+			-((p1.x - p2.x) * (p1.y - p3.y) - (p1.y - p2.y) * (p1.x - p3.x)) / den
 
 		if (t >= 0 && u >= 0 && u <= 1) {
 			return {
@@ -131,21 +157,45 @@ function drawSingleModel(
 			for (let i = 0; i < shadedParts; i++) {
 				const row = Math.floor(i / columns)
 				const col = i % columns
-				canvas.drawRect(rectX + col * cellWidth, rectY + row * cellHeight, cellWidth, cellHeight, {
-					fill: shadeColor
-				})
+				canvas.drawRect(
+					rectX + col * cellWidth,
+					rectY + row * cellHeight,
+					cellWidth,
+					cellHeight,
+					{
+						fill: shadeColor
+					}
+				)
 			}
 			for (let r = 0; r <= rows; r++) {
-				canvas.drawLine(rectX, rectY + r * cellHeight, rectX + size, rectY + r * cellHeight, {
-					stroke: theme.colors.black,
-					strokeWidth: r === 0 || r === rows ? theme.stroke.width.thick : theme.stroke.width.thin
-				})
+				canvas.drawLine(
+					rectX,
+					rectY + r * cellHeight,
+					rectX + size,
+					rectY + r * cellHeight,
+					{
+						stroke: theme.colors.black,
+						strokeWidth:
+							r === 0 || r === rows
+								? theme.stroke.width.thick
+								: theme.stroke.width.thin
+					}
+				)
 			}
 			for (let c = 0; c <= columns; c++) {
-				canvas.drawLine(rectX + c * cellWidth, rectY, rectX + c * cellWidth, rectY + size, {
-					stroke: theme.colors.black,
-					strokeWidth: c === 0 || c === columns ? theme.stroke.width.thick : theme.stroke.width.thin
-				})
+				canvas.drawLine(
+					rectX + c * cellWidth,
+					rectY,
+					rectX + c * cellWidth,
+					rectY + size,
+					{
+						stroke: theme.colors.black,
+						strokeWidth:
+							c === 0 || c === columns
+								? theme.stroke.width.thick
+								: theme.stroke.width.thin
+					}
+				)
 			}
 			break
 		}
@@ -206,15 +256,25 @@ function drawSingleModel(
 					y: cy + Math.sin(toRad(endAngle))
 				}
 
-				const startHit = findRayPolygonIntersection({ x: cx, y: cy }, rayStart, vertices)
-				const endHit = findRayPolygonIntersection({ x: cx, y: cy }, rayEnd, vertices)
+				const startHit = findRayPolygonIntersection(
+					{ x: cx, y: cy },
+					rayStart,
+					vertices
+				)
+				const endHit = findRayPolygonIntersection(
+					{ x: cx, y: cy },
+					rayEnd,
+					vertices
+				)
 
 				if (!startHit || !endHit) continue
 
 				const { point: startIntersect, edgeIndex: startEdge } = startHit
 				const { point: endIntersect, edgeIndex: endEdge } = endHit
 
-				const path = new Path2D().moveTo(cx, cy).lineTo(startIntersect.x, startIntersect.y)
+				const path = new Path2D()
+					.moveTo(cx, cy)
+					.lineTo(startIntersect.x, startIntersect.y)
 
 				// Walk along the polygon perimeter from the edge after startEdge up to endEdge
 				let edge = (startEdge + 1) % sides
@@ -246,7 +306,11 @@ function drawSingleModel(
 					x: cx + radius * 2 * Math.cos(angle),
 					y: cy + radius * 2 * Math.sin(angle)
 				}
-				const intersect = findRayPolygonIntersection({ x: cx, y: cy }, p2, vertices)
+				const intersect = findRayPolygonIntersection(
+					{ x: cx, y: cy },
+					p2,
+					vertices
+				)
 				if (intersect) {
 					canvas.drawLine(cx, cy, intersect.point.x, intersect.point.y, {
 						stroke: theme.colors.black,
@@ -270,7 +334,10 @@ function drawModelWithOverflow(
 	cy: number,
 	size: number
 ) {
-	const repeatCount = Math.max(1, Math.ceil(modelProps.shadedParts / modelProps.totalParts))
+	const repeatCount = Math.max(
+		1,
+		Math.ceil(modelProps.shadedParts / modelProps.totalParts)
+	)
 	if (repeatCount === 1) {
 		drawSingleModel(canvas, modelProps, cx, cy, size)
 		return
@@ -305,7 +372,10 @@ function drawModelWithOverflow(
 }
 
 function measureGroupWidth(modelProps: FractionModel, size: number): number {
-	const repeatCount = Math.max(1, Math.ceil(modelProps.shadedParts / modelProps.totalParts))
+	const repeatCount = Math.max(
+		1,
+		Math.ceil(modelProps.shadedParts / modelProps.totalParts)
+	)
 	const gap = Math.max(8, Math.floor(size * 0.1))
 	const totalGap = gap * (repeatCount - 1)
 	const tileSize = size
@@ -332,7 +402,8 @@ export const generateFractionMultiplicationModel: WidgetGenerator<
 	// Account for potential overflow width caused by repeated tiles
 	const leftWidth = measureGroupWidth(leftOperand, modelSize)
 	const rightWidth = measureGroupWidth(rightOperand, modelSize)
-	const totalContentWidth = leftWidth + operatorWidth + middleTermWidth + operatorWidth + rightWidth
+	const totalContentWidth =
+		leftWidth + operatorWidth + middleTermWidth + operatorWidth + rightWidth
 	let currentX = (width - totalContentWidth) / 2
 	const verticalCenter = height / 2
 
@@ -367,12 +438,18 @@ export const generateFractionMultiplicationModel: WidgetGenerator<
 	} else {
 		const boxWidth = middleTermWidth * 0.8
 		const boxHeight = modelSize * 0.8
-		canvas.drawRect(middleCx - boxWidth / 2, verticalCenter - boxHeight / 2, boxWidth, boxHeight, {
-			fill: "none",
-			stroke: theme.colors.border,
-			strokeWidth: 2,
-			dash: "6,4"
-		})
+		canvas.drawRect(
+			middleCx - boxWidth / 2,
+			verticalCenter - boxHeight / 2,
+			boxWidth,
+			boxHeight,
+			{
+				fill: "none",
+				stroke: theme.colors.border,
+				strokeWidth: 2,
+				dash: "6,4"
+			}
+		)
 	}
 	currentX += middleTermWidth
 
@@ -390,7 +467,13 @@ export const generateFractionMultiplicationModel: WidgetGenerator<
 
 	// --- Draw Right Operand ---
 	const rightCx = currentX + rightWidth / 2
-	drawModelWithOverflow(canvas, rightOperand, rightCx, verticalCenter, modelSize)
+	drawModelWithOverflow(
+		canvas,
+		rightOperand,
+		rightCx,
+		verticalCenter,
+		modelSize
+	)
 
 	const {
 		svgBody,

@@ -1,15 +1,15 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { PADDING } from "../utils/constants"
-import { CSS_COLOR_PATTERN } from "../utils/css-color"
-import { MATHML_INNER_PATTERN } from "../utils/mathml"
-import { Path2D } from "../utils/path-builder"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { estimateWrappedTextDimensions } from "../utils/text"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { PADDING } from "@/widgets/utils/constants"
+import { CSS_COLOR_PATTERN } from "@/widgets/utils/css-color"
+import { MATHML_INNER_PATTERN } from "@/widgets/utils/mathml"
+import { Path2D } from "@/widgets/utils/path-builder"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { estimateWrappedTextDimensions } from "@/widgets/utils/text"
+import { theme } from "@/widgets/utils/theme"
 
 // -----------------------------
 // Constraint-first schema (angles by three points)
@@ -21,7 +21,9 @@ function createAngleValueSchema() {
 		.discriminatedUnion("type", [
 			z
 				.object({
-					type: z.literal("numeric").describe("Indicates this is a numeric angle value."),
+					type: z
+						.literal("numeric")
+						.describe("Indicates this is a numeric angle value."),
 					value: z
 						.number()
 						.gt(0)
@@ -54,7 +56,9 @@ function createSideValueSchema() {
 		.discriminatedUnion("type", [
 			z
 				.object({
-					type: z.literal("numeric").describe("Indicates this is a numeric side length."),
+					type: z
+						.literal("numeric")
+						.describe("Indicates this is a numeric side length."),
 					value: z
 						.number()
 						.gt(0)
@@ -67,7 +71,9 @@ function createSideValueSchema() {
 				.object({
 					type: z
 						.literal("symbolic")
-						.describe("Indicates this is a symbolic side length representation."),
+						.describe(
+							"Indicates this is a symbolic side length representation."
+						),
 					symbol: z
 						.string()
 						.describe(
@@ -137,7 +143,9 @@ function createAngleMarkSchema() {
 				),
 			showArc: z
 				.boolean()
-				.describe("Whether to render the arc for this angle. Does not affect geometry."),
+				.describe(
+					"Whether to render the arc for this angle. Does not affect geometry."
+				),
 			showLabel: z
 				.boolean()
 				.describe(
@@ -500,8 +508,14 @@ function drawArc(
 	const sy = center.y + r * Math.sin(s)
 	const ex = center.x + r * Math.cos(e)
 	const ey = center.y + r * Math.sin(e)
-	const path = new Path2D().moveTo(sx, sy).arcTo(r, r, 0, largeFlag, sweepFlag, ex, ey)
-	canvas.drawPath(path, { fill: "none", stroke: color, strokeWidth: theme.stroke.width.thick })
+	const path = new Path2D()
+		.moveTo(sx, sy)
+		.arcTo(r, r, 0, largeFlag, sweepFlag, ex, ey)
+	canvas.drawPath(path, {
+		fill: "none",
+		stroke: color,
+		strokeWidth: theme.stroke.width.thick
+	})
 }
 
 type AngleValue = z.infer<ReturnType<typeof createAngleValueSchema>>
@@ -520,9 +534,9 @@ function sideValueToString(v: SideValue): string {
 
 // forward-only schema: no legacy normalization helpers
 
-export const generateTriangleDiagram: WidgetGenerator<typeof TriangleDiagramPropsSchema> = async (
-	props
-) => {
+export const generateTriangleDiagram: WidgetGenerator<
+	typeof TriangleDiagramPropsSchema
+> = async (props) => {
 	const {
 		width,
 		height,
@@ -589,14 +603,19 @@ export const generateTriangleDiagram: WidgetGenerator<typeof TriangleDiagramProp
 		} else {
 			others = [idA, idB]
 		}
-		const arcs = angleMarks.filter((a) => a.vertex === vertex && a.value.type === "numeric")
+		const arcs = angleMarks.filter(
+			(a) => a.vertex === vertex && a.value.type === "numeric"
+		)
 		let v: number | null = null
 		for (const a of arcs) {
 			const f = a.from
 			const t = a.to
 			if (a.value.type !== "numeric") continue
 			const val = a.value.value
-			if ((f === others[0] && t === others[1]) || (f === others[1] && t === others[0])) {
+			if (
+				(f === others[0] && t === others[1]) ||
+				(f === others[1] && t === others[0])
+			) {
 				v = val
 				break
 			}
@@ -619,7 +638,12 @@ export const generateTriangleDiagram: WidgetGenerator<typeof TriangleDiagramProp
 	const providedCount = [AinProvided, BinProvided, CinProvided].filter(
 		(x): x is number => x != null
 	).length
-	if (providedCount === 3 && AinProvided != null && BinProvided != null && CinProvided != null) {
+	if (
+		providedCount === 3 &&
+		AinProvided != null &&
+		BinProvided != null &&
+		CinProvided != null
+	) {
 		const sumProvided = AinProvided + BinProvided + CinProvided
 		if (Math.abs(sumProvided - 180) > 1e-6) {
 			logger.error("interior angles do not sum to 180", {
@@ -641,14 +665,19 @@ export const generateTriangleDiagram: WidgetGenerator<typeof TriangleDiagramProp
 		} else {
 			others = [idA, idB]
 		}
-		const arcs = angleMarks.filter((a) => a.vertex === vertex && a.value.type === "numeric")
+		const arcs = angleMarks.filter(
+			(a) => a.vertex === vertex && a.value.type === "numeric"
+		)
 		let fromArcs: number | null = null
 		for (const a of arcs) {
 			const f = a.from
 			const t = a.to
 			if (a.value.type !== "numeric") continue
 			const val = a.value.value
-			if ((f === others[0] && t === others[1]) || (f === others[1] && t === others[0])) {
+			if (
+				(f === others[0] && t === others[1]) ||
+				(f === others[1] && t === others[0])
+			) {
 				fromArcs = val
 				break
 			}
@@ -664,7 +693,10 @@ export const generateTriangleDiagram: WidgetGenerator<typeof TriangleDiagramProp
 		}
 		if (fromArcs != null) {
 			if (rightAt.has(vertex) && Math.abs(fromArcs - 90) > 1e-6) {
-				logger.error("conflicting angle constraints at vertex", { vertex, numeric: fromArcs })
+				logger.error("conflicting angle constraints at vertex", {
+					vertex,
+					numeric: fromArcs
+				})
 				throw errors.new("conflicting angle constraints")
 			}
 			return fromArcs
@@ -677,7 +709,9 @@ export const generateTriangleDiagram: WidgetGenerator<typeof TriangleDiagramProp
 	let Bdeg = tryInteriorDegFor(idB)
 	let Cdeg = tryInteriorDegFor(idC)
 
-	const known = [Adeg, Bdeg, Cdeg].filter((v): v is number => typeof v === "number")
+	const known = [Adeg, Bdeg, Cdeg].filter(
+		(v): v is number => typeof v === "number"
+	)
 	if (known.length < 2) {
 		logger.error("insufficient numeric angle constraints", {
 			hasA: Adeg != null,
@@ -690,8 +724,21 @@ export const generateTriangleDiagram: WidgetGenerator<typeof TriangleDiagramProp
 	if (Bdeg == null && Adeg != null && Cdeg != null) Bdeg = 180 - (Adeg + Cdeg)
 	if (Cdeg == null && Adeg != null && Bdeg != null) Cdeg = 180 - (Adeg + Bdeg)
 
-	if (!(Adeg != null && Bdeg != null && Cdeg != null && Adeg > 0 && Bdeg > 0 && Cdeg > 0)) {
-		logger.error("derived triangle angles invalid", { A: Adeg, B: Bdeg, C: Cdeg })
+	if (
+		!(
+			Adeg != null &&
+			Bdeg != null &&
+			Cdeg != null &&
+			Adeg > 0 &&
+			Bdeg > 0 &&
+			Cdeg > 0
+		)
+	) {
+		logger.error("derived triangle angles invalid", {
+			A: Adeg,
+			B: Bdeg,
+			C: Cdeg
+		})
 		throw errors.new("invalid derived triangle angles")
 	}
 
@@ -703,8 +750,14 @@ export const generateTriangleDiagram: WidgetGenerator<typeof TriangleDiagramProp
 	// --- Data space geometry (unit base), then fit to box ---
 	const A_data: Vec = { x: 0, y: 0 }
 	const B_data: Vec = { x: 1, y: 0 }
-	const vA_data: Vec = { x: Math.cos(toRad(AdegVal)), y: -Math.sin(toRad(AdegVal)) }
-	const vB_data: Vec = { x: -Math.cos(toRad(BdegVal)), y: -Math.sin(toRad(BdegVal)) }
+	const vA_data: Vec = {
+		x: Math.cos(toRad(AdegVal)),
+		y: -Math.sin(toRad(AdegVal))
+	}
+	const vB_data: Vec = {
+		x: -Math.cos(toRad(BdegVal)),
+		y: -Math.sin(toRad(BdegVal))
+	}
 	const C_data = lineIntersection(A_data, vA_data, B_data, vB_data)
 
 	function computeFit(pointsList: Vec[]) {
@@ -723,7 +776,10 @@ export const generateTriangleDiagram: WidgetGenerator<typeof TriangleDiagramProp
 		)
 		const offsetX = (width - scale * rawW) / 2 - scale * minX
 		const offsetY = (height - scale * rawH) / 2 - scale * minY
-		const project = (p: Vec) => ({ x: offsetX + scale * p.x, y: offsetY + scale * p.y })
+		const project = (p: Vec) => ({
+			x: offsetX + scale * p.x,
+			y: offsetY + scale * p.y
+		})
 		return { scale, project }
 	}
 
@@ -774,7 +830,8 @@ export const generateTriangleDiagram: WidgetGenerator<typeof TriangleDiagramProp
 	if (lines) {
 		for (const line of lines) {
 			const knownIdx: number[] = []
-			for (let i = 0; i < line.length; i++) if (idToPoint.has(line[i])) knownIdx.push(i)
+			for (let i = 0; i < line.length; i++)
+				if (idToPoint.has(line[i])) knownIdx.push(i)
 			if (knownIdx.length < 2) continue
 			const p1 = idToPoint.get(line[knownIdx[0]])
 			const p2 = idToPoint.get(line[knownIdx[1]])
@@ -805,7 +862,10 @@ export const generateTriangleDiagram: WidgetGenerator<typeof TriangleDiagramProp
 	}
 
 	// Build screen segments for collision detection (triangle edges + explicit base lines)
-	const screenSegments: Array<{ a: { x: number; y: number }; b: { x: number; y: number } }> = []
+	const screenSegments: Array<{
+		a: { x: number; y: number }
+		b: { x: number; y: number }
+	}> = []
 	screenSegments.push({ a: A, b: B }, { a: B, b: C }, { a: C, b: A })
 	if (lines) {
 		for (const line of lines) {
@@ -847,14 +907,19 @@ export const generateTriangleDiagram: WidgetGenerator<typeof TriangleDiagramProp
 	}
 
 	// Precompute altitude segments BEFORE placing angle labels so labels can avoid them
-	const precomputedAltitudes: Array<{ alt: AltitudeSpec; v: Vec; foot: Vec }> = []
+	const precomputedAltitudes: Array<{ alt: AltitudeSpec; v: Vec; foot: Vec }> =
+		[]
 	if (altitudes) {
 		const sideMap: Record<"AB" | "BC" | "CA", { p1: Vec; p2: Vec }> = {
 			AB: { p1: A, p2: B },
 			BC: { p1: B, p2: C },
 			CA: { p1: C, p2: A }
 		}
-		const vertexMap: Record<string, Vec> = { [points.A.id]: A, [points.B.id]: B, [points.C.id]: C }
+		const vertexMap: Record<string, Vec> = {
+			[points.A.id]: A,
+			[points.B.id]: B,
+			[points.C.id]: C
+		}
 		for (const alt of altitudes) {
 			const v = vertexMap[alt.vertex]
 			const base = sideMap[alt.toSide]
@@ -923,10 +988,17 @@ export const generateTriangleDiagram: WidgetGenerator<typeof TriangleDiagramProp
 		// towards the triangle centroid.
 		const mid = (start + end) / 2 // kept for arc construction only
 		const baseR = arcRadius + 18
-		const centerToCentroid: Vec = { x: centroid.x - center.x, y: centroid.y - center.y }
-		const interiorAngle = interiorDirByVertex.get(mark.vertex) ?? angleOf(centerToCentroid)
+		const centerToCentroid: Vec = {
+			x: centroid.x - center.x,
+			y: centroid.y - center.y
+		}
+		const interiorAngle =
+			interiorDirByVertex.get(mark.vertex) ?? angleOf(centerToCentroid)
 		// Save opposite (outward) direction for vertex letter placement later
-		preferredOppositeByVertex.set(mark.vertex, (interiorAngle + Math.PI) % (2 * Math.PI))
+		preferredOppositeByVertex.set(
+			mark.vertex,
+			(interiorAngle + Math.PI) % (2 * Math.PI)
+		)
 		// const segments = [
 		// 	{ p1: A, p2: B },
 		// 	{ p1: B, p2: C },
@@ -980,7 +1052,10 @@ export const generateTriangleDiagram: WidgetGenerator<typeof TriangleDiagramProp
 		)
 		const halfW = maxWidth / 2
 		const halfH = textH / 2
-		let best = { x: center.x + baseR * Math.cos(mid), y: center.y + baseR * Math.sin(mid) }
+		let best = {
+			x: center.x + baseR * Math.cos(mid),
+			y: center.y + baseR * Math.sin(mid)
+		}
 		let minHits = Number.POSITIVE_INFINITY
 		// Prefer placing labels opposite the triangle interior
 		// const tri = [A, B, C]
@@ -1001,7 +1076,13 @@ export const generateTriangleDiagram: WidgetGenerator<typeof TriangleDiagramProp
 				const ang = interiorAngle + dt
 				const x = center.x + r * Math.cos(ang)
 				const y = center.y + r * Math.sin(ang)
-				const rect = { x: x - halfW, y: y - halfH, width: maxWidth, height: textH, pad: 2 }
+				const rect = {
+					x: x - halfW,
+					y: y - halfH,
+					width: maxWidth,
+					height: textH,
+					pad: 2
+				}
 				const hits = rectIntersectsAnySegment(rect) ? 1 : 0
 				if (hits < minHits) {
 					minHits = hits
@@ -1101,7 +1182,11 @@ export const generateTriangleDiagram: WidgetGenerator<typeof TriangleDiagramProp
 					fill: theme.colors.black,
 					anchor: "middle",
 					dominantBaseline: "middle",
-					rotate: { angle: rotationAngle, cx: mid.x + nx * off, cy: mid.y + ny * off }
+					rotate: {
+						angle: rotationAngle,
+						cx: mid.x + nx * off,
+						cy: mid.y + ny * off
+					}
 				})
 			}
 		}
@@ -1191,15 +1276,27 @@ export const generateTriangleDiagram: WidgetGenerator<typeof TriangleDiagramProp
 		const angleCandidates: number[] = []
 		if (typeof preferredAngleRad === "number") {
 			angleCandidates.push(preferredAngleRad)
-			angleCandidates.push(preferredAngleRad + Math.PI / 6, preferredAngleRad - Math.PI / 6)
-			angleCandidates.push(preferredAngleRad + Math.PI / 3, preferredAngleRad - Math.PI / 3)
+			angleCandidates.push(
+				preferredAngleRad + Math.PI / 6,
+				preferredAngleRad - Math.PI / 6
+			)
+			angleCandidates.push(
+				preferredAngleRad + Math.PI / 3,
+				preferredAngleRad - Math.PI / 3
+			)
 		}
 		for (let i = 0; i < 8; i++) angleCandidates.push((i * Math.PI) / 4)
 		for (const ang of angleCandidates) {
 			for (const dist of [24, 34, 14, 44]) {
 				const tx = pos.x + dist * Math.cos(ang)
 				const ty = pos.y + dist * Math.sin(ang)
-				const rect = { x: tx - halfW, y: ty - halfH, width: w, height: h, pad: 2 }
+				const rect = {
+					x: tx - halfW,
+					y: ty - halfH,
+					width: w,
+					height: h,
+					pad: 2
+				}
 				const hits = rectIntersectsAnySegment(rect) ? 1 : 0
 				if (hits < minCollisions) {
 					minCollisions = hits

@@ -31,7 +31,11 @@ function findTuplesInSchema(widgetKey: string, schema: $ZodType): Offender[] {
 	)
 	if (conversionResult.error) {
 		// If conversion fails for any reason, surface it as an offender for visibility
-		offenders.push({ widget: widgetKey, nodeType: "conversion_error", path: [] })
+		offenders.push({
+			widget: widgetKey,
+			nodeType: "conversion_error",
+			path: []
+		})
 	}
 
 	return offenders
@@ -46,7 +50,10 @@ describe("Widgets: no usage of Zod tuples anywhere", () => {
 
 		if (allOffenders.length > 0) {
 			const details = allOffenders
-				.map((o) => `${o.widget} :: ${o.nodeType} at jsonPath=${JSON.stringify(o.path)}`)
+				.map(
+					(o) =>
+						`${o.widget} :: ${o.nodeType} at jsonPath=${JSON.stringify(o.path)}`
+				)
 				.join("\n")
 			expect(`Found tuple types in widget schemas:\n${details}`).toBe("")
 		} else {

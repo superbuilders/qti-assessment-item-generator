@@ -1,7 +1,10 @@
-import { CHART_TITLE_FONT_PX, CHART_TITLE_TOP_PADDING_PX } from "../utils/constants"
-import type { Canvas } from "../utils/layout"
-import { estimateWrappedTextDimensions } from "../utils/text"
-import { theme } from "../utils/theme"
+import {
+	CHART_TITLE_FONT_PX,
+	CHART_TITLE_TOP_PADDING_PX
+} from "@/utils/constants"
+import type { Canvas } from "@/utils/layout"
+import { estimateWrappedTextDimensions } from "@/utils/text"
+import { theme } from "@/utils/theme"
 
 export type ChartFrame = {
 	left: number

@@ -54,7 +54,12 @@ function stripPropertyNames(node: z.core.JSONSchema._JSONSchema): void {
 	if (Array.isArray(oneOf)) for (const s of oneOf) stripPropertyNames(s)
 
 	const notSchema = node.not
-	if (notSchema !== undefined && notSchema !== true && notSchema !== false && isRecord(notSchema)) {
+	if (
+		notSchema !== undefined &&
+		notSchema !== true &&
+		notSchema !== false &&
+		isRecord(notSchema)
+	) {
 		stripPropertyNames(notSchema)
 	}
 
@@ -80,7 +85,8 @@ function stripPropertyNames(node: z.core.JSONSchema._JSONSchema): void {
 
 // Hoisted normalization helper: ensure every object has an explicit properties: {} and additionalProperties: false
 function ensureEmptyProperties(node: BaseSchema): void {
-	if (!(typeof node === "object" && node !== null && !Array.isArray(node))) return
+	if (!(typeof node === "object" && node !== null && !Array.isArray(node)))
+		return
 
 	// For object-type schemas, ensure properties exists and additionalProperties is false
 	if (node.type === "object") {
@@ -106,7 +112,8 @@ function ensureEmptyProperties(node: BaseSchema): void {
 	const items = node.items
 	if (Array.isArray(items)) {
 		for (const it of items) {
-			if (it && typeof it === "object" && !Array.isArray(it)) ensureEmptyProperties(it)
+			if (it && typeof it === "object" && !Array.isArray(it))
+				ensureEmptyProperties(it)
 		}
 	} else if (items && typeof items === "object" && !Array.isArray(items)) {
 		ensureEmptyProperties(items)
@@ -125,7 +132,10 @@ function ensureEmptyProperties(node: BaseSchema): void {
 		ensureEmptyProperties(node.not)
 
 	// Recurse into additionalProperties when it is a schema
-	if (node.additionalProperties && typeof node.additionalProperties === "object") {
+	if (
+		node.additionalProperties &&
+		typeof node.additionalProperties === "object"
+	) {
 		ensureEmptyProperties(node.additionalProperties)
 	}
 

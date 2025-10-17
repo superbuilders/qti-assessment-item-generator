@@ -1,17 +1,19 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { PADDING } from "../utils/constants"
-import { CSS_COLOR_PATTERN } from "../utils/css-color"
-import { abbreviateMonth } from "../utils/labels"
-import { calculateXAxisLayout, selectAxisLabels } from "../utils/layout"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { theme } from "../utils/theme"
-import { buildTicks } from "../utils/ticks"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { PADDING } from "@/widgets/utils/constants"
+import { CSS_COLOR_PATTERN } from "@/widgets/utils/css-color"
+import { abbreviateMonth } from "@/widgets/utils/labels"
+import { calculateXAxisLayout, selectAxisLabels } from "@/widgets/utils/layout"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
+import { buildTicks } from "@/widgets/utils/ticks"
 
-export const ErrInvalidDimensions = errors.new("invalid chart dimensions or axis range")
+export const ErrInvalidDimensions = errors.new(
+	"invalid chart dimensions or axis range"
+)
 
 const DataPoint = z
 	.object({
@@ -34,7 +36,9 @@ export const DotPlotPropsSchema = z
 	.object({
 		type: z
 			.literal("dotPlot")
-			.describe("Identifies this as a dot plot widget for displaying frequency distributions."),
+			.describe(
+				"Identifies this as a dot plot widget for displaying frequency distributions."
+			),
 		width: createWidthSchema(),
 		height: createHeightSchema(),
 		axis: z
@@ -42,7 +46,9 @@ export const DotPlotPropsSchema = z
 				label: z
 					.string()
 					.nullable()
-					.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
+					.transform((val) =>
+						val === "null" || val === "NULL" || val === "" ? null : val
+					)
 					.describe(
 						"Title for the horizontal axis describing the variable (e.g., 'Test Score', 'Number of Siblings', 'Temperature (°C)', null). Null shows no label."
 					),
@@ -97,7 +103,9 @@ export type DotPlotProps = z.infer<typeof DotPlotPropsSchema>
  * Dot plots are used to visualize the distribution of a numerical data set,
  * especially when the data consists of discrete values or has been binned.
  */
-export const generateDotPlot: WidgetGenerator<typeof DotPlotPropsSchema> = async (data) => {
+export const generateDotPlot: WidgetGenerator<
+	typeof DotPlotPropsSchema
+> = async (data) => {
 	const { width, height, axis, data: plotData, dotColor, dotRadius } = data
 
 	const { bottomMargin, xAxisTitleY } = calculateXAxisLayout(true)
@@ -155,7 +163,11 @@ export const generateDotPlot: WidgetGenerator<typeof DotPlotPropsSchema> = async
 	}
 
 	// Draw tick marks and labels
-	const { values, labels: tickLabels } = buildTicks(axis.min, axis.max, axis.tickInterval)
+	const { values, labels: tickLabels } = buildTicks(
+		axis.min,
+		axis.max,
+		axis.tickInterval
+	)
 	const tickPositions = values.map(toSvgX)
 	const selectedLabels = selectAxisLabels({
 		labels: tickLabels,
@@ -193,7 +205,8 @@ export const generateDotPlot: WidgetGenerator<typeof DotPlotPropsSchema> = async
 		if (dp.count > 0) {
 			const x = toSvgX(dp.value)
 			for (let i = 0; i < dp.count; i++) {
-				const y = axisY - dotRadius - baseOffset - i * (dotDiameter + dotSpacing)
+				const y =
+					axisY - dotRadius - baseOffset - i * (dotDiameter + dotSpacing)
 				canvas.drawCircle(x, y, dotRadius, {
 					fill: dotColor
 				})

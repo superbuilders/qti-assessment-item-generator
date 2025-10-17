@@ -1,13 +1,13 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { PADDING } from "../utils/constants"
-import { CSS_COLOR_PATTERN } from "../utils/css-color"
-import { Path2D } from "../utils/path-builder"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { PADDING } from "@/widgets/utils/constants"
+import { CSS_COLOR_PATTERN } from "@/widgets/utils/css-color"
+import { Path2D } from "@/widgets/utils/path-builder"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
 
 // Defines the geometric shape used to model the fractions.
 const ShapeTypeEnum = z
@@ -25,12 +25,18 @@ const OperatorEnum = z
 function createPartitionedShapeSchema() {
 	return z
 		.object({
-			numerator: z.number().int().min(0).describe("The number of shaded pieces in the shape."),
+			numerator: z
+				.number()
+				.int()
+				.min(0)
+				.describe("The number of shaded pieces in the shape."),
 			denominator: z
 				.number()
 				.int()
 				.positive()
-				.describe("The total number of equal pieces the shape is divided into."),
+				.describe(
+					"The total number of equal pieces the shape is divided into."
+				),
 			color: z
 				.string()
 				.regex(CSS_COLOR_PATTERN, "invalid css color")
@@ -64,7 +70,9 @@ export const FractionModelDiagramPropsSchema = z
 		"Creates a visual representation of fraction operations or comparisons using a sequence of partitioned shapes (circles, regular polygons, or boxes). Ideal for teaching fraction concepts, equivalency, and operations like repeated addition."
 	)
 
-export type FractionModelDiagramProps = z.infer<typeof FractionModelDiagramPropsSchema>
+export type FractionModelDiagramProps = z.infer<
+	typeof FractionModelDiagramPropsSchema
+>
 
 /**
  * Generates an SVG diagram showing a sequence of fractions, represented as partitioned shapes,
@@ -98,7 +106,8 @@ export const generateFractionModelDiagram: WidgetGenerator<
 
 	// Allocate space proportionally. Let's assume operators take up 1/4 the space of a shape.
 	const operatorSpaceRatio = 0.25
-	const totalUnits = shapes.length + (operators?.length || 0) * operatorSpaceRatio
+	const totalUnits =
+		shapes.length + (operators?.length || 0) * operatorSpaceRatio
 	const shapeDiameter = availableWidth / totalUnits
 	const operatorWidth = shapeDiameter * operatorSpaceRatio
 	const radius = Math.min(shapeDiameter, availableHeight) / 2
@@ -131,7 +140,11 @@ export const generateFractionModelDiagram: WidgetGenerator<
 			const p1 = vertices[i]
 			const p2 = vertices[(i + 1) % numSides]
 			if (!p1 || !p2) continue
-			const path = new Path2D().moveTo(cx, cy).lineTo(p1.x, p1.y).lineTo(p2.x, p2.y).closePath()
+			const path = new Path2D()
+				.moveTo(cx, cy)
+				.lineTo(p1.x, p1.y)
+				.lineTo(p2.x, p2.y)
+				.closePath()
 			const isShaded = i < numerator
 			canvas.drawPath(path, {
 				fill: isShaded ? color : "none",

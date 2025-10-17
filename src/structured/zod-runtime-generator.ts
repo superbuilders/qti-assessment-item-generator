@@ -33,7 +33,9 @@ export function generateZodSchemaFromObject(
 				logger.error("zod schema generation map corruption detected", {
 					objType: typeof obj
 				})
-				throw errors.new("zod schema generation: schema map corruption detected")
+				throw errors.new(
+					"zod schema generation: schema map corruption detected"
+				)
 			}
 			return existingSchema
 		}
@@ -79,7 +81,8 @@ export function generateZodSchemaFromObject(
 			let parentHasCorrect = false
 			for (const [k, v] of entries) {
 				if (k === "type" && typeof v === "string") parentType = v
-				if (k === "identifier" && typeof v === "string") parentHasIdentifier = true
+				if (k === "identifier" && typeof v === "string")
+					parentHasIdentifier = true
 				if (k === "correct") parentHasCorrect = true
 			}
 
@@ -125,18 +128,27 @@ export function generateZodSchemaFromObject(
 					}
 				}
 
-				if ((key === "cardinality" || key === "baseType") && typeof value === "string") {
+				if (
+					(key === "cardinality" || key === "baseType") &&
+					typeof value === "string"
+				) {
 					// Freeze only for response declaration objects: heuristic check by sibling keys
 					const lacksType = typeof parentType !== "string"
-					const isLikelyResponseDeclaration = parentHasIdentifier && parentHasCorrect && lacksType
-					const isInResponseDeclarationsPath = path.includes("responseDeclarations")
+					const isLikelyResponseDeclaration =
+						parentHasIdentifier && parentHasCorrect && lacksType
+					const isInResponseDeclarationsPath = path.includes(
+						"responseDeclarations"
+					)
 					if (isLikelyResponseDeclaration || isInResponseDeclarationsPath) {
 						shape[key] = z.literal(value)
 						continue
 					}
 				}
 
-				shape[key] = generateZodSchemaFromObject(value, visited, processing, [...path, key])
+				shape[key] = generateZodSchemaFromObject(value, visited, processing, [
+					...path,
+					key
+				])
 			}
 
 			// Create a strict object schema to disallow any extra properties.
@@ -155,6 +167,8 @@ export function generateZodSchemaFromObject(
 				objType: typeof obj,
 				obj
 			})
-			throw errors.new(`zod schema generation: unsupported type '${typeof obj}'`)
+			throw errors.new(
+				`zod schema generation: unsupported type '${typeof obj}'`
+			)
 	}
 }

@@ -29,7 +29,9 @@ logger.info("verifying cartridge", { file: absolutePath })
 async function main() {
 	const ext = path.extname(absolutePath)
 	if (ext !== ".zst") {
-		logger.error("unsupported cartridge format, only .tar.zst supported", { extension: ext })
+		logger.error("unsupported cartridge format, only .tar.zst supported", {
+			extension: ext
+		})
 		throw errors.new("unsupported cartridge format")
 	}
 
@@ -102,7 +104,9 @@ async function main() {
 						const xml = await readQuestionXml(reader, q.xml)
 						const jsonData = await readQuestionJson(reader, q.json)
 						const jsonKeys =
-							typeof jsonData === "object" && jsonData !== null ? Object.keys(jsonData) : []
+							typeof jsonData === "object" && jsonData !== null
+								? Object.keys(jsonData)
+								: []
 						logger.debug("question verified", {
 							unitId: unit.id,
 							lessonId: lesson.id,
@@ -135,7 +139,9 @@ async function main() {
 				const xml = await readQuestionXml(reader, q.xml)
 				const jsonData = await readQuestionJson(reader, q.json)
 				const jsonKeys =
-					typeof jsonData === "object" && jsonData !== null ? Object.keys(jsonData) : []
+					typeof jsonData === "object" && jsonData !== null
+						? Object.keys(jsonData)
+						: []
 				logger.debug("unit test question verified", {
 					unitId: unit.id,
 					questionNumber: q.number,

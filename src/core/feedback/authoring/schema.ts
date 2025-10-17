@@ -3,22 +3,40 @@ import * as logger from "@superbuilders/slog"
 import { z } from "zod"
 import type { FeedbackContent } from "@/core/content"
 import { createFeedbackContentSchema } from "@/core/content/contextual-schemas"
+import type {
+	AuthoringFeedbackOverall,
+	AuthoringNestedLeaf,
+	AuthoringNestedNode
+} from "@/core/feedback/authoring/types"
+import type { FeedbackPlan } from "@/core/feedback/plan"
+import { buildFeedbackPlanFromInteractions } from "@/core/feedback/plan"
 import type { AnyInteraction } from "@/core/interactions"
 import type { ResponseDeclaration } from "@/core/item"
-import type { FeedbackPlan } from "../plan"
-import { buildFeedbackPlanFromInteractions } from "../plan"
-import type { AuthoringFeedbackOverall, AuthoringNestedLeaf, AuthoringNestedNode } from "./types"
 
 // --- Error Constants ---
 
-export const ErrFeedbackMissingOverall = errors.new("feedback must contain FEEDBACK__OVERALL")
-export const ErrFeedbackOverallNotObject = errors.new("FEEDBACK__OVERALL must be an object")
-export const ErrFeedbackLeafAtRoot = errors.new("feedback leaf node cannot be at the root")
-export const ErrFeedbackInvalidNode = errors.new("feedback tree contains non-object node")
-export const ErrFeedbackNoCombinationForPath = errors.new("no combination found for path")
+export const ErrFeedbackMissingOverall = errors.new(
+	"feedback must contain FEEDBACK__OVERALL"
+)
+export const ErrFeedbackOverallNotObject = errors.new(
+	"FEEDBACK__OVERALL must be an object"
+)
+export const ErrFeedbackLeafAtRoot = errors.new(
+	"feedback leaf node cannot be at the root"
+)
+export const ErrFeedbackInvalidNode = errors.new(
+	"feedback tree contains non-object node"
+)
+export const ErrFeedbackNoCombinationForPath = errors.new(
+	"no combination found for path"
+)
 export const ErrFeedbackExtraKeys = errors.new("feedback contains extra keys")
-export const ErrFeedbackMissingLeaves = errors.new("feedback is missing required leaves")
-export const ErrFeedbackSchemaValidation = errors.new("feedback schema validation")
+export const ErrFeedbackMissingLeaves = errors.new(
+	"feedback is missing required leaves"
+)
+export const ErrFeedbackSchemaValidation = errors.new(
+	"feedback schema validation"
+)
 
 // --- Nested Schema Builder ---
 
@@ -47,7 +65,9 @@ export function createFeedbackObjectSchema<
 		type LeafT = AuthoringNestedLeaf<E>
 		type NodeT = AuthoringNestedNode<P, E>
 		if (feedbackPlan.dimensions.length === 0) {
-			logger.error("combo feedback plan has no dimensions", { dimensionCount: 0 })
+			logger.error("combo feedback plan has no dimensions", {
+				dimensionCount: 0
+			})
 			throw errors.new("combo feedback plan has no dimensions")
 		}
 		let current: z.ZodType<LeafT | NodeT> = LeafNodeSchema
@@ -61,7 +81,9 @@ export function createFeedbackObjectSchema<
 				throw errors.new("undefined dimension in feedback plan")
 			}
 			const keys: readonly string[] =
-				dimension.kind === "enumerated" ? dimension.keys : ["CORRECT", "INCORRECT"]
+				dimension.kind === "enumerated"
+					? dimension.keys
+					: ["CORRECT", "INCORRECT"]
 
 			const innerShape: Record<string, z.ZodType<LeafT | NodeT>> = {}
 			for (const key of keys) {
@@ -69,7 +91,9 @@ export function createFeedbackObjectSchema<
 			}
 			const inner = z.object(innerShape).strict()
 
-			const branchShape: Record<string, typeof inner> = { [dimension.responseIdentifier]: inner }
+			const branchShape: Record<string, typeof inner> = {
+				[dimension.responseIdentifier]: inner
+			}
 			const branch = z.object(branchShape).strict()
 			current = branch
 		}
@@ -77,13 +101,18 @@ export function createFeedbackObjectSchema<
 		OverallSchema = current as z.ZodType<NodeT>
 	}
 
-	const FeedbackObjectSchema = z.object({ FEEDBACK__OVERALL: OverallSchema }).strict()
+	const FeedbackObjectSchema = z
+		.object({ FEEDBACK__OVERALL: OverallSchema })
+		.strict()
 	return FeedbackObjectSchema
 }
 
 // --- Validation and Conversion ---
 
-export function validateFeedbackObject<P extends FeedbackPlan, const E extends readonly string[]>(
+export function validateFeedbackObject<
+	P extends FeedbackPlan,
+	const E extends readonly string[]
+>(
 	feedbackObject: unknown,
 	feedbackPlan: P,
 	widgetTypeKeys: E
@@ -99,15 +128,22 @@ export function validateFeedbackObject<P extends FeedbackPlan, const E extends r
 	return result.data
 }
 
-export function convertFeedbackObjectToBlocks<P extends FeedbackPlan, E extends readonly string[]>(
-	feedbackObject: { FEEDBACK__OVERALL: AuthoringFeedbackOverall<FeedbackPlan, E> },
+export function convertFeedbackObjectToBlocks<
+	P extends FeedbackPlan,
+	E extends readonly string[]
+>(
+	feedbackObject: {
+		FEEDBACK__OVERALL: AuthoringFeedbackOverall<FeedbackPlan, E>
+	},
 	feedbackPlan: P
 ): Record<string, FeedbackContent<E>> {
 	const blocks: Record<string, FeedbackContent<E>> = {}
 	const overallFeedback = feedbackObject.FEEDBACK__OVERALL
 
 	if (!overallFeedback || typeof overallFeedback !== "object") {
-		logger.error("FEEDBACK__OVERALL is not an object during conversion", { overallFeedback })
+		logger.error("FEEDBACK__OVERALL is not an object during conversion", {
+			overallFeedback
+		})
 		throw ErrFeedbackOverallNotObject
 	}
 
@@ -133,7 +169,9 @@ export function convertFeedbackObjectToBlocks<P extends FeedbackPlan, E extends 
 
 	if (feedbackPlan.mode === "fallback") {
 		if (!isFallbackOverall(overallFeedback)) {
-			logger.error("invalid overall feedback shape for fallback", { overallFeedback })
+			logger.error("invalid overall feedback shape for fallback", {
+				overallFeedback
+			})
 			throw errors.new("invalid overall fallback feedback shape")
 		}
 		blocks.CORRECT = overallFeedback.CORRECT.content
@@ -154,7 +192,10 @@ export function convertFeedbackObjectToBlocks<P extends FeedbackPlan, E extends 
 				(c: FeedbackPlan["combinations"][number]) =>
 					c.path.length === path.length &&
 					c.path.every(
-						(seg: FeedbackPlan["combinations"][number]["path"][number], i: number) =>
+						(
+							seg: FeedbackPlan["combinations"][number]["path"][number],
+							i: number
+						) =>
 							path[i] !== undefined &&
 							seg.responseIdentifier === path[i].responseIdentifier &&
 							seg.key === path[i].key
@@ -171,7 +212,10 @@ export function convertFeedbackObjectToBlocks<P extends FeedbackPlan, E extends 
 		const branch = node
 		for (const [responseIdentifier, keyed] of Object.entries(branch)) {
 			if (typeof keyed !== "object" || keyed === null) {
-				logger.error("invalid child node in feedback tree", { keyed, pathSegments: path })
+				logger.error("invalid child node in feedback tree", {
+					keyed,
+					pathSegments: path
+				})
 				throw ErrFeedbackInvalidNode
 			}
 			for (const [subKey, subChild] of Object.entries(keyed)) {
@@ -188,7 +232,9 @@ export function convertFeedbackObjectToBlocks<P extends FeedbackPlan, E extends 
 
 	const producedIds = new Set(Object.keys(blocks))
 	const expectedIds = new Set(
-		feedbackPlan.combinations.map((c: FeedbackPlan["combinations"][number]) => c.id)
+		feedbackPlan.combinations.map(
+			(c: FeedbackPlan["combinations"][number]) => c.id
+		)
 	)
 
 	if (producedIds.size > expectedIds.size) {
@@ -202,7 +248,9 @@ export function convertFeedbackObjectToBlocks<P extends FeedbackPlan, E extends 
 	}
 
 	if (producedIds.size < expectedIds.size) {
-		const missingKeys = [...expectedIds].filter((id: string) => !producedIds.has(id))
+		const missingKeys = [...expectedIds].filter(
+			(id: string) => !producedIds.has(id)
+		)
 		logger.error("feedback is missing required leaves", {
 			dimensionCount: feedbackPlan.dimensions.length,
 			combinationCount: feedbackPlan.combinations.length,
@@ -217,7 +265,9 @@ export function convertFeedbackObjectToBlocks<P extends FeedbackPlan, E extends 
 export function buildEmptyNestedFeedback<
 	P extends FeedbackPlan,
 	E extends readonly string[] = readonly string[]
->(feedbackPlan: P): { FEEDBACK__OVERALL: AuthoringFeedbackOverall<FeedbackPlan, E> } {
+>(
+	feedbackPlan: P
+): { FEEDBACK__OVERALL: AuthoringFeedbackOverall<FeedbackPlan, E> } {
 	function buildNode(
 		dims: readonly FeedbackPlan["dimensions"][number][]
 	): AuthoringNestedNode<FeedbackPlan, E> {
@@ -226,16 +276,20 @@ export function buildEmptyNestedFeedback<
 			throw errors.new("no dimensions to build nested node")
 		}
 		const [currentDim, ...restDims] = dims
-		const keys = currentDim.kind === "enumerated" ? currentDim.keys : ["CORRECT", "INCORRECT"]
+		const keys =
+			currentDim.kind === "enumerated"
+				? currentDim.keys
+				: ["CORRECT", "INCORRECT"]
 		const childIsLeaf = restDims.length === 0
-		const child: AuthoringNestedLeaf<E> | AuthoringNestedNode<FeedbackPlan, E> = childIsLeaf
-			? {
-					content: {
-						preamble: { correctness: "incorrect", summary: [] },
-						steps: []
+		const child: AuthoringNestedLeaf<E> | AuthoringNestedNode<FeedbackPlan, E> =
+			childIsLeaf
+				? {
+						content: {
+							preamble: { correctness: "incorrect", summary: [] },
+							steps: []
+						}
 					}
-				}
-			: buildNode(restDims)
+				: buildNode(restDims)
 		const branch: Record<string, typeof child> = {}
 		for (const key of keys) {
 			branch[key] = child
@@ -246,8 +300,18 @@ export function buildEmptyNestedFeedback<
 	const overallFeedback: AuthoringFeedbackOverall<FeedbackPlan, E> =
 		feedbackPlan.mode === "fallback"
 			? {
-					CORRECT: { content: { preamble: { correctness: "correct", summary: [] }, steps: [] } },
-					INCORRECT: { content: { preamble: { correctness: "incorrect", summary: [] }, steps: [] } }
+					CORRECT: {
+						content: {
+							preamble: { correctness: "correct", summary: [] },
+							steps: []
+						}
+					},
+					INCORRECT: {
+						content: {
+							preamble: { correctness: "incorrect", summary: [] },
+							steps: []
+						}
+					}
 				}
 			: buildNode(feedbackPlan.dimensions)
 
@@ -256,13 +320,23 @@ export function buildEmptyNestedFeedback<
 	}
 }
 
-export function buildFeedbackFromNestedForTemplate<const E extends readonly string[]>(
+export function buildFeedbackFromNestedForTemplate<
+	const E extends readonly string[]
+>(
 	interactions: Record<string, AnyInteraction<E>>,
 	responseDeclarations: ResponseDeclaration[],
-	feedbackObject: { FEEDBACK__OVERALL: AuthoringFeedbackOverall<FeedbackPlan, E> },
+	feedbackObject: {
+		FEEDBACK__OVERALL: AuthoringFeedbackOverall<FeedbackPlan, E>
+	},
 	widgetTypeKeys: E
-): { feedbackPlan: FeedbackPlan; feedbackBlocks: Record<string, FeedbackContent<E>> } {
-	const plan = buildFeedbackPlanFromInteractions(interactions, responseDeclarations)
+): {
+	feedbackPlan: FeedbackPlan
+	feedbackBlocks: Record<string, FeedbackContent<E>>
+} {
+	const plan = buildFeedbackPlanFromInteractions(
+		interactions,
+		responseDeclarations
+	)
 	validateFeedbackObject(feedbackObject, plan, widgetTypeKeys)
 	const blocks = convertFeedbackObjectToBlocks(feedbackObject, plan)
 

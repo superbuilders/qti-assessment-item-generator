@@ -2,8 +2,8 @@ import { describe, expect, mock, test } from "bun:test"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import type OpenAI from "openai"
-import { generateFromEnvelope } from "../../src/structured/client"
-import { allWidgetsCollection } from "../../src/widgets/collections/all"
+import { generateFromEnvelope } from "@/structured/client"
+import { allWidgetsCollection } from "@/widgets/collections/all"
 
 // Mock OpenAI Responses API
 mock.module("openai", () => {
@@ -16,7 +16,9 @@ mock.module("openai", () => {
 						output_text: JSON.stringify({
 							identifier: "item_1",
 							title: "title",
-							body: [{ type: "interactionRef", interactionId: "choice_interaction" }],
+							body: [
+								{ type: "interactionRef", interactionId: "choice_interaction" }
+							],
 							responseDeclarations: [
 								{
 									identifier: "RESPONSE",
@@ -38,11 +40,21 @@ mock.module("openai", () => {
 								choices: [
 									{
 										identifier: "A",
-										content: [{ type: "paragraph", content: [{ type: "text", content: "A" }] }]
+										content: [
+											{
+												type: "paragraph",
+												content: [{ type: "text", content: "A" }]
+											}
+										]
 									},
 									{
 										identifier: "B",
-										content: [{ type: "paragraph", content: [{ type: "text", content: "B" }] }]
+										content: [
+											{
+												type: "paragraph",
+												content: [{ type: "text", content: "B" }]
+											}
+										]
 									}
 								],
 								shuffle: true,
@@ -68,14 +80,20 @@ mock.module("openai", () => {
 										type: "step",
 										title: [{ type: "text", content: "Step 1" }],
 										content: [
-											{ type: "paragraph", content: [{ type: "text", content: "Do this." }] }
+											{
+												type: "paragraph",
+												content: [{ type: "text", content: "Do this." }]
+											}
 										]
 									},
 									{
 										type: "step",
 										title: [{ type: "text", content: "Step 2" }],
 										content: [
-											{ type: "paragraph", content: [{ type: "text", content: "Then this." }] }
+											{
+												type: "paragraph",
+												content: [{ type: "text", content: "Then this." }]
+											}
 										]
 									}
 								]
@@ -100,7 +118,10 @@ describe("Responses shots wiring", () => {
 			supplementaryContent: ["s1"],
 			multimodalImageUrls: ["data:image/png;base64,AAAA"],
 			multimodalImagePayloads: [
-				{ data: new Uint8Array([1, 2, 3]).buffer, mimeType: "image/png" as const }
+				{
+					data: new Uint8Array([1, 2, 3]).buffer,
+					mimeType: "image/png" as const
+				}
 			],
 			pdfPayloads: [{ name: "doc", data: new Uint8Array([9, 9]).buffer }]
 		}

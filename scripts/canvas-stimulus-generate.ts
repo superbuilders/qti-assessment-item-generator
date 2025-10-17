@@ -17,7 +17,9 @@ const CONCURRENCY_LIMIT = 200
 const BASE_DIR_ARG = process.argv[2]
 if (!BASE_DIR_ARG) {
 	logger.error("base data directory not provided")
-	throw errors.new("base data directory must be provided as first argument (e.g., 'data')")
+	throw errors.new(
+		"base data directory must be provided as first argument (e.g., 'data')"
+	)
 }
 const OUTPUT_DIR = path.resolve(process.cwd(), BASE_DIR_ARG, "stimulus-out")
 const ROOT = path.resolve(process.cwd(), ROOT_DIR)
@@ -118,14 +120,19 @@ async function processPage(
 
 	const pd = PageDataSchema.safeParse(parsed.data)
 	if (!pd.success) {
-		logger.warn("page-data.json schema mismatch, skipping", { file: pageJsonPath })
+		logger.warn("page-data.json schema mismatch, skipping", {
+			file: pageJsonPath
+		})
 		return
 	}
 
 	await buildAndWriteStimulus(pd.data, outDir)
 }
 
-async function buildAndWriteStimulus(page: PageData, outDir: string): Promise<void> {
+async function buildAndWriteStimulus(
+	page: PageData,
+	outDir: string
+): Promise<void> {
 	const buildResult = buildStimulusFromPageData(page)
 	if (!buildResult) {
 		logger.warn("page missing mainContent.html, skipping", { outDir })
@@ -174,7 +181,10 @@ async function buildAndWriteStimulus(page: PageData, outDir: string): Promise<vo
 	}
 	const writeRes = await errors.try(writeStimulusFile())
 	if (writeRes.error) {
-		logger.error("failed to write stimulus html", { file: outPath, error: writeRes.error })
+		logger.error("failed to write stimulus html", {
+			file: outPath,
+			error: writeRes.error
+		})
 	} else {
 		logger.info("wrote stimulus html", { file: outPath })
 	}
@@ -190,9 +200,14 @@ async function discoverPages(root: string): Promise<string[]> {
 	while (stack.length > 0) {
 		const current = stack.pop()
 		if (!current) continue
-		const direntsResult = await errors.try(fs.readdir(current, { withFileTypes: true }))
+		const direntsResult = await errors.try(
+			fs.readdir(current, { withFileTypes: true })
+		)
 		if (direntsResult.error) {
-			logger.debug("failed reading directory", { dir: current, error: direntsResult.error })
+			logger.debug("failed reading directory", {
+				dir: current,
+				error: direntsResult.error
+			})
 			continue
 		}
 		for (const d of direntsResult.data) {
@@ -211,17 +226,24 @@ async function discoverPages(root: string): Promise<string[]> {
 async function main() {
 	const rootStat = await errors.try(fs.stat(ROOT))
 	if (rootStat.error || !rootStat.data.isDirectory()) {
-		logger.error("root directory not found", { dir: ROOT, error: rootStat.error })
+		logger.error("root directory not found", {
+			dir: ROOT,
+			error: rootStat.error
+		})
 		throw errors.new("root directory not found")
 	}
 
 	const pageJsonFiles = await discoverPages(ROOT)
-	logger.info("discovered pages with page-data.json", { count: pageJsonFiles.length })
+	logger.info("discovered pages with page-data.json", {
+		count: pageJsonFiles.length
+	})
 
 	const tasks = pageJsonFiles.map((p) => () => processPage(p, OUTPUT_DIR, ROOT))
 	const results = await runWithConcurrency(tasks, CONCURRENCY_LIMIT)
 
-	const failures = results.filter((r): r is PromiseRejectedResult => r.status === "rejected")
+	const failures = results.filter(
+		(r): r is PromiseRejectedResult => r.status === "rejected"
+	)
 	if (failures.length > 0) {
 		logger.error("some pages failed to process", {
 			failureCount: failures.length,

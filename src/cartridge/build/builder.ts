@@ -20,9 +20,15 @@ export type GeneratorInfo = { name: string; version: string; commit?: string }
 
 // Runtime schemas for strict validation (no extra fields allowed)
 const GeneratorInfoSchema = z
-	.object({ name: z.string(), version: z.string(), commit: z.string().optional() })
+	.object({
+		name: z.string(),
+		version: z.string(),
+		commit: z.string().optional()
+	})
 	.strict()
-const CourseInfoSchema = z.object({ title: z.string(), subject: z.string() }).strict()
+const CourseInfoSchema = z
+	.object({ title: z.string(), subject: z.string() })
+	.strict()
 
 const UnitTestSchema = z
 	.object({
@@ -37,7 +43,9 @@ const UnitTestSchema = z
 const NumericUnitId = z.string().regex(/^unit-\d+$/)
 const NonNumericUnitId = z
 	.string()
-	.refine((v) => !/^unit-\d+$/.test(v), { message: "non-numeric unit id must not match unit-<n>" })
+	.refine((v) => !/^unit-\d+$/.test(v), {
+		message: "non-numeric unit id must not match unit-<n>"
+	})
 
 const BuildUnitNumericSchema = z
 	.object({
@@ -59,12 +67,17 @@ const BuildUnitNonNumericSchema = z
 	})
 	.strict()
 
-export const BuildUnitSchema = z.union([BuildUnitNumericSchema, BuildUnitNonNumericSchema])
+export const BuildUnitSchema = z.union([
+	BuildUnitNumericSchema,
+	BuildUnitNonNumericSchema
+])
 export type BuildUnit = z.infer<typeof BuildUnitSchema>
 
-const CartridgePathSchema = z.string().refine((p) => !p.startsWith("/") && !p.includes("\\"), {
-	message: "paths must be POSIX relative"
-})
+const CartridgePathSchema = z
+	.string()
+	.refine((p) => !p.startsWith("/") && !p.includes("\\"), {
+		message: "paths must be POSIX relative"
+	})
 
 export const CartridgeBuildInputSchema = z
 	.object({
@@ -97,11 +110,15 @@ function assert(condition: boolean, msg: string): void {
 	}
 }
 
-export async function buildCartridgeToBytes(input: CartridgeBuildInput): Promise<Uint8Array> {
+export async function buildCartridgeToBytes(
+	input: CartridgeBuildInput
+): Promise<Uint8Array> {
 	// Validate full input strictly
 	const inputValidation = CartridgeBuildInputSchema.safeParse(input)
 	if (!inputValidation.success) {
-		logger.error("cartridge build input invalid", { error: inputValidation.error })
+		logger.error("cartridge build input invalid", {
+			error: inputValidation.error
+		})
 		throw errors.wrap(inputValidation.error, "cartridge build input validation")
 	}
 	const validated = inputValidation.data
@@ -131,7 +148,9 @@ export async function buildCartridgeToBytes(input: CartridgeBuildInput): Promise
 		assert(p in validated.files, `missing file payload: ${p}`)
 	}
 	// No extras: every provided file must be referenced
-	const extras = Object.keys(validated.files).filter((p) => !requiredPaths.has(p))
+	const extras = Object.keys(validated.files).filter(
+		(p) => !requiredPaths.has(p)
+	)
 	if (extras.length > 0) {
 		logger.error("unexpected file inputs", { count: extras.length, extras })
 		throw errors.new("unexpected file inputs")
@@ -141,16 +160,25 @@ export async function buildCartridgeToBytes(input: CartridgeBuildInput): Promise
 	// As we add entries, compute integrity in-memory to write integrity.json last.
 	const integrityFiles: Record<string, { size: number; sha256: string }> = {}
 	function hashAndRecord(pathRel: string, bytes: Uint8Array | string): void {
-		const content = typeof bytes === "string" ? Buffer.from(bytes, "utf8") : Buffer.from(bytes)
+		const content =
+			typeof bytes === "string"
+				? Buffer.from(bytes, "utf8")
+				: Buffer.from(bytes)
 		const sha = createHash("sha256").update(content).digest("hex")
 		integrityFiles[pathRel] = { size: content.length, sha256: sha }
 	}
 
 	// Pack tar stream
 	const pack = tar.pack()
-	const addEntry = async (name: string, content: Uint8Array | string): Promise<void> => {
+	const addEntry = async (
+		name: string,
+		content: Uint8Array | string
+	): Promise<void> => {
 		hashAndRecord(name, content)
-		const buffer = typeof content === "string" ? Buffer.from(content, "utf8") : Buffer.from(content)
+		const buffer =
+			typeof content === "string"
+				? Buffer.from(content, "utf8")
+				: Buffer.from(content)
 		await new Promise<void>((resolve, reject) => {
 			pack.entry({ name, size: buffer.length, type: "file" }, buffer, (err) => {
 				if (err) return reject(errors.wrap(err, "tar entry"))
@@ -172,7 +200,11 @@ export async function buildCartridgeToBytes(input: CartridgeBuildInput): Promise
 			const lessonPath = `lessons/${u.id}/${l.id}.json`
 			const lv = LessonSchema.safeParse(lessonJson)
 			if (!lv.success) {
-				logger.error("lesson schema invalid", { unitId: u.id, lessonId: l.id, error: lv.error })
+				logger.error("lesson schema invalid", {
+					unitId: u.id,
+					lessonId: l.id,
+					error: lv.error
+				})
 				throw errors.wrap(lv.error, "lesson schema validation")
 			}
 			await addEntry(lessonPath, stringifyJson(lv.data))
@@ -188,7 +220,10 @@ export async function buildCartridgeToBytes(input: CartridgeBuildInput): Promise
 			path: `lessons/${u.id}/${l.id}.json`
 		}))
 		const lessonCount = u.lessons.length
-		const resourceCount = u.lessons.reduce((sum, l) => sum + l.resources.length, 0)
+		const resourceCount = u.lessons.reduce(
+			(sum, l) => sum + l.resources.length,
+			0
+		)
 		const quizQuestionCount = u.lessons.reduce((sum, l) => {
 			let lessonQuizQuestions = 0
 			for (const r of l.resources) {
@@ -278,7 +313,10 @@ export async function buildCartridgeToBytes(input: CartridgeBuildInput): Promise
 		const waited = await errors.try(proc.exited)
 		if (waited.error || proc.exitCode !== 0) {
 			const stderrText = await new Response(proc.stderr).text()
-			logger.error("zstd compression failed", { exitCode: proc.exitCode, stderr: stderrText })
+			logger.error("zstd compression failed", {
+				exitCode: proc.exitCode,
+				stderr: stderrText
+			})
 			throw errors.new("zstd compression failure")
 		}
 		const zst = new Uint8Array(await new Response(proc.stdout).arrayBuffer())
@@ -286,7 +324,9 @@ export async function buildCartridgeToBytes(input: CartridgeBuildInput): Promise
 	}
 	const streamResult = await errors.try(runZstdStream())
 	if (streamResult.error) {
-		logger.error("zstd streaming encountered error", { error: streamResult.error })
+		logger.error("zstd streaming encountered error", {
+			error: streamResult.error
+		})
 		throw streamResult.error
 	}
 	return streamResult.data
@@ -307,14 +347,20 @@ export async function buildCartridgeToFile(
 	// Prepare integrity accumulator and tar pack
 	const integrityFiles: Record<string, { size: number; sha256: string }> = {}
 	function record(pathRel: string, bytes: Uint8Array | string): Buffer {
-		const buffer = typeof bytes === "string" ? Buffer.from(bytes, "utf8") : Buffer.from(bytes)
+		const buffer =
+			typeof bytes === "string"
+				? Buffer.from(bytes, "utf8")
+				: Buffer.from(bytes)
 		const sha = createHash("sha256").update(buffer).digest("hex")
 		integrityFiles[pathRel] = { size: buffer.length, sha256: sha }
 		return buffer
 	}
 
 	const pack = tar.pack()
-	const addEntry = async (name: string, content: Uint8Array | string): Promise<void> => {
+	const addEntry = async (
+		name: string,
+		content: Uint8Array | string
+	): Promise<void> => {
 		const buffer = record(name, content)
 		await new Promise<void>((resolve, reject) => {
 			pack.entry({ name, size: buffer.length, type: "file" }, buffer, (err) => {
@@ -329,8 +375,13 @@ export async function buildCartridgeToFile(
 		// We duplicate minimal logic to avoid buffering the whole archive
 		const inputValidation = CartridgeBuildInputSchema.safeParse(input)
 		if (!inputValidation.success) {
-			logger.error("cartridge build input invalid", { error: inputValidation.error })
-			throw errors.wrap(inputValidation.error, "cartridge build input validation")
+			logger.error("cartridge build input invalid", {
+				error: inputValidation.error
+			})
+			throw errors.wrap(
+				inputValidation.error,
+				"cartridge build input validation"
+			)
 		}
 		const validated = inputValidation.data
 
@@ -347,7 +398,11 @@ export async function buildCartridgeToFile(
 				const lessonPath = `lessons/${u.id}/${l.id}.json`
 				const lv = LessonSchema.safeParse(lessonJson)
 				if (!lv.success) {
-					logger.error("lesson schema invalid", { unitId: u.id, lessonId: l.id, error: lv.error })
+					logger.error("lesson schema invalid", {
+						unitId: u.id,
+						lessonId: l.id,
+						error: lv.error
+					})
 					throw errors.wrap(lv.error, "lesson schema validation")
 				}
 				await addEntry(lessonPath, stringifyJson(lv.data))
@@ -363,7 +418,10 @@ export async function buildCartridgeToFile(
 				path: `lessons/${u.id}/${l.id}.json`
 			}))
 			const lessonCount = u.lessons.length
-			const resourceCount = u.lessons.reduce((sum, l) => sum + l.resources.length, 0)
+			const resourceCount = u.lessons.reduce(
+				(sum, l) => sum + l.resources.length,
+				0
+			)
 			const quizQuestionCount = u.lessons.reduce((sum, l) => {
 				let lessonQuizQuestions = 0
 				for (const r of l.resources) {
@@ -459,7 +517,10 @@ export async function buildCartridgeToFile(
 		const waited = await errors.try(proc.exited)
 		if (waited.error || proc.exitCode !== 0) {
 			const stderrText = await new Response(proc.stderr).text()
-			logger.error("zstd compression failed", { exitCode: proc.exitCode, stderr: stderrText })
+			logger.error("zstd compression failed", {
+				exitCode: proc.exitCode,
+				stderr: stderrText
+			})
 			throw errors.new("zstd compression failure")
 		}
 		return true as const
@@ -467,7 +528,10 @@ export async function buildCartridgeToFile(
 	await pipeToZstdFile()
 }
 
-async function copyWithHash(src: string, dest: string): Promise<{ size: number; sha256: string }> {
+async function copyWithHash(
+	src: string,
+	dest: string
+): Promise<{ size: number; sha256: string }> {
 	await fs.mkdir(path.dirname(dest), { recursive: true })
 	const read = fscore.createReadStream(src)
 	const write = fscore.createWriteStream(dest)
@@ -541,7 +605,11 @@ export async function buildCartridgeFromFileMap(
 				resources: l.resources
 			})
 			if (!lv.success) {
-				logger.error("lesson schema invalid", { unitId: u.id, lessonId: l.id, error: lv.error })
+				logger.error("lesson schema invalid", {
+					unitId: u.id,
+					lessonId: l.id,
+					error: lv.error
+				})
 				throw errors.wrap(lv.error, "lesson schema validation")
 			}
 			await writeJson(lessonPath, lv.data)
@@ -557,10 +625,14 @@ export async function buildCartridgeFromFileMap(
 			path: `lessons/${u.id}/${l.id}.json`
 		}))
 		const lessonCount = u.lessons.length
-		const resourceCount = u.lessons.reduce((sum, l) => sum + l.resources.length, 0)
+		const resourceCount = u.lessons.reduce(
+			(sum, l) => sum + l.resources.length,
+			0
+		)
 		const quizQuestionCount = u.lessons.reduce((sum, l) => {
 			let lessonQuizQuestions = 0
-			for (const r of l.resources) if (r.type === "quiz") lessonQuizQuestions += r.questionCount
+			for (const r of l.resources)
+				if (r.type === "quiz") lessonQuizQuestions += r.questionCount
 			return sum + lessonQuizQuestions
 		}, 0)
 		const unitTestQuestionCount = u.unitTest ? u.unitTest.questionCount : 0
@@ -609,14 +681,21 @@ export async function buildCartridgeFromFileMap(
 		const destAbs = path.join(stageRoot, destRel)
 		const res = await errors.try(copyWithHash(srcAbs, destAbs))
 		if (res.error) {
-			logger.error("file copy", { src: srcAbs, dest: destAbs, error: res.error })
+			logger.error("file copy", {
+				src: srcAbs,
+				dest: destAbs,
+				error: res.error
+			})
 			throw res.error
 		}
 		integrityFiles[destRel] = res.data
 	}
 
 	// Integrity JSON
-	const integ = IntegritySchema.safeParse({ algorithm: "sha256" as const, files: integrityFiles })
+	const integ = IntegritySchema.safeParse({
+		algorithm: "sha256" as const,
+		files: integrityFiles
+	})
 	if (!integ.success) {
 		logger.error("integrity schema invalid", { error: integ.error })
 		throw errors.wrap(integ.error, "integrity schema validation")
@@ -668,8 +747,13 @@ export async function buildCartridgeFromFileMap(
 	}
 	await runCompression()
 
-	const rm = await errors.try(fs.rm(stageRoot, { recursive: true, force: true }))
+	const rm = await errors.try(
+		fs.rm(stageRoot, { recursive: true, force: true })
+	)
 	if (rm.error) {
-		logger.warn("failed to remove staging directory", { dir: stageRoot, error: rm.error })
+		logger.warn("failed to remove staging directory", {
+			dir: stageRoot,
+			error: rm.error
+		})
 	}
 }

@@ -36,7 +36,9 @@ export function validateNoLatex(xml: string, logger: logger.Logger): void {
 			const content = match.groups.content
 
 			// Check if this looks like a mathematical expression rather than currency
-			const isCurrency = /^[0-9]{1,3}(?:,[0-9]{3})*(?:\.[0-9]{1,2})?$/.test(content.trim())
+			const isCurrency = /^[0-9]{1,3}(?:,[0-9]{3})*(?:\.[0-9]{1,2})?$/.test(
+				content.trim()
+			)
 
 			if (!isCurrency) {
 				// Check for mathematical indicators
@@ -66,11 +68,14 @@ export function validateNoLatex(xml: string, logger: logger.Logger): void {
 						Math.max(0, contextIndex - 50),
 						Math.min(xml.length, contextIndex + 100)
 					)
-					logger.error("found dollar-sign delimited latex content in compiled xml", {
-						match: match[0],
-						content: content,
-						context: errorContext
-					})
+					logger.error(
+						"found dollar-sign delimited latex content in compiled xml",
+						{
+							match: match[0],
+							content: content,
+							context: errorContext
+						}
+					)
 					throw errors.new(
 						`invalid content: Dollar-sign delimited LaTeX ('$...$') is not allowed in QTI. All math must be converted to MathML. Found: "${match[0]}". Context: "...${errorContext}..."`
 					)

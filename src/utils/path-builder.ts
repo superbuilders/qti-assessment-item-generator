@@ -1,4 +1,4 @@
-import type { Extents2D } from "../utils/layout"
+import type { Extents2D } from "@/utils/layout"
 
 /**
  * A typesafe, chainable builder for SVG paths that tracks its own bounding box.

@@ -1,12 +1,12 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { PADDING } from "../utils/constants"
-import { CSS_COLOR_PATTERN } from "../utils/css-color"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { PADDING } from "@/widgets/utils/constants"
+import { CSS_COLOR_PATTERN } from "@/widgets/utils/css-color"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
 
 export const ErrInvalidRange = errors.new("min must be less than max")
 
@@ -48,7 +48,9 @@ function createStartSchema() {
 	return z.discriminatedUnion("type", [
 		z
 			.object({
-				type: z.literal("bounded").describe("The range has a defined starting point."),
+				type: z
+					.literal("bounded")
+					.describe("The range has a defined starting point."),
 				at: createBoundarySchema().describe(
 					"The starting boundary with its value and open/closed type."
 				)
@@ -58,7 +60,9 @@ function createStartSchema() {
 			.object({
 				type: z
 					.literal("unbounded")
-					.describe("The range extends infinitely to the left (negative infinity).")
+					.describe(
+						"The range extends infinitely to the left (negative infinity)."
+					)
 			})
 			.strict()
 	])
@@ -68,7 +72,9 @@ function createEndSchema() {
 	return z.discriminatedUnion("type", [
 		z
 			.object({
-				type: z.literal("bounded").describe("The range has a defined ending point."),
+				type: z
+					.literal("bounded")
+					.describe("The range has a defined ending point."),
 				at: createBoundarySchema().describe(
 					"The ending boundary with its value and open/closed type."
 				)
@@ -78,7 +84,9 @@ function createEndSchema() {
 			.object({
 				type: z
 					.literal("unbounded")
-					.describe("The range extends infinitely to the right (positive infinity).")
+					.describe(
+						"The range extends infinitely to the right (positive infinity)."
+					)
 			})
 			.strict()
 	])
@@ -95,7 +103,10 @@ function createRangeSchema() {
 			),
 			color: z
 				.string()
-				.regex(CSS_COLOR_PATTERN, "invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)")
+				.regex(
+					CSS_COLOR_PATTERN,
+					"invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)"
+				)
 				.describe(
 					"Hex-only color for the shaded region (e.g., '#4287F54D' for 30% alpha, '#FFE5B4'). Use translucency via 8-digit hex for overlapping ranges."
 				)
@@ -107,7 +118,9 @@ export const InequalityNumberLinePropsSchema = z
 	.object({
 		type: z
 			.literal("inequalityNumberLine")
-			.describe("Identifies this as an inequality number line for visualizing solution sets."),
+			.describe(
+				"Identifies this as an inequality number line for visualizing solution sets."
+			),
 		width: createWidthSchema(),
 		height: createHeightSchema(),
 		min: z
@@ -137,7 +150,9 @@ export const InequalityNumberLinePropsSchema = z
 		"Creates number lines showing solution sets for inequalities with shaded regions, open/closed endpoints, and arrows for unbounded intervals. Essential for teaching inequality notation (x < 5, x ≥ -2), compound inequalities (3 < x ≤ 7), and solution set visualization. Supports multiple overlapping ranges."
 	)
 
-export type InequalityNumberLineProps = z.infer<typeof InequalityNumberLinePropsSchema>
+export type InequalityNumberLineProps = z.infer<
+	typeof InequalityNumberLinePropsSchema
+>
 
 /**
  * Generates an SVG number line to graph the solution set of single or compound inequalities,
@@ -152,7 +167,10 @@ export const generateInequalityNumberLine: WidgetGenerator<
 
 	if (min >= max) {
 		logger.error("inequality number line invalid range", { min, max })
-		throw errors.wrap(ErrInvalidRange, `min (${min}) must be less than max (${max})`)
+		throw errors.wrap(
+			ErrInvalidRange,
+			`min (${min}) must be less than max (${max})`
+		)
 	}
 
 	const scale = chartWidth / (max - min)
@@ -204,8 +222,10 @@ export const generateInequalityNumberLine: WidgetGenerator<
 
 	for (const r of ranges) {
 		const lineColor = toOpaqueHex(r.color)
-		const startPos = r.start.type === "bounded" ? toSvgX(r.start.at.value) : PADDING
-		const endPos = r.end.type === "bounded" ? toSvgX(r.end.at.value) : width - PADDING
+		const startPos =
+			r.start.type === "bounded" ? toSvgX(r.start.at.value) : PADDING
+		const endPos =
+			r.end.type === "bounded" ? toSvgX(r.end.at.value) : width - PADDING
 		const colorId = lineColor.replace(/[^a-zA-Z0-9]/g, "")
 
 		// Add markers for unbounded cases
@@ -228,7 +248,8 @@ export const generateInequalityNumberLine: WidgetGenerator<
 
 		// Boundary circles
 		if (r.start.type === "bounded") {
-			const fill = r.start.at.type === "closed" ? lineColor : theme.colors.background
+			const fill =
+				r.start.at.type === "closed" ? lineColor : theme.colors.background
 			canvas.drawCircle(startPos, yPos, 5, {
 				fill: fill,
 				stroke: lineColor,

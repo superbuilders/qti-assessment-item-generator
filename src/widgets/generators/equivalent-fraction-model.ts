@@ -1,10 +1,10 @@
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { PADDING } from "../utils/constants"
-import { CSS_COLOR_PATTERN } from "../utils/css-color"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { PADDING } from "@/widgets/utils/constants"
+import { CSS_COLOR_PATTERN } from "@/widgets/utils/css-color"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
 
 // The main Zod schema for the equivalent fraction model diagram.
 export const EquivalentFractionModelPropsSchema = z
@@ -38,7 +38,9 @@ export const EquivalentFractionModelPropsSchema = z
 		"Creates a visual comparison of a fraction in tenths and its equivalent in hundredths using two partitioned squares. The left square shows shaded vertical bars for tenths, and the right square shows a shaded 10x10 grid for hundredths."
 	)
 
-export type EquivalentFractionModelProps = z.infer<typeof EquivalentFractionModelPropsSchema>
+export type EquivalentFractionModelProps = z.infer<
+	typeof EquivalentFractionModelPropsSchema
+>
 
 /**
  * Generates an SVG diagram comparing a fraction in tenths to its equivalent in hundredths.
@@ -95,10 +97,16 @@ export const generateEquivalentFractionModel: WidgetGenerator<
 	for (let i = 0; i < numHundredthsShaded; i++) {
 		const row = Math.floor(i / 10)
 		const col = i % 10
-		canvas.drawRect(rightBoxX + col * cellWidth, yPos + row * cellWidth, cellWidth, cellWidth, {
-			fill: hundredthsColor,
-			stroke: "none"
-		})
+		canvas.drawRect(
+			rightBoxX + col * cellWidth,
+			yPos + row * cellWidth,
+			cellWidth,
+			cellWidth,
+			{
+				fill: hundredthsColor,
+				stroke: "none"
+			}
+		)
 	}
 	// Grid lines on top
 	for (let i = 1; i < 10; i++) {

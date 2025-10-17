@@ -17,7 +17,9 @@ export type AuthoringNestedNode<
 	ContentT = FeedbackContent<E>
 > = {
 	[responseIdentifier: string]: {
-		[key: string]: AuthoringNestedLeaf<E, ContentT> | AuthoringNestedNode<P, E, ContentT>
+		[key: string]:
+			| AuthoringNestedLeaf<E, ContentT>
+			| AuthoringNestedNode<P, E, ContentT>
 	}
 }
 
@@ -26,7 +28,10 @@ export type AuthoringFeedbackOverall<
 	E extends readonly string[] = readonly string[],
 	ContentT = FeedbackContent<E>
 > =
-	| { CORRECT: AuthoringNestedLeaf<E, ContentT>; INCORRECT: AuthoringNestedLeaf<E, ContentT> }
+	| {
+			CORRECT: AuthoringNestedLeaf<E, ContentT>
+			INCORRECT: AuthoringNestedLeaf<E, ContentT>
+	  }
 	| AuthoringNestedNode<P, E, ContentT>
 
 export type NestedFeedbackAuthoring<

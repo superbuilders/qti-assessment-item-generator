@@ -1,4 +1,9 @@
-export type ResourceArticle = { id: string; title: string; type: "article"; path: string }
+export type ResourceArticle = {
+	id: string
+	title: string
+	type: "article"
+	path: string
+}
 export type QuestionRef = { number: number; xml: string; json: string }
 export type ResourceQuiz = {
 	id: string
@@ -30,7 +35,12 @@ export type Unit = {
 	id: string
 	unitNumber: number
 	title: string
-	lessons: Array<{ id: string; lessonNumber: number; title: string; path: string }>
+	lessons: Array<{
+		id: string
+		lessonNumber: number
+		title: string
+		path: string
+	}>
 	unitTest?: UnitTest
 	counts: { lessonCount: number; resourceCount: number; questionCount: number }
 }
@@ -44,4 +54,7 @@ export type IndexV1 = {
 }
 
 export type IntegrityEntry = { size: number; sha256: string }
-export type IntegrityManifest = { algorithm: "sha256"; files: Record<string, IntegrityEntry> }
+export type IntegrityManifest = {
+	algorithm: "sha256"
+	files: Record<string, IntegrityEntry>
+}

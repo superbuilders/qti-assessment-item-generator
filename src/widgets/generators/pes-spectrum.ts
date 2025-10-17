@@ -1,11 +1,11 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { PADDING } from "../utils/constants"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { PADDING } from "@/widgets/utils/constants"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
 
 // Photoelectron spectroscopy (PES) spectrum generator
 
@@ -16,14 +16,18 @@ const PeakSchema = z
 			.number()
 			.min(0)
 			.max(1000)
-			.describe("Binding energy in MJ/mol (0-1000). Positioned with higher values to the left."),
+			.describe(
+				"Binding energy in MJ/mol (0-1000). Positioned with higher values to the left."
+			),
 		// Peak height in discrete units of the horizontal grid (1..7)
 		heightUnits: z
 			.number()
 			.int()
 			.min(1)
 			.max(7)
-			.describe("Peak height measured in grid units (1-7). 7 reaches the top grid line."),
+			.describe(
+				"Peak height measured in grid units (1-7). 7 reaches the top grid line."
+			),
 		// Optional label shown above the peak tip. Use empty string to omit.
 		topLabel: z
 			.string()
@@ -33,7 +37,9 @@ const PeakSchema = z
 			)
 	})
 	.strict()
-	.describe("Defines a single PES peak: binding energy, height in units, and optional top label.")
+	.describe(
+		"Defines a single PES peak: binding energy, height in units, and optional top label."
+	)
 
 export const PESSpectrumPropsSchema = z
 	.object({
@@ -41,7 +47,9 @@ export const PESSpectrumPropsSchema = z
 		title: z
 			.string()
 			.nullable()
-			.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
+			.transform((val) =>
+				val === "null" || val === "NULL" || val === "" ? null : val
+			)
 			.describe(
 				"Optional chart title to display above the plot. If the graph does not have a title, do not include this field or pass an empty string."
 			),
@@ -70,9 +78,9 @@ const X_TICK_LABELS = ["1000", "100", "10", "1", "0"]
 // Shape parameter to reduce compression near higher-decade bounds (1.0 = pure log)
 const LOG_GAMMA = 1.5
 
-export const generatePESSpectrum: WidgetGenerator<typeof PESSpectrumPropsSchema> = async (
-	props
-) => {
+export const generatePESSpectrum: WidgetGenerator<
+	typeof PESSpectrumPropsSchema
+> = async (props) => {
 	const { width, height, peaks, title, yAxisLabel } = props
 
 	// Create canvas
@@ -224,7 +232,9 @@ export const generatePESSpectrum: WidgetGenerator<typeof PESSpectrumPropsSchema>
 
 	for (const peak of peaks) {
 		if (peak.heightUnits < 1 || peak.heightUnits > 7) {
-			logger.error("invalid peak height units", { heightUnits: peak.heightUnits })
+			logger.error("invalid peak height units", {
+				heightUnits: peak.heightUnits
+			})
 			throw errors.new("invalid peak height units")
 		}
 

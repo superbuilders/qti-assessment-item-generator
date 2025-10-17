@@ -1,14 +1,14 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { PADDING } from "../utils/constants"
-import { CSS_COLOR_PATTERN } from "../utils/css-color"
-import { Path2D } from "../utils/path-builder"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { estimateWrappedTextDimensions } from "../utils/text"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { PADDING } from "@/widgets/utils/constants"
+import { CSS_COLOR_PATTERN } from "@/widgets/utils/css-color"
+import { Path2D } from "@/widgets/utils/path-builder"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { estimateWrappedTextDimensions } from "@/widgets/utils/text"
+import { theme } from "@/widgets/utils/theme"
 
 // Schema for an angle segment in the diagram.
 const AngleSegmentSchema = z
@@ -97,7 +97,11 @@ export const generateRadiallyConstrainedAngleDiagram: WidgetGenerator<
 	for (const angle of angles) {
 		const fromIndex = labelToIndexMap.get(angle.fromRayLabel)
 		const toIndex = labelToIndexMap.get(angle.toRayLabel)
-		if (fromIndex !== undefined && toIndex !== undefined && toIndex === fromIndex + 1) {
+		if (
+			fromIndex !== undefined &&
+			toIndex !== undefined &&
+			toIndex === fromIndex + 1
+		) {
 			primaryForTotal.push(angle)
 		}
 	}
@@ -276,7 +280,15 @@ export const generateRadiallyConstrainedAngleDiagram: WidgetGenerator<
 		const path = new Path2D()
 			.moveTo(cx, cy)
 			.lineTo(startPoint.x, startPoint.y)
-			.arcTo(primaryArcRadius, primaryArcRadius, 0, largeArcFlag, 1, endPoint.x, endPoint.y)
+			.arcTo(
+				primaryArcRadius,
+				primaryArcRadius,
+				0,
+				largeArcFlag,
+				1,
+				endPoint.x,
+				endPoint.y
+			)
 			.closePath()
 		canvas.drawPath(path, { fill: angle.color, stroke: "none" })
 
@@ -292,11 +304,18 @@ export const generateRadiallyConstrainedAngleDiagram: WidgetGenerator<
 	const innerArcMinRadius = primaryLabelRadius + 14
 	const innerArcMaxRadius = pointOnRayDist - 24
 	// Push the first secondary arc outward a bit for additional headroom near labels
-	const baseSecondaryRadius = Math.min(innerArcMaxRadius, innerArcMinRadius + 16)
+	const baseSecondaryRadius = Math.min(
+		innerArcMaxRadius,
+		innerArcMinRadius + 16
+	)
 	// Widen spacing so the outer arc sits farther out as well
 	const radiusStep = 44
-	const pendingSecondaryLabels: Array<{ x: number; y: number; text: string; midAngleRad: number }> =
-		[]
+	const pendingSecondaryLabels: Array<{
+		x: number
+		y: number
+		text: string
+		midAngleRad: number
+	}> = []
 
 	let i = 0
 	for (const angle of secondaryAngles) {
@@ -328,7 +347,15 @@ export const generateRadiallyConstrainedAngleDiagram: WidgetGenerator<
 		const largeArcFlag = angleDiff > Math.PI ? 1 : 0
 		const arcPath = new Path2D()
 			.moveTo(startPoint.x, startPoint.y)
-			.arcTo(secondaryRadius, secondaryRadius, 0, largeArcFlag, 1, endPoint.x, endPoint.y)
+			.arcTo(
+				secondaryRadius,
+				secondaryRadius,
+				0,
+				largeArcFlag,
+				1,
+				endPoint.x,
+				endPoint.y
+			)
 		canvas.drawPath(arcPath, {
 			stroke: angle.color,
 			strokeWidth: theme.stroke.width.thick,
@@ -340,15 +367,26 @@ export const generateRadiallyConstrainedAngleDiagram: WidgetGenerator<
 		const extraLabelOffset = 16 + i * 12 // 16px first, 28px second, etc.
 		// Allow labels to extend a bit closer to the ray endpoints than arcs do
 		const labelMaxRadius = Math.max(innerArcMaxRadius, pointOnRayDist - 8)
-		const labelRadius = Math.min(labelMaxRadius, secondaryRadius + extraLabelOffset)
+		const labelRadius = Math.min(
+			labelMaxRadius,
+			secondaryRadius + extraLabelOffset
+		)
 		const labelX = cx + labelRadius * Math.cos(midAngleRad)
 		const labelY = cy + labelRadius * Math.sin(midAngleRad)
-		pendingSecondaryLabels.push({ x: labelX, y: labelY, text: `${angle.value}°`, midAngleRad })
+		pendingSecondaryLabels.push({
+			x: labelX,
+			y: labelY,
+			text: `${angle.value}°`,
+			midAngleRad
+		})
 		i++
 	}
 
 	// Draw rays and ray labels ON TOP of sectors/arcs
-	const screenSegments: Array<{ a: { x: number; y: number }; b: { x: number; y: number } }> = []
+	const screenSegments: Array<{
+		a: { x: number; y: number }
+		b: { x: number; y: number }
+	}> = []
 	for (const ray of rayPositions) {
 		// Draw ray line
 		canvas.drawLine(cx, cy, ray.x, ray.y, {
@@ -362,8 +400,10 @@ export const generateRadiallyConstrainedAngleDiagram: WidgetGenerator<
 
 		// Draw ray label
 		const labelDistFromPoint = 22
-		const rayLabelX = cx + (pointOnRayDist + labelDistFromPoint) * Math.cos(ray.angleRad)
-		const rayLabelY = cy + (pointOnRayDist + labelDistFromPoint) * Math.sin(ray.angleRad)
+		const rayLabelX =
+			cx + (pointOnRayDist + labelDistFromPoint) * Math.cos(ray.angleRad)
+		const rayLabelY =
+			cy + (pointOnRayDist + labelDistFromPoint) * Math.sin(ray.angleRad)
 		canvas.drawText({
 			x: rayLabelX,
 			y: rayLabelY,
@@ -483,7 +523,13 @@ export const generateRadiallyConstrainedAngleDiagram: WidgetGenerator<
 			const maxIt = 80
 			const step = 3
 			while (
-				rectIntersectsAnySegment({ x: px - halfW, y: py - halfH, width: w, height: h, pad: 1 }) &&
+				rectIntersectsAnySegment({
+					x: px - halfW,
+					y: py - halfH,
+					width: w,
+					height: h,
+					pad: 1
+				}) &&
 				it < maxIt
 			) {
 				px += mult * step * tanX

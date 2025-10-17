@@ -1,8 +1,8 @@
 import { describe, expect, it } from "bun:test"
-import { compile } from "../../src/compiler/compiler"
-import type { AssessmentItem } from "../../src/core/item"
-import { allWidgetsCollection } from "../../src/widgets/collections/all"
-import { MINIMAL_INCORRECT_FEEDBACK } from "../helpers/feedback-fixtures"
+import { compile } from "@/compiler/compiler"
+import type { AssessmentItem } from "@/core/item"
+import { MINIMAL_INCORRECT_FEEDBACK } from "@/testing/helpers/feedback-fixtures"
+import { allWidgetsCollection } from "@/widgets/collections/all"
 
 describe("E2E compile: two MC with combo feedback", () => {
 	it("produces valid QTI with response processing and feedback blocks", async () => {
@@ -10,11 +10,24 @@ describe("E2E compile: two MC with combo feedback", () => {
 			identifier: "ITEM_TWO_MC",
 			title: "Two MC E2E",
 			responseDeclarations: [
-				{ identifier: "RESPONSE_1", cardinality: "single", baseType: "identifier", correct: "A" },
-				{ identifier: "RESPONSE_2", cardinality: "single", baseType: "identifier", correct: "B" }
+				{
+					identifier: "RESPONSE_1",
+					cardinality: "single",
+					baseType: "identifier",
+					correct: "A"
+				},
+				{
+					identifier: "RESPONSE_2",
+					cardinality: "single",
+					baseType: "identifier",
+					correct: "B"
+				}
 			],
 			body: [
-				{ type: "paragraph", content: [{ type: "text", content: "Question stem." }] },
+				{
+					type: "paragraph",
+					content: [{ type: "text", content: "Question stem." }]
+				},
 				{ type: "interactionRef", interactionId: "int_1" },
 				{ type: "interactionRef", interactionId: "int_2" }
 			],
@@ -27,11 +40,15 @@ describe("E2E compile: two MC with combo feedback", () => {
 					choices: [
 						{
 							identifier: "A",
-							content: [{ type: "paragraph", content: [{ type: "text", content: "A" }] }]
+							content: [
+								{ type: "paragraph", content: [{ type: "text", content: "A" }] }
+							]
 						},
 						{
 							identifier: "B",
-							content: [{ type: "paragraph", content: [{ type: "text", content: "B" }] }]
+							content: [
+								{ type: "paragraph", content: [{ type: "text", content: "B" }] }
+							]
 						}
 					],
 					shuffle: true,
@@ -45,11 +62,15 @@ describe("E2E compile: two MC with combo feedback", () => {
 					choices: [
 						{
 							identifier: "A",
-							content: [{ type: "paragraph", content: [{ type: "text", content: "A" }] }]
+							content: [
+								{ type: "paragraph", content: [{ type: "text", content: "A" }] }
+							]
 						},
 						{
 							identifier: "B",
-							content: [{ type: "paragraph", content: [{ type: "text", content: "B" }] }]
+							content: [
+								{ type: "paragraph", content: [{ type: "text", content: "B" }] }
+							]
 						}
 					],
 					shuffle: true,
@@ -60,8 +81,16 @@ describe("E2E compile: two MC with combo feedback", () => {
 			feedbackPlan: {
 				mode: "combo",
 				dimensions: [
-					{ responseIdentifier: "RESPONSE_1", kind: "enumerated", keys: ["A", "B"] },
-					{ responseIdentifier: "RESPONSE_2", kind: "enumerated", keys: ["A", "B"] }
+					{
+						responseIdentifier: "RESPONSE_1",
+						kind: "enumerated",
+						keys: ["A", "B"]
+					},
+					{
+						responseIdentifier: "RESPONSE_2",
+						kind: "enumerated",
+						keys: ["A", "B"]
+					}
 				],
 				combinations: [
 					{

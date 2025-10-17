@@ -3,7 +3,7 @@ import type {
 	FeedbackCombinationSchema,
 	FeedbackDimensionSchema,
 	FeedbackPlanSchema
-} from "./schema"
+} from "@/core/feedback/plan/schema"
 
 export type FeedbackDimension = z.infer<typeof FeedbackDimensionSchema>
 export type FeedbackCombination = z.infer<typeof FeedbackCombinationSchema>

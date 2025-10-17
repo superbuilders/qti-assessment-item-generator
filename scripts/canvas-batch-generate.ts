@@ -9,7 +9,11 @@ import OpenAI from "openai"
 import { z } from "zod"
 import { compile } from "@/compiler/compiler"
 import { generateFromEnvelope } from "@/structured/client"
-import type { AiContextEnvelope, PdfPayload, RasterImagePayload } from "@/structured/types"
+import type {
+	AiContextEnvelope,
+	PdfPayload,
+	RasterImagePayload
+} from "@/structured/types"
 import { simpleVisualCollection } from "@/widgets/collections/simple-visual"
 
 // Enable debug logging for this script
@@ -24,7 +28,9 @@ const CONCURRENCY_LIMIT = 250
 const BASE_DIR_ARG = process.argv[2]
 if (!BASE_DIR_ARG) {
 	logger.error("base data directory not provided")
-	throw errors.new("base data directory must be provided as first argument (e.g., 'data')")
+	throw errors.new(
+		"base data directory must be provided as first argument (e.g., 'data')"
+	)
 }
 const OUTPUT_DIR = path.resolve(process.cwd(), BASE_DIR_ARG, "quiz-out")
 const ROOT = path.resolve(process.cwd(), ROOT_DIR)
@@ -69,7 +75,9 @@ async function runWithConcurrency<T>(
 		await execute()
 	}
 
-	const initialPromises = Array(Math.min(limit, tasks.length)).fill(null).map(execute)
+	const initialPromises = Array(Math.min(limit, tasks.length))
+		.fill(null)
+		.map(execute)
 	await Promise.all(initialPromises)
 
 	return results
@@ -206,14 +214,24 @@ function extractUnitNumberFromDirName(dirName: string): string | undefined {
  */
 async function resolveLessonDirsForQuiz(
 	quizDir: string
-): Promise<{ lessonDirs: string[]; unitDir?: string; quizRootDir: string; quizDirName: string }> {
+): Promise<{
+	lessonDirs: string[]
+	unitDir?: string
+	quizRootDir: string
+	quizDirName: string
+}> {
 	const quizRootDir = path.dirname(quizDir)
 	const unitDir = path.dirname(quizRootDir)
 	const quizDirName = path.basename(quizRootDir)
 
-	const direntsResult = await errors.try(fs.readdir(unitDir, { withFileTypes: true }))
+	const direntsResult = await errors.try(
+		fs.readdir(unitDir, { withFileTypes: true })
+	)
 	if (direntsResult.error) {
-		logger.debug("failed listing unit directory", { unitDir, error: direntsResult.error })
+		logger.debug("failed listing unit directory", {
+			unitDir,
+			error: direntsResult.error
+		})
 		return { lessonDirs: [], unitDir, quizRootDir, quizDirName }
 	}
 	const dirents = direntsResult.data
@@ -223,14 +241,20 @@ async function resolveLessonDirsForQuiz(
 	if (unitNum) {
 		// Collect all lessons matching "N.X ..." for the unit
 		const lessonDirs: string[] = []
-		const pattern = new RegExp(`^${escapeForRegExp(unitNum)}\\.(\\d+)(\\b|\\s|[-:_])`, "i")
+		const pattern = new RegExp(
+			`^${escapeForRegExp(unitNum)}\\.(\\d+)(\\b|\\s|[-:_])`,
+			"i"
+		)
 		for (const d of dirents) {
 			if (!d.isDirectory()) continue
 			if (pattern.test(d.name)) {
 				lessonDirs.push(path.join(unitDir, d.name))
 			}
 		}
-		logger.debug("resolved unit test lessons", { quizDirName, lessonCount: lessonDirs.length })
+		logger.debug("resolved unit test lessons", {
+			quizDirName,
+			lessonCount: lessonDirs.length
+		})
 		return { lessonDirs, unitDir, quizRootDir, quizDirName }
 	}
 
@@ -243,16 +267,24 @@ async function resolveLessonDirsForQuiz(
 			if (d.name === quizDirName) continue
 			if (pattern.test(d.name)) {
 				const candidate = path.join(unitDir, d.name)
-				logger.debug("resolved lesson directory for quiz", { quizDirName, lessonDir: candidate })
+				logger.debug("resolved lesson directory for quiz", {
+					quizDirName,
+					lessonDir: candidate
+				})
 				return { lessonDirs: [candidate], unitDir, quizRootDir, quizDirName }
 			}
 		}
-		logger.debug("no sibling lesson directory matched quiz number", { quizDirName, num })
+		logger.debug("no sibling lesson directory matched quiz number", {
+			quizDirName,
+			num
+		})
 		return { lessonDirs: [], unitDir, quizRootDir, quizDirName }
 	}
 
 	// No pattern matched (e.g., MANDATORY QUIZ)
-	logger.debug("could not extract quiz or unit number from directory name", { quizDirName })
+	logger.debug("could not extract quiz or unit number from directory name", {
+		quizDirName
+	})
 	return { lessonDirs: [], quizRootDir, quizDirName }
 }
 
@@ -289,7 +321,9 @@ async function gatherSupplementaryContent(quizDir: string): Promise<{
 		} else {
 			const parsed = LessonPageDataSchema.safeParse(pageDataResult.data)
 			if (!parsed.success) {
-				logger.debug("lesson page-data.json did not match expected schema", { file: pageDataPath })
+				logger.debug("lesson page-data.json did not match expected schema", {
+					file: pageDataPath
+				})
 			} else {
 				if (parsed.data.mainContent?.html) {
 					const html = parsed.data.mainContent.html
@@ -308,7 +342,9 @@ async function gatherSupplementaryContent(quizDir: string): Promise<{
 		const lessonMetaPath = path.join(lessonDir, "metadata.json")
 		const lessonMetaResult = await errors.try(Bun.file(lessonMetaPath).json())
 		if (!lessonMetaResult.error) {
-			content.push(`Lesson metadata:\n${JSON.stringify(lessonMetaResult.data, null, 2)}`)
+			content.push(
+				`Lesson metadata:\n${JSON.stringify(lessonMetaResult.data, null, 2)}`
+			)
 			filesIncluded.push(lessonMetaPath)
 			logger.debug("included lesson metadata.json", { file: lessonMetaPath })
 		} else {
@@ -324,7 +360,9 @@ async function gatherSupplementaryContent(quizDir: string): Promise<{
 		const unitMetaPath = path.join(unitDir, "metadata.json")
 		const unitMetaResult = await errors.try(Bun.file(unitMetaPath).json())
 		if (!unitMetaResult.error) {
-			content.push(`Unit metadata:\n${JSON.stringify(unitMetaResult.data, null, 2)}`)
+			content.push(
+				`Unit metadata:\n${JSON.stringify(unitMetaResult.data, null, 2)}`
+			)
 			filesIncluded.push(unitMetaPath)
 			logger.debug("included unit metadata.json", { file: unitMetaPath })
 		} else {
@@ -339,7 +377,9 @@ async function gatherSupplementaryContent(quizDir: string): Promise<{
 	const quizMetaPath = path.join(quizRootDir, "metadata.json")
 	const quizMetaResult = await errors.try(Bun.file(quizMetaPath).json())
 	if (!quizMetaResult.error) {
-		content.push(`Quiz metadata:\n${JSON.stringify(quizMetaResult.data, null, 2)}`)
+		content.push(
+			`Quiz metadata:\n${JSON.stringify(quizMetaResult.data, null, 2)}`
+		)
 		filesIncluded.push(quizMetaPath)
 		logger.debug("included quiz metadata.json", { file: quizMetaPath })
 	} else {
@@ -378,7 +418,10 @@ async function gatherImagePayloads(
 			}
 			const dataResult = await errors.try(file.arrayBuffer())
 			if (dataResult.error) {
-				logger.warn("failed to read image file", { file: filePath, error: dataResult.error })
+				logger.warn("failed to read image file", {
+					file: filePath,
+					error: dataResult.error
+				})
 				continue
 			}
 			if (dataResult.data) {
@@ -409,7 +452,9 @@ async function gatherImagePayloads(
 			}
 		}
 	} else {
-		logger.debug("_images directory not found, skipping image ingestion", { dir: imagesDir })
+		logger.debug("_images directory not found, skipping image ingestion", {
+			dir: imagesDir
+		})
 	}
 
 	return { payloads, filesIncluded }
@@ -430,7 +475,9 @@ async function discoverAndLoadPdfs(
 			.replace(/\s+/g, " ")
 			.trim()
 
-	const textNormalized = normalize([JSON.stringify(question), ...supplementaryContent].join(" "))
+	const textNormalized = normalize(
+		[JSON.stringify(question), ...supplementaryContent].join(" ")
+	)
 
 	// Discover PDFs at runtime from the actual scraped data in provided base dirs
 	const candidates: Array<{ path: string; name: string; phrase: string }> = []
@@ -438,7 +485,9 @@ async function discoverAndLoadPdfs(
 		const resourceDir = path.join(baseDir, "_resources")
 		const statResult = await errors.try(fs.stat(resourceDir))
 		if (statResult.error || !statResult.data.isDirectory()) {
-			logger.debug("resources directory not found, skipping", { dir: resourceDir })
+			logger.debug("resources directory not found, skipping", {
+				dir: resourceDir
+			})
 			continue
 		}
 		const pdfGlob = new Glob(path.join(resourceDir, "*.pdf"))
@@ -465,7 +514,10 @@ async function discoverAndLoadPdfs(
 		// Simple, deterministic containment check against question + lesson text
 		if (c.phrase.length >= 6 && textNormalized.includes(c.phrase)) {
 			matched.push({ path: c.path, name: c.name })
-			logger.debug("pdf matched via phrase containment", { name: c.name, phrase: c.phrase })
+			logger.debug("pdf matched via phrase containment", {
+				name: c.name,
+				phrase: c.phrase
+			})
 		}
 	}
 
@@ -480,20 +532,29 @@ async function discoverAndLoadPdfs(
 	for (const m of matched) {
 		const file = Bun.file(m.path)
 		if (!(await file.exists())) {
-			logger.error("referenced pdf not found on disk, this is a critical invariant", {
-				file: m.path
-			})
+			logger.error(
+				"referenced pdf not found on disk, this is a critical invariant",
+				{
+					file: m.path
+				}
+			)
 			throw errors.new("referenced pdf not found")
 		}
 		const dataResult = await errors.try(file.arrayBuffer())
 		if (dataResult.error) {
-			logger.error("failed to read pdf file", { file: m.path, error: dataResult.error })
+			logger.error("failed to read pdf file", {
+				file: m.path,
+				error: dataResult.error
+			})
 			throw errors.wrap(dataResult.error, "pdf file read")
 		}
 		if (dataResult.data) {
 			// Preserve original filename exactly
 			payloads.push({ name: m.name, data: dataResult.data })
-			logger.debug("loaded pdf file", { name: m.name, byteLength: dataResult.data.byteLength })
+			logger.debug("loaded pdf file", {
+				name: m.name,
+				byteLength: dataResult.data.byteLength
+			})
 		}
 	}
 	logger.info("pdf loading complete", {
@@ -548,8 +609,12 @@ async function processQuestion(
 			// Try to resolve label -> text if possible
 			let resolvedText: string | undefined
 			if (raw && question.options && question.options.length > 0) {
-				const byLabel = question.options.find((opt) => opt.label && opt.label === raw)
-				const byText = question.options.find((opt) => opt.text && opt.text === raw)
+				const byLabel = question.options.find(
+					(opt) => opt.label && opt.label === raw
+				)
+				const byText = question.options.find(
+					(opt) => opt.text && opt.text === raw
+				)
 				if (byLabel && typeof byLabel.text === "string") {
 					resolvedText = byLabel.text
 				} else if (byText && typeof byText.text === "string") {
@@ -565,11 +630,15 @@ async function processQuestion(
 			attemptLines.push(`Selected: ${selectedRendered}`)
 		} else if (attempt.type === "dropdown") {
 			const raws = attempt.answers
-			attemptLines.push(`Selected: ${raws && raws.length > 0 ? JSON.stringify(raws) : "[]"}`)
+			attemptLines.push(
+				`Selected: ${raws && raws.length > 0 ? JSON.stringify(raws) : "[]"}`
+			)
 		} else if (attempt.type === "matching") {
 			const pairs = attempt.matches
 			if (pairs && pairs.length > 0) {
-				const joined = pairs.map((p) => `${p.prompt} => ${p.answer}`).join(" | ")
+				const joined = pairs
+					.map((p) => `${p.prompt} => ${p.answer}`)
+					.join(" | ")
 				attemptLines.push(`Selected: ${joined}`)
 			} else {
 				attemptLines.push("Selected: []")
@@ -608,7 +677,9 @@ async function processQuestion(
 			"❌ WRONG: Do NOT use these mappings.",
 			"✅ CORRECT: Re-map each prompt to the correct option from the available choices."
 		].join("\n")
-		supplementaryContent.push([attemptLines.join("\n"), semanticsGuidance].join("\n\n"))
+		supplementaryContent.push(
+			[attemptLines.join("\n"), semanticsGuidance].join("\n\n")
+		)
 		logger.debug("included quiz-data attempt context", {
 			questionId,
 			correct: attempt.correct === true,
@@ -616,7 +687,10 @@ async function processQuestion(
 		})
 	}
 
-	const imageGatherResult = await gatherImagePayloads(assessmentDirs.quizDir, questionNumber)
+	const imageGatherResult = await gatherImagePayloads(
+		assessmentDirs.quizDir,
+		questionNumber
+	)
 	const multimodalImagePayloads = imageGatherResult.payloads
 
 	// Unit 1 Test fallback: if this question is a stub (added due to missing quiz-data.json entry),
@@ -630,10 +704,16 @@ async function processQuestion(
 		(!question.pairs || question.pairs.length === 0)
 
 	if (isUnit1TestAssessment && isFallbackStub) {
-		const fallbackPng = path.join(assessmentDirs.quizDir, `question-${questionNumber}.png`)
+		const fallbackPng = path.join(
+			assessmentDirs.quizDir,
+			`question-${questionNumber}.png`
+		)
 		const pngFile = Bun.file(fallbackPng)
 		if (!(await pngFile.exists())) {
-			logger.error("unit 1 test fallback screenshot missing", { questionId, file: fallbackPng })
+			logger.error("unit 1 test fallback screenshot missing", {
+				questionId,
+				file: fallbackPng
+			})
 			throw errors.new("unit 1 test fallback screenshot missing")
 		}
 		const pngDataResult = await errors.try(pngFile.arrayBuffer())
@@ -643,7 +723,10 @@ async function processQuestion(
 				file: fallbackPng,
 				error: pngDataResult.error
 			})
-			throw errors.wrap(pngDataResult.error, "unit 1 test fallback screenshot read")
+			throw errors.wrap(
+				pngDataResult.error,
+				"unit 1 test fallback screenshot read"
+			)
 		}
 		let mimeType: "image/png" | "image/jpeg" | "image/webp" | "image/gif"
 		switch (pngFile.type) {
@@ -663,7 +746,10 @@ async function processQuestion(
 				mimeType = "image/png"
 		}
 		multimodalImagePayloads.push({ data: pngDataResult.data, mimeType })
-		logger.info("included unit 1 test fallback screenshot", { questionId, file: fallbackPng })
+		logger.info("included unit 1 test fallback screenshot", {
+			questionId,
+			file: fallbackPng
+		})
 	}
 	if (imageGatherResult.filesIncluded.length > 0) {
 		logger.info("included images from _images directory", {
@@ -674,15 +760,21 @@ async function processQuestion(
 	}
 
 	const pdfSearchDirs: string[] = [...gathered.lessonDirs, gathered.quizRootDir]
-	logger.debug("searching for pdfs in directories", { questionId, pdfSearchDirs })
+	logger.debug("searching for pdfs in directories", {
+		questionId,
+		pdfSearchDirs
+	})
 	const pdfPayloadsResult = await errors.try(
 		discoverAndLoadPdfs(question, supplementaryContent, pdfSearchDirs)
 	)
 	if (pdfPayloadsResult.error) {
-		logger.error("failed to process pdfs for question, stopping this question", {
-			questionId,
-			error: pdfPayloadsResult.error
-		})
+		logger.error(
+			"failed to process pdfs for question, stopping this question",
+			{
+				questionId,
+				error: pdfPayloadsResult.error
+			}
+		)
 		return
 	}
 	const pdfPayloads = pdfPayloadsResult.data
@@ -694,7 +786,10 @@ async function processQuestion(
 		imagePayloadCount: multimodalImagePayloads.length,
 		pdfPayloadCount: pdfPayloads.length,
 		pdfNames: pdfPayloads.map((p) => p.name),
-		filesIncluded: [...gathered.filesIncluded, ...imageGatherResult.filesIncluded]
+		filesIncluded: [
+			...gathered.filesIncluded,
+			...imageGatherResult.filesIncluded
+		]
 	})
 
 	const envelope: AiContextEnvelope = {
@@ -714,16 +809,22 @@ async function processQuestion(
 			"status" in structuredResult.error &&
 			structuredResult.error.status === 400
 		) {
-			const totalBytes = multimodalImagePayloads.reduce((sum, p) => sum + p.data.byteLength, 0)
-			logger.error("provider rejected payload (400), failing fast for this question", {
-				questionId,
-				error: structuredResult.error,
-				diagnostics: {
-					imageCount: multimodalImagePayloads.length,
-					pdfCount: pdfPayloads.length,
-					totalBytes
+			const totalBytes = multimodalImagePayloads.reduce(
+				(sum, p) => sum + p.data.byteLength,
+				0
+			)
+			logger.error(
+				"provider rejected payload (400), failing fast for this question",
+				{
+					questionId,
+					error: structuredResult.error,
+					diagnostics: {
+						imageCount: multimodalImagePayloads.length,
+						pdfCount: pdfPayloads.length,
+						totalBytes
+					}
 				}
-			})
+			)
 			return
 		}
 		logger.error("failed to generate structured item", {
@@ -749,28 +850,46 @@ async function processQuestion(
 		return
 	}
 
-	const compileResult = await errors.try(compile(structuredItem, WIDGET_COLLECTION))
+	const compileResult = await errors.try(
+		compile(structuredItem, WIDGET_COLLECTION)
+	)
 	if (compileResult.error) {
-		logger.error("failed to compile qti xml", { questionId, error: compileResult.error })
+		logger.error("failed to compile qti xml", {
+			questionId,
+			error: compileResult.error
+		})
 		return
 	}
 
-	const xmlPath = path.join(assessmentDirs.outputDir, `question-${questionNumberStr}.xml`)
-	const writeXmlResult = await errors.try(Bun.write(xmlPath, compileResult.data))
+	const xmlPath = path.join(
+		assessmentDirs.outputDir,
+		`question-${questionNumberStr}.xml`
+	)
+	const writeXmlResult = await errors.try(
+		Bun.write(xmlPath, compileResult.data)
+	)
 	if (writeXmlResult.error) {
-		logger.error("failed to write compiled xml", { file: xmlPath, error: writeXmlResult.error })
+		logger.error("failed to write compiled xml", {
+			file: xmlPath,
+			error: writeXmlResult.error
+		})
 	}
 }
 
 /**
  * Processes a single assessment directory.
  */
-async function processAssessmentDir(dir: string, openai: OpenAI): Promise<void> {
+async function processAssessmentDir(
+	dir: string,
+	openai: OpenAI
+): Promise<void> {
 	const assessmentName = path.basename(dir)
 
 	// Skip MANDATORY QUIZ (course rules, not actual content)
 	if (assessmentName.toLowerCase().includes("mandatory")) {
-		logger.info("skipping mandatory quiz (not content-related)", { assessmentName })
+		logger.info("skipping mandatory quiz (not content-related)", {
+			assessmentName
+		})
 		return
 	}
 
@@ -789,7 +908,9 @@ async function processAssessmentDir(dir: string, openai: OpenAI): Promise<void> 
 		return
 	}
 
-	const quizDataUnknown = errors.trySync(() => JSON.parse(quizDataJsonResult.data))
+	const quizDataUnknown = errors.trySync(() =>
+		JSON.parse(quizDataJsonResult.data)
+	)
 	if (quizDataUnknown.error) {
 		logger.warn("failed to parse quiz-data.json, skipping", {
 			assessmentName,
@@ -799,7 +920,9 @@ async function processAssessmentDir(dir: string, openai: OpenAI): Promise<void> 
 	}
 	const quizDataParsed = QuizDataSchema.safeParse(quizDataUnknown.data)
 	if (!quizDataParsed.success) {
-		logger.warn("quiz-data.json did not match expected schema, skipping", { assessmentName })
+		logger.warn("quiz-data.json did not match expected schema, skipping", {
+			assessmentName
+		})
 		return
 	}
 
@@ -812,8 +935,12 @@ async function processAssessmentDir(dir: string, openai: OpenAI): Promise<void> 
 	// Special-case: Only for Unit 1 Test, supplement missing questions from per-question screenshots
 	let allQuestions: CanvasQuestion[] = [...sortedQuestions]
 	if (assessmentName === "Unit 1 Test") {
-		const existingNumbers = new Set<number>(allQuestions.map((q) => q.questionNumber))
-		const dirEntriesResult = await errors.try(fs.readdir(quizDir, { withFileTypes: true }))
+		const existingNumbers = new Set<number>(
+			allQuestions.map((q) => q.questionNumber)
+		)
+		const dirEntriesResult = await errors.try(
+			fs.readdir(quizDir, { withFileTypes: true })
+		)
 		if (dirEntriesResult.error) {
 			logger.debug("failed reading quiz directory for fallback discovery", {
 				dir: quizDir,
@@ -839,7 +966,9 @@ async function processAssessmentDir(dir: string, openai: OpenAI): Promise<void> 
 					missingCount: missing.length,
 					questionNumbers: missing
 				})
-				const fallbackQuestions: CanvasQuestion[] = missing.map((n) => ({ questionNumber: n }))
+				const fallbackQuestions: CanvasQuestion[] = missing.map((n) => ({
+					questionNumber: n
+				}))
 				allQuestions = [...allQuestions, ...fallbackQuestions].sort(
 					(a, b) => a.questionNumber - b.questionNumber
 				)
@@ -859,7 +988,10 @@ async function processAssessmentDir(dir: string, openai: OpenAI): Promise<void> 
 			)
 	)
 
-	const questionResults = await runWithConcurrency(questionTasks, CONCURRENCY_LIMIT)
+	const questionResults = await runWithConcurrency(
+		questionTasks,
+		CONCURRENCY_LIMIT
+	)
 	const questionFailures = questionResults.filter(
 		(r): r is PromiseRejectedResult => r.status === "rejected"
 	)
@@ -894,9 +1026,14 @@ async function main() {
 	// Use fs.readdir recursively to find _quiz directories (Glob has issues with spaces in paths)
 	const findQuizDirs = async (dir: string): Promise<string[]> => {
 		const results: string[] = []
-		const direntsResult = await errors.try(fs.readdir(dir, { withFileTypes: true }))
+		const direntsResult = await errors.try(
+			fs.readdir(dir, { withFileTypes: true })
+		)
 		if (direntsResult.error) {
-			logger.debug("failed reading directory", { dir, error: direntsResult.error })
+			logger.debug("failed reading directory", {
+				dir,
+				error: direntsResult.error
+			})
 			return results
 		}
 		for (const dirent of direntsResult.data) {
@@ -924,10 +1061,14 @@ async function main() {
 		concurrency: CONCURRENCY_LIMIT
 	})
 
-	const tasks = assessmentDirList.map((dir) => () => processAssessmentDir(dir, openai))
+	const tasks = assessmentDirList.map(
+		(dir) => () => processAssessmentDir(dir, openai)
+	)
 	const results = await runWithConcurrency(tasks, CONCURRENCY_LIMIT)
 
-	const failures = results.filter((r): r is PromiseRejectedResult => r.status === "rejected")
+	const failures = results.filter(
+		(r): r is PromiseRejectedResult => r.status === "rejected"
+	)
 	if (failures.length > 0) {
 		logger.error("some assessment directories failed to process", {
 			failureCount: failures.length,

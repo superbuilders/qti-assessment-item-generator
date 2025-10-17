@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test"
-import { compileResponseDeclarations } from "../../src/compiler/response-processor"
-import type { AssessmentItem } from "../../src/core/item"
+import { compileResponseDeclarations } from "@/compiler/response-processor"
+import type { AssessmentItem } from "@/core/item"
 
 describe("compileResponseDeclarations", () => {
 	test("emits directedPair correct-response and mapping", () => {
@@ -26,7 +26,12 @@ describe("compileResponseDeclarations", () => {
 
 	test("emits single textual mapping for string", () => {
 		const decls: AssessmentItem<[]>["responseDeclarations"] = [
-			{ identifier: "RESPONSE", cardinality: "single", baseType: "string", correct: "42" }
+			{
+				identifier: "RESPONSE",
+				cardinality: "single",
+				baseType: "string",
+				correct: "42"
+			}
 		]
 		const xml = compileResponseDeclarations(decls)
 		expect(xml).toContain('base-type="string"')

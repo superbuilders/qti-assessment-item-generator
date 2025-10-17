@@ -1,11 +1,11 @@
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { PADDING } from "../utils/constants"
-import { CSS_COLOR_PATTERN } from "../utils/css-color"
-import { Path2D } from "../utils/path-builder"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { PADDING } from "@/widgets/utils/constants"
+import { CSS_COLOR_PATTERN } from "@/widgets/utils/css-color"
+import { Path2D } from "@/widgets/utils/path-builder"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
 
 // Defines a group of identical sectors on the spinner
 const ProbabilitySpinnerSectorGroupSchema = z
@@ -26,7 +26,10 @@ const ProbabilitySpinnerSectorGroupSchema = z
 			),
 		color: z
 			.string()
-			.regex(CSS_COLOR_PATTERN, "invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)")
+			.regex(
+				CSS_COLOR_PATTERN,
+				"invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)"
+			)
 			.describe(
 				"Hex-only color for all sectors in this group (e.g., '#FF6B6B', '#1E90FF', '#000000', '#00000080' for 50% alpha). Each group should have distinct color."
 			)
@@ -56,7 +59,9 @@ export const ProbabilitySpinnerPropsSchema = z
 		title: z
 			.string()
 			.nullable()
-			.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
+			.transform((val) =>
+				val === "null" || val === "NULL" || val === "" ? null : val
+			)
 			.describe(
 				"Title displayed above the spinner (e.g., 'Spin the Wheel!', 'Color Spinner', null). Null means no title. Keep concise for space. Plaintext only; no markdown or HTML."
 			)
@@ -66,7 +71,9 @@ export const ProbabilitySpinnerPropsSchema = z
 		"Creates a circular spinner divided into colored sectors for probability experiments. Each sector group can have multiple equal sectors with the same appearance. Perfect for teaching probability, likelihood, and random events. The pointer indicates the 'selected' outcome."
 	)
 
-export type ProbabilitySpinnerProps = z.infer<typeof ProbabilitySpinnerPropsSchema>
+export type ProbabilitySpinnerProps = z.infer<
+	typeof ProbabilitySpinnerPropsSchema
+>
 
 /**
  * Generates an SVG diagram of a probability spinner.
@@ -100,7 +107,9 @@ export const generateProbabilitySpinner: WidgetGenerator<
 		y: cy + r * Math.sin(toRad(angleDeg))
 	})
 
-	canvas.addStyle(".title { font-size: 16px; font-weight: bold; text-anchor: middle; }")
+	canvas.addStyle(
+		".title { font-size: 16px; font-weight: bold; text-anchor: middle; }"
+	)
 
 	if (title !== null) {
 		canvas.drawText({

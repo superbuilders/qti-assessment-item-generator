@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import type { WidgetInput } from "../../src/widgets/registry"
-import { generateWidgetForTest } from "../helpers/generateWidgetForTest"
+import { generateWidgetForTest } from "@/testing/helpers/generateWidgetForTest"
+import type { WidgetInput } from "@/widgets/registry"
 
 function makeSeededRandom(seed: number): () => number {
 	let s = seed >>> 0
@@ -14,7 +14,10 @@ function makeSeededRandom(seed: number): () => number {
 
 async function runWithSeed<T>(seed: number, fn: () => Promise<T>): Promise<T> {
 	const original = Math.random
-	Object.defineProperty(Math, "random", { value: makeSeededRandom(seed), configurable: true })
+	Object.defineProperty(Math, "random", {
+		value: makeSeededRandom(seed),
+		configurable: true
+	})
 	const execResult = await errors.try(fn())
 	Object.defineProperty(Math, "random", { value: original, configurable: true })
 	if (execResult.error) {
@@ -57,7 +60,10 @@ describe("Widget: marble-diagram", () => {
 			await runWithSeed(12345 + index * 777, async () => {
 				const result = await errors.try(generateWidgetForTest(props))
 				if (result.error) {
-					logger.error("widget generation failed", { error: result.error, index })
+					logger.error("widget generation failed", {
+						error: result.error,
+						index
+					})
 					throw result.error
 				}
 				expect(result.data).toMatchSnapshot()

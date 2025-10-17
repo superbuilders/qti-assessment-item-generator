@@ -1,6 +1,10 @@
 import type { z } from "zod"
 import type { AssessmentItemInput } from "@/core/item"
-import type { FractionSchema, NumericValueSchema, RationalValueSchema } from "@/templates/schemas"
+import type {
+	FractionSchema,
+	NumericValueSchema,
+	RationalValueSchema
+} from "@/templates/schemas"
 import type { WidgetTypeTuple } from "@/widgets/collections/types"
 import type { PartitionedShapePropsSchema } from "@/widgets/registry"
 

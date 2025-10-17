@@ -1,17 +1,25 @@
 // imports kept minimal in this module; errors/logging handled by callers
 import type { AssessmentItemInput } from "@/core/item"
-import type { WidgetCollection, WidgetDefinition } from "@/widgets/collections/types"
-import { allExamples } from "../../examples"
+import { allExamples } from "@/examples"
+import { caretBanPromptSection } from "@/structured/prompts/caret"
+import {
+	createWidgetSelectionPromptSection,
+	formatUnifiedContextSections
+} from "@/structured/prompts/shared"
+import { createEquationsInChoicesSection } from "@/structured/prompts/shared/equations-in-choices"
+import { createMathmlComplianceSection } from "@/structured/prompts/shared/mathml"
 // Note: do not validate example shells here; examples are illustrative only
 // import { createAssessmentItemShellSchema } from "@core/item"
-import type { AiContextEnvelope, ImageContext } from "../types"
-import { caretBanPromptSection } from "./caret"
-import { createWidgetSelectionPromptSection, formatUnifiedContextSections } from "./shared"
-import { createEquationsInChoicesSection } from "./shared/equations-in-choices"
-import { createMathmlComplianceSection } from "./shared/mathml"
+import type { AiContextEnvelope, ImageContext } from "@/structured/types"
+import type {
+	WidgetCollection,
+	WidgetDefinition
+} from "@/widgets/collections/types"
 
 // Helper to convert a full AssessmentItemInput into a shell for prompt examples
-function createShellFromExample<const E extends readonly string[]>(item: AssessmentItemInput<E>) {
+function createShellFromExample<const E extends readonly string[]>(
+	item: AssessmentItemInput<E>
+) {
 	// The shell now derives widget/interaction usage from refs in content.
 	// Do NOT include legacy 'widgets' or 'interactions' arrays.
 	const shell = {
@@ -25,7 +33,10 @@ function createShellFromExample<const E extends readonly string[]>(item: Assessm
 }
 
 export function createAssessmentShellPrompt<
-	C extends WidgetCollection<Record<string, WidgetDefinition<unknown, unknown>>, readonly string[]>
+	C extends WidgetCollection<
+		Record<string, WidgetDefinition<unknown, unknown>>,
+		readonly string[]
+	>
 >(
 	envelope: AiContextEnvelope,
 	imageContext: ImageContext,
@@ -1561,7 +1572,8 @@ Any discrepancy will cause your output to be rejected. Review your work carefull
 	const validExamples = allExamples
 	const exampleShells = validExamples.map((ex) => createShellFromExample(ex))
 
-	const widgetSelectionSection = createWidgetSelectionPromptSection(widgetCollection)
+	const widgetSelectionSection =
+		createWidgetSelectionPromptSection(widgetCollection)
 
 	const userContent = `Convert the following source into an assessment shell. Use the provided context, including raster images for vision and vector images as text, to understand the content fully.
 

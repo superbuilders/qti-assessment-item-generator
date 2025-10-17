@@ -1,16 +1,18 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { AXIS_VIEWBOX_PADDING } from "../utils/constants"
-import { setupCoordinatePlaneBaseV2 } from "../utils/coordinate-plane-utils"
-import { CSS_COLOR_PATTERN } from "../utils/css-color"
-import { abbreviateMonth } from "../utils/labels"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { AXIS_VIEWBOX_PADDING } from "@/widgets/utils/constants"
+import { setupCoordinatePlaneBaseV2 } from "@/widgets/utils/coordinate-plane-utils"
+import { CSS_COLOR_PATTERN } from "@/widgets/utils/css-color"
+import { abbreviateMonth } from "@/widgets/utils/labels"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
 
-export const ErrInvalidDimensions = errors.new("invalid chart dimensions or data")
+export const ErrInvalidDimensions = errors.new(
+	"invalid chart dimensions or data"
+)
 
 // Defines the data for a single bar in the chart
 const DataPointSchema = z
@@ -35,13 +37,19 @@ export const DivergentBarChartPropsSchema = z
 		type: z.literal("divergentBarChart"),
 		width: createWidthSchema(),
 		height: createHeightSchema(),
-		xAxisLabel: z.string().describe("The label for the horizontal axis (e.g., 'Century')."),
+		xAxisLabel: z
+			.string()
+			.describe("The label for the horizontal axis (e.g., 'Century')."),
 		yAxis: z
 			.object({
 				label: z
 					.string()
-					.describe("The title for the vertical axis (e.g., 'Change in sea level (cm)')."),
-				min: z.number().describe("The minimum value on the y-axis (can be negative)."),
+					.describe(
+						"The title for the vertical axis (e.g., 'Change in sea level (cm)')."
+					),
+				min: z
+					.number()
+					.describe("The minimum value on the y-axis (can be negative)."),
 				max: z.number().describe("The maximum value on the y-axis."),
 				tickInterval: z
 					.number()
@@ -73,7 +81,9 @@ export const DivergentBarChartPropsSchema = z
 		"Creates a divergent bar chart where bars can be positive or negative, extending from a central zero line. Styled to match the sea level change example."
 	)
 
-export type DivergentBarChartProps = z.infer<typeof DivergentBarChartPropsSchema>
+export type DivergentBarChartProps = z.infer<
+	typeof DivergentBarChartPropsSchema
+>
 
 /**
  * Generates a divergent bar chart styled to replicate the provided sea level change graph.
@@ -165,10 +175,16 @@ export const generateDivergentBarChart: WidgetGenerator<
 	// Bar rendering
 	const bandWidth = baseInfo.bandWidth
 	if (bandWidth === undefined) {
-		logger.error("bandWidth missing for categorical x-axis in divergent bar chart", {
-			length: chartData.length
-		})
-		throw errors.wrap(ErrInvalidDimensions, "categorical x-axis requires defined bandWidth")
+		logger.error(
+			"bandWidth missing for categorical x-axis in divergent bar chart",
+			{
+				length: chartData.length
+			}
+		)
+		throw errors.wrap(
+			ErrInvalidDimensions,
+			"categorical x-axis requires defined bandWidth"
+		)
 	}
 	const barPadding = 0.4
 	const innerBarWidth = bandWidth * (1 - barPadding)
@@ -178,7 +194,9 @@ export const generateDivergentBarChart: WidgetGenerator<
 		chartData.forEach((d, i) => {
 			const xCenter = baseInfo.toSvgX(i)
 			const barX = xCenter - innerBarWidth / 2
-			const barAbsHeight = (Math.abs(d.value) / (yAxis.max - yAxis.min)) * baseInfo.chartArea.height
+			const barAbsHeight =
+				(Math.abs(d.value) / (yAxis.max - yAxis.min)) *
+				baseInfo.chartArea.height
 
 			let y: number
 			let color: string

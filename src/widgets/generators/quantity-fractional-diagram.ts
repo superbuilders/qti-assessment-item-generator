@@ -1,13 +1,13 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { PADDING } from "../utils/constants"
-import { CSS_COLOR_PATTERN } from "../utils/css-color"
-import { Path2D } from "../utils/path-builder"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { PADDING } from "@/widgets/utils/constants"
+import { CSS_COLOR_PATTERN } from "@/widgets/utils/css-color"
+import { Path2D } from "@/widgets/utils/path-builder"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
 
 // The main Zod schema for the new, unified widget.
 export const QuantityFractionalDiagramPropsSchema = z
@@ -35,7 +35,9 @@ export const QuantityFractionalDiagramPropsSchema = z
 						.describe("Number of columns in the grid partition for each shape.")
 				}),
 				z.object({
-					type: z.literal("circle").describe("A circular shape partitioned into equal sectors.")
+					type: z
+						.literal("circle")
+						.describe("A circular shape partitioned into equal sectors.")
 				}),
 				z.object({
 					type: z.literal("polygon"),
@@ -46,7 +48,9 @@ export const QuantityFractionalDiagramPropsSchema = z
 						.describe(
 							"Number of sides for the regular polygon (e.g., 3 for triangle, 8 for octagon)."
 						),
-					rotation: z.number().describe("Rotation angle in degrees to orient the polygon.")
+					rotation: z
+						.number()
+						.describe("Rotation angle in degrees to orient the polygon.")
 				})
 			])
 			.describe("The geometric shape used for all models in the diagram."),
@@ -76,8 +80,12 @@ export const QuantityFractionalDiagramPropsSchema = z
 	})
 	.strict()
 
-export type QuantityFractionalDiagramProps = z.infer<typeof QuantityFractionalDiagramPropsSchema>
-type ShapeDefinition = z.infer<typeof QuantityFractionalDiagramPropsSchema>["shape"]
+export type QuantityFractionalDiagramProps = z.infer<
+	typeof QuantityFractionalDiagramPropsSchema
+>
+type ShapeDefinition = z.infer<
+	typeof QuantityFractionalDiagramPropsSchema
+>["shape"]
 
 // Helper function to find the intersection of a ray from a center point with a polygon's edge
 // Returns both the intersection point and the edge index that was intersected
@@ -92,8 +100,10 @@ function findRayPolygonIntersection(
 		if (!p3 || !p4) continue
 		const den = (p1.x - p2.x) * (p3.y - p4.y) - (p1.y - p2.y) * (p3.x - p4.x)
 		if (den === 0) continue
-		const t = ((p1.x - p3.x) * (p3.y - p4.y) - (p1.y - p3.y) * (p3.x - p4.x)) / den
-		const u = -((p1.x - p2.x) * (p1.y - p3.y) - (p1.y - p2.y) * (p1.x - p3.x)) / den
+		const t =
+			((p1.x - p3.x) * (p3.y - p4.y) - (p1.y - p3.y) * (p3.x - p4.x)) / den
+		const u =
+			-((p1.x - p2.x) * (p1.y - p3.y) - (p1.y - p2.y) * (p1.x - p3.x)) / den
 		if (t >= 0 && u >= 0 && u <= 1) {
 			return {
 				point: { x: p1.x + t * (p2.x - p1.x), y: p1.y + t * (p2.y - p1.y) },
@@ -137,20 +147,44 @@ function drawSingleModel(
 			for (let i = 0; i < shadedParts; i++) {
 				const row = Math.floor(i / columns)
 				const col = i % columns
-				canvas.drawRect(rectX + col * cellWidth, rectY + row * cellHeight, cellWidth, cellHeight, {
-					fill: shadeColor
-				})
+				canvas.drawRect(
+					rectX + col * cellWidth,
+					rectY + row * cellHeight,
+					cellWidth,
+					cellHeight,
+					{
+						fill: shadeColor
+					}
+				)
 			}
 			for (let r = 0; r <= rows; r++)
-				canvas.drawLine(rectX, rectY + r * cellHeight, rectX + size, rectY + r * cellHeight, {
-					stroke: theme.colors.black,
-					strokeWidth: r === 0 || r === rows ? theme.stroke.width.thick : theme.stroke.width.thin
-				})
+				canvas.drawLine(
+					rectX,
+					rectY + r * cellHeight,
+					rectX + size,
+					rectY + r * cellHeight,
+					{
+						stroke: theme.colors.black,
+						strokeWidth:
+							r === 0 || r === rows
+								? theme.stroke.width.thick
+								: theme.stroke.width.thin
+					}
+				)
 			for (let c = 0; c <= columns; c++)
-				canvas.drawLine(rectX + c * cellWidth, rectY, rectX + c * cellWidth, rectY + size, {
-					stroke: theme.colors.black,
-					strokeWidth: c === 0 || c === columns ? theme.stroke.width.thick : theme.stroke.width.thin
-				})
+				canvas.drawLine(
+					rectX + c * cellWidth,
+					rectY,
+					rectX + c * cellWidth,
+					rectY + size,
+					{
+						stroke: theme.colors.black,
+						strokeWidth:
+							c === 0 || c === columns
+								? theme.stroke.width.thick
+								: theme.stroke.width.thin
+					}
+				)
 			break
 		}
 		case "circle": {
@@ -209,15 +243,25 @@ function drawSingleModel(
 					y: cy + Math.sin(toRad(endAngle))
 				}
 
-				const startHit = findRayPolygonIntersection({ x: cx, y: cy }, rayStart, vertices)
-				const endHit = findRayPolygonIntersection({ x: cx, y: cy }, rayEnd, vertices)
+				const startHit = findRayPolygonIntersection(
+					{ x: cx, y: cy },
+					rayStart,
+					vertices
+				)
+				const endHit = findRayPolygonIntersection(
+					{ x: cx, y: cy },
+					rayEnd,
+					vertices
+				)
 
 				if (!startHit || !endHit) continue
 
 				const { point: startIntersect, edgeIndex: startEdge } = startHit
 				const { point: endIntersect, edgeIndex: endEdge } = endHit
 
-				const path = new Path2D().moveTo(cx, cy).lineTo(startIntersect.x, startIntersect.y)
+				const path = new Path2D()
+					.moveTo(cx, cy)
+					.lineTo(startIntersect.x, startIntersect.y)
 
 				// Walk along the polygon perimeter from the edge after startEdge up to endEdge
 				let edge = (startEdge + 1) % sides
@@ -248,7 +292,11 @@ function drawSingleModel(
 					x: cx + radius * 2 * Math.cos(angle),
 					y: cy + radius * 2 * Math.sin(angle)
 				}
-				const intersect = findRayPolygonIntersection({ x: cx, y: cy }, p2, vertices)
+				const intersect = findRayPolygonIntersection(
+					{ x: cx, y: cy },
+					p2,
+					vertices
+				)
 				if (intersect) {
 					canvas.drawLine(cx, cy, intersect.point.x, intersect.point.y, {
 						stroke: theme.colors.black,
@@ -264,7 +312,15 @@ function drawSingleModel(
 export const generateQuantityFractionalDiagram: WidgetGenerator<
 	typeof QuantityFractionalDiagramPropsSchema
 > = async (props) => {
-	const { width, height, shape, numerator, denominator, shadeColor, shapesPerRow } = props
+	const {
+		width,
+		height,
+		shape,
+		numerator,
+		denominator,
+		shadeColor,
+		shapesPerRow
+	} = props
 
 	const canvas = new CanvasImpl({
 		chartArea: { left: 0, top: 0, width, height },
@@ -279,7 +335,16 @@ export const generateQuantityFractionalDiagram: WidgetGenerator<
 	if (totalShapes === 0) {
 		// Render a single, unshaded shape if the quantity is zero.
 		const shapeSize = Math.min(width, height) - PADDING * 2
-		drawSingleModel(canvas, shape, denominator, 0, shadeColor, width / 2, height / 2, shapeSize)
+		drawSingleModel(
+			canvas,
+			shape,
+			denominator,
+			0,
+			shadeColor,
+			width / 2,
+			height / 2,
+			shapeSize
+		)
 		const {
 			svgBody,
 			vbMinX,
@@ -297,7 +362,10 @@ export const generateQuantityFractionalDiagram: WidgetGenerator<
 	const availableWidth = width - PADDING * 2 - (numCols - 1) * gap
 	const availableHeight = height - PADDING * 2 - (numRows - 1) * gap
 
-	const shapeSize = Math.min(availableWidth / numCols, availableHeight / numRows)
+	const shapeSize = Math.min(
+		availableWidth / numCols,
+		availableHeight / numRows
+	)
 
 	const totalContentWidth = numCols * shapeSize + (numCols - 1) * gap
 	const totalContentHeight = numRows * shapeSize + (numRows - 1) * gap
@@ -314,7 +382,16 @@ export const generateQuantityFractionalDiagram: WidgetGenerator<
 		const isWhole = i < wholePart
 		const shaded = isWhole ? denominator : fractionalNumerator
 
-		drawSingleModel(canvas, shape, denominator, shaded, shadeColor, cx, cy, shapeSize)
+		drawSingleModel(
+			canvas,
+			shape,
+			denominator,
+			shaded,
+			shadeColor,
+			cx,
+			cy,
+			shapeSize
+		)
 	}
 
 	const {

@@ -4,13 +4,13 @@ import {
 	TICK_LABEL_FONT_PX,
 	X_AXIS_MIN_LABEL_PADDING_PX,
 	Y_AXIS_MIN_LABEL_GAP_PX
-} from "../utils/constants"
-import type { Canvas } from "../utils/layout"
-import { selectAxisLabels } from "../utils/layout"
-import { theme } from "../utils/theme"
-import { abbreviateMonth } from "./labels"
-import { estimateWrappedTextDimensions } from "./text"
-import { buildTicks } from "./ticks"
+} from "@/widgets/utils/constants"
+import { abbreviateMonth } from "@/widgets/utils/labels"
+import type { Canvas } from "@/widgets/utils/layout"
+import { selectAxisLabels } from "@/widgets/utils/layout"
+import { estimateWrappedTextDimensions } from "@/widgets/utils/text"
+import { theme } from "@/widgets/utils/theme"
+import { buildTicks } from "@/widgets/utils/ticks"
 
 // Re-export types that are needed for the render functions
 export type AxisOptions = {
@@ -94,13 +94,20 @@ export function setupCoordinatePlaneV2(
 	const scaleY = chartHeight / (yAxis.max - yAxis.min)
 
 	const toSvgX = (val: number) => margin.left + (val - xAxis.min) * scaleX
-	const toSvgY = (val: number) => height - margin.bottom - (val - yAxis.min) * scaleY
+	const toSvgY = (val: number) =>
+		height - margin.bottom - (val - yAxis.min) * scaleY
 
 	const zeroX = toSvgX(0)
 	const zeroY = toSvgY(0)
 	// Clamp axis anchors to chart edges when 0 is outside the visible domain
-	const anchorXPos = Math.min(Math.max(zeroX, margin.left), margin.left + chartWidth)
-	const anchorYPos = Math.min(Math.max(zeroY, margin.top), margin.top + chartHeight)
+	const anchorXPos = Math.min(
+		Math.max(zeroX, margin.left),
+		margin.left + chartWidth
+	)
+	const anchorYPos = Math.min(
+		Math.max(zeroY, margin.top),
+		margin.top + chartHeight
+	)
 
 	const chartArea = {
 		left: margin.left,
@@ -163,7 +170,11 @@ export function setupCoordinatePlaneV2(
 	})
 
 	// X-axis ticks and labels
-	const { values: xValues, labels: xLabels } = buildTicks(xAxis.min, xAxis.max, xAxis.tickInterval)
+	const { values: xValues, labels: xLabels } = buildTicks(
+		xAxis.min,
+		xAxis.max,
+		xAxis.tickInterval
+	)
 	const xTickPositions = xValues.map(toSvgX)
 
 	const selectedXTicks = selectAxisLabels({
@@ -197,7 +208,11 @@ export function setupCoordinatePlaneV2(
 	})
 
 	// Y-axis ticks and labels
-	const { values: yValues, labels: yLabels } = buildTicks(yAxis.min, yAxis.max, yAxis.tickInterval)
+	const { values: yValues, labels: yLabels } = buildTicks(
+		yAxis.min,
+		yAxis.max,
+		yAxis.tickInterval
+	)
 	const yTickPositions = yValues.map(toSvgY)
 
 	const selectedYTicks = selectAxisLabels({

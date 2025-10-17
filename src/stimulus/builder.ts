@@ -1,12 +1,22 @@
-import { collectAssets } from "./assets"
-import { createDocument } from "./dom"
-import { normalizeStructure } from "./normalizers"
-import { sanitizeDocument } from "./sanitizers"
-import { serializeArticle } from "./serializer"
-import type { StimulusBuildResult, StimulusInput, StimulusIssue, StimulusOptions } from "./types"
-import { validateHtml } from "./validator"
+import { collectAssets } from "@/stimulus/assets"
+import { createDocument } from "@/stimulus/dom"
+import { normalizeStructure } from "@/stimulus/normalizers"
+import { sanitizeDocument } from "@/stimulus/sanitizers"
+import { serializeArticle } from "@/stimulus/serializer"
+import type {
+	StimulusBuildResult,
+	StimulusInput,
+	StimulusIssue,
+	StimulusOptions
+} from "@/stimulus/types"
+import { validateHtml } from "@/stimulus/validator"
 
-export type { StimulusAsset, StimulusBuildResult, StimulusIssue, StimulusOptions } from "./types"
+export type {
+	StimulusAsset,
+	StimulusBuildResult,
+	StimulusIssue,
+	StimulusOptions
+} from "@/stimulus/types"
 
 export interface CanvasPageData {
 	title?: string

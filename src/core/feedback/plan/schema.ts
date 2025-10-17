@@ -1,5 +1,8 @@
 import { z } from "zod"
-import { CHOICE_IDENTIFIER_REGEX, RESPONSE_IDENTIFIER_REGEX } from "@/compiler/qti-constants"
+import {
+	CHOICE_IDENTIFIER_REGEX,
+	RESPONSE_IDENTIFIER_REGEX
+} from "@/compiler/qti-constants"
 
 export const FeedbackDimensionSchema = z
 	.discriminatedUnion("kind", [
@@ -27,7 +30,9 @@ export const FeedbackDimensionSchema = z
 			})
 			.strict()
 	])
-	.describe("Defines a single dimension for feedback evaluation, linked to a response.")
+	.describe(
+		"Defines a single dimension for feedback evaluation, linked to a response."
+	)
 
 export const FeedbackCombinationSchema = z
 	.object({

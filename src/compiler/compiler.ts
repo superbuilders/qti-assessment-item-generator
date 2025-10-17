@@ -1,32 +1,50 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import type { z } from "zod"
-import type { BlockContent, BlockContentItem, FeedbackContent, InlineContent } from "@/core/content"
-import type { FeedbackPlan } from "@/core/feedback"
-import { convertFeedbackObjectToBlocks, validateFeedbackObject } from "@/core/feedback"
-import type { AssessmentItem, AssessmentItemInput } from "@/core/item"
-import { createDynamicAssessmentItemSchema } from "@/core/item"
-import { ErrUnsupportedInteraction } from "../structured/client"
-import type {
-	WidgetCollection,
-	WidgetDefinition,
-	WidgetTypeTupleFrom
-} from "../widgets/collections/types"
-import { renderBlockContent, renderFeedbackContent } from "./content-renderer"
-import { compileInteraction } from "./interaction-compiler"
-import { compileResponseDeclarations, compileResponseProcessing } from "./response-processor"
-import { encodeDataUri } from "./utils/helpers"
+import {
+	renderBlockContent,
+	renderFeedbackContent
+} from "@/compiler/content-renderer"
+import { compileInteraction } from "@/compiler/interaction-compiler"
+import {
+	compileResponseDeclarations,
+	compileResponseProcessing
+} from "@/compiler/response-processor"
+import { encodeDataUri } from "@/compiler/utils/helpers"
 import {
 	convertHtmlEntities,
 	fixInequalityOperators,
 	fixMathMLOperators,
 	removeDoubleNewlines,
 	stripXmlComments
-} from "./utils/xml-fixes"
-import { escapeXmlAttribute } from "./utils/xml-utils"
+} from "@/compiler/utils/xml-fixes"
+import { escapeXmlAttribute } from "@/compiler/utils/xml-utils"
+import type {
+	BlockContent,
+	BlockContentItem,
+	FeedbackContent,
+	InlineContent
+} from "@/core/content"
+import type { FeedbackPlan } from "@/core/feedback"
+import {
+	convertFeedbackObjectToBlocks,
+	validateFeedbackObject
+} from "@/core/feedback"
+import type { AssessmentItem, AssessmentItemInput } from "@/core/item"
+import { createDynamicAssessmentItemSchema } from "@/core/item"
+import { ErrUnsupportedInteraction } from "@/structured/client"
+import type {
+	WidgetCollection,
+	WidgetDefinition,
+	WidgetTypeTupleFrom
+} from "@/widgets/collections/types"
 
-export const ErrDuplicateResponseIdentifier = errors.new("duplicate response identifier")
-export const ErrDuplicateChoiceIdentifier = errors.new("duplicate choice identifiers")
+export const ErrDuplicateResponseIdentifier = errors.new(
+	"duplicate response identifier"
+)
+export const ErrDuplicateChoiceIdentifier = errors.new(
+	"duplicate choice identifiers"
+)
 
 // Internal type used during compilation after nested feedback is flattened
 type AssessmentItemWithFlatFeedback<E extends readonly string[]> = Omit<
@@ -50,7 +68,8 @@ function dedupePromptTextFromBody<E extends readonly string[]>(
 	if (!item.interactions || !item.body) return
 
 	// --- normalization helpers ---
-	const collapseWhitespace = (s: string): string => s.replace(/\s+/g, " ").trim()
+	const collapseWhitespace = (s: string): string =>
+		s.replace(/\s+/g, " ").trim()
 	const decodeEntities = (s: string): string =>
 		s
 			.replace(/&lt;/gi, "<")
@@ -182,10 +201,13 @@ function dedupePromptTextFromBody<E extends readonly string[]>(
 	}
 	const normalizeMath = (mathml: string): string => {
 		// prefer <mo> text; otherwise strip tags
-		const moMatches = Array.from(mathml.matchAll(/<mo[^>]*>([\s\S]*?)<\/mo>/g)).map(
-			(m) => m[1] ?? ""
-		)
-		const raw = moMatches.length > 0 ? moMatches.join(" ") : mathml.replace(/<[^>]+>/g, " ")
+		const moMatches = Array.from(
+			mathml.matchAll(/<mo[^>]*>([\s\S]*?)<\/mo>/g)
+		).map((m) => m[1] ?? "")
+		const raw =
+			moMatches.length > 0
+				? moMatches.join(" ")
+				: mathml.replace(/<[^>]+>/g, " ")
 		return toComparable(raw)
 	}
 	const normalizeInline = (inline: InlineContent<E>): string => {
@@ -229,14 +251,19 @@ function dedupePromptTextFromBody<E extends readonly string[]>(
 	// collect prompts from interactions that support it, keyed by interaction id
 	const interactionIdToPrompt: Record<string, string> = {}
 	for (const [id, interaction] of Object.entries(item.interactions)) {
-		if (interaction.type === "choiceInteraction" || interaction.type === "orderInteraction") {
+		if (
+			interaction.type === "choiceInteraction" ||
+			interaction.type === "orderInteraction"
+		) {
 			if (interaction.prompt && interaction.prompt.length > 0) {
 				const normalizedPrompt = normalizeInline(interaction.prompt)
 				interactionIdToPrompt[id] = stripSelectionGuidance(normalizedPrompt)
 			}
 		}
 	}
-	const supportedInteractionIds = new Set<string>(Object.keys(interactionIdToPrompt))
+	const supportedInteractionIds = new Set<string>(
+		Object.keys(interactionIdToPrompt)
+	)
 	if (supportedInteractionIds.size === 0) return
 
 	// Pre-bind non-null body reference for type narrowing within nested helpers
@@ -251,7 +278,10 @@ function dedupePromptTextFromBody<E extends readonly string[]>(
 	const slotIndices: Array<{ index: number; interactionId: string }> = []
 	for (let i = 0; i < body.length; i++) {
 		const block = body[i]
-		if (block?.type === "interactionRef" && supportedInteractionIds.has(block.interactionId)) {
+		if (
+			block?.type === "interactionRef" &&
+			supportedInteractionIds.has(block.interactionId)
+		) {
 			slotIndices.push({ index: i, interactionId: block.interactionId })
 		}
 	}
@@ -345,14 +375,17 @@ function dedupePromptTextFromBody<E extends readonly string[]>(
 		}
 		return { text, spans }
 	}
-	const splitSentences = (source: string): Array<{ start: number; end: number; text: string }> => {
+	const splitSentences = (
+		source: string
+	): Array<{ start: number; end: number; text: string }> => {
 		const results: Array<{ start: number; end: number; text: string }> = []
 		let start = 0
 		for (let i = 0; i < source.length; i++) {
 			const ch = source.charAt(i)
 			if (ch === "." || ch === "!" || ch === "?" || ch === "…") {
 				let end = i + 1
-				while (end < source.length && /[)\]"'\s]/.test(source.charAt(end))) end += 1
+				while (end < source.length && /[)\]"'\s]/.test(source.charAt(end)))
+					end += 1
 				const raw = source.slice(start, end)
 				if (raw.trim() !== "") results.push({ start, end, text: raw })
 				start = end
@@ -360,7 +393,8 @@ function dedupePromptTextFromBody<E extends readonly string[]>(
 		}
 		if (start < source.length) {
 			const raw = source.slice(start)
-			if (raw.trim() !== "") results.push({ start, end: source.length, text: raw })
+			if (raw.trim() !== "")
+				results.push({ start, end: source.length, text: raw })
 		}
 		return results
 	}
@@ -368,7 +402,12 @@ function dedupePromptTextFromBody<E extends readonly string[]>(
 		if (s.trim().endsWith("?")) return true
 		const tokens = tokenizeForFuzzy(s)
 		return tokens.some(
-			(t) => t === "which" || t === "what" || t === "why" || t === "how" || t === "where"
+			(t) =>
+				t === "which" ||
+				t === "what" ||
+				t === "why" ||
+				t === "how" ||
+				t === "where"
 		)
 	}
 
@@ -460,11 +499,14 @@ function enforceIdentifierOnlyMatching<E extends readonly string[]>(
 		// Check for duplicate responseIdentifier across different interactions
 		const existingOwner = responseIdOwners.get(id)
 		if (existingOwner && existingOwner !== ownerId) {
-			logger.error("duplicate response identifier found across multiple interactions", {
-				responseIdentifier: id,
-				firstOwner: existingOwner,
-				secondOwner: ownerId
-			})
+			logger.error(
+				"duplicate response identifier found across multiple interactions",
+				{
+					responseIdentifier: id,
+					firstOwner: existingOwner,
+					secondOwner: ownerId
+				}
+			)
 			throw ErrDuplicateResponseIdentifier
 		}
 		responseIdOwners.set(id, ownerId)
@@ -476,7 +518,9 @@ function enforceIdentifierOnlyMatching<E extends readonly string[]>(
 
 	// Interactions: inlineChoice, choice, order
 	if (item.interactions) {
-		for (const [interactionId, interaction] of Object.entries(item.interactions)) {
+		for (const [interactionId, interaction] of Object.entries(
+			item.interactions
+		)) {
 			if (!interaction) continue
 			if (
 				interaction.type === "inlineChoiceInteraction" ||
@@ -495,7 +539,10 @@ function enforceIdentifierOnlyMatching<E extends readonly string[]>(
 				}
 				const responseId = interaction.responseIdentifier
 				const seenIdentifiers = new Set<string>()
-				if (!("choices" in interaction) || !Array.isArray(interaction.choices)) {
+				if (
+					!("choices" in interaction) ||
+					!Array.isArray(interaction.choices)
+				) {
 					logger.error("invalid choices array in interaction", {
 						interactionId
 					})
@@ -505,10 +552,13 @@ function enforceIdentifierOnlyMatching<E extends readonly string[]>(
 					const ident = String("identifier" in choice ? choice.identifier : "")
 					// REMOVED: .toLowerCase() - now case-sensitive
 					if (seenIdentifiers.has(ident)) {
-						logger.error("duplicate choice identifiers within interaction (case-sensitive)", {
-							interactionId,
-							identifier: ident
-						})
+						logger.error(
+							"duplicate choice identifiers within interaction (case-sensitive)",
+							{
+								interactionId,
+								identifier: ident
+							}
+						)
 						throw ErrDuplicateChoiceIdentifier
 					}
 					seenIdentifiers.add(ident)
@@ -568,7 +618,8 @@ function collectRefs<E extends readonly string[]>(
 		if (!inline) return
 		for (const node of inline) {
 			if (node.type === "inlineWidgetRef") widgetRefs.add(node.widgetId)
-			if (node.type === "inlineInteractionRef") interactionRefs.add(node.interactionId)
+			if (node.type === "inlineInteractionRef")
+				interactionRefs.add(node.interactionId)
 		}
 	}
 
@@ -576,7 +627,8 @@ function collectRefs<E extends readonly string[]>(
 		if (!block) return
 		for (const node of block) {
 			if (node.type === "widgetRef") widgetRefs.add(node.widgetId)
-			if (node.type === "interactionRef") interactionRefs.add(node.interactionId)
+			if (node.type === "interactionRef")
+				interactionRefs.add(node.interactionId)
 			if (node.type === "paragraph") walkInline(node.content)
 			if (node.type === "blockquote") {
 				walkInline(node.content)
@@ -584,7 +636,9 @@ function collectRefs<E extends readonly string[]>(
 			if (node.type === "unorderedList" || node.type === "orderedList")
 				node.items.forEach(walkInline)
 			if (node.type === "tableRich") {
-				const walkRows = (rows: Array<Array<InlineContent<E> | null>> | null) => {
+				const walkRows = (
+					rows: Array<Array<InlineContent<E> | null>> | null
+				) => {
 					if (!rows) return
 					for (const row of rows) {
 						for (const cell of row) walkInline(cell)
@@ -608,7 +662,10 @@ function collectRefs<E extends readonly string[]>(
 
 	if (item.interactions) {
 		for (const interaction of Object.values(item.interactions)) {
-			if (interaction.type === "choiceInteraction" || interaction.type === "orderInteraction") {
+			if (
+				interaction.type === "choiceInteraction" ||
+				interaction.type === "orderInteraction"
+			) {
 				walkInline(interaction.prompt)
 				for (const choice of interaction.choices) {
 					walkBlock(choice.content)
@@ -638,8 +695,14 @@ function collectWidgetIds<E extends readonly string[]>(
 }
 
 export async function compile<
-	C extends WidgetCollection<Record<string, WidgetDefinition<unknown, unknown>>, readonly string[]>
->(itemData: AssessmentItemInput<WidgetTypeTupleFrom<C>>, widgetCollection: C): Promise<string> {
+	C extends WidgetCollection<
+		Record<string, WidgetDefinition<unknown, unknown>>,
+		readonly string[]
+	>
+>(
+	itemData: AssessmentItemInput<WidgetTypeTupleFrom<C>>,
+	widgetCollection: C
+): Promise<string> {
 	// Step 1: Widget Type Derivation
 	const widgetMapping: Record<string, string> = {}
 	if (itemData.widgets) {
@@ -670,7 +733,10 @@ export async function compile<
 	}
 
 	// Decouple schema creation from global registry - build schemas from widgetTypeKeys
-	const widgetSchemasForCollection: Record<string, z.ZodType<unknown, unknown>> = {}
+	const widgetSchemasForCollection: Record<
+		string,
+		z.ZodType<unknown, unknown>
+	> = {}
 	for (const k of widgetCollection.widgetTypeKeys) {
 		widgetSchemasForCollection[k] = widgetCollection.widgets[k].schema
 	}
@@ -708,10 +774,11 @@ export async function compile<
 	})
 
 	// Create a normalized item with flat feedbackBlocks for downstream processing
-	const normalizedItem: AssessmentItemWithFlatFeedback<WidgetTypeTupleFrom<C>> = {
-		...enforcedItem,
-		feedbackBlocks
-	}
+	const normalizedItem: AssessmentItemWithFlatFeedback<WidgetTypeTupleFrom<C>> =
+		{
+			...enforcedItem,
+			feedbackBlocks
+		}
 
 	// Pre-compile gate for unsupported interactions
 	if (enforcedItem.interactions) {
@@ -719,13 +786,17 @@ export async function compile<
 			if (interaction.type === "unsupportedInteraction") {
 				// Access property safely using in operator
 				const perseusType =
-					"perseusType" in interaction && typeof interaction.perseusType === "string"
+					"perseusType" in interaction &&
+					typeof interaction.perseusType === "string"
 						? interaction.perseusType
 						: "unknown"
-				logger.error("unsupported interaction type detected, failing compilation", {
-					identifier: enforcedItem.identifier,
-					perseusType: perseusType
-				})
+				logger.error(
+					"unsupported interaction type detected, failing compilation",
+					{
+						identifier: enforcedItem.identifier,
+						perseusType: perseusType
+					}
+				)
 				// Throw the specific, non-retriable error
 				throw errors.wrap(
 					ErrUnsupportedInteraction,
@@ -760,7 +831,9 @@ export async function compile<
 		for (const widgetId of requiredWidgetIds) {
 			const widgetData = enforcedItem.widgets[widgetId]
 			if (!widgetData) {
-				logger.error("content references widgetId not defined in widgets map", { widgetId })
+				logger.error("content references widgetId not defined in widgets map", {
+					widgetId
+				})
 				throw errors.new("content references undefined widget")
 			}
 
@@ -803,7 +876,9 @@ export async function compile<
 
 	// Step 3: Compile interactions and populate interactionSlots (after widgets are generated)
 	if (enforcedItem.interactions) {
-		for (const [interactionId, interactionDef] of Object.entries(enforcedItem.interactions)) {
+		for (const [interactionId, interactionDef] of Object.entries(
+			enforcedItem.interactions
+		)) {
 			interactionSlots.set(
 				interactionId,
 				compileInteraction(interactionDef, widgetSlots, interactionSlots)
@@ -853,14 +928,20 @@ export async function compile<
 
 			// Schema validation structurally prevents interactions in feedback content.
 			// No runtime check needed here.
-			const contentXml = renderFeedbackContent(content, widgetSlots, interactionSlots)
+			const contentXml = renderFeedbackContent(
+				content,
+				widgetSlots,
+				interactionSlots
+			)
 			return `        <qti-feedback-block outcome-identifier="FEEDBACK__OVERALL" identifier="${escapeXmlAttribute(combination.id)}" show-hide="show">
             <qti-content-body>${contentXml}</qti-content-body>
         </qti-feedback-block>`
 		})
 		.join("\n")
 
-	const responseDeclarations = compileResponseDeclarations(enforcedItem.responseDeclarations)
+	const responseDeclarations = compileResponseDeclarations(
+		enforcedItem.responseDeclarations
+	)
 	const responseProcessing = compileResponseProcessing(normalizedItem)
 
 	// MODIFIED: Assemble the final XML with dynamic declarations and blocks.

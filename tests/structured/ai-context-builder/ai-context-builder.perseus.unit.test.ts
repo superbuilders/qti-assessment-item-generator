@@ -1,13 +1,16 @@
 import { afterAll, beforeAll, describe, expect, test } from "bun:test"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import { buildPerseusEnvelope } from "../../../src/structured/ai-context-builder"
+import { buildPerseusEnvelope } from "@/structured/ai-context-builder"
 import {
 	expectEmptyPayloads,
 	expectSortedUrls,
 	expectSupplementaryContentCount
-} from "./helpers/assertions"
-import { createAlwaysFailFetch, createPrdMockFetch } from "./helpers/mock-fetch"
+} from "@/testing/structured/ai-context-builder/helpers/assertions"
+import {
+	createAlwaysFailFetch,
+	createPrdMockFetch
+} from "@/testing/structured/ai-context-builder/helpers/mock-fetch"
 
 describe("buildPerseusEnvelope (unit)", () => {
 	let previousFetch: typeof fetch
@@ -94,7 +97,9 @@ describe("buildPerseusEnvelope (unit)", () => {
 					"Examine the chart: ![Chart](https://cdn.kastatic.org/ka-perseus-images/082e6068e0c842e2b09e2a8520bd22817d55a134.svg). Source: [Census Data](https://www.census.gov/prod/2002pubs/p23-206.pdf)"
 			}
 		}
-		const result = await errors.try(buildPerseusEnvelope(perseusJsonWithMixedLinks))
+		const result = await errors.try(
+			buildPerseusEnvelope(perseusJsonWithMixedLinks)
+		)
 		expect(result.error).toBeFalsy()
 		if (result.error) {
 			logger.error("test failed", { error: result.error })
@@ -142,13 +147,16 @@ describe("buildPerseusEnvelope (unit)", () => {
 		const envelope = result.data
 		expect(envelope.primaryContent).toBeTruthy()
 		expectSupplementaryContentCount(envelope, 1)
-		expect(envelope.multimodalImageUrls).toEqual(["https://example.com/foo.png"])
+		expect(envelope.multimodalImageUrls).toEqual([
+			"https://example.com/foo.png"
+		])
 		expectSortedUrls(envelope)
 	})
 
 	test("deduplicates discovered URLs across content and widgets", async () => {
 		const perseusJson = {
-			content: "https://example.com/diagram.svg https://example.com/diagram.svg",
+			content:
+				"https://example.com/diagram.svg https://example.com/diagram.svg",
 			widgets: {
 				"image 1": {
 					type: "image",
@@ -187,7 +195,12 @@ describe("buildPerseusEnvelope (unit)", () => {
 					}
 				}
 			},
-			hints: [{ content: "See [this reference](https://www.reference.com/page) for more info." }]
+			hints: [
+				{
+					content:
+						"See [this reference](https://www.reference.com/page) for more info."
+				}
+			]
 		}
 		const result = await errors.try(buildPerseusEnvelope(complexPerseusJson))
 		expect(result.error).toBeFalsy()
@@ -198,7 +211,9 @@ describe("buildPerseusEnvelope (unit)", () => {
 		const envelope = result.data
 		expect(envelope.primaryContent).toBeTruthy()
 		expectSupplementaryContentCount(envelope, 0)
-		expect(envelope.multimodalImageUrls).toEqual(["https://cdn.example.com/chart.png"])
+		expect(envelope.multimodalImageUrls).toEqual([
+			"https://cdn.example.com/chart.png"
+		])
 	})
 
 	test("handles Perseus JSON with no URLs gracefully", async () => {
@@ -244,7 +259,8 @@ describe("buildPerseusEnvelope (unit)", () => {
 				},
 				{
 					images: {},
-					content: "$\\qquad \\text{P(draw a blue or red marble}) = \\dfrac{16}{21}\\approx0.76$",
+					content:
+						"$\\qquad \\text{P(draw a blue or red marble}) = \\dfrac{16}{21}\\approx0.76$",
 					replace: false,
 					widgets: {}
 				}
@@ -336,7 +352,9 @@ describe("buildPerseusEnvelope (unit)", () => {
 					"Check [source A](https://example.com/a) and [source B](https://example.com/b) for more information."
 			}
 		}
-		const result = await errors.try(buildPerseusEnvelope(perseusJsonWithMultipleLinks))
+		const result = await errors.try(
+			buildPerseusEnvelope(perseusJsonWithMultipleLinks)
+		)
 		expect(result.error).toBeFalsy()
 		if (result.error) {
 			logger.error("test failed", { error: result.error })
@@ -357,7 +375,8 @@ describe("buildPerseusEnvelope (unit)", () => {
 						options: {
 							choices: [
 								{
-									content: "Choice with [embedded link](https://example.com/choice1)",
+									content:
+										"Choice with [embedded link](https://example.com/choice1)",
 									clue: "This references [another source](https://example.com/clue1)"
 								},
 								{ content: "Regular choice", clue: "Regular clue" }
@@ -398,7 +417,9 @@ describe("buildPerseusEnvelope (unit)", () => {
 		const perseusJsonWithSvg = {
 			question: { content: "Here is an SVG: https://example.com/diagram.svg" }
 		}
-		const result = await errors.try(buildPerseusEnvelope(perseusJsonWithSvg, failing))
+		const result = await errors.try(
+			buildPerseusEnvelope(perseusJsonWithSvg, failing)
+		)
 		expect(result.error).toBeFalsy()
 		if (result.error) {
 			logger.error("test failed", { error: result.error })

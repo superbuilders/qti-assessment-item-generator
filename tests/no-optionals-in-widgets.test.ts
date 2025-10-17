@@ -11,7 +11,10 @@ type Offender = {
 	path: Array<string | number>
 }
 
-function findOptionalsInSchema(widgetKey: string, schema: $ZodType): Offender[] {
+function findOptionalsInSchema(
+	widgetKey: string,
+	schema: $ZodType
+): Offender[] {
 	const offenders: Offender[] = []
 
 	// Use zod's JSON Schema traversal hook to visit every node and detect optional wrappers
@@ -31,7 +34,11 @@ function findOptionalsInSchema(widgetKey: string, schema: $ZodType): Offender[] 
 	)
 	if (conversionResult.error) {
 		// If conversion fails for any reason, surface it as an offender for visibility
-		offenders.push({ widget: widgetKey, nodeType: "conversion_error", path: [] })
+		offenders.push({
+			widget: widgetKey,
+			nodeType: "conversion_error",
+			path: []
+		})
 	}
 
 	return offenders
@@ -46,7 +53,10 @@ describe("Widgets: no usage of Zod .optional() anywhere", () => {
 
 		if (allOffenders.length > 0) {
 			const details = allOffenders
-				.map((o) => `${o.widget} :: ${o.nodeType} at jsonPath=${JSON.stringify(o.path)}`)
+				.map(
+					(o) =>
+						`${o.widget} :: ${o.nodeType} at jsonPath=${JSON.stringify(o.path)}`
+				)
 				.join("\n")
 			expect(`Found optional() in widget schemas:\n${details}`).toBe("")
 		} else {

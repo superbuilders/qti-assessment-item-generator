@@ -17,7 +17,10 @@ describe("Compiler: feedback-as-steps", () => {
 				}
 			],
 			body: [
-				{ type: "paragraph", content: [{ type: "text", content: "What is 2 + 2?" }] },
+				{
+					type: "paragraph",
+					content: [{ type: "text", content: "What is 2 + 2?" }]
+				},
 				{ type: "interactionRef", interactionId: "ci" }
 			],
 			widgets: null,
@@ -29,11 +32,15 @@ describe("Compiler: feedback-as-steps", () => {
 					choices: [
 						{
 							identifier: "A",
-							content: [{ type: "paragraph", content: [{ type: "text", content: "4" }] }]
+							content: [
+								{ type: "paragraph", content: [{ type: "text", content: "4" }] }
+							]
 						},
 						{
 							identifier: "B",
-							content: [{ type: "paragraph", content: [{ type: "text", content: "5" }] }]
+							content: [
+								{ type: "paragraph", content: [{ type: "text", content: "5" }] }
+							]
 						}
 					],
 					shuffle: true,
@@ -62,7 +69,12 @@ describe("Compiler: feedback-as-steps", () => {
 							content: {
 								preamble: {
 									correctness: "correct",
-									summary: [{ type: "text", content: "You identified the sum correctly." }]
+									summary: [
+										{
+											type: "text",
+											content: "You identified the sum correctly."
+										}
+									]
 								},
 								steps: [
 									{
@@ -72,7 +84,10 @@ describe("Compiler: feedback-as-steps", () => {
 											{
 												type: "paragraph",
 												content: [
-													{ type: "text", content: "2 + 2 means combining two groups of 2." }
+													{
+														type: "text",
+														content: "2 + 2 means combining two groups of 2."
+													}
 												]
 											}
 										]
@@ -98,7 +113,9 @@ describe("Compiler: feedback-as-steps", () => {
 							content: {
 								preamble: {
 									correctness: "incorrect",
-									summary: [{ type: "text", content: "The sum of 2 + 2 is not 5." }]
+									summary: [
+										{ type: "text", content: "The sum of 2 + 2 is not 5." }
+									]
 								},
 								steps: [
 									{
@@ -108,14 +125,19 @@ describe("Compiler: feedback-as-steps", () => {
 											{
 												type: "paragraph",
 												content: [
-													{ type: "text", content: "When adding, count all items together." }
+													{
+														type: "text",
+														content: "When adding, count all items together."
+													}
 												]
 											}
 										]
 									},
 									{
 										type: "step",
-										title: [{ type: "text", content: "Find the Correct Answer" }],
+										title: [
+											{ type: "text", content: "Find the Correct Answer" }
+										],
 										content: [
 											{
 												type: "paragraph",
@@ -208,7 +230,12 @@ describe("Compiler: feedback-as-steps", () => {
 								{
 									type: "step",
 									title: [{ type: "text", content: "Only Step" }],
-									content: [{ type: "paragraph", content: [{ type: "text", content: "Done." }] }]
+									content: [
+										{
+											type: "paragraph",
+											content: [{ type: "text", content: "Done." }]
+										}
+									]
 								}
 							]
 						}
@@ -224,7 +251,10 @@ describe("Compiler: feedback-as-steps", () => {
 									type: "step",
 									title: [{ type: "text", content: "Only Step" }],
 									content: [
-										{ type: "paragraph", content: [{ type: "text", content: "Try again." }] }
+										{
+											type: "paragraph",
+											content: [{ type: "text", content: "Try again." }]
+										}
 									]
 								}
 							]
@@ -235,6 +265,8 @@ describe("Compiler: feedback-as-steps", () => {
 		}
 
 		// Should throw due to schema validation (steps.min(2))
-		await expect(compile(itemWithOneStep, allWidgetsCollection)).rejects.toThrow()
+		await expect(
+			compile(itemWithOneStep, allWidgetsCollection)
+		).rejects.toThrow()
 	})
 })

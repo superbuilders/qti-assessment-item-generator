@@ -1,10 +1,15 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
+import {
+	renderBlockContent,
+	renderInlineContent
+} from "@/compiler/content-renderer"
+import { escapeXmlAttribute } from "@/compiler/utils/xml-utils"
 import type { AnyInteraction } from "@/core/interactions"
-import { renderBlockContent, renderInlineContent } from "./content-renderer"
-import { escapeXmlAttribute } from "./utils/xml-utils"
 
-export function compileInteraction<E extends readonly string[] = readonly string[]>(
+export function compileInteraction<
+	E extends readonly string[] = readonly string[]
+>(
 	interaction: AnyInteraction<E>,
 	widgetSlots: Map<string, string>,
 	interactionSlots: Map<string, string>
@@ -13,10 +18,18 @@ export function compileInteraction<E extends readonly string[] = readonly string
 
 	switch (interaction.type) {
 		case "choiceInteraction": {
-			const promptXml = renderInlineContent(interaction.prompt, widgetSlots, interactionSlots)
+			const promptXml = renderInlineContent(
+				interaction.prompt,
+				widgetSlots,
+				interactionSlots
+			)
 			const choicesXml = interaction.choices
 				.map((c): string => {
-					const contentXml = renderBlockContent(c.content, widgetSlots, interactionSlots)
+					const contentXml = renderBlockContent(
+						c.content,
+						widgetSlots,
+						interactionSlots
+					)
 					return `<qti-simple-choice identifier="${escapeXmlAttribute(c.identifier)}">${contentXml}</qti-simple-choice>`
 				})
 				.join("\n            ")
@@ -28,10 +41,18 @@ export function compileInteraction<E extends readonly string[] = readonly string
 			break
 		}
 		case "orderInteraction": {
-			const promptXml = renderInlineContent(interaction.prompt, widgetSlots, interactionSlots)
+			const promptXml = renderInlineContent(
+				interaction.prompt,
+				widgetSlots,
+				interactionSlots
+			)
 			const choicesXml = interaction.choices
 				.map((c): string => {
-					const contentXml = renderBlockContent(c.content, widgetSlots, interactionSlots)
+					const contentXml = renderBlockContent(
+						c.content,
+						widgetSlots,
+						interactionSlots
+					)
 					return `<qti-simple-choice identifier="${escapeXmlAttribute(c.identifier)}">${contentXml}</qti-simple-choice>`
 				})
 				.join("\n            ")
@@ -44,7 +65,9 @@ export function compileInteraction<E extends readonly string[] = readonly string
 		}
 		case "textEntryInteraction": {
 			interactionXml = `<qti-text-entry-interaction response-identifier="${escapeXmlAttribute(interaction.responseIdentifier)}"${
-				interaction.expectedLength ? ` expected-length="${interaction.expectedLength}"` : ""
+				interaction.expectedLength
+					? ` expected-length="${interaction.expectedLength}"`
+					: ""
 			}/>`
 			break
 		}
@@ -64,7 +87,11 @@ export function compileInteraction<E extends readonly string[] = readonly string
 		case "gapMatchInteraction": {
 			const gapTextsXml = interaction.gapTexts
 				.map((gt): string => {
-					const contentXml = renderInlineContent(gt.content, widgetSlots, interactionSlots)
+					const contentXml = renderInlineContent(
+						gt.content,
+						widgetSlots,
+						interactionSlots
+					)
 					return `<qti-gap-text identifier="${escapeXmlAttribute(gt.identifier)}" match-max="${gt.matchMax}">${contentXml}</qti-gap-text>`
 				})
 				.join("\n            ")

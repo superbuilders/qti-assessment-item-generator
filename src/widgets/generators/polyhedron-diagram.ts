@@ -1,9 +1,9 @@
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { PADDING } from "../utils/constants"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { PADDING } from "@/widgets/utils/constants"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
 
 // Defines a dimension label for an edge or a face area
 const DimensionLabel = z
@@ -23,7 +23,15 @@ const DimensionLabel = z
 
 // Defines the face names that can appear across all supported polyhedra
 const FaceName = z
-	.enum(["frontFace", "backFace", "leftFace", "rightFace", "topFace", "bottomFace", "baseFace"])
+	.enum([
+		"frontFace",
+		"backFace",
+		"leftFace",
+		"rightFace",
+		"topFace",
+		"bottomFace",
+		"baseFace"
+	])
 	.describe(
 		"Face identifier for polyhedra. 'frontFace' is the viewer-facing surface, 'backFace' is hidden behind, 'leftFace'/'rightFace' are side surfaces, 'topFace'/'bottomFace' are vertical extremes, and 'baseFace' is the foundation of pyramids."
 	)
@@ -43,7 +51,9 @@ const createAnchorSchema = () =>
 					)
 			})
 			.strict()
-			.describe("References an existing vertex of the polyhedron by its index position."),
+			.describe(
+				"References an existing vertex of the polyhedron by its index position."
+			),
 		z
 			.object({
 				type: z.literal("edgeMidpoint"),
@@ -51,7 +61,9 @@ const createAnchorSchema = () =>
 					.number()
 					.int()
 					.min(0)
-					.describe("Index of the first vertex that defines one endpoint of the edge."),
+					.describe(
+						"Index of the first vertex that defines one endpoint of the edge."
+					),
 				b: z
 					.number()
 					.int()
@@ -71,7 +83,9 @@ const createAnchorSchema = () =>
 					.number()
 					.int()
 					.min(0)
-					.describe("Index of the first vertex defining the edge's starting point."),
+					.describe(
+						"Index of the first vertex defining the edge's starting point."
+					),
 				b: z
 					.number()
 					.int()
@@ -94,7 +108,9 @@ const createAnchorSchema = () =>
 		z
 			.object({
 				type: z.literal("faceCentroid"),
-				face: FaceName.describe("The face whose geometric center will be used as the anchor point.")
+				face: FaceName.describe(
+					"The face whose geometric center will be used as the anchor point."
+				)
 			})
 			.strict()
 			.describe(
@@ -114,7 +130,9 @@ const Segment = z
 		label: z
 			.string()
 			.nullable()
-			.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
+			.transform((val) =>
+				val === "null" || val === "NULL" || val === "" ? null : val
+			)
 			.describe(
 				"Optional text label for the segment (e.g., '140 cm', 'slant height', 'd = √50', null). Positioned at the segment's midpoint with automatic offset. Null means no label."
 			)
@@ -199,7 +217,9 @@ const Diagonal = z
 		label: z
 			.string()
 			.nullable()
-			.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
+			.transform((val) =>
+				val === "null" || val === "NULL" || val === "" ? null : val
+			)
 			.describe(
 				"Text label for the diagonal's length (e.g., '12.7 cm', 'd = 15', '√50', null). Null means no label."
 			)
@@ -216,8 +236,12 @@ export const PolyhedronDiagramPropsSchema = z
 		height: createHeightSchema(),
 		shape: z
 			.discriminatedUnion("type", [
-				RectangularPrismDataSchema.describe("A box-shaped prism with rectangular faces."),
-				TriangularPrismDataSchema.describe("A prism with triangular bases and rectangular sides."),
+				RectangularPrismDataSchema.describe(
+					"A box-shaped prism with rectangular faces."
+				),
+				TriangularPrismDataSchema.describe(
+					"A prism with triangular bases and rectangular sides."
+				),
 				RectangularPyramidDataSchema.describe(
 					"A pyramid with a rectangular base and triangular faces."
 				),
@@ -253,7 +277,9 @@ export const PolyhedronDiagramPropsSchema = z
 		shadedFace: z
 			.string()
 			.nullable()
-			.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
+			.transform((val) =>
+				val === "null" || val === "NULL" || val === "" ? null : val
+			)
 			.describe(
 				"Face identifier to shade/highlight: 'topFace', 'bottomFace', 'frontFace', 'backFace', 'leftFace', 'rightFace', 'baseFace', or null. Null means no shading."
 			),
@@ -268,7 +294,9 @@ export const PolyhedronDiagramPropsSchema = z
 		"Creates 3D diagrams of prisms and pyramids in isometric projection. Shows vertices, edges, faces with optional labels, diagonals, and face highlighting. Essential for teaching 3D geometry, volume, surface area, and spatial visualization. Supports both solid and wireframe views with hidden edge visibility control."
 	)
 
-export type PolyhedronDiagramProps = z.infer<typeof PolyhedronDiagramPropsSchema>
+export type PolyhedronDiagramProps = z.infer<
+	typeof PolyhedronDiagramPropsSchema
+>
 
 /**
  * This template is a versatile tool for generating SVG diagrams of three-dimensional
@@ -326,7 +354,10 @@ export const generatePolyhedronDiagram: WidgetGenerator<
 			| { type: "edgePoint"; a: number; b: number; t: number }
 			| { type: "faceCentroid"; face: z.infer<typeof FaceName> },
 		p: Array<{ x: number; y: number } | undefined>,
-		faces: Record<string, { points: Array<{ x: number; y: number } | undefined> }>
+		faces: Record<
+			string,
+			{ points: Array<{ x: number; y: number } | undefined> }
+		>
 	): { x: number; y: number } | null {
 		switch (anchor.type) {
 			case "vertex": {
@@ -349,9 +380,14 @@ export const generatePolyhedronDiagram: WidgetGenerator<
 			case "faceCentroid": {
 				const face = faces[anchor.face]
 				if (!face) return null
-				const pts = face.points.filter((pt): pt is { x: number; y: number } => !!pt)
+				const pts = face.points.filter(
+					(pt): pt is { x: number; y: number } => !!pt
+				)
 				if (pts.length === 0) return null
-				const sum = pts.reduce((acc, q) => ({ x: acc.x + q.x, y: acc.y + q.y }), { x: 0, y: 0 })
+				const sum = pts.reduce(
+					(acc, q) => ({ x: acc.x + q.x, y: acc.y + q.y }),
+					{ x: 0, y: 0 }
+				)
 				return { x: sum.x / pts.length, y: sum.y / pts.length }
 			}
 		}
@@ -359,7 +395,10 @@ export const generatePolyhedronDiagram: WidgetGenerator<
 
 	function drawSegmentsAndMarkers(
 		p: Array<{ x: number; y: number } | undefined>,
-		faces: Record<string, { points: Array<{ x: number; y: number } | undefined> }>
+		faces: Record<
+			string,
+			{ points: Array<{ x: number; y: number } | undefined> }
+		>
 	) {
 		// Back-compat: map legacy diagonals to segments if any were provided
 		const allSegments: Array<{
@@ -498,7 +537,9 @@ export const generatePolyhedronDiagram: WidgetGenerator<
 
 			const getFaceSvg = (faceName: keyof typeof faces) => {
 				const face = faces[faceName]
-				const polygonPoints = face.points.filter((pt): pt is { x: number; y: number } => !!pt)
+				const polygonPoints = face.points.filter(
+					(pt): pt is { x: number; y: number } => !!pt
+				)
 				canvas.drawPolygon(polygonPoints, {
 					fill: shadedFace === faceName ? face.color : "none",
 					stroke: theme.colors.black,
@@ -617,7 +658,9 @@ export const generatePolyhedronDiagram: WidgetGenerator<
 			// Helper to draw face
 			const drawFace = (faceName: keyof typeof faces) => {
 				const face = faces[faceName]
-				const polygonPoints = face.points.filter((pt): pt is { x: number; y: number } => !!pt)
+				const polygonPoints = face.points.filter(
+					(pt): pt is { x: number; y: number } => !!pt
+				)
 				canvas.drawPolygon(polygonPoints, {
 					fill: shadedFace === faceName ? face.color : "none",
 					stroke: theme.colors.black,
@@ -728,7 +771,9 @@ export const generatePolyhedronDiagram: WidgetGenerator<
 			// Helper to draw face
 			const drawFace = (faceName: keyof typeof faces) => {
 				const face = faces[faceName]
-				const polygonPoints = face.points.filter((pt): pt is { x: number; y: number } => !!pt)
+				const polygonPoints = face.points.filter(
+					(pt): pt is { x: number; y: number } => !!pt
+				)
 				canvas.drawPolygon(polygonPoints, {
 					fill: shadedFace === faceName ? face.color : "none",
 					stroke: theme.colors.black,
@@ -860,7 +905,9 @@ export const generatePolyhedronDiagram: WidgetGenerator<
 			// Helper to draw face
 			const drawFace = (faceName: keyof typeof faces) => {
 				const face = faces[faceName]
-				const polygonPoints = face.points.filter((pt): pt is { x: number; y: number } => !!pt)
+				const polygonPoints = face.points.filter(
+					(pt): pt is { x: number; y: number } => !!pt
+				)
 				canvas.drawPolygon(polygonPoints, {
 					fill: shadedFace === faceName ? face.color : "none",
 					stroke: theme.colors.black,
@@ -957,11 +1004,17 @@ export const generatePolyhedronDiagram: WidgetGenerator<
 					// Draw height line from base centroid to apex
 					const base_centroid_x_for_label = (p[0].x + p[1].x + p[2].x) / 3
 					const base_centroid_y_for_label = (p[0].y + p[1].y + p[2].y) / 3
-					canvas.drawLine(base_centroid_x_for_label, base_centroid_y_for_label, p[3].x, p[3].y, {
-						stroke: theme.colors.gridMinor,
-						strokeWidth: theme.stroke.width.thin,
-						dash: theme.stroke.dasharray.dotted
-					})
+					canvas.drawLine(
+						base_centroid_x_for_label,
+						base_centroid_y_for_label,
+						p[3].x,
+						p[3].y,
+						{
+							stroke: theme.colors.gridMinor,
+							strokeWidth: theme.stroke.width.thin,
+							dash: theme.stroke.dasharray.dotted
+						}
+					)
 					const textX = base_centroid_x_for_label - 10
 					const textY = (base_centroid_y_for_label + p[3].y) / 2
 					canvas.drawText({

@@ -1,12 +1,12 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { PADDING } from "../utils/constants"
-import { Path2D } from "../utils/path-builder"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { PADDING } from "@/widgets/utils/constants"
+import { Path2D } from "@/widgets/utils/path-builder"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
 
 // hardcoded transparent protractor svg as base64
 const PROTRACTOR_BASE64 =
@@ -28,21 +28,33 @@ export const ProtractorAngleDiagramPropsSchema = z
 			.number()
 			.min(0)
 			.max(180)
-			.describe("angle size in degrees measured counterclockwise from the starting ray"),
+			.describe(
+				"angle size in degrees measured counterclockwise from the starting ray"
+			),
 		startPointLabel: z
 			.string()
-			.describe("label for the starting point (e.g., 'A'). use empty string for no label."),
+			.describe(
+				"label for the starting point (e.g., 'A'). use empty string for no label."
+			),
 		centerPointLabel: z
 			.string()
-			.describe("label for the center vertex point (e.g., 'B'). use empty string for no label."),
+			.describe(
+				"label for the center vertex point (e.g., 'B'). use empty string for no label."
+			),
 		endPointLabel: z
 			.string()
-			.describe("label for the ending point (e.g., 'C'). use empty string for no label.")
+			.describe(
+				"label for the ending point (e.g., 'C'). use empty string for no label."
+			)
 	})
 	.strict()
-	.describe("creates a protractor diagram with two lines showing a specific angle measurement")
+	.describe(
+		"creates a protractor diagram with two lines showing a specific angle measurement"
+	)
 
-export type ProtractorAngleDiagramProps = z.infer<typeof ProtractorAngleDiagramPropsSchema>
+export type ProtractorAngleDiagramProps = z.infer<
+	typeof ProtractorAngleDiagramPropsSchema
+>
 
 /**
  * generates a protractor diagram with two lines showing a specific angle
@@ -67,7 +79,9 @@ export const generateProtractorAngleDiagram: WidgetGenerator<
 	})
 
 	// decode the protractor svg
-	const protractorSvg = Buffer.from(PROTRACTOR_BASE64, "base64").toString("utf-8")
+	const protractorSvg = Buffer.from(PROTRACTOR_BASE64, "base64").toString(
+		"utf-8"
+	)
 	const protractorContent = protractorSvg
 		.replace(/<\?xml[^>]*>\s*/, "")
 		.replace(/<!--[^>]*-->\s*/, "")
@@ -192,13 +206,21 @@ export const generateProtractorAngleDiagram: WidgetGenerator<
 	const startArrowTipX = startX
 	const startArrowTipY = startY
 	const startArrowBase1X =
-		startX - arrowSize * Math.cos(startLineAngle) - (arrowSize / 2) * Math.sin(startLineAngle)
+		startX -
+		arrowSize * Math.cos(startLineAngle) -
+		(arrowSize / 2) * Math.sin(startLineAngle)
 	const startArrowBase1Y =
-		startY - arrowSize * Math.sin(startLineAngle) + (arrowSize / 2) * Math.cos(startLineAngle)
+		startY -
+		arrowSize * Math.sin(startLineAngle) +
+		(arrowSize / 2) * Math.cos(startLineAngle)
 	const startArrowBase2X =
-		startX - arrowSize * Math.cos(startLineAngle) + (arrowSize / 2) * Math.sin(startLineAngle)
+		startX -
+		arrowSize * Math.cos(startLineAngle) +
+		(arrowSize / 2) * Math.sin(startLineAngle)
 	const startArrowBase2Y =
-		startY - arrowSize * Math.sin(startLineAngle) - (arrowSize / 2) * Math.cos(startLineAngle)
+		startY -
+		arrowSize * Math.sin(startLineAngle) -
+		(arrowSize / 2) * Math.cos(startLineAngle)
 
 	canvas.drawPolygon(
 		[
@@ -245,13 +267,21 @@ export const generateProtractorAngleDiagram: WidgetGenerator<
 	const endArrowTipX = endX
 	const endArrowTipY = endY
 	const endArrowBase1X =
-		endX - arrowSize * Math.cos(lineAngle) - (arrowSize / 2) * Math.sin(lineAngle)
+		endX -
+		arrowSize * Math.cos(lineAngle) -
+		(arrowSize / 2) * Math.sin(lineAngle)
 	const endArrowBase1Y =
-		endY - arrowSize * Math.sin(lineAngle) + (arrowSize / 2) * Math.cos(lineAngle)
+		endY -
+		arrowSize * Math.sin(lineAngle) +
+		(arrowSize / 2) * Math.cos(lineAngle)
 	const endArrowBase2X =
-		endX - arrowSize * Math.cos(lineAngle) + (arrowSize / 2) * Math.sin(lineAngle)
+		endX -
+		arrowSize * Math.cos(lineAngle) +
+		(arrowSize / 2) * Math.sin(lineAngle)
 	const endArrowBase2Y =
-		endY - arrowSize * Math.sin(lineAngle) - (arrowSize / 2) * Math.cos(lineAngle)
+		endY -
+		arrowSize * Math.sin(lineAngle) -
+		(arrowSize / 2) * Math.cos(lineAngle)
 
 	canvas.drawPolygon(
 		[

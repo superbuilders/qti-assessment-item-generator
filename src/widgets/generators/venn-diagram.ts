@@ -1,12 +1,12 @@
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { PADDING } from "../utils/constants"
-import { CSS_COLOR_PATTERN } from "../utils/css-color"
-import { abbreviateMonth } from "../utils/labels"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { estimateWrappedTextDimensions } from "../utils/text"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { PADDING } from "@/widgets/utils/constants"
+import { CSS_COLOR_PATTERN } from "@/widgets/utils/css-color"
+import { abbreviateMonth } from "@/widgets/utils/labels"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { estimateWrappedTextDimensions } from "@/widgets/utils/text"
+import { theme } from "@/widgets/utils/theme"
 
 function createCircleSchema() {
 	return z
@@ -25,7 +25,10 @@ function createCircleSchema() {
 				),
 			color: z
 				.string()
-				.regex(CSS_COLOR_PATTERN, "invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)")
+				.regex(
+					CSS_COLOR_PATTERN,
+					"invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)"
+				)
 				.describe(
 					"Hex-only fill color for this circle (e.g., '#FF6B6B', '#1E90FF', '#000000', '#00000080' for 50% alpha). Use translucency to show overlap."
 				)
@@ -75,8 +78,11 @@ export type VennDiagramProps = z.infer<typeof VennDiagramPropsSchema>
  * This template generates a classic two-circle Venn diagram as an SVG graphic
  * to visually represent the relationship between two sets of data.
  */
-export const generateVennDiagram: WidgetGenerator<typeof VennDiagramPropsSchema> = async (data) => {
-	const { width, height, circleA, circleB, intersectionCount, outsideCount } = data
+export const generateVennDiagram: WidgetGenerator<
+	typeof VennDiagramPropsSchema
+> = async (data) => {
+	const { width, height, circleA, circleB, intersectionCount, outsideCount } =
+		data
 	const padding = {
 		top: PADDING * 2,
 		bottom: PADDING * 2,

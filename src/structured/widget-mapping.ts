@@ -1,8 +1,14 @@
 import { z } from "zod"
 import { createWidgetSelectionPromptSection } from "@/structured/prompts/shared"
-import type { WidgetCollection, WidgetDefinition } from "@/widgets/collections/types"
+import type {
+	WidgetCollection,
+	WidgetDefinition
+} from "@/widgets/collections/types"
 
-function createWidgetMappingSchema(slotNames: string[], allowedWidgetKeys: readonly string[]) {
+function createWidgetMappingSchema(
+	slotNames: string[],
+	allowedWidgetKeys: readonly string[]
+) {
 	const values = [...allowedWidgetKeys, "WIDGET_NOT_FOUND"] as const
 	const valueSchema = z.enum(values)
 	const shape: Record<string, z.ZodType> = {}
@@ -19,8 +25,16 @@ function createWidgetMappingSchema(slotNames: string[], allowedWidgetKeys: reado
 }
 
 export function createWidgetMappingPrompt<
-	C extends WidgetCollection<Record<string, WidgetDefinition<unknown, unknown>>, readonly string[]>
->(perseusJson: string, assessmentBody: string, slotNames: string[], widgetCollection: C) {
+	C extends WidgetCollection<
+		Record<string, WidgetDefinition<unknown, unknown>>,
+		readonly string[]
+	>
+>(
+	perseusJson: string,
+	assessmentBody: string,
+	slotNames: string[],
+	widgetCollection: C
+) {
 	// MODIFIED: Create a base instruction and then conditionally add the refined, collection-specific rule.
 	let systemInstruction = `You are an expert in educational content and QTI standards. Your task is to analyze an assessment item's body content and the original Perseus JSON to map widget slots to the most appropriate widget type from a given list.
 
@@ -136,7 +150,10 @@ Your response must be a JSON object with a single key "widget_mapping", mapping 
 Slot Names to Map:
 ${slotNames.join("\n")}`
 
-	const WidgetMappingSchema = createWidgetMappingSchema(slotNames, widgetCollection.widgetTypeKeys)
+	const WidgetMappingSchema = createWidgetMappingSchema(
+		slotNames,
+		widgetCollection.widgetTypeKeys
+	)
 	// Resource mapping guidance (collection-aware): When Perseus includes reference resources
 	// such as periodic tables and the collection supports a corresponding widget type
 	// (e.g., 'periodicTable'), prefer mapping the slot to that type instead of bailing.

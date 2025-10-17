@@ -5,9 +5,9 @@ import {
 	circleWithRectangleExample,
 	compositeFromNestedExamples,
 	compositeShapeExample
-} from "../../examples/composite-shape-diagram"
-import { type WidgetInput, WidgetSchema } from "../../src/widgets/registry"
-import { generateWidgetForTest } from "../helpers/generateWidgetForTest"
+} from "@/examples/composite-shape-diagram"
+import { generateWidgetForTest } from "@/testing/helpers/generateWidgetForTest"
+import { type WidgetInput, WidgetSchema } from "@/widgets/registry"
 
 function ensureWidgetInput(input: unknown): WidgetInput {
 	const parsed = WidgetSchema.safeParse(input)
@@ -21,7 +21,9 @@ function ensureWidgetInput(input: unknown): WidgetInput {
 describe("Widget: composite-shape-diagram", () => {
 	// Test the examples from the examples file
 	test("should produce consistent output for compositeShapeExample", async () => {
-		const result = await errors.try(generateWidgetForTest(ensureWidgetInput(compositeShapeExample)))
+		const result = await errors.try(
+			generateWidgetForTest(ensureWidgetInput(compositeShapeExample))
+		)
 		if (result.error) {
 			logger.error("widget generation failed", { error: result.error })
 			throw result.error
@@ -101,8 +103,18 @@ describe("Widget: composite-shape-diagram", () => {
 					type: "simple",
 					label: { unit: "cm", value: 11 }
 				},
-				{ to: "rectBottomLeft", from: "rectBottomRight", type: "simple", label: null },
-				{ to: "rectTopLeft", from: "rectBottomLeft", type: "simple", label: null }
+				{
+					to: "rectBottomLeft",
+					from: "rectBottomRight",
+					type: "simple",
+					label: null
+				},
+				{
+					to: "rectTopLeft",
+					from: "rectBottomLeft",
+					type: "simple",
+					label: null
+				}
 			],
 			shadedRegions: [
 				{
@@ -128,7 +140,12 @@ describe("Widget: composite-shape-diagram", () => {
 				},
 				{
 					fillColor: "#fdfdfd",
-					vertexIds: ["rectTopLeft", "rectTopRight", "rectBottomRight", "rectBottomLeft"]
+					vertexIds: [
+						"rectTopLeft",
+						"rectTopRight",
+						"rectBottomRight",
+						"rectBottomLeft"
+					]
 				}
 			],
 			internalSegments: [
@@ -159,10 +176,13 @@ describe("Widget: composite-shape-diagram", () => {
 			const input = ensureWidgetInput(example)
 			const result = await errors.try(generateWidgetForTest(input))
 			if (result.error) {
-				logger.error("widget generation failed for migrated composite example", {
-					error: result.error,
-					index
-				})
+				logger.error(
+					"widget generation failed for migrated composite example",
+					{
+						error: result.error,
+						index
+					}
+				)
 				throw errors.wrap(result.error, "widget generation")
 			}
 			expect(result.data).toMatchSnapshot()
@@ -267,9 +287,24 @@ describe("Widget: composite-shape-diagram", () => {
 				{ fillColor: "#ffffff", vertexIds: ["R1", "R2", "R3", "R4"] }
 			],
 			internalSegments: [
-				{ label: { unit: "cm", value: 11 }, style: "solid", toVertexId: "C0", fromVertexId: "O" },
-				{ label: { unit: "cm", value: 4 }, style: "solid", toVertexId: "R2", fromVertexId: "R1" },
-				{ label: { unit: "cm", value: 6 }, style: "solid", toVertexId: "R3", fromVertexId: "R2" },
+				{
+					label: { unit: "cm", value: 11 },
+					style: "solid",
+					toVertexId: "C0",
+					fromVertexId: "O"
+				},
+				{
+					label: { unit: "cm", value: 4 },
+					style: "solid",
+					toVertexId: "R2",
+					fromVertexId: "R1"
+				},
+				{
+					label: { unit: "cm", value: 6 },
+					style: "solid",
+					toVertexId: "R3",
+					fromVertexId: "R2"
+				},
 				{ label: null, style: "solid", toVertexId: "R4", fromVertexId: "R3" },
 				{ label: null, style: "solid", toVertexId: "R1", fromVertexId: "R4" }
 			],
@@ -331,15 +366,38 @@ describe("Widget: composite-shape-diagram", () => {
 			shadedRegions: [
 				{
 					fillColor: "#ccfaff80",
-					vertexIds: ["C0", "C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9", "C10", "C11"]
+					vertexIds: [
+						"C0",
+						"C1",
+						"C2",
+						"C3",
+						"C4",
+						"C5",
+						"C6",
+						"C7",
+						"C8",
+						"C9",
+						"C10",
+						"C11"
+					]
 				},
 				{ fillColor: "#ffffff", vertexIds: ["R1", "R2", "R3", "R4"] }
 			],
 			internalSegments: [
-				{ label: { unit: "cm", value: 7 }, style: "solid", toVertexId: "R2", fromVertexId: "R1" },
+				{
+					label: { unit: "cm", value: 7 },
+					style: "solid",
+					toVertexId: "R2",
+					fromVertexId: "R1"
+				},
 				{ label: null, style: "solid", toVertexId: "R3", fromVertexId: "R2" },
 				{ label: null, style: "solid", toVertexId: "R4", fromVertexId: "R3" },
-				{ label: { unit: "cm", value: 5 }, style: "solid", toVertexId: "R1", fromVertexId: "R4" },
+				{
+					label: { unit: "cm", value: 5 },
+					style: "solid",
+					toVertexId: "R1",
+					fromVertexId: "R4"
+				},
 				{
 					label: { unit: "cm", value: 6 },
 					style: "solid",
@@ -401,20 +459,48 @@ describe("Widget: composite-shape-diagram", () => {
 				{ to: "C10", from: "C9", type: "simple", label: null },
 				{ to: "C11", from: "C10", type: "simple", label: null },
 				{ to: "C0", from: "C11", type: "simple", label: null },
-				{ to: "R2", from: "R1", type: "simple", label: { unit: "cm", value: 3 } },
-				{ to: "R3", from: "R2", type: "simple", label: { unit: "cm", value: 2 } },
+				{
+					to: "R2",
+					from: "R1",
+					type: "simple",
+					label: { unit: "cm", value: 3 }
+				},
+				{
+					to: "R3",
+					from: "R2",
+					type: "simple",
+					label: { unit: "cm", value: 2 }
+				},
 				{ to: "R4", from: "R3", type: "simple", label: null },
 				{ to: "R1", from: "R4", type: "simple", label: null }
 			],
 			shadedRegions: [
 				{
 					fillColor: "#ccfaff80",
-					vertexIds: ["C0", "C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9", "C10", "C11"]
+					vertexIds: [
+						"C0",
+						"C1",
+						"C2",
+						"C3",
+						"C4",
+						"C5",
+						"C6",
+						"C7",
+						"C8",
+						"C9",
+						"C10",
+						"C11"
+					]
 				},
 				{ fillColor: "#ffffff", vertexIds: ["R1", "R2", "R3", "R4"] }
 			],
 			internalSegments: [
-				{ label: { unit: "cm", value: 4 }, style: "solid", toVertexId: "C0", fromVertexId: "O" }
+				{
+					label: { unit: "cm", value: 4 },
+					style: "solid",
+					toVertexId: "C0",
+					fromVertexId: "O"
+				}
 			],
 			rightAngleMarkers: null
 		})
@@ -512,7 +598,12 @@ describe("Widget: composite-shape-diagram", () => {
 				{ text: "D", position: { x: 220, y: 140 } }
 			],
 			boundaryEdges: [
-				{ to: "L", from: "T", type: "simple", label: { unit: "units", value: 4 } },
+				{
+					to: "L",
+					from: "T",
+					type: "simple",
+					label: { unit: "units", value: 4 }
+				},
 				{ to: "BL", from: "L", type: "simple", label: null },
 				{ to: "BR", from: "BL", type: "simple", label: null },
 				{ to: "R", from: "BR", type: "simple", label: null },
@@ -557,9 +648,21 @@ describe("Widget: composite-shape-diagram", () => {
 				}
 			],
 			rightAngleMarkers: [
-				{ cornerVertexId: "L", adjacentVertex1Id: "T", adjacentVertex2Id: "H1" },
-				{ cornerVertexId: "H1", adjacentVertex1Id: "L", adjacentVertex2Id: "BL" },
-				{ cornerVertexId: "H2", adjacentVertex1Id: "R", adjacentVertex2Id: "BR" }
+				{
+					cornerVertexId: "L",
+					adjacentVertex1Id: "T",
+					adjacentVertex2Id: "H1"
+				},
+				{
+					cornerVertexId: "H1",
+					adjacentVertex1Id: "L",
+					adjacentVertex2Id: "BL"
+				},
+				{
+					cornerVertexId: "H2",
+					adjacentVertex1Id: "R",
+					adjacentVertex2Id: "BR"
+				}
 			]
 		})
 
@@ -591,11 +694,21 @@ describe("Widget: composite-shape-diagram", () => {
 			],
 			regionLabels: null,
 			boundaryEdges: [
-				{ to: "B", from: "A", type: "simple", label: { unit: "units", value: 9 } },
+				{
+					to: "B",
+					from: "A",
+					type: "simple",
+					label: { unit: "units", value: 9 }
+				},
 				{ to: "C", from: "B", type: "simple", label: null },
 				{ to: "apex", from: "C", type: "simple", label: null },
 				{ to: "D", from: "apex", type: "simple", label: null },
-				{ to: "A", from: "D", type: "simple", label: { unit: "units", value: 6 } }
+				{
+					to: "A",
+					from: "D",
+					type: "simple",
+					label: { unit: "units", value: 6 }
+				}
 			],
 			shadedRegions: null,
 			internalSegments: [
@@ -608,7 +721,11 @@ describe("Widget: composite-shape-diagram", () => {
 				}
 			],
 			rightAngleMarkers: [
-				{ cornerVertexId: "midBase", adjacentVertex1Id: "apex", adjacentVertex2Id: "D" }
+				{
+					cornerVertexId: "midBase",
+					adjacentVertex1Id: "apex",
+					adjacentVertex2Id: "D"
+				}
 			]
 		})
 
@@ -642,17 +759,42 @@ describe("Widget: composite-shape-diagram", () => {
 			],
 			regionLabels: null,
 			boundaryEdges: [
-				{ to: "B_topRight", from: "A_topLeft", type: "simple", label: { unit: "units", value: 9 } },
+				{
+					to: "B_topRight",
+					from: "A_topLeft",
+					type: "simple",
+					label: { unit: "units", value: 9 }
+				},
 				{
 					to: "C_rightCut",
 					from: "B_topRight",
 					type: "simple",
 					label: { unit: "units", value: 4 }
 				},
-				{ to: "D_bottomRightInner", from: "C_rightCut", type: "simple", label: null },
-				{ to: "E_bottomLeftInner", from: "D_bottomRightInner", type: "simple", label: null },
-				{ to: "F_leftCut", from: "E_bottomLeftInner", type: "simple", label: null },
-				{ to: "A_topLeft", from: "F_leftCut", type: "simple", label: { unit: "units", value: 5 } }
+				{
+					to: "D_bottomRightInner",
+					from: "C_rightCut",
+					type: "simple",
+					label: null
+				},
+				{
+					to: "E_bottomLeftInner",
+					from: "D_bottomRightInner",
+					type: "simple",
+					label: null
+				},
+				{
+					to: "F_leftCut",
+					from: "E_bottomLeftInner",
+					type: "simple",
+					label: null
+				},
+				{
+					to: "A_topLeft",
+					from: "F_leftCut",
+					type: "simple",
+					label: { unit: "units", value: 5 }
+				}
 			],
 			shadedRegions: null,
 			internalSegments: [

@@ -1,22 +1,24 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
 import {
 	createAxisOptionsSchema,
 	createLineSchema,
 	createPlotPointSchema,
 	renderLines,
 	renderPoints
-} from "../utils/canvas-utils"
-import { AXIS_VIEWBOX_PADDING } from "../utils/constants"
-import { setupCoordinatePlaneV2 } from "../utils/coordinate-plane-v2"
-import { CSS_COLOR_PATTERN } from "../utils/css-color"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { theme } from "../utils/theme"
+} from "@/widgets/utils/canvas-utils"
+import { AXIS_VIEWBOX_PADDING } from "@/widgets/utils/constants"
+import { setupCoordinatePlaneV2 } from "@/widgets/utils/coordinate-plane-v2"
+import { CSS_COLOR_PATTERN } from "@/widgets/utils/css-color"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
 
-export const ErrInvalidPolygon = errors.new("polygon must have at least 3 vertices")
+export const ErrInvalidPolygon = errors.new(
+	"polygon must have at least 3 vertices"
+)
 
 const createVertexSchema = () =>
 	z
@@ -57,7 +59,9 @@ const createPolygonObjectSchema = () =>
 			label: z
 				.string()
 				.nullable()
-				.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
+				.transform((val) =>
+					val === "null" || val === "NULL" || val === "" ? null : val
+				)
 				.describe(
 					"Text label for the shape (e.g., 'A', 'Original', 'Pre-image', null). Null means no label. Positioned at shape's centroid."
 				)
@@ -72,7 +76,9 @@ const createTransformationRuleSchema = () =>
 			.object({
 				type: z
 					.literal("translation")
-					.describe("Slide transformation moving all points by a fixed vector."),
+					.describe(
+						"Slide transformation moving all points by a fixed vector."
+					),
 				vector: z
 					.object({
 						x: z
@@ -92,7 +98,9 @@ const createTransformationRuleSchema = () =>
 			.strict(),
 		z
 			.object({
-				type: z.literal("reflection").describe("Flip transformation across an axis."),
+				type: z
+					.literal("reflection")
+					.describe("Flip transformation across an axis."),
 				axis: z
 					.enum(["x", "y"])
 					.describe(
@@ -102,7 +110,9 @@ const createTransformationRuleSchema = () =>
 			.strict(),
 		z
 			.object({
-				type: z.literal("rotation").describe("Turn transformation around a fixed point."),
+				type: z
+					.literal("rotation")
+					.describe("Turn transformation around a fixed point."),
 				center: createVertexSchema().describe(
 					"The center point of rotation. Shape rotates around this point, which remains fixed."
 				),
@@ -115,7 +125,9 @@ const createTransformationRuleSchema = () =>
 			.strict(),
 		z
 			.object({
-				type: z.literal("dilation").describe("Scaling transformation from a center point."),
+				type: z
+					.literal("dilation")
+					.describe("Scaling transformation from a center point."),
 				center: createVertexSchema().describe(
 					"The center of dilation. Points move toward (scale < 1) or away from (scale > 1) this point."
 				),
@@ -173,7 +185,9 @@ export const ShapeTransformationGraphPropsSchema = z
 		"Displays geometric transformations on a coordinate plane, showing both the original shape (pre-image) and the transformed shape (image). Supports translations, reflections, rotations, and dilations. Essential for teaching transformation geometry, symmetry, and coordinate geometry concepts."
 	)
 
-export type ShapeTransformationGraphProps = z.infer<typeof ShapeTransformationGraphPropsSchema>
+export type ShapeTransformationGraphProps = z.infer<
+	typeof ShapeTransformationGraphPropsSchema
+>
 
 export const generateShapeTransformationGraph: WidgetGenerator<
 	typeof ShapeTransformationGraphPropsSchema
@@ -269,8 +283,14 @@ export const generateShapeTransformationGraph: WidgetGenerator<
 					const translatedX = v.x - center.x
 					const translatedY = v.y - center.y
 					return {
-						x: translatedX * Math.cos(angleRad) - translatedY * Math.sin(angleRad) + center.x,
-						y: translatedX * Math.sin(angleRad) + translatedY * Math.cos(angleRad) + center.y
+						x:
+							translatedX * Math.cos(angleRad) -
+							translatedY * Math.sin(angleRad) +
+							center.x,
+						y:
+							translatedX * Math.sin(angleRad) +
+							translatedY * Math.cos(angleRad) +
+							center.y
 					}
 				})
 				break
@@ -301,7 +321,10 @@ export const generateShapeTransformationGraph: WidgetGenerator<
 	})
 
 	// 5. Add visual aids like center of rotation/dilation
-	if (transformation.type === "rotation" || transformation.type === "dilation") {
+	if (
+		transformation.type === "rotation" ||
+		transformation.type === "dilation"
+	) {
 		const c = transformation.center
 		const cx = baseInfo.toSvgX(c.x)
 		const cy = baseInfo.toSvgY(c.y)

@@ -1,6 +1,6 @@
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { theme } from "@/widgets/utils/theme"
 
 // Factory function to create addition with regrouping schema - avoids $ref in OpenAI JSON schema
 function createAdditionWithRegroupingPropsSchema() {
@@ -36,7 +36,14 @@ function createAdditionWithRegroupingPropsSchema() {
 					"Whether to show the sum/result. When true, displays the answer below the line. When false, shows only the problem setup. Works independently from showCarrying."
 				),
 			revealUpTo: z
-				.enum(["ones", "tens", "hundreds", "thousands", "ten-thousands", "complete"])
+				.enum([
+					"ones",
+					"tens",
+					"hundreds",
+					"thousands",
+					"ten-thousands",
+					"complete"
+				])
 				.describe(
 					"Controls progressive reveal of the answer digits. 'ones' reveals only ones digit, 'tens' reveals ones and tens, etc. 'complete' shows all answer digits. This field is ignored when showAnswer is false. Common patterns: use 'complete' for full answer, use 'ones' or 'tens' for step-by-step teaching."
 				)
@@ -48,9 +55,12 @@ function createAdditionWithRegroupingPropsSchema() {
 }
 
 // Export the schema created by the factory function
-export const AdditionWithRegroupingPropsSchema = createAdditionWithRegroupingPropsSchema()
+export const AdditionWithRegroupingPropsSchema =
+	createAdditionWithRegroupingPropsSchema()
 
-export type AdditionWithRegroupingProps = z.infer<typeof AdditionWithRegroupingPropsSchema>
+export type AdditionWithRegroupingProps = z.infer<
+	typeof AdditionWithRegroupingPropsSchema
+>
 
 /**
  * Performs addition with regrouping and returns the steps
@@ -118,10 +128,23 @@ function performAdditionWithRegrouping(addend1: number, addend2: number) {
 export const generateAdditionWithRegrouping: WidgetGenerator<
 	typeof AdditionWithRegroupingPropsSchema
 > = async (data) => {
-	const { addend1, addend2, showCarrying, showAnswer, revealUpTo = "complete" } = data
+	const {
+		addend1,
+		addend2,
+		showCarrying,
+		showAnswer,
+		revealUpTo = "complete"
+	} = data
 
 	const result = performAdditionWithRegrouping(addend1, addend2)
-	const { addend1Digits, addend2Digits, sumDigits, carried, maxLength, hasFinalCarry } = result
+	const {
+		addend1Digits,
+		addend2Digits,
+		sumDigits,
+		carried,
+		maxLength,
+		hasFinalCarry
+	} = result
 
 	// Determine which columns to reveal based on revealUpTo
 	let columnsToReveal = maxLength // Default to all columns
@@ -133,7 +156,10 @@ export const generateAdditionWithRegrouping: WidgetGenerator<
 			thousands: 4,
 			"ten-thousands": 5
 		}
-		columnsToReveal = Math.min(placeValueMap[revealUpTo] ?? maxLength, maxLength)
+		columnsToReveal = Math.min(
+			placeValueMap[revealUpTo] ?? maxLength,
+			maxLength
+		)
 	}
 
 	let html = `<div style="display: inline-block; font-family: ${theme.font.family.mono}; font-size: 1.4em; text-align: right;">`
@@ -183,7 +209,8 @@ export const generateAdditionWithRegrouping: WidgetGenerator<
 		const digit = addend1Digits[index]
 		// Don't show leading zeros for the first addend
 		const isLeadingZero =
-			index < addend1Digits.length - 1 && addend1Digits.slice(0, index + 1).every((d) => d === 0)
+			index < addend1Digits.length - 1 &&
+			addend1Digits.slice(0, index + 1).every((d) => d === 0)
 		html += `<td style="padding: 2px 8px;">${isLeadingZero ? "" : String(digit)}</td>`
 	}
 	html += "</tr>"
@@ -201,7 +228,8 @@ export const generateAdditionWithRegrouping: WidgetGenerator<
 		const digit = addend2Digits[index]
 		// Don't show leading zeros for the second addend
 		const isLeadingZero =
-			index < addend2Digits.length - 1 && addend2Digits.slice(0, index + 1).every((d) => d === 0)
+			index < addend2Digits.length - 1 &&
+			addend2Digits.slice(0, index + 1).every((d) => d === 0)
 		html += `<td style="padding: 2px 8px; border-bottom: 2px solid ${theme.colors.black};">${isLeadingZero ? "" : String(digit)}</td>`
 	}
 	html += "</tr>"
@@ -215,10 +243,12 @@ export const generateAdditionWithRegrouping: WidgetGenerator<
 			const digit = sumDigits[index]
 			// Calculate position from right (1 = ones, 2 = tens, etc.)
 			const columnPosition = sumDigits.length - index
-			const shouldReveal = revealUpTo === "complete" || columnPosition <= columnsToReveal
+			const shouldReveal =
+				revealUpTo === "complete" || columnPosition <= columnsToReveal
 
 			if (shouldReveal) {
-				html += '<td style="padding: 2px 8px; color: #4472c4; font-weight: bold;">'
+				html +=
+					'<td style="padding: 2px 8px; color: #4472c4; font-weight: bold;">'
 				html += String(digit)
 				html += "</td>"
 			} else {

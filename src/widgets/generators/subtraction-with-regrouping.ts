@@ -1,8 +1,8 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { theme } from "@/widgets/utils/theme"
 
 // Factory function to create subtraction with regrouping schema - avoids $ref in OpenAI JSON schema
 function createSubtractionWithRegroupingPropsSchema() {
@@ -36,7 +36,14 @@ function createSubtractionWithRegroupingPropsSchema() {
 					"Whether to show the difference/result. When true, displays the answer below the line. When false, shows only the problem setup. Works independently from showRegrouping."
 				),
 			revealUpTo: z
-				.enum(["ones", "tens", "hundreds", "thousands", "ten-thousands", "complete"])
+				.enum([
+					"ones",
+					"tens",
+					"hundreds",
+					"thousands",
+					"ten-thousands",
+					"complete"
+				])
 				.describe(
 					"Controls progressive reveal of the answer digits. 'ones' reveals only ones digit, 'tens' reveals ones and tens, etc. 'complete' shows all answer digits. This field is ignored when showAnswer is false. Common patterns: use 'complete' for full answer, use 'ones' or 'tens' for step-by-step teaching."
 				)
@@ -48,9 +55,12 @@ function createSubtractionWithRegroupingPropsSchema() {
 }
 
 // Export the factory function call directly to avoid $ref generation
-export const SubtractionWithRegroupingPropsSchema = createSubtractionWithRegroupingPropsSchema()
+export const SubtractionWithRegroupingPropsSchema =
+	createSubtractionWithRegroupingPropsSchema()
 
-export type SubtractionWithRegroupingProps = z.infer<typeof SubtractionWithRegroupingPropsSchema>
+export type SubtractionWithRegroupingProps = z.infer<
+	typeof SubtractionWithRegroupingPropsSchema
+>
 
 /**
  * Performs subtraction with regrouping and returns the steps
@@ -76,7 +86,11 @@ function performSubtractionWithRegrouping(minuend: number, subtrahend: number) {
 		const topDigit = regroupedMinuend[i]
 		const bottomDigit = subtrahendDigits[i]
 
-		if (topDigit !== undefined && bottomDigit !== undefined && topDigit < bottomDigit) {
+		if (
+			topDigit !== undefined &&
+			bottomDigit !== undefined &&
+			topDigit < bottomDigit
+		) {
 			// Need to borrow from the left
 			let borrowFrom = i - 1
 			while (borrowFrom >= 0 && regroupedMinuend[borrowFrom] === 0) {
@@ -113,16 +127,29 @@ function performSubtractionWithRegrouping(minuend: number, subtrahend: number) {
 export const generateSubtractionWithRegrouping: WidgetGenerator<
 	typeof SubtractionWithRegroupingPropsSchema
 > = async (data) => {
-	const { minuend, subtrahend, showRegrouping, showAnswer, revealUpTo = "complete" } = data
+	const {
+		minuend,
+		subtrahend,
+		showRegrouping,
+		showAnswer,
+		revealUpTo = "complete"
+	} = data
 
 	// Validate that minuend > subtrahend
 	if (minuend <= subtrahend) {
 		logger.error("invalid subtraction parameters", { minuend, subtrahend })
-		throw errors.new("minuend must be greater than subtrahend for valid subtraction")
+		throw errors.new(
+			"minuend must be greater than subtrahend for valid subtraction"
+		)
 	}
 
 	const result = performSubtractionWithRegrouping(minuend, subtrahend)
-	const { minuendDigits, subtrahendDigits, differenceDigits, regroupedMinuend } = result
+	const {
+		minuendDigits,
+		subtrahendDigits,
+		differenceDigits,
+		regroupedMinuend
+	} = result
 
 	// Determine which columns to reveal based on revealUpTo
 	const maxLength = minuendDigits.length
@@ -135,7 +162,10 @@ export const generateSubtractionWithRegrouping: WidgetGenerator<
 			thousands: 4,
 			"ten-thousands": 5
 		}
-		columnsToReveal = Math.min(placeValueMap[revealUpTo] ?? maxLength, maxLength)
+		columnsToReveal = Math.min(
+			placeValueMap[revealUpTo] ?? maxLength,
+			maxLength
+		)
 	}
 
 	let html = `<div style="display: inline-block; font-family: ${theme.font.family.mono}; font-size: 1.4em; text-align: right;">`
@@ -157,7 +187,10 @@ export const generateSubtractionWithRegrouping: WidgetGenerator<
 				html += '<td style="padding: 0 8px; position: relative;">'
 				html +=
 					'<div style="position: absolute; top: -18px; left: 0; right: 0; text-align: center; font-size: 0.7em; color: #1E90FF;">'
-				html += regroupedValue < 10 ? String(regroupedValue) : `1${regroupedValue % 10}`
+				html +=
+					regroupedValue < 10
+						? String(regroupedValue)
+						: `1${regroupedValue % 10}`
 				html += "</div>"
 				html += "</td>"
 			} else {
@@ -175,7 +208,11 @@ export const generateSubtractionWithRegrouping: WidgetGenerator<
 		const regroupedValue = regroupedMinuend[index]
 
 		// Cross out any digit that changed (gave or received a borrow)
-		if (showRegrouping && regroupedValue !== undefined && regroupedValue !== digit) {
+		if (
+			showRegrouping &&
+			regroupedValue !== undefined &&
+			regroupedValue !== digit
+		) {
 			// Show crossed out original digit
 			html += '<td style="padding: 2px 8px; position: relative;">'
 			html += `<span style="text-decoration: line-through; text-decoration-color: #FF6B6B; text-decoration-thickness: 2px;">${digit}</span>`
@@ -201,13 +238,15 @@ export const generateSubtractionWithRegrouping: WidgetGenerator<
 		for (let index = 0; index < differenceDigits.length; index++) {
 			const digit = differenceDigits[index]
 			const columnPosition = maxLength - index // Column position from right (1-based)
-			const shouldReveal = revealUpTo === "complete" || columnPosition <= columnsToReveal
+			const shouldReveal =
+				revealUpTo === "complete" || columnPosition <= columnsToReveal
 
 			// Don't show leading zeros
 			const isLeadingZero =
 				index < differenceDigits.length - 1 &&
 				differenceDigits.slice(0, index + 1).every((d) => d === 0)
-			html += '<td style="padding: 2px 8px; color: #4472c4; font-weight: bold;">'
+			html +=
+				'<td style="padding: 2px 8px; color: #4472c4; font-weight: bold;">'
 			html += shouldReveal && !isLeadingZero ? String(digit) : ""
 			html += "</td>"
 		}

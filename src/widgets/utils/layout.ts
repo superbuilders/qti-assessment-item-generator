@@ -1,8 +1,8 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import { LABEL_AVG_CHAR_WIDTH_PX } from "../utils/constants"
-import { estimateWrappedTextDimensions } from "../utils/text"
-import type { Path2D } from "./path-builder"
+import { LABEL_AVG_CHAR_WIDTH_PX } from "@/widgets/utils/constants"
+import type { Path2D } from "@/widgets/utils/path-builder"
+import { estimateWrappedTextDimensions } from "@/widgets/utils/text"
 
 // NEW: 2D extents and finalized SVG types
 export type Extents2D = {
@@ -47,7 +47,16 @@ export interface Canvas {
 		anchor?: "start" | "middle" | "end"
 		dominantBaseline?: "hanging" | "middle" | "baseline"
 		fontPx?: number
-		fontWeight?: "100" | "200" | "300" | "400" | "500" | "600" | "700" | "800" | "900"
+		fontWeight?:
+			| "100"
+			| "200"
+			| "300"
+			| "400"
+			| "500"
+			| "600"
+			| "700"
+			| "800"
+			| "900"
 		paintOrder?: "stroke fill"
 		stroke?: string
 		strokeWidth?: number | string
@@ -68,7 +77,16 @@ export interface Canvas {
 		anchor?: "start" | "middle" | "end"
 		fontPx?: number
 		lineHeight?: number
-		fontWeight?: "100" | "200" | "300" | "400" | "500" | "600" | "700" | "800" | "900"
+		fontWeight?:
+			| "100"
+			| "200"
+			| "300"
+			| "400"
+			| "500"
+			| "600"
+			| "700"
+			| "800"
+			| "900"
 		paintOrder?: "stroke fill"
 		stroke?: string
 		strokeWidth?: number | string
@@ -78,7 +96,13 @@ export interface Canvas {
 		fillOpacity?: number
 		transform?: string
 		rotate?: { angle: number; cx: number; cy: number }
-		dominantBaseline?: "auto" | "alphabetic" | "hanging" | "ideographic" | "mathematical" | "middle"
+		dominantBaseline?:
+			| "auto"
+			| "alphabetic"
+			| "hanging"
+			| "ideographic"
+			| "mathematical"
+			| "middle"
 	}): void
 
 	// Basic shapes
@@ -330,17 +354,23 @@ export function calculateYAxisLayoutAxisAware(
 		}
 	}
 
-	const spaceLeftOfAnchor = T + LP + maxTickLabelWidth + TP + wrappedTitleHeight / 2
+	const spaceLeftOfAnchor =
+		T + LP + maxTickLabelWidth + TP + wrappedTitleHeight / 2
 
 	const xRange = xAxis.max - xAxis.min
-	const f = opts.axisPlacement === "internalZero" && xRange > 0 ? (0 - xAxis.min) / xRange : 0
+	const f =
+		opts.axisPlacement === "internalZero" && xRange > 0
+			? (0 - xAxis.min) / xRange
+			: 0
 
 	let leftMargin: number
 	if (f >= 1) {
 		leftMargin = Math.ceil(spaceLeftOfAnchor)
 	} else {
 		const denom = 1 - f
-		leftMargin = Math.ceil((spaceLeftOfAnchor - f * (svgWidth - pads.right)) / denom)
+		leftMargin = Math.ceil(
+			(spaceLeftOfAnchor - f * (svgWidth - pads.right)) / denom
+		)
 	}
 
 	if (!Number.isFinite(leftMargin) || leftMargin < 0) {
@@ -349,7 +379,8 @@ export function calculateYAxisLayoutAxisAware(
 
 	const chartWidth = svgWidth - leftMargin - pads.right
 	const anchorX = leftMargin + f * chartWidth
-	const yAxisLabelX = anchorX - (T + LP + maxTickLabelWidth + TP + wrappedTitleHeight / 2)
+	const yAxisLabelX =
+		anchorX - (T + LP + maxTickLabelWidth + TP + wrappedTitleHeight / 2)
 
 	return { leftMargin, yAxisLabelX, anchorX }
 }
@@ -369,7 +400,8 @@ export function calculateXAxisLayout(
 	const TITLE_HEIGHT = 16 // Height of axis title text
 
 	if (hasTickLabels) {
-		const bottomMargin = TICK_LENGTH + TICK_LABEL_HEIGHT + titlePadding + TITLE_HEIGHT
+		const bottomMargin =
+			TICK_LENGTH + TICK_LABEL_HEIGHT + titlePadding + TITLE_HEIGHT
 		const xAxisTitleY = TICK_LENGTH + TICK_LABEL_HEIGHT + titlePadding
 		return { bottomMargin, xAxisTitleY }
 	}
@@ -407,7 +439,11 @@ export function calculateRightYAxisLayout(
 	let maxLabelWidth = 0
 
 	// Determine the longest tick label string
-	for (let t = yAxisRight.min; t <= yAxisRight.max; t += yAxisRight.tickInterval) {
+	for (
+		let t = yAxisRight.min;
+		t <= yAxisRight.max;
+		t += yAxisRight.tickInterval
+	) {
 		const label = String(t)
 		const estimatedWidth = label.length * AVG_CHAR_WIDTH_PX
 		if (estimatedWidth > maxLabelWidth) {
@@ -415,9 +451,18 @@ export function calculateRightYAxisLayout(
 		}
 	}
 
-	const rightMargin = TICK_LENGTH + LABEL_PADDING + maxLabelWidth + titlePadding + AXIS_TITLE_HEIGHT
+	const rightMargin =
+		TICK_LENGTH +
+		LABEL_PADDING +
+		maxLabelWidth +
+		titlePadding +
+		AXIS_TITLE_HEIGHT
 	const rightYAxisLabelX =
-		TICK_LENGTH + LABEL_PADDING + maxLabelWidth + titlePadding + AXIS_TITLE_HEIGHT / 2
+		TICK_LENGTH +
+		LABEL_PADDING +
+		maxLabelWidth +
+		titlePadding +
+		AXIS_TITLE_HEIGHT / 2
 
 	return { rightMargin, rightYAxisLabelX }
 }
@@ -454,7 +499,11 @@ export function calculateHorizontalBarChartYAxisLayout(
  * Estimates how many lines a title will wrap to based on available width.
  * Accounts for the wrapping logic in renderWrappedText.
  */
-function estimateTitleLines(title: string, maxWidthPx: number, avgCharWidthPx = 8): number {
+function estimateTitleLines(
+	title: string,
+	maxWidthPx: number,
+	avgCharWidthPx = 8
+): number {
 	// Handle parenthetical splitting (from renderWrappedText logic)
 	const titlePattern = /^(.*)\s+(\(.+\))$/
 	const match = title.match(titlePattern)
@@ -506,16 +555,20 @@ export function calculateTitleLayout(
 	const titleBufferBottom = 15 // Minimum space between title and chart
 
 	// Estimate how many lines the title will actually wrap to
-	const estimatedLines = maxTitleWidth ? estimateTitleLines(title, maxTitleWidth) : 1
+	const estimatedLines = maxTitleWidth
+		? estimateTitleLines(title, maxTitleWidth)
+		: 1
 
 	// Calculate actual title height including line spacing
 	const estimatedTitleHeight = fontSize * estimatedLines * lineHeight
 
 	// Calculate required top margin: buffer + title height + buffer
-	const calculatedTopMargin = titleBufferTop + estimatedTitleHeight + titleBufferBottom
+	const calculatedTopMargin =
+		titleBufferTop + estimatedTitleHeight + titleBufferBottom
 
 	// Use custom margin if provided, otherwise ensure minimum spacing
-	const topMargin = customTopMargin || Math.max(65, Math.ceil(calculatedTopMargin))
+	const topMargin =
+		customTopMargin || Math.max(65, Math.ceil(calculatedTopMargin))
 
 	return {
 		titleY: titleBufferTop,
@@ -573,7 +626,8 @@ export function selectAxisLabels(inputs: {
 	minGapPx: number
 	avgCharWidthPx?: number
 }): Set<number> {
-	const { labels, positions, axisLengthPx, orientation, fontPx, minGapPx } = inputs
+	const { labels, positions, axisLengthPx, orientation, fontPx, minGapPx } =
+		inputs
 	const avgCharWidthPx = inputs.avgCharWidthPx ?? LABEL_AVG_CHAR_WIDTH_PX
 
 	if (labels.length !== positions.length) {
@@ -601,7 +655,8 @@ export function selectAxisLabels(inputs: {
 	}
 
 	const avgSize =
-		nonEmptyIndices.reduce((sum, i) => sum + (sizesPx[i] ?? 0), 0) / nonEmptyIndices.length
+		nonEmptyIndices.reduce((sum, i) => sum + (sizesPx[i] ?? 0), 0) /
+		nonEmptyIndices.length
 
 	const maxLabelsThatCanFit = Math.floor(axisLengthPx / (avgSize + minGapPx))
 

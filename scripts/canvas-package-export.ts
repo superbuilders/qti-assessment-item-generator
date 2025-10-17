@@ -20,7 +20,9 @@ logger.info("canvas package export started with debug logging enabled")
 const BASE_DIR_ARG = process.argv[2]
 if (!BASE_DIR_ARG) {
 	logger.error("base data directory not provided")
-	throw errors.new("base data directory must be provided as first argument (e.g., 'data')")
+	throw errors.new(
+		"base data directory must be provided as first argument (e.g., 'data')"
+	)
 }
 const DATA_DIR = path.resolve(process.cwd(), BASE_DIR_ARG)
 const OUT_CARTRIDGE = path.resolve(DATA_DIR, "course-cartridge-v1.tar.zst")
@@ -29,11 +31,19 @@ const EXCLUDED_GROUPS = new Set([
 	"final-exam",
 	"course-completion--requesting-a-transcript"
 ])
-async function collectCourseInfo(): Promise<{ title: string; subject: string }> {
+async function collectCourseInfo(): Promise<{
+	title: string
+	subject: string
+}> {
 	const scrapeRoot = path.resolve(process.cwd(), "canvas-scrape")
-	const direntsResult = await errors.try(fs.readdir(scrapeRoot, { withFileTypes: true }))
+	const direntsResult = await errors.try(
+		fs.readdir(scrapeRoot, { withFileTypes: true })
+	)
 	if (direntsResult.error) {
-		logger.error("canvas-scrape directory read", { dir: scrapeRoot, error: direntsResult.error })
+		logger.error("canvas-scrape directory read", {
+			dir: scrapeRoot,
+			error: direntsResult.error
+		})
 		throw errors.wrap(direntsResult.error, "directory read")
 	}
 	const candidates = direntsResult.data
@@ -71,9 +81,14 @@ async function collectPrettyMaps(courseTitle: string): Promise<{
 	const unitTitleBySlug: Record<string, string> = {}
 	const lessonTitleByGroupAndSlug: Record<string, Record<string, string>> = {}
 
-	const unitsDirents = await errors.try(fs.readdir(root, { withFileTypes: true }))
+	const unitsDirents = await errors.try(
+		fs.readdir(root, { withFileTypes: true })
+	)
 	if (unitsDirents.error) {
-		logger.error("canvas course directory read", { dir: root, error: unitsDirents.error })
+		logger.error("canvas course directory read", {
+			dir: root,
+			error: unitsDirents.error
+		})
 		throw errors.wrap(unitsDirents.error, "directory read")
 	}
 	for (const u of unitsDirents.data) {
@@ -82,7 +97,9 @@ async function collectPrettyMaps(courseTitle: string): Promise<{
 		const unitSlug = slugifyName(unitPretty)
 		unitTitleBySlug[unitSlug] = unitPretty
 		const unitPath = path.join(root, unitPretty)
-		const pagesDirents = await errors.try(fs.readdir(unitPath, { withFileTypes: true }))
+		const pagesDirents = await errors.try(
+			fs.readdir(unitPath, { withFileTypes: true })
+		)
 		if (pagesDirents.error) continue
 		for (const p of pagesDirents.data) {
 			if (!p.isDirectory()) continue
@@ -92,7 +109,9 @@ async function collectPrettyMaps(courseTitle: string): Promise<{
 			const metaRead = await errors.try(fs.readFile(metaPath, "utf8"))
 			let pageTitle = pagePretty
 			if (!metaRead.error) {
-				const metaParse = errors.trySync<unknown>(() => JSON.parse(metaRead.data))
+				const metaParse = errors.trySync<unknown>(() =>
+					JSON.parse(metaRead.data)
+				)
 				if (!metaParse.error && hasOptionalTitle(metaParse.data)) {
 					const maybeTitle = metaParse.data.title
 					if (typeof maybeTitle === "string" && maybeTitle.trim().length > 0) {
@@ -100,7 +119,8 @@ async function collectPrettyMaps(courseTitle: string): Promise<{
 					}
 				}
 			}
-			if (!lessonTitleByGroupAndSlug[unitSlug]) lessonTitleByGroupAndSlug[unitSlug] = {}
+			if (!lessonTitleByGroupAndSlug[unitSlug])
+				lessonTitleByGroupAndSlug[unitSlug] = {}
 			lessonTitleByGroupAndSlug[unitSlug][pageSlug] = pageTitle
 		}
 	}
@@ -183,7 +203,10 @@ async function collectStimulus(): Promise<
 	const stimulusRoot = path.join(DATA_DIR, "stimulus-out")
 	const statResult = await errors.try(fs.stat(stimulusRoot))
 	if (statResult.error || !statResult.data.isDirectory()) {
-		logger.error("stimulus-out directory missing", { dir: stimulusRoot, error: statResult.error })
+		logger.error("stimulus-out directory missing", {
+			dir: stimulusRoot,
+			error: statResult.error
+		})
 		throw errors.new("stimulus-out directory missing")
 	}
 
@@ -191,7 +214,9 @@ async function collectStimulus(): Promise<
 		group: string
 		pages: Array<{ slug: string; path: string; diskPath: string }>
 	}> = []
-	const groupDirentsResult = await errors.try(fs.readdir(stimulusRoot, { withFileTypes: true }))
+	const groupDirentsResult = await errors.try(
+		fs.readdir(stimulusRoot, { withFileTypes: true })
+	)
 	if (groupDirentsResult.error) {
 		logger.error("stimulus-out directory read", {
 			dir: stimulusRoot,
@@ -207,9 +232,14 @@ async function collectStimulus(): Promise<
 
 	for (const groupDir of groupDirs) {
 		const pages: Array<{ slug: string; path: string; diskPath: string }> = []
-		const pageDirentsResult = await errors.try(fs.readdir(groupDir, { withFileTypes: true }))
+		const pageDirentsResult = await errors.try(
+			fs.readdir(groupDir, { withFileTypes: true })
+		)
 		if (pageDirentsResult.error) {
-			logger.error("group directory read", { dir: groupDir, error: pageDirentsResult.error })
+			logger.error("group directory read", {
+				dir: groupDir,
+				error: pageDirentsResult.error
+			})
 			throw errors.wrap(pageDirentsResult.error, "directory read")
 		}
 		const pageDirs = pageDirentsResult.data
@@ -224,7 +254,10 @@ async function collectStimulus(): Promise<
 				continue
 			}
 			const relativePath = path.relative(stimulusRoot, htmlPath)
-			const cartridgePath = path.join("content", relativePath).split(path.sep).join("/")
+			const cartridgePath = path
+				.join("content", relativePath)
+				.split(path.sep)
+				.join("/")
 			pages.push({
 				slug: path.basename(pageDir),
 				path: cartridgePath,
@@ -247,9 +280,14 @@ async function collectAssessments(): Promise<{
 	quizzes: Array<z.infer<typeof IndexAssessmentSchema>>
 	tests: Array<z.infer<typeof IndexAssessmentSchema>>
 }> {
-	const direntsResult = await errors.try(fs.readdir(DATA_DIR, { withFileTypes: true }))
+	const direntsResult = await errors.try(
+		fs.readdir(DATA_DIR, { withFileTypes: true })
+	)
 	if (direntsResult.error) {
-		logger.error("failed to read data directory", { dir: DATA_DIR, error: direntsResult.error })
+		logger.error("failed to read data directory", {
+			dir: DATA_DIR,
+			error: direntsResult.error
+		})
 		throw errors.wrap(direntsResult.error, "data directory read")
 	}
 	const entries = direntsResult.data
@@ -260,12 +298,18 @@ async function collectAssessments(): Promise<{
 		if (!de.isDirectory()) continue
 		const name = de.name
 		if (/^quiz-\d+-\d+$/.test(name)) {
-			const a = await buildAssessment(path.join(DATA_DIR, name), path.join("quizzes", name))
+			const a = await buildAssessment(
+				path.join(DATA_DIR, name),
+				path.join("quizzes", name)
+			)
 			quizzes.push(a)
 			continue
 		}
 		if (/^unit-\d+-test$/.test(name)) {
-			const a = await buildAssessment(path.join(DATA_DIR, name), path.join("tests", name))
+			const a = await buildAssessment(
+				path.join(DATA_DIR, name),
+				path.join("tests", name)
+			)
 			tests.push(a)
 		}
 	}
@@ -302,9 +346,14 @@ async function buildAssessment(
 ): Promise<z.infer<typeof IndexAssessmentSchema>> {
 	const id = path.basename(sourceDir)
 	const questions: Array<z.infer<typeof IndexQuestionSchema>> = []
-	const direntsResult = await errors.try(fs.readdir(sourceDir, { withFileTypes: true }))
+	const direntsResult = await errors.try(
+		fs.readdir(sourceDir, { withFileTypes: true })
+	)
 	if (direntsResult.error) {
-		logger.error("assessment directory read", { dir: sourceDir, error: direntsResult.error })
+		logger.error("assessment directory read", {
+			dir: sourceDir,
+			error: direntsResult.error
+		})
 		throw errors.wrap(direntsResult.error, "directory read")
 	}
 	const files = direntsResult.data.filter((d) => d.isFile()).map((d) => d.name)
@@ -343,7 +392,12 @@ async function buildAssessment(
 // Hierarchical Index Construction (Units → Lessons → Resources)
 // ----------------------
 
-type ArticleResource = { id: string; title: string; type: "article"; path: string }
+type ArticleResource = {
+	id: string
+	title: string
+	type: "article"
+	path: string
+}
 type QuizResource = {
 	id: string
 	title: string
@@ -384,18 +438,27 @@ function toUnitIdFromGroup(group: string): { unitId: string; unitNum: number } {
 	throw errors.new("invalid unit group name; expected unit-<n>")
 }
 
-function toLessonId(unitNum: number, slug: string): { lessonId: string; lessonNumber: number } {
+function toLessonId(
+	unitNum: number,
+	slug: string
+): { lessonId: string; lessonNumber: number } {
 	const nums = numericTokens(slug)
 	if (nums.length >= 2 && nums[0] === unitNum) {
 		const lessonNum = nums[1]
-		return { lessonId: `lesson-${unitNum}-${lessonNum}`, lessonNumber: lessonNum }
+		return {
+			lessonId: `lesson-${unitNum}-${lessonNum}`,
+			lessonNumber: lessonNum
+		}
 	}
 	// Handle non-numbered study guides deterministically: place before lesson 1 as 0
 	const sg = slug.match(/^unit-(\d+)-study-guide$/)
 	if (sg && Number(sg[1]) === unitNum) {
 		return { lessonId: `lesson-${unitNum}-0`, lessonNumber: 0 }
 	}
-	logger.error("page slug does not encode unit and lesson numbers", { unitNum, slug })
+	logger.error("page slug does not encode unit and lesson numbers", {
+		unitNum,
+		slug
+	})
 	throw errors.new("invalid lesson slug; expected <unit>-<lesson> prefix")
 }
 
@@ -425,19 +488,34 @@ function buildHierarchy(
 				logger.error("missing pretty unit title", { groupSlug: g.group })
 				throw errors.new("missing pretty unit title")
 			}
-			unit = { unitId, unitNumber: unitNum, title: prettyUnitTitle, lessons: [] }
+			unit = {
+				unitId,
+				unitNumber: unitNum,
+				title: prettyUnitTitle,
+				lessons: []
+			}
 			unitsMap.set(unitId, unit)
 		}
 		for (const p of g.pages) {
 			const { lessonId, lessonNumber } = toLessonId(unitNum, p.slug)
-			const prettyLessonTitle = pretty.lessonTitleByGroupAndSlug[g.group]?.[p.slug]
+			const prettyLessonTitle =
+				pretty.lessonTitleByGroupAndSlug[g.group]?.[p.slug]
 			if (!prettyLessonTitle) {
-				logger.error("missing pretty lesson title", { groupSlug: g.group, pageSlug: p.slug })
+				logger.error("missing pretty lesson title", {
+					groupSlug: g.group,
+					pageSlug: p.slug
+				})
 				throw errors.new("missing pretty lesson title")
 			}
 			let lesson = unit.lessons.find((l) => l.lessonId === lessonId)
 			if (!lesson) {
-				lesson = { unitId, lessonId, lessonNumber, title: prettyLessonTitle, resources: [] }
+				lesson = {
+					unitId,
+					lessonId,
+					lessonNumber,
+					title: prettyLessonTitle,
+					resources: []
+				}
 				unit.lessons.push(lesson)
 			}
 			lesson.resources.push({
@@ -459,15 +537,24 @@ function buildHierarchy(
 		const unitSlugKey = Object.keys(pretty.unitTitleBySlug).find((k) =>
 			k.startsWith(`unit-${unitNum}`)
 		)
-		const prettyUnitTitle = unitSlugKey ? pretty.unitTitleBySlug[unitSlugKey] : undefined
-		const lessonMap = unitSlugKey ? pretty.lessonTitleByGroupAndSlug[unitSlugKey] : undefined
+		const prettyUnitTitle = unitSlugKey
+			? pretty.unitTitleBySlug[unitSlugKey]
+			: undefined
+		const lessonMap = unitSlugKey
+			? pretty.lessonTitleByGroupAndSlug[unitSlugKey]
+			: undefined
 		let unit = unitsMap.get(unitId)
 		if (!unit) {
 			if (!prettyUnitTitle) {
 				logger.error("missing pretty unit title for injected unit", { unitNum })
 				throw errors.new("missing pretty unit title")
 			}
-			unit = { unitId, unitNumber: unitNum, title: prettyUnitTitle, lessons: [] }
+			unit = {
+				unitId,
+				unitNumber: unitNum,
+				title: prettyUnitTitle,
+				lessons: []
+			}
 			unitsMap.set(unitId, unit)
 		}
 		let lesson = unit.lessons.find((l) => l.lessonNumber === lessonNum)
@@ -478,7 +565,10 @@ function buildHierarchy(
 				: undefined
 			const prettyLessonTitle = pageKey ? lessonMap?.[pageKey] : undefined
 			if (!prettyLessonTitle) {
-				logger.error("missing pretty lesson title for injected lesson", { unitNum, lessonNum })
+				logger.error("missing pretty lesson title for injected lesson", {
+					unitNum,
+					lessonNum
+				})
 				throw errors.new("missing pretty lesson title")
 			}
 			lesson = {
@@ -492,7 +582,11 @@ function buildHierarchy(
 		}
 		const quizTitle = lessonMap?.[q.id]
 		if (!quizTitle) {
-			logger.error("missing pretty quiz title", { unitNum, lessonNum, quizId: q.id })
+			logger.error("missing pretty quiz title", {
+				unitNum,
+				lessonNum,
+				quizId: q.id
+			})
 			throw errors.new("missing pretty quiz title")
 		}
 		lesson.resources.push({
@@ -514,17 +608,26 @@ function buildHierarchy(
 		const unitSlugKey = Object.keys(pretty.unitTitleBySlug).find((k) =>
 			k.startsWith(`unit-${unitNum}`)
 		)
-		const prettyUnitTitle = unitSlugKey ? pretty.unitTitleBySlug[unitSlugKey] : undefined
+		const prettyUnitTitle = unitSlugKey
+			? pretty.unitTitleBySlug[unitSlugKey]
+			: undefined
 		let unit = unitsMap.get(unitId)
 		if (!unit) {
 			if (!prettyUnitTitle) {
 				logger.error("missing pretty unit title for unit test", { unitNum })
 				throw errors.new("missing pretty unit title")
 			}
-			unit = { unitId, unitNumber: unitNum, title: prettyUnitTitle, lessons: [] }
+			unit = {
+				unitId,
+				unitNumber: unitNum,
+				title: prettyUnitTitle,
+				lessons: []
+			}
 			unitsMap.set(unitId, unit)
 		}
-		const lessonMap = unitSlugKey ? pretty.lessonTitleByGroupAndSlug[unitSlugKey] : undefined
+		const lessonMap = unitSlugKey
+			? pretty.lessonTitleByGroupAndSlug[unitSlugKey]
+			: undefined
 		const prettyTestTitle = lessonMap ? lessonMap[t.id] : undefined
 		if (!prettyTestTitle) {
 			logger.error("missing pretty unit test title", { unitNum, testId: t.id })
@@ -567,7 +670,10 @@ function buildHierarchy(
 async function main() {
 	const dataStat = await errors.try(fs.stat(DATA_DIR))
 	if (dataStat.error || !dataStat.data.isDirectory()) {
-		logger.error("data directory not found", { dir: DATA_DIR, error: dataStat.error })
+		logger.error("data directory not found", {
+			dir: DATA_DIR,
+			error: dataStat.error
+		})
 		throw errors.new("data directory not found")
 	}
 
@@ -628,23 +734,44 @@ async function main() {
 	}
 	for (const q of assessments.quizzes) {
 		for (const entry of q.questions) {
-			fileMap[entry.xml] = path.join(DATA_DIR, path.basename(q.path), path.basename(entry.xml))
-			fileMap[entry.json] = path.join(DATA_DIR, path.basename(q.path), path.basename(entry.json))
+			fileMap[entry.xml] = path.join(
+				DATA_DIR,
+				path.basename(q.path),
+				path.basename(entry.xml)
+			)
+			fileMap[entry.json] = path.join(
+				DATA_DIR,
+				path.basename(q.path),
+				path.basename(entry.json)
+			)
 		}
 	}
 	for (const t of assessments.tests) {
 		for (const entry of t.questions) {
-			fileMap[entry.xml] = path.join(DATA_DIR, path.basename(t.path), path.basename(entry.xml))
-			fileMap[entry.json] = path.join(DATA_DIR, path.basename(t.path), path.basename(entry.json))
+			fileMap[entry.xml] = path.join(
+				DATA_DIR,
+				path.basename(t.path),
+				path.basename(entry.xml)
+			)
+			fileMap[entry.json] = path.join(
+				DATA_DIR,
+				path.basename(t.path),
+				path.basename(entry.json)
+			)
 		}
 	}
 
-	logger.info("building zstd-compressed cartridge (tar.zst) via on-disk staging")
+	logger.info(
+		"building zstd-compressed cartridge (tar.zst) via on-disk staging"
+	)
 	await buildCartridgeFromFileMap(
 		{ generator, course, units: buildUnits, files: fileMap },
 		OUT_CARTRIDGE
 	)
-	logger.info("package export complete", { cartridge: OUT_CARTRIDGE, compression: "zstd" })
+	logger.info("package export complete", {
+		cartridge: OUT_CARTRIDGE,
+		compression: "zstd"
+	})
 }
 
 const result = await errors.try(main())

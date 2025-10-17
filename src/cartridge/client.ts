@@ -25,7 +25,10 @@ export async function readIndex(reader: CartridgeReader): Promise<IndexV1> {
 	return validated.data
 }
 
-export async function readUnit(reader: CartridgeReader, unitPath: string): Promise<Unit> {
+export async function readUnit(
+	reader: CartridgeReader,
+	unitPath: string
+): Promise<Unit> {
 	const res = await errors.try(reader.readText(unitPath))
 	if (res.error) {
 		logger.error("unit read", { path: unitPath, error: res.error })
@@ -39,7 +42,10 @@ export async function readUnit(reader: CartridgeReader, unitPath: string): Promi
 	return parseRes.data
 }
 
-export async function readLesson(reader: CartridgeReader, lessonPath: string): Promise<Lesson> {
+export async function readLesson(
+	reader: CartridgeReader,
+	lessonPath: string
+): Promise<Lesson> {
 	const res = await errors.try(reader.readText(lessonPath))
 	if (res.error) {
 		logger.error("lesson read", { path: lessonPath, error: res.error })
@@ -65,7 +71,10 @@ export async function readArticleContent(
 	return res.data
 }
 
-export async function readQuestionXml(reader: CartridgeReader, xmlPath: string): Promise<string> {
+export async function readQuestionXml(
+	reader: CartridgeReader,
+	xmlPath: string
+): Promise<string> {
 	const res = await errors.try(reader.readText(xmlPath))
 	if (res.error) {
 		logger.error("question xml read", { path: xmlPath, error: res.error })
@@ -85,7 +94,10 @@ export async function readQuestionJson(
 	}
 	const parseRes = errors.trySync(() => JSON.parse(res.data))
 	if (parseRes.error) {
-		logger.error("question json parse", { path: jsonPath, error: parseRes.error })
+		logger.error("question json parse", {
+			path: jsonPath,
+			error: parseRes.error
+		})
 		throw errors.wrap(parseRes.error, "question json parse")
 	}
 	return parseRes.data
@@ -98,7 +110,10 @@ export async function* iterUnits(reader: CartridgeReader): AsyncIterable<Unit> {
 	}
 }
 
-export async function* iterUnitLessons(reader: CartridgeReader, unit: Unit): AsyncIterable<Lesson> {
+export async function* iterUnitLessons(
+	reader: CartridgeReader,
+	unit: Unit
+): AsyncIterable<Lesson> {
 	for (const lref of unit.lessons) {
 		yield await readLesson(reader, lref.path)
 	}
@@ -122,16 +137,24 @@ export async function validateIntegrity(
 	if (manifestText.error)
 		return {
 			ok: false,
-			issues: [{ path: "integrity.json", reason: "file not found or unreadable" }]
+			issues: [
+				{ path: "integrity.json", reason: "file not found or unreadable" }
+			]
 		}
 
 	const manifestParsed = errors.trySync(() => JSON.parse(manifestText.data))
 	if (manifestParsed.error)
-		return { ok: false, issues: [{ path: "integrity.json", reason: "JSON parse failed" }] }
+		return {
+			ok: false,
+			issues: [{ path: "integrity.json", reason: "JSON parse failed" }]
+		}
 
 	const validated = IntegritySchema.safeParse(manifestParsed.data)
 	if (!validated.success)
-		return { ok: false, issues: [{ path: "integrity.json", reason: "schema validation failed" }] }
+		return {
+			ok: false,
+			issues: [{ path: "integrity.json", reason: "schema validation failed" }]
+		}
 
 	const manifest = validated.data
 

@@ -1,18 +1,20 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { AXIS_VIEWBOX_PADDING } from "../utils/constants"
-import { setupCoordinatePlaneBaseV2 } from "../utils/coordinate-plane-utils"
-import { CSS_COLOR_PATTERN } from "../utils/css-color"
-import { abbreviateMonth } from "../utils/labels"
-import { Path2D } from "../utils/path-builder"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { AXIS_VIEWBOX_PADDING } from "@/widgets/utils/constants"
+import { setupCoordinatePlaneBaseV2 } from "@/widgets/utils/coordinate-plane-utils"
+import { CSS_COLOR_PATTERN } from "@/widgets/utils/css-color"
+import { abbreviateMonth } from "@/widgets/utils/labels"
+import { Path2D } from "@/widgets/utils/path-builder"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
 
 const PointSchema = z.object({
-	x: z.number().describe("The x-coordinate (horizontal value) of the data point."),
+	x: z
+		.number()
+		.describe("The x-coordinate (horizontal value) of the data point."),
 	y: z.number().describe("The y-coordinate (vertical value) of the data point.")
 })
 
@@ -24,23 +26,33 @@ export const AreaGraphPropsSchema = z
 		title: z.string().describe("The main title displayed above the graph."),
 		xAxis: z
 			.object({
-				label: z.string().describe("The label for the horizontal axis (e.g., 'Year')."),
+				label: z
+					.string()
+					.describe("The label for the horizontal axis (e.g., 'Year')."),
 				min: z.number().describe("The minimum value for the x-axis scale."),
 				max: z.number().describe("The maximum value for the x-axis scale."),
 				tickValues: z
 					.array(z.number())
-					.describe("An array of specific numerical values to be marked as ticks on the x-axis.")
+					.describe(
+						"An array of specific numerical values to be marked as ticks on the x-axis."
+					)
 			})
 			.strict(),
 		yAxis: z
 			.object({
-				label: z.string().describe("The label for the vertical axis (e.g., 'Percent of total')."),
+				label: z
+					.string()
+					.describe(
+						"The label for the vertical axis (e.g., 'Percent of total')."
+					),
 				min: z.number().describe("The minimum value for the y-axis scale."),
 				max: z.number().describe("The maximum value for the y-axis scale."),
 				tickInterval: z
 					.number()
 					.positive()
-					.describe("The numeric interval between labeled tick marks on the y-axis."),
+					.describe(
+						"The numeric interval between labeled tick marks on the y-axis."
+					),
 				// REMOVED: tickFormat field is no longer supported.
 				showGridLines: z
 					.boolean()
@@ -50,10 +62,14 @@ export const AreaGraphPropsSchema = z
 		dataPoints: z
 			.array(PointSchema)
 			.min(2)
-			.describe("An array of {x, y} points defining the boundary line between the two areas."),
+			.describe(
+				"An array of {x, y} points defining the boundary line between the two areas."
+			),
 		bottomArea: z
 			.object({
-				label: z.string().describe("Text label to display within the bottom area."),
+				label: z
+					.string()
+					.describe("Text label to display within the bottom area."),
 				color: z
 					.string()
 					.regex(CSS_COLOR_PATTERN, "invalid css color")
@@ -62,7 +78,9 @@ export const AreaGraphPropsSchema = z
 			.strict(),
 		topArea: z
 			.object({
-				label: z.string().describe("Text label to display within the top area."),
+				label: z
+					.string()
+					.describe("Text label to display within the top area."),
 				color: z
 					.string()
 					.regex(CSS_COLOR_PATTERN, "invalid css color")
@@ -89,9 +107,20 @@ export const AreaGraphPropsSchema = z
 
 export type AreaGraphProps = z.infer<typeof AreaGraphPropsSchema>
 
-export const generateAreaGraph: WidgetGenerator<typeof AreaGraphPropsSchema> = async (props) => {
-	const { width, height, title, xAxis, yAxis, dataPoints, bottomArea, topArea, boundaryLine } =
-		props
+export const generateAreaGraph: WidgetGenerator<
+	typeof AreaGraphPropsSchema
+> = async (props) => {
+	const {
+		width,
+		height,
+		title,
+		xAxis,
+		yAxis,
+		dataPoints,
+		bottomArea,
+		topArea,
+		boundaryLine
+	} = props
 
 	if (xAxis.tickValues.length < 2) {
 		logger.error("area graph invalid tickValues", {
@@ -214,7 +243,12 @@ export const generateAreaGraph: WidgetGenerator<typeof AreaGraphPropsSchema> = a
 		const topThick1 = yAxis.max - p1.y
 		const bottomThick0 = p0.y - yAxis.min
 		const bottomThick1 = p1.y - yAxis.min
-		if (topThick0 < 0 || topThick1 < 0 || bottomThick0 < 0 || bottomThick1 < 0) {
+		if (
+			topThick0 < 0 ||
+			topThick1 < 0 ||
+			bottomThick0 < 0 ||
+			bottomThick1 < 0
+		) {
 			logger.error("area graph y outside bounds", { index: i })
 			throw errors.new("y out of bounds")
 		}
@@ -269,7 +303,9 @@ export const generateAreaGraph: WidgetGenerator<typeof AreaGraphPropsSchema> = a
 	const bottomLabelX = toSvgX(bottomCenterXVal)
 	// Position labels comfortably within each area band
 	const topLabelY = toSvgY(yAxis.max - (yAxis.max - topBoundaryYVal) * 0.25)
-	const bottomLabelY = toSvgY(yAxis.min + (bottomBoundaryYVal - yAxis.min) * 0.25)
+	const bottomLabelY = toSvgY(
+		yAxis.min + (bottomBoundaryYVal - yAxis.min) * 0.25
+	)
 
 	// 2. Draw area fills and boundary line using Canvas, within a clipped region
 	canvas.drawInClippedRegion((clippedCanvas) => {

@@ -5,11 +5,12 @@ export type InlineContentItem<E extends readonly string[] = readonly string[]> =
 	| { type: "inlineInteractionRef"; interactionId: string }
 	| { type: "gap"; gapId: string }
 
-export type InlineContent<E extends readonly string[] = readonly string[]> = Array<
-	InlineContentItem<E>
->
+export type InlineContent<E extends readonly string[] = readonly string[]> =
+	Array<InlineContentItem<E>>
 
-export type BlockQuoteBlockItem<E extends readonly string[] = readonly string[]> = {
+export type BlockQuoteBlockItem<
+	E extends readonly string[] = readonly string[]
+> = {
 	type: "blockquote"
 	content: InlineContent<E>
 }
@@ -27,14 +28,14 @@ export type BlockContentItem<E extends readonly string[] = readonly string[]> =
 	| { type: "widgetRef"; widgetId: string; widgetType: E[number] }
 	| { type: "interactionRef"; interactionId: string }
 
-export type BlockContent<E extends readonly string[] = readonly string[]> = Array<
-	BlockContentItem<E>
->
+export type BlockContent<E extends readonly string[] = readonly string[]> =
+	Array<BlockContentItem<E>>
 
-export type FeedbackPreamble<E extends readonly string[] = readonly string[]> = {
-	correctness: "correct" | "incorrect"
-	summary: InlineContent<E>
-}
+export type FeedbackPreamble<E extends readonly string[] = readonly string[]> =
+	{
+		correctness: "correct" | "incorrect"
+		summary: InlineContent<E>
+	}
 
 export type StepBlock<E extends readonly string[] = readonly string[]> = {
 	type: "step"

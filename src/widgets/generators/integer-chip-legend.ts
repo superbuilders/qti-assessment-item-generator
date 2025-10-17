@@ -1,6 +1,6 @@
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { theme } from "@/widgets/utils/theme"
 
 const MINUS_CHIP_COLOR = "#FADBD8"
 const PLUS_CHIP_COLOR = "#FEF9E7"
@@ -12,12 +12,18 @@ export const IntegerChipLegendPropsSchema = z
 		type: z
 			.literal("integerChipLegend")
 			.describe("Identifies this as an integer chip legend widget."),
-		positiveChipLabel: z.string().describe("The text label for the positive chip (e.g., '= +1')."),
-		negativeChipLabel: z.string().describe("The text label for the negative chip (e.g., '= -1').")
+		positiveChipLabel: z
+			.string()
+			.describe("The text label for the positive chip (e.g., '= +1')."),
+		negativeChipLabel: z
+			.string()
+			.describe("The text label for the negative chip (e.g., '= -1').")
 	})
 	.strict()
 
-export type IntegerChipLegendProps = z.infer<typeof IntegerChipLegendPropsSchema>
+export type IntegerChipLegendProps = z.infer<
+	typeof IntegerChipLegendPropsSchema
+>
 
 export const generateIntegerChipLegend: WidgetGenerator<
 	typeof IntegerChipLegendPropsSchema
@@ -36,7 +42,11 @@ export const generateIntegerChipLegend: WidgetGenerator<
 
 	// Calculate dynamic width: padding + circle diameter + label spacing + text width + padding
 	const legendWidth =
-		legendPadding + legendCircleRadius * 2 + labelSpacing + maxTextWidth + legendPadding
+		legendPadding +
+		legendCircleRadius * 2 +
+		labelSpacing +
+		maxTextWidth +
+		legendPadding
 	const legendHeight = legendRowHeight * 2 + legendPadding * 3
 	const legendX = 0
 	const legendY = 0
@@ -46,7 +56,10 @@ export const generateIntegerChipLegend: WidgetGenerator<
 
 	function legendRow(row: number, sign: "plus" | "minus", label: string): void {
 		const cy =
-			legendY + legendPadding + legendCircleRadius + row * (legendRowHeight + legendPadding)
+			legendY +
+			legendPadding +
+			legendCircleRadius +
+			row * (legendRowHeight + legendPadding)
 		const cx = legendX + legendPadding + legendCircleRadius
 		const fillColor = sign === "plus" ? PLUS_CHIP_COLOR : MINUS_CHIP_COLOR
 		const symbol = sign === "plus" ? "+" : "−"

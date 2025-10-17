@@ -1,12 +1,12 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { PADDING } from "../utils/constants"
-import { CSS_COLOR_PATTERN } from "../utils/css-color"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { PADDING } from "@/widgets/utils/constants"
+import { CSS_COLOR_PATTERN } from "@/widgets/utils/css-color"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
 
 // Function that returns a fresh discriminated union schema to avoid $ref deduplication
 const createValueOrUnknownSchema = () =>
@@ -19,16 +19,22 @@ const createValueOrUnknownSchema = () =>
 			z.object({
 				type: z
 					.literal("unknown")
-					.describe("An unknown value that should be represented by an empty box.")
+					.describe(
+						"An unknown value that should be represented by an empty box."
+					)
 			})
 		])
-		.describe("Represents either a known numeric value or an unknown value to be solved.")
+		.describe(
+			"Represents either a known numeric value or an unknown value to be solved."
+		)
 
 // Defines the content for a single cell in the area model.
 const CellContentSchema = z
 	.discriminatedUnion("type", [
 		z.object({
-			type: z.literal("value").describe("The cell displays a specific positive integer value."),
+			type: z
+				.literal("value")
+				.describe("The cell displays a specific positive integer value."),
 			value: z
 				.number()
 				.int()
@@ -38,7 +44,9 @@ const CellContentSchema = z
 		z.object({
 			type: z
 				.literal("unknown")
-				.describe("The cell's value is unknown and should be represented by an empty box.")
+				.describe(
+					"The cell's value is unknown and should be represented by an empty box."
+				)
 		})
 	])
 	.describe(
@@ -81,7 +89,9 @@ export const AreaModelMultiplicationPropsSchema = z
 		"Creates an area model diagram to visualize the distributive property of multiplication. The model consists of a rectangle partitioned into smaller cells, with factors along the sides and products (or placeholders) inside."
 	)
 
-export type AreaModelMultiplicationProps = z.infer<typeof AreaModelMultiplicationPropsSchema>
+export type AreaModelMultiplicationProps = z.infer<
+	typeof AreaModelMultiplicationPropsSchema
+>
 
 /**
  * Generates an SVG diagram of an area model for multiplication.
@@ -89,10 +99,14 @@ export type AreaModelMultiplicationProps = z.infer<typeof AreaModelMultiplicatio
 export const generateAreaModelMultiplication: WidgetGenerator<
 	typeof AreaModelMultiplicationPropsSchema
 > = async (props) => {
-	const { width, height, rowFactors, columnFactors, cellContents, cellColors } = props
+	const { width, height, rowFactors, columnFactors, cellContents, cellColors } =
+		props
 
 	// Runtime validation to ensure 2D arrays have matching dimensions.
-	if (cellContents.length !== rowFactors.length || cellColors.length !== rowFactors.length) {
+	if (
+		cellContents.length !== rowFactors.length ||
+		cellColors.length !== rowFactors.length
+	) {
 		logger.error("dimension mismatch in area model", {
 			cellContentsRows: cellContents.length,
 			cellColorsRows: cellColors.length,
@@ -112,7 +126,9 @@ export const generateAreaModelMultiplication: WidgetGenerator<
 				cellColorsColumns: cellColors[i]?.length,
 				columnFactorsLength: columnFactors.length
 			})
-			throw errors.new(`row ${i} arrays must have same length as column factors`)
+			throw errors.new(
+				`row ${i} arrays must have same length as column factors`
+			)
 		}
 	}
 
@@ -161,11 +177,18 @@ export const generateAreaModelMultiplication: WidgetGenerator<
 		getFactorValueForLayout(factor, index, true)
 	)
 	const logFactors = columnFactorValues.map((factor) => Math.log10(factor + 1)) // +1 to handle factor=1
-	const totalLogWidth = logFactors.reduce((sum, logFactor) => sum + logFactor, 0)
+	const totalLogWidth = logFactors.reduce(
+		(sum, logFactor) => sum + logFactor,
+		0
+	)
 
 	// Calculate base widths using log scale, then ensure minimum sizes
-	const baseWidths = logFactors.map((logFactor) => (logFactor / totalLogWidth) * availableWidth)
-	const scaledColWidths = baseWidths.map((baseWidth) => Math.max(baseWidth, minCellWidth))
+	const baseWidths = logFactors.map(
+		(logFactor) => (logFactor / totalLogWidth) * availableWidth
+	)
+	const scaledColWidths = baseWidths.map((baseWidth) =>
+		Math.max(baseWidth, minCellWidth)
+	)
 
 	// If minimum widths caused overflow, scale down proportionally
 	const totalActualWidth = scaledColWidths.reduce((sum, w) => sum + w, 0)
@@ -181,13 +204,18 @@ export const generateAreaModelMultiplication: WidgetGenerator<
 		getFactorValueForLayout(factor, index, false)
 	)
 	const logRowFactors = rowFactorValues.map((factor) => Math.log10(factor + 1))
-	const totalLogHeight = logRowFactors.reduce((sum, logFactor) => sum + logFactor, 0)
+	const totalLogHeight = logRowFactors.reduce(
+		(sum, logFactor) => sum + logFactor,
+		0
+	)
 
 	// Calculate base heights using log scale, then ensure minimum sizes
 	const baseHeights = logRowFactors.map(
 		(logFactor) => (logFactor / totalLogHeight) * availableHeight
 	)
-	const scaledRowHeights = baseHeights.map((baseHeight) => Math.max(baseHeight, minCellHeight))
+	const scaledRowHeights = baseHeights.map((baseHeight) =>
+		Math.max(baseHeight, minCellHeight)
+	)
 
 	// If minimum heights caused overflow, scale down proportionally
 	const totalActualHeight = scaledRowHeights.reduce((sum, h) => sum + h, 0)
@@ -286,7 +314,12 @@ export const generateAreaModelMultiplication: WidgetGenerator<
 			const colWidth = scaledColWidths[j]
 			const content = cellContents[i]?.[j]
 			const color = cellColors[i]?.[j]
-			if (colWidth === undefined || content === undefined || color === undefined) continue
+			if (
+				colWidth === undefined ||
+				content === undefined ||
+				color === undefined
+			)
+				continue
 
 			// Draw cell background
 			canvas.drawRect(currentX, currentY, colWidth, rowHeight, {

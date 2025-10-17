@@ -1,6 +1,10 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import type { BlockContent, FeedbackContent, InlineContent } from "@/core/content"
+import type {
+	BlockContent,
+	FeedbackContent,
+	InlineContent
+} from "@/core/content"
 import type {
 	AuthoringFeedbackOverall,
 	AuthoringNestedLeaf,
@@ -63,7 +67,9 @@ function walkBlock<E extends readonly string[]>(
 				}
 				break
 			case "tableRich": {
-				const walkRows = (rows: Array<Array<InlineContent<E> | null>> | null) => {
+				const walkRows = (
+					rows: Array<Array<InlineContent<E> | null>> | null
+				) => {
 					if (!rows) return
 					for (const row of rows) {
 						for (const cell of row) {
@@ -148,7 +154,10 @@ function walkFeedbackNode<E extends readonly string[]>(
 
 function isFallbackFeedback<E extends readonly string[]>(
 	overall: AuthoringFeedbackOverall<FeedbackPlan, E>
-): overall is { CORRECT: AuthoringNestedLeaf<E>; INCORRECT: AuthoringNestedLeaf<E> } {
+): overall is {
+	CORRECT: AuthoringNestedLeaf<E>
+	INCORRECT: AuthoringNestedLeaf<E>
+} {
 	return "CORRECT" in overall && "INCORRECT" in overall
 }
 
@@ -189,7 +198,9 @@ function walkFeedbackOverall<E extends readonly string[]>(
  */
 export function collectWidgetRefs<E extends readonly string[]>(item: {
 	body: BlockContent<E> | null
-	feedback: { FEEDBACK__OVERALL: AuthoringFeedbackOverall<FeedbackPlan, E> } | null
+	feedback: {
+		FEEDBACK__OVERALL: AuthoringFeedbackOverall<FeedbackPlan, E>
+	} | null
 	interactions: Record<string, AnyInteraction<E>> | null
 }): Map<string, string> {
 	const out = new Map<string, string>()
@@ -208,7 +219,9 @@ export function collectWidgetRefs<E extends readonly string[]>(item: {
  */
 export function collectAllWidgetSlotIds<E extends readonly string[]>(item: {
 	body: BlockContent<E> | null
-	feedback: { FEEDBACK__OVERALL: AuthoringFeedbackOverall<FeedbackPlan, E> } | null
+	feedback: {
+		FEEDBACK__OVERALL: AuthoringFeedbackOverall<FeedbackPlan, E>
+	} | null
 	interactions: Record<string, AnyInteraction<E>> | null
 }): string[] {
 	const refs = collectWidgetRefs(item)

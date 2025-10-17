@@ -1,4 +1,4 @@
-import type { Extents2D } from "../utils/layout"
+import type { Extents2D } from "@/widgets/utils/layout"
 
 /**
  * A typesafe, chainable builder for SVG paths that tracks its own bounding box.
@@ -61,7 +61,14 @@ export class Path2D {
 	/**
 	 * Alias for cubic Bézier curves to match common Canvas/SVG naming styles used by generators
 	 */
-	cubicCurveTo(cp1x: number, cp1y: number, cp2x: number, cp2y: number, x: number, y: number): this {
+	cubicCurveTo(
+		cp1x: number,
+		cp1y: number,
+		cp2x: number,
+		cp2y: number,
+		x: number,
+		y: number
+	): this {
 		return this.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, x, y)
 	}
 

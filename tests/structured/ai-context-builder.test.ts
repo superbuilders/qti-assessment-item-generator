@@ -5,7 +5,7 @@ import * as logger from "@superbuilders/slog"
 import {
 	buildMathacademyEnvelope,
 	buildPerseusEnvelope
-} from "../../src/structured/ai-context-builder"
+} from "@/structured/ai-context-builder"
 
 // NOTE: Additional comprehensive tests have been split into:
 // - tests/structured/ai-context-builder/ai-context-builder.perseus.unit.test.ts
@@ -36,7 +36,9 @@ describe("AI Context Builders", () => {
 		test("should throw an error for an invalid screenshot URL", async () => {
 			const html = "<div>...</div>"
 			const invalidUrl = "not-a-valid-url"
-			return expect(buildMathacademyEnvelope(html, invalidUrl)).rejects.toThrow()
+			return expect(
+				buildMathacademyEnvelope(html, invalidUrl)
+			).rejects.toThrow()
 		})
 	})
 
@@ -74,7 +76,9 @@ describe("AI Context Builders", () => {
 				}
 			}
 
-			const result = await errors.try(buildPerseusEnvelope(perseusJsonWithBadUrl))
+			const result = await errors.try(
+				buildPerseusEnvelope(perseusJsonWithBadUrl)
+			)
 
 			// The most important thing is that it does NOT throw an error.
 			expect(result.error).toBeFalsy()

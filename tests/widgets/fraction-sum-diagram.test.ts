@@ -1,9 +1,9 @@
 import { describe, expect, test } from "bun:test"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import { fractionSumDiagramExamples } from "../../examples/fraction-sum-diagram"
-import type { WidgetInput } from "../../src/widgets/registry"
-import { generateWidgetForTest } from "../helpers/generateWidgetForTest"
+import { fractionSumDiagramExamples } from "@/examples/fraction-sum-diagram"
+import { generateWidgetForTest } from "@/testing/helpers/generateWidgetForTest"
+import type { WidgetInput } from "@/widgets/registry"
 
 describe("Widget: fraction-sum-diagram", () => {
 	const examples: WidgetInput[] = fractionSumDiagramExamples

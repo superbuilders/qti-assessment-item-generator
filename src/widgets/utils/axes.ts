@@ -11,14 +11,20 @@ import {
 	X_AXIS_MIN_LABEL_PADDING_PX,
 	X_AXIS_TITLE_PADDING_PX,
 	Y_AXIS_MIN_LABEL_GAP_PX
-} from "../utils/constants"
-import { type Canvas, selectAxisLabels } from "../utils/layout"
-import { theme } from "../utils/theme"
-import { buildTicks } from "../utils/ticks"
+} from "@/widgets/utils/constants"
+import { type Canvas, selectAxisLabels } from "@/widgets/utils/layout"
+import { theme } from "@/widgets/utils/theme"
+import { buildTicks } from "@/widgets/utils/ticks"
 
-export const ErrInvalidAxisDomain = errors.new("axis domain min must be less than max")
-export const ErrInvalidTickInterval = errors.new("axis tick interval must be positive")
-export const ErrInvalidCategories = errors.new("axis categories must not be empty when provided")
+export const ErrInvalidAxisDomain = errors.new(
+	"axis domain min must be less than max"
+)
+export const ErrInvalidTickInterval = errors.new(
+	"axis tick interval must be positive"
+)
+export const ErrInvalidCategories = errors.new(
+	"axis categories must not be empty when provided"
+)
 
 type AxisDomain = { min: number; max: number }
 // Removed unused MAX_TICKS constant
@@ -94,7 +100,9 @@ export function computeAndRenderYAxis(
 ): AxisResult {
 	const tickLength = spec.showTicks === false ? 0 : TICK_LENGTH_PX
 	// Type guard function for categorical spec
-	function isCategoricalSpec(spec: AxisSpec): spec is AxisSpec & { categories: string[] } {
+	function isCategoricalSpec(
+		spec: AxisSpec
+	): spec is AxisSpec & { categories: string[] } {
 		return !!(spec.categories && spec.categories.length > 0)
 	}
 	const isCategorical = isCategoricalSpec(spec)
@@ -110,14 +118,20 @@ export function computeAndRenderYAxis(
 			logger.error("invalid y-axis tick interval", {
 				tickInterval: spec.tickInterval
 			})
-			throw errors.wrap(ErrInvalidTickInterval, "y-axis tickInterval must be positive")
+			throw errors.wrap(
+				ErrInvalidTickInterval,
+				"y-axis tickInterval must be positive"
+			)
 		}
 	} else {
 		if (!spec.categories || spec.categories.length === 0) {
 			logger.error("invalid y-axis categories", {
 				categories: spec.categories
 			})
-			throw errors.wrap(ErrInvalidCategories, "y-axis categories array cannot be empty")
+			throw errors.wrap(
+				ErrInvalidCategories,
+				"y-axis categories array cannot be empty"
+			)
 		}
 	}
 
@@ -138,10 +152,16 @@ export function computeAndRenderYAxis(
 	}
 
 	// MODIFIED: Replace all markup generation with canvas calls.
-	canvas.drawLine(axisX, chartArea.top, axisX, chartArea.top + chartArea.height, {
-		stroke: theme.colors.axis,
-		strokeWidth: AXIS_STROKE_WIDTH_PX
-	})
+	canvas.drawLine(
+		axisX,
+		chartArea.top,
+		axisX,
+		chartArea.top + chartArea.height,
+		{
+			stroke: theme.colors.axis,
+			strokeWidth: AXIS_STROKE_WIDTH_PX
+		}
+	)
 
 	if (isCategorical) {
 		const cats = spec.categories
@@ -165,7 +185,11 @@ export function computeAndRenderYAxis(
 			}
 		}
 	} else {
-		const { values, labels } = buildTicks(spec.domain.min, spec.domain.max, spec.tickInterval)
+		const { values, labels } = buildTicks(
+			spec.domain.min,
+			spec.domain.max,
+			spec.tickInterval
+		)
 		const tickPositions = values.map(toSvgYNumeric)
 
 		const selected = selectAxisLabels({
@@ -201,10 +225,16 @@ export function computeAndRenderYAxis(
 
 			// Always render horizontal gridlines for all ticks when enabled, including at y = 0
 			if (spec.showGridLines) {
-				canvas.drawLine(chartArea.left, y, chartArea.left + chartArea.width, y, {
-					stroke: theme.colors.gridMajor,
-					strokeWidth: GRID_STROKE_WIDTH_PX
-				})
+				canvas.drawLine(
+					chartArea.left,
+					y,
+					chartArea.left + chartArea.width,
+					y,
+					{
+						stroke: theme.colors.gridMajor,
+						strokeWidth: GRID_STROKE_WIDTH_PX
+					}
+				)
 			}
 		})
 	}
@@ -256,7 +286,10 @@ export function computeAndRenderXAxis(
 				logger.error("invalid x-axis tick interval for numeric scale", {
 					tickInterval: spec.tickInterval
 				})
-				throw errors.wrap(ErrInvalidTickInterval, "x-axis tickInterval must be positive")
+				throw errors.wrap(
+					ErrInvalidTickInterval,
+					"x-axis tickInterval must be positive"
+				)
 			}
 			break
 		case "categoryBand":
@@ -267,17 +300,26 @@ export function computeAndRenderXAxis(
 					categories: spec.categories,
 					xScaleType: spec.xScaleType
 				})
-				throw errors.wrap(ErrInvalidCategories, `${spec.xScaleType} requires non-empty categories`)
+				throw errors.wrap(
+					ErrInvalidCategories,
+					`${spec.xScaleType} requires non-empty categories`
+				)
 			}
 			break
 	}
 
 	const axisY = chartArea.top + chartArea.height
 
-	canvas.drawLine(chartArea.left, axisY, chartArea.left + chartArea.width, axisY, {
-		stroke: theme.colors.axis,
-		strokeWidth: AXIS_STROKE_WIDTH_PX
-	})
+	canvas.drawLine(
+		chartArea.left,
+		axisY,
+		chartArea.left + chartArea.width,
+		axisY,
+		{
+			stroke: theme.colors.axis,
+			strokeWidth: AXIS_STROKE_WIDTH_PX
+		}
+	)
 
 	let toSvgX: (val: number) => number
 	let bandWidth: number | undefined
@@ -323,7 +365,11 @@ export function computeAndRenderXAxis(
 			break
 		}
 		case "numeric": {
-			const { values, labels } = buildTicks(spec.domain.min, spec.domain.max, spec.tickInterval)
+			const { values, labels } = buildTicks(
+				spec.domain.min,
+				spec.domain.max,
+				spec.tickInterval
+			)
 			tickLabels = labels
 			tickPositions = values.map(toSvgX)
 			tickValues = values
@@ -354,7 +400,9 @@ export function computeAndRenderXAxis(
 			if (labelValue === undefined && labelText === undefined) continue
 
 			const label =
-				spec.xScaleType === "numeric" && spec.labelFormatter && labelValue !== undefined
+				spec.xScaleType === "numeric" &&
+				spec.labelFormatter &&
+				labelValue !== undefined
 					? spec.labelFormatter(labelValue)
 					: labelText
 			canvas.drawText({
@@ -377,7 +425,11 @@ export function computeAndRenderXAxis(
 	}
 
 	const xAxisLabelY =
-		axisY + TICK_LENGTH_PX + TICK_LABEL_PADDING_PX + TICK_LABEL_FONT_PX + X_AXIS_TITLE_PADDING_PX
+		axisY +
+		TICK_LENGTH_PX +
+		TICK_LABEL_PADDING_PX +
+		TICK_LABEL_FONT_PX +
+		X_AXIS_TITLE_PADDING_PX
 	canvas.drawWrappedText({
 		x: chartArea.left + chartArea.width / 2,
 		y: xAxisLabelY,

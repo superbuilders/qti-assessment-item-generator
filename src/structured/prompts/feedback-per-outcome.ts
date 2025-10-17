@@ -6,12 +6,12 @@ import { createFeedbackContentSchema } from "@/core/content"
 import type { FeedbackCombination, FeedbackPlan } from "@/core/feedback"
 import type { AnyInteraction } from "@/core/interactions"
 import type { AssessmentItemShell } from "@/core/item"
+import { createMathmlComplianceSection } from "@/structured/prompts/shared/mathml"
 import type {
 	WidgetCollection,
 	WidgetDefinition,
 	WidgetTypeTupleFrom
 } from "@/widgets/collections/types"
-import { createMathmlComplianceSection } from "./shared/mathml"
 
 type ShallowFeedbackPayload<E extends readonly string[]> = {
 	content: FeedbackContent<E>
@@ -23,7 +23,10 @@ type ShallowFeedbackPayload<E extends readonly string[]> = {
  * information about the outcome is encoded directly into the prompt text.
  */
 export function createPerOutcomeNestedFeedbackPrompt<
-	C extends WidgetCollection<Record<string, WidgetDefinition<unknown, unknown>>, readonly string[]>
+	C extends WidgetCollection<
+		Record<string, WidgetDefinition<unknown, unknown>>,
+		readonly string[]
+	>
 >(
 	assessmentShell: AssessmentItemShell<WidgetTypeTupleFrom<C>>,
 	feedbackPlan: FeedbackPlan,
@@ -77,7 +80,9 @@ export function createPerOutcomeNestedFeedbackPrompt<
 	const shellJson = JSON.stringify(assessmentShell)
 	const interactionsResult = errors.trySync(() => JSON.stringify(interactions))
 	if (interactionsResult.error) {
-		logger.error("json stringify interactions", { error: interactionsResult.error })
+		logger.error("json stringify interactions", {
+			error: interactionsResult.error
+		})
 		throw errors.wrap(interactionsResult.error, "json stringify interactions")
 	}
 	const interactionsJson = interactionsResult.data

@@ -8,9 +8,9 @@ import {
 	divisionAreaDiagramExamples_99_div_6,
 	divisionAreaDiagramExamples_809_div_4,
 	divisionAreaDiagramExamples_954_div_9
-} from "../../examples/division-area-diagram"
-import type { WidgetInput } from "../../src/widgets/registry"
-import { generateWidgetForTest } from "../helpers/generateWidgetForTest"
+} from "@/examples/division-area-diagram"
+import { generateWidgetForTest } from "@/testing/helpers/generateWidgetForTest"
+import type { WidgetInput } from "@/widgets/registry"
 
 describe("Widget: division-area-diagram", () => {
 	const examples: WidgetInput[] = [

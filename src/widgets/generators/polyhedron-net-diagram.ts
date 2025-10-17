@@ -1,13 +1,15 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { PADDING } from "../utils/constants"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { PADDING } from "@/widgets/utils/constants"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
 
-export const ErrInvalidBaseShape = errors.new("invalid base shape for polyhedron type")
+export const ErrInvalidBaseShape = errors.new(
+	"invalid base shape for polyhedron type"
+)
 
 // Base shape definition factories (avoid reusing schema instances to prevent $ref)
 function createSquareBase() {
@@ -26,7 +28,9 @@ function createSquareBase() {
 function createRectangleBase() {
 	return z
 		.object({
-			type: z.literal("rectangle").describe("Specifies a rectangular base shape."),
+			type: z
+				.literal("rectangle")
+				.describe("Specifies a rectangular base shape."),
 			length: z
 				.number()
 				.describe(
@@ -44,7 +48,9 @@ function createRectangleBase() {
 function createTriangleBase() {
 	return z
 		.object({
-			type: z.literal("triangle").describe("Specifies a triangular base shape."),
+			type: z
+				.literal("triangle")
+				.describe("Specifies a triangular base shape."),
 			base: z
 				.number()
 				.describe(
@@ -72,7 +78,9 @@ function createTriangleBase() {
 function createPentagonBase() {
 	return z
 		.object({
-			type: z.literal("pentagon").describe("Specifies a regular pentagon base shape."),
+			type: z
+				.literal("pentagon")
+				.describe("Specifies a regular pentagon base shape."),
 			side: z
 				.number()
 				.describe(
@@ -120,7 +128,9 @@ const RectPrism = z
 		showLabels: z
 			.boolean()
 			.nullable()
-			.describe("Whether to show dimension labels. True helps with surface area calculations.")
+			.describe(
+				"Whether to show dimension labels. True helps with surface area calculations."
+			)
 	})
 	.strict()
 
@@ -128,7 +138,9 @@ const TriPrism = z
 	.object({
 		polyhedronType: z
 			.literal("triangularPrism")
-			.describe("A triangular prism net with 2 triangular faces and 3 rectangular faces."),
+			.describe(
+				"A triangular prism net with 2 triangular faces and 3 rectangular faces."
+			),
 		width: createWidthSchema(),
 		height: createHeightSchema(),
 		base: createTriangleBase().describe(
@@ -142,7 +154,9 @@ const TriPrism = z
 		showLabels: z
 			.boolean()
 			.nullable()
-			.describe("Whether to display edge measurements. Useful for surface area problems.")
+			.describe(
+				"Whether to display edge measurements. Useful for surface area problems."
+			)
 	})
 	.strict()
 
@@ -150,7 +164,9 @@ const SquarePyr = z
 	.object({
 		polyhedronType: z
 			.literal("squarePyramid")
-			.describe("A square pyramid net with 1 square base and 4 triangular faces."),
+			.describe(
+				"A square pyramid net with 1 square base and 4 triangular faces."
+			),
 		width: createWidthSchema(),
 		height: createHeightSchema(),
 		base: createSquareBase().describe(
@@ -174,7 +190,9 @@ const TriPyr = z
 	.object({
 		polyhedronType: z
 			.literal("triangularPyramid")
-			.describe("A triangular pyramid (tetrahedron) net with 4 triangular faces."),
+			.describe(
+				"A triangular pyramid (tetrahedron) net with 4 triangular faces."
+			),
 		width: createWidthSchema(),
 		height: createHeightSchema(),
 		base: createTriangleBase().describe(
@@ -188,7 +206,9 @@ const TriPyr = z
 		showLabels: z
 			.boolean()
 			.nullable()
-			.describe("Whether to show measurements. Helps identify which edges connect when folded.")
+			.describe(
+				"Whether to show measurements. Helps identify which edges connect when folded."
+			)
 	})
 	.strict()
 
@@ -196,7 +216,9 @@ const PentPyr = z
 	.object({
 		polyhedronType: z
 			.literal("pentagonalPyramid")
-			.describe("A pentagonal pyramid net with 1 pentagon base and 5 triangular faces."),
+			.describe(
+				"A pentagonal pyramid net with 1 pentagon base and 5 triangular faces."
+			),
 		width: createWidthSchema(),
 		height: createHeightSchema(),
 		base: createPentagonBase().describe(
@@ -210,7 +232,9 @@ const PentPyr = z
 		showLabels: z
 			.boolean()
 			.nullable()
-			.describe("Whether to display edge labels. Useful for surface area and folding exercises.")
+			.describe(
+				"Whether to display edge labels. Useful for surface area and folding exercises."
+			)
 	})
 	.strict()
 
@@ -245,7 +269,9 @@ export const PolyhedronNetDiagramPropsSchema = z
 		"Creates 2D nets (unfolded patterns) of 3D polyhedra. Each net shows how faces connect and can be folded to form the 3D shape. Essential for teaching surface area, 3D visualization, and spatial reasoning. The polyhedronType determines which specific shape and net pattern to generate."
 	)
 
-export type PolyhedronNetDiagramProps = z.infer<typeof PolyhedronNetDiagramPropsSchema>
+export type PolyhedronNetDiagramProps = z.infer<
+	typeof PolyhedronNetDiagramPropsSchema
+>
 
 /**
  * This template generates a two-dimensional "net" of a 3D polyhedron as an SVG graphic.
@@ -316,7 +342,10 @@ export const generatePolyhedronNetDiagram: WidgetGenerator<
 			})
 			.filter(
 				(p) =>
-					!Number.isNaN(p.x) && !Number.isNaN(p.y) && Number.isFinite(p.x) && Number.isFinite(p.y)
+					!Number.isNaN(p.x) &&
+					!Number.isNaN(p.y) &&
+					Number.isFinite(p.x) &&
+					Number.isFinite(p.y)
 			)
 		polys.push(polygonPoints)
 	}
@@ -410,7 +439,10 @@ export const generatePolyhedronNetDiagram: WidgetGenerator<
 				logger.error("missing lateral height for rectangular prism", {
 					polyhedronType
 				})
-				throw errors.wrap(ErrInvalidBaseShape, "lateralHeight is required for rectangularPrism")
+				throw errors.wrap(
+					ErrInvalidBaseShape,
+					"lateralHeight is required for rectangularPrism"
+				)
 			}
 			const length = base.length
 			const width = base.width
@@ -437,7 +469,14 @@ export const generatePolyhedronNetDiagram: WidgetGenerator<
 				drawGridLines(x_start, row_y, b_u, c_u, width, prismHeight)
 				drawGridLines(x_start + b_u, row_y, a_u, c_u, length, prismHeight)
 				drawGridLines(x_start + b_u + a_u, row_y, b_u, c_u, width, prismHeight)
-				drawGridLines(x_start + b_u + a_u + b_u, row_y, a_u, c_u, length, prismHeight)
+				drawGridLines(
+					x_start + b_u + a_u + b_u,
+					row_y,
+					a_u,
+					c_u,
+					length,
+					prismHeight
+				)
 				drawGridLines(x_start + b_u, row_y - b_u, a_u, b_u, length, width)
 				drawGridLines(x_start + b_u, row_y + c_u, a_u, b_u, length, width)
 			}
@@ -458,7 +497,10 @@ export const generatePolyhedronNetDiagram: WidgetGenerator<
 				logger.error("missing lateral height for triangular prism", {
 					polyhedronType
 				})
-				throw errors.wrap(ErrInvalidBaseShape, "lateralHeight is required for triangularPrism")
+				throw errors.wrap(
+					ErrInvalidBaseShape,
+					"lateralHeight is required for triangularPrism"
+				)
 			}
 			const base_len = base.base
 			const tri_h = base.height
@@ -488,11 +530,15 @@ export const generatePolyhedronNetDiagram: WidgetGenerator<
 			const top_y_base = row_y
 			const top_apex_x = middle_x + d * unit
 			const top_apex_y = row_y - tri_h_u
-			poly(`${top_left},${top_y_base} ${top_right},${top_y_base} ${top_apex_x},${top_apex_y}`)
+			poly(
+				`${top_left},${top_y_base} ${top_right},${top_y_base} ${top_apex_x},${top_apex_y}`
+			)
 			const bot_y_base = row_y + prism_h_u
 			const bot_apex_y = bot_y_base + tri_h_u
 			const bot_apex_x = middle_x + d * unit
-			poly(`${top_left},${bot_y_base} ${top_right},${bot_y_base} ${bot_apex_x},${bot_apex_y}`)
+			poly(
+				`${top_left},${bot_y_base} ${top_right},${bot_y_base} ${bot_apex_x},${bot_apex_y}`
+			)
 			if (showLabels === true) {
 				drawGridLines(row_start_x, row_y, side1_u, prism_h_u, side1, prism_h)
 				drawGridLines(middle_x, row_y, base_u, prism_h_u, base_len, prism_h)
@@ -515,7 +561,10 @@ export const generatePolyhedronNetDiagram: WidgetGenerator<
 				logger.error("missing lateral height for square pyramid", {
 					polyhedronType
 				})
-				throw errors.wrap(ErrInvalidBaseShape, "lateralHeight is required for squarePyramid")
+				throw errors.wrap(
+					ErrInvalidBaseShape,
+					"lateralHeight is required for squarePyramid"
+				)
 			}
 			const side = base.side
 			const lat_h = lateralHeight
@@ -534,11 +583,15 @@ export const generatePolyhedronNetDiagram: WidgetGenerator<
 			const apex_d = side / 2
 			const top_apex_x = base_x + apex_d * unit
 			const top_apex_y = base_y - lat_u
-			poly(`${top_left_x},${top_base_y} ${top_right_x},${top_base_y} ${top_apex_x},${top_apex_y}`)
+			poly(
+				`${top_left_x},${top_base_y} ${top_right_x},${top_base_y} ${top_apex_x},${top_apex_y}`
+			)
 			const bot_base_y = base_y + s_u
 			const bot_apex_y = bot_base_y + lat_u
 			const bot_apex_x = base_x + apex_d * unit
-			poly(`${top_left_x},${bot_base_y} ${top_right_x},${bot_base_y} ${bot_apex_x},${bot_apex_y}`)
+			poly(
+				`${top_left_x},${bot_base_y} ${top_right_x},${bot_base_y} ${bot_apex_x},${bot_apex_y}`
+			)
 			const left_base_top_y = base_y
 			const left_base_bot_y = base_y + s_u
 			const left_base_x = base_x
@@ -573,7 +626,10 @@ export const generatePolyhedronNetDiagram: WidgetGenerator<
 				logger.error("missing lateral height for triangular pyramid", {
 					polyhedronType
 				})
-				throw errors.wrap(ErrInvalidBaseShape, "lateralHeight is required for triangularPyramid")
+				throw errors.wrap(
+					ErrInvalidBaseShape,
+					"lateralHeight is required for triangularPyramid"
+				)
 			}
 			const base_len = base.base
 			const tri_h = base.height
@@ -613,7 +669,14 @@ export const generatePolyhedronNetDiagram: WidgetGenerator<
 			const apex_base = getApex(p1, p2, p3)
 			const apex_side1 = getApex(p1, p3, p2)
 			const apex_side2 = getApex(p3, p2, p1)
-			const all_points: Point[] = [p1, p2, p3, apex_base, apex_side1, apex_side2]
+			const all_points: Point[] = [
+				p1,
+				p2,
+				p3,
+				apex_base,
+				apex_side1,
+				apex_side2
+			]
 			// Find bounds and center around (0,0)
 			const min_x = Math.min(...all_points.map((p) => p.x))
 			const max_x = Math.max(...all_points.map((p) => p.x))
@@ -639,9 +702,15 @@ export const generatePolyhedronNetDiagram: WidgetGenerator<
 			}
 
 			poly(`${cp1.x},${cp1.y} ${cp2.x},${cp2.y} ${cp3.x},${cp3.y}`)
-			poly(`${cp1.x},${cp1.y} ${cp2.x},${cp2.y} ${capex_base.x},${capex_base.y}`)
-			poly(`${cp1.x},${cp1.y} ${cp3.x},${cp3.y} ${capex_side1.x},${capex_side1.y}`)
-			poly(`${cp3.x},${cp3.y} ${cp2.x},${cp2.y} ${capex_side2.x},${capex_side2.y}`)
+			poly(
+				`${cp1.x},${cp1.y} ${cp2.x},${cp2.y} ${capex_base.x},${capex_base.y}`
+			)
+			poly(
+				`${cp1.x},${cp1.y} ${cp3.x},${cp3.y} ${capex_side1.x},${capex_side1.y}`
+			)
+			poly(
+				`${cp3.x},${cp3.y} ${cp2.x},${cp2.y} ${capex_side2.x},${capex_side2.y}`
+			)
 			break
 		}
 		case "pentagonalPyramid": {
@@ -659,7 +728,10 @@ export const generatePolyhedronNetDiagram: WidgetGenerator<
 				logger.error("missing lateral height for pentagonal pyramid", {
 					polyhedronType
 				})
-				throw errors.wrap(ErrInvalidBaseShape, "lateralHeight is required for pentagonalPyramid")
+				throw errors.wrap(
+					ErrInvalidBaseShape,
+					"lateralHeight is required for pentagonalPyramid"
+				)
 			}
 			const side = base.side
 			const lat_h = lateralHeight

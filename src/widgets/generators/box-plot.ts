@@ -1,14 +1,14 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { PADDING } from "../utils/constants"
-import { CSS_COLOR_PATTERN } from "../utils/css-color"
-import { abbreviateMonth } from "../utils/labels"
-import { calculateXAxisLayout, selectAxisLabels } from "../utils/layout"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { PADDING } from "@/widgets/utils/constants"
+import { CSS_COLOR_PATTERN } from "@/widgets/utils/css-color"
+import { abbreviateMonth } from "@/widgets/utils/labels"
+import { calculateXAxisLayout, selectAxisLabels } from "@/widgets/utils/layout"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
 
 export const ErrInvalidRange = errors.new("axis min must be less than axis max")
 
@@ -28,7 +28,9 @@ const BoxPlotAxisSchema = z
 		label: z
 			.string()
 			.nullable()
-			.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
+			.transform((val) =>
+				val === "null" || val === "NULL" || val === "" ? null : val
+			)
 			.describe(
 				"Title for the horizontal axis describing what is measured (e.g., 'Test Scores', 'Height (cm)', 'Temperature (°F)', 'Age', null). Null if not needed."
 			),
@@ -88,16 +90,24 @@ export const BoxPlotPropsSchema = z
 		axis: BoxPlotAxisSchema.describe(
 			"Configuration for the horizontal scale including range and tick marks."
 		),
-		summary: BoxPlotSummarySchema.describe("The five-number summary used to draw the plot."),
+		summary: BoxPlotSummarySchema.describe(
+			"The five-number summary used to draw the plot."
+		),
 		boxColor: z
 			.string()
-			.regex(CSS_COLOR_PATTERN, "invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)")
+			.regex(
+				CSS_COLOR_PATTERN,
+				"invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)"
+			)
 			.describe(
 				"CSS color for the box fill showing the interquartile range (e.g., '#E8F4FD' for light blue, 'lightgray', 'rgba(150,150,150,0.3)'). Should be subtle to show median line clearly."
 			),
 		medianColor: z
 			.string()
-			.regex(CSS_COLOR_PATTERN, "invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)")
+			.regex(
+				CSS_COLOR_PATTERN,
+				"invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)"
+			)
 			.describe(
 				"CSS color for the median line inside the box (e.g., '#FF6B6B' for red, 'black', 'darkblue'). Should contrast strongly with boxColor for emphasis."
 			)
@@ -114,7 +124,9 @@ export type BoxPlotProps = z.infer<typeof BoxPlotPropsSchema>
  * This type of plot is a powerful tool for summarizing the distribution of a numerical
  * data set through its five-number summary.
  */
-export const generateBoxPlot: WidgetGenerator<typeof BoxPlotPropsSchema> = async (data) => {
+export const generateBoxPlot: WidgetGenerator<
+	typeof BoxPlotPropsSchema
+> = async (data) => {
 	const { width, height, axis, summary, boxColor, medianColor } = data
 
 	const { bottomMargin, xAxisTitleY } = calculateXAxisLayout(true, 15) // has tick labels, less padding
@@ -212,7 +224,10 @@ export const generateBoxPlot: WidgetGenerator<typeof BoxPlotPropsSchema> = async
 	const maxBoxHeightPx = 28
 	const safeBottom = axisY - innerBottomGapPx
 	// For cramped charts, draw a proper box anchored to the axis regardless of plotHeight
-	const desiredHeight = Math.max(minBoxHeightPx, Math.min(maxBoxHeightPx, height * 0.25))
+	const desiredHeight = Math.max(
+		minBoxHeightPx,
+		Math.min(maxBoxHeightPx, height * 0.25)
+	)
 	const boxTopRaw = safeBottom - desiredHeight
 	const boxTop = Math.max(0, boxTopRaw)
 	const boxHeight = Math.max(minBoxHeightPx, safeBottom - boxTop)

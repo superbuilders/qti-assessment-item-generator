@@ -1,4 +1,4 @@
-import { typedSchemas } from "../widgets/registry"
+import { typedSchemas } from "@/widgets/registry"
 
 /**
  * Calculates the greatest common divisor (GCD) of two numbers using the Euclidean algorithm.
@@ -17,7 +17,10 @@ export function gcd(a: number, b: number): number {
  * @param denominator The denominator of the fraction.
  * @returns True if the fraction terminates, false otherwise.
  */
-export function isTerminatingFraction(numerator: number, denominator: number): boolean {
+export function isTerminatingFraction(
+	numerator: number,
+	denominator: number
+): boolean {
 	if (denominator === 0) {
 		return false
 	}
@@ -43,7 +46,9 @@ export function encodeDataUri(content: string): string {
 }
 
 // Helper function to check if a string is a valid widget type
-export function isValidWidgetType(type: string): type is keyof typeof typedSchemas {
+export function isValidWidgetType(
+	type: string
+): type is keyof typeof typedSchemas {
 	return type in typedSchemas
 }
 
@@ -58,7 +63,10 @@ export function isValidWidgetType(type: string): type is keyof typeof typedSchem
  *
  * Returns a normalized decimal string if evaluation succeeds, otherwise null.
  */
-export function tryApproximatePiProduct(rawExpr: string, piApprox = 3.14): string | null {
+export function tryApproximatePiProduct(
+	rawExpr: string,
+	piApprox = 3.14
+): string | null {
 	if (typeof rawExpr !== "string" || rawExpr.trim() === "") return null
 
 	// Quick check: must contain a pi token of some sort

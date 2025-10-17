@@ -1,3 +1,3 @@
 // biome-ignore lint/performance/noBarrelFile: public API aggregator required by package exports
-export * from "./schema"
-export * from "./types"
+export * from "@/core/item/schema"
+export * from "@/core/item/types"

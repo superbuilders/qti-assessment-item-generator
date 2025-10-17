@@ -1,9 +1,9 @@
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { PADDING } from "../utils/constants"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { PADDING } from "@/widgets/utils/constants"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
 
 export const QuadrantDiagramPropsSchema = z
 	.object({
@@ -18,9 +18,9 @@ export const QuadrantDiagramPropsSchema = z
 
 export type QuadrantDiagramProps = z.infer<typeof QuadrantDiagramPropsSchema>
 
-export const generateQuadrantDiagram: WidgetGenerator<typeof QuadrantDiagramPropsSchema> = async (
-	props
-) => {
+export const generateQuadrantDiagram: WidgetGenerator<
+	typeof QuadrantDiagramPropsSchema
+> = async (props) => {
 	const { width, height } = props
 
 	const canvas = new CanvasImpl({

@@ -1,18 +1,20 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { PADDING } from "../utils/constants"
-import { selectAxisLabels } from "../utils/layout"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { PADDING } from "@/widgets/utils/constants"
+import { selectAxisLabels } from "@/widgets/utils/layout"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
 
 export const NumberLineWithFractionGroupsPropsSchema = z
 	.object({
 		type: z
 			.literal("numberLineWithFractionGroups")
-			.describe("Identifies this as a number line with fraction groups showing repeated segments."),
+			.describe(
+				"Identifies this as a number line with fraction groups showing repeated segments."
+			),
 		width: createWidthSchema(),
 		height: createHeightSchema(),
 		axis: z
@@ -21,7 +23,10 @@ export const NumberLineWithFractionGroupsPropsSchema = z
 					.number()
 					.int()
 					.describe("Lower bound numerator (e.g., 0 for 0/4, -2 for -2/4)"),
-				upperBound: z.number().int().describe("Upper bound numerator (e.g., 8 for 8/4 = 2)"),
+				upperBound: z
+					.number()
+					.int()
+					.describe("Upper bound numerator (e.g., 8 for 8/4 = 2)"),
 				denominator: z
 					.number()
 					.int()
@@ -37,11 +42,15 @@ export const NumberLineWithFractionGroupsPropsSchema = z
 				lowerBound: z
 					.number()
 					.int()
-					.describe("Starting numerator for the boxes (e.g., 0 to start from 0/4, -2 for -2/4)"),
+					.describe(
+						"Starting numerator for the boxes (e.g., 0 to start from 0/4, -2 for -2/4)"
+					),
 				upperBound: z
 					.number()
 					.int()
-					.describe("Ending numerator for the boxes (e.g., 7 for boxes up to 7/4)"),
+					.describe(
+						"Ending numerator for the boxes (e.g., 7 for boxes up to 7/4)"
+					),
 				fillTo: z
 					.number()
 					.int()
@@ -83,7 +92,8 @@ export const generateNumberLineWithFractionGroups: WidgetGenerator<
 	const maxValue = axis.upperBound / axis.denominator
 
 	// Validation checks
-	if (minValue >= maxValue) return `<svg width="${width}" height="${height}"></svg>`
+	if (minValue >= maxValue)
+		return `<svg width="${width}" height="${height}"></svg>`
 
 	if (boxes.lowerBound >= boxes.upperBound) {
 		logger.error("invalid box bounds", {
@@ -138,7 +148,11 @@ export const generateNumberLineWithFractionGroups: WidgetGenerator<
 	const wholeLabels: string[] = []
 	const tickPositions: number[] = []
 
-	for (let numerator = axis.lowerBound; numerator <= axis.upperBound; numerator++) {
+	for (
+		let numerator = axis.lowerBound;
+		numerator <= axis.upperBound;
+		numerator++
+	) {
 		const fractionValue = numerator / axis.denominator
 		const position = toSvgX(fractionValue)
 
@@ -206,7 +220,11 @@ export const generateNumberLineWithFractionGroups: WidgetGenerator<
 	const boxHeight = 40
 	const boxY = yPos - boxHeight - 45
 
-	for (let numerator = boxes.lowerBound; numerator < boxes.upperBound; numerator++) {
+	for (
+		let numerator = boxes.lowerBound;
+		numerator < boxes.upperBound;
+		numerator++
+	) {
 		const fractionValue = numerator / axis.denominator
 		const boxX = toSvgX(fractionValue)
 

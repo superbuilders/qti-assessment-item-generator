@@ -1,13 +1,13 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { PADDING } from "../utils/constants"
-import { CSS_COLOR_PATTERN } from "../utils/css-color"
-import { Path2D } from "../utils/path-builder"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { PADDING } from "@/widgets/utils/constants"
+import { CSS_COLOR_PATTERN } from "@/widgets/utils/css-color"
+import { Path2D } from "@/widgets/utils/path-builder"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
 
 const KAArc = z
 	.object({
@@ -59,7 +59,9 @@ const KAArc = z
 		label: z
 			.string()
 			.nullable()
-			.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
+			.transform((val) =>
+				val === "null" || val === "NULL" || val === "" ? null : val
+			)
 			.describe(
 				"Text label for the angle (e.g., '72°', '36°', 'α', null). Null shows arc without label. Positioned near the arc."
 			),
@@ -152,7 +154,9 @@ export const generatePentagonIntersectionDiagram: WidgetGenerator<
 		logger.error("pentagon diagram invalid point count", {
 			pointCount: data.pentagonPoints.length
 		})
-		throw errors.new(`pentagon must have exactly 5 points, got ${data.pentagonPoints.length}`)
+		throw errors.new(
+			`pentagon must have exactly 5 points, got ${data.pentagonPoints.length}`
+		)
 	}
 
 	const { width, height, pentagonPoints, intersectionLines, khanArcs } = data
@@ -266,9 +270,11 @@ export const generatePentagonIntersectionDiagram: WidgetGenerator<
 		// Calculate the perpendicular direction outward from the arc
 		// This is perpendicular to the line from start to end of arc
 		const perpX =
-			-arc.endDeltaY / Math.sqrt(arc.endDeltaX * arc.endDeltaX + arc.endDeltaY * arc.endDeltaY)
+			-arc.endDeltaY /
+			Math.sqrt(arc.endDeltaX * arc.endDeltaX + arc.endDeltaY * arc.endDeltaY)
 		const perpY =
-			arc.endDeltaX / Math.sqrt(arc.endDeltaX * arc.endDeltaX + arc.endDeltaY * arc.endDeltaY)
+			arc.endDeltaX /
+			Math.sqrt(arc.endDeltaX * arc.endDeltaX + arc.endDeltaY * arc.endDeltaY)
 
 		// Position label just outside the arc edge (radius + small offset) if label exists
 		if (arc.label) {

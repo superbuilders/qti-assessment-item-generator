@@ -2,9 +2,9 @@ import { describe, expect, test } from "bun:test"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { XMLValidator } from "fast-xml-parser"
-import { compile } from "../../src/compiler/compiler"
-import { allExamples } from "../../src/examples"
-import { allWidgetsCollection } from "../../src/widgets/collections/all"
+import { compile } from "@/compiler/compiler"
+import { allExamples } from "@/examples"
+import { allWidgetsCollection } from "@/widgets/collections/all"
 
 describe("QTI Compiler End-to-End Tests", () => {
 	for (const example of allExamples) {

@@ -1,13 +1,13 @@
 import { afterAll, beforeAll, describe, expect, test } from "bun:test"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import { buildMathacademyEnvelope } from "../../../src/structured/ai-context-builder"
+import { buildMathacademyEnvelope } from "@/structured/ai-context-builder"
 import {
 	expectEmptyPayloads,
 	expectSortedUrls,
 	expectSupplementaryContentCount
-} from "./helpers/assertions"
-import { createPrdMockFetch } from "./helpers/mock-fetch"
+} from "@/testing/structured/ai-context-builder/helpers/assertions"
+import { createPrdMockFetch } from "@/testing/structured/ai-context-builder/helpers/mock-fetch"
 
 describe("buildMathacademyEnvelope (unit)", () => {
 	let previousFetch: typeof fetch
@@ -38,7 +38,9 @@ describe("buildMathacademyEnvelope (unit)", () => {
 	})
 
 	test("throws for invalid screenshot URL", async () => {
-		const result = await errors.try(buildMathacademyEnvelope("<div>...</div>", "not-a-valid-url"))
+		const result = await errors.try(
+			buildMathacademyEnvelope("<div>...</div>", "not-a-valid-url")
+		)
 		expect(result.error).toBeTruthy()
 	})
 
@@ -66,7 +68,8 @@ describe("buildMathacademyEnvelope (unit)", () => {
 	})
 
 	test("handles mixed-case SVG extensions and querystrings", async () => {
-		const html = '<img src="https://example.com/Vector.SVG?cache=1" alt="diagram">'
+		const html =
+			'<img src="https://example.com/Vector.SVG?cache=1" alt="diagram">'
 		const result = await errors.try(buildMathacademyEnvelope(html))
 		expect(result.error).toBeFalsy()
 		if (result.error) {
@@ -104,7 +107,8 @@ describe("buildMathacademyEnvelope (unit)", () => {
 	})
 
 	test("does not extract inline SVG content", async () => {
-		const html = '<p>Inline SVG: <svg><circle cx="10" cy="10" r="5" /></svg></p>'
+		const html =
+			'<p>Inline SVG: <svg><circle cx="10" cy="10" r="5" /></svg></p>'
 		const result = await errors.try(buildMathacademyEnvelope(html))
 		expect(result.error).toBeFalsy()
 		if (result.error) {
@@ -133,7 +137,9 @@ describe("buildMathacademyEnvelope (unit)", () => {
 		// One HTML + one fetched SVG content
 		expect(envelope.primaryContent).toBeTruthy()
 		expectSupplementaryContentCount(envelope, 1)
-		expect(envelope.multimodalImageUrls).toEqual(["https://example.com/photo.png"])
+		expect(envelope.multimodalImageUrls).toEqual([
+			"https://example.com/photo.png"
+		])
 	})
 
 	test("skips external SVG that times out/fails", async () => {

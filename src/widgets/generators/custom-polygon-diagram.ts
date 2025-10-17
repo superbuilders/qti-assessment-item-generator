@@ -1,24 +1,36 @@
 import { z } from "zod"
 // Path2D not needed after removing annotations
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { PADDING } from "../utils/constants"
-import { CSS_COLOR_PATTERN } from "../utils/css-color"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { PADDING } from "@/widgets/utils/constants"
+import { CSS_COLOR_PATTERN } from "@/widgets/utils/css-color"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
 
 // Factory to create a point schema. Using a factory prevents Zod from deduplicating
 // and emitting $ref in generated JSON schema, which breaks OpenAI schema consumers.
 function createPointSchema() {
 	return z
 		.object({
-			x: z.number().describe("The x-coordinate of the vertex in a relative coordinate space."),
-			y: z.number().describe("The y-coordinate of the vertex in a relative coordinate space."),
+			x: z
+				.number()
+				.describe(
+					"The x-coordinate of the vertex in a relative coordinate space."
+				),
+			y: z
+				.number()
+				.describe(
+					"The y-coordinate of the vertex in a relative coordinate space."
+				),
 			label: z
 				.string()
 				.nullable()
-				.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
-				.describe("Optional text label for the vertex (e.g., 'P', 'Q'). Null for no label.")
+				.transform((val) =>
+					val === "null" || val === "NULL" || val === "" ? null : val
+				)
+				.describe(
+					"Optional text label for the vertex (e.g., 'P', 'Q'). Null for no label."
+				)
 		})
 		.strict()
 }
@@ -52,7 +64,9 @@ export const CustomPolygonDiagramPropsSchema = z
 	})
 	.strict()
 
-export type CustomPolygonDiagramProps = z.infer<typeof CustomPolygonDiagramPropsSchema>
+export type CustomPolygonDiagramProps = z.infer<
+	typeof CustomPolygonDiagramPropsSchema
+>
 
 /**
  * Generates an SVG diagram of a custom polygon with annotations.
@@ -78,7 +92,10 @@ export const generateCustomPolygonDiagram: WidgetGenerator<
 	const dataWidth = maxX - minX
 	const dataHeight = maxY - minY
 
-	const scale = Math.min((width - PADDING * 4) / dataWidth, (height - PADDING * 4) / dataHeight)
+	const scale = Math.min(
+		(width - PADDING * 4) / dataWidth,
+		(height - PADDING * 4) / dataHeight
+	)
 	const offsetX = (width - dataWidth * scale) / 2
 	const offsetY = (height - dataHeight * scale) / 2
 
@@ -103,7 +120,9 @@ export const generateCustomPolygonDiagram: WidgetGenerator<
 		const pointDef = points[i]
 		if (!pointDef) return
 
-		canvas.drawCircle(p.x, p.y, theme.geometry.pointRadius.base, { fill: theme.colors.black })
+		canvas.drawCircle(p.x, p.y, theme.geometry.pointRadius.base, {
+			fill: theme.colors.black
+		})
 
 		if (pointDef.label) {
 			const OFFSET = 14

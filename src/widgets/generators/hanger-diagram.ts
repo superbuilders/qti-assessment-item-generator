@@ -1,11 +1,11 @@
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { PADDING } from "../utils/constants"
-import { CSS_COLOR_PATTERN } from "../utils/css-color"
-import { Path2D } from "../utils/path-builder"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { PADDING } from "@/widgets/utils/constants"
+import { CSS_COLOR_PATTERN } from "@/widgets/utils/css-color"
+import { Path2D } from "@/widgets/utils/path-builder"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
 
 function createWeightSchema() {
 	return z
@@ -13,7 +13,9 @@ function createWeightSchema() {
 			label: z
 				.union([z.string(), z.number()])
 				.nullable()
-				.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
+				.transform((val) =>
+					val === "null" || val === "NULL" || val === "" ? null : val
+				)
 				.describe(
 					"The value or variable displayed on this weight (e.g., 5, 'x', 12, 'y', '2x', 3.5, null). Can be numeric values or algebraic expressions. Null shows no label."
 				),
@@ -24,7 +26,10 @@ function createWeightSchema() {
 				),
 			backgroundColor: z
 				.string()
-				.regex(CSS_COLOR_PATTERN, "invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)")
+				.regex(
+					CSS_COLOR_PATTERN,
+					"invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)"
+				)
 				.describe(
 					"Hex-only background color for this weight (e.g., '#F4F8FF', '#FFF5CC', '#E6FFEE'). Text is rendered in black on top; background MUST be a light color to ensure contrast."
 				)
@@ -64,9 +69,9 @@ export type HangerDiagramProps = z.infer<typeof HangerDiagramPropsSchema>
  * algebraic equation, rendered as an SVG graphic. This diagram is ideal for introducing
  * students to the concept of solving equations by maintaining balance.
  */
-export const generateHangerDiagram: WidgetGenerator<typeof HangerDiagramPropsSchema> = async (
-	data
-) => {
+export const generateHangerDiagram: WidgetGenerator<
+	typeof HangerDiagramPropsSchema
+> = async (data) => {
 	const { width, height, leftSide, rightSide } = data
 	const centerX = width / 2
 
@@ -89,7 +94,10 @@ export const generateHangerDiagram: WidgetGenerator<typeof HangerDiagramPropsSch
 	// Compute weight size so that all rows fit within available space
 	let size = Math.min(
 		maxWeightSize,
-		Math.max(minWeightSize, Math.floor((availableBelowBeam - 10) / maxStack) - baseGap)
+		Math.max(
+			minWeightSize,
+			Math.floor((availableBelowBeam - 10) / maxStack) - baseGap
+		)
 	)
 	// In edge cases (very small height), ensure size is not NaN or negative
 	if (!Number.isFinite(size) || size < minWeightSize) {
@@ -179,7 +187,9 @@ export const generateHangerDiagram: WidgetGenerator<typeof HangerDiagramPropsSch
 
 	// First, draw all the lines
 	const renderLines = (weights: typeof leftSide, isLeft: boolean) => {
-		const sideCenterX = isLeft ? beamStartX + beamWidth / 4 : beamEndX - beamWidth / 4
+		const sideCenterX = isLeft
+			? beamStartX + beamWidth / 4
+			: beamEndX - beamWidth / 4
 		weights.forEach((_w, i) => {
 			const weightY = weightYStart + i * weightHeight
 			canvas.drawLine(
@@ -197,7 +207,9 @@ export const generateHangerDiagram: WidgetGenerator<typeof HangerDiagramPropsSch
 
 	// Then, draw all the shapes on top
 	const renderShapes = (weights: typeof leftSide, isLeft: boolean) => {
-		const sideCenterX = isLeft ? beamStartX + beamWidth / 4 : beamEndX - beamWidth / 4
+		const sideCenterX = isLeft
+			? beamStartX + beamWidth / 4
+			: beamEndX - beamWidth / 4
 		weights.forEach((w, i) => {
 			const weightY = weightYStart + i * weightHeight
 			drawWeight(sideCenterX, weightY, w)

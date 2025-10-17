@@ -1,9 +1,9 @@
 import { describe, expect, test } from "bun:test"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import { treeDiagramExamples } from "../../examples/tree-diagram"
-import type { WidgetInput } from "../../src/widgets/registry"
-import { generateWidgetForTest } from "../helpers/generateWidgetForTest"
+import { treeDiagramExamples } from "@/examples/tree-diagram"
+import { generateWidgetForTest } from "@/testing/helpers/generateWidgetForTest"
+import type { WidgetInput } from "@/widgets/registry"
 
 describe("Widget: tree-diagram", () => {
 	const examples: WidgetInput[] = treeDiagramExamples

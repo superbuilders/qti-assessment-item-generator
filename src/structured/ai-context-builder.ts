@@ -1,6 +1,6 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import type { AiContextEnvelope } from "./types"
+import type { AiContextEnvelope } from "@/structured/types"
 
 const SUPPORTED_EXTENSIONS = ["svg", "png", "jpeg", "jpg", "gif"] as const
 const IMAGE_URL_REGEX = /https?:\/\/[^\s"'()<>]+?\.(svg|png|jpeg|jpg|gif)/gi
@@ -8,7 +8,10 @@ const IMAGE_URL_REGEX = /https?:\/\/[^\s"'()<>]+?\.(svg|png|jpeg|jpg|gif)/gi
 const FETCH_TIMEOUT_MS = 30000
 export async function buildPerseusEnvelope(
 	perseusJson: unknown,
-	fetchFn: (url: string | URL | Request, init?: RequestInit) => Promise<Response> = fetch
+	fetchFn: (
+		url: string | URL | Request,
+		init?: RequestInit
+	) => Promise<Response> = fetch
 ): Promise<AiContextEnvelope> {
 	const primaryContent = JSON.stringify(perseusJson, null, 2)
 	const supplementaryContent: string[] = []
@@ -36,7 +39,11 @@ export async function buildPerseusEnvelope(
 
 	const resolveAndFetchUrl = async (
 		url: string
-	): Promise<{ type: "raster" | "svg"; url: string; content?: string } | null> => {
+	): Promise<{
+		type: "raster" | "svg"
+		url: string
+		content?: string
+	} | null> => {
 		if (url.startsWith("web+graphie://")) {
 			const baseUrl = url.replace("web+graphie://", "https://")
 			for (const ext of SUPPORTED_EXTENSIONS) {
@@ -52,7 +59,9 @@ export async function buildPerseusEnvelope(
 
 				if (ext === "svg") {
 					const dl = await errors.try(
-						fetchFn(urlWithExt, { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) })
+						fetchFn(urlWithExt, {
+							signal: AbortSignal.timeout(FETCH_TIMEOUT_MS)
+						})
 					)
 					if (dl.error || !dl.data.ok) continue
 					const text = await errors.try(dl.data.text())
@@ -70,7 +79,9 @@ export async function buildPerseusEnvelope(
 			if (u.protocol !== "http:" && u.protocol !== "https:") return null
 
 			if (url.endsWith(".svg")) {
-				const dl = await errors.try(fetchFn(url, { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) }))
+				const dl = await errors.try(
+					fetchFn(url, { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) })
+				)
 				if (dl.error || !dl.data.ok) return null
 				const text = await errors.try(dl.data.text())
 				if (text.error) return null
@@ -88,7 +99,10 @@ export async function buildPerseusEnvelope(
 		const promises = Array.from(foundUrls).map(async (url) => {
 			const result = await errors.try(resolveAndFetchUrl(url))
 			if (result.error || !result.data) {
-				logger.warn("failed to resolve perseus url", { url, error: result.error })
+				logger.warn("failed to resolve perseus url", {
+					url,
+					error: result.error
+				})
 				return
 			}
 			if (result.data.type === "svg" && result.data.content) {
@@ -113,7 +127,10 @@ export async function buildPerseusEnvelope(
 export async function buildMathacademyEnvelope(
 	html: string,
 	screenshotUrl?: string,
-	fetchFn: (url: string | URL | Request, init?: RequestInit) => Promise<Response> = fetch
+	fetchFn: (
+		url: string | URL | Request,
+		init?: RequestInit
+	) => Promise<Response> = fetch
 ): Promise<AiContextEnvelope> {
 	const primaryContent = html
 	const supplementaryContent: string[] = []
@@ -123,7 +140,10 @@ export async function buildMathacademyEnvelope(
 	if (screenshotUrl) {
 		const result = errors.trySync(() => new URL(screenshotUrl))
 		if (result.error) {
-			logger.error("invalid screenshot url", { screenshotUrl, error: result.error })
+			logger.error("invalid screenshot url", {
+				screenshotUrl,
+				error: result.error
+			})
 			throw errors.wrap(result.error, "screenshot url parse")
 		}
 		const normalized = result.data
@@ -148,7 +168,10 @@ export async function buildMathacademyEnvelope(
 
 		const urlResult = errors.trySync(() => new URL(rawSrc))
 		if (urlResult.error) {
-			logger.warn("skipping invalid image src in html", { src: rawSrc, error: urlResult.error })
+			logger.warn("skipping invalid image src in html", {
+				src: rawSrc,
+				error: urlResult.error
+			})
 			match = imgTagRegex.exec(html)
 			continue
 		}
@@ -174,12 +197,18 @@ export async function buildMathacademyEnvelope(
 				fetchFn(url, { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) })
 			)
 			if (result.error || !result.data.ok) {
-				logger.warn("failed to fetch svg from html", { url, error: result.error })
+				logger.warn("failed to fetch svg from html", {
+					url,
+					error: result.error
+				})
 				return
 			}
 			const textResult = await errors.try(result.data.text())
 			if (textResult.error) {
-				logger.warn("failed to read svg text from html", { url, error: textResult.error })
+				logger.warn("failed to read svg text from html", {
+					url,
+					error: textResult.error
+				})
 				return
 			}
 			const contentWithComment = `<!-- URL: ${url} -->\n${textResult.data}`

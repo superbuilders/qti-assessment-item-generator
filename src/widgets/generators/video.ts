@@ -1,8 +1,8 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
+import type { WidgetGenerator } from "@/widgets/types"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
 
 // 1. Zod Schema for Video Widget Properties
 export const VideoPropsSchema = z
@@ -14,7 +14,9 @@ export const VideoPropsSchema = z
 			.string()
 			.url()
 			.regex(/^https:/, "URL must use https://")
-			.describe("The full embed URL for the video (e.g., from YouTube). Must be an https:// URL."),
+			.describe(
+				"The full embed URL for the video (e.g., from YouTube). Must be an https:// URL."
+			),
 		fallbackText: z
 			.string()
 			.max(200)
@@ -29,10 +31,15 @@ export const VideoPropsSchema = z
 export type VideoProps = z.infer<typeof VideoPropsSchema>
 
 // 3. Widget Generator Function
-export const generateVideo: WidgetGenerator<typeof VideoPropsSchema> = async (data) => {
+export const generateVideo: WidgetGenerator<typeof VideoPropsSchema> = async (
+	data
+) => {
 	const validationResult = VideoPropsSchema.safeParse(data)
 	if (!validationResult.success) {
-		logger.error("video widget validation failed", { error: validationResult.error, data })
+		logger.error("video widget validation failed", {
+			error: validationResult.error,
+			data
+		})
 		throw errors.wrap(validationResult.error, "video widget validation")
 	}
 

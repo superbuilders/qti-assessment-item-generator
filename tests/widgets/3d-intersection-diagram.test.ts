@@ -1,9 +1,9 @@
 import { describe, expect, test } from "bun:test"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import { threeDIntersectionDiagramExamples } from "../../examples/3d-intersection-diagram"
-import type { WidgetInput } from "../../src/widgets/registry"
-import { generateWidgetForTest } from "../helpers/generateWidgetForTest"
+import { threeDIntersectionDiagramExamples } from "@/examples/3d-intersection-diagram"
+import { generateWidgetForTest } from "@/testing/helpers/generateWidgetForTest"
+import type { WidgetInput } from "@/widgets/registry"
 
 describe("Widget: 3d-intersection-diagram", () => {
 	const examples: WidgetInput[] = threeDIntersectionDiagramExamples

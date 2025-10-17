@@ -1,9 +1,9 @@
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { PADDING } from "../utils/constants"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { PADDING } from "@/widgets/utils/constants"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
 
 /**
  * Creates a diagram of an analog clock face showing a specific time.
@@ -18,13 +18,17 @@ export const ClockDiagramPropsSchema = z
 			.int()
 			.min(1)
 			.max(12)
-			.describe("The hour to display (1-12). The hour hand will be positioned accordingly."),
+			.describe(
+				"The hour to display (1-12). The hour hand will be positioned accordingly."
+			),
 		minute: z
 			.number()
 			.int()
 			.min(0)
 			.max(59)
-			.describe("The minute to display (0-59). The minute hand will be positioned accordingly.")
+			.describe(
+				"The minute to display (0-59). The minute hand will be positioned accordingly."
+			)
 	})
 	.strict()
 
@@ -33,9 +37,9 @@ export type ClockDiagramProps = z.infer<typeof ClockDiagramPropsSchema>
 /**
  * Generates an SVG diagram of an analog clock.
  */
-export const generateClockDiagram: WidgetGenerator<typeof ClockDiagramPropsSchema> = async (
-	props
-) => {
+export const generateClockDiagram: WidgetGenerator<
+	typeof ClockDiagramPropsSchema
+> = async (props) => {
 	const { width, height, hour, minute } = props
 
 	const canvas = new CanvasImpl({
@@ -107,13 +111,20 @@ export const generateClockDiagram: WidgetGenerator<typeof ClockDiagramPropsSchem
 	)
 
 	// Hour hand (moves with minute)
-	const hourAngle = ((hour % 12) / 12 + minute / (12 * 60)) * 2 * Math.PI - Math.PI / 2
+	const hourAngle =
+		((hour % 12) / 12 + minute / (12 * 60)) * 2 * Math.PI - Math.PI / 2
 	const hourLen = radius * 0.38
-	canvas.drawLine(cx, cy, cx + hourLen * Math.cos(hourAngle), cy + hourLen * Math.sin(hourAngle), {
-		stroke: theme.colors.black,
-		strokeWidth: 6,
-		strokeLinecap: "round"
-	})
+	canvas.drawLine(
+		cx,
+		cy,
+		cx + hourLen * Math.cos(hourAngle),
+		cy + hourLen * Math.sin(hourAngle),
+		{
+			stroke: theme.colors.black,
+			strokeWidth: 6,
+			strokeLinecap: "round"
+		}
+	)
 
 	// Center hub
 	canvas.drawCircle(cx, cy, 6, { fill: theme.colors.black })

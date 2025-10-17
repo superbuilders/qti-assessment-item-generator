@@ -1,10 +1,10 @@
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { PADDING } from "../utils/constants"
-import { CSS_COLOR_PATTERN } from "../utils/css-color"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { PADDING } from "@/widgets/utils/constants"
+import { CSS_COLOR_PATTERN } from "@/widgets/utils/css-color"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
 
 // New side-centric square and side schemas
 function createSquarePropsSchema() {
@@ -13,7 +13,9 @@ function createSquarePropsSchema() {
 			.object({
 				type: z
 					.literal("unknown")
-					.describe("Square with unknown area, displays '?' as placeholder text"),
+					.describe(
+						"Square with unknown area, displays '?' as placeholder text"
+					),
 				color: z
 					.string()
 					.regex(
@@ -32,7 +34,9 @@ function createSquarePropsSchema() {
 			.object({
 				type: z
 					.literal("value")
-					.describe("Square with known numeric area, displays the calculated area value"),
+					.describe(
+						"Square with known numeric area, displays the calculated area value"
+					),
 				area: z
 					.number()
 					.positive()
@@ -65,7 +69,9 @@ function createTriangleSidePropsSchema() {
 				),
 			square: createSquarePropsSchema()
 				.nullable()
-				.describe("Optional square attached to this side. Null to hide the square.")
+				.describe(
+					"Optional square attached to this side. Null to hide the square."
+				)
 		})
 		.strict()
 }
@@ -97,7 +103,9 @@ const NewPythagoreanPropsSchema = z
 
 export const PythagoreanProofDiagramPropsSchema = NewPythagoreanPropsSchema
 
-export type PythagoreanProofDiagramProps = z.infer<typeof PythagoreanProofDiagramPropsSchema>
+export type PythagoreanProofDiagramProps = z.infer<
+	typeof PythagoreanProofDiagramPropsSchema
+>
 
 /**
  * Generates a visual diagram to illustrate the Pythagorean theorem by rendering a
@@ -109,15 +117,24 @@ export const generatePythagoreanProofDiagram: WidgetGenerator<
 	const { width, height, sideA, sideB, sideC } = data
 
 	const aAreaNum =
-		sideA?.square?.type === "value" && sideA.square.area > 0 ? sideA.square.area : undefined
+		sideA?.square?.type === "value" && sideA.square.area > 0
+			? sideA.square.area
+			: undefined
 	const bAreaNum =
-		sideB?.square?.type === "value" && sideB.square.area > 0 ? sideB.square.area : undefined
+		sideB?.square?.type === "value" && sideB.square.area > 0
+			? sideB.square.area
+			: undefined
 	const cAreaNum =
-		sideC?.square?.type === "value" && sideC.square.area > 0 ? sideC.square.area : undefined
+		sideC?.square?.type === "value" && sideC.square.area > 0
+			? sideC.square.area
+			: undefined
 
-	let aLen: number | undefined = aAreaNum !== undefined ? Math.sqrt(aAreaNum) : undefined
-	let bLen: number | undefined = bAreaNum !== undefined ? Math.sqrt(bAreaNum) : undefined
-	let cLen: number | undefined = cAreaNum !== undefined ? Math.sqrt(cAreaNum) : undefined
+	let aLen: number | undefined =
+		aAreaNum !== undefined ? Math.sqrt(aAreaNum) : undefined
+	let bLen: number | undefined =
+		bAreaNum !== undefined ? Math.sqrt(bAreaNum) : undefined
+	let cLen: number | undefined =
+		cAreaNum !== undefined ? Math.sqrt(cAreaNum) : undefined
 
 	if (
 		aLen === undefined &&
@@ -143,7 +160,8 @@ export const generatePythagoreanProofDiagram: WidgetGenerator<
 	const defaultLen = 10
 	const resolvedA = aLen ?? defaultLen
 	const resolvedB = bLen ?? defaultLen
-	const resolvedC = cLen ?? Math.sqrt(resolvedA * resolvedA + resolvedB * resolvedB)
+	const resolvedC =
+		cLen ?? Math.sqrt(resolvedA * resolvedA + resolvedB * resolvedB)
 	const a = resolvedA
 	const b = resolvedB
 	const c = resolvedC
@@ -231,7 +249,9 @@ export const generatePythagoreanProofDiagram: WidgetGenerator<
 				.map((ch) => supMap[ch] ?? ch)
 				.join("")
 		// ^{...}
-		let out = input.replace(/\^\{([^}]+)\}/g, (_, grp: string) => replaceSeq(grp))
+		let out = input.replace(/\^\{([^}]+)\}/g, (_, grp: string) =>
+			replaceSeq(grp)
+		)
 		// ^x (single token of digits/sign)
 		out = out.replace(/\^(\d[\d+-]*)/g, (_, grp: string) => replaceSeq(grp))
 		return out
@@ -272,7 +292,9 @@ export const generatePythagoreanProofDiagram: WidgetGenerator<
 			y: (v_a_end.y + v_c1.y) / 2
 		})
 		const cText =
-			sideC.square.type === "unknown" ? "?" : toSuperscript(String(Math.round(sideC.square.area)))
+			sideC.square.type === "unknown"
+				? "?"
+				: toSuperscript(String(Math.round(sideC.square.area)))
 		canvas.drawText({
 			x: centerC.x,
 			y: centerC.y,
@@ -300,7 +322,9 @@ export const generatePythagoreanProofDiagram: WidgetGenerator<
 
 		const centerB = project({ x: v_right.x + b / 2, y: v_b_end.y + b / 2 })
 		const bText =
-			sideB.square.type === "unknown" ? "?" : toSuperscript(String(Math.round(sideB.square.area)))
+			sideB.square.type === "unknown"
+				? "?"
+				: toSuperscript(String(Math.round(sideB.square.area)))
 		canvas.drawText({
 			x: centerB.x,
 			y: centerB.y,
@@ -328,7 +352,9 @@ export const generatePythagoreanProofDiagram: WidgetGenerator<
 
 		const centerA = project({ x: v_a_end.x + a / 2, y: v_a_end.y + a / 2 })
 		const aText =
-			sideA.square.type === "unknown" ? "?" : toSuperscript(String(Math.round(sideA.square.area)))
+			sideA.square.type === "unknown"
+				? "?"
+				: toSuperscript(String(Math.round(sideA.square.area)))
 		canvas.drawText({
 			x: centerA.x,
 			y: centerA.y,

@@ -16,7 +16,11 @@ export type AnyInteraction<E extends readonly string[] = readonly string[]> =
 			choices: Array<{ identifier: string; content: InlineContent<E> }>
 			shuffle: true
 	  }
-	| { type: "textEntryInteraction"; responseIdentifier: string; expectedLength: number | null }
+	| {
+			type: "textEntryInteraction"
+			responseIdentifier: string
+			expectedLength: number | null
+	  }
 	| {
 			type: "orderInteraction"
 			responseIdentifier: string
@@ -30,7 +34,15 @@ export type AnyInteraction<E extends readonly string[] = readonly string[]> =
 			responseIdentifier: string
 			shuffle: boolean
 			content: BlockContent<E>
-			gapTexts: Array<{ identifier: string; matchMax: number; content: InlineContent<E> }>
+			gapTexts: Array<{
+				identifier: string
+				matchMax: number
+				content: InlineContent<E>
+			}>
 			gaps: Array<{ identifier: string; required: boolean | null }>
 	  }
-	| { type: "unsupportedInteraction"; perseusType: string; responseIdentifier: string }
+	| {
+			type: "unsupportedInteraction"
+			perseusType: string
+			responseIdentifier: string
+	  }

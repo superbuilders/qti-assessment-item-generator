@@ -1,10 +1,10 @@
 import { describe, expect, test } from "bun:test"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import { integerChipModelExamples } from "../../examples/integer-chip-model"
-import type { IntegerChipModelProps } from "../../src/widgets/generators/integer-chip-model"
-import type { WidgetInput } from "../../src/widgets/registry"
-import { generateWidgetForTest } from "../helpers/generateWidgetForTest"
+import { integerChipModelExamples } from "@/examples/integer-chip-model"
+import { generateWidgetForTest } from "@/testing/helpers/generateWidgetForTest"
+import type { IntegerChipModelProps } from "@/widgets/generators/integer-chip-model"
+import type { WidgetInput } from "@/widgets/registry"
 
 describe("Widget: integer-chip-model", () => {
 	const examples: WidgetInput[] = integerChipModelExamples

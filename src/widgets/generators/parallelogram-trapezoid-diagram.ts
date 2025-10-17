@@ -1,12 +1,12 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { PADDING } from "../utils/constants"
-import { Path2D } from "../utils/path-builder"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { PADDING } from "@/widgets/utils/constants"
+import { Path2D } from "@/widgets/utils/path-builder"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
 
 // Factory function to create label value schema - avoids $ref in OpenAI JSON schema
 const createLabelValueSchema = () =>
@@ -23,7 +23,9 @@ type LabelValue =
 
 const Parallelogram = z
 	.object({
-		type: z.literal("parallelogram").describe("Specifies a parallelogram shape."),
+		type: z
+			.literal("parallelogram")
+			.describe("Specifies a parallelogram shape."),
 		base: z
 			.number()
 			.positive()
@@ -33,7 +35,9 @@ const Parallelogram = z
 		height: z
 			.number()
 			.positive()
-			.describe("Perpendicular height of the parallelogram in arbitrary units (e.g., 4, 6, 7.5)"),
+			.describe(
+				"Perpendicular height of the parallelogram in arbitrary units (e.g., 4, 6, 7.5)"
+			),
 		slantAngle: z
 			.number()
 			.min(1, "slant angle must be at least 1°")
@@ -110,7 +114,9 @@ const RightTrapezoid = z
 
 const GeneralTrapezoid = z
 	.object({
-		type: z.literal("trapezoid").describe("Specifies a general trapezoid (both sides slanted)."),
+		type: z
+			.literal("trapezoid")
+			.describe("Specifies a general trapezoid (both sides slanted)."),
 		topBase: z
 			.number()
 			.positive()
@@ -164,12 +170,20 @@ export const ParallelogramTrapezoidDiagramPropsSchema = z
 	.object({
 		type: z
 			.literal("parallelogramTrapezoidDiagram")
-			.describe("Identifies this as a parallelogram or trapezoid diagram widget."),
+			.describe(
+				"Identifies this as a parallelogram or trapezoid diagram widget."
+			),
 		width: createWidthSchema(),
 		height: createHeightSchema(),
 		shape: z
-			.discriminatedUnion("type", [Parallelogram, RightTrapezoid, GeneralTrapezoid])
-			.describe("The specific quadrilateral to draw with its dimensions and labels.")
+			.discriminatedUnion("type", [
+				Parallelogram,
+				RightTrapezoid,
+				GeneralTrapezoid
+			])
+			.describe(
+				"The specific quadrilateral to draw with its dimensions and labels."
+			)
 	})
 	.strict()
 	.describe(
@@ -221,7 +235,10 @@ export const generateParallelogramTrapezoidDiagram: WidgetGenerator<
 		shapeHeight = shape.height
 	}
 
-	const scale = Math.min(availableWidth / shapeWidth, availableHeight / shapeHeight)
+	const scale = Math.min(
+		availableWidth / shapeWidth,
+		availableHeight / shapeHeight
+	)
 	// --- SCALING LOGIC END ---
 
 	// Center the shape in the diagram
@@ -250,9 +267,12 @@ export const generateParallelogramTrapezoidDiagram: WidgetGenerator<
 		]
 
 		// Draw outer boundary polygon
-		const outerPoints = [vertices[0], vertices[1], vertices[2], vertices[3]].filter(
-			(p) => p !== undefined
-		)
+		const outerPoints = [
+			vertices[0],
+			vertices[1],
+			vertices[2],
+			vertices[3]
+		].filter((p) => p !== undefined)
 		canvas.drawPolygon(outerPoints, {
 			stroke: theme.colors.black,
 			strokeWidth: theme.stroke.width.thick
@@ -412,9 +432,12 @@ export const generateParallelogramTrapezoidDiagram: WidgetGenerator<
 		]
 
 		// Draw outer boundary polygon
-		const outerPoints = [vertices[0], vertices[1], vertices[2], vertices[3]].filter(
-			(p) => p !== undefined
-		)
+		const outerPoints = [
+			vertices[0],
+			vertices[1],
+			vertices[2],
+			vertices[3]
+		].filter((p) => p !== undefined)
 		canvas.drawPolygon(outerPoints, {
 			stroke: theme.colors.black,
 			strokeWidth: theme.stroke.width.thick
@@ -545,9 +568,12 @@ export const generateParallelogramTrapezoidDiagram: WidgetGenerator<
 		]
 
 		// Draw outer boundary polygon
-		const outerPoints = [vertices[0], vertices[1], vertices[2], vertices[3]].filter(
-			(p) => p !== undefined
-		)
+		const outerPoints = [
+			vertices[0],
+			vertices[1],
+			vertices[2],
+			vertices[3]
+		].filter((p) => p !== undefined)
 		canvas.drawPolygon(outerPoints, {
 			stroke: theme.colors.black,
 			strokeWidth: theme.stroke.width.thick

@@ -1,10 +1,10 @@
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { PADDING } from "../utils/constants"
-import { CSS_COLOR_PATTERN } from "../utils/css-color"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { PADDING } from "@/widgets/utils/constants"
+import { CSS_COLOR_PATTERN } from "@/widgets/utils/css-color"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
 
 function createRectSchema() {
 	return z
@@ -31,7 +31,9 @@ function createGroupSchema() {
 			label: z
 				.string()
 				.nullable()
-				.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
+				.transform((val) =>
+					val === "null" || val === "NULL" || val === "" ? null : val
+				)
 				.describe(
 					"Label for this shape transformation (e.g., 'Shape A', 'Rectangle 1', 'Original', null). Displayed as a header for the shape pair. Null for no label."
 				),
@@ -75,7 +77,9 @@ export const ScaleCopiesSliderPropsSchema = z
 		"Compares two rectangle transformations side-by-side to illustrate proportional (similar shapes) vs non-proportional scaling. Each group shows before/after rectangles. Essential for teaching similarity, scale factors, and distinguishing between scaling that preserves shape vs distortion."
 	)
 
-export type ScaleCopiesSliderProps = z.infer<typeof ScaleCopiesSliderPropsSchema>
+export type ScaleCopiesSliderProps = z.infer<
+	typeof ScaleCopiesSliderPropsSchema
+>
 
 /**
  * Generates an SVG diagram to visually compare a proportional scaling
@@ -122,7 +126,10 @@ export const generateScaleCopiesSlider: WidgetGenerator<
 	 * Helper function to draw a single row (e.g., for Shape A) containing
 	 * the "Before" shape, an arrow, and the "After" shape.
 	 */
-	const drawShapeGroup = (shape: ScaleCopiesSliderProps["shapeA"], yOffset: number): void => {
+	const drawShapeGroup = (
+		shape: ScaleCopiesSliderProps["shapeA"],
+		yOffset: number
+	): void => {
 		// --- Before Shape ---
 		const beforeW = shape.before.width * scale
 		const beforeH = shape.before.height * scale
@@ -159,7 +166,8 @@ export const generateScaleCopiesSlider: WidgetGenerator<
 		// --- After Shape ---
 		const afterW = shape.after.width * scale
 		const afterH = shape.after.height * scale
-		const afterX = padding.left + shapeWidth + colGap + (shapeWidth - afterW) / 2 // Center
+		const afterX =
+			padding.left + shapeWidth + colGap + (shapeWidth - afterW) / 2 // Center
 		const afterY = yOffset + (rowHeight - afterH) / 2 // Center
 		// Canvas automatically tracks extents
 		canvas.drawRect(afterX, afterY, afterW, afterH, {

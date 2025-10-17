@@ -1,102 +1,101 @@
 import { z } from "zod"
 
 // Import individual schemas and keep their generators defined in their own files
-import { ThreeDIntersectionDiagramPropsSchema } from "./generators/3d-intersection-diagram"
-import { AdditionWithRegroupingPropsSchema } from "./generators/addition-with-regrouping"
-import { AngleDiagramPropsSchema } from "./generators/angle-diagram"
-import { AngleTypeDiagramPropsSchema } from "./generators/angle-type-diagram"
-import { AreaGraphPropsSchema } from "./generators/area-graph"
-import { AreaModelMultiplicationPropsSchema } from "./generators/area-model-multiplication"
-import { BarChartPropsSchema } from "./generators/bar-chart"
-import { BoxGridPropsSchema } from "./generators/box-grid"
-import { BoxPlotPropsSchema } from "./generators/box-plot"
-import { CircleAngleDiagramPropsSchema } from "./generators/circle-angle-diagram"
-import { CircleDiagramPropsSchema } from "./generators/circle-diagram"
-import { ClockDiagramPropsSchema } from "./generators/clock-diagram"
-import { CompositeShapeDiagramPropsSchema } from "./generators/composite-shape-diagram"
-import { ConceptualGraphPropsSchema } from "./generators/conceptual-graph"
-import { ConstraintGeometryDiagramPropsSchema } from "./generators/constraint-geometry-diagram"
-import { CoordinatePlaneComprehensivePropsSchema } from "./generators/coordinate-plane-comprehensive"
-import { CustomPolygonDiagramPropsSchema } from "./generators/custom-polygon-diagram"
-import { DiscreteObjectRatioDiagramPropsSchema } from "./generators/discrete-object-ratio-diagram"
-import { DivergentBarChartPropsSchema } from "./generators/divergent-bar-chart"
-import { DivisionAreaDiagramPropsSchema } from "./generators/division-area-diagram"
-import { DivisionModelDiagramPropsSchema } from "./generators/division-model-diagram"
-import { DotPlotPropsSchema } from "./generators/dot-plot"
-import { DoubleNumberLinePropsSchema } from "./generators/double-number-line"
-import { EmojiImagePropsSchema } from "./generators/emoji-image"
-import { EquivalentFractionModelPropsSchema } from "./generators/equivalent-fraction-model"
-import { FactorizationDiagramPropsSchema } from "./generators/factorization-diagram"
-import { FigureComparisonDiagramPropsSchema } from "./generators/figure-comparison-diagram"
-import { FractionFrequencyPlotPropsSchema } from "./generators/fraction-frequency-plot"
-import { FractionMultiplicationModelPropsSchema } from "./generators/fraction-multiplication-model"
-import { FractionSumDiagramPropsSchema } from "./generators/fraction-sum-diagram"
-import { FractionModelDiagramPropsSchema } from "./generators/fractional-model-diagram"
-import { FreeBodyDiagramPropsSchema } from "./generators/free-body-diagram"
-import { FunctionPlotGraphPropsSchema } from "./generators/function-plot-graph"
-import { GeometricPrimitiveDiagramPropsSchema } from "./generators/geometric-primitive-diagram"
-import { GeometricSolidDiagramPropsSchema } from "./generators/geometric-solid-diagram"
-import { HangerDiagramPropsSchema } from "./generators/hanger-diagram"
-import { HistogramPropsSchema } from "./generators/histogram"
-import { InequalityNumberLinePropsSchema } from "./generators/inequality-number-line"
-import { IntegerChipLegendPropsSchema } from "./generators/integer-chip-legend"
-import { IntegerChipModelPropsSchema } from "./generators/integer-chip-model"
-import { KeelingCurvePropsSchema } from "./generators/keeling-curve"
-import { LabeledRectangleDiagramPropsSchema } from "./generators/labeled-rectangle-diagram"
-import { LineDiagramPropsSchema } from "./generators/line-diagram"
-import { LineEquationGraphPropsSchema } from "./generators/line-equation-graph"
-import { LineGraphPropsSchema } from "./generators/line-graph"
-import { MarbleDiagramPropsSchema } from "./generators/marble-diagram"
-import { NPolygonPropsSchema } from "./generators/n-polygon"
-import { NumberLinePropsSchema } from "./generators/number-line"
-// removed: number-line-for-opposites
-import { NumberLineWithActionPropsSchema } from "./generators/number-line-with-action"
-import { NumberLineWithFractionGroupsPropsSchema } from "./generators/number-line-with-fraction-groups"
-import { NumberSetDiagramPropsSchema } from "./generators/number-set-diagram"
-import { ParabolaGraphPropsSchema } from "./generators/parabola-graph"
-import { ParallelogramTrapezoidDiagramPropsSchema } from "./generators/parallelogram-trapezoid-diagram"
-import { PartitionedShapePropsSchema } from "./generators/partitioned-shape"
-import { PatternDiagramPropsSchema } from "./generators/pattern-diagram"
-import { PentagonIntersectionDiagramPropsSchema } from "./generators/pentagon-intersection-diagram"
-import { PeriodicTableWidgetPropsSchema } from "./generators/periodic-table"
-import { PESSpectrumPropsSchema } from "./generators/pes-spectrum"
-import { PieChartWidgetPropsSchema } from "./generators/pi-chart"
-import { PictographPropsSchema } from "./generators/pictograph"
-import { PointPlotGraphPropsSchema } from "./generators/point-plot-graph"
-import { PolygonGraphPropsSchema } from "./generators/polygon-graph"
-import { PolyhedronDiagramPropsSchema } from "./generators/polyhedron-diagram"
-import { PolyhedronNetDiagramPropsSchema } from "./generators/polyhedron-net-diagram"
-import { PopulationBarChartPropsSchema } from "./generators/population-bar-chart"
-import { PopulationChangeEventGraphPropsSchema } from "./generators/population-change-event-graph"
-import { ProbabilitySpinnerPropsSchema } from "./generators/probability-spinner"
-import { ProtractorAngleDiagramPropsSchema } from "./generators/protractor-angle-diagram"
-import { PythagoreanProofDiagramPropsSchema } from "./generators/pythagorean-proof-diagram"
-import { QuadrantDiagramPropsSchema } from "./generators/quadrant-diagram"
-import { QuantityFractionalDiagramPropsSchema } from "./generators/quantity-fractional-diagram"
-import { RadiallyConstrainedAngleDiagramPropsSchema } from "./generators/radially-constrained-angle-diagram"
-import { RatioBoxDiagramPropsSchema } from "./generators/ratio-box-diagram"
-import { RectangularFrameDiagramPropsSchema } from "./generators/rectangular-frame-diagram"
-import { ScaleCopiesSliderPropsSchema } from "./generators/scale-copies-slider"
-import { ScatterPlotPropsSchema } from "./generators/scatter-plot"
-import { ShapeTransformationGraphPropsSchema } from "./generators/shape-transformation-graph"
-import { SimpleArrowPropsSchema } from "./generators/simple-arrow"
-import { SinCosineWidgetPropsSchema } from "./generators/sin-cosine-widget"
-import { StackedItemsDiagramPropsSchema } from "./generators/stacked-items-diagram"
-import { StickPlotPropsSchema } from "./generators/stick-plot"
-import { SubtractionWithRegroupingPropsSchema } from "./generators/subtraction-with-regrouping"
-import { SymmetryDiagramPropsSchema } from "./generators/symmetry-diagram"
-import { TapeDiagramPropsSchema } from "./generators/tape-diagram"
-import { TransformationDiagramPropsSchema } from "./generators/transformation-diagram"
-import { TransversalAngleDiagramPropsSchema } from "./generators/transversal-angle-diagram"
-import { TreeDiagramPropsSchema } from "./generators/tree-diagram"
-import { TriangleDiagramPropsSchema } from "./generators/triangle-diagram"
-import { UnitBlockDiagramPropsSchema } from "./generators/unit-block-diagram"
-import { UrlImageWidgetPropsSchema } from "./generators/url-image"
-import { VectorDiagramPropsSchema } from "./generators/vector-diagram"
-import { VennDiagramPropsSchema } from "./generators/venn-diagram"
-import { VerticalArithmeticSetupPropsSchema } from "./generators/vertical-arithmetic-setup"
-import { VideoPropsSchema } from "./generators/video"
-import { WheelDiagramPropsSchema } from "./generators/wheel-diagram"
+import { ThreeDIntersectionDiagramPropsSchema } from "@/widgets/generators/3d-intersection-diagram"
+import { AdditionWithRegroupingPropsSchema } from "@/widgets/generators/addition-with-regrouping"
+import { AngleDiagramPropsSchema } from "@/widgets/generators/angle-diagram"
+import { AngleTypeDiagramPropsSchema } from "@/widgets/generators/angle-type-diagram"
+import { AreaGraphPropsSchema } from "@/widgets/generators/area-graph"
+import { AreaModelMultiplicationPropsSchema } from "@/widgets/generators/area-model-multiplication"
+import { BarChartPropsSchema } from "@/widgets/generators/bar-chart"
+import { BoxGridPropsSchema } from "@/widgets/generators/box-grid"
+import { BoxPlotPropsSchema } from "@/widgets/generators/box-plot"
+import { CircleAngleDiagramPropsSchema } from "@/widgets/generators/circle-angle-diagram"
+import { CircleDiagramPropsSchema } from "@/widgets/generators/circle-diagram"
+import { ClockDiagramPropsSchema } from "@/widgets/generators/clock-diagram"
+import { CompositeShapeDiagramPropsSchema } from "@/widgets/generators/composite-shape-diagram"
+import { ConceptualGraphPropsSchema } from "@/widgets/generators/conceptual-graph"
+import { ConstraintGeometryDiagramPropsSchema } from "@/widgets/generators/constraint-geometry-diagram"
+import { CoordinatePlaneComprehensivePropsSchema } from "@/widgets/generators/coordinate-plane-comprehensive"
+import { CustomPolygonDiagramPropsSchema } from "@/widgets/generators/custom-polygon-diagram"
+import { DiscreteObjectRatioDiagramPropsSchema } from "@/widgets/generators/discrete-object-ratio-diagram"
+import { DivergentBarChartPropsSchema } from "@/widgets/generators/divergent-bar-chart"
+import { DivisionAreaDiagramPropsSchema } from "@/widgets/generators/division-area-diagram"
+import { DivisionModelDiagramPropsSchema } from "@/widgets/generators/division-model-diagram"
+import { DotPlotPropsSchema } from "@/widgets/generators/dot-plot"
+import { DoubleNumberLinePropsSchema } from "@/widgets/generators/double-number-line"
+import { EmojiImagePropsSchema } from "@/widgets/generators/emoji-image"
+import { EquivalentFractionModelPropsSchema } from "@/widgets/generators/equivalent-fraction-model"
+import { FactorizationDiagramPropsSchema } from "@/widgets/generators/factorization-diagram"
+import { FigureComparisonDiagramPropsSchema } from "@/widgets/generators/figure-comparison-diagram"
+import { FractionFrequencyPlotPropsSchema } from "@/widgets/generators/fraction-frequency-plot"
+import { FractionMultiplicationModelPropsSchema } from "@/widgets/generators/fraction-multiplication-model"
+import { FractionSumDiagramPropsSchema } from "@/widgets/generators/fraction-sum-diagram"
+import { FractionModelDiagramPropsSchema } from "@/widgets/generators/fractional-model-diagram"
+import { FreeBodyDiagramPropsSchema } from "@/widgets/generators/free-body-diagram"
+import { FunctionPlotGraphPropsSchema } from "@/widgets/generators/function-plot-graph"
+import { GeometricPrimitiveDiagramPropsSchema } from "@/widgets/generators/geometric-primitive-diagram"
+import { GeometricSolidDiagramPropsSchema } from "@/widgets/generators/geometric-solid-diagram"
+import { HangerDiagramPropsSchema } from "@/widgets/generators/hanger-diagram"
+import { HistogramPropsSchema } from "@/widgets/generators/histogram"
+import { InequalityNumberLinePropsSchema } from "@/widgets/generators/inequality-number-line"
+import { IntegerChipLegendPropsSchema } from "@/widgets/generators/integer-chip-legend"
+import { IntegerChipModelPropsSchema } from "@/widgets/generators/integer-chip-model"
+import { KeelingCurvePropsSchema } from "@/widgets/generators/keeling-curve"
+import { LabeledRectangleDiagramPropsSchema } from "@/widgets/generators/labeled-rectangle-diagram"
+import { LineDiagramPropsSchema } from "@/widgets/generators/line-diagram"
+import { LineEquationGraphPropsSchema } from "@/widgets/generators/line-equation-graph"
+import { LineGraphPropsSchema } from "@/widgets/generators/line-graph"
+import { MarbleDiagramPropsSchema } from "@/widgets/generators/marble-diagram"
+import { NPolygonPropsSchema } from "@/widgets/generators/n-polygon"
+import { NumberLinePropsSchema } from "@/widgets/generators/number-line"
+import { NumberLineWithActionPropsSchema } from "@/widgets/generators/number-line-with-action"
+import { NumberLineWithFractionGroupsPropsSchema } from "@/widgets/generators/number-line-with-fraction-groups"
+import { NumberSetDiagramPropsSchema } from "@/widgets/generators/number-set-diagram"
+import { ParabolaGraphPropsSchema } from "@/widgets/generators/parabola-graph"
+import { ParallelogramTrapezoidDiagramPropsSchema } from "@/widgets/generators/parallelogram-trapezoid-diagram"
+import { PartitionedShapePropsSchema } from "@/widgets/generators/partitioned-shape"
+import { PatternDiagramPropsSchema } from "@/widgets/generators/pattern-diagram"
+import { PentagonIntersectionDiagramPropsSchema } from "@/widgets/generators/pentagon-intersection-diagram"
+import { PeriodicTableWidgetPropsSchema } from "@/widgets/generators/periodic-table"
+import { PESSpectrumPropsSchema } from "@/widgets/generators/pes-spectrum"
+import { PieChartWidgetPropsSchema } from "@/widgets/generators/pi-chart"
+import { PictographPropsSchema } from "@/widgets/generators/pictograph"
+import { PointPlotGraphPropsSchema } from "@/widgets/generators/point-plot-graph"
+import { PolygonGraphPropsSchema } from "@/widgets/generators/polygon-graph"
+import { PolyhedronDiagramPropsSchema } from "@/widgets/generators/polyhedron-diagram"
+import { PolyhedronNetDiagramPropsSchema } from "@/widgets/generators/polyhedron-net-diagram"
+import { PopulationBarChartPropsSchema } from "@/widgets/generators/population-bar-chart"
+import { PopulationChangeEventGraphPropsSchema } from "@/widgets/generators/population-change-event-graph"
+import { ProbabilitySpinnerPropsSchema } from "@/widgets/generators/probability-spinner"
+import { ProtractorAngleDiagramPropsSchema } from "@/widgets/generators/protractor-angle-diagram"
+import { PythagoreanProofDiagramPropsSchema } from "@/widgets/generators/pythagorean-proof-diagram"
+import { QuadrantDiagramPropsSchema } from "@/widgets/generators/quadrant-diagram"
+import { QuantityFractionalDiagramPropsSchema } from "@/widgets/generators/quantity-fractional-diagram"
+import { RadiallyConstrainedAngleDiagramPropsSchema } from "@/widgets/generators/radially-constrained-angle-diagram"
+import { RatioBoxDiagramPropsSchema } from "@/widgets/generators/ratio-box-diagram"
+import { RectangularFrameDiagramPropsSchema } from "@/widgets/generators/rectangular-frame-diagram"
+import { ScaleCopiesSliderPropsSchema } from "@/widgets/generators/scale-copies-slider"
+import { ScatterPlotPropsSchema } from "@/widgets/generators/scatter-plot"
+import { ShapeTransformationGraphPropsSchema } from "@/widgets/generators/shape-transformation-graph"
+import { SimpleArrowPropsSchema } from "@/widgets/generators/simple-arrow"
+import { SinCosineWidgetPropsSchema } from "@/widgets/generators/sin-cosine-widget"
+import { StackedItemsDiagramPropsSchema } from "@/widgets/generators/stacked-items-diagram"
+import { StickPlotPropsSchema } from "@/widgets/generators/stick-plot"
+import { SubtractionWithRegroupingPropsSchema } from "@/widgets/generators/subtraction-with-regrouping"
+import { SymmetryDiagramPropsSchema } from "@/widgets/generators/symmetry-diagram"
+import { TapeDiagramPropsSchema } from "@/widgets/generators/tape-diagram"
+import { TransformationDiagramPropsSchema } from "@/widgets/generators/transformation-diagram"
+import { TransversalAngleDiagramPropsSchema } from "@/widgets/generators/transversal-angle-diagram"
+import { TreeDiagramPropsSchema } from "@/widgets/generators/tree-diagram"
+import { TriangleDiagramPropsSchema } from "@/widgets/generators/triangle-diagram"
+import { UnitBlockDiagramPropsSchema } from "@/widgets/generators/unit-block-diagram"
+import { UrlImageWidgetPropsSchema } from "@/widgets/generators/url-image"
+import { VectorDiagramPropsSchema } from "@/widgets/generators/vector-diagram"
+import { VennDiagramPropsSchema } from "@/widgets/generators/venn-diagram"
+import { VerticalArithmeticSetupPropsSchema } from "@/widgets/generators/vertical-arithmetic-setup"
+import { VideoPropsSchema } from "@/widgets/generators/video"
+import { WheelDiagramPropsSchema } from "@/widgets/generators/wheel-diagram"
 
 // Master registry of widget schemas for dynamic validation and prompting
 export const allWidgetSchemas = {
@@ -299,56 +298,102 @@ export {
 }
 
 // NEW: Input types for each schema
-export type ThreeDIntersectionDiagramProps = z.input<typeof ThreeDIntersectionDiagramPropsSchema>
+export type ThreeDIntersectionDiagramProps = z.input<
+	typeof ThreeDIntersectionDiagramPropsSchema
+>
 export type QuadrantDiagramProps = z.input<typeof QuadrantDiagramPropsSchema>
-export type AdditionWithRegroupingProps = z.input<typeof AdditionWithRegroupingPropsSchema>
+export type AdditionWithRegroupingProps = z.input<
+	typeof AdditionWithRegroupingPropsSchema
+>
 export type AngleDiagramProps = z.input<typeof AngleDiagramPropsSchema>
 export type AngleTypeDiagramProps = z.input<typeof AngleTypeDiagramPropsSchema>
 export type AreaGraphProps = z.input<typeof AreaGraphPropsSchema>
-export type AreaModelMultiplicationProps = z.input<typeof AreaModelMultiplicationPropsSchema>
+export type AreaModelMultiplicationProps = z.input<
+	typeof AreaModelMultiplicationPropsSchema
+>
 export type BarChartProps = z.input<typeof BarChartPropsSchema>
 export type BoxGridProps = z.input<typeof BoxGridPropsSchema>
 export type BoxPlotProps = z.input<typeof BoxPlotPropsSchema>
 export type CircleDiagramProps = z.input<typeof CircleDiagramPropsSchema>
-export type CircleAngleDiagramProps = z.input<typeof CircleAngleDiagramPropsSchema>
-export type CompositeShapeDiagramProps = z.input<typeof CompositeShapeDiagramPropsSchema>
+export type CircleAngleDiagramProps = z.input<
+	typeof CircleAngleDiagramPropsSchema
+>
+export type CompositeShapeDiagramProps = z.input<
+	typeof CompositeShapeDiagramPropsSchema
+>
 export type ConceptualGraphProps = z.input<typeof ConceptualGraphPropsSchema>
-export type ConstraintGeometryDiagramProps = z.input<typeof ConstraintGeometryDiagramPropsSchema>
+export type ConstraintGeometryDiagramProps = z.input<
+	typeof ConstraintGeometryDiagramPropsSchema
+>
 export type CoordinatePlaneComprehensiveProps = z.input<
 	typeof CoordinatePlaneComprehensivePropsSchema
 >
-export type DiscreteObjectRatioDiagramProps = z.input<typeof DiscreteObjectRatioDiagramPropsSchema>
-export type DivergentBarChartProps = z.input<typeof DivergentBarChartPropsSchema>
-export type DivisionAreaDiagramProps = z.input<typeof DivisionAreaDiagramPropsSchema>
-export type DivisionModelDiagramProps = z.input<typeof DivisionModelDiagramPropsSchema>
+export type DiscreteObjectRatioDiagramProps = z.input<
+	typeof DiscreteObjectRatioDiagramPropsSchema
+>
+export type DivergentBarChartProps = z.input<
+	typeof DivergentBarChartPropsSchema
+>
+export type DivisionAreaDiagramProps = z.input<
+	typeof DivisionAreaDiagramPropsSchema
+>
+export type DivisionModelDiagramProps = z.input<
+	typeof DivisionModelDiagramPropsSchema
+>
 export type DotPlotProps = z.input<typeof DotPlotPropsSchema>
 export type DoubleNumberLineProps = z.input<typeof DoubleNumberLinePropsSchema>
 export type EmojiImageProps = z.input<typeof EmojiImagePropsSchema>
-export type EquivalentFractionModelProps = z.input<typeof EquivalentFractionModelPropsSchema>
-export type FactorizationDiagramProps = z.input<typeof FactorizationDiagramPropsSchema>
-export type FigureComparisonDiagramProps = z.input<typeof FigureComparisonDiagramPropsSchema>
-export type FractionFrequencyPlotProps = z.input<typeof FractionFrequencyPlotPropsSchema>
+export type EquivalentFractionModelProps = z.input<
+	typeof EquivalentFractionModelPropsSchema
+>
+export type FactorizationDiagramProps = z.input<
+	typeof FactorizationDiagramPropsSchema
+>
+export type FigureComparisonDiagramProps = z.input<
+	typeof FigureComparisonDiagramPropsSchema
+>
+export type FractionFrequencyPlotProps = z.input<
+	typeof FractionFrequencyPlotPropsSchema
+>
 export type FractionMultiplicationModelProps = z.input<
 	typeof FractionMultiplicationModelPropsSchema
 >
-export type FractionSumDiagramProps = z.input<typeof FractionSumDiagramPropsSchema>
-export type FractionModelDiagramProps = z.input<typeof FractionModelDiagramPropsSchema>
+export type FractionSumDiagramProps = z.input<
+	typeof FractionSumDiagramPropsSchema
+>
+export type FractionModelDiagramProps = z.input<
+	typeof FractionModelDiagramPropsSchema
+>
 export type FreeBodyDiagramProps = z.input<typeof FreeBodyDiagramPropsSchema>
-export type FunctionPlotGraphProps = z.input<typeof FunctionPlotGraphPropsSchema>
-export type GeometricPrimitiveDiagramProps = z.input<typeof GeometricPrimitiveDiagramPropsSchema>
-export type GeometricSolidDiagramProps = z.input<typeof GeometricSolidDiagramPropsSchema>
+export type FunctionPlotGraphProps = z.input<
+	typeof FunctionPlotGraphPropsSchema
+>
+export type GeometricPrimitiveDiagramProps = z.input<
+	typeof GeometricPrimitiveDiagramPropsSchema
+>
+export type GeometricSolidDiagramProps = z.input<
+	typeof GeometricSolidDiagramPropsSchema
+>
 export type HangerDiagramProps = z.input<typeof HangerDiagramPropsSchema>
 export type HistogramProps = z.input<typeof HistogramPropsSchema>
-export type InequalityNumberLineProps = z.input<typeof InequalityNumberLinePropsSchema>
+export type InequalityNumberLineProps = z.input<
+	typeof InequalityNumberLinePropsSchema
+>
 export type IntegerChipModelProps = z.input<typeof IntegerChipModelPropsSchema>
-export type IntegerChipLegendProps = z.input<typeof IntegerChipLegendPropsSchema>
+export type IntegerChipLegendProps = z.input<
+	typeof IntegerChipLegendPropsSchema
+>
 export type KeelingCurveProps = z.input<typeof KeelingCurvePropsSchema>
-export type LineEquationGraphProps = z.input<typeof LineEquationGraphPropsSchema>
+export type LineEquationGraphProps = z.input<
+	typeof LineEquationGraphPropsSchema
+>
 export type LineGraphProps = z.input<typeof LineGraphPropsSchema>
 export type NPolygonProps = z.input<typeof NPolygonPropsSchema>
 export type PatternDiagramProps = z.input<typeof PatternDiagramPropsSchema>
 export type NumberLineProps = z.input<typeof NumberLinePropsSchema>
-export type NumberLineWithActionProps = z.input<typeof NumberLineWithActionPropsSchema>
+export type NumberLineWithActionProps = z.input<
+	typeof NumberLineWithActionPropsSchema
+>
 export type NumberLineWithFractionGroupsProps = z.input<
 	typeof NumberLineWithFractionGroupsPropsSchema
 >
@@ -361,45 +406,83 @@ export type PartitionedShapeProps = z.input<typeof PartitionedShapePropsSchema>
 export type PentagonIntersectionDiagramProps = z.input<
 	typeof PentagonIntersectionDiagramPropsSchema
 >
-export type PeriodicTableWidgetProps = z.input<typeof PeriodicTableWidgetPropsSchema>
+export type PeriodicTableWidgetProps = z.input<
+	typeof PeriodicTableWidgetPropsSchema
+>
 export type PieChartWidgetProps = z.input<typeof PieChartWidgetPropsSchema>
 export type PictographProps = z.input<typeof PictographPropsSchema>
 export type PointPlotGraphProps = z.input<typeof PointPlotGraphPropsSchema>
 export type PolygonGraphProps = z.input<typeof PolygonGraphPropsSchema>
-export type PolyhedronDiagramProps = z.input<typeof PolyhedronDiagramPropsSchema>
-export type PolyhedronNetDiagramProps = z.input<typeof PolyhedronNetDiagramPropsSchema>
-export type PopulationBarChartProps = z.input<typeof PopulationBarChartPropsSchema>
-export type PopulationChangeEventGraphProps = z.input<typeof PopulationChangeEventGraphPropsSchema>
-export type ProbabilitySpinnerProps = z.input<typeof ProbabilitySpinnerPropsSchema>
-export type ProtractorAngleDiagramProps = z.input<typeof ProtractorAngleDiagramPropsSchema>
+export type PolyhedronDiagramProps = z.input<
+	typeof PolyhedronDiagramPropsSchema
+>
+export type PolyhedronNetDiagramProps = z.input<
+	typeof PolyhedronNetDiagramPropsSchema
+>
+export type PopulationBarChartProps = z.input<
+	typeof PopulationBarChartPropsSchema
+>
+export type PopulationChangeEventGraphProps = z.input<
+	typeof PopulationChangeEventGraphPropsSchema
+>
+export type ProbabilitySpinnerProps = z.input<
+	typeof ProbabilitySpinnerPropsSchema
+>
+export type ProtractorAngleDiagramProps = z.input<
+	typeof ProtractorAngleDiagramPropsSchema
+>
 export type RadiallyConstrainedAngleDiagramProps = z.input<
 	typeof RadiallyConstrainedAngleDiagramPropsSchema
 >
-export type PythagoreanProofDiagramProps = z.input<typeof PythagoreanProofDiagramPropsSchema>
-export type QuantityFractionalDiagramProps = z.input<typeof QuantityFractionalDiagramPropsSchema>
+export type PythagoreanProofDiagramProps = z.input<
+	typeof PythagoreanProofDiagramPropsSchema
+>
+export type QuantityFractionalDiagramProps = z.input<
+	typeof QuantityFractionalDiagramPropsSchema
+>
 export type RatioBoxDiagramProps = z.input<typeof RatioBoxDiagramPropsSchema>
-export type RectangularFrameDiagramProps = z.input<typeof RectangularFrameDiagramPropsSchema>
-export type ScaleCopiesSliderProps = z.input<typeof ScaleCopiesSliderPropsSchema>
+export type RectangularFrameDiagramProps = z.input<
+	typeof RectangularFrameDiagramPropsSchema
+>
+export type ScaleCopiesSliderProps = z.input<
+	typeof ScaleCopiesSliderPropsSchema
+>
 export type ScatterPlotProps = z.input<typeof ScatterPlotPropsSchema>
-export type ShapeTransformationGraphProps = z.input<typeof ShapeTransformationGraphPropsSchema>
+export type ShapeTransformationGraphProps = z.input<
+	typeof ShapeTransformationGraphPropsSchema
+>
 export type SimpleArrowProps = z.input<typeof SimpleArrowPropsSchema>
 export type SinCosineWidgetProps = z.input<typeof SinCosineWidgetPropsSchema>
-export type StackedItemsDiagramProps = z.input<typeof StackedItemsDiagramPropsSchema>
-export type SubtractionWithRegroupingProps = z.input<typeof SubtractionWithRegroupingPropsSchema>
+export type StackedItemsDiagramProps = z.input<
+	typeof StackedItemsDiagramPropsSchema
+>
+export type SubtractionWithRegroupingProps = z.input<
+	typeof SubtractionWithRegroupingPropsSchema
+>
 export type TapeDiagramProps = z.input<typeof TapeDiagramPropsSchema>
-export type TransformationDiagramProps = z.input<typeof TransformationDiagramPropsSchema>
-export type TransversalAngleDiagramProps = z.input<typeof TransversalAngleDiagramPropsSchema>
+export type TransformationDiagramProps = z.input<
+	typeof TransformationDiagramPropsSchema
+>
+export type TransversalAngleDiagramProps = z.input<
+	typeof TransversalAngleDiagramPropsSchema
+>
 export type TreeDiagramProps = z.input<typeof TreeDiagramPropsSchema>
 export type TriangleDiagramProps = z.input<typeof TriangleDiagramPropsSchema>
 export type UnitBlockDiagramProps = z.input<typeof UnitBlockDiagramPropsSchema>
 export type UrlImageWidgetProps = z.input<typeof UrlImageWidgetPropsSchema>
 export type VectorDiagramProps = z.input<typeof VectorDiagramPropsSchema>
 export type VennDiagramProps = z.input<typeof VennDiagramPropsSchema>
-export type VerticalArithmeticSetupProps = z.input<typeof VerticalArithmeticSetupPropsSchema>
+export type VerticalArithmeticSetupProps = z.input<
+	typeof VerticalArithmeticSetupPropsSchema
+>
 export type ClockDiagramProps = z.input<typeof ClockDiagramPropsSchema>
 export type WheelDiagramProps = z.input<typeof WheelDiagramPropsSchema>
-export type LabeledRectangleDiagramProps = z.input<typeof LabeledRectangleDiagramPropsSchema>
-export type CustomPolygonDiagramProps = z.input<typeof CustomPolygonDiagramPropsSchema>
+export type LabeledRectangleDiagramProps = z.input<
+	typeof LabeledRectangleDiagramPropsSchema
+>
+export type CustomPolygonDiagramProps = z.input<
+	typeof CustomPolygonDiagramPropsSchema
+>
 export type LineDiagramProps = z.input<typeof LineDiagramPropsSchema>
 export type PESSpectrumProps = z.input<typeof PESSpectrumPropsSchema>
 export type StickPlotProps = z.input<typeof StickPlotPropsSchema>

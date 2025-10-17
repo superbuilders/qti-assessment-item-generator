@@ -1,19 +1,19 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
 import {
 	createAxisOptionsSchema,
 	createLineSchema,
 	createPlotPointSchema,
 	renderLines,
 	renderPoints
-} from "../utils/canvas-utils"
-import { AXIS_VIEWBOX_PADDING } from "../utils/constants"
-import { setupCoordinatePlaneV2 } from "../utils/coordinate-plane-v2"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { theme } from "../utils/theme"
+} from "@/widgets/utils/canvas-utils"
+import { AXIS_VIEWBOX_PADDING } from "@/widgets/utils/constants"
+import { setupCoordinatePlaneV2 } from "@/widgets/utils/coordinate-plane-v2"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
 
 export const LineEquationGraphPropsSchema = z
 	.object({
@@ -51,12 +51,15 @@ export const LineEquationGraphPropsSchema = z
 		"Creates a coordinate plane for graphing linear equations and plotting points. Supports multiple lines defined by equations (y = mx + b) or point pairs. Essential for teaching linear functions, slope, intercepts, and systems of equations. Points can mark important locations like intersections or solutions."
 	)
 
-export type LineEquationGraphProps = z.infer<typeof LineEquationGraphPropsSchema>
+export type LineEquationGraphProps = z.infer<
+	typeof LineEquationGraphPropsSchema
+>
 
 export const generateLineEquationGraph: WidgetGenerator<
 	typeof LineEquationGraphPropsSchema
 > = async (props) => {
-	const { width, height, xAxis, yAxis, showQuadrantLabels, lines, points } = props
+	const { width, height, xAxis, yAxis, showQuadrantLabels, lines, points } =
+		props
 
 	// Validate that all points are within axis bounds
 	for (const point of points) {

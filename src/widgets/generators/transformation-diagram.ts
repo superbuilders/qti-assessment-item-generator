@@ -1,14 +1,14 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { PADDING } from "../utils/constants"
-import { CSS_COLOR_PATTERN } from "../utils/css-color"
-import { Path2D } from "../utils/path-builder"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { estimateWrappedTextDimensions } from "../utils/text"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { PADDING } from "@/widgets/utils/constants"
+import { CSS_COLOR_PATTERN } from "@/widgets/utils/css-color"
+import { Path2D } from "@/widgets/utils/path-builder"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { estimateWrappedTextDimensions } from "@/widgets/utils/text"
+import { theme } from "@/widgets/utils/theme"
 
 function createShapeSchema() {
 	const shape = z
@@ -22,7 +22,9 @@ function createShapeSchema() {
 				.string()
 				.nullable()
 				.transform((val) =>
-					val === null || val.trim() === "" || val.trim().toLowerCase() === "null"
+					val === null ||
+					val.trim() === "" ||
+					val.trim().toLowerCase() === "null"
 						? null
 						: val.trim()
 				)
@@ -31,13 +33,19 @@ function createShapeSchema() {
 				),
 			fillColor: z
 				.string()
-				.regex(CSS_COLOR_PATTERN, "invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)")
+				.regex(
+					CSS_COLOR_PATTERN,
+					"invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)"
+				)
 				.describe(
 					"CSS fill color (e.g., 'rgba(100,149,237,0.3)' for translucent blue, 'lightgreen', '#FFE5B4'). Use alpha for see-through shapes."
 				),
 			strokeColor: z
 				.string()
-				.regex(CSS_COLOR_PATTERN, "invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)")
+				.regex(
+					CSS_COLOR_PATTERN,
+					"invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)"
+				)
 				.describe(
 					"CSS color for shape outline (e.g., 'black', '#0000FF', 'darkgreen'). Should contrast with fill and background."
 				),
@@ -56,7 +64,9 @@ function createShapeSchema() {
 								.string()
 								.nullable()
 								.transform((val) =>
-									val === null || val.trim() === "" || val.trim().toLowerCase() === "null"
+									val === null ||
+									val.trim() === "" ||
+									val.trim().toLowerCase() === "null"
 										? null
 										: val.trim()
 								),
@@ -136,7 +146,9 @@ function createTransformationSchema() {
 		z
 			.object({
 				type: z.literal("rotation"),
-				centerOfRotation: createPoint().describe("Fixed point around which rotation occurs."),
+				centerOfRotation: createPoint().describe(
+					"Fixed point around which rotation occurs."
+				),
 				angle: z
 					.number()
 					.describe(
@@ -147,10 +159,14 @@ function createTransformationSchema() {
 		z
 			.object({
 				type: z.literal("dilation"),
-				centerOfDilation: createPoint().describe("Fixed point from which scaling occurs."),
+				centerOfDilation: createPoint().describe(
+					"Fixed point from which scaling occurs."
+				),
 				scaleFactor: z
 					.number()
-					.describe("Scaling factor for dilation. Values > 1 enlarge, 0 < values < 1 shrink.")
+					.describe(
+						"Scaling factor for dilation. Values > 1 enlarge, 0 < values < 1 shrink."
+					)
 			})
 			.strict()
 	])
@@ -172,7 +188,9 @@ const AngleMark = z
 			.string()
 			.nullable()
 			.transform((val) =>
-				val === null || val.trim() === "" || val.trim().toLowerCase() === "null" ? null : val.trim()
+				val === null || val.trim() === "" || val.trim().toLowerCase() === "null"
+					? null
+					: val.trim()
 			)
 			.describe(
 				"Angle measurement or name (e.g., '90°', '45°', '∠ABC', 'θ', null). Null shows arc without label. Positioned near the arc."
@@ -206,7 +224,9 @@ export const TransformationDiagramPropsSchema = z
 		"Creates detailed geometric transformation diagrams showing pre-image and image shapes with comprehensive annotations including vertex labels, angle marks, side lengths, and transformation-specific visual aids. Perfect for teaching reflections, rotations, translations, and dilations with full mathematical notation."
 	)
 
-export type TransformationDiagramProps = z.infer<typeof TransformationDiagramPropsSchema>
+export type TransformationDiagramProps = z.infer<
+	typeof TransformationDiagramPropsSchema
+>
 
 /**
  * Generates an SVG diagram illustrating a geometric transformation.
@@ -223,10 +243,13 @@ export const generateTransformationDiagram: WidgetGenerator<
 	})
 
 	const calculateCentroid = (vertices: Array<{ x: number; y: number }>) => {
-		const centroid = vertices.reduce((acc, p) => ({ x: acc.x + p.x, y: acc.y + p.y }), {
-			x: 0,
-			y: 0
-		})
+		const centroid = vertices.reduce(
+			(acc, p) => ({ x: acc.x + p.x, y: acc.y + p.y }),
+			{
+				x: 0,
+				y: 0
+			}
+		)
 		centroid.x /= vertices.length
 		centroid.y /= vertices.length
 		return centroid
@@ -285,7 +308,9 @@ export const generateTransformationDiagram: WidgetGenerator<
 			break
 		case "reflection": {
 			const { from, to } = transformation.lineOfReflection
-			imageVertices = preImage.vertices.map((p) => reflectPointAcrossLine(p, from, to))
+			imageVertices = preImage.vertices.map((p) =>
+				reflectPointAcrossLine(p, from, to)
+			)
 			break
 		}
 		case "dilation": {
@@ -309,10 +334,14 @@ export const generateTransformationDiagram: WidgetGenerator<
 	}
 
 	let centerPoint: { x: number; y: number } | null = null
-	if (transformation.type === "rotation") centerPoint = transformation.centerOfRotation
-	if (transformation.type === "dilation") centerPoint = transformation.centerOfDilation
+	if (transformation.type === "rotation")
+		centerPoint = transformation.centerOfRotation
+	if (transformation.type === "dilation")
+		centerPoint = transformation.centerOfDilation
 
-	let centerPointInfo: { x: number; y: number; label: string | null; style: string } | undefined
+	let centerPointInfo:
+		| { x: number; y: number; label: string | null; style: string }
+		| undefined
 	// const otherPoints: Array<{
 	//	x: number
 	//	y: number
@@ -323,7 +352,10 @@ export const generateTransformationDiagram: WidgetGenerator<
 	const allPoints = [...preImage.vertices, ...image.vertices]
 	if (centerPoint) allPoints.push(centerPoint)
 	if (transformation.type === "reflection")
-		allPoints.push(transformation.lineOfReflection.from, transformation.lineOfReflection.to)
+		allPoints.push(
+			transformation.lineOfReflection.from,
+			transformation.lineOfReflection.to
+		)
 
 	const minX = Math.min(...allPoints.map((p) => p.x))
 	const maxX = Math.max(...allPoints.map((p) => p.x))
@@ -350,7 +382,10 @@ export const generateTransformationDiagram: WidgetGenerator<
 	const toSvgY = (y: number) => svgCenterY - (y - dataCenterY) * scale
 
 	// --- Begin screen geometry for collision detection ---
-	const screenSegments: Array<{ a: { x: number; y: number }; b: { x: number; y: number } }> = []
+	const screenSegments: Array<{
+		a: { x: number; y: number }
+		b: { x: number; y: number }
+	}> = []
 
 	function addShapeSegments(shape: TransformationDiagramProps["preImage"]) {
 		const pts = shape.vertices.map((p) => ({ x: toSvgX(p.x), y: toSvgY(p.y) }))
@@ -361,7 +396,10 @@ export const generateTransformationDiagram: WidgetGenerator<
 		}
 	}
 
-	function addSegment(from: { x: number; y: number }, to: { x: number; y: number }) {
+	function addSegment(
+		from: { x: number; y: number },
+		to: { x: number; y: number }
+	) {
 		screenSegments.push({
 			a: { x: toSvgX(from.x), y: toSvgY(from.y) },
 			b: { x: toSvgX(to.x), y: toSvgY(to.y) }
@@ -374,7 +412,10 @@ export const generateTransformationDiagram: WidgetGenerator<
 
 	// Add reflection aid segments when applicable
 	if (transformation.type === "reflection") {
-		addSegment(transformation.lineOfReflection.from, transformation.lineOfReflection.to)
+		addSegment(
+			transformation.lineOfReflection.from,
+			transformation.lineOfReflection.to
+		)
 		// Also add dotted correspondence lines (pre vertex -> image vertex)
 		for (let i = 0; i < preImage.vertices.length; i++) {
 			const p = preImage.vertices[i]
@@ -478,7 +519,10 @@ export const generateTransformationDiagram: WidgetGenerator<
 	}
 	// --- End screen geometry for collision detection ---
 
-	const drawPolygon = (shape: TransformationDiagramProps["preImage"], isImage: boolean) => {
+	const drawPolygon = (
+		shape: TransformationDiagramProps["preImage"],
+		isImage: boolean
+	) => {
 		const polygonPoints = shape.vertices.map((p) => ({
 			x: toSvgX(p.x),
 			y: toSvgY(p.y)
@@ -530,7 +574,12 @@ export const generateTransformationDiagram: WidgetGenerator<
 
 	// Removed unused function drawRotationArc
 
-	const placedLabelRects: Array<{ x: number; y: number; width: number; height: number }> = []
+	const placedLabelRects: Array<{
+		x: number
+		y: number
+		width: number
+		height: number
+	}> = []
 
 	const drawVertexLabels = (
 		shape: TransformationDiagramProps["preImage"],
@@ -541,10 +590,13 @@ export const generateTransformationDiagram: WidgetGenerator<
 			const label = shape.vertexLabels[i]
 			if (!vertex || !label || label === "•") continue // Skip bullet point placeholders
 
-			const perVertexExtraOffset = Array.isArray(extraOffset) ? (extraOffset[i] ?? 0) : extraOffset
+			const perVertexExtraOffset = Array.isArray(extraOffset)
+				? (extraOffset[i] ?? 0)
+				: extraOffset
 			const labelOffset = 16 + perVertexExtraOffset
 
-			const prevVertex = shape.vertices[(i - 1 + shape.vertices.length) % shape.vertices.length]
+			const prevVertex =
+				shape.vertices[(i - 1 + shape.vertices.length) % shape.vertices.length]
 			const nextVertex = shape.vertices[(i + 1) % shape.vertices.length]
 			if (!prevVertex || !nextVertex) continue
 
@@ -620,7 +672,10 @@ export const generateTransformationDiagram: WidgetGenerator<
 						pad: 1
 					}) ||
 						placedLabelRects.some((r) =>
-							rectsOverlap({ x: px - halfW, y: py - halfH, width: w, height: h }, r)
+							rectsOverlap(
+								{ x: px - halfW, y: py - halfH, width: w, height: h },
+								r
+							)
 						)) &&
 					it < maxIt
 				) {
@@ -646,7 +701,12 @@ export const generateTransformationDiagram: WidgetGenerator<
 				fill: theme.colors.text
 			})
 
-			placedLabelRects.push({ x: chosen.x - halfW, y: chosen.y - halfH, width: w, height: h })
+			placedLabelRects.push({
+				x: chosen.x - halfW,
+				y: chosen.y - halfH,
+				width: w,
+				height: h
+			})
 		}
 	}
 
@@ -657,7 +717,8 @@ export const generateTransformationDiagram: WidgetGenerator<
 	) => {
 		if (mark.vertexIndex < 0 || mark.vertexIndex >= vertices.length) return
 		const vertex = vertices[mark.vertexIndex]
-		const prevVertex = vertices[(mark.vertexIndex - 1 + vertices.length) % vertices.length]
+		const prevVertex =
+			vertices[(mark.vertexIndex - 1 + vertices.length) % vertices.length]
 		const nextVertex = vertices[(mark.vertexIndex + 1) % vertices.length]
 		if (!vertex || !prevVertex || !nextVertex) return
 
@@ -688,12 +749,14 @@ export const generateTransformationDiagram: WidgetGenerator<
 		const midAngle = angle1 + angleDiff / 2
 		const midDirX = Math.cos(midAngle)
 		const midDirY = Math.sin(midAngle)
-		const pointsTowardCentroid = midDirX * dirToCentroidX + midDirY * dirToCentroidY > 0
+		const pointsTowardCentroid =
+			midDirX * dirToCentroidX + midDirY * dirToCentroidY > 0
 		// We want the interior (small) arc when its bisector points toward the centroid; otherwise use the exterior arc
 		const largeArcFlag: 0 | 1 = pointsTowardCentroid ? 0 : 1
 
 		// Determine sweep direction in SVG coords (angles increase clockwise).
-		const startScreen = ((-angle1 % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI)
+		const startScreen =
+			((-angle1 % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI)
 		const endScreen = ((-angle2 % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI)
 		const cwDiff = (endScreen - startScreen + 2 * Math.PI) % (2 * Math.PI)
 		const clockwiseIsSmall = cwDiff <= Math.PI
@@ -722,7 +785,10 @@ export const generateTransformationDiagram: WidgetGenerator<
 			const LABEL_HALF_HEIGHT = LABEL_FONT / 2
 			const CLEARANCE = 10
 			const minDistanceFromCenter = svgRadius + LABEL_HALF_HEIGHT + CLEARANCE
-			const svgLabelDistance = Math.max(mark.labelDistance * scale, minDistanceFromCenter)
+			const svgLabelDistance = Math.max(
+				mark.labelDistance * scale,
+				minDistanceFromCenter
+			)
 			const labelX = svgVertexX + svgLabelDistance * Math.cos(-labelAngle)
 			const labelY = svgVertexY + svgLabelDistance * Math.sin(-labelAngle)
 			canvas.drawText({
@@ -737,7 +803,12 @@ export const generateTransformationDiagram: WidgetGenerator<
 		}
 	}
 
-	const drawPoint = (point: { x: number; y: number; label: string | null; style: string }) => {
+	const drawPoint = (point: {
+		x: number
+		y: number
+		label: string | null
+		style: string
+	}) => {
 		const svgX = toSvgX(point.x)
 		const svgY = toSvgY(point.y)
 		const radius = 4
@@ -837,7 +908,9 @@ export const generateTransformationDiagram: WidgetGenerator<
 	if (transformation.type === "dilation") {
 		const s = transformation.scaleFactor
 		const defaultNudge = Math.abs(s - 1) < 0.05 ? 14 : 0
-		const perVertex: Array<number> = new Array(image.vertices.length).fill(defaultNudge)
+		const perVertex: Array<number> = new Array(image.vertices.length).fill(
+			defaultNudge
+		)
 		const count = Math.min(preImage.vertices.length, image.vertices.length)
 		for (let i = 0; i < count; i++) {
 			const p = preImage.vertices[i]
@@ -875,11 +948,19 @@ export const generateTransformationDiagram: WidgetGenerator<
 		)
 		const textX = svgX
 		const textY = svgY - 12 // baseline offset in drawPoint
-		placedLabelRects.push({ x: textX - w / 2, y: textY - h, width: w, height: h })
+		placedLabelRects.push({
+			x: textX - w / 2,
+			y: textY - h,
+			width: w,
+			height: h
+		})
 	}
 
 	// Draw shape labels with collision avoidance against edges and other labels
-	const drawShapeLabel = (shape: TransformationDiagramProps["preImage"], preferBelow = false) => {
+	const drawShapeLabel = (
+		shape: TransformationDiagramProps["preImage"],
+		preferBelow = false
+	) => {
 		if (!shape.label) return
 
 		// Compute screen-space bbox of the shape
@@ -908,7 +989,13 @@ export const generateTransformationDiagram: WidgetGenerator<
 
 		const padForEdges = preferBelow ? 2 : 1
 		function fitsAt(x: number, y: number): boolean {
-			const rect = { x: x - halfW, y: y - halfH, width: w, height: h, pad: padForEdges }
+			const rect = {
+				x: x - halfW,
+				y: y - halfH,
+				width: w,
+				height: h,
+				pad: padForEdges
+			}
 			if (rectIntersectsAnySegment(rect)) return false
 			for (const r of placedLabelRects) {
 				// add extra separation so shape labels don't stack on top of vertex labels
@@ -987,7 +1074,12 @@ export const generateTransformationDiagram: WidgetGenerator<
 			fill: shape.strokeColor
 		})
 
-		placedLabelRects.push({ x: chosen.x - halfW, y: chosen.y - halfH, width: w, height: h })
+		placedLabelRects.push({
+			x: chosen.x - halfW,
+			y: chosen.y - halfH,
+			width: w,
+			height: h
+		})
 	}
 
 	drawShapeLabel(preImage)

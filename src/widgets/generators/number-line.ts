@@ -1,14 +1,14 @@
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { PADDING } from "../utils/constants"
-import { CSS_COLOR_PATTERN } from "../utils/css-color"
-import { selectAxisLabels } from "../utils/layout"
-import { MATHML_INNER_PATTERN } from "../utils/mathml"
-import { numberContentToInnerMathML } from "../utils/number-to-mathml"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { theme } from "../utils/theme"
-import { buildTicks } from "../utils/ticks"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { PADDING } from "@/widgets/utils/constants"
+import { CSS_COLOR_PATTERN } from "@/widgets/utils/css-color"
+import { selectAxisLabels } from "@/widgets/utils/layout"
+import { MATHML_INNER_PATTERN } from "@/widgets/utils/mathml"
+import { numberContentToInnerMathML } from "@/widgets/utils/number-to-mathml"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
+import { buildTicks } from "@/widgets/utils/ticks"
 
 // Additional overlays to subsume fraction-number-line without adding new tick modes
 const Segment = z
@@ -26,7 +26,9 @@ const Segment = z
 		color: z
 			.string()
 			.regex(CSS_COLOR_PATTERN, "invalid css color")
-			.describe("CSS color for the segment stroke (e.g., '#11accd', 'rgba(255,0,0,0.5)')")
+			.describe(
+				"CSS color for the segment stroke (e.g., '#11accd', 'rgba(255,0,0,0.5)')"
+			)
 	})
 	.strict()
 
@@ -36,7 +38,9 @@ const ModelCellGroup = z
 			.number()
 			.int()
 			.positive()
-			.describe("Number of consecutive cells in this group. Sum across groups equals totalCells."),
+			.describe(
+				"Number of consecutive cells in this group. Sum across groups equals totalCells."
+			),
 		color: z
 			.string()
 			.regex(CSS_COLOR_PATTERN, "invalid css color")
@@ -50,10 +54,14 @@ const Model = z
 			.number()
 			.int()
 			.positive()
-			.describe("Total number of cells in the model bar (e.g., 8 for eighths)."),
+			.describe(
+				"Total number of cells in the model bar (e.g., 8 for eighths)."
+			),
 		cellGroups: z
 			.array(ModelCellGroup)
-			.describe("Groups of colored cells shown left-to-right. Sum of counts equals totalCells."),
+			.describe(
+				"Groups of colored cells shown left-to-right. Sum of counts equals totalCells."
+			),
 		bracketLabel: z
 			.string()
 			.describe(
@@ -298,7 +306,9 @@ export const NumberLinePropsSchema = z
 		segments: z
 			.array(Segment)
 			.nullable()
-			.describe("Colored segments drawn along the axis to highlight ranges. Null for none."),
+			.describe(
+				"Colored segments drawn along the axis to highlight ranges. Null for none."
+			),
 		model: Model.nullable().describe(
 			"Optional cell-based model bar shown above the axis (horizontal only). Null to omit."
 		)
@@ -314,7 +324,9 @@ export type NumberLineProps = z.infer<typeof NumberLinePropsSchema>
 const getNumericInterval = (
 	interval: z.infer<ReturnType<typeof createTickIntervalSchema>>
 ): number => {
-	return interval.type === "whole" ? interval.interval : 1 / interval.denominator
+	return interval.type === "whole"
+		? interval.interval
+		: 1 / interval.denominator
 }
 
 // Helper to format tick labels based on interval type
@@ -339,7 +351,8 @@ const formatTickLabel = (
 	}
 
 	// Simplify the fraction
-	const gcd = (a: number, b: number): number => (b === 0 ? Math.abs(a) : gcd(b, a % b))
+	const gcd = (a: number, b: number): number =>
+		b === 0 ? Math.abs(a) : gcd(b, a % b)
 	const g = gcd(Math.abs(numerator), denominator)
 	const simplifiedNum = numerator / g
 	const simplifiedDen = denominator / g
@@ -347,7 +360,9 @@ const formatTickLabel = (
 	return `${simplifiedNum}/${simplifiedDen}`
 }
 
-export const generateNumberLine: WidgetGenerator<typeof NumberLinePropsSchema> = async (data) => {
+export const generateNumberLine: WidgetGenerator<
+	typeof NumberLinePropsSchema
+> = async (data) => {
 	const {
 		width,
 		height,
@@ -379,7 +394,9 @@ export const generateNumberLine: WidgetGenerator<typeof NumberLinePropsSchema> =
 	const { values: majorValues } = buildTicks(min, max, majorInterval)
 
 	// Generate custom labels based on tick interval type
-	const majorLabels = majorValues.map((value) => formatTickLabel(value, tickInterval))
+	const majorLabels = majorValues.map((value) =>
+		formatTickLabel(value, tickInterval)
+	)
 
 	const minorValues = secondaryTickInterval
 		? buildTicks(min, max, getNumericInterval(secondaryTickInterval)).values
@@ -486,10 +503,16 @@ export const generateNumberLine: WidgetGenerator<typeof NumberLinePropsSchema> =
 				const bracketY = modelY - 15
 				const bracketStartX = PADDING
 				const bracketEndX = PADDING + chartWidth
-				canvas.drawLine(bracketStartX, bracketY + 5, bracketStartX, bracketY - 5, {
-					stroke: theme.colors.black,
-					strokeWidth: theme.stroke.width.base
-				})
+				canvas.drawLine(
+					bracketStartX,
+					bracketY + 5,
+					bracketStartX,
+					bracketY - 5,
+					{
+						stroke: theme.colors.black,
+						strokeWidth: theme.stroke.width.base
+					}
+				)
 				canvas.drawLine(bracketStartX, bracketY, bracketEndX, bracketY, {
 					stroke: theme.colors.black,
 					strokeWidth: theme.stroke.width.base
@@ -525,7 +548,11 @@ export const generateNumberLine: WidgetGenerator<typeof NumberLinePropsSchema> =
 				if (p.type === "mathml") {
 					inner = p.mathml
 				} else if (p.type === "whole") {
-					inner = numberContentToInnerMathML({ type: "whole", value: p.value, sign: p.sign })
+					inner = numberContentToInnerMathML({
+						type: "whole",
+						value: p.value,
+						sign: p.sign
+					})
 				} else if (p.type === "fraction") {
 					inner = numberContentToInnerMathML({
 						type: "fraction",
@@ -626,7 +653,11 @@ export const generateNumberLine: WidgetGenerator<typeof NumberLinePropsSchema> =
 				if (p.type === "mathml") {
 					inner = p.mathml
 				} else if (p.type === "whole") {
-					inner = numberContentToInnerMathML({ type: "whole", value: p.value, sign: p.sign })
+					inner = numberContentToInnerMathML({
+						type: "whole",
+						value: p.value,
+						sign: p.sign
+					})
 				} else if (p.type === "fraction") {
 					inner = numberContentToInnerMathML({
 						type: "fraction",

@@ -1,11 +1,14 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { stripMarkdownToPlaintext } from "../utils/text"
-import { theme } from "../utils/theme"
-import { escapeXmlAttribute, sanitizeXmlAttributeValue } from "../utils/xml-utils"
+import type { WidgetGenerator } from "@/widgets/types"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { stripMarkdownToPlaintext } from "@/widgets/utils/text"
+import { theme } from "@/widgets/utils/theme"
+import {
+	escapeXmlAttribute,
+	sanitizeXmlAttributeValue
+} from "@/widgets/utils/xml-utils"
 
 export const UrlImageWidgetPropsSchema = z
 	.object({
@@ -29,14 +32,18 @@ export const UrlImageWidgetPropsSchema = z
 		caption: z
 			.string()
 			.nullable()
-			.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
+			.transform((val) =>
+				val === "null" || val === "NULL" || val === "" ? null : val
+			)
 			.describe(
 				"An optional descriptive caption to display below the image. This should describe what the image shows or provide context. Plaintext only; no markdown or HTML."
 			),
 		attribution: z
 			.string()
 			.nullable()
-			.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
+			.transform((val) =>
+				val === "null" || val === "NULL" || val === "" ? null : val
+			)
 			.describe(
 				"Optional attribution or source credit. Use this to provide image source, creator, or licensing details. Keep the caption strictly descriptive and place attribution here instead. Plaintext only; no markdown or HTML."
 			)
@@ -46,9 +53,9 @@ export const UrlImageWidgetPropsSchema = z
 		"Static image widget rendered from a direct HTTPS URL. Use 'alt' for accessibility, optional 'width'/'height' for sizing, 'caption' for descriptive figure text, and 'attribution' for source/credit/licensing. Keep captions strictly descriptive; place any credits or licensing details in 'attribution'."
 	)
 
-export const generateUrlImage: WidgetGenerator<typeof UrlImageWidgetPropsSchema> = async (
-	props
-) => {
+export const generateUrlImage: WidgetGenerator<
+	typeof UrlImageWidgetPropsSchema
+> = async (props) => {
 	const { url, alt, width, height, caption: _caption } = props
 	// Temporarily disable caption rendering: we deliberately do not render captions right now.
 	// We still accept the field in the schema, but force it to be ignored at generation time
@@ -107,7 +114,9 @@ export const generateUrlImage: WidgetGenerator<typeof UrlImageWidgetPropsSchema>
 	const sanitizedAlt = stripMarkdownToPlaintext(alt)
 	const normalizedAlt = stripWrappingDelimiters(sanitizedAlt)
 	const sanitizedCaption = caption ? stripMarkdownToPlaintext(caption) : ""
-	const normalizedCaption = sanitizedCaption ? stripWrappingDelimiters(sanitizedCaption) : null
+	const normalizedCaption = sanitizedCaption
+		? stripWrappingDelimiters(sanitizedCaption)
+		: null
 	// Normalize attribution even though we don't render it yet to avoid leaking artifacts if usage changes
 	// Note: do not keep an unused variable; normalize inline when/if rendering changes
 

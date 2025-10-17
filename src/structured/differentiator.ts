@@ -2,17 +2,23 @@ import * as errors from "@superbuilders/errors"
 import type * as logger from "@superbuilders/slog"
 import type OpenAI from "openai"
 import { z } from "zod"
-import { type AssessmentItemInput, createDynamicAssessmentItemSchema } from "@/core/item"
+import {
+	type AssessmentItemInput,
+	createDynamicAssessmentItemSchema
+} from "@/core/item"
 import { toJSONSchemaPromptSafe } from "@/core/json-schema"
+import { callOpenAIWithRetry } from "@/structured/utils/openai"
+import {
+	transformArraysToObjects,
+	transformObjectsToArrays
+} from "@/structured/utils/shape-helpers"
+import { generateZodSchemaFromObject } from "@/structured/utils/zod-runtime-generator"
 import type {
 	WidgetCollection,
 	WidgetDefinition,
 	WidgetTypeTupleFrom
 } from "@/widgets/collections/types"
 import { allWidgetSchemas, type Widget, WidgetSchema } from "@/widgets/registry"
-import { callOpenAIWithRetry } from "./utils/openai"
-import { transformArraysToObjects, transformObjectsToArrays } from "./utils/shape-helpers"
-import { generateZodSchemaFromObject } from "./utils/zod-runtime-generator"
 
 const OPENAI_MODEL = "gpt-5"
 
@@ -33,7 +39,9 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 // Type guard to verify an object is a ContentPlan
-function isContentPlan<E extends readonly string[]>(value: unknown): value is ContentPlan<E> {
+function isContentPlan<E extends readonly string[]>(
+	value: unknown
+): value is ContentPlan<E> {
 	if (!isRecord(value)) return false
 	// ContentPlan must not have widgets or identifier
 	if ("widgets" in value || "identifier" in value) return false
@@ -51,7 +59,9 @@ function getProp(obj: unknown, key: string): unknown {
 	return obj[key]
 }
 
-function isWidgetTypeName(value: unknown): value is keyof typeof allWidgetSchemas {
+function isWidgetTypeName(
+	value: unknown
+): value is keyof typeof allWidgetSchemas {
 	return typeof value === "string" && value in allWidgetSchemas
 }
 
@@ -92,13 +102,17 @@ function buildShot1WidgetInfoSection<E extends readonly string[]>(
 	const digestSections: string[] = []
 	for (const typeName of uniqueTypes) {
 		if (!isWidgetTypeName(typeName)) {
-			logger.error("internal widget type mismatch after mapping build", { typeName })
+			logger.error("internal widget type mismatch after mapping build", {
+				typeName
+			})
 			throw errors.new("internal widget type mismatch")
 		}
 		const zodSchema = allWidgetSchemas[typeName]
 		const jsonSchema = toJSONSchemaPromptSafe(zodSchema)
 		if (!isRecord(jsonSchema)) {
-			logger.error("invalid json schema structure for widget type", { typeName })
+			logger.error("invalid json schema structure for widget type", {
+				typeName
+			})
 			throw errors.new("widget json schema invalid structure")
 		}
 		const properties = getProp(jsonSchema, "properties")
@@ -154,7 +168,11 @@ async function planContentDifferentiation<const E extends readonly string[]>(
 
 	// Create a pure content payload by explicitly removing widget and identifier fields at runtime.
 	// This ensures the LLM focuses only on the content to be varied.
-	const { widgets: _widgets, identifier: _identifier, ...contentOnlyItem } = assessmentItem
+	const {
+		widgets: _widgets,
+		identifier: _identifier,
+		...contentOnlyItem
+	} = assessmentItem
 	const transformedItem = transformArraysToObjects(contentOnlyItem)
 
 	// Also prepare the full original item for context (not used for schema validation).
@@ -423,11 +441,20 @@ async function planContentDifferentiation<const E extends readonly string[]>(
 		const sourceInteractions = assessmentItem.interactions
 		const planInteractionsUnknown = getProp(plan, "interactions")
 		const planInteractions = planInteractionsUnknown
-		const sourceKeys = sourceInteractions ? Object.keys(sourceInteractions).sort() : []
-		const planKeys = isRecord(planInteractions) ? Object.keys(planInteractions).sort() : []
+		const sourceKeys = sourceInteractions
+			? Object.keys(sourceInteractions).sort()
+			: []
+		const planKeys = isRecord(planInteractions)
+			? Object.keys(planInteractions).sort()
+			: []
 		if (JSON.stringify(sourceKeys) !== JSON.stringify(planKeys)) {
-			logger.error("plan interaction keys do not match source", { sourceKeys, planKeys })
-			throw errors.new("structural validation failed: interaction keys mismatch")
+			logger.error("plan interaction keys do not match source", {
+				sourceKeys,
+				planKeys
+			})
+			throw errors.new(
+				"structural validation failed: interaction keys mismatch"
+			)
 		}
 
 		// Helper to get array length for a given key if present; returns -1 when not an array
@@ -442,15 +469,22 @@ async function planContentDifferentiation<const E extends readonly string[]>(
 		const planBodyLen = arrayLengthOfKey(plan, "body")
 		if (sourceBodyLen !== -1 || planBodyLen !== -1) {
 			if (sourceBodyLen !== planBodyLen) {
-				logger.error("plan body length does not match source", { sourceBodyLen, planBodyLen })
+				logger.error("plan body length does not match source", {
+					sourceBodyLen,
+					planBodyLen
+				})
 				throw errors.new("structural validation failed: body length mismatch")
 			}
 		}
 
 		// 3) For each interaction, enforce choices length equality when choices arrays exist
 		for (const key of sourceKeys) {
-			const srcInteraction = isRecord(sourceInteractions) ? sourceInteractions[key] : undefined
-			const planInteraction = isRecord(planInteractions) ? planInteractions[key] : undefined
+			const srcInteraction = isRecord(sourceInteractions)
+				? sourceInteractions[key]
+				: undefined
+			const planInteraction = isRecord(planInteractions)
+				? planInteractions[key]
+				: undefined
 			const srcChoicesLen = arrayLengthOfKey(srcInteraction, "choices")
 			const planChoicesLen = arrayLengthOfKey(planInteraction, "choices")
 			if (srcChoicesLen !== -1 || planChoicesLen !== -1) {
@@ -460,7 +494,9 @@ async function planContentDifferentiation<const E extends readonly string[]>(
 						srcChoicesLen,
 						planChoicesLen
 					})
-					throw errors.new("structural validation failed: interaction choices length mismatch")
+					throw errors.new(
+						"structural validation failed: interaction choices length mismatch"
+					)
 				}
 			}
 		}
@@ -509,7 +545,9 @@ async function regenerateWidgetsViaLLM<const E extends readonly string[]>(
 	widgetTypes: Record<string, keyof typeof allWidgetSchemas>
 ): Promise<Record<string, Widget>> {
 	const widgetKeys = Object.keys(widgetTypes)
-	logger.info("shot 2 widget generation starting", { widgetKeysCount: widgetKeys.length })
+	logger.info("shot 2 widget generation starting", {
+		widgetKeysCount: widgetKeys.length
+	})
 	const WidgetsEnvelopeSchema = z
 		.object({ widgets: buildWidgetsResponseSchema(logger, widgetTypes) })
 		.strict()
@@ -595,9 +633,13 @@ async function regenerateWidgetsViaLLM<const E extends readonly string[]>(
 	}
 
 	// Re-validate widgets against the global union to ensure type is Widget
-	const revalidate = z.record(z.string(), WidgetSchema).safeParse(validation.data.widgets)
+	const revalidate = z
+		.record(z.string(), WidgetSchema)
+		.safeParse(validation.data.widgets)
 	if (!revalidate.success) {
-		logger.error("widgets post-validate against union failed", { error: revalidate.error })
+		logger.error("widgets post-validate against union failed", {
+			error: revalidate.error
+		})
 		throw errors.wrap(revalidate.error, "widgets post-validate")
 	}
 	return revalidate.data
@@ -609,7 +651,10 @@ async function regenerateWidgetsViaLLM<const E extends readonly string[]>(
  * variations are generated successfully, or it throws an error.
  */
 export async function differentiateAssessmentItem<
-	C extends WidgetCollection<Record<string, WidgetDefinition<unknown, unknown>>, readonly string[]>
+	C extends WidgetCollection<
+		Record<string, WidgetDefinition<unknown, unknown>>,
+		readonly string[]
+	>
 >(
 	openai: OpenAI,
 	logger: logger.Logger,
@@ -617,12 +662,19 @@ export async function differentiateAssessmentItem<
 	n: number,
 	widgetCollection: C
 ): Promise<Array<AssessmentItemInput<WidgetTypeTupleFrom<C>>>> {
-	logger.info("starting differentiation", { identifier: sourceItem.identifier, variations: n })
+	logger.info("starting differentiation", {
+		identifier: sourceItem.identifier,
+		variations: n
+	})
 
 	// Shot 1: Generate UI-agnostic content plans (LLM prompt includes full original item for context).
-	const plansResult = await errors.try(planContentDifferentiation(openai, logger, sourceItem, n))
+	const plansResult = await errors.try(
+		planContentDifferentiation(openai, logger, sourceItem, n)
+	)
 	if (plansResult.error) {
-		logger.error("differentiation planning shot failed", { error: plansResult.error })
+		logger.error("differentiation planning shot failed", {
+			error: plansResult.error
+		})
 		throw errors.wrap(plansResult.error, "differentiation planning")
 	}
 	const plans = plansResult.data
@@ -637,7 +689,10 @@ export async function differentiateAssessmentItem<
 				throw errors.new("invalid source item: widget missing type")
 			}
 			if (!isWidgetTypeName(widget.type)) {
-				logger.error("source widget has unknown type", { key, typeName: widget.type })
+				logger.error("source widget has unknown type", {
+					key,
+					typeName: widget.type
+				})
 				throw errors.new("invalid source item: unknown widget type")
 			}
 			widgetTypes[key] = widget.type
@@ -681,7 +736,10 @@ export async function differentiateAssessmentItem<
 		}
 
 		// Use the collection's widget schemas for validation
-		const widgetSchemasForCollection: Record<string, z.ZodType<unknown, unknown>> = {}
+		const widgetSchemasForCollection: Record<
+			string,
+			z.ZodType<unknown, unknown>
+		> = {}
 		for (const k of widgetCollection.widgetTypeKeys) {
 			const schema = widgetCollection.widgets[k]?.schema
 			if (schema) {
@@ -689,12 +747,13 @@ export async function differentiateAssessmentItem<
 			}
 		}
 
-		const { AssessmentItemSchema: finalItemSchema } = createDynamicAssessmentItemSchema(
-			widgetTypes,
-			widgetCollection.widgetTypeKeys,
-			widgetSchemasForCollection,
-			finalItem.feedbackPlan
-		)
+		const { AssessmentItemSchema: finalItemSchema } =
+			createDynamicAssessmentItemSchema(
+				widgetTypes,
+				widgetCollection.widgetTypeKeys,
+				widgetSchemasForCollection,
+				finalItem.feedbackPlan
+			)
 		const finalValidation = finalItemSchema.safeParse(finalItem)
 		if (!finalValidation.success) {
 			logger.error("final differentiated item failed schema validation", {
@@ -706,6 +765,9 @@ export async function differentiateAssessmentItem<
 		finalItems.push(finalValidation.data)
 	}
 
-	logger.info("differentiation complete", { requested: n, completed: finalItems.length })
+	logger.info("differentiation complete", {
+		requested: n,
+		completed: finalItems.length
+	})
 	return finalItems
 }

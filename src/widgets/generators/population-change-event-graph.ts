@@ -1,17 +1,21 @@
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { AXIS_VIEWBOX_PADDING } from "../utils/constants"
-import { setupCoordinatePlaneBaseV2 } from "../utils/coordinate-plane-utils"
-import { CSS_COLOR_PATTERN } from "../utils/css-color"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { AXIS_VIEWBOX_PADDING } from "@/widgets/utils/constants"
+import { setupCoordinatePlaneBaseV2 } from "@/widgets/utils/coordinate-plane-utils"
+import { CSS_COLOR_PATTERN } from "@/widgets/utils/css-color"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
 
 // Factory helpers to avoid schema reuse and $ref generation
 function createPointSchema() {
 	return z.object({
-		x: z.number().describe("The x-coordinate of the point in an arbitrary data space."),
-		y: z.number().describe("The y-coordinate of the point in an arbitrary data space.")
+		x: z
+			.number()
+			.describe("The x-coordinate of the point in an arbitrary data space."),
+		y: z
+			.number()
+			.describe("The y-coordinate of the point in an arbitrary data space.")
 	})
 }
 
@@ -19,12 +23,18 @@ function createSegmentSchema() {
 	return z.object({
 		points: z
 			.array(createPointSchema())
-			.describe("An array of {x, y} points that define this segment of the curve."),
+			.describe(
+				"An array of {x, y} points that define this segment of the curve."
+			),
 		color: z
 			.string()
 			.regex(CSS_COLOR_PATTERN, "invalid css color")
 			.describe("The color of this line segment."),
-		label: z.string().describe("The text label for this segment to be displayed in the legend.")
+		label: z
+			.string()
+			.describe(
+				"The text label for this segment to be displayed in the legend."
+			)
 	})
 }
 
@@ -33,10 +43,14 @@ export const PopulationChangeEventGraphPropsSchema = z
 		type: z.literal("populationChangeEventGraph"),
 		width: createWidthSchema(),
 		height: createHeightSchema(),
-		xAxisLabel: z.string().describe("The label for the horizontal axis (e.g., 'Time')."),
+		xAxisLabel: z
+			.string()
+			.describe("The label for the horizontal axis (e.g., 'Time')."),
 		yAxisLabel: z
 			.string()
-			.describe("The label for the vertical axis (e.g., 'Deer population size')."),
+			.describe(
+				"The label for the vertical axis (e.g., 'Deer population size')."
+			),
 		xAxisMin: z
 			.number()
 			.describe(
@@ -72,7 +86,9 @@ export const PopulationChangeEventGraphPropsSchema = z
 		"Creates a conceptual graph showing a 'before' and 'after' scenario, typically for population changes over time. Renders a solid line followed by a dashed line, with a legend. IMPORTANT: Always use consistent axis scales across related graphs to enable visual comparison."
 	)
 
-export type PopulationChangeEventGraphProps = z.infer<typeof PopulationChangeEventGraphPropsSchema>
+export type PopulationChangeEventGraphProps = z.infer<
+	typeof PopulationChangeEventGraphPropsSchema
+>
 
 export const generatePopulationChangeEventGraph: WidgetGenerator<
 	typeof PopulationChangeEventGraphPropsSchema
@@ -141,11 +157,17 @@ export const generatePopulationChangeEventGraph: WidgetGenerator<
 		strokeWidth: theme.stroke.width.thick,
 		markerEnd: "url(#graph-arrow)"
 	})
-	canvas.drawLine(yAxisX, xAxisY, baseInfo.chartArea.left + baseInfo.chartArea.width, xAxisY, {
-		stroke: theme.colors.axis,
-		strokeWidth: theme.stroke.width.thick,
-		markerEnd: "url(#graph-arrow)"
-	})
+	canvas.drawLine(
+		yAxisX,
+		xAxisY,
+		baseInfo.chartArea.left + baseInfo.chartArea.width,
+		xAxisY,
+		{
+			stroke: theme.colors.axis,
+			strokeWidth: theme.stroke.width.thick,
+			markerEnd: "url(#graph-arrow)"
+		}
+	)
 
 	// Curves using Canvas API
 	if (beforeSegment.points.length > 0) {

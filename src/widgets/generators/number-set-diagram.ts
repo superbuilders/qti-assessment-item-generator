@@ -1,10 +1,10 @@
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { PADDING } from "../utils/constants"
-import { CSS_COLOR_PATTERN } from "../utils/css-color"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { PADDING } from "@/widgets/utils/constants"
+import { CSS_COLOR_PATTERN } from "@/widgets/utils/css-color"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
 
 function createStyleSchema() {
 	return z
@@ -12,13 +12,18 @@ function createStyleSchema() {
 			label: z
 				.string()
 				.nullable()
-				.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
+				.transform((val) =>
+					val === "null" || val === "NULL" || val === "" ? null : val
+				)
 				.describe(
 					"Display name for this number set (e.g., 'Whole Numbers', 'Integers', 'Rational', 'ℚ', null). Can use symbols or full names. Null shows no label."
 				),
 			color: z
 				.string()
-				.regex(CSS_COLOR_PATTERN, "invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)")
+				.regex(
+					CSS_COLOR_PATTERN,
+					"invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)"
+				)
 				.describe(
 					"Hex-only fill color for this set's region (e.g., '#E8F4FD', '#1E90FF', '#FFC86480' for 50% alpha). Use translucency via 8-digit hex for nested visibility."
 				)
@@ -63,9 +68,9 @@ export type NumberSetDiagramProps = z.infer<typeof NumberSetDiagramPropsSchema>
  * Generates a static SVG Euler diagram that visually represents the hierarchical
  * relationship between different sets of numbers (whole, integer, rational, irrational).
  */
-export const generateNumberSetDiagram: WidgetGenerator<typeof NumberSetDiagramPropsSchema> = async (
-	data
-) => {
+export const generateNumberSetDiagram: WidgetGenerator<
+	typeof NumberSetDiagramPropsSchema
+> = async (data) => {
 	const { width, height, sets } = data
 
 	const canvas = new CanvasImpl({
@@ -144,10 +149,16 @@ export const generateNumberSetDiagram: WidgetGenerator<typeof NumberSetDiagramPr
 	}
 
 	// Irrational Numbers (separate)
-	canvas.drawEllipse(irrationalCenterX, irrationalCenterY, irrationalRx, irrationalRy, {
-		fill: sets.irrational.color,
-		stroke: theme.colors.black
-	})
+	canvas.drawEllipse(
+		irrationalCenterX,
+		irrationalCenterY,
+		irrationalRx,
+		irrationalRy,
+		{
+			fill: sets.irrational.color,
+			stroke: theme.colors.black
+		}
+	)
 	if (sets.irrational.label !== null) {
 		canvas.drawText({
 			x: irrationalCenterX,

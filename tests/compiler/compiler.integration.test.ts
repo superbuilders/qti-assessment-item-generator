@@ -7,8 +7,11 @@ import {
 	ErrDuplicateResponseIdentifier
 } from "@/compiler/compiler"
 import type { AssessmentItemInput } from "@/core/item"
+import {
+	MINIMAL_CORRECT_FEEDBACK,
+	MINIMAL_INCORRECT_FEEDBACK
+} from "@/testing/helpers/feedback-fixtures"
 import { allWidgetsCollection } from "@/widgets/collections/all"
-import { MINIMAL_CORRECT_FEEDBACK, MINIMAL_INCORRECT_FEEDBACK } from "../helpers/feedback-fixtures"
 
 describe("Compiler Identifier Validation Integration Tests", () => {
 	test("should throw ErrDuplicateResponseIdentifier for duplicates across interactions", async () => {
@@ -20,8 +23,14 @@ describe("Compiler Identifier Validation Integration Tests", () => {
 				mode: "fallback",
 				dimensions: [{ responseIdentifier: "RESPONSE_1", kind: "binary" }],
 				combinations: [
-					{ id: "CORRECT", path: [{ responseIdentifier: "RESPONSE_1", key: "CORRECT" }] },
-					{ id: "INCORRECT", path: [{ responseIdentifier: "RESPONSE_1", key: "INCORRECT" }] }
+					{
+						id: "CORRECT",
+						path: [{ responseIdentifier: "RESPONSE_1", key: "CORRECT" }]
+					},
+					{
+						id: "INCORRECT",
+						path: [{ responseIdentifier: "RESPONSE_1", key: "INCORRECT" }]
+					}
 				]
 			},
 			feedback: {
@@ -60,13 +69,23 @@ describe("Compiler Identifier Validation Integration Tests", () => {
 			},
 			widgets: {},
 			responseDeclarations: [
-				{ identifier: "RESPONSE_1", cardinality: "single", baseType: "identifier", correct: "A" },
-				{ identifier: "RESPONSE_TEXT", cardinality: "single", baseType: "string", correct: "test" }
+				{
+					identifier: "RESPONSE_1",
+					cardinality: "single",
+					baseType: "identifier",
+					correct: "A"
+				},
+				{
+					identifier: "RESPONSE_TEXT",
+					cardinality: "single",
+					baseType: "string",
+					correct: "test"
+				}
 			]
 		}
-		return expect(compile(itemWithDuplicate, allWidgetsCollection)).rejects.toThrow(
-			ErrDuplicateResponseIdentifier
-		)
+		return expect(
+			compile(itemWithDuplicate, allWidgetsCollection)
+		).rejects.toThrow(ErrDuplicateResponseIdentifier)
 	})
 
 	test("should throw ErrDuplicateChoiceIdentifier for duplicates within a choiceInteraction", async () => {
@@ -76,10 +95,22 @@ describe("Compiler Identifier Validation Integration Tests", () => {
 			body: [],
 			feedbackPlan: {
 				mode: "combo",
-				dimensions: [{ responseIdentifier: "RESPONSE_1", kind: "enumerated", keys: ["A", "A"] }],
+				dimensions: [
+					{
+						responseIdentifier: "RESPONSE_1",
+						kind: "enumerated",
+						keys: ["A", "A"]
+					}
+				],
 				combinations: [
-					{ id: "FB__RESPONSE_1_A", path: [{ responseIdentifier: "RESPONSE_1", key: "A" }] },
-					{ id: "FB__RESPONSE_1_A", path: [{ responseIdentifier: "RESPONSE_1", key: "A" }] }
+					{
+						id: "FB__RESPONSE_1_A",
+						path: [{ responseIdentifier: "RESPONSE_1", key: "A" }]
+					},
+					{
+						id: "FB__RESPONSE_1_A",
+						path: [{ responseIdentifier: "RESPONSE_1", key: "A" }]
+					}
 				]
 			},
 			feedback: {
@@ -105,12 +136,17 @@ describe("Compiler Identifier Validation Integration Tests", () => {
 			},
 			widgets: {},
 			responseDeclarations: [
-				{ identifier: "RESPONSE_1", cardinality: "single", baseType: "identifier", correct: "A" }
+				{
+					identifier: "RESPONSE_1",
+					cardinality: "single",
+					baseType: "identifier",
+					correct: "A"
+				}
 			]
 		}
-		return expect(compile(itemWithDuplicate, allWidgetsCollection)).rejects.toThrow(
-			ErrDuplicateChoiceIdentifier
-		)
+		return expect(
+			compile(itemWithDuplicate, allWidgetsCollection)
+		).rejects.toThrow(ErrDuplicateChoiceIdentifier)
 	})
 
 	test("should compile successfully with complex valid identifiers", async () => {
@@ -121,7 +157,11 @@ describe("Compiler Identifier Validation Integration Tests", () => {
 			feedbackPlan: {
 				mode: "combo",
 				dimensions: [
-					{ responseIdentifier: "RESPONSE_1", kind: "enumerated", keys: ["A", "B"] },
+					{
+						responseIdentifier: "RESPONSE_1",
+						kind: "enumerated",
+						keys: ["A", "B"]
+					},
 					{ responseIdentifier: "RESPONSE_TEXT", kind: "binary" }
 				],
 				combinations: [
@@ -194,14 +234,26 @@ describe("Compiler Identifier Validation Integration Tests", () => {
 			},
 			widgets: {},
 			responseDeclarations: [
-				{ identifier: "RESPONSE_1", cardinality: "single", baseType: "identifier", correct: "A" },
-				{ identifier: "RESPONSE_TEXT", cardinality: "single", baseType: "string", correct: "test" }
+				{
+					identifier: "RESPONSE_1",
+					cardinality: "single",
+					baseType: "identifier",
+					correct: "A"
+				},
+				{
+					identifier: "RESPONSE_TEXT",
+					cardinality: "single",
+					baseType: "string",
+					correct: "test"
+				}
 			]
 		}
 
 		const result = await errors.try(compile(validItem, allWidgetsCollection))
 		if (result.error) {
-			logger.error("valid item failed compilation unexpectedly", { error: result.error })
+			logger.error("valid item failed compilation unexpectedly", {
+				error: result.error
+			})
 		}
 		expect(result.error).toBeUndefined()
 	})

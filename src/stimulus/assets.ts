@@ -1,4 +1,4 @@
-import type { StimulusAsset } from "./types"
+import type { StimulusAsset } from "@/stimulus/types"
 
 export function collectAssets(article: Element): StimulusAsset[] {
 	const assets: StimulusAsset[] = []

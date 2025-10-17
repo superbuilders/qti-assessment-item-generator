@@ -27,7 +27,9 @@ export function renderWrappedText(
 			const words = text.split(/\s+/).filter(Boolean)
 			if (words.length > 1) {
 				const wordWidths = words.map((w) => w.length * approxCharWidthPx)
-				const total = wordWidths.reduce((a, b) => a + b, 0) + (words.length - 1) * approxCharWidthPx
+				const total =
+					wordWidths.reduce((a, b) => a + b, 0) +
+					(words.length - 1) * approxCharWidthPx
 				const target = total / 2
 				let acc = 0
 				let splitIdx = 1
@@ -83,7 +85,10 @@ export function renderRotatedWrappedYAxisLabel(
 		approxCharWidthPx
 	)
 	// Inject rotation transform with pivot
-	wrapped = wrapped.replace("<text ", `<text transform="rotate(-90, ${x}, ${yCenter})" `)
+	wrapped = wrapped.replace(
+		"<text ",
+		`<text transform="rotate(-90, ${x}, ${yCenter})" `
+	)
 	return wrapped
 }
 
@@ -175,7 +180,9 @@ export function estimateWrappedTextDimensions(
 	const lines = wrapText(text, maxWidthPx, fontSize)
 
 	const totalHeight = fontSize * lines.length * lineHeight
-	const maxWidth = Math.max(...lines.map((line) => estimateTextWidth(line, fontSize)))
+	const maxWidth = Math.max(
+		...lines.map((line) => estimateTextWidth(line, fontSize))
+	)
 	return { height: totalHeight, maxWidth }
 }
 

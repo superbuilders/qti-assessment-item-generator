@@ -1,10 +1,10 @@
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
-import { CSS_COLOR_PATTERN } from "../utils/css-color"
-import { abbreviateMonth } from "../utils/labels"
-import type { Canvas } from "../utils/layout"
-import { estimateWrappedTextDimensions } from "../utils/text"
-import { theme } from "../utils/theme"
+import { CSS_COLOR_PATTERN } from "@/utils/css-color"
+import { abbreviateMonth } from "@/utils/labels"
+import type { Canvas } from "@/utils/layout"
+import { estimateWrappedTextDimensions } from "@/utils/text"
+import { theme } from "@/utils/theme"
 
 // --- START: Moved Zod Schema Definitions ---
 // These schemas were previously in coordinate-plane-base.ts and are now homed here.
@@ -20,14 +20,22 @@ export const createAxisOptionsSchema = () =>
 			label: z
 				.string()
 				.nullable()
-				.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
-				.describe('The text title for the axis (e.g., "Number of Days"). Null hides the label.'),
+				.transform((val) =>
+					val === "null" || val === "NULL" || val === "" ? null : val
+				)
+				.describe(
+					'The text title for the axis (e.g., "Number of Days"). Null hides the label.'
+				),
 			min: z.number().describe("The minimum value displayed on the axis."),
 			max: z.number().describe("The maximum value displayed on the axis."),
 			tickInterval: z
 				.number()
-				.describe("The numeric interval between labeled tick marks on the axis."),
-			showGridLines: z.boolean().describe("If true, display grid lines for this axis.")
+				.describe(
+					"The numeric interval between labeled tick marks on the axis."
+				),
+			showGridLines: z
+				.boolean()
+				.describe("If true, display grid lines for this axis.")
 		})
 		.strict()
 
@@ -43,10 +51,20 @@ export const createPlotPointSchema = () =>
 				.describe(
 					"A unique identifier for this point, used to reference it when creating polygons."
 				),
-			x: z.number().describe("The value of the point on the horizontal (X) axis."),
-			y: z.number().describe("The value of the point on the vertical (Y) axis."),
-			label: z.string().describe('A text label to display near the point (e.g., "A", "(m, n)").'),
-			style: z.enum(["open", "closed"]).describe("Visual style for the point marker.")
+			x: z
+				.number()
+				.describe("The value of the point on the horizontal (X) axis."),
+			y: z
+				.number()
+				.describe("The value of the point on the vertical (Y) axis."),
+			label: z
+				.string()
+				.describe(
+					'A text label to display near the point (e.g., "A", "(m, n)").'
+				),
+			style: z
+				.enum(["open", "closed"])
+				.describe("Visual style for the point marker.")
 		})
 		.strict()
 
@@ -57,16 +75,22 @@ export type PlotPoint = z.infer<typeof PlotPointSchema>
 export const createSlopeInterceptLineSchema = () =>
 	z
 		.object({
-			type: z.literal("slopeIntercept").describe("Specifies a straight line in y = mx + b form."),
+			type: z
+				.literal("slopeIntercept")
+				.describe("Specifies a straight line in y = mx + b form."),
 			slope: z.number().describe("The slope of the line (m)."),
-			yIntercept: z.number().describe("The y-value where the line crosses the Y-axis (b).")
+			yIntercept: z
+				.number()
+				.describe("The y-value where the line crosses the Y-axis (b).")
 		})
 		.strict()
 
 export const createStandardLineSchema = () =>
 	z
 		.object({
-			type: z.literal("standard").describe("Specifies a straight line in Ax + By = C form."),
+			type: z
+				.literal("standard")
+				.describe("Specifies a straight line in Ax + By = C form."),
 			A: z.number().describe("The coefficient of x."),
 			B: z.number().describe("The coefficient of y."),
 			C: z.number().describe("The constant term.")
@@ -76,7 +100,9 @@ export const createStandardLineSchema = () =>
 export const createPointSlopeLineSchema = () =>
 	z
 		.object({
-			type: z.literal("pointSlope").describe("Specifies a straight line in point-slope form."),
+			type: z
+				.literal("pointSlope")
+				.describe("Specifies a straight line in point-slope form."),
 			x1: z.number().describe("The x-coordinate of the known point."),
 			y1: z.number().describe("The y-coordinate of the known point."),
 			slope: z.number().describe("The slope of the line.")
@@ -99,20 +125,28 @@ export const createLineSchema = () =>
 				.string()
 				.regex(LINE_ID, "invalid line id; must match ^line_[A-Za-z0-9_]+$")
 				.describe('A unique identifier for the line (e.g., "line_p").'),
-			equation: createLineEquationSchema().describe("The mathematical definition of the line."),
+			equation: createLineEquationSchema().describe(
+				"The mathematical definition of the line."
+			),
 			color: z
 				.string()
 				.regex(
 					CSS_COLOR_PATTERN,
 					"invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA), rgb/rgba(), hsl/hsla(), or a common named color"
 				)
-				.describe('The color of the line, as a CSS color string (e.g., "red", "#FF0000").'),
+				.describe(
+					'The color of the line, as a CSS color string (e.g., "red", "#FF0000").'
+				),
 			style: z.enum(["solid", "dashed"]).describe("The style of the line."),
 			label: z
 				.string()
 				.nullable()
-				.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
-				.describe("Optional text label to place near the rendered line. Use null for no label.")
+				.transform((val) =>
+					val === "null" || val === "NULL" || val === "" ? null : val
+				)
+				.describe(
+					"Optional text label to place near the rendered line. Use null for no label."
+				)
 		})
 		.strict()
 
@@ -165,9 +199,15 @@ export const createDistanceSchema = () =>
 			pointId2: z.string().describe("The ID of the second point."),
 			showLegs: z
 				.boolean()
-				.describe("If true, draws the 'rise' and 'run' legs of the right triangle."),
-			showLegLabels: z.boolean().describe("If true, labels the legs with their lengths."),
-			hypotenuseLabel: z.string().describe("A label for the hypotenuse (the distance line)."),
+				.describe(
+					"If true, draws the 'rise' and 'run' legs of the right triangle."
+				),
+			showLegLabels: z
+				.boolean()
+				.describe("If true, labels the legs with their lengths."),
+			hypotenuseLabel: z
+				.string()
+				.describe("A label for the hypotenuse (the distance line)."),
 			color: z
 				.string()
 				.regex(
@@ -175,7 +215,9 @@ export const createDistanceSchema = () =>
 					"invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA), rgb/rgba(), hsl/hsla(), or a common named color"
 				)
 				.describe("The color of the distance lines."),
-			style: z.enum(["solid", "dashed"]).describe("The style of the distance lines.")
+			style: z
+				.enum(["solid", "dashed"])
+				.describe("The style of the distance lines.")
 		})
 		.strict()
 
@@ -192,8 +234,13 @@ export const createPolylineSchema = () =>
 					.describe("Indicates this polyline is defined by explicit points."),
 				id: z
 					.string()
-					.regex(POLYLINE_ID, "invalid polyline id; must match ^polyline_[A-Za-z0-9_]+$")
-					.describe("A unique identifier for this polyline (e.g., 'polyline_motion')."),
+					.regex(
+						POLYLINE_ID,
+						"invalid polyline id; must match ^polyline_[A-Za-z0-9_]+$"
+					)
+					.describe(
+						"A unique identifier for this polyline (e.g., 'polyline_motion')."
+					),
 				points: z
 					.array(z.object({ x: z.number(), y: z.number() }))
 					.describe("An array of {x, y} points to connect in order."),
@@ -204,11 +251,15 @@ export const createPolylineSchema = () =>
 						"invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA), rgb/rgba(), hsl/hsla(), or a common named color"
 					)
 					.describe("The color of the polyline."),
-				style: z.enum(["solid", "dashed"]).describe("The style of the polyline."),
+				style: z
+					.enum(["solid", "dashed"])
+					.describe("The style of the polyline."),
 				label: z
 					.string()
 					.nullable()
-					.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
+					.transform((val) =>
+						val === "null" || val === "NULL" || val === "" ? null : val
+					)
 					.describe(
 						"Optional text label to place near the rendered polyline. Use null for no label."
 					)
@@ -218,11 +269,18 @@ export const createPolylineSchema = () =>
 			.object({
 				type: z
 					.literal("function")
-					.describe("Indicates this polyline is defined by a polynomial function."),
+					.describe(
+						"Indicates this polyline is defined by a polynomial function."
+					),
 				id: z
 					.string()
-					.regex(POLYLINE_ID, "invalid polyline id; must match ^polyline_[A-Za-z0-9_]+$")
-					.describe("A unique identifier for this polyline (e.g., 'polyline_motion')."),
+					.regex(
+						POLYLINE_ID,
+						"invalid polyline id; must match ^polyline_[A-Za-z0-9_]+$"
+					)
+					.describe(
+						"A unique identifier for this polyline (e.g., 'polyline_motion')."
+					),
 				coefficients: z
 					.array(z.number())
 					.min(1, "must have at least one coefficient")
@@ -231,16 +289,22 @@ export const createPolylineSchema = () =>
 					),
 				xRange: z
 					.object({
-						min: z.number().describe("Minimum x value for function evaluation."),
+						min: z
+							.number()
+							.describe("Minimum x value for function evaluation."),
 						max: z.number().describe("Maximum x value for function evaluation.")
 					})
-					.describe("The x-range over which to evaluate and plot the function."),
+					.describe(
+						"The x-range over which to evaluate and plot the function."
+					),
 				resolution: z
 					.number()
 					.int()
 					.min(10, "resolution must be at least 10 points")
 					.default(100)
-					.describe("Number of points to generate when plotting the function (default: 100)."),
+					.describe(
+						"Number of points to generate when plotting the function (default: 100)."
+					),
 				color: z
 					.string()
 					.regex(
@@ -248,11 +312,15 @@ export const createPolylineSchema = () =>
 						"invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA), rgb/rgba(), hsl/hsla(), or a common named color"
 					)
 					.describe("The color of the polyline."),
-				style: z.enum(["solid", "dashed"]).describe("The style of the polyline."),
+				style: z
+					.enum(["solid", "dashed"])
+					.describe("The style of the polyline."),
 				label: z
 					.string()
 					.nullable()
-					.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
+					.transform((val) =>
+						val === "null" || val === "NULL" || val === "" ? null : val
+					)
 					.describe(
 						"Optional text label to place near the rendered polyline. Use null for no label."
 					)
@@ -314,7 +382,10 @@ export function renderLines(
 	const chartBottom = Math.max(toSvgY(yAxis.min), toSvgY(yAxis.max))
 
 	// Axes segments to avoid (if visible)
-	const avoidAxes: Array<{ a: { x: number; y: number }; b: { x: number; y: number } }> = []
+	const avoidAxes: Array<{
+		a: { x: number; y: number }
+		b: { x: number; y: number }
+	}> = []
 	if (yAxis.min <= 0 && 0 <= yAxis.max) {
 		const y0 = toSvgY(0)
 		avoidAxes.push({ a: { x: chartLeft, y: y0 }, b: { x: chartRight, y: y0 } })
@@ -352,8 +423,10 @@ export function renderLines(
 		}
 
 		const dash = l.style === "dashed" ? "5 3" : undefined
-		const x1Svg = isVertical && verticalX !== null ? toSvgX(verticalX) : toSvgX(xAxis.min)
-		const x2Svg = isVertical && verticalX !== null ? toSvgX(verticalX) : toSvgX(xAxis.max)
+		const x1Svg =
+			isVertical && verticalX !== null ? toSvgX(verticalX) : toSvgX(xAxis.min)
+		const x2Svg =
+			isVertical && verticalX !== null ? toSvgX(verticalX) : toSvgX(xAxis.max)
 		const y1Svg = toSvgY(y1)
 		const y2Svg = toSvgY(y2)
 
@@ -378,7 +451,10 @@ export function renderLines(
 				const nx = -ty
 				const ny = tx
 
-				const midAnchor = { x: (seg.a.x + seg.b.x) / 2, y: (seg.a.y + seg.b.y) / 2 }
+				const midAnchor = {
+					x: (seg.a.x + seg.b.x) / 2,
+					y: (seg.a.y + seg.b.y) / 2
+				}
 				const normalOffset = 14
 
 				const fontPx = theme.font.size.medium
@@ -393,13 +469,23 @@ export function renderLines(
 
 				const avoid = [...avoidAxes, seg]
 
-				function withinBounds(rect: { x: number; y: number; width: number; height: number }) {
+				function withinBounds(rect: {
+					x: number
+					y: number
+					width: number
+					height: number
+				}) {
 					const pad = 2
 					const lft = rect.x - pad
 					const rgt = rect.x + rect.width + pad
 					const top = rect.y - pad
 					const bot = rect.y + rect.height + pad
-					return lft >= chartLeft && rgt <= chartRight && top >= chartTop && bot <= chartBottom
+					return (
+						lft >= chartLeft &&
+						rgt <= chartRight &&
+						top >= chartTop &&
+						bot <= chartBottom
+					)
 				}
 				function orient(
 					p: { x: number; y: number },
@@ -427,7 +513,12 @@ export function renderLines(
 					rect: { x: number; y: number; width: number; height: number },
 					s: { a: { x: number; y: number }; b: { x: number; y: number } }
 				) {
-					const r = { x1: rect.x, y1: rect.y, x2: rect.x + rect.width, y2: rect.y + rect.height }
+					const r = {
+						x1: rect.x,
+						y1: rect.y,
+						x2: rect.x + rect.width,
+						y2: rect.y + rect.height
+					}
 					const edges = [
 						{ a: { x: r.x1, y: r.y1 }, b: { x: r.x2, y: r.y1 } },
 						{ a: { x: r.x2, y: r.y1 }, b: { x: r.x2, y: r.y2 } },
@@ -436,7 +527,10 @@ export function renderLines(
 					]
 					return edges.some((e) => intersects(e.a, e.b, s.a, s.b))
 				}
-				function placeFromBase(base: { x: number; y: number }, direction: 1 | -1) {
+				function placeFromBase(
+					base: { x: number; y: number },
+					direction: 1 | -1
+				) {
 					const step = 6
 					const maxIt = 80
 					for (let i = 0; i < maxIt; i++) {
@@ -474,7 +568,10 @@ export function renderLines(
 				let chosen: { x: number; y: number; i: number } | null = null
 				let bestDistFromYAxis = Number.NEGATIVE_INFINITY
 				for (const a of anchors) {
-					const base = { x: a.x + nx * normalOffset, y: a.y + ny * normalOffset }
+					const base = {
+						x: a.x + nx * normalOffset,
+						y: a.y + ny * normalOffset
+					}
 					// Prefer direction that increases distance from y-axis
 					let preferredDir: 1 | -1 = 1
 					if (yAxisVisible) {
@@ -503,7 +600,12 @@ export function renderLines(
 							while (extra <= maxExtra) {
 								const cx = cand.x + preferredDir * tx * step
 								const cy = cand.y + preferredDir * ty * step
-								const rect = { x: cx - halfW, y: cy - halfH, width: w, height: h }
+								const rect = {
+									x: cx - halfW,
+									y: cy - halfH,
+									width: w,
+									height: h
+								}
 								const within = withinBounds(rect)
 								let hit = false
 								for (const s of avoid) {
@@ -521,7 +623,9 @@ export function renderLines(
 						}
 					}
 
-					const distFromYAxis = yAxisVisible ? Math.abs(cand.x - x0) : Number.POSITIVE_INFINITY
+					const distFromYAxis = yAxisVisible
+						? Math.abs(cand.x - x0)
+						: Number.POSITIVE_INFINITY
 					if (distFromYAxis > bestDistFromYAxis) {
 						bestDistFromYAxis = distFromYAxis
 						chosen = cand
@@ -544,7 +648,11 @@ export function renderLines(
 						// ultimate fallback: use line midpoint
 						const midX = (x1Svg + x2Svg) / 2
 						const midY = (y1Svg + y2Svg) / 2
-						chosen = { x: midX + nx * normalOffset, y: midY + ny * normalOffset, i: 0 }
+						chosen = {
+							x: midX + nx * normalOffset,
+							y: midY + ny * normalOffset,
+							i: 0
+						}
 					}
 				}
 
@@ -616,7 +724,10 @@ function ensureFillOpacity(color: string): string {
 
 	// Check if it's a 3-digit hex (opaque) - expand and add alpha
 	if (/^#[0-9a-fA-F]{3}$/.test(color)) {
-		const expanded = color.replace(/^#([0-9a-fA-F])([0-9a-fA-F])([0-9a-fA-F])$/, "#$1$1$2$2$3$3")
+		const expanded = color.replace(
+			/^#([0-9a-fA-F])([0-9a-fA-F])([0-9a-fA-F])$/,
+			"#$1$1$2$2$3$3"
+		)
 		return `${expanded}26` // Add ~15% opacity
 	}
 
@@ -679,7 +790,8 @@ export function renderPolygons(
 					})
 				}
 
-				const centroidX = polyPoints.reduce((sum, pt) => sum + pt.x, 0) / polyPoints.length
+				const centroidX =
+					polyPoints.reduce((sum, pt) => sum + pt.x, 0) / polyPoints.length
 				const bottomY = Math.max(...polyPoints.map((pt) => pt.y))
 				const labelX = centroidX
 				const labelY = bottomY + 20
@@ -817,7 +929,10 @@ export function renderPolylines(
 						}
 						const a = points[Math.min(segIndex, points.length - 2)]
 						const b = points[Math.min(segIndex + 1, points.length - 1)]
-						const segLen = Math.max(1, segLens[Math.min(segIndex, segLens.length - 1)] || 1)
+						const segLen = Math.max(
+							1,
+							segLens[Math.min(segIndex, segLens.length - 1)] || 1
+						)
 						const t = target / segLen
 						const anchorX = a.x + (b.x - a.x) * t
 						const anchorY = a.y + (b.y - a.y) * t
@@ -829,7 +944,10 @@ export function renderPolylines(
 						const nx = -ty
 						const ny = tx
 
-						const avoid: Array<{ a: { x: number; y: number }; b: { x: number; y: number } }> = []
+						const avoid: Array<{
+							a: { x: number; y: number }
+							b: { x: number; y: number }
+						}> = []
 						for (let i = 0; i < points.length - 1; i++) {
 							avoid.push({ a: points[i], b: points[i + 1] })
 						}
@@ -893,7 +1011,12 @@ export function renderPolylines(
 							for (let i = 0; i < maxIt; i++) {
 								const cx = baseX + direction * tx * i * step
 								const cy = baseY + direction * ty * i * step
-								const rect = { x: cx - halfW, y: cy - halfH, width: w, height: h }
+								const rect = {
+									x: cx - halfW,
+									y: cy - halfH,
+									width: w,
+									height: h
+								}
 								let hit = false
 								for (const s of avoid) {
 									if (rectIntersectsSegment(rect, s)) {
@@ -932,7 +1055,11 @@ export function renderPolylines(
 									polyline.type === "function" && polyline.xRange
 										? { x: polyline.xRange.min, y: 0 }
 										: { x: 0, y: 0 }
-								chosen = { x: toSvgX(firstPoint.x), y: toSvgY(firstPoint.y) - 20, i: 0 }
+								chosen = {
+									x: toSvgX(firstPoint.x),
+									y: toSvgY(firstPoint.y) - 20,
+									i: 0
+								}
 							}
 						}
 

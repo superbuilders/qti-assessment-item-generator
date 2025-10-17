@@ -1,9 +1,9 @@
 import * as errors from "@superbuilders/errors"
 import { XMLParser } from "fast-xml-parser"
 import * as he from "he"
-import { VOID_ELEMENTS } from "./constants"
-import { createDocument } from "./dom"
-import type { StimulusIssue } from "./types"
+import { VOID_ELEMENTS } from "@/stimulus/constants"
+import { createDocument } from "@/stimulus/dom"
+import type { StimulusIssue } from "@/stimulus/types"
 
 const ALLOWED_NAMED_ENTITIES = new Set(["amp", "lt", "gt", "quot", "apos"])
 const NAMED_ENTITY_PATTERN = /&([a-zA-Z][a-zA-Z0-9]+);/g
@@ -57,7 +57,8 @@ export function validateHtml(html: string): StimulusIssue[] {
 			{
 				severity: "error",
 				code: "html-extra-content",
-				message: "Stimulus output must contain exactly one <article> as the root element."
+				message:
+					"Stimulus output must contain exactly one <article> as the root element."
 			}
 		]
 	}

@@ -1,17 +1,21 @@
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { AXIS_VIEWBOX_PADDING } from "../utils/constants"
-import { setupCoordinatePlaneBaseV2 } from "../utils/coordinate-plane-utils"
-import { CSS_COLOR_PATTERN } from "../utils/css-color"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { AXIS_VIEWBOX_PADDING } from "@/widgets/utils/constants"
+import { setupCoordinatePlaneBaseV2 } from "@/widgets/utils/coordinate-plane-utils"
+import { CSS_COLOR_PATTERN } from "@/widgets/utils/css-color"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
 
 // Factory functions to avoid schema instance reuse which causes $ref in JSON Schema
 function createPointSchema() {
 	return z.object({
-		x: z.number().describe("The x-coordinate of the point in an arbitrary data space."),
-		y: z.number().describe("The y-coordinate of the point in an arbitrary data space.")
+		x: z
+			.number()
+			.describe("The x-coordinate of the point in an arbitrary data space."),
+		y: z
+			.number()
+			.describe("The y-coordinate of the point in an arbitrary data space.")
 	})
 }
 
@@ -26,7 +30,9 @@ function createHighlightPointSchema() {
 			),
 		label: z
 			.string()
-			.describe("The text label to display next to this point (e.g., 'A', 'B', 'C').")
+			.describe(
+				"The text label to display next to this point (e.g., 'A', 'B', 'C')."
+			)
 	})
 }
 
@@ -35,10 +41,14 @@ export const ConceptualGraphPropsSchema = z
 		type: z.literal("conceptualGraph"),
 		width: createWidthSchema(),
 		height: createHeightSchema(),
-		xAxisLabel: z.string().describe("The label for the horizontal axis (e.g., 'Time')."),
+		xAxisLabel: z
+			.string()
+			.describe("The label for the horizontal axis (e.g., 'Time')."),
 		yAxisLabel: z
 			.string()
-			.describe("The label for the vertical axis (e.g., 'Frog population size')."),
+			.describe(
+				"The label for the vertical axis (e.g., 'Frog population size')."
+			),
 		curvePoints: z
 			.array(createPointSchema())
 			.min(2)
@@ -49,7 +59,9 @@ export const ConceptualGraphPropsSchema = z
 			.describe("The color of the plotted curve."),
 		highlightPoints: z
 			.array(createHighlightPointSchema())
-			.describe("An array of specific, labeled points to highlight on the graph."),
+			.describe(
+				"An array of specific, labeled points to highlight on the graph."
+			),
 		highlightPointColor: z
 			.string()
 			.regex(CSS_COLOR_PATTERN, "invalid css color")
@@ -66,9 +78,9 @@ export const ConceptualGraphPropsSchema = z
 
 export type ConceptualGraphProps = z.infer<typeof ConceptualGraphPropsSchema>
 
-export const generateConceptualGraph: WidgetGenerator<typeof ConceptualGraphPropsSchema> = async (
-	props
-) => {
+export const generateConceptualGraph: WidgetGenerator<
+	typeof ConceptualGraphPropsSchema
+> = async (props) => {
 	const {
 		width,
 		height,
@@ -138,11 +150,17 @@ export const generateConceptualGraph: WidgetGenerator<typeof ConceptualGraphProp
 		strokeWidth: theme.stroke.width.thick,
 		markerEnd: "url(#graph-arrow)"
 	})
-	canvas.drawLine(yAxisX, xAxisY, baseInfo.chartArea.left + baseInfo.chartArea.width, xAxisY, {
-		stroke: theme.colors.axis,
-		strokeWidth: theme.stroke.width.thick,
-		markerEnd: "url(#graph-arrow)"
-	})
+	canvas.drawLine(
+		yAxisX,
+		xAxisY,
+		baseInfo.chartArea.left + baseInfo.chartArea.width,
+		xAxisY,
+		{
+			stroke: theme.colors.axis,
+			strokeWidth: theme.stroke.width.thick,
+			markerEnd: "url(#graph-arrow)"
+		}
+	)
 
 	// Track vertical extents for unclipped content so we can grow the viewBox vertically
 	let minYExtent = 0
@@ -185,7 +203,8 @@ export const generateConceptualGraph: WidgetGenerator<typeof ConceptualGraphProp
 	const totalLength = cumulativeLengths[cumulativeLengths.length - 1] ?? 0
 	function pointAtT(t: number): { x: number; y: number } {
 		if (curvePoints.length === 0) return { x: 0, y: 0 }
-		if (curvePoints.length === 1 || totalLength === 0) return curvePoints[0] ?? { x: 0, y: 0 }
+		if (curvePoints.length === 1 || totalLength === 0)
+			return curvePoints[0] ?? { x: 0, y: 0 }
 		if (t <= 0) return curvePoints[0] ?? { x: 0, y: 0 }
 		if (t >= 1) return curvePoints[curvePoints.length - 1] ?? { x: 0, y: 0 }
 		const target = t * totalLength
@@ -199,7 +218,8 @@ export const generateConceptualGraph: WidgetGenerator<typeof ConceptualGraphProp
 			}
 		}
 		if (idx < 0) idx = 0
-		if (idx >= curvePoints.length - 1) return curvePoints[curvePoints.length - 1] ?? { x: 0, y: 0 }
+		if (idx >= curvePoints.length - 1)
+			return curvePoints[curvePoints.length - 1] ?? { x: 0, y: 0 }
 		const cStartVal = cumulativeLengths[idx] ?? 0
 		const cEndVal = cumulativeLengths[idx + 1] ?? cStartVal
 		const cStart = cStartVal

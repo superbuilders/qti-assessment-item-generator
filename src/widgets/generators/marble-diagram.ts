@@ -1,7 +1,7 @@
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CSS_COLOR_PATTERN } from "../utils/css-color"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CSS_COLOR_PATTERN } from "@/widgets/utils/css-color"
+import { theme } from "@/widgets/utils/theme"
 
 // Factory for a color group of marbles schema (avoids pointer reuse/$ref)
 const createMarbleColorGroupSchema = () =>
@@ -38,9 +38,9 @@ export const MarbleDiagramPropsSchema = z
 
 export type MarbleDiagramProps = z.infer<typeof MarbleDiagramPropsSchema>
 
-export const generateMarbleDiagram: WidgetGenerator<typeof MarbleDiagramPropsSchema> = async (
-	props
-) => {
+export const generateMarbleDiagram: WidgetGenerator<
+	typeof MarbleDiagramPropsSchema
+> = async (props) => {
 	const { groups } = props
 	const total = groups.reduce((sum, g) => sum + g.count, 0)
 	if (total === 0) {
@@ -83,7 +83,10 @@ export const generateMarbleDiagram: WidgetGenerator<typeof MarbleDiagramPropsSch
 	type Pt = { x: number; y: number; fill: string }
 	const placed: Pt[] = []
 
-	function dist2(a: { x: number; y: number }, b: { x: number; y: number }): number {
+	function dist2(
+		a: { x: number; y: number },
+		b: { x: number; y: number }
+	): number {
 		const dx = a.x - b.x
 		const dy = a.y - b.y
 		return dx * dx + dy * dy

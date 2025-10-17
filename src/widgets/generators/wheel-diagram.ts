@@ -1,11 +1,11 @@
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { PADDING } from "../utils/constants"
-import { CSS_COLOR_PATTERN } from "../utils/css-color"
-import { Path2D } from "../utils/path-builder"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { PADDING } from "@/widgets/utils/constants"
+import { CSS_COLOR_PATTERN } from "@/widgets/utils/css-color"
+import { Path2D } from "@/widgets/utils/path-builder"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
 
 /**
  * Creates a diagram of a wheel with spokes and optionally shaded contiguous sectors.
@@ -24,7 +24,9 @@ export const WheelDiagramPropsSchema = z
 			.number()
 			.int()
 			.min(0)
-			.describe("Number of contiguous sectors to shade from the top (12 o'clock)."),
+			.describe(
+				"Number of contiguous sectors to shade from the top (12 o'clock)."
+			),
 		shadeColor: z
 			.string()
 			.regex(CSS_COLOR_PATTERN, "invalid css color")
@@ -34,9 +36,9 @@ export const WheelDiagramPropsSchema = z
 
 export type WheelDiagramProps = z.infer<typeof WheelDiagramPropsSchema>
 
-export const generateWheelDiagram: WidgetGenerator<typeof WheelDiagramPropsSchema> = async (
-	props
-) => {
+export const generateWheelDiagram: WidgetGenerator<
+	typeof WheelDiagramPropsSchema
+> = async (props) => {
 	const { width, height, spokeCount, shadedSectorCount, shadeColor } = props
 
 	const canvas = new CanvasImpl({
@@ -52,7 +54,10 @@ export const generateWheelDiagram: WidgetGenerator<typeof WheelDiagramPropsSchem
 	const tireThickness = Math.max(4, Math.floor(outerRadius * 0.1))
 
 	// Tire (outer ring)
-	canvas.drawCircle(cx, cy, outerRadius, { fill: theme.colors.black, stroke: "none" })
+	canvas.drawCircle(cx, cy, outerRadius, {
+		fill: theme.colors.black,
+		stroke: "none"
+	})
 	canvas.drawCircle(cx, cy, outerRadius - tireThickness, {
 		fill: theme.colors.background,
 		stroke: "none"
@@ -60,7 +65,10 @@ export const generateWheelDiagram: WidgetGenerator<typeof WheelDiagramPropsSchem
 
 	const angleStep = (2 * Math.PI) / spokeCount
 	// Colored sectors extend only halfway out from the center
-	const shadeOuterRadius = Math.max(hubRadius + 1, Math.floor(outerRadius * 0.5))
+	const shadeOuterRadius = Math.max(
+		hubRadius + 1,
+		Math.floor(outerRadius * 0.5)
+	)
 
 	// Shaded sectors from 12 o'clock clockwise
 	if (shadedSectorCount > 0) {
@@ -69,7 +77,10 @@ export const generateWheelDiagram: WidgetGenerator<typeof WheelDiagramPropsSchem
 			const endAngle = startAngle + angleStep
 
 			const path = new Path2D()
-				.moveTo(cx + hubRadius * Math.cos(startAngle), cy + hubRadius * Math.sin(startAngle))
+				.moveTo(
+					cx + hubRadius * Math.cos(startAngle),
+					cy + hubRadius * Math.sin(startAngle)
+				)
 				.lineTo(
 					cx + shadeOuterRadius * Math.cos(startAngle),
 					cy + shadeOuterRadius * Math.sin(startAngle)
@@ -83,7 +94,10 @@ export const generateWheelDiagram: WidgetGenerator<typeof WheelDiagramPropsSchem
 					cx + shadeOuterRadius * Math.cos(endAngle),
 					cy + shadeOuterRadius * Math.sin(endAngle)
 				)
-				.lineTo(cx + hubRadius * Math.cos(endAngle), cy + hubRadius * Math.sin(endAngle))
+				.lineTo(
+					cx + hubRadius * Math.cos(endAngle),
+					cy + hubRadius * Math.sin(endAngle)
+				)
 				.arcTo(
 					hubRadius,
 					hubRadius,

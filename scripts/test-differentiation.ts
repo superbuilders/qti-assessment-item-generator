@@ -34,13 +34,21 @@ const sourceItem: AssessmentItemInput<["boxPlot"]> = {
 				{ type: "math", mathml: "<mn>2012</mn>" },
 				{ type: "text", content: " Olympic Games and the top " },
 				{ type: "math", mathml: "<mn>12</mn>" },
-				{ type: "text", content: " women's discus throwers at the U.S. qualifying meet." }
+				{
+					type: "text",
+					content: " women's discus throwers at the U.S. qualifying meet."
+				}
 			]
 		},
 		{ type: "widgetRef", widgetId: "image_1", widgetType: "boxPlot" },
 		{
 			type: "paragraph",
-			content: [{ type: "text", content: "Which conclusion is supported by these box plots?" }]
+			content: [
+				{
+					type: "text",
+					content: "Which conclusion is supported by these box plots?"
+				}
+			]
 		},
 		{ type: "interactionRef", interactionId: "choice_interaction" }
 	],
@@ -93,7 +101,8 @@ const sourceItem: AssessmentItemInput<["boxPlot"]> = {
 									content: [
 										{
 											type: "text",
-											content: "The Olympic final center is higher on the dot plot scale."
+											content:
+												"The Olympic final center is higher on the dot plot scale."
 										}
 									]
 								}
@@ -108,7 +117,8 @@ const sourceItem: AssessmentItemInput<["boxPlot"]> = {
 									content: [
 										{
 											type: "text",
-											content: "The Olympic final distances were greater on average."
+											content:
+												"The Olympic final distances were greater on average."
 										}
 									]
 								}
@@ -174,7 +184,8 @@ const sourceItem: AssessmentItemInput<["boxPlot"]> = {
 			prompt: [
 				{
 					type: "text",
-					content: "Which conclusion is supported by these box plots? Select one answer."
+					content:
+						"Which conclusion is supported by these box plots? Select one answer."
 				}
 			],
 			choices: [
@@ -185,7 +196,8 @@ const sourceItem: AssessmentItemInput<["boxPlot"]> = {
 							content: [
 								{
 									type: "text",
-									content: "The distances in the Olympic final were farther on average."
+									content:
+										"The distances in the Olympic final were farther on average."
 								}
 							]
 						}
@@ -224,7 +236,10 @@ const sourceItem: AssessmentItemInput<["boxPlot"]> = {
 				},
 				{
 					content: [
-						{ type: "paragraph", content: [{ type: "text", content: "None of the above." }] }
+						{
+							type: "paragraph",
+							content: [{ type: "text", content: "None of the above." }]
+						}
 					],
 					identifier: "D"
 				}
@@ -267,7 +282,13 @@ async function main() {
 
 	// Run differentiation
 	const result = await errors.try(
-		differentiateAssessmentItem(openai, logger, sourceItem, numVariations, allWidgetsCollection)
+		differentiateAssessmentItem(
+			openai,
+			logger,
+			sourceItem,
+			numVariations,
+			allWidgetsCollection
+		)
 	)
 
 	if (result.error) {
@@ -276,7 +297,9 @@ async function main() {
 	}
 
 	const differentiatedItems = result.data
-	logger.info("successfully generated variations", { count: differentiatedItems.length })
+	logger.info("successfully generated variations", {
+		count: differentiatedItems.length
+	})
 
 	// Display each variation
 	for (let i = 0; i < differentiatedItems.length; i++) {
@@ -321,7 +344,9 @@ async function main() {
 
 	// Optionally compile one variation to XML
 	logger.info("compiling first variation to qti xml")
-	const xmlResult = await errors.try(compile(differentiatedItems[0], allWidgetsCollection))
+	const xmlResult = await errors.try(
+		compile(differentiatedItems[0], allWidgetsCollection)
+	)
 
 	if (xmlResult.error) {
 		logger.error("compilation failed", { error: xmlResult.error })
@@ -342,7 +367,9 @@ async function main() {
 		`${outputDir}/differentiated-items.json`,
 		JSON.stringify(differentiatedItems, null, 2)
 	)
-	logger.info("saved differentiated items", { path: `${outputDir}/differentiated-items.json` })
+	logger.info("saved differentiated items", {
+		path: `${outputDir}/differentiated-items.json`
+	})
 
 	// Save first XML
 	if (xmlResult.data) {

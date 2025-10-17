@@ -1,16 +1,18 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { AXIS_VIEWBOX_PADDING } from "../utils/constants"
-import { setupCoordinatePlaneBaseV2 } from "../utils/coordinate-plane-utils"
-import { CSS_COLOR_PATTERN } from "../utils/css-color"
-import { abbreviateMonth } from "../utils/labels"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { AXIS_VIEWBOX_PADDING } from "@/widgets/utils/constants"
+import { setupCoordinatePlaneBaseV2 } from "@/widgets/utils/coordinate-plane-utils"
+import { CSS_COLOR_PATTERN } from "@/widgets/utils/css-color"
+import { abbreviateMonth } from "@/widgets/utils/labels"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
 
-export const ErrInvalidDimensions = errors.new("invalid chart dimensions or data")
+export const ErrInvalidDimensions = errors.new(
+	"invalid chart dimensions or data"
+)
 
 // Defines the data and state for a single bar in the chart
 const BarDataSchema = z
@@ -40,7 +42,9 @@ const createYAxisSchema = () =>
 			label: z
 				.string()
 				.nullable()
-				.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
+				.transform((val) =>
+					val === "null" || val === "NULL" || val === "" ? null : val
+				)
 				.describe(
 					"Title for the vertical y-axis. Examples: 'Sales ($)', 'Population (thousands)', 'Test Scores', 'Temperature (°C)'. Set to null for no axis label."
 				),
@@ -67,20 +71,26 @@ export const BarChartPropsSchema = z
 	.object({
 		type: z
 			.literal("barChart")
-			.describe("Widget type identifier for vertical bar charts used to compare categorical data."),
+			.describe(
+				"Widget type identifier for vertical bar charts used to compare categorical data."
+			),
 		width: createWidthSchema(),
 		height: createHeightSchema(),
 		title: z
 			.string()
 			.nullable()
-			.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
+			.transform((val) =>
+				val === "null" || val === "NULL" || val === "" ? null : val
+			)
 			.describe(
 				"Chart title displayed at the top. Examples: 'Monthly Sales Report', 'Student Test Scores by Grade', 'Quarterly Revenue'. Set to null for no title."
 			),
 		xAxisLabel: z
 			.string()
 			.nullable()
-			.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
+			.transform((val) =>
+				val === "null" || val === "NULL" || val === "" ? null : val
+			)
 			.describe(
 				"Label for the horizontal axis describing the categories. Examples: 'Months', 'Product Types', 'School Districts'. Set to null when category labels are self-explanatory."
 			),
@@ -94,7 +104,10 @@ export const BarChartPropsSchema = z
 			),
 		barColor: z
 			.string()
-			.regex(CSS_COLOR_PATTERN, "invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)")
+			.regex(
+				CSS_COLOR_PATTERN,
+				"invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)"
+			)
 			.describe(
 				"CSS color for normal bars. Examples: '#4472C4' (blue), '#E74C3C' (red), '#2ECC71' (green). Use hex format with optional alpha channel for transparency."
 			)
@@ -111,8 +124,18 @@ export type BarChartProps = z.infer<typeof BarChartPropsSchema>
  * Bar charts are used to compare numerical values across a set of discrete categories.
  * Supports rendering bars in an "unknown" state for missing value problems.
  */
-export const generateBarChart: WidgetGenerator<typeof BarChartPropsSchema> = async (data) => {
-	const { width, height, title, xAxisLabel, yAxis, data: chartData, barColor } = data
+export const generateBarChart: WidgetGenerator<
+	typeof BarChartPropsSchema
+> = async (data) => {
+	const {
+		width,
+		height,
+		title,
+		xAxisLabel,
+		yAxis,
+		data: chartData,
+		barColor
+	} = data
 
 	const canvas = new CanvasImpl({
 		chartArea: { left: 0, top: 0, width, height },
@@ -160,7 +183,10 @@ export const generateBarChart: WidgetGenerator<typeof BarChartPropsSchema> = asy
 		logger.error("bandWidth missing for categorical x-axis in bar chart", {
 			length: chartData.length
 		})
-		throw errors.wrap(ErrInvalidDimensions, "categorical x-axis requires defined bandWidth")
+		throw errors.wrap(
+			ErrInvalidDimensions,
+			"categorical x-axis requires defined bandWidth"
+		)
 	}
 	const barPadding = 0.2
 	const innerBarWidth = bandWidth * (1 - barPadding)
@@ -171,7 +197,8 @@ export const generateBarChart: WidgetGenerator<typeof BarChartPropsSchema> = asy
 			const xCenter = baseInfo.toSvgX(i)
 			const barX = xCenter - innerBarWidth / 2
 			const barHeight =
-				((d.value - yAxis.min) / (yAxis.max - yAxis.min)) * baseInfo.chartArea.height
+				((d.value - yAxis.min) / (yAxis.max - yAxis.min)) *
+				baseInfo.chartArea.height
 			const y = baseInfo.chartArea.top + baseInfo.chartArea.height - barHeight
 
 			if (d.state === "normal") {

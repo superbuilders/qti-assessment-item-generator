@@ -1,6 +1,6 @@
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { theme } from "@/widgets/utils/theme"
 
 const Key = z
 	.object({
@@ -12,7 +12,9 @@ const Key = z
 		label: z
 			.string()
 			.nullable()
-			.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
+			.transform((val) =>
+				val === "null" || val === "NULL" || val === "" ? null : val
+			)
 			.describe(
 				"What each icon represents with its value (e.g., '= 10 apples', '= 5 cars', '= 100 votes', null). Shows the scale/multiplier. Null means no label."
 			)
@@ -38,11 +40,15 @@ export const PictographPropsSchema = z
 	.object({
 		type: z
 			.literal("pictograph")
-			.describe("Identifies this as a pictograph widget using icons to represent quantities."),
+			.describe(
+				"Identifies this as a pictograph widget using icons to represent quantities."
+			),
 		title: z
 			.string()
 			.nullable()
-			.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
+			.transform((val) =>
+				val === "null" || val === "NULL" || val === "" ? null : val
+			)
 			.describe(
 				"Title displayed above the pictograph (e.g., 'Fruit Sales This Week', 'Favorite Pets', null). Null means no title."
 			),
@@ -67,7 +73,9 @@ export type PictographProps = z.infer<typeof PictographPropsSchema>
  * (often emojis) to represent data quantities, making it visually engaging and
  * easy to understand at a glance.
  */
-export const generatePictograph: WidgetGenerator<typeof PictographPropsSchema> = async (data) => {
+export const generatePictograph: WidgetGenerator<
+	typeof PictographPropsSchema
+> = async (data) => {
 	const { title, key, data: pictographData } = data
 	let html = `<div style="font-family: ${theme.font.family.sans}; border: 1px solid ${theme.colors.border}; padding: ${theme.table.padding}; border-radius: 5px;">`
 

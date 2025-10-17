@@ -1,11 +1,11 @@
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { PADDING } from "../utils/constants"
-import { CSS_COLOR_PATTERN } from "../utils/css-color"
-import { MATHML_INNER_PATTERN } from "../utils/mathml"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { PADDING } from "@/widgets/utils/constants"
+import { CSS_COLOR_PATTERN } from "@/widgets/utils/css-color"
+import { MATHML_INNER_PATTERN } from "@/widgets/utils/mathml"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
 
 /**
  * Creates a diagram of a rectangle with labeled sides and area.
@@ -22,27 +22,37 @@ export const LabeledRectangleDiagramPropsSchema = z
 			.string()
 			.regex(MATHML_INNER_PATTERN, "invalid mathml inner content")
 			.nullable()
-			.describe("MathML INNER content (no <math> wrapper) rendered above the rectangle."),
+			.describe(
+				"MathML INNER content (no <math> wrapper) rendered above the rectangle."
+			),
 		bottomLabel: z
 			.string()
 			.regex(MATHML_INNER_PATTERN, "invalid mathml inner content")
 			.nullable()
-			.describe("MathML INNER content (no <math> wrapper) rendered below the rectangle."),
+			.describe(
+				"MathML INNER content (no <math> wrapper) rendered below the rectangle."
+			),
 		leftLabel: z
 			.string()
 			.regex(MATHML_INNER_PATTERN, "invalid mathml inner content")
 			.nullable()
-			.describe("MathML INNER content (no <math>) along the left side, rotated -90°."),
+			.describe(
+				"MathML INNER content (no <math>) along the left side, rotated -90°."
+			),
 		rightLabel: z
 			.string()
 			.regex(MATHML_INNER_PATTERN, "invalid mathml inner content")
 			.nullable()
-			.describe("MathML INNER content (no <math>) along the right side, rotated -90°."),
+			.describe(
+				"MathML INNER content (no <math>) along the right side, rotated -90°."
+			),
 		areaLabel: z
 			.string()
 			.regex(MATHML_INNER_PATTERN, "invalid mathml inner content")
 			.nullable()
-			.describe("MathML INNER content (no <math>) centered inside the rectangle."),
+			.describe(
+				"MathML INNER content (no <math>) centered inside the rectangle."
+			),
 		fillColor: z
 			.string()
 			.regex(CSS_COLOR_PATTERN, "invalid css color")
@@ -58,7 +68,9 @@ export const LabeledRectangleDiagramPropsSchema = z
 	})
 	.strict()
 
-export type LabeledRectangleDiagramProps = z.infer<typeof LabeledRectangleDiagramPropsSchema>
+export type LabeledRectangleDiagramProps = z.infer<
+	typeof LabeledRectangleDiagramPropsSchema
+>
 
 /**
  * Generates an SVG diagram of a labeled rectangle.

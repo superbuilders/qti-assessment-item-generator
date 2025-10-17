@@ -1,11 +1,11 @@
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { PADDING } from "../utils/constants"
-import { CSS_COLOR_PATTERN } from "../utils/css-color"
-import { Path2D } from "../utils/path-builder"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { PADDING } from "@/widgets/utils/constants"
+import { CSS_COLOR_PATTERN } from "@/widgets/utils/css-color"
+import { Path2D } from "@/widgets/utils/path-builder"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
 
 // Define the schema for the symmetry diagram widget's properties.
 export const SymmetryDiagramPropsSchema = z
@@ -46,10 +46,17 @@ export type SymmetryDiagramProps = z.infer<typeof SymmetryDiagramPropsSchema>
 /**
  * Generates an SVG diagram of a shape with its lines of symmetry.
  */
-export const generateSymmetryDiagram: WidgetGenerator<typeof SymmetryDiagramPropsSchema> = async (
-	props
-) => {
-	const { width, height, shape, drawCorrectLines, drawIncorrectLines, shapeColor } = props
+export const generateSymmetryDiagram: WidgetGenerator<
+	typeof SymmetryDiagramPropsSchema
+> = async (props) => {
+	const {
+		width,
+		height,
+		shape,
+		drawCorrectLines,
+		drawIncorrectLines,
+		shapeColor
+	} = props
 
 	const canvas = new CanvasImpl({
 		chartArea: { left: 0, top: 0, width, height },
@@ -88,7 +95,12 @@ export const generateSymmetryDiagram: WidgetGenerator<typeof SymmetryDiagramProp
 		const ux = dx / norm
 		const uy = dy / norm
 		const margin = Math.max(10, Math.min(width, height) * 0.03)
-		drawSymmetryLine(ax - ux * margin, ay - uy * margin, bx + ux * margin, by + uy * margin)
+		drawSymmetryLine(
+			ax - ux * margin,
+			ay - uy * margin,
+			bx + ux * margin,
+			by + uy * margin
+		)
 	}
 
 	// Main drawing logic based on the selected shape
@@ -123,7 +135,11 @@ export const generateSymmetryDiagram: WidgetGenerator<typeof SymmetryDiagramProp
 				{ x: cx + topW / 2, y: cy - h / 2 },
 				{ x: cx - topW / 2, y: cy - h / 2 }
 			]
-			canvas.drawPolygon(points, { fill: shapeColor, stroke: strokeColor, strokeWidth: 2 })
+			canvas.drawPolygon(points, {
+				fill: shapeColor,
+				stroke: strokeColor,
+				strokeWidth: 2
+			})
 			if (drawCorrectLines) {
 				drawExtendedLine(cx, cy - h / 2, cx, cy + h / 2) // Vertical
 			}
@@ -142,7 +158,11 @@ export const generateSymmetryDiagram: WidgetGenerator<typeof SymmetryDiagramProp
 			const p1 = points[0]
 			const p2 = points[1]
 			const p3 = points[2]
-			canvas.drawPolygon(points, { fill: shapeColor, stroke: strokeColor, strokeWidth: 2 })
+			canvas.drawPolygon(points, {
+				fill: shapeColor,
+				stroke: strokeColor,
+				strokeWidth: 2
+			})
 			if (drawCorrectLines) {
 				const m23x = (p2.x + p3.x) / 2
 				const m13x = (p1.x + p3.x) / 2
@@ -171,7 +191,11 @@ export const generateSymmetryDiagram: WidgetGenerator<typeof SymmetryDiagramProp
 			const p1 = points[0]
 			const p2 = points[1]
 			const p3 = points[2]
-			canvas.drawPolygon(points, { fill: shapeColor, stroke: strokeColor, strokeWidth: 2 })
+			canvas.drawPolygon(points, {
+				fill: shapeColor,
+				stroke: strokeColor,
+				strokeWidth: 2
+			})
 			if (drawCorrectLines) {
 				drawExtendedLine(p3.x, p3.y, cx, cy + h / 2) // Vertical
 			}
@@ -239,7 +263,11 @@ export const generateSymmetryDiagram: WidgetGenerator<typeof SymmetryDiagramProp
 				)
 				.lineTo(cx + 3.9 * s, cy + 64.3 * s)
 				.arcTo(6.1 * s, 6.1 * s, 0, 0, 1, cx, cy + 65.6 * s)
-			canvas.drawPath(path, { fill: shapeColor, stroke: strokeColor, strokeWidth: 2 })
+			canvas.drawPath(path, {
+				fill: shapeColor,
+				stroke: strokeColor,
+				strokeWidth: 2
+			})
 			if (drawCorrectLines) {
 				drawSymmetryLine(cx, cy - 67 * s, cx, cy + 82 * s) // Vertical
 			}
@@ -253,7 +281,11 @@ export const generateSymmetryDiagram: WidgetGenerator<typeof SymmetryDiagramProp
 			const side = size * 0.75
 			const x1 = cx - side / 2
 			const y1 = cy - side / 2
-			canvas.drawRect(x1, y1, side, side, { fill: shapeColor, stroke: strokeColor, strokeWidth: 2 })
+			canvas.drawRect(x1, y1, side, side, {
+				fill: shapeColor,
+				stroke: strokeColor,
+				strokeWidth: 2
+			})
 			if (drawCorrectLines) {
 				drawExtendedLine(cx, y1, cx, y1 + side) // vertical
 				drawExtendedLine(x1, cy, x1 + side, cy) // horizontal
@@ -276,14 +308,23 @@ export const generateSymmetryDiagram: WidgetGenerator<typeof SymmetryDiagramProp
 				{ x: cx, y: cy + h / 2 },
 				{ x: cx - w / 2, y: cy }
 			]
-			canvas.drawPolygon(points, { fill: shapeColor, stroke: strokeColor, strokeWidth: 2 })
+			canvas.drawPolygon(points, {
+				fill: shapeColor,
+				stroke: strokeColor,
+				strokeWidth: 2
+			})
 			if (drawCorrectLines) {
 				drawExtendedLine(cx - w / 2, cy, cx + w / 2, cy) // horizontal diagonal
 				drawExtendedLine(cx, cy - h / 2, cx, cy + h / 2) // vertical diagonal
 			}
 			if (drawIncorrectLines) {
 				// Non-axes lines through center
-				drawExtendedLine(cx - w * 0.45, cy - h * 0.15, cx + w * 0.45, cy + h * 0.15)
+				drawExtendedLine(
+					cx - w * 0.45,
+					cy - h * 0.15,
+					cx + w * 0.45,
+					cy + h * 0.15
+				)
 			}
 			break
 		}
@@ -300,7 +341,11 @@ export const generateSymmetryDiagram: WidgetGenerator<typeof SymmetryDiagramProp
 				{ x: cx - r, y: cy },
 				{ x: cx - r * 0.25, y: cy - r * 0.25 }
 			]
-			canvas.drawPolygon(arms, { fill: shapeColor, stroke: strokeColor, strokeWidth: 2 })
+			canvas.drawPolygon(arms, {
+				fill: shapeColor,
+				stroke: strokeColor,
+				strokeWidth: 2
+			})
 			if (drawCorrectLines) {
 				drawExtendedLine(cx, cy - r, cx, cy + r) // vertical
 				drawExtendedLine(cx - r, cy, cx + r, cy) // horizontal

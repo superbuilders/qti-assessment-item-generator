@@ -93,11 +93,23 @@ export const DEFAULT_REMOVAL_SELECTORS = [
 	".sr-only"
 ]
 
-export const ALLOWED_GLOBAL_ATTRIBUTES = new Set(["id", "title", "lang", "xml:lang"])
+export const ALLOWED_GLOBAL_ATTRIBUTES = new Set([
+	"id",
+	"title",
+	"lang",
+	"xml:lang"
+])
 
 export const TAG_ATTRIBUTE_WHITELIST: Record<string, ReadonlySet<string>> = {
 	a: new Set(["href", "title", "target", "rel"]),
-	iframe: new Set(["src", "width", "height", "allow", "allowfullscreen", "title"]),
+	iframe: new Set([
+		"src",
+		"width",
+		"height",
+		"allow",
+		"allowfullscreen",
+		"title"
+	]),
 	img: new Set(["src", "alt", "title", "width", "height"]),
 	ol: new Set(["start", "type"]),
 	ul: new Set(["type"]),

@@ -1,14 +1,17 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import { BLOCK_ELEMENTS, INLINE_ELEMENTS } from "./constants"
-import { createDocument } from "./dom"
-import type { StimulusIssue } from "./types"
+import { BLOCK_ELEMENTS, INLINE_ELEMENTS } from "@/stimulus/constants"
+import { createDocument } from "@/stimulus/dom"
+import type { StimulusIssue } from "@/stimulus/types"
 
 const NODE_FILTER = {
 	SHOW_ELEMENT: 1
 } as const
 
-export function normalizeStructure(document: Document, issues: StimulusIssue[]): Element {
+export function normalizeStructure(
+	document: Document,
+	issues: StimulusIssue[]
+): Element {
 	const sourceRoot = resolveSourceRoot(document)
 
 	removeEmptyElements(sourceRoot)
@@ -43,7 +46,10 @@ export function normalizeStructure(document: Document, issues: StimulusIssue[]):
 }
 
 function removeEmptyElements(root: Element) {
-	const walker = root.ownerDocument.createTreeWalker(root, NODE_FILTER.SHOW_ELEMENT)
+	const walker = root.ownerDocument.createTreeWalker(
+		root,
+		NODE_FILTER.SHOW_ELEMENT
+	)
 	const empty: Element[] = []
 	let current = walker.nextNode()
 	while (current) {
@@ -53,7 +59,10 @@ function removeEmptyElements(root: Element) {
 			} else if (
 				current.childNodes.length === 1 &&
 				current.firstChild instanceof Text &&
-				readTextValue(current.firstChild, "removeEmptyElements:firstChild").trim().length === 0
+				readTextValue(
+					current.firstChild,
+					"removeEmptyElements:firstChild"
+				).trim().length === 0
 			) {
 				empty.push(current)
 			}

@@ -26,7 +26,12 @@
 			"@/compiler/*": ["src/compiler/*"],
 			"@/widgets/*": ["src/widgets/*"],
 			"@/cartridge/*": ["src/cartridge/*"],
-			"@/stimulus/*": ["src/stimulus/*"]
+			"@/stimulus/*": ["src/stimulus/*"],
+			"@/examples": ["src/examples.ts"],
+			"@/examples/*": ["src/examples/*"],
+			"@/testing/*": ["src/testing/*"],
+			"@/utils/*": ["src/utils/*"],
+			"@/qti-validation/*": ["src/qti-validation/*"]
 		}
 	},
 	"include": ["src/**/*", "tests/**/*", "scripts/**/*"],

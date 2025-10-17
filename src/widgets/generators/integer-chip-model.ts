@@ -1,7 +1,7 @@
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
 
 const MINUS_CHIP_COLOR = "#FADBD8"
 const PLUS_CHIP_COLOR = "#FEF9E7"
@@ -22,7 +22,9 @@ export const IntegerChipModelPropsSchema = z
 					})
 					.strict()
 			)
-			.describe("Sequence of chips in render order; 'crossedOut' draws an X overlay.")
+			.describe(
+				"Sequence of chips in render order; 'crossedOut' draws an X overlay."
+			)
 	})
 	.strict()
 	.describe(
@@ -31,9 +33,9 @@ export const IntegerChipModelPropsSchema = z
 
 export type IntegerChipModelProps = z.infer<typeof IntegerChipModelPropsSchema>
 
-export const generateIntegerChipModel: WidgetGenerator<typeof IntegerChipModelPropsSchema> = async (
-	props
-) => {
+export const generateIntegerChipModel: WidgetGenerator<
+	typeof IntegerChipModelPropsSchema
+> = async (props) => {
 	const { width, height, chips } = props
 
 	const chipRadius = 24
@@ -90,7 +92,11 @@ export const generateIntegerChipModel: WidgetGenerator<typeof IntegerChipModelPr
 	}
 
 	// Start plus chips on a new row if there were minus chips
-	if (minusChips.length > 0 && plusChips.length > 0 && chipsInCurrentRow !== 0) {
+	if (
+		minusChips.length > 0 &&
+		plusChips.length > 0 &&
+		chipsInCurrentRow !== 0
+	) {
 		currentY += chipDiameter + padding
 		currentX = padding + chipRadius
 		chipsInCurrentRow = 0

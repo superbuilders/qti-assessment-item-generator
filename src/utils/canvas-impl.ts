@@ -1,8 +1,13 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import type { Canvas, CanvasOptions, Extents2D, FinalizedSvg } from "../utils/layout"
-import { estimateWrappedTextDimensions } from "../utils/text"
-import type { Path2D } from "./path-builder"
+import type {
+	Canvas,
+	CanvasOptions,
+	Extents2D,
+	FinalizedSvg
+} from "@/utils/layout"
+import type { Path2D } from "@/utils/path-builder"
+import { estimateWrappedTextDimensions } from "@/utils/text"
 
 // A lightweight, internal-only canvas for collecting clipped content.
 // It shares the main canvas's extents for proper bounding box calculation but writes to its own buffer.
@@ -19,7 +24,9 @@ class ClippedCanvas implements Canvas {
 	private drawAndCapture(drawFn: () => void): void {
 		const originalBody = this.mainCanvas.getSvgBody()
 		drawFn()
-		const newContent = this.mainCanvas.getSvgBody().substring(originalBody.length)
+		const newContent = this.mainCanvas
+			.getSvgBody()
+			.substring(originalBody.length)
 		this.internalSvgBody += newContent
 	}
 
@@ -31,7 +38,16 @@ class ClippedCanvas implements Canvas {
 		anchor?: "start" | "middle" | "end"
 		dominantBaseline?: "hanging" | "middle" | "baseline"
 		fontPx?: number
-		fontWeight?: "100" | "200" | "300" | "400" | "500" | "600" | "700" | "800" | "900"
+		fontWeight?:
+			| "100"
+			| "200"
+			| "300"
+			| "400"
+			| "500"
+			| "600"
+			| "700"
+			| "800"
+			| "900"
 		paintOrder?: "stroke fill"
 		stroke?: string
 		strokeWidth?: number | string
@@ -54,7 +70,16 @@ class ClippedCanvas implements Canvas {
 		anchor?: "start" | "middle" | "end"
 		fontPx?: number
 		lineHeight?: number
-		fontWeight?: "100" | "200" | "300" | "400" | "500" | "600" | "700" | "800" | "900"
+		fontWeight?:
+			| "100"
+			| "200"
+			| "300"
+			| "400"
+			| "500"
+			| "600"
+			| "700"
+			| "800"
+			| "900"
 		paintOrder?: "stroke fill"
 		stroke?: string
 		strokeWidth?: number | string
@@ -64,7 +89,13 @@ class ClippedCanvas implements Canvas {
 		fillOpacity?: number
 		transform?: string
 		rotate?: { angle: number; cx: number; cy: number }
-		dominantBaseline?: "auto" | "alphabetic" | "hanging" | "ideographic" | "mathematical" | "middle"
+		dominantBaseline?:
+			| "auto"
+			| "alphabetic"
+			| "hanging"
+			| "ideographic"
+			| "mathematical"
+			| "middle"
 	}): void {
 		this.drawAndCapture(() => this.mainCanvas.drawWrappedText(opts))
 	}
@@ -180,11 +211,18 @@ export class CanvasImpl implements Canvas {
 	constructor(options: CanvasOptions) {
 		// Validate parameters according to PRD constraints
 		if (!Number.isFinite(options.fontPxDefault) || options.fontPxDefault <= 0) {
-			logger.error("invalid fontPxDefault", { fontPxDefault: options.fontPxDefault })
+			logger.error("invalid fontPxDefault", {
+				fontPxDefault: options.fontPxDefault
+			})
 			throw errors.new("fontPxDefault must be finite and > 0")
 		}
-		if (!Number.isFinite(options.lineHeightDefault) || options.lineHeightDefault <= 0) {
-			logger.error("invalid lineHeightDefault", { lineHeightDefault: options.lineHeightDefault })
+		if (
+			!Number.isFinite(options.lineHeightDefault) ||
+			options.lineHeightDefault <= 0
+		) {
+			logger.error("invalid lineHeightDefault", {
+				lineHeightDefault: options.lineHeightDefault
+			})
 			throw errors.new("lineHeightDefault must be finite and > 0")
 		}
 
@@ -239,7 +277,16 @@ export class CanvasImpl implements Canvas {
 		anchor?: "start" | "middle" | "end"
 		dominantBaseline?: "hanging" | "middle" | "baseline"
 		fontPx?: number
-		fontWeight?: "100" | "200" | "300" | "400" | "500" | "600" | "700" | "800" | "900"
+		fontWeight?:
+			| "100"
+			| "200"
+			| "300"
+			| "400"
+			| "500"
+			| "600"
+			| "700"
+			| "800"
+			| "900"
 		paintOrder?: "stroke fill"
 		stroke?: string
 		strokeWidth?: number | string
@@ -253,7 +300,10 @@ export class CanvasImpl implements Canvas {
 		lineHeight?: number // NEW: Line height multiplier (default 1.2)
 	}): void {
 		// Validate parameters
-		if (opts.fontPx !== undefined && (!Number.isFinite(opts.fontPx) || opts.fontPx <= 0)) {
+		if (
+			opts.fontPx !== undefined &&
+			(!Number.isFinite(opts.fontPx) || opts.fontPx <= 0)
+		) {
 			logger.error("invalid fontPx", { fontPx: opts.fontPx })
 			throw errors.new("fontPx must be finite and > 0")
 		}
@@ -266,7 +316,9 @@ export class CanvasImpl implements Canvas {
 			} else if (typeof opts.strokeWidth === "string") {
 				// Allow CSS units like em; basic sanity check to disallow empty strings
 				if (opts.strokeWidth.trim() === "") {
-					logger.error("invalid strokeWidth string", { strokeWidth: opts.strokeWidth })
+					logger.error("invalid strokeWidth string", {
+						strokeWidth: opts.strokeWidth
+					})
 					throw errors.new("strokeWidth string must be non-empty")
 				}
 			}
@@ -275,15 +327,26 @@ export class CanvasImpl implements Canvas {
 			logger.error("invalid opacity", { opacity: opts.opacity })
 			throw errors.new("opacity must be within [0, 1]")
 		}
-		if (opts.strokeOpacity !== undefined && (opts.strokeOpacity < 0 || opts.strokeOpacity > 1)) {
-			logger.error("invalid strokeOpacity", { strokeOpacity: opts.strokeOpacity })
+		if (
+			opts.strokeOpacity !== undefined &&
+			(opts.strokeOpacity < 0 || opts.strokeOpacity > 1)
+		) {
+			logger.error("invalid strokeOpacity", {
+				strokeOpacity: opts.strokeOpacity
+			})
 			throw errors.new("strokeOpacity must be within [0, 1]")
 		}
-		if (opts.fillOpacity !== undefined && (opts.fillOpacity < 0 || opts.fillOpacity > 1)) {
+		if (
+			opts.fillOpacity !== undefined &&
+			(opts.fillOpacity < 0 || opts.fillOpacity > 1)
+		) {
 			logger.error("invalid fillOpacity", { fillOpacity: opts.fillOpacity })
 			throw errors.new("fillOpacity must be within [0, 1]")
 		}
-		if (opts.maxWidth !== undefined && (!Number.isFinite(opts.maxWidth) || opts.maxWidth <= 0)) {
+		if (
+			opts.maxWidth !== undefined &&
+			(!Number.isFinite(opts.maxWidth) || opts.maxWidth <= 0)
+		) {
 			logger.error("invalid maxWidth", { maxWidth: opts.maxWidth })
 			throw errors.new("maxWidth must be finite and > 0")
 		}
@@ -301,11 +364,15 @@ export class CanvasImpl implements Canvas {
 				!Number.isFinite(opts.rotate.cy))
 		) {
 			logger.error("invalid rotate parameters", { rotate: opts.rotate })
-			throw errors.new("rotate.angle, rotate.cx, rotate.cy must be finite numbers")
+			throw errors.new(
+				"rotate.angle, rotate.cx, rotate.cy must be finite numbers"
+			)
 		}
 		if (opts.paintOrder && opts.paintOrder !== "stroke fill") {
 			logger.error("invalid paintOrder", { paintOrder: opts.paintOrder })
-			throw errors.new("paintOrder, when provided, must be exactly 'stroke fill'")
+			throw errors.new(
+				"paintOrder, when provided, must be exactly 'stroke fill'"
+			)
 		}
 
 		const fontPx = opts.fontPx || this.options.fontPxDefault
@@ -331,7 +398,9 @@ export class CanvasImpl implements Canvas {
 		}
 
 		// Calculate max line width for bounding box
-		const maxLineWidth = Math.max(...lines.map((line) => this.estimateTextWidth(line, fontPx)))
+		const maxLineWidth = Math.max(
+			...lines.map((line) => this.estimateTextWidth(line, fontPx))
+		)
 
 		// Calculate initial bounding box corners before rotation
 		let minX = opts.x
@@ -370,7 +439,8 @@ export class CanvasImpl implements Canvas {
 			const finalMaxY = Math.max(...rotatedCorners.map((p) => p.y))
 
 			// Expand extents by stroke if present
-			const strokeExpansion = typeof opts.strokeWidth === "number" ? opts.strokeWidth : 0
+			const strokeExpansion =
+				typeof opts.strokeWidth === "number" ? opts.strokeWidth : 0
 			this.updateExtents(
 				finalMinX - strokeExpansion,
 				finalMaxX + strokeExpansion,
@@ -379,7 +449,8 @@ export class CanvasImpl implements Canvas {
 			)
 		} else {
 			// Expand extents by stroke if present
-			const strokeExpansion = typeof opts.strokeWidth === "number" ? opts.strokeWidth : 0
+			const strokeExpansion =
+				typeof opts.strokeWidth === "number" ? opts.strokeWidth : 0
 			this.updateExtents(
 				minX - strokeExpansion,
 				minX + maxLineWidth + strokeExpansion,
@@ -391,15 +462,19 @@ export class CanvasImpl implements Canvas {
 		// Build SVG attributes
 		let attrs = `x="${opts.x}" y="${opts.y}" font-size="${fontPx}"`
 		if (anchor !== "start") attrs += ` text-anchor="${anchor}"`
-		if (dominantBaseline !== "baseline") attrs += ` dominant-baseline="${dominantBaseline}"`
+		if (dominantBaseline !== "baseline")
+			attrs += ` dominant-baseline="${dominantBaseline}"`
 		if (opts.fontWeight) attrs += ` font-weight="${opts.fontWeight}"`
 		if (opts.fill) attrs += ` fill="${opts.fill}"`
 		if (opts.stroke) attrs += ` stroke="${opts.stroke}"`
-		if (opts.strokeWidth !== undefined) attrs += ` stroke-width="${opts.strokeWidth}"`
+		if (opts.strokeWidth !== undefined)
+			attrs += ` stroke-width="${opts.strokeWidth}"`
 		if (opts.paintOrder) attrs += ` paint-order="${opts.paintOrder}"`
 		if (opts.opacity !== undefined) attrs += ` opacity="${opts.opacity}"`
-		if (opts.strokeOpacity !== undefined) attrs += ` stroke-opacity="${opts.strokeOpacity}"`
-		if (opts.fillOpacity !== undefined) attrs += ` fill-opacity="${opts.fillOpacity}"`
+		if (opts.strokeOpacity !== undefined)
+			attrs += ` stroke-opacity="${opts.strokeOpacity}"`
+		if (opts.fillOpacity !== undefined)
+			attrs += ` fill-opacity="${opts.fillOpacity}"`
 
 		let transformAttr = ""
 		if (opts.rotate) {
@@ -443,7 +518,16 @@ export class CanvasImpl implements Canvas {
 		anchor?: "start" | "middle" | "end"
 		fontPx?: number
 		lineHeight?: number
-		fontWeight?: "100" | "200" | "300" | "400" | "500" | "600" | "700" | "800" | "900"
+		fontWeight?:
+			| "100"
+			| "200"
+			| "300"
+			| "400"
+			| "500"
+			| "600"
+			| "700"
+			| "800"
+			| "900"
 		paintOrder?: "stroke fill"
 		stroke?: string
 		strokeWidth?: number | string
@@ -453,10 +537,19 @@ export class CanvasImpl implements Canvas {
 		fillOpacity?: number
 		transform?: string
 		rotate?: { angle: number; cx: number; cy: number }
-		dominantBaseline?: "auto" | "alphabetic" | "hanging" | "ideographic" | "mathematical" | "middle"
+		dominantBaseline?:
+			| "auto"
+			| "alphabetic"
+			| "hanging"
+			| "ideographic"
+			| "mathematical"
+			| "middle"
 	}): void {
 		// Validate parameters
-		if (opts.fontPx !== undefined && (!Number.isFinite(opts.fontPx) || opts.fontPx <= 0)) {
+		if (
+			opts.fontPx !== undefined &&
+			(!Number.isFinite(opts.fontPx) || opts.fontPx <= 0)
+		) {
 			logger.error("invalid fontPx", { fontPx: opts.fontPx })
 			throw errors.new("fontPx must be finite and > 0")
 		}
@@ -475,7 +568,9 @@ export class CanvasImpl implements Canvas {
 				}
 			} else if (typeof opts.strokeWidth === "string") {
 				if (opts.strokeWidth.trim() === "") {
-					logger.error("invalid strokeWidth string", { strokeWidth: opts.strokeWidth })
+					logger.error("invalid strokeWidth string", {
+						strokeWidth: opts.strokeWidth
+					})
 					throw errors.new("strokeWidth string must be non-empty")
 				}
 			}
@@ -510,8 +605,10 @@ export class CanvasImpl implements Canvas {
 		if (opts.strokeWidth) attrs += ` stroke-width="${opts.strokeWidth}"`
 		if (opts.paintOrder) attrs += ` paint-order="${opts.paintOrder}"`
 		if (opts.opacity !== undefined) attrs += ` opacity="${opts.opacity}"`
-		if (opts.strokeOpacity !== undefined) attrs += ` stroke-opacity="${opts.strokeOpacity}"`
-		if (opts.fillOpacity !== undefined) attrs += ` fill-opacity="${opts.fillOpacity}"`
+		if (opts.strokeOpacity !== undefined)
+			attrs += ` stroke-opacity="${opts.strokeOpacity}"`
+		if (opts.fillOpacity !== undefined)
+			attrs += ` fill-opacity="${opts.fillOpacity}"`
 		if (opts.dominantBaseline && opts.dominantBaseline !== "auto")
 			attrs += ` dominant-baseline="${opts.dominantBaseline}"`
 
@@ -528,7 +625,9 @@ export class CanvasImpl implements Canvas {
 
 		// Update extents based on the entire block
 		const totalHeight = lines.length * fontPx * lineHeight
-		const maxLineWidth = Math.max(...lines.map((line) => this.estimateTextWidth(line, fontPx)))
+		const maxLineWidth = Math.max(
+			...lines.map((line) => this.estimateTextWidth(line, fontPx))
+		)
 
 		let textMinX = opts.x
 		if (anchor === "middle") textMinX -= maxLineWidth / 2
@@ -548,13 +647,23 @@ export class CanvasImpl implements Canvas {
 		}
 
 		// Only expand extents for numeric strokeWidth (not em units)
-		const strokeExpansion = typeof opts.strokeWidth === "number" ? opts.strokeWidth / 2 : 0
+		const strokeExpansion =
+			typeof opts.strokeWidth === "number" ? opts.strokeWidth / 2 : 0
 
 		const corners = [
 			{ x: textMinX - strokeExpansion, y: textMinY - strokeExpansion },
-			{ x: textMinX + maxLineWidth + strokeExpansion, y: textMinY - strokeExpansion },
-			{ x: textMinX + maxLineWidth + strokeExpansion, y: textMinY + totalHeight + strokeExpansion },
-			{ x: textMinX - strokeExpansion, y: textMinY + totalHeight + strokeExpansion }
+			{
+				x: textMinX + maxLineWidth + strokeExpansion,
+				y: textMinY - strokeExpansion
+			},
+			{
+				x: textMinX + maxLineWidth + strokeExpansion,
+				y: textMinY + totalHeight + strokeExpansion
+			},
+			{
+				x: textMinX - strokeExpansion,
+				y: textMinY + totalHeight + strokeExpansion
+			}
 		]
 
 		if (opts.rotate) {
@@ -612,12 +721,20 @@ export class CanvasImpl implements Canvas {
 			logger.error("invalid strokeWidth", { strokeWidth: style.strokeWidth })
 			throw errors.new("strokeWidth must be finite and >= 0")
 		}
-		if (style.opacity !== undefined && (style.opacity < 0 || style.opacity > 1)) {
+		if (
+			style.opacity !== undefined &&
+			(style.opacity < 0 || style.opacity > 1)
+		) {
 			logger.error("invalid opacity", { opacity: style.opacity })
 			throw errors.new("opacity must be within [0, 1]")
 		}
-		if (style.strokeOpacity !== undefined && (style.strokeOpacity < 0 || style.strokeOpacity > 1)) {
-			logger.error("invalid strokeOpacity", { strokeOpacity: style.strokeOpacity })
+		if (
+			style.strokeOpacity !== undefined &&
+			(style.strokeOpacity < 0 || style.strokeOpacity > 1)
+		) {
+			logger.error("invalid strokeOpacity", {
+				strokeOpacity: style.strokeOpacity
+			})
 			throw errors.new("strokeOpacity must be within [0, 1]")
 		}
 
@@ -648,13 +765,16 @@ export class CanvasImpl implements Canvas {
 		let attrs = `x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${style.stroke}" stroke-width="${style.strokeWidth}"`
 		if (style.dash) attrs += ` stroke-dasharray="${style.dash}"`
 		if (style.strokeLinecap) attrs += ` stroke-linecap="${style.strokeLinecap}"`
-		if (style.strokeLinejoin) attrs += ` stroke-linejoin="${style.strokeLinejoin}"`
-		if (style.strokeMiterlimit) attrs += ` stroke-miterlimit="${style.strokeMiterlimit}"`
+		if (style.strokeLinejoin)
+			attrs += ` stroke-linejoin="${style.strokeLinejoin}"`
+		if (style.strokeMiterlimit)
+			attrs += ` stroke-miterlimit="${style.strokeMiterlimit}"`
 		if (style.markerStart) attrs += ` marker-start="${style.markerStart}"`
 		if (style.markerMid) attrs += ` marker-mid="${style.markerMid}"`
 		if (style.markerEnd) attrs += ` marker-end="${style.markerEnd}"`
 		if (style.opacity !== undefined) attrs += ` opacity="${style.opacity}"`
-		if (style.strokeOpacity !== undefined) attrs += ` stroke-opacity="${style.strokeOpacity}"`
+		if (style.strokeOpacity !== undefined)
+			attrs += ` stroke-opacity="${style.strokeOpacity}"`
 		if (style.transform) attrs += ` transform="${style.transform}"`
 
 		this.svgBody += `<line ${attrs}/>`
@@ -703,8 +823,10 @@ export class CanvasImpl implements Canvas {
 		if (style.strokeWidth) attrs += ` stroke-width="${style.strokeWidth}"`
 		if (style.dash) attrs += ` stroke-dasharray="${style.dash}"`
 		if (style.opacity !== undefined) attrs += ` opacity="${style.opacity}"`
-		if (style.fillOpacity !== undefined) attrs += ` fill-opacity="${style.fillOpacity}"`
-		if (style.strokeOpacity !== undefined) attrs += ` stroke-opacity="${style.strokeOpacity}"`
+		if (style.fillOpacity !== undefined)
+			attrs += ` fill-opacity="${style.fillOpacity}"`
+		if (style.strokeOpacity !== undefined)
+			attrs += ` stroke-opacity="${style.strokeOpacity}"`
 		if (style.transform) attrs += ` transform="${style.transform}"`
 
 		this.svgBody += `<circle ${attrs}/>`
@@ -739,7 +861,12 @@ export class CanvasImpl implements Canvas {
 		// Calculate rect bounds with stroke expansion
 		const strokeWidth = style.strokeWidth || 0
 		const expansion = strokeWidth / 2
-		this.updateExtents(x - expansion, x + w + expansion, y - expansion, y + h + expansion)
+		this.updateExtents(
+			x - expansion,
+			x + w + expansion,
+			y - expansion,
+			y + h + expansion
+		)
 
 		// Build SVG attributes
 		let attrs = `x="${x}" y="${y}" width="${w}" height="${h}"`
@@ -749,8 +876,10 @@ export class CanvasImpl implements Canvas {
 		if (style.strokeWidth) attrs += ` stroke-width="${style.strokeWidth}"`
 		if (style.dash) attrs += ` stroke-dasharray="${style.dash}"`
 		if (style.opacity !== undefined) attrs += ` opacity="${style.opacity}"`
-		if (style.fillOpacity !== undefined) attrs += ` fill-opacity="${style.fillOpacity}"`
-		if (style.strokeOpacity !== undefined) attrs += ` stroke-opacity="${style.strokeOpacity}"`
+		if (style.fillOpacity !== undefined)
+			attrs += ` fill-opacity="${style.fillOpacity}"`
+		if (style.strokeOpacity !== undefined)
+			attrs += ` stroke-opacity="${style.strokeOpacity}"`
 		if (style.transform) attrs += ` transform="${style.transform}"`
 
 		this.svgBody += `<rect ${attrs}/>`
@@ -800,8 +929,10 @@ export class CanvasImpl implements Canvas {
 		if (style.strokeWidth) attrs += ` stroke-width="${style.strokeWidth}"`
 		if (style.dash) attrs += ` stroke-dasharray="${style.dash}"`
 		if (style.opacity !== undefined) attrs += ` opacity="${style.opacity}"`
-		if (style.fillOpacity !== undefined) attrs += ` fill-opacity="${style.fillOpacity}"`
-		if (style.strokeOpacity !== undefined) attrs += ` stroke-opacity="${style.strokeOpacity}"`
+		if (style.fillOpacity !== undefined)
+			attrs += ` fill-opacity="${style.fillOpacity}"`
+		if (style.strokeOpacity !== undefined)
+			attrs += ` stroke-opacity="${style.strokeOpacity}"`
 		if (style.transform) attrs += ` transform="${style.transform}"`
 
 		this.svgBody += `<ellipse ${attrs}/>`
@@ -847,15 +978,19 @@ export class CanvasImpl implements Canvas {
 		if (style.strokeWidth) attrs += ` stroke-width="${style.strokeWidth}"`
 		if (style.dash) attrs += ` stroke-dasharray="${style.dash}"`
 		if (style.strokeLinecap) attrs += ` stroke-linecap="${style.strokeLinecap}"`
-		if (style.strokeLinejoin) attrs += ` stroke-linejoin="${style.strokeLinejoin}"`
-		if (style.strokeMiterlimit) attrs += ` stroke-miterlimit="${style.strokeMiterlimit}"`
+		if (style.strokeLinejoin)
+			attrs += ` stroke-linejoin="${style.strokeLinejoin}"`
+		if (style.strokeMiterlimit)
+			attrs += ` stroke-miterlimit="${style.strokeMiterlimit}"`
 		if (style.fillRule) attrs += ` fill-rule="${style.fillRule}"`
 		if (style.markerStart) attrs += ` marker-start="${style.markerStart}"`
 		if (style.markerMid) attrs += ` marker-mid="${style.markerMid}"`
 		if (style.markerEnd) attrs += ` marker-end="${style.markerEnd}"`
 		if (style.opacity !== undefined) attrs += ` opacity="${style.opacity}"`
-		if (style.fillOpacity !== undefined) attrs += ` fill-opacity="${style.fillOpacity}"`
-		if (style.strokeOpacity !== undefined) attrs += ` stroke-opacity="${style.strokeOpacity}"`
+		if (style.fillOpacity !== undefined)
+			attrs += ` fill-opacity="${style.fillOpacity}"`
+		if (style.strokeOpacity !== undefined)
+			attrs += ` stroke-opacity="${style.strokeOpacity}"`
 		if (style.transform) attrs += ` transform="${style.transform}"`
 
 		this.svgBody += `<path ${attrs}/>`
@@ -887,7 +1022,12 @@ export class CanvasImpl implements Canvas {
 
 		const strokeWidth = style.strokeWidth || 0
 		const expansion = strokeWidth / 2
-		this.updateExtents(minX - expansion, maxX + expansion, minY - expansion, maxY + expansion)
+		this.updateExtents(
+			minX - expansion,
+			maxX + expansion,
+			minY - expansion,
+			maxY + expansion
+		)
 
 		// Build points string
 		const pointsStr = points.map((p) => `${p.x},${p.y}`).join(" ")
@@ -900,11 +1040,15 @@ export class CanvasImpl implements Canvas {
 		if (style.strokeWidth) attrs += ` stroke-width="${style.strokeWidth}"`
 		if (style.dash) attrs += ` stroke-dasharray="${style.dash}"`
 		if (style.fillRule) attrs += ` fill-rule="${style.fillRule}"`
-		if (style.strokeLinejoin) attrs += ` stroke-linejoin="${style.strokeLinejoin}"`
-		if (style.strokeMiterlimit) attrs += ` stroke-miterlimit="${style.strokeMiterlimit}"`
+		if (style.strokeLinejoin)
+			attrs += ` stroke-linejoin="${style.strokeLinejoin}"`
+		if (style.strokeMiterlimit)
+			attrs += ` stroke-miterlimit="${style.strokeMiterlimit}"`
 		if (style.opacity !== undefined) attrs += ` opacity="${style.opacity}"`
-		if (style.fillOpacity !== undefined) attrs += ` fill-opacity="${style.fillOpacity}"`
-		if (style.strokeOpacity !== undefined) attrs += ` stroke-opacity="${style.strokeOpacity}"`
+		if (style.fillOpacity !== undefined)
+			attrs += ` fill-opacity="${style.fillOpacity}"`
+		if (style.strokeOpacity !== undefined)
+			attrs += ` stroke-opacity="${style.strokeOpacity}"`
 		if (style.transform) attrs += ` transform="${style.transform}"`
 
 		this.svgBody += `<polygon ${attrs}/>`
@@ -952,10 +1096,13 @@ export class CanvasImpl implements Canvas {
 		let attrs = `points="${pointsStr}" stroke="${style.stroke}" stroke-width="${style.strokeWidth}"`
 		if (style.dash) attrs += ` stroke-dasharray="${style.dash}"`
 		if (style.strokeLinecap) attrs += ` stroke-linecap="${style.strokeLinecap}"`
-		if (style.strokeLinejoin) attrs += ` stroke-linejoin="${style.strokeLinejoin}"`
-		if (style.strokeMiterlimit) attrs += ` stroke-miterlimit="${style.strokeMiterlimit}"`
+		if (style.strokeLinejoin)
+			attrs += ` stroke-linejoin="${style.strokeLinejoin}"`
+		if (style.strokeMiterlimit)
+			attrs += ` stroke-miterlimit="${style.strokeMiterlimit}"`
 		if (style.opacity !== undefined) attrs += ` opacity="${style.opacity}"`
-		if (style.strokeOpacity !== undefined) attrs += ` stroke-opacity="${style.strokeOpacity}"`
+		if (style.strokeOpacity !== undefined)
+			attrs += ` stroke-opacity="${style.strokeOpacity}"`
 		if (style.transform) attrs += ` transform="${style.transform}"`
 
 		this.svgBody += `<polyline ${attrs} fill="none"/>`
@@ -971,14 +1118,21 @@ export class CanvasImpl implements Canvas {
 	}): void {
 		// Validate content has proper XHTML wrapper
 		if (!opts.content.includes('xmlns="http://www.w3.org/1999/xhtml"')) {
-			logger.error("invalid XHTML content", { content: opts.content.substring(0, 100) })
+			logger.error("invalid XHTML content", {
+				content: opts.content.substring(0, 100)
+			})
 			throw errors.new(
 				'drawForeignObject.content must be wrapped in a single root XHTML element with xmlns="http://www.w3.org/1999/xhtml"'
 			)
 		}
 
 		// Update extents for the foreign object bounds
-		this.updateExtents(opts.x, opts.x + opts.width, opts.y, opts.y + opts.height)
+		this.updateExtents(
+			opts.x,
+			opts.x + opts.width,
+			opts.y,
+			opts.y + opts.height
+		)
 
 		const transformAttr = opts.transform ? ` transform="${opts.transform}"` : ""
 		this.svgBody += `<foreignObject x="${opts.x}" y="${opts.y}" width="${opts.width}" height="${opts.height}"${transformAttr}>${opts.content}</foreignObject>`
@@ -995,11 +1149,17 @@ export class CanvasImpl implements Canvas {
 		transform?: string
 	}): void {
 		// Update extents for the image bounds
-		this.updateExtents(opts.x, opts.x + opts.width, opts.y, opts.y + opts.height)
+		this.updateExtents(
+			opts.x,
+			opts.x + opts.width,
+			opts.y,
+			opts.y + opts.height
+		)
 
 		// Build SVG attributes
 		let attrs = `x="${opts.x}" y="${opts.y}" width="${opts.width}" height="${opts.height}" href="${opts.href}"`
-		if (opts.preserveAspectRatio) attrs += ` preserveAspectRatio="${opts.preserveAspectRatio}"`
+		if (opts.preserveAspectRatio)
+			attrs += ` preserveAspectRatio="${opts.preserveAspectRatio}"`
 		if (opts.opacity !== undefined) attrs += ` opacity="${opts.opacity}"`
 		if (opts.transform) attrs += ` transform="${opts.transform}"`
 
@@ -1063,14 +1223,20 @@ export class CanvasImpl implements Canvas {
 				fontPx: labelFontPx
 			})
 
-			const rowWidth = sampleLengthPx + 8 + this.estimateTextWidth(row.label, labelFontPx)
+			const rowWidth =
+				sampleLengthPx + 8 + this.estimateTextWidth(row.label, labelFontPx)
 			maxWidth = Math.max(maxWidth, rowWidth)
 
 			currentY += labelFontPx + opts.rowGapPx
 		}
 
 		// Update extents for the entire legend block
-		this.updateExtents(opts.startX, opts.startX + maxWidth, opts.startY, currentY - opts.rowGapPx)
+		this.updateExtents(
+			opts.startX,
+			opts.startX + maxWidth,
+			opts.startY,
+			currentY - opts.rowGapPx
+		)
 	}
 
 	addDef(def: string): void {
@@ -1119,7 +1285,9 @@ export class CanvasImpl implements Canvas {
 		if (opts.gradientUnits) attrs += ` gradientUnits="${opts.gradientUnits}"`
 
 		const stops = opts.stops
-			.map((stop) => `<stop offset="${stop.offset}" stop-color="${stop.color}"/>`)
+			.map(
+				(stop) => `<stop offset="${stop.offset}" stop-color="${stop.color}"/>`
+			)
 			.join("")
 		this.defs += `<linearGradient ${attrs}>${stops}</linearGradient>`
 	}
@@ -1143,7 +1311,9 @@ export class CanvasImpl implements Canvas {
 		if (opts.gradientUnits) attrs += ` gradientUnits="${opts.gradientUnits}"`
 
 		const stops = opts.stops
-			.map((stop) => `<stop offset="${stop.offset}" stop-color="${stop.color}"/>`)
+			.map(
+				(stop) => `<stop offset="${stop.offset}" stop-color="${stop.color}"/>`
+			)
 			.join("")
 		this.defs += `<radialGradient ${attrs}>${stops}</radialGradient>`
 	}
@@ -1211,7 +1381,12 @@ export class CanvasImpl implements Canvas {
 		return text.length * fontPx * 0.6
 	}
 
-	private updateExtents(minX: number, maxX: number, minY: number, maxY: number): void {
+	private updateExtents(
+		minX: number,
+		maxX: number,
+		minY: number,
+		maxY: number
+	): void {
 		this.extents.minX = Math.min(this.extents.minX, minX)
 		this.extents.maxX = Math.max(this.extents.maxX, maxX)
 		this.extents.minY = Math.min(this.extents.minY, minY)

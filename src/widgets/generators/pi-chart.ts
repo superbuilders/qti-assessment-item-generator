@@ -1,13 +1,13 @@
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { drawChartTitle } from "../utils/chart-layout-utils"
-import { PADDING } from "../utils/constants"
-import { CSS_COLOR_PATTERN } from "../utils/css-color"
-import { abbreviateMonth } from "../utils/labels"
-import { Path2D } from "../utils/path-builder"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { drawChartTitle } from "@/widgets/utils/chart-layout-utils"
+import { PADDING } from "@/widgets/utils/constants"
+import { CSS_COLOR_PATTERN } from "@/widgets/utils/css-color"
+import { abbreviateMonth } from "@/widgets/utils/labels"
+import { Path2D } from "@/widgets/utils/path-builder"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
 
 // Defines a single slice within a pie chart.
 const SliceSchema = z
@@ -26,7 +26,10 @@ const SliceSchema = z
 			),
 		color: z
 			.string()
-			.regex(CSS_COLOR_PATTERN, "invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)")
+			.regex(
+				CSS_COLOR_PATTERN,
+				"invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)"
+			)
 			.describe(
 				"The hex-only fill color for the slice (e.g., '#4472C4', '#1E90FF', '#FF000080' for 50% alpha)."
 			)
@@ -36,7 +39,9 @@ const SliceSchema = z
 // Defines the data and title for a single pie chart.
 const PieChartDataSchema = z
 	.object({
-		title: z.string().describe("The title displayed above this specific pie chart."),
+		title: z
+			.string()
+			.describe("The title displayed above this specific pie chart."),
 		slices: z
 			.array(SliceSchema)
 			.min(1)
@@ -51,7 +56,9 @@ export const PieChartWidgetPropsSchema = z
 	.object({
 		type: z
 			.literal("pieChart")
-			.describe("Identifies this as a pie chart widget for showing part-to-whole relationships."),
+			.describe(
+				"Identifies this as a pie chart widget for showing part-to-whole relationships."
+			),
 		width: createWidthSchema(),
 		height: createHeightSchema(),
 		charts: z
@@ -62,8 +69,13 @@ export const PieChartWidgetPropsSchema = z
 			),
 		layout: z
 			.literal("vertical")
-			.describe("Pie charts stack vertically only. Horizontal layout is not supported."),
-		spacing: z.number().min(0).describe("The gap in pixels between stacked charts.")
+			.describe(
+				"Pie charts stack vertically only. Horizontal layout is not supported."
+			),
+		spacing: z
+			.number()
+			.min(0)
+			.describe("The gap in pixels between stacked charts.")
 	})
 	.strict()
 	.describe(
@@ -75,9 +87,9 @@ export type PieChartWidgetProps = z.infer<typeof PieChartWidgetPropsSchema>
 /**
  * Generates one or more SVG pie charts from a declarative JSON structure.
  */
-export const generatePieChart: WidgetGenerator<typeof PieChartWidgetPropsSchema> = async (
-	props
-) => {
+export const generatePieChart: WidgetGenerator<
+	typeof PieChartWidgetPropsSchema
+> = async (props) => {
 	const { width, height, charts, spacing } = props
 	const numCharts = charts.length
 
@@ -167,7 +179,8 @@ export const generatePieChart: WidgetGenerator<typeof PieChartWidgetPropsSchema>
 			// Prepare label info
 			const midAngle = startAngle + sliceAngle / 2
 			const midRad = (midAngle * Math.PI) / 180
-			const side: "left" | "right" = midAngle > -90 && midAngle < 90 ? "right" : "left"
+			const side: "left" | "right" =
+				midAngle > -90 && midAngle < 90 ? "right" : "left"
 			const outerRadForStart = radius * 0.98
 			const startX = cx + outerRadForStart * Math.cos(midRad)
 			const startY = cy + outerRadForStart * Math.sin(midRad)
@@ -193,7 +206,9 @@ export const generatePieChart: WidgetGenerator<typeof PieChartWidgetPropsSchema>
 		const topBound = yOffset + 40
 		const bottomBound = yOffset + chartAreaHeight - 10
 		const minGap = 16
-		const resolveCollisions = (items: LabelInfo[]): Array<LabelInfo & { finalY: number }> => {
+		const resolveCollisions = (
+			items: LabelInfo[]
+		): Array<LabelInfo & { finalY: number }> => {
 			const sorted = [...items].sort((a, b) => a.preferredY - b.preferredY)
 			const out: Array<LabelInfo & { finalY: number }> = []
 			for (let i = 0; i < sorted.length; i++) {

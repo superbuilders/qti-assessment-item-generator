@@ -1,6 +1,10 @@
 import * as errors from "@superbuilders/errors"
 import type * as logger from "@superbuilders/slog"
-import type { BlockContent, FeedbackContent, InlineContent } from "@/core/content"
+import type {
+	BlockContent,
+	FeedbackContent,
+	InlineContent
+} from "@/core/content"
 import type {
 	AuthoringFeedbackOverall,
 	AuthoringNestedLeaf,
@@ -14,7 +18,7 @@ import {
 	checkNoPerseusArtifacts,
 	sanitizeHtmlEntities,
 	sanitizeMathMLOperators
-} from "../qti-validation/utils"
+} from "@/qti-validation/utils"
 
 // NEW: Recursive walker function for inline content
 function processInlineContent<E extends readonly string[]>(
@@ -32,7 +36,9 @@ function processInlineContent<E extends readonly string[]>(
 				item.content = sanitized
 			} else {
 				// This should not happen with the new strict schema, but we log it as a safeguard.
-				logger.warn("sanitizer skipping text item with missing or invalid 'content' field")
+				logger.warn(
+					"sanitizer skipping text item with missing or invalid 'content' field"
+				)
 			}
 		} else if (item.type === "math") {
 			// MODIFIED: Add a type check to prevent crashes on undefined.
@@ -42,7 +48,9 @@ function processInlineContent<E extends readonly string[]>(
 				item.mathml = sanitized
 			} else {
 				// This should not happen with the new strict schema, but we log it as a safeguard.
-				logger.warn("sanitizer skipping math item with missing or invalid 'mathml' field")
+				logger.warn(
+					"sanitizer skipping math item with missing or invalid 'mathml' field"
+				)
 			}
 		}
 	}
@@ -113,11 +121,16 @@ export function validateAndSanitizeHtmlFields<E extends readonly string[]>(
 
 	function isFallbackFeedback(
 		overall: AuthoringFeedbackOverall<FeedbackPlan, E>
-	): overall is { CORRECT: AuthoringNestedLeaf<E>; INCORRECT: AuthoringNestedLeaf<E> } {
+	): overall is {
+		CORRECT: AuthoringNestedLeaf<E>
+		INCORRECT: AuthoringNestedLeaf<E>
+	} {
 		return "CORRECT" in overall && "INCORRECT" in overall
 	}
 
-	function processOverall(overall: AuthoringFeedbackOverall<FeedbackPlan, E>): void {
+	function processOverall(
+		overall: AuthoringFeedbackOverall<FeedbackPlan, E>
+	): void {
 		if (isFallbackFeedback(overall)) {
 			processFeedbackContent(overall.CORRECT.content, logger)
 			processFeedbackContent(overall.INCORRECT.content, logger)
@@ -140,7 +153,10 @@ export function validateAndSanitizeHtmlFields<E extends readonly string[]>(
 			}
 			if ("choices" in interaction && interaction.choices) {
 				// Runtime validation for minimum number of choices
-				if (interaction.type === "choiceInteraction" || interaction.type === "orderInteraction") {
+				if (
+					interaction.type === "choiceInteraction" ||
+					interaction.type === "orderInteraction"
+				) {
 					if (interaction.choices.length < 2) {
 						logger.error("interaction has insufficient choices", {
 							interactionType: interaction.type,

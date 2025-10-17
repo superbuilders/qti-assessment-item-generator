@@ -1,9 +1,9 @@
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { PADDING } from "../utils/constants"
-import { CSS_COLOR_PATTERN } from "../utils/css-color"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { PADDING } from "@/widgets/utils/constants"
+import { CSS_COLOR_PATTERN } from "@/widgets/utils/css-color"
+import { theme } from "@/widgets/utils/theme"
 
 export const UnitBlockDiagramPropsSchema = z
 	.object({
@@ -68,11 +68,17 @@ export type UnitBlockDiagramProps = z.infer<typeof UnitBlockDiagramPropsSchema>
  * place value and percentages of large numbers that are multiples of 100.
  * It is particularly effective for explaining concepts like "1% of 800" in a concrete, countable manner.
  */
-export const generateUnitBlockDiagram: WidgetGenerator<typeof UnitBlockDiagramPropsSchema> = async (
-	data
-) => {
-	const { totalBlocks, shadedUnitsPerBlock, blocksPerRow, blockWidth, blockHeight, shadeColor } =
-		data
+export const generateUnitBlockDiagram: WidgetGenerator<
+	typeof UnitBlockDiagramPropsSchema
+> = async (data) => {
+	const {
+		totalBlocks,
+		shadedUnitsPerBlock,
+		blocksPerRow,
+		blockWidth,
+		blockHeight,
+		shadeColor
+	} = data
 	const gap = 10
 	const numRows = Math.ceil(totalBlocks / blocksPerRow)
 	const svgWidth = blocksPerRow * blockWidth + (blocksPerRow - 1) * gap

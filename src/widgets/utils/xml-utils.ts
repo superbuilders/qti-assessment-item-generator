@@ -45,7 +45,10 @@ export function replaceRootAttributes(
 	title: string
 ): string {
 	// Use robust named capture groups; fail fast if not found
-	const openTagRegex = new RegExp(`(?<open><\\s*${elementName}\\b)(?<attrs>[^>]*)>`, "i")
+	const openTagRegex = new RegExp(
+		`(?<open><\\s*${elementName}\\b)(?<attrs>[^>]*)>`,
+		"i"
+	)
 	const openMatch = openTagRegex.exec(xml)
 	if (!openMatch || !openMatch.groups) {
 		logger.error("xml root open tag not found", { elementName })
@@ -96,7 +99,10 @@ export function replaceRootAttributes(
  */
 export function extractIdentifier(xml: string, elementName: string): string {
 	// Use named groups for the open tag; fail fast
-	const openTagRegex = new RegExp(`(?<open><\\s*${elementName}\\b)(?<attrs>[^>]*)>`, "i")
+	const openTagRegex = new RegExp(
+		`(?<open><\\s*${elementName}\\b)(?<attrs>[^>]*)>`,
+		"i"
+	)
 	const openMatch = openTagRegex.exec(xml)
 	if (!openMatch || !openMatch.groups) {
 		logger.error("xml root open tag not found in extractIdentifier", {
@@ -140,7 +146,9 @@ export function extractTitle(xml: string): string | null {
  */
 export function extractQtiStimulusBodyContent(xml: string): string {
 	// Extract content between <qti-stimulus-body> tags
-	const match = xml.match(/<qti-stimulus-body[^>]*>([\s\S]*?)<\/qti-stimulus-body>/i)
+	const match = xml.match(
+		/<qti-stimulus-body[^>]*>([\s\S]*?)<\/qti-stimulus-body>/i
+	)
 	if (!match) {
 		return ""
 	}

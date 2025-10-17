@@ -1,9 +1,9 @@
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { PADDING } from "../utils/constants"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { PADDING } from "@/widgets/utils/constants"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
 
 // Discriminated union for label values: whole number, simple fraction, or mixed number
 const FractionLabelSchema = z.discriminatedUnion("type", [
@@ -15,17 +15,31 @@ const FractionLabelSchema = z.discriminatedUnion("type", [
 		.strict(),
 	z
 		.object({
-			type: z.literal("fraction").describe("Proper or improper fraction like 1/2, 5/4"),
+			type: z
+				.literal("fraction")
+				.describe("Proper or improper fraction like 1/2, 5/4"),
 			numerator: z.number().int().min(0).describe("Numerator of the fraction"),
-			denominator: z.number().int().positive().describe("Denominator of the fraction")
+			denominator: z
+				.number()
+				.int()
+				.positive()
+				.describe("Denominator of the fraction")
 		})
 		.strict(),
 	z
 		.object({
 			type: z.literal("mixed").describe("Mixed number like 1 1/4"),
 			whole: z.number().int().describe("Whole number part of the mixed number"),
-			numerator: z.number().int().min(0).describe("Numerator of the fractional part"),
-			denominator: z.number().int().positive().describe("Denominator of the fractional part")
+			numerator: z
+				.number()
+				.int()
+				.min(0)
+				.describe("Numerator of the fractional part"),
+			denominator: z
+				.number()
+				.int()
+				.positive()
+				.describe("Denominator of the fractional part")
 		})
 		.strict()
 ])
@@ -40,7 +54,9 @@ const TickSchema = z
 			.number()
 			.int()
 			.min(0)
-			.describe("The number of 'X' marks to stack above this tick, representing its frequency.")
+			.describe(
+				"The number of 'X' marks to stack above this tick, representing its frequency."
+			)
 	})
 	.strict()
 
@@ -55,19 +71,25 @@ export const FractionFrequencyPlotPropsSchema = z
 		title: z
 			.string()
 			.nullable()
-			.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
+			.transform((val) =>
+				val === "null" || val === "NULL" || val === "" ? null : val
+			)
 			.describe("Optional title displayed above the plot."),
 		ticks: z
 			.array(TickSchema)
 			.min(1)
-			.describe("An array of the tick marks to display, each with its label and frequency count.")
+			.describe(
+				"An array of the tick marks to display, each with its label and frequency count."
+			)
 	})
 	.strict()
 	.describe(
 		"Creates a line plot for fractional data by stacking 'X's above each specified tick based on its frequency. The axis range is automatically determined from the ticks provided."
 	)
 
-export type FractionFrequencyPlotProps = z.infer<typeof FractionFrequencyPlotPropsSchema>
+export type FractionFrequencyPlotProps = z.infer<
+	typeof FractionFrequencyPlotPropsSchema
+>
 // type Tick = z.infer<typeof TickSchema> // Unused type
 type FractionLabel = z.infer<typeof FractionLabelSchema>
 
@@ -79,7 +101,10 @@ const toNumericValue = (label: FractionLabel): number => {
 	if (label.type === "fraction")
 		return label.denominator === 0 ? 0 : label.numerator / label.denominator
 	// mixed
-	return label.whole + (label.denominator === 0 ? 0 : label.numerator / label.denominator)
+	return (
+		label.whole +
+		(label.denominator === 0 ? 0 : label.numerator / label.denominator)
+	)
 }
 
 /**
@@ -194,10 +219,16 @@ export const generateFractionFrequencyPlot: WidgetGenerator<
 			text: numText,
 			...fontStyles
 		})
-		canvas.drawLine(fracX - fracWidth / 2, y - 1, fracX + fracWidth / 2, y - 1, {
-			stroke: theme.colors.axisLabel,
-			strokeWidth: 1.5
-		})
+		canvas.drawLine(
+			fracX - fracWidth / 2,
+			y - 1,
+			fracX + fracWidth / 2,
+			y - 1,
+			{
+				stroke: theme.colors.axisLabel,
+				strokeWidth: 1.5
+			}
+		)
 		canvas.drawText({
 			x: fracX,
 			y: y + FRACTION_OFFSET,

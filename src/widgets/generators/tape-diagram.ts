@@ -1,11 +1,11 @@
 import { z } from "zod"
 // Path2D import no longer needed since curly bracket was removed
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { PADDING } from "../utils/constants"
-import { CSS_COLOR_PATTERN } from "../utils/css-color"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { PADDING } from "@/widgets/utils/constants"
+import { CSS_COLOR_PATTERN } from "@/widgets/utils/css-color"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
 
 // -----------------------------
 // Unified span-based tape diagram schema
@@ -137,7 +137,9 @@ function createFillStyleSchema() {
 					color: z
 						.string()
 						.regex(CSS_COLOR_PATTERN, "invalid css color")
-						.describe("CSS color for the hatch lines. Often black or a dark color for visibility."),
+						.describe(
+							"CSS color for the hatch lines. Often black or a dark color for visibility."
+						),
 					strokeWidth: z
 						.number()
 						.min(0)
@@ -359,7 +361,9 @@ export const TapeDiagramPropsSchema = z
 	.object({
 		type: z
 			.literal("tapeDiagram")
-			.describe("Identifies this as a tape diagram widget. Always use exactly 'tapeDiagram'."),
+			.describe(
+				"Identifies this as a tape diagram widget. Always use exactly 'tapeDiagram'."
+			),
 		width: createWidthSchema(),
 		height: createHeightSchema(),
 		referenceUnitsTotal: z
@@ -417,10 +421,11 @@ function clamp01(v: number): number {
 // -----------------------------
 // Generator
 // -----------------------------
-export const generateTapeDiagram: WidgetGenerator<typeof TapeDiagramPropsSchema> = async (
-	props
-) => {
-	const { width, height, referenceUnitsTotal, topTape, bottomTape, brackets } = props
+export const generateTapeDiagram: WidgetGenerator<
+	typeof TapeDiagramPropsSchema
+> = async (props) => {
+	const { width, height, referenceUnitsTotal, topTape, bottomTape, brackets } =
+		props
 
 	const canvas = new CanvasImpl({
 		chartArea: { left: 0, top: 0, width, height },
@@ -449,7 +454,8 @@ export const generateTapeDiagram: WidgetGenerator<typeof TapeDiagramPropsSchema>
 		let startFrac = 0
 		let endFrac = 1
 		if (extentSpan != null) {
-			const denom = referenceUnitsTotal != null ? referenceUnitsTotal : tape.unitsTotal
+			const denom =
+				referenceUnitsTotal != null ? referenceUnitsTotal : tape.unitsTotal
 			const f = spanToFraction(extentSpan, denom)
 			startFrac = clamp01(f.start)
 			endFrac = clamp01(f.end)
@@ -492,7 +498,10 @@ export const generateTapeDiagram: WidgetGenerator<typeof TapeDiagramPropsSchema>
 	let topGeom = computeTapeGeometry(topTape, padding + 20)
 	let bottomGeom: TapeGeom | null = null
 	if (bottomTape) {
-		bottomGeom = computeTapeGeometry(bottomTape, topGeom.y + tapeHeight + tapeGap)
+		bottomGeom = computeTapeGeometry(
+			bottomTape,
+			topGeom.y + tapeHeight + tapeGap
+		)
 	}
 
 	type BracketRange = { x1: number; x2: number }
@@ -515,7 +524,8 @@ export const generateTapeDiagram: WidgetGenerator<typeof TapeDiagramPropsSchema>
 		if (fill.style.kind === "solid") {
 			canvas.drawRect(x, geom.y, w, tapeHeight, {
 				fill: fill.style.fill,
-				fillOpacity: fill.style.fillOpacity == null ? undefined : fill.style.fillOpacity,
+				fillOpacity:
+					fill.style.fillOpacity == null ? undefined : fill.style.fillOpacity,
 				stroke: theme.colors.black,
 				strokeWidth: theme.stroke.width.base
 			})
@@ -565,7 +575,10 @@ export const generateTapeDiagram: WidgetGenerator<typeof TapeDiagramPropsSchema>
 			}
 			if (fill.label.placement === "above" && overlaps(topBracketRanges)) {
 				cy = geom.y - 40
-			} else if (fill.label.placement === "below" && overlaps(bottomBracketRanges)) {
+			} else if (
+				fill.label.placement === "below" &&
+				overlaps(bottomBracketRanges)
+			) {
 				cy = geom.y + tapeHeight + 40
 			}
 			// ALWAYS render text in black for accessibility and consistency, regardless of placement
@@ -576,7 +589,8 @@ export const generateTapeDiagram: WidgetGenerator<typeof TapeDiagramPropsSchema>
 				text: fill.label.text,
 				fill: labelColor,
 				anchor: "middle",
-				dominantBaseline: fill.label.placement === "inside" ? "middle" : "baseline",
+				dominantBaseline:
+					fill.label.placement === "inside" ? "middle" : "baseline",
 				fontWeight: theme.font.weight.bold
 			})
 		}
@@ -636,10 +650,22 @@ export const generateTapeDiagram: WidgetGenerator<typeof TapeDiagramPropsSchema>
 
 	// Draw fills first so grid lines appear on top
 	for (const f of topTape.fills)
-		drawFillSpan(topTape, topGeom, f, topBracketTopRanges, topBracketBottomRanges)
+		drawFillSpan(
+			topTape,
+			topGeom,
+			f,
+			topBracketTopRanges,
+			topBracketBottomRanges
+		)
 	if (bottomTape && bottomGeom)
 		for (const f of bottomTape.fills)
-			drawFillSpan(bottomTape, bottomGeom, f, bottomBracketTopRanges, bottomBracketBottomRanges)
+			drawFillSpan(
+				bottomTape,
+				bottomGeom,
+				f,
+				bottomBracketTopRanges,
+				bottomBracketBottomRanges
+			)
 
 	// Draw grids and borders
 	drawGridAndBorder(topTape, topGeom)
@@ -693,11 +719,25 @@ export const generateTapeDiagram: WidgetGenerator<typeof TapeDiagramPropsSchema>
 		if (b.style.kind === "straight") {
 			// Keep a consistent clearance from the tape to avoid label collisions
 			if (b.labelTop) drawStraightBracket(x1, x2, geom.y - 6, b.labelTop, true)
-			if (b.labelBottom) drawStraightBracket(x1, x2, geom.y + tapeHeight + 6, b.labelBottom, false)
+			if (b.labelBottom)
+				drawStraightBracket(
+					x1,
+					x2,
+					geom.y + tapeHeight + 6,
+					b.labelBottom,
+					false
+				)
 		} else {
 			// Treat curly style as straight for simpler and clearer visuals
 			if (b.labelTop) drawStraightBracket(x1, x2, geom.y - 6, b.labelTop, true)
-			if (b.labelBottom) drawStraightBracket(x1, x2, geom.y + tapeHeight + 6, b.labelBottom, false)
+			if (b.labelBottom)
+				drawStraightBracket(
+					x1,
+					x2,
+					geom.y + tapeHeight + 6,
+					b.labelBottom,
+					false
+				)
 		}
 	}
 

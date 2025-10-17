@@ -1,12 +1,12 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { PADDING } from "../utils/constants"
-import { Path2D } from "../utils/path-builder"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { PADDING } from "@/widgets/utils/constants"
+import { Path2D } from "@/widgets/utils/path-builder"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
 
 export const ErrInvalidDimensions = errors.new("invalid frame dimensions")
 
@@ -42,7 +42,9 @@ const Diagonal = z
 		label: z
 			.string()
 			.nullable()
-			.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
+			.transform((val) =>
+				val === "null" || val === "NULL" || val === "" ? null : val
+			)
 			.describe(
 				"Text label for the diagonal's length (e.g., '15 cm', 'd = 13', '√50', null). Null means no label. Positioned at midpoint."
 			),
@@ -58,7 +60,9 @@ export const RectangularFrameDiagramPropsSchema = z
 	.object({
 		type: z
 			.literal("rectangularFrameDiagram")
-			.describe("Identifies this as a 3D rectangular frame (hollow box) diagram."),
+			.describe(
+				"Identifies this as a 3D rectangular frame (hollow box) diagram."
+			),
 		width: createWidthSchema(),
 		height: createHeightSchema(),
 		outerLength: z
@@ -94,7 +98,9 @@ export const RectangularFrameDiagramPropsSchema = z
 		shadedFace: z
 			.string()
 			.nullable()
-			.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
+			.transform((val) =>
+				val === "null" || val === "NULL" || val === "" ? null : val
+			)
 			.describe(
 				"Face identifier to shade/highlight: 'top_face', 'side_face', 'front_face', 'bottom_face', or null. Null means no shading."
 			),
@@ -109,7 +115,9 @@ export const RectangularFrameDiagramPropsSchema = z
 		"Creates a 3D hollow rectangular frame (box with walls) in isometric projection. Shows inner and outer dimensions with wall thickness. Perfect for volume problems involving hollow objects, surface area of boxes with cavities, or structural engineering concepts. Supports face shading and space diagonals."
 	)
 
-export type RectangularFrameDiagramProps = z.infer<typeof RectangularFrameDiagramPropsSchema>
+export type RectangularFrameDiagramProps = z.infer<
+	typeof RectangularFrameDiagramPropsSchema
+>
 
 /**
  * This template generates SVG diagrams of three-dimensional hollow rectangular frames
@@ -134,10 +142,16 @@ export const generateRectangularFrameDiagram: WidgetGenerator<
 
 	if (width <= 0 || height <= 0) {
 		logger.error("invalid frame dimensions", { width, height })
-		throw errors.wrap(ErrInvalidDimensions, `width: ${width}, height: ${height}`)
+		throw errors.wrap(
+			ErrInvalidDimensions,
+			`width: ${width}, height: ${height}`
+		)
 	}
 
-	if (thickness <= 0 || thickness >= Math.min(outerLength, outerWidth, outerHeight)) {
+	if (
+		thickness <= 0 ||
+		thickness >= Math.min(outerLength, outerWidth, outerHeight)
+	) {
 		logger.error("invalid frame thickness", {
 			thickness,
 			outerLength,
@@ -230,7 +244,10 @@ export const generateRectangularFrameDiagram: WidgetGenerator<
 	connectingEdgesPath.moveTo(frontLeft, frontTop)
 	connectingEdgesPath.lineTo(frontLeft + boxDepth, frontTop - boxDepth * 0.5)
 	connectingEdgesPath.moveTo(frontRight, frontBottom)
-	connectingEdgesPath.lineTo(frontRight + boxDepth, frontBottom - boxDepth * 0.5)
+	connectingEdgesPath.lineTo(
+		frontRight + boxDepth,
+		frontBottom - boxDepth * 0.5
+	)
 	connectingEdgesPath.moveTo(frontRight, frontTop)
 	connectingEdgesPath.lineTo(frontRight + boxDepth, frontTop - boxDepth * 0.5)
 	canvas.drawPath(connectingEdgesPath, {
@@ -264,7 +281,10 @@ export const generateRectangularFrameDiagram: WidgetGenerator<
 	leftSidePath.moveTo(frontLeft, frontBottom)
 	leftSidePath.lineTo(frontLeft, frontTop)
 	leftSidePath.lineTo(frontLeft + boxDepth, frontTop - boxDepth * 0.5)
-	leftSidePath.lineTo(frontLeft + boxDepth, frontTop - boxDepth * 0.5 + boxHeight)
+	leftSidePath.lineTo(
+		frontLeft + boxDepth,
+		frontTop - boxDepth * 0.5 + boxHeight
+	)
 	leftSidePath.closePath()
 
 	const topFacePath = new Path2D()
@@ -278,7 +298,10 @@ export const generateRectangularFrameDiagram: WidgetGenerator<
 	rightSidePath.moveTo(frontRight, frontBottom)
 	rightSidePath.lineTo(frontRight, frontTop)
 	rightSidePath.lineTo(frontRight + boxDepth, frontTop - boxDepth * 0.5)
-	rightSidePath.lineTo(frontRight + boxDepth, frontTop - boxDepth * 0.5 + boxHeight)
+	rightSidePath.lineTo(
+		frontRight + boxDepth,
+		frontTop - boxDepth * 0.5 + boxHeight
+	)
 	rightSidePath.closePath()
 
 	// Combine left side and top face into single path like Khan Academy does
@@ -286,7 +309,10 @@ export const generateRectangularFrameDiagram: WidgetGenerator<
 	combinedSideTopPath.moveTo(frontLeft, frontBottom)
 	combinedSideTopPath.lineTo(frontLeft, frontTop)
 	combinedSideTopPath.lineTo(frontLeft + boxDepth, frontTop - boxDepth * 0.5)
-	combinedSideTopPath.lineTo(frontLeft + boxDepth, frontTop - boxDepth * 0.5 + boxHeight)
+	combinedSideTopPath.lineTo(
+		frontLeft + boxDepth,
+		frontTop - boxDepth * 0.5 + boxHeight
+	)
 	combinedSideTopPath.closePath()
 	combinedSideTopPath.moveTo(backLeft, backTop)
 	combinedSideTopPath.lineTo(backLeft, backTop + boxHeight)
@@ -376,7 +402,9 @@ export const generateRectangularFrameDiagram: WidgetGenerator<
 			canvas.drawLine(from.x, from.y, to.x, to.y, {
 				stroke: theme.colors.black,
 				strokeWidth: theme.stroke.width.thick,
-				dash: strokeDashArray.replace(' stroke-dasharray="', "").replace('"', "")
+				dash: strokeDashArray
+					.replace(' stroke-dasharray="', "")
+					.replace('"', "")
 			})
 
 			if (d.label) {

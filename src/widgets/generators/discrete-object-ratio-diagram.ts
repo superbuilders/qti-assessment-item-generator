@@ -1,11 +1,11 @@
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { drawChartTitle } from "../utils/chart-layout-utils"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { drawChartTitle } from "@/widgets/utils/chart-layout-utils"
 // PADDING intentionally unused; this widget uses tighter padding for visuals.
-import { abbreviateMonth } from "../utils/labels"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { theme } from "../utils/theme"
+import { abbreviateMonth } from "@/widgets/utils/labels"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
 
 // Defines a type of object to be rendered
 const ObjectTypeSchema = z
@@ -44,7 +44,9 @@ export const DiscreteObjectRatioDiagramPropsSchema = z
 		title: z
 			.string()
 			.nullable()
-			.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
+			.transform((val) =>
+				val === "null" || val === "NULL" || val === "" ? null : val
+			)
 			.describe(
 				"Title displayed above the diagram (e.g., 'Fruit Basket Contents', null). Null means no title. Plaintext only; no markdown/HTML."
 			)
@@ -54,7 +56,9 @@ export const DiscreteObjectRatioDiagramPropsSchema = z
 		"Creates visual representations of ratios using discrete countable objects (emojis). Objects are grouped by rows, one row per object type."
 	)
 
-export type DiscreteObjectRatioDiagramProps = z.infer<typeof DiscreteObjectRatioDiagramPropsSchema>
+export type DiscreteObjectRatioDiagramProps = z.infer<
+	typeof DiscreteObjectRatioDiagramPropsSchema
+>
 
 /**
  * This template generates an SVG graphic that visually represents a ratio using a collection
@@ -120,7 +124,10 @@ export const generateDiscreteObjectRatioDiagram: WidgetGenerator<
 			o.count > 0 ? chartWidth / (o.count * (1 + spacingRatio)) : heightBased
 		)
 	)
-	const iconSize = Math.max(12, Math.floor(Math.min(heightBased, widthBasedAllRows)))
+	const iconSize = Math.max(
+		12,
+		Math.floor(Math.min(heightBased, widthBasedAllRows))
+	)
 	const iconPadding = Math.floor(iconSize * spacingRatio)
 	const step = iconSize + iconPadding
 
@@ -157,7 +164,13 @@ export const generateDiscreteObjectRatioDiagram: WidgetGenerator<
 	}
 
 	// NEW: Finalize the canvas and construct the root SVG element with smaller outer padding
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(12)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(12)
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.medium}">${svgBody}</svg>`
 }

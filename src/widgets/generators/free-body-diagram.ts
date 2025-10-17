@@ -1,8 +1,8 @@
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { PADDING } from "../utils/constants"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { PADDING } from "@/widgets/utils/constants"
+import { theme } from "@/widgets/utils/theme"
 
 // Defines the properties for the Free Body Diagram widget.
 export const FreeBodyDiagramPropsSchema = z
@@ -63,9 +63,9 @@ const ensureForceLabel = (label: string): string => {
  * The client-side rendering process will transform these
  * into proper physics notation (F_subscript) using MathML.
  */
-export const generateFreeBodyDiagram: WidgetGenerator<typeof FreeBodyDiagramPropsSchema> = async (
-	props
-) => {
+export const generateFreeBodyDiagram: WidgetGenerator<
+	typeof FreeBodyDiagramPropsSchema
+> = async (props) => {
 	// Normalize string "null" or whitespace-only labels to actual null (no arrow)
 	const normalize = (val: string | null): string | null => {
 		if (val === null) return null

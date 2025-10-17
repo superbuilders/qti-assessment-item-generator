@@ -2,8 +2,8 @@ import {
 	ALLOWED_GLOBAL_ATTRIBUTES,
 	DEFAULT_REMOVAL_SELECTORS,
 	TAG_ATTRIBUTE_WHITELIST
-} from "./constants"
-import type { StimulusIssue, StimulusOptions } from "./types"
+} from "@/stimulus/constants"
+import type { StimulusIssue, StimulusOptions } from "@/stimulus/types"
 
 const BOOLEAN_ATTRIBUTES = new Set(["allowfullscreen"])
 
@@ -45,7 +45,10 @@ function stripComments(document: Document) {
 	}
 }
 
-function stripDisallowedAttributes(document: Document, issues: StimulusIssue[]) {
+function stripDisallowedAttributes(
+	document: Document,
+	issues: StimulusIssue[]
+) {
 	const walker = document.createTreeWalker(document, NODE_FILTER.SHOW_ELEMENT)
 	let current = walker.nextNode()
 	while (current) {

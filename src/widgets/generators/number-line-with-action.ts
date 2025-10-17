@@ -1,12 +1,12 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { PADDING } from "../utils/constants"
-import { selectAxisLabels } from "../utils/layout"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { type Theme, theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { PADDING } from "@/widgets/utils/constants"
+import { selectAxisLabels } from "@/widgets/utils/layout"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { type Theme, theme } from "@/widgets/utils/theme"
 
 export const NumberLineWithActionPropsSchema = z
 	.object({
@@ -40,7 +40,9 @@ export const NumberLineWithActionPropsSchema = z
 						interval: z
 							.number()
 							.positive()
-							.describe("Whole number interval between major ticks (e.g., 1, 2, 5, 10)")
+							.describe(
+								"Whole number interval between major ticks (e.g., 1, 2, 5, 10)"
+							)
 					})
 					.strict(),
 				z
@@ -51,11 +53,15 @@ export const NumberLineWithActionPropsSchema = z
 							.number()
 							.int()
 							.positive()
-							.describe("Denominator for unit fractions (e.g., 5 for fifths, 7 for sevenths)")
+							.describe(
+								"Denominator for unit fractions (e.g., 5 for fifths, 7 for sevenths)"
+							)
 					})
 					.strict()
 			])
-			.describe("Major tick interval specification with full-length ticks and labels"),
+			.describe(
+				"Major tick interval specification with full-length ticks and labels"
+			),
 		secondaryTickInterval: z
 			.discriminatedUnion("type", [
 				z
@@ -64,7 +70,9 @@ export const NumberLineWithActionPropsSchema = z
 						interval: z
 							.number()
 							.positive()
-							.describe("Whole number interval between minor ticks (e.g., 0.5, 1, 2.5)")
+							.describe(
+								"Whole number interval between minor ticks (e.g., 0.5, 1, 2.5)"
+							)
 					})
 					.strict(),
 				z
@@ -75,12 +83,16 @@ export const NumberLineWithActionPropsSchema = z
 							.number()
 							.int()
 							.positive()
-							.describe("Denominator for unit fractions (e.g., 10 for tenths, 20 for twentieths)")
+							.describe(
+								"Denominator for unit fractions (e.g., 10 for tenths, 20 for twentieths)"
+							)
 					})
 					.strict()
 			])
 			.nullable()
-			.describe("Optional minor tick interval with half-length ticks and no labels"),
+			.describe(
+				"Optional minor tick interval with half-length ticks and no labels"
+			),
 		startValue: z
 			.number()
 			.describe(
@@ -95,29 +107,60 @@ export const NumberLineWithActionPropsSchema = z
 								z
 									.object({
 										type: z.literal("whole").describe("Whole number change"),
-										value: z.number().int().describe("Integer value for the change, e.g. -3, 0, 5"),
-										sign: z.enum(["+", "-"]).describe("Sign of the whole number change")
+										value: z
+											.number()
+											.int()
+											.describe("Integer value for the change, e.g. -3, 0, 5"),
+										sign: z
+											.enum(["+", "-"])
+											.describe("Sign of the whole number change")
 									})
 									.strict(),
 								z
 									.object({
-										type: z.literal("fraction").describe("Proper or improper fraction change"),
-										numerator: z.number().int().min(0).describe("Numerator (non-negative)"),
-										denominator: z.number().int().positive().describe("Denominator (positive)"),
-										sign: z.enum(["+", "-"]).describe("Sign of the fraction change")
-									})
-									.strict(),
-								z
-									.object({
-										type: z.literal("mixed").describe("Mixed number change like 1 1/4"),
-										whole: z.number().int().min(0).describe("Whole part (non-negative)"),
-										numerator: z.number().int().min(0).describe("Numerator of the fractional part"),
+										type: z
+											.literal("fraction")
+											.describe("Proper or improper fraction change"),
+										numerator: z
+											.number()
+											.int()
+											.min(0)
+											.describe("Numerator (non-negative)"),
 										denominator: z
 											.number()
 											.int()
 											.positive()
-											.describe("Denominator of the fractional part (positive)"),
-										sign: z.enum(["+", "-"]).describe("Sign of the mixed number change")
+											.describe("Denominator (positive)"),
+										sign: z
+											.enum(["+", "-"])
+											.describe("Sign of the fraction change")
+									})
+									.strict(),
+								z
+									.object({
+										type: z
+											.literal("mixed")
+											.describe("Mixed number change like 1 1/4"),
+										whole: z
+											.number()
+											.int()
+											.min(0)
+											.describe("Whole part (non-negative)"),
+										numerator: z
+											.number()
+											.int()
+											.min(0)
+											.describe("Numerator of the fractional part"),
+										denominator: z
+											.number()
+											.int()
+											.positive()
+											.describe(
+												"Denominator of the fractional part (positive)"
+											),
+										sign: z
+											.enum(["+", "-"])
+											.describe("Sign of the mixed number change")
 									})
 									.strict()
 							])
@@ -136,9 +179,13 @@ export const NumberLineWithActionPropsSchema = z
 		"Creates an interactive number line showing arithmetic operations as curved 'jump' arrows. Perfect for teaching addition/subtraction concepts, multi-step problems, and integer operations. Supports multiple sequential actions to show complex calculations step-by-step."
 	)
 
-export type NumberLineWithActionProps = z.infer<typeof NumberLineWithActionPropsSchema>
+export type NumberLineWithActionProps = z.infer<
+	typeof NumberLineWithActionPropsSchema
+>
 
-type ActionDelta = z.infer<typeof NumberLineWithActionPropsSchema>["actions"][number]["delta"]
+type ActionDelta = z.infer<
+	typeof NumberLineWithActionPropsSchema
+>["actions"][number]["delta"]
 
 /**
  * Calculates the numerical value of an action's delta.
@@ -148,11 +195,14 @@ const toNumericDelta = (delta: ActionDelta): number => {
 		return delta.sign === "-" ? -delta.value : delta.value
 	}
 	if (delta.type === "fraction") {
-		const magnitude = delta.denominator === 0 ? 0 : delta.numerator / delta.denominator
+		const magnitude =
+			delta.denominator === 0 ? 0 : delta.numerator / delta.denominator
 		return delta.sign === "-" ? -magnitude : magnitude
 	}
 	// mixed
-	const total = delta.whole + (delta.denominator === 0 ? 0 : delta.numerator / delta.denominator)
+	const total =
+		delta.whole +
+		(delta.denominator === 0 ? 0 : delta.numerator / delta.denominator)
 	return delta.sign === "-" ? -total : total
 }
 
@@ -191,7 +241,8 @@ const formatPointLabel = (value: number, min: number, max: number): string => {
 				if (num === 0) return "0"
 				if (num === den) return "1"
 				// Simplify the fraction
-				const gcd = (a: number, b: number): number => (b === 0 ? a : gcd(b, a % b))
+				const gcd = (a: number, b: number): number =>
+					b === 0 ? a : gcd(b, a % b)
 				const g = gcd(num, den)
 				return `${num / g}/${den / g}`
 			}
@@ -390,7 +441,9 @@ export const generateNumberLineWithAction: WidgetGenerator<
 	const scale = lineLength / (max - min)
 
 	// Helper function to generate tick values and labels
-	const generateTicks = (tickSpec: typeof tickInterval): { values: number[]; labels: string[] } => {
+	const generateTicks = (
+		tickSpec: typeof tickInterval
+	): { values: number[]; labels: string[] } => {
 		const values: number[] = []
 		const labels: string[] = []
 
@@ -402,7 +455,9 @@ export const generateNumberLineWithAction: WidgetGenerator<
 			for (let value = startTick; value <= max; value += interval) {
 				if (value >= min) {
 					values.push(value)
-					labels.push(Number.isInteger(value) ? value.toString() : value.toFixed(2))
+					labels.push(
+						Number.isInteger(value) ? value.toString() : value.toFixed(2)
+					)
 				}
 			}
 		} else if (tickSpec.type === "fraction") {
@@ -478,7 +533,9 @@ export const generateNumberLineWithAction: WidgetGenerator<
 		const tickPositions = values.map(toSvgX)
 
 		// Check if start value coincides with any tick and force it to have a label
-		const startValueAtTick = tickValues.some((tick) => Math.abs(tick - startValue) < 1e-10)
+		const startValueAtTick = tickValues.some(
+			(tick) => Math.abs(tick - startValue) < 1e-10
+		)
 
 		// Smart label selection to prevent overlaps, but force start value to be labeled
 		const selectedLabels = selectAxisLabels({
@@ -492,7 +549,9 @@ export const generateNumberLineWithAction: WidgetGenerator<
 
 		// If start value is at a tick position, force it to be selected
 		if (startValueAtTick) {
-			const startTickIndex = tickValues.findIndex((tick) => Math.abs(tick - startValue) < 1e-10)
+			const startTickIndex = tickValues.findIndex(
+				(tick) => Math.abs(tick - startValue) < 1e-10
+			)
 			if (startTickIndex >= 0) {
 				selectedLabels.add(startTickIndex)
 			}
@@ -521,7 +580,9 @@ export const generateNumberLineWithAction: WidgetGenerator<
 		// Draw secondary ticks with half length and no labels, BUT promote to primary if it's the start value
 		for (const t of secondaryTickValues) {
 			// Skip secondary ticks that overlap with major ticks
-			const isOverlapping = tickValues.some((majorTick) => Math.abs(majorTick - t) < 1e-10)
+			const isOverlapping = tickValues.some(
+				(majorTick) => Math.abs(majorTick - t) < 1e-10
+			)
 			if (!isOverlapping) {
 				const x = toSvgX(t)
 				const isStartValue = Math.abs(t - startValue) < 1e-10
@@ -621,8 +682,24 @@ export const generateNumberLineWithAction: WidgetGenerator<
 			})
 
 			// Draw dotted lines with clipping around labels
-			drawClippedDottedLine(canvas, actionStartX, arrowY, actionStartX, yPos, labelBounds, theme)
-			drawClippedDottedLine(canvas, actionEndX, arrowY, actionEndX, yPos, labelBounds, theme)
+			drawClippedDottedLine(
+				canvas,
+				actionStartX,
+				arrowY,
+				actionStartX,
+				yPos,
+				labelBounds,
+				theme
+			)
+			drawClippedDottedLine(
+				canvas,
+				actionEndX,
+				arrowY,
+				actionEndX,
+				yPos,
+				labelBounds,
+				theme
+			)
 
 			// Arrow label with better spacing
 			const actionLabel = toDeltaLabel(action.delta)
@@ -662,7 +739,9 @@ export const generateNumberLineWithAction: WidgetGenerator<
 		const tickPositions = values.map(toSvgY)
 
 		// Check if start value coincides with any tick and force it to have a label
-		const startValueAtTick = tickValues.some((tick) => Math.abs(tick - startValue) < 1e-10)
+		const startValueAtTick = tickValues.some(
+			(tick) => Math.abs(tick - startValue) < 1e-10
+		)
 
 		// Smart label selection to prevent overlaps, but force start value to be labeled
 		const selectedLabels = selectAxisLabels({
@@ -676,7 +755,9 @@ export const generateNumberLineWithAction: WidgetGenerator<
 
 		// If start value is at a tick position, force it to be selected
 		if (startValueAtTick) {
-			const startTickIndex = tickValues.findIndex((tick) => Math.abs(tick - startValue) < 1e-10)
+			const startTickIndex = tickValues.findIndex(
+				(tick) => Math.abs(tick - startValue) < 1e-10
+			)
 			if (startTickIndex >= 0) {
 				selectedLabels.add(startTickIndex)
 			}
@@ -706,7 +787,9 @@ export const generateNumberLineWithAction: WidgetGenerator<
 		// Draw secondary ticks with half length and no labels, BUT promote to primary if it's the start value
 		for (const t of secondaryTickValues) {
 			// Skip secondary ticks that overlap with major ticks
-			const isOverlapping = tickValues.some((majorTick) => Math.abs(majorTick - t) < 1e-10)
+			const isOverlapping = tickValues.some(
+				(majorTick) => Math.abs(majorTick - t) < 1e-10
+			)
 			if (!isOverlapping) {
 				const y = toSvgY(t)
 				const isStartValue = Math.abs(t - startValue) < 1e-10
@@ -815,8 +898,24 @@ export const generateNumberLineWithAction: WidgetGenerator<
 			})
 
 			// Draw dotted lines with clipping around labels
-			drawClippedDottedLine(canvas, arrowX, actionStartY, xPos, actionStartY, labelBounds, theme)
-			drawClippedDottedLine(canvas, arrowX, actionEndY, xPos, actionEndY, labelBounds, theme)
+			drawClippedDottedLine(
+				canvas,
+				arrowX,
+				actionStartY,
+				xPos,
+				actionStartY,
+				labelBounds,
+				theme
+			)
+			drawClippedDottedLine(
+				canvas,
+				arrowX,
+				actionEndY,
+				xPos,
+				actionEndY,
+				labelBounds,
+				theme
+			)
 
 			// Arrow label (rotated for vertical layout) with better spacing
 			const actionLabel = toDeltaLabel(action.delta)

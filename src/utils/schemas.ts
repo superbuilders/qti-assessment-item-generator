@@ -4,7 +4,7 @@ import {
 	SVG_DIAGRAM_HEIGHT_MIN,
 	SVG_DIAGRAM_WIDTH_MAX,
 	SVG_DIAGRAM_WIDTH_MIN
-} from "./constants"
+} from "@/utils/constants"
 
 /**
  * Creates a width schema for SVG diagrams with standard constraints.

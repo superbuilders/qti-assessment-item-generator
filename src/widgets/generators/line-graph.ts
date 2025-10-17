@@ -1,16 +1,16 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { AXIS_VIEWBOX_PADDING } from "../utils/constants"
-import { setupCoordinatePlaneBaseV2 } from "../utils/coordinate-plane-utils"
-import { CSS_COLOR_PATTERN } from "../utils/css-color"
-import { abbreviateMonth } from "../utils/labels"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { estimateWrappedTextDimensions } from "../utils/text" // ADD THIS IMPORT
-import { theme } from "../utils/theme"
-import { buildTicks } from "../utils/ticks" // ADD THIS IMPORT
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { AXIS_VIEWBOX_PADDING } from "@/widgets/utils/constants"
+import { setupCoordinatePlaneBaseV2 } from "@/widgets/utils/coordinate-plane-utils"
+import { CSS_COLOR_PATTERN } from "@/widgets/utils/css-color"
+import { abbreviateMonth } from "@/widgets/utils/labels"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { estimateWrappedTextDimensions } from "@/widgets/utils/text" // ADD THIS IMPORT
+import { theme } from "@/widgets/utils/theme"
+import { buildTicks } from "@/widgets/utils/ticks" // ADD THIS IMPORT
 
 export const ErrMismatchedDataLength = errors.new(
 	"series data must have the same length as x-axis categories"
@@ -49,7 +49,9 @@ function createSeriesSchema() {
 				.describe("The shape of the marker for each data point."),
 			yAxis: z
 				.enum(["left", "right"])
-				.describe("Specifies which Y-axis this series should be plotted against.")
+				.describe(
+					"Specifies which Y-axis this series should be plotted against."
+				)
 		})
 		.strict()
 }
@@ -59,14 +61,20 @@ function createYAxisSchema() {
 		.object({
 			label: z
 				.string()
-				.describe("The label for the vertical axis (e.g., 'Average temperature (°C)')."),
+				.describe(
+					"The label for the vertical axis (e.g., 'Average temperature (°C)')."
+				),
 			min: z.number().describe("The minimum value for the y-axis scale."),
 			max: z.number().describe("The maximum value for the y-axis scale."),
 			tickInterval: z
 				.number()
 				.positive()
-				.describe("The numeric interval between labeled tick marks on the y-axis."),
-			showGridLines: z.boolean().describe("If true, displays horizontal grid lines for the y-axis.")
+				.describe(
+					"The numeric interval between labeled tick marks on the y-axis."
+				),
+			showGridLines: z
+				.boolean()
+				.describe("If true, displays horizontal grid lines for the y-axis.")
 		})
 		.strict()
 }
@@ -79,7 +87,9 @@ export const LineGraphPropsSchema = z
 		title: z.string().describe("The main title displayed above the graph."),
 		xAxis: z
 			.object({
-				label: z.string().describe("The label for the horizontal axis (e.g., 'Month')."),
+				label: z
+					.string()
+					.describe("The label for the horizontal axis (e.g., 'Month')."),
 				categories: z
 					.array(z.string().min(1, "tick label cannot be empty"))
 					.describe(
@@ -93,8 +103,12 @@ export const LineGraphPropsSchema = z
 			.describe(
 				"Configuration for an optional second Y-axis on the right side. Null for a single-axis graph."
 			),
-		series: z.array(createSeriesSchema()).describe("An array of data series to plot on the graph."),
-		showLegend: z.boolean().describe("If true, a legend is displayed to identify each data series.")
+		series: z
+			.array(createSeriesSchema())
+			.describe("An array of data series to plot on the graph."),
+		showLegend: z
+			.boolean()
+			.describe("If true, a legend is displayed to identify each data series.")
 	})
 	.strict()
 	.describe(
@@ -103,8 +117,11 @@ export const LineGraphPropsSchema = z
 
 export type LineGraphProps = z.infer<typeof LineGraphPropsSchema>
 
-export const generateLineGraph: WidgetGenerator<typeof LineGraphPropsSchema> = async (props) => {
-	const { width, height, title, xAxis, yAxis, yAxisRight, series, showLegend } = props
+export const generateLineGraph: WidgetGenerator<
+	typeof LineGraphPropsSchema
+> = async (props) => {
+	const { width, height, title, xAxis, yAxis, yAxisRight, series, showLegend } =
+		props
 
 	for (const s of series) {
 		if (s.values.length !== xAxis.categories.length) {
@@ -157,7 +174,11 @@ export const generateLineGraph: WidgetGenerator<typeof LineGraphPropsSchema> = a
 		const rightAxisX = baseInfo.chartArea.left + baseInfo.chartArea.width
 		toSvgYRight = (val: number) => {
 			const frac = (val - yAxisRight.min) / (yAxisRight.max - yAxisRight.min)
-			return baseInfo.chartArea.top + baseInfo.chartArea.height - frac * baseInfo.chartArea.height
+			return (
+				baseInfo.chartArea.top +
+				baseInfo.chartArea.height -
+				frac * baseInfo.chartArea.height
+			)
 		}
 
 		canvas.drawLine(
@@ -171,7 +192,11 @@ export const generateLineGraph: WidgetGenerator<typeof LineGraphPropsSchema> = a
 			}
 		)
 
-		for (let t = yAxisRight.min; t <= yAxisRight.max; t += yAxisRight.tickInterval) {
+		for (
+			let t = yAxisRight.min;
+			t <= yAxisRight.max;
+			t += yAxisRight.tickInterval
+		) {
 			const y = toSvgYRight(t)
 			canvas.drawLine(rightAxisX, y, rightAxisX + 5, y, {
 				stroke: theme.colors.axis,
@@ -195,8 +220,14 @@ export const generateLineGraph: WidgetGenerator<typeof LineGraphPropsSchema> = a
 			16,
 			1.2
 		)
-		const rightTickInfo = buildTicks(yAxisRight.min, yAxisRight.max, yAxisRight.tickInterval)
-		const maxTickLabelWidth = Math.max(...rightTickInfo.labels.map((l) => l.length * 7)) // Heuristic
+		const rightTickInfo = buildTicks(
+			yAxisRight.min,
+			yAxisRight.max,
+			yAxisRight.tickInterval
+		)
+		const maxTickLabelWidth = Math.max(
+			...rightTickInfo.labels.map((l) => l.length * 7)
+		) // Heuristic
 		const TICK_LENGTH = 5
 		const TICK_LABEL_PADDING = 10
 		const AXIS_TITLE_PADDING = 15
@@ -284,8 +315,14 @@ export const generateLineGraph: WidgetGenerator<typeof LineGraphPropsSchema> = a
 				16,
 				1.2
 			)
-			const rightTickInfo = buildTicks(yAxisRight.min, yAxisRight.max, yAxisRight.tickInterval)
-			const maxTickLabelWidth = Math.max(...rightTickInfo.labels.map((l) => l.length * 7))
+			const rightTickInfo = buildTicks(
+				yAxisRight.min,
+				yAxisRight.max,
+				yAxisRight.tickInterval
+			)
+			const maxTickLabelWidth = Math.max(
+				...rightTickInfo.labels.map((l) => l.length * 7)
+			)
 			const TICK_LENGTH = 5
 			const TICK_LABEL_PADDING = 10
 			const AXIS_TITLE_PADDING = 15

@@ -1,14 +1,23 @@
 import type { AnyInteraction } from "@/core/interactions"
 import type { AssessmentItemShell } from "@/core/item"
+import { caretBanPromptSection } from "@/structured/prompts/caret"
+import {
+	createWidgetSelectionPromptSection,
+	formatUnifiedContextSections
+} from "@/structured/prompts/shared"
+import type { AiContextEnvelope, ImageContext } from "@/structured/types"
 import { createSubsetCollection } from "@/widgets/collections/subset"
-import type { WidgetCollection, WidgetDefinition } from "@/widgets/collections/types"
-import type { AiContextEnvelope, ImageContext } from "../types"
-import { caretBanPromptSection } from "./caret"
-import { createWidgetSelectionPromptSection, formatUnifiedContextSections } from "./shared"
+import type {
+	WidgetCollection,
+	WidgetDefinition
+} from "@/widgets/collections/types"
 
 export function createWidgetContentPrompt<
 	E extends readonly string[],
-	C extends WidgetCollection<Record<string, WidgetDefinition<unknown, unknown>>, E>
+	C extends WidgetCollection<
+		Record<string, WidgetDefinition<unknown, unknown>>,
+		E
+	>
 >(
 	envelope: AiContextEnvelope,
 	assessmentShell: AssessmentItemShell<E>,
@@ -25,8 +34,12 @@ export function createWidgetContentPrompt<
 	for (const typeName of Object.values(widgetMapping)) {
 		uniqueWidgetTypes.add(typeName)
 	}
-	const neededWidgetTypes: ReadonlyArray<E[number]> = Array.from(uniqueWidgetTypes)
-	const subsetCollection = createSubsetCollection(widgetCollection, neededWidgetTypes)
+	const neededWidgetTypes: ReadonlyArray<E[number]> =
+		Array.from(uniqueWidgetTypes)
+	const subsetCollection = createSubsetCollection(
+		widgetCollection,
+		neededWidgetTypes
+	)
 
 	const systemInstruction = `You are an expert in educational content conversion with vision capabilities, focused on generating widget content for QTI assessments. Your task is to generate ONLY the widget content objects based on the original Perseus JSON, an assessment shell, a mapping that specifies the exact widget type for each slot, and accompanying visual context.
 

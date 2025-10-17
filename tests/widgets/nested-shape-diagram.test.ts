@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import { nestedShapeDiagramExamples } from "../../examples/nested-shape-diagram"
-import { generateWidgetForTest } from "../helpers/generateWidgetForTest"
+import { nestedShapeDiagramExamples } from "@/examples/nested-shape-diagram"
+import { generateWidgetForTest } from "@/testing/helpers/generateWidgetForTest"
 
 describe("nestedShapeDiagram widget tests", () => {
 	// Test each example from the examples file

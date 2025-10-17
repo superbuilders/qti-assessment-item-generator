@@ -1,10 +1,10 @@
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { PADDING } from "../utils/constants"
-import { CSS_COLOR_PATTERN } from "../utils/css-color"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { PADDING } from "@/widgets/utils/constants"
+import { CSS_COLOR_PATTERN } from "@/widgets/utils/css-color"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
 
 // Simplified solid object schema with just the type enum
 const SolidObjectSchema = z
@@ -109,7 +109,9 @@ export const ThreeDIntersectionDiagramPropsSchema = z
 					),
 				showHiddenEdges: z
 					.boolean()
-					.describe("Whether to show edges that would be hidden behind the solid as dashed lines."),
+					.describe(
+						"Whether to show edges that would be hidden behind the solid as dashed lines."
+					),
 				showLabels: z
 					.boolean()
 					.describe(
@@ -126,7 +128,9 @@ export const ThreeDIntersectionDiagramPropsSchema = z
 		"Generates an SVG diagram illustrating the cross-section of a 3D solid intersected by a plane. This widget supports rectangular prisms, pyramids, cylinders, cones, and spheres with horizontal, vertical, or oblique plane intersections. The resulting cross-section is highlighted to show the 2D shape created by slicing the 3D object."
 	)
 
-export type ThreeDIntersectionDiagramProps = z.infer<typeof ThreeDIntersectionDiagramPropsSchema>
+export type ThreeDIntersectionDiagramProps = z.infer<
+	typeof ThreeDIntersectionDiagramPropsSchema
+>
 
 // Type definitions for 3D vector math
 type Point3D = { x: number; y: number; z: number }
@@ -166,7 +170,9 @@ const makeColorTransparent = (color: string, opacity: number): string => {
 	}
 
 	// Handle rgba/rgb colors - extract RGB values and apply new opacity
-	const rgbaMatch = color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*[\d.]+)?\)/)
+	const rgbaMatch = color.match(
+		/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*[\d.]+)?\)/
+	)
 	if (rgbaMatch) {
 		const [, r, g, b] = rgbaMatch
 		return `rgba(${r}, ${g}, ${b}, ${opacity})`
@@ -474,7 +480,10 @@ export const generateThreeDIntersectionDiagram: WidgetGenerator<
 	})
 
 	// Calculate rectangular plane that cuts through the solid
-	const calculateRectangularPlane = (): { planePoints: Point2D[]; planeZ: number } => {
+	const calculateRectangularPlane = (): {
+		planePoints: Point2D[]
+		planeZ: number
+	} => {
 		// Calculate bounds of the entire solid
 		const bounds = {
 			minX: Math.min(...vertices.map((v) => v.x)),
@@ -501,7 +510,9 @@ export const generateThreeDIntersectionDiagram: WidgetGenerator<
 
 		if (plane.orientation === "vertical") {
 			// Vertical plane (parallel to YZ plane)
-			planeZ = paddedBounds.minZ + plane.position * (paddedBounds.maxZ - paddedBounds.minZ)
+			planeZ =
+				paddedBounds.minZ +
+				plane.position * (paddedBounds.maxZ - paddedBounds.minZ)
 			planeVertices = [
 				{ x: paddedBounds.minX, y: paddedBounds.minY, z: planeZ },
 				{ x: paddedBounds.maxX, y: paddedBounds.minY, z: planeZ },
@@ -510,7 +521,9 @@ export const generateThreeDIntersectionDiagram: WidgetGenerator<
 			]
 		} else if (plane.orientation === "horizontal") {
 			// Horizontal plane (parallel to XZ plane)
-			const planeY = paddedBounds.minY + plane.position * (paddedBounds.maxY - paddedBounds.minY)
+			const planeY =
+				paddedBounds.minY +
+				plane.position * (paddedBounds.maxY - paddedBounds.minY)
 			planeZ = planeY // for depth sorting, use Y coordinate
 			planeVertices = [
 				{ x: paddedBounds.minX, y: planeY, z: paddedBounds.minZ },
@@ -521,8 +534,12 @@ export const generateThreeDIntersectionDiagram: WidgetGenerator<
 		} else {
 			// Oblique plane
 			const angleRad = (plane.angle * Math.PI) / 180
-			const centerY = paddedBounds.minY + plane.position * (paddedBounds.maxY - paddedBounds.minY)
-			const centerZ = paddedBounds.minZ + plane.position * (paddedBounds.maxZ - paddedBounds.minZ)
+			const centerY =
+				paddedBounds.minY +
+				plane.position * (paddedBounds.maxY - paddedBounds.minY)
+			const centerZ =
+				paddedBounds.minZ +
+				plane.position * (paddedBounds.maxZ - paddedBounds.minZ)
 			planeZ = centerZ
 
 			// Create tilted rectangular plane that spans the full width and depth
@@ -530,10 +547,26 @@ export const generateThreeDIntersectionDiagram: WidgetGenerator<
 			const tiltOffset = (Math.tan(angleRad) * yRange) / 2
 
 			planeVertices = [
-				{ x: paddedBounds.minX, y: centerY - yRange / 2, z: centerZ - tiltOffset },
-				{ x: paddedBounds.maxX, y: centerY - yRange / 2, z: centerZ - tiltOffset },
-				{ x: paddedBounds.maxX, y: centerY + yRange / 2, z: centerZ + tiltOffset },
-				{ x: paddedBounds.minX, y: centerY + yRange / 2, z: centerZ + tiltOffset }
+				{
+					x: paddedBounds.minX,
+					y: centerY - yRange / 2,
+					z: centerZ - tiltOffset
+				},
+				{
+					x: paddedBounds.maxX,
+					y: centerY - yRange / 2,
+					z: centerZ - tiltOffset
+				},
+				{
+					x: paddedBounds.maxX,
+					y: centerY + yRange / 2,
+					z: centerZ + tiltOffset
+				},
+				{
+					x: paddedBounds.minX,
+					y: centerY + yRange / 2,
+					z: centerZ + tiltOffset
+				}
 			]
 		}
 

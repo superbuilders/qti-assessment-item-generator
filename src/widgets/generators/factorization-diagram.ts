@@ -1,10 +1,10 @@
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { PADDING } from "../utils/constants"
-import { CSS_COLOR_PATTERN } from "../utils/css-color"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { PADDING } from "@/widgets/utils/constants"
+import { CSS_COLOR_PATTERN } from "@/widgets/utils/css-color"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
 
 // The main Zod schema for the factorization diagram.
 export const FactorizationDiagramPropsSchema = z
@@ -18,7 +18,9 @@ export const FactorizationDiagramPropsSchema = z
 			.number()
 			.int()
 			.positive()
-			.describe("The integer to be factored and displayed as a rectangular array of dots."),
+			.describe(
+				"The integer to be factored and displayed as a rectangular array of dots."
+			),
 		dotColor: z
 			.string()
 			.regex(CSS_COLOR_PATTERN, "invalid css color")
@@ -29,7 +31,9 @@ export const FactorizationDiagramPropsSchema = z
 		"Creates a rectangular array of numbered dots to visually represent the factors of a number. The widget automatically determines the number of rows and columns by finding the factors closest to the square root of the number."
 	)
 
-export type FactorizationDiagramProps = z.infer<typeof FactorizationDiagramPropsSchema>
+export type FactorizationDiagramProps = z.infer<
+	typeof FactorizationDiagramPropsSchema
+>
 
 /**
  * Finds the pair of integer factors of a number that are closest to its square root.

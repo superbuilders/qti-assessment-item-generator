@@ -8,7 +8,9 @@ describe("Widget Ref Collection: Feedback Traversal", () => {
 	const W = ["numberLine", "coordinatePlane"] as const
 
 	test("should collect widget refs from fallback feedback (CORRECT/INCORRECT)", () => {
-		const feedback: { FEEDBACK__OVERALL: AuthoringFeedbackOverall<FeedbackPlan, typeof W> } = {
+		const feedback: {
+			FEEDBACK__OVERALL: AuthoringFeedbackOverall<FeedbackPlan, typeof W>
+		} = {
 			FEEDBACK__OVERALL: {
 				CORRECT: {
 					content: {
@@ -75,7 +77,9 @@ describe("Widget Ref Collection: Feedback Traversal", () => {
 	})
 
 	test("should collect widget refs from nested combo feedback", () => {
-		const feedback: { FEEDBACK__OVERALL: AuthoringFeedbackOverall<FeedbackPlan, typeof W> } = {
+		const feedback: {
+			FEEDBACK__OVERALL: AuthoringFeedbackOverall<FeedbackPlan, typeof W>
+		} = {
 			FEEDBACK__OVERALL: {
 				RESPONSE_1: {
 					CORRECT: {
@@ -91,7 +95,11 @@ describe("Widget Ref Collection: Feedback Traversal", () => {
 											type: "step",
 											title: [{ type: "text", content: "Step" }],
 											content: [
-												{ type: "widgetRef", widgetId: "widget_r1c_r2a", widgetType: "numberLine" }
+												{
+													type: "widgetRef",
+													widgetId: "widget_r1c_r2a",
+													widgetType: "numberLine"
+												}
 											]
 										}
 									]
@@ -139,7 +147,10 @@ describe("Widget Ref Collection: Feedback Traversal", () => {
 											type: "step",
 											title: [{ type: "text", content: "Step 1" }],
 											content: [
-												{ type: "paragraph", content: [{ type: "text", content: "Review." }] }
+												{
+													type: "paragraph",
+													content: [{ type: "text", content: "Review." }]
+												}
 											]
 										}
 									]
@@ -156,7 +167,10 @@ describe("Widget Ref Collection: Feedback Traversal", () => {
 											type: "step",
 											title: [{ type: "text", content: "Step 1" }],
 											content: [
-												{ type: "paragraph", content: [{ type: "text", content: "Review." }] }
+												{
+													type: "paragraph",
+													content: [{ type: "text", content: "Review." }]
+												}
 											]
 										}
 									]
@@ -185,7 +199,9 @@ describe("Widget Ref Collection: Feedback Traversal", () => {
 			{ type: "widgetRef", widgetId: "body_widget", widgetType: "numberLine" }
 		]
 
-		const feedback: { FEEDBACK__OVERALL: AuthoringFeedbackOverall<FeedbackPlan, typeof W> } = {
+		const feedback: {
+			FEEDBACK__OVERALL: AuthoringFeedbackOverall<FeedbackPlan, typeof W>
+		} = {
 			FEEDBACK__OVERALL: {
 				CORRECT: {
 					content: {
@@ -198,7 +214,11 @@ describe("Widget Ref Collection: Feedback Traversal", () => {
 								type: "step",
 								title: [{ type: "text", content: "Diagram" }],
 								content: [
-									{ type: "widgetRef", widgetId: "feedback_widget", widgetType: "coordinatePlane" }
+									{
+										type: "widgetRef",
+										widgetId: "feedback_widget",
+										widgetType: "coordinatePlane"
+									}
 								]
 							}
 						]
@@ -214,7 +234,12 @@ describe("Widget Ref Collection: Feedback Traversal", () => {
 							{
 								type: "step",
 								title: [{ type: "text", content: "Step 1" }],
-								content: [{ type: "paragraph", content: [{ type: "text", content: "Review." }] }]
+								content: [
+									{
+										type: "paragraph",
+										content: [{ type: "text", content: "Review." }]
+									}
+								]
 							}
 						]
 					}

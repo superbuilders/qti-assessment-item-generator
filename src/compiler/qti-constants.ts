@@ -14,7 +14,8 @@ export const OUTCOME_IDENTIFIER_REGEX = /^FEEDBACK__OVERALL$/
 
 // Feedback block identifier pattern: CORRECT, INCORRECT, or the new derived format 'FB__...'
 // This supports both fallback mode and the combinatorial feedback model.
-export const FEEDBACK_BLOCK_IDENTIFIER_REGEX = /^(CORRECT|INCORRECT|FB(__[A-Z0-9_]+)+)$/
+export const FEEDBACK_BLOCK_IDENTIFIER_REGEX =
+	/^(CORRECT|INCORRECT|FB(__[A-Z0-9_]+)+)$/
 
 // Choice/Gap/Item identifier pattern: uppercase alphanumeric with underscores
 // Used for choice options, gap IDs, draggable items, etc.

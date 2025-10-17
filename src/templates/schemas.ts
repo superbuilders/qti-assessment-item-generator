@@ -88,7 +88,9 @@ export const RationalValueSchema = z
 		FractionSchema,
 		MixedNumberSchema
 	])
-	.describe("Exact rational numeric value (integer, positiveInteger, fraction, mixed)")
+	.describe(
+		"Exact rational numeric value (integer, positiveInteger, fraction, mixed)"
+	)
 
 export type RationalValue = z.infer<typeof RationalValueSchema>
 

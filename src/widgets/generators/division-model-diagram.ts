@@ -1,14 +1,16 @@
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { PADDING } from "../utils/constants"
-import { CSS_COLOR_PATTERN } from "../utils/css-color"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { PADDING } from "@/widgets/utils/constants"
+import { CSS_COLOR_PATTERN } from "@/widgets/utils/css-color"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
 
 // The main Zod schema for the division model diagram.
 export const DivisionModelDiagramPropsSchema = z
 	.object({
-		type: z.literal("divisionModelDiagram").describe("Identifies this as a division model widget."),
+		type: z
+			.literal("divisionModelDiagram")
+			.describe("Identifies this as a division model widget."),
 		width: createWidthSchema(),
 		height: createHeightSchema(),
 		dividend: z
@@ -31,7 +33,9 @@ export const DivisionModelDiagramPropsSchema = z
 		"Creates a visual model for division with remainders by arranging objects into a grid. The number of full rows represents the quotient, and the items in the last, incomplete row represent the remainder."
 	)
 
-export type DivisionModelDiagramProps = z.infer<typeof DivisionModelDiagramPropsSchema>
+export type DivisionModelDiagramProps = z.infer<
+	typeof DivisionModelDiagramPropsSchema
+>
 
 /**
  * Generates an SVG diagram to model division with remainders.

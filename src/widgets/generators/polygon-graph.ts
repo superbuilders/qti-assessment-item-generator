@@ -1,23 +1,25 @@
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
 import {
 	createAxisOptionsSchema,
 	createPlotPointSchema,
 	createPolygonSchema,
 	renderPoints,
 	renderPolygons
-} from "../utils/canvas-utils"
-import { AXIS_VIEWBOX_PADDING } from "../utils/constants"
-import { setupCoordinatePlaneV2 } from "../utils/coordinate-plane-v2"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { theme } from "../utils/theme"
+} from "@/widgets/utils/canvas-utils"
+import { AXIS_VIEWBOX_PADDING } from "@/widgets/utils/constants"
+import { setupCoordinatePlaneV2 } from "@/widgets/utils/coordinate-plane-v2"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
 
 export const PolygonGraphPropsSchema = z
 	.object({
 		type: z
 			.literal("polygonGraph")
-			.describe("Identifies this as a polygon graph for drawing shapes on a coordinate plane."),
+			.describe(
+				"Identifies this as a polygon graph for drawing shapes on a coordinate plane."
+			),
 		width: createWidthSchema(),
 		height: createHeightSchema(),
 		xAxis: createAxisOptionsSchema().describe(
@@ -49,10 +51,11 @@ export const PolygonGraphPropsSchema = z
 
 export type PolygonGraphProps = z.infer<typeof PolygonGraphPropsSchema>
 
-export const generatePolygonGraph: WidgetGenerator<typeof PolygonGraphPropsSchema> = async (
-	props
-) => {
-	const { width, height, xAxis, yAxis, showQuadrantLabels, points, polygons } = props
+export const generatePolygonGraph: WidgetGenerator<
+	typeof PolygonGraphPropsSchema
+> = async (props) => {
+	const { width, height, xAxis, yAxis, showQuadrantLabels, points, polygons } =
+		props
 
 	// 1. Call the base generator and get the body content and extents object
 	const canvas = new CanvasImpl({

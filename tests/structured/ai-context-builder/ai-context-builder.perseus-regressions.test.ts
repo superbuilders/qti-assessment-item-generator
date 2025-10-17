@@ -1,15 +1,15 @@
 import { afterAll, beforeAll, describe, expect, test } from "bun:test"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import { buildPerseusEnvelope } from "../../../src/structured/ai-context-builder"
+import { buildPerseusEnvelope } from "@/structured/ai-context-builder"
 import {
 	interactiveGraphPlotting,
 	numberLineMatcher,
 	rectangularPrismVolume,
 	soupVolumeEstimation
-} from "../../fixtures/perseus-regression-items"
-import { expectSortedUrls } from "./helpers/assertions"
-import { createPrdMockFetch } from "./helpers/mock-fetch"
+} from "@/testing/fixtures/perseus-regression-items"
+import { expectSortedUrls } from "@/testing/structured/ai-context-builder/helpers/assertions"
+import { createPrdMockFetch } from "@/testing/structured/ai-context-builder/helpers/mock-fetch"
 
 describe("buildPerseusEnvelope (regressions)", () => {
 	let previousFetch: typeof fetch

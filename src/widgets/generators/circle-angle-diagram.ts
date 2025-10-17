@@ -1,12 +1,12 @@
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { PADDING } from "../utils/constants"
-import { CSS_COLOR_PATTERN } from "../utils/css-color"
-import { Path2D } from "../utils/path-builder"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { estimateWrappedTextDimensions } from "../utils/text"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { PADDING } from "@/widgets/utils/constants"
+import { CSS_COLOR_PATTERN } from "@/widgets/utils/css-color"
+import { Path2D } from "@/widgets/utils/path-builder"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { estimateWrappedTextDimensions } from "@/widgets/utils/text"
+import { theme } from "@/widgets/utils/theme"
 
 /**
  * Creates a diagram of a circle with a central angle (sector) highlighted.
@@ -32,7 +32,11 @@ export const CircleAngleDiagramPropsSchema = z
 			),
 		labels: z
 			.object({
-				center: z.string().describe("The label for the center point of the circle (e.g., 'O')."),
+				center: z
+					.string()
+					.describe(
+						"The label for the center point of the circle (e.g., 'O')."
+					),
 				point1: z
 					.string()
 					.describe(
@@ -53,7 +57,9 @@ export const CircleAngleDiagramPropsSchema = z
 	})
 	.strict()
 
-export type CircleAngleDiagramProps = z.infer<typeof CircleAngleDiagramPropsSchema>
+export type CircleAngleDiagramProps = z.infer<
+	typeof CircleAngleDiagramPropsSchema
+>
 
 /**
  * Generates an SVG diagram of a circle with a central angle.
@@ -88,8 +94,14 @@ export const generateCircleAngleDiagram: WidgetGenerator<
 	const endAngleRad = toRad(rotation + angle)
 
 	// Points on the circumference
-	const p1 = { x: cx + radius * Math.cos(startAngleRad), y: cy + radius * Math.sin(startAngleRad) }
-	const p2 = { x: cx + radius * Math.cos(endAngleRad), y: cy + radius * Math.sin(endAngleRad) }
+	const p1 = {
+		x: cx + radius * Math.cos(startAngleRad),
+		y: cy + radius * Math.sin(startAngleRad)
+	}
+	const p2 = {
+		x: cx + radius * Math.cos(endAngleRad),
+		y: cy + radius * Math.sin(endAngleRad)
+	}
 
 	// Draw shaded sector
 	const largeArcFlag: 0 | 1 = angle > 180 ? 1 : 0
@@ -121,7 +133,10 @@ export const generateCircleAngleDiagram: WidgetGenerator<
 
 	// --- Draw Labels ---
 	// Build collision segments for label placement (the two radii)
-	const screenSegments: Array<{ a: { x: number; y: number }; b: { x: number; y: number } }> = [
+	const screenSegments: Array<{
+		a: { x: number; y: number }
+		b: { x: number; y: number }
+	}> = [
 		{ a: { x: cx, y: cy }, b: { x: p1.x, y: p1.y } },
 		{ a: { x: cx, y: cy }, b: { x: p2.x, y: p2.y } }
 	]
@@ -191,7 +206,11 @@ export const generateCircleAngleDiagram: WidgetGenerator<
 	}
 
 	// Helper to position labels slightly away from their points
-	const placeLabel = (point: { x: number; y: number }, label: string, angleRad: number) => {
+	const placeLabel = (
+		point: { x: number; y: number },
+		label: string,
+		angleRad: number
+	) => {
 		const labelOffset = 20
 		const labelX = point.x + labelOffset * Math.cos(angleRad)
 		const labelY = point.y + labelOffset * Math.sin(angleRad)

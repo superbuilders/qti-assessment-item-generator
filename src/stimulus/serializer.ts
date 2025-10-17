@@ -1,7 +1,7 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import * as he from "he"
-import { VOID_ELEMENTS } from "./constants"
+import { VOID_ELEMENTS } from "@/stimulus/constants"
 
 export function serializeArticle(article: Element): string {
 	const clone = article.cloneNode(true)
@@ -55,7 +55,9 @@ function escapeAttribute(value: string): string {
 function readTextValue(node: Text, context: string): string {
 	const value = node.nodeValue
 	if (value === null) {
-		logger.error("serializeNode encountered text node without value", { context })
+		logger.error("serializeNode encountered text node without value", {
+			context
+		})
 		throw errors.new("serializeNode: text node missing value")
 	}
 	return value

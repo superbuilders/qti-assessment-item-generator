@@ -1,14 +1,14 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { PADDING } from "../utils/constants"
-import { CSS_COLOR_PATTERN } from "../utils/css-color"
-import { Path2D } from "../utils/path-builder"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { estimateWrappedTextDimensions } from "../utils/text"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { PADDING } from "@/widgets/utils/constants"
+import { CSS_COLOR_PATTERN } from "@/widgets/utils/css-color"
+import { Path2D } from "@/widgets/utils/path-builder"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { estimateWrappedTextDimensions } from "@/widgets/utils/text"
+import { theme } from "@/widgets/utils/theme"
 
 // Utility function to find intersection point of two lines
 // Line 1: from point1 to point2, Line 2: from point3 to point4
@@ -65,7 +65,9 @@ const Point = z
 		label: z
 			.string()
 			.nullable()
-			.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
+			.transform((val) =>
+				val === "null" || val === "NULL" || val === "" ? null : val
+			)
 			.describe(
 				"Text label displayed near this point. Examples: 'A', 'B', 'C', 'O' (for origin), 'P₁'. Set to null for unlabeled points. Use single letters or short identifiers for clarity."
 			),
@@ -79,7 +81,9 @@ const Point = z
 
 const AngleArc = z
 	.object({
-		type: z.literal("arc").describe("Angle visualization using a curved arc between the two rays."),
+		type: z
+			.literal("arc")
+			.describe("Angle visualization using a curved arc between the two rays."),
 		pointOnFirstRay: z
 			.string()
 			.describe(
@@ -98,13 +102,18 @@ const AngleArc = z
 		label: z
 			.string()
 			.nullable()
-			.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
+			.transform((val) =>
+				val === "null" || val === "NULL" || val === "" ? null : val
+			)
 			.describe(
 				"Text label for the angle measurement. Examples: '45°', '90°', 'θ', 'α', '∠ABC'. Set to null for unlabeled arcs. Use plain text only - no HTML or markdown."
 			),
 		color: z
 			.string()
-			.regex(CSS_COLOR_PATTERN, "invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)")
+			.regex(
+				CSS_COLOR_PATTERN,
+				"invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)"
+			)
 			.describe(
 				"CSS color value for the arc and its label. Examples: '#FF0000' (red), '#0066CC' (blue), '#00AA00' (green). Use contrasting colors for multiple angles."
 			),
@@ -121,7 +130,9 @@ const AngleRight = z
 	.object({
 		type: z
 			.literal("right")
-			.describe("Right angle (90°) visualization using a small square marker at the vertex."),
+			.describe(
+				"Right angle (90°) visualization using a small square marker at the vertex."
+			),
 		pointOnFirstRay: z
 			.string()
 			.describe(
@@ -140,13 +151,18 @@ const AngleRight = z
 		label: z
 			.string()
 			.nullable()
-			.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
+			.transform((val) =>
+				val === "null" || val === "NULL" || val === "" ? null : val
+			)
 			.describe(
 				"Text label for the right angle. Examples: '90°', '⊥', 'right angle'. Set to null to show only the square marker without text. Use plain text only."
 			),
 		color: z
 			.string()
-			.regex(CSS_COLOR_PATTERN, "invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)")
+			.regex(
+				CSS_COLOR_PATTERN,
+				"invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)"
+			)
 			.describe(
 				"CSS color value for the right angle square marker and its label. Examples: '#000000' (black), '#0066CC' (blue). Should contrast well with the background."
 			)
@@ -207,9 +223,9 @@ export type AngleDiagramProps = z.infer<typeof AngleDiagramPropsSchema>
  * Generates a flexible diagram of angles from a set of points and rays.
  * Ideal for a wide range of geometry problems.
  */
-export const generateAngleDiagram: WidgetGenerator<typeof AngleDiagramPropsSchema> = async (
-	props
-) => {
+export const generateAngleDiagram: WidgetGenerator<
+	typeof AngleDiagramPropsSchema
+> = async (props) => {
 	const { width, height, points, rays, angles } = props
 
 	// Validate that every point is connected to at least one ray
@@ -219,14 +235,18 @@ export const generateAngleDiagram: WidgetGenerator<typeof AngleDiagramPropsSchem
 		connectedPointIds.add(ray.to)
 	}
 
-	const isolatedPoints = points.filter((point) => !connectedPointIds.has(point.id))
+	const isolatedPoints = points.filter(
+		(point) => !connectedPointIds.has(point.id)
+	)
 	if (isolatedPoints.length > 0) {
 		const isolatedIds = isolatedPoints.map((p) => p.id).join(", ")
 		logger.error("angle diagram validation failed: isolated points found", {
 			isolatedPointIds: isolatedIds,
 			isolatedPointCount: isolatedPoints.length
 		})
-		throw errors.new("points not connected to any rays - incomplete line definitions")
+		throw errors.new(
+			"points not connected to any rays - incomplete line definitions"
+		)
 	}
 
 	const canvas = new CanvasImpl({
@@ -237,12 +257,18 @@ export const generateAngleDiagram: WidgetGenerator<typeof AngleDiagramPropsSchem
 	const pointMap = new Map(points.map((p) => [p.id, p]))
 
 	// Build screen-space segments for collision checks (rays only)
-	const screenSegments: Array<{ a: { x: number; y: number }; b: { x: number; y: number } }> = []
+	const screenSegments: Array<{
+		a: { x: number; y: number }
+		b: { x: number; y: number }
+	}> = []
 	for (const ray of rays) {
 		const from = pointMap.get(ray.from)
 		const to = pointMap.get(ray.to)
 		if (!from || !to) continue
-		screenSegments.push({ a: { x: from.x, y: from.y }, b: { x: to.x, y: to.y } })
+		screenSegments.push({
+			a: { x: from.x, y: from.y },
+			b: { x: to.x, y: to.y }
+		})
 	}
 
 	// Collision helpers (ported from other widgets)
@@ -345,7 +371,10 @@ export const generateAngleDiagram: WidgetGenerator<typeof AngleDiagramPropsSchem
 			const m3x = vertex.x + (u1x + u2x) * markerSize
 			const m3y = vertex.y + (u1y + u2y) * markerSize
 
-			const path = new Path2D().moveTo(m1x, m1y).lineTo(m3x, m3y).lineTo(m2x, m2y)
+			const path = new Path2D()
+				.moveTo(m1x, m1y)
+				.lineTo(m3x, m3y)
+				.lineTo(m2x, m2y)
 			canvas.drawPath(path, {
 				fill: "none",
 				stroke: angle.color,
@@ -373,7 +402,15 @@ export const generateAngleDiagram: WidgetGenerator<typeof AngleDiagramPropsSchem
 
 			const path = new Path2D()
 				.moveTo(arcStartX, arcStartY)
-				.arcTo(angle.radius, angle.radius, 0, largeArcFlag, sweepFlag, arcEndX, arcEndY)
+				.arcTo(
+					angle.radius,
+					angle.radius,
+					0,
+					largeArcFlag,
+					sweepFlag,
+					arcEndX,
+					arcEndY
+				)
 			canvas.drawPath(path, {
 				fill: "none",
 				stroke: angle.color,
@@ -395,7 +432,12 @@ export const generateAngleDiagram: WidgetGenerator<typeof AngleDiagramPropsSchem
 	}
 
 	// Prepare to place labels with collision avoidance (over rays)
-	const placedLabelRects: Array<{ x: number; y: number; width: number; height: number }> = []
+	const placedLabelRects: Array<{
+		x: number
+		y: number
+		width: number
+		height: number
+	}> = []
 
 	// Angle labels: compute smart positions and slide tangentially to avoid ray overlap
 	for (const angle of angles) {
@@ -431,13 +473,19 @@ export const generateAngleDiagram: WidgetGenerator<typeof AngleDiagramPropsSchem
 				labelRadius = baseLabelRadius
 			}
 			if (angle.label.length > 3) {
-				const extraSpacing = angle.label.length > 4 ? (angle.label.length - 4) * 4 : 0
+				const extraSpacing =
+					angle.label.length > 4 ? (angle.label.length - 4) * 4 : 0
 				labelRadius += 18 + extraSpacing
 			}
 		}
 
 		const fontPx = theme.font.size.medium
-		const dims = estimateWrappedTextDimensions(angle.label, Number.POSITIVE_INFINITY, fontPx, 1.2)
+		const dims = estimateWrappedTextDimensions(
+			angle.label,
+			Number.POSITIVE_INFINITY,
+			fontPx,
+			1.2
+		)
 		const halfW = dims.maxWidth / 2
 		const halfH = dims.height / 2
 
@@ -529,11 +577,16 @@ export const generateAngleDiagram: WidgetGenerator<typeof AngleDiagramPropsSchem
 			for (const ray of rays) {
 				if (ray.from === point.id) {
 					const toPoint = pointMap.get(ray.to)
-					if (toPoint) connectedAngles.push(Math.atan2(toPoint.y - point.y, toPoint.x - point.x))
+					if (toPoint)
+						connectedAngles.push(
+							Math.atan2(toPoint.y - point.y, toPoint.x - point.x)
+						)
 				} else if (ray.to === point.id) {
 					const fromPoint = pointMap.get(ray.from)
 					if (fromPoint)
-						connectedAngles.push(Math.atan2(fromPoint.y - point.y, fromPoint.x - point.x))
+						connectedAngles.push(
+							Math.atan2(fromPoint.y - point.y, fromPoint.x - point.x)
+						)
 				}
 			}
 
@@ -560,7 +613,12 @@ export const generateAngleDiagram: WidgetGenerator<typeof AngleDiagramPropsSchem
 
 			const baseDist = 18 // more breathing room than before
 			const fontPx = theme.font.size.large
-			const dims = estimateWrappedTextDimensions(point.label, Number.POSITIVE_INFINITY, fontPx, 1.2)
+			const dims = estimateWrappedTextDimensions(
+				point.label,
+				Number.POSITIVE_INFINITY,
+				fontPx,
+				1.2
+			)
 			const halfW = dims.maxWidth / 2
 			const halfH = dims.height / 2
 

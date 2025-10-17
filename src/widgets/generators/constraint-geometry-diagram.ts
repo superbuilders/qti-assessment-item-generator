@@ -2,12 +2,12 @@ import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { init as initZ3 } from "z3-solver"
 import { z } from "zod"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { PADDING } from "../utils/constants"
-import { CSS_COLOR_PATTERN } from "../utils/css-color"
-import { Path2D } from "../utils/path-builder"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { theme } from "../utils/theme"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { PADDING } from "@/widgets/utils/constants"
+import { CSS_COLOR_PATTERN } from "@/widgets/utils/css-color"
+import { Path2D } from "@/widgets/utils/path-builder"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
 
 // --- START: Zod Schema Definitions (Unchanged) ---
 
@@ -63,17 +63,24 @@ const LineSchema = z
 			.describe(
 				"A unique identifier for this line, which must be prefixed with 'line_' (e.g., 'line_AB', 'line_hypotenuse')."
 			),
-		from: z.string().regex(vertexIdRegex).describe("The ID of the vertex where the line begins."),
+		from: z
+			.string()
+			.regex(vertexIdRegex)
+			.describe("The ID of the vertex where the line begins."),
 		to: z
 			.string()
 			.regex(vertexIdRegex)
-			.describe("The ID of the vertex that defines the line's end point or direction."),
+			.describe(
+				"The ID of the vertex that defines the line's end point or direction."
+			),
 		isRay: z
 			.boolean()
 			.describe(
 				"If true, the line starts at 'from' and extends infinitely in the direction of 'to'. If false, it is a finite segment connecting the two vertices."
 			),
-		style: z.enum(["solid", "dashed"]).describe("The visual style of the line for rendering."),
+		style: z
+			.enum(["solid", "dashed"])
+			.describe("The visual style of the line for rendering."),
 		label: LabelSchema.describe(
 			"An optional structured label for the line, typically used to display its length."
 		)
@@ -99,8 +106,13 @@ const AngleVisualizationSchema = z
 			),
 		color: z
 			.string()
-			.regex(CSS_COLOR_PATTERN, "Invalid CSS color; use hex (#RGB, #RRGGBB, #RRGGBBAA)")
-			.describe("The CSS color for the angle marker (arc or square) and its accompanying label."),
+			.regex(
+				CSS_COLOR_PATTERN,
+				"Invalid CSS color; use hex (#RGB, #RRGGBB, #RRGGBBAA)"
+			)
+			.describe(
+				"The CSS color for the angle marker (arc or square) and its accompanying label."
+			),
 		xAxisRotation: z
 			.number()
 			.describe(
@@ -168,7 +180,9 @@ const ConstraintSchema = z
 				)
 			})
 			.strict()
-			.describe("Fixes the measure of the angle at a specific vertex formed by two lines."),
+			.describe(
+				"Fixes the measure of the angle at a specific vertex formed by two lines."
+			),
 		z
 			.object({
 				type: z.literal("equalLength"),
@@ -211,7 +225,9 @@ const ConstraintSchema = z
 				lines: z
 					.array(z.string().regex(lineIdRegex))
 					.min(2)
-					.describe("An array of two or more line IDs that must be parallel to each other.")
+					.describe(
+						"An array of two or more line IDs that must be parallel to each other."
+					)
 			})
 			.strict()
 			.describe("Forces a set of lines to be parallel."),
@@ -242,12 +258,21 @@ const ConstraintSchema = z
 						"If no axisLine is provided, specifies a global canvas axis for symmetry ('horizontal' or 'vertical')."
 					),
 				elements: z
-					.array(z.union([z.string().regex(vertexIdRegex), z.string().regex(lineIdRegex)]))
+					.array(
+						z.union([
+							z.string().regex(vertexIdRegex),
+							z.string().regex(lineIdRegex)
+						])
+					)
 					.min(2)
-					.describe("An array of vertex or line IDs to be made symmetric with respect to the axis.")
+					.describe(
+						"An array of vertex or line IDs to be made symmetric with respect to the axis."
+					)
 			})
 			.strict()
-			.describe("Defines an axial symmetry relationship between a set of geometric elements."),
+			.describe(
+				"Defines an axial symmetry relationship between a set of geometric elements."
+			),
 		z
 			.object({
 				type: z.literal("intersect"),
@@ -257,13 +282,23 @@ const ConstraintSchema = z
 					.describe(
 						"A new, unique ID for the virtual vertex that will be created at the intersection, prefixed with 'vertex_'."
 					),
-				line1: z.string().regex(lineIdRegex).describe("The ID of the first intersecting line."),
-				line2: z.string().regex(lineIdRegex).describe("The ID of the second intersecting line."),
+				line1: z
+					.string()
+					.regex(lineIdRegex)
+					.describe("The ID of the first intersecting line."),
+				line2: z
+					.string()
+					.regex(lineIdRegex)
+					.describe("The ID of the second intersecting line."),
 				label: z
 					.string()
 					.nullable()
-					.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
-					.describe("An optional display label for the new intersection vertex.")
+					.transform((val) =>
+						val === "null" || val === "NULL" || val === "" ? null : val
+					)
+					.describe(
+						"An optional display label for the new intersection vertex."
+					)
 			})
 			.strict()
 			.describe(
@@ -285,18 +320,24 @@ const ConstraintSchema = z
 				label: z
 					.string()
 					.nullable()
-					.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
+					.transform((val) =>
+						val === "null" || val === "NULL" || val === "" ? null : val
+					)
 					.describe("An optional display label for the new midpoint vertex.")
 			})
 			.strict()
-			.describe("Creates a 'virtual' vertex at the midpoint of a specified line."),
+			.describe(
+				"Creates a 'virtual' vertex at the midpoint of a specified line."
+			),
 		z
 			.object({
 				type: z.literal("presetPolygon"),
 				vertices: z
 					.array(z.string().regex(vertexIdRegex))
 					.min(3)
-					.describe("An ordered array of vertex IDs that form the vertices of the polygon."),
+					.describe(
+						"An ordered array of vertex IDs that form the vertices of the polygon."
+					),
 				isRegular: z
 					.boolean()
 					.describe(
@@ -310,7 +351,9 @@ const ConstraintSchema = z
 					),
 				closed: z
 					.boolean()
-					.describe("If true, the last vertex is connected to the first to form a closed shape.")
+					.describe(
+						"If true, the last vertex is connected to the first to form a closed shape."
+					)
 			})
 			.strict()
 			.describe(
@@ -338,13 +381,17 @@ const ShadedRegionSchema = z
 		// Opacity is not exposed; encode via alpha in fillColor (e.g., #RRGGBBAA)
 	})
 	.strict()
-	.describe("Defines a shaded polygonal area, specified by a sequence of vertices.")
+	.describe(
+		"Defines a shaded polygonal area, specified by a sequence of vertices."
+	)
 
 const RegionLabelSchema = z
 	.object({
 		text: z
 			.string()
-			.describe("The content of the label to be displayed (e.g., 'Area A', '108°', 'x')."),
+			.describe(
+				"The content of the label to be displayed (e.g., 'Area A', '108°', 'x')."
+			),
 		placement: z
 			.union([
 				z
@@ -364,7 +411,9 @@ const RegionLabelSchema = z
 						line: z
 							.string()
 							.regex(lineIdRegex)
-							.describe("The ID of the line along which the label should be placed."),
+							.describe(
+								"The ID of the line along which the label should be placed."
+							),
 						offset: z
 							.number()
 							.describe(
@@ -393,7 +442,9 @@ export const ConstraintGeometryDiagramPropsSchema = z
 	.object({
 		type: z
 			.literal("constraintGeometryDiagram")
-			.describe("Identifies this widget as a pure constraint-based geometric diagram."),
+			.describe(
+				"Identifies this widget as a pure constraint-based geometric diagram."
+			),
 		width: createWidthSchema(),
 		height: createHeightSchema(),
 		vertices: z
@@ -405,7 +456,9 @@ export const ConstraintGeometryDiagramPropsSchema = z
 		lines: z
 			.array(LineSchema)
 			.min(0)
-			.describe("An array of all lines (segments or rays) connecting the vertices."),
+			.describe(
+				"An array of all lines (segments or rays) connecting the vertices."
+			),
 		constraints: z
 			.array(ConstraintSchema)
 			.min(1)
@@ -415,11 +468,15 @@ export const ConstraintGeometryDiagramPropsSchema = z
 		shadedRegions: z
 			.array(ShadedRegionSchema)
 			.nullable()
-			.describe("An optional array of polygonal areas to be shaded with a specified color."),
+			.describe(
+				"An optional array of polygonal areas to be shaded with a specified color."
+			),
 		regionLabels: z
 			.array(RegionLabelSchema)
 			.nullable()
-			.describe("An optional array of text labels to be placed within the diagram."),
+			.describe(
+				"An optional array of text labels to be placed within the diagram."
+			),
 		layoutHint: z
 			.enum(["circle", "grid", "linear"])
 			.nullable()
@@ -450,7 +507,9 @@ type ConstraintDef = z.infer<typeof ConstraintSchema>
 async function solveWithZ3(
 	props: z.infer<typeof ConstraintGeometryDiagramPropsSchema>
 ): Promise<SolvedPositions> {
-	const initResult = await errors.try<Awaited<ReturnType<typeof initZ3>>>(initZ3())
+	const initResult = await errors.try<Awaited<ReturnType<typeof initZ3>>>(
+		initZ3()
+	)
 	if (initResult.error) {
 		logger.error("z3 init", { error: initResult.error })
 		throw errors.wrap(initResult.error, "z3 init")
@@ -460,7 +519,9 @@ async function solveWithZ3(
 	type Arith = ReturnType<typeof Z.Real.const>
 	const solver = new Z.Solver()
 
-	const allVertices = new Map<string, VertexDef>(props.vertices.map((v) => [v.id, v]))
+	const allVertices = new Map<string, VertexDef>(
+		props.vertices.map((v) => [v.id, v])
+	)
 	for (const c of props.constraints) {
 		if (c.type === "intersect" || c.type === "midpoint") {
 			allVertices.set(c.id, { id: c.id, label: c.label ?? null })
@@ -509,7 +570,10 @@ async function solveWithZ3(
 
 	// --- Constraint Translation ---
 	// Build lookup for angle constraints by id for equalAngle
-	const anglesById = new Map<string, Extract<ConstraintDef, { type: "angle" }>>()
+	const anglesById = new Map<
+		string,
+		Extract<ConstraintDef, { type: "angle" }>
+	>()
 	for (const c of expandedConstraints) {
 		if (c.type === "angle") anglesById.set(c.id, c)
 	}
@@ -650,7 +714,9 @@ async function solveWithZ3(
 				const distSqAC = vecAC.x.mul(vecAC.x).add(vecAC.y.mul(vecAC.y))
 
 				// dot^2 = |AB|^2 * |AC|^2 * cos^2(theta)
-				solver.add(dot.mul(dot).eq(distSqAB.mul(distSqAC).mul(cosTheta * cosTheta)))
+				solver.add(
+					dot.mul(dot).eq(distSqAB.mul(distSqAC).mul(cosTheta * cosTheta))
+				)
 
 				// Disambiguate angle with cross product's sign
 				const crossZ = vecAC.x.mul(vecAB.y).sub(vecAC.y.mul(vecAB.x))
@@ -713,8 +779,12 @@ async function solveWithZ3(
 					throw errors.new("solver: line missing")
 				}
 				const vA = vars.get(ref.vertex)
-				const vB = vars.get(refLine1.from === ref.vertex ? refLine1.to : refLine1.from)
-				const vC = vars.get(refLine2.from === ref.vertex ? refLine2.to : refLine2.from)
+				const vB = vars.get(
+					refLine1.from === ref.vertex ? refLine1.to : refLine1.from
+				)
+				const vC = vars.get(
+					refLine2.from === ref.vertex ? refLine2.to : refLine2.from
+				)
 				if (!vA || !vB || !vC) {
 					logger.error("solver equalAngle reference vertices missing")
 					throw errors.new("solver: vertex missing")
@@ -766,7 +836,11 @@ async function solveWithZ3(
 				if (c.value !== null && c.value !== undefined) {
 					const rad = (c.value * Math.PI) / 180
 					const cosTheta = Math.cos(rad)
-					solver.add(refDot.mul(refDot).eq(refLenSqAB.mul(refLenSqAC).mul(cosTheta * cosTheta)))
+					solver.add(
+						refDot
+							.mul(refDot)
+							.eq(refLenSqAB.mul(refLenSqAC).mul(cosTheta * cosTheta))
+					)
 				}
 				break
 			}
@@ -799,7 +873,9 @@ async function solveWithZ3(
 						solver.add(mx.eq(axisPoint.x.add(axisVec.x.mul(t))))
 						solver.add(my.eq(axisPoint.y.add(axisVec.y.mul(t))))
 						// (q - p) dot axisVec = 0
-						solver.add(q.x.sub(p.x).mul(axisVec.x).add(q.y.sub(p.y).mul(axisVec.y)).eq(0))
+						solver.add(
+							q.x.sub(p.x).mul(axisVec.x).add(q.y.sub(p.y).mul(axisVec.y)).eq(0)
+						)
 					} else {
 						// axisType: horizontal or vertical through canvas center
 						if (c.axisType === "horizontal") {
@@ -851,7 +927,8 @@ async function solveWithZ3(
 					const isLine1 = e1.startsWith("line_")
 					const isLine2 = e2.startsWith("line_")
 					if (isVertex1 && isVertex2) {
-						if (axisVec && axisPoint) applyVertexPairAcrossAxis(e1, e2, axisVec, axisPoint)
+						if (axisVec && axisPoint)
+							applyVertexPairAcrossAxis(e1, e2, axisVec, axisPoint)
 						else {
 							if (c.axisType === "horizontal") {
 								const p = vars.get(e1)
@@ -1007,7 +1084,9 @@ export const generateConstraintGeometryDiagram = async (
 
 	const solvedPositions = await solveWithZ3(props)
 
-	const allVertices = new Map<string, VertexDef>(props.vertices.map((v) => [v.id, v]))
+	const allVertices = new Map<string, VertexDef>(
+		props.vertices.map((v) => [v.id, v])
+	)
 	for (const c of props.constraints) {
 		if (c.type === "intersect" || c.type === "midpoint") {
 			allVertices.set(c.id, { id: c.id, label: c.label ?? null })
@@ -1034,7 +1113,12 @@ export const generateConstraintGeometryDiagram = async (
 		const r2 = { x: rx + rw, y: ry }
 		const r3 = { x: rx + rw, y: ry + rh }
 		const r4 = { x: rx, y: ry + rh }
-		const segmentsIntersect = (p1: Point, p2: Point, p3: Point, p4: Point): boolean => {
+		const segmentsIntersect = (
+			p1: Point,
+			p2: Point,
+			p3: Point,
+			p4: Point
+		): boolean => {
 			const o = (a: Point, b: Point, c: Point) => {
 				const val = (b.y - a.y) * (c.x - b.x) - (b.x - a.x) * (c.y - b.y)
 				if (val > 1e-9) return 1
@@ -1141,7 +1225,10 @@ export const generateConstraintGeometryDiagram = async (
 			const m2y = vertexPos.y + u2y * size
 			const m3x = vertexPos.x + (u1x + u2x) * size
 			const m3y = vertexPos.y + (u1y + u2y) * size
-			const path = new Path2D().moveTo(m1x, m1y).lineTo(m3x, m3y).lineTo(m2x, m2y)
+			const path = new Path2D()
+				.moveTo(m1x, m1y)
+				.lineTo(m3x, m3y)
+				.lineTo(m2x, m2y)
 			canvas.drawPath(path, {
 				fill: "none",
 				stroke: viz.color,
@@ -1159,7 +1246,15 @@ export const generateConstraintGeometryDiagram = async (
 			const arcEndY = vertexPos.y + radius * Math.sin(endAngle)
 			const path = new Path2D()
 				.moveTo(arcStartX, arcStartY)
-				.arcTo(radius, radius, 0, viz.largeArcFlag, viz.sweepFlag, arcEndX, arcEndY)
+				.arcTo(
+					radius,
+					radius,
+					0,
+					viz.largeArcFlag,
+					viz.sweepFlag,
+					arcEndX,
+					arcEndY
+				)
 			canvas.drawPath(path, {
 				fill: "none",
 				stroke: viz.color,
@@ -1174,7 +1269,8 @@ export const generateConstraintGeometryDiagram = async (
 			while (angleDiff > Math.PI) angleDiff -= 2 * Math.PI
 			while (angleDiff < -Math.PI) angleDiff += 2 * Math.PI
 			if (Math.abs(angleDiff) > Math.PI)
-				angleDiff = angleDiff > 0 ? angleDiff - 2 * Math.PI : angleDiff + 2 * Math.PI
+				angleDiff =
+					angleDiff > 0 ? angleDiff - 2 * Math.PI : angleDiff + 2 * Math.PI
 			const angleSize = Math.abs(angleDiff)
 			const midAngle = startAngle + angleDiff / 2
 			let labelRadius: number
@@ -1184,7 +1280,8 @@ export const generateConstraintGeometryDiagram = async (
 				const ARC_OFFSET = 6
 				const FONT_SIZE_ESTIMATE = 14
 				const MIN_LABEL_CLEARANCE = FONT_SIZE_ESTIMATE * 1.5
-				const baseLabelRadius = (viz.radius ?? 25) + ARC_OFFSET + MIN_LABEL_CLEARANCE
+				const baseLabelRadius =
+					(viz.radius ?? 25) + ARC_OFFSET + MIN_LABEL_CLEARANCE
 				const CLEARANCE_PX = FONT_SIZE_ESTIMATE * 0.7
 				if (Math.sin(angleSize / 2) > 0.01) {
 					const minRadiusForClearance = CLEARANCE_PX / Math.sin(angleSize / 2)
@@ -1194,7 +1291,8 @@ export const generateConstraintGeometryDiagram = async (
 				}
 				const isLongLabel = viz.label ? viz.label.length > 3 : false
 				if (isLongLabel) {
-					const extraSpacing = viz.label && viz.label.length > 4 ? (viz.label.length - 4) * 4 : 0
+					const extraSpacing =
+						viz.label && viz.label.length > 4 ? (viz.label.length - 4) * 4 : 0
 					labelRadius += 18 + extraSpacing
 				}
 			}
@@ -1238,7 +1336,8 @@ export const generateConstraintGeometryDiagram = async (
 					const a1 = angles[i]
 					const a2 = angles[(i + 1) % angles.length]
 					const firstAngle = angles[0]
-					if (a1 === undefined || a2 === undefined || firstAngle === undefined) continue
+					if (a1 === undefined || a2 === undefined || firstAngle === undefined)
+						continue
 					let gap = a2 - a1
 					if (gap < 0) gap += 2 * Math.PI
 					if (i === angles.length - 1) gap = firstAngle + 2 * Math.PI - a1

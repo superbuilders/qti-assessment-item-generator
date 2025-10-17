@@ -1,13 +1,13 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { AXIS_VIEWBOX_PADDING } from "../utils/constants"
-import { setupCoordinatePlaneBaseV2 } from "../utils/coordinate-plane-utils"
-import { CSS_COLOR_PATTERN } from "../utils/css-color"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { AXIS_VIEWBOX_PADDING } from "@/widgets/utils/constants"
+import { setupCoordinatePlaneBaseV2 } from "@/widgets/utils/coordinate-plane-utils"
+import { CSS_COLOR_PATTERN } from "@/widgets/utils/css-color"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
 
 function createAxisOptionsSchema() {
 	return z
@@ -17,7 +17,9 @@ function createAxisOptionsSchema() {
 			max: z.number(),
 			tickInterval: z.number().positive(),
 			showGridLines: z.boolean(),
-			showTickLabels: z.boolean().describe("Whether to show tick labels on the axis.")
+			showTickLabels: z
+				.boolean()
+				.describe("Whether to show tick labels on the axis.")
 		})
 		.strict()
 }
@@ -33,19 +35,29 @@ export const ParabolaGraphPropsSchema = z
 			.object({
 				vertex: z
 					.object({
-						x: z.number().positive().describe("x-coordinate of the vertex (must be > 0)"),
-						y: z.number().positive().describe("y-coordinate of the vertex (must be > 0)")
+						x: z
+							.number()
+							.positive()
+							.describe("x-coordinate of the vertex (must be > 0)"),
+						y: z
+							.number()
+							.positive()
+							.describe("y-coordinate of the vertex (must be > 0)")
 					})
 					.strict(),
 				yIntercept: z
 					.number()
 					.positive()
-					.describe("Positive y-intercept at x = 0 (must be > 0 and less than vertex.y)."),
+					.describe(
+						"Positive y-intercept at x = 0 (must be > 0 and less than vertex.y)."
+					),
 				color: z
 					.string()
 					.regex(CSS_COLOR_PATTERN, "invalid css color")
 					.describe("The color of the parabola curve."),
-				style: z.enum(["solid", "dashed"]).describe("The line style of the parabola curve.")
+				style: z
+					.enum(["solid", "dashed"])
+					.describe("The line style of the parabola curve.")
 			})
 			.strict()
 	})
@@ -56,9 +68,9 @@ export const ParabolaGraphPropsSchema = z
 
 export type ParabolaGraphProps = z.infer<typeof ParabolaGraphPropsSchema>
 
-export const generateParabolaGraph: WidgetGenerator<typeof ParabolaGraphPropsSchema> = async (
-	props
-) => {
+export const generateParabolaGraph: WidgetGenerator<
+	typeof ParabolaGraphPropsSchema
+> = async (props) => {
 	const { width, height, xAxis, yAxis, parabola } = props
 
 	// Vertex-form parabola: y = a (x - h)^2 + k

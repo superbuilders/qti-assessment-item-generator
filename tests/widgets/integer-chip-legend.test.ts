@@ -1,9 +1,9 @@
 import { describe, expect, test } from "bun:test"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import { integerChipLegendExamples } from "../../examples/integer-chip-legend"
-import type { WidgetInput } from "../../src/widgets/registry"
-import { generateWidgetForTest } from "../helpers/generateWidgetForTest"
+import { integerChipLegendExamples } from "@/examples/integer-chip-legend"
+import { generateWidgetForTest } from "@/testing/helpers/generateWidgetForTest"
+import type { WidgetInput } from "@/widgets/registry"
 
 describe("Widget: integer-chip-legend", () => {
 	const examples: WidgetInput[] = integerChipLegendExamples

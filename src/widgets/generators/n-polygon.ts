@@ -1,9 +1,9 @@
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { PADDING } from "../utils/constants"
-import { CSS_COLOR_PATTERN } from "../utils/css-color"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { PADDING } from "@/widgets/utils/constants"
+import { CSS_COLOR_PATTERN } from "@/widgets/utils/css-color"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
 
 export const NPolygonPropsSchema = z
 	.object({
@@ -34,7 +34,10 @@ export const NPolygonPropsSchema = z
 						),
 					fillColor: z
 						.string()
-						.regex(CSS_COLOR_PATTERN, "invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)")
+						.regex(
+							CSS_COLOR_PATTERN,
+							"invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)"
+						)
 						.describe("The hex-only fill color for this polygon.")
 				})
 			)
@@ -50,7 +53,9 @@ export const NPolygonPropsSchema = z
 
 export type NPolygonProps = z.infer<typeof NPolygonPropsSchema>
 
-export const generateNPolygon: WidgetGenerator<typeof NPolygonPropsSchema> = async (props) => {
+export const generateNPolygon: WidgetGenerator<
+	typeof NPolygonPropsSchema
+> = async (props) => {
 	const { width, height, polygons } = props
 
 	const canvas = new CanvasImpl({
@@ -165,7 +170,8 @@ export const generateNPolygon: WidgetGenerator<typeof NPolygonPropsSchema> = asy
 				const roofHeight = Math.min(availableHeight * 0.35, baseWidth * 0.35)
 				const leftX = cx - baseWidth / 2
 				const rightX = cx + baseWidth / 2
-				const bottomY = cy + Math.max(0, (availableHeight - (wallHeight + roofHeight)) / 2)
+				const bottomY =
+					cy + Math.max(0, (availableHeight - (wallHeight + roofHeight)) / 2)
 				const topWallY = bottomY - wallHeight
 				const roofApexY = topWallY - roofHeight
 				const apexX = cx
@@ -181,7 +187,8 @@ export const generateNPolygon: WidgetGenerator<typeof NPolygonPropsSchema> = asy
 			default: {
 				if (isRegularShape(shape)) {
 					const numSides = regularSides[shape]
-					const angleOffset = shape === "regularSquare" ? Math.PI / 4 : -Math.PI / 2
+					const angleOffset =
+						shape === "regularSquare" ? Math.PI / 4 : -Math.PI / 2
 					for (let i = 0; i < numSides; i++) {
 						const angle = (i / numSides) * 2 * Math.PI + angleOffset
 						points.push({
@@ -205,7 +212,14 @@ export const generateNPolygon: WidgetGenerator<typeof NPolygonPropsSchema> = asy
 		const poly = polygons[index]
 		if (!poly) continue
 		const tileLeft = index * (tileWidth + INTERNAL_SPACING)
-		drawSinglePolygon(tileLeft, 0, tileWidth, tileHeight, poly.shape, poly.fillColor)
+		drawSinglePolygon(
+			tileLeft,
+			0,
+			tileWidth,
+			tileHeight,
+			poly.shape,
+			poly.fillColor
+		)
 	}
 
 	const {

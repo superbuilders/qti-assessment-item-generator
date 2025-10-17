@@ -7,8 +7,8 @@
 import { z } from "zod"
 import type { FeedbackContent } from "@/core/content"
 import type { AssessmentItemInput } from "@/core/item"
-import { FractionSchema } from "../schemas"
-import type { TemplateModule } from "../types"
+import { FractionSchema } from "@/templates/schemas"
+import type { TemplateModule } from "@/templates/types"
 
 // Define the exact widget tuple used by this template
 // The template includes a 'partitionedShape' widget in the widgets map below
@@ -70,8 +70,12 @@ export function generateFractionAdditionQuestion(
 
 	const addFractions = (f1: Fraction, f2: Fraction): Fraction => {
 		const commonDenominator = f1.denominator * f2.denominator
-		const newNumerator = f1.numerator * f2.denominator + f2.numerator * f1.denominator
-		return simplifyFraction({ numerator: newNumerator, denominator: commonDenominator })
+		const newNumerator =
+			f1.numerator * f2.denominator + f2.numerator * f1.denominator
+		return simplifyFraction({
+			numerator: newNumerator,
+			denominator: commonDenominator
+		})
 	}
 
 	const formatFractionMathML = (frac: Fraction): string => {
@@ -100,7 +104,11 @@ export function generateFractionAdditionQuestion(
 	// Each distractor is tagged with its error type for targeted feedback.
 	const distractors: {
 		fraction: Fraction
-		type: "ADD_ACROSS" | "ADD_NUM_KEEP_DEN" | "MULTIPLY_DENOMINATORS_ONLY" | "FORGOT_TO_SIMPLIFY"
+		type:
+			| "ADD_ACROSS"
+			| "ADD_NUM_KEEP_DEN"
+			| "MULTIPLY_DENOMINATORS_ONLY"
+			| "FORGOT_TO_SIMPLIFY"
 	}[] = [
 		{
 			// Most common error: Adding numerators and denominators directly
@@ -129,7 +137,8 @@ export function generateFractionAdditionQuestion(
 		{
 			// Show unsimplified correct answer if it's different from simplified
 			fraction: {
-				numerator: f1.numerator * f2.denominator + f2.numerator * f1.denominator,
+				numerator:
+					f1.numerator * f2.denominator + f2.numerator * f1.denominator,
 				denominator: f1.denominator * f2.denominator
 			},
 			type: "FORGOT_TO_SIMPLIFY"
@@ -188,7 +197,8 @@ export function generateFractionAdditionQuestion(
 				content: [
 					{
 						type: "text",
-						content: "What is the sum of the fractions below? Give your answer in simplest form."
+						content:
+							"What is the sum of the fractions below? Give your answer in simplest form."
 					}
 				]
 			},
@@ -217,7 +227,10 @@ export function generateFractionAdditionQuestion(
 					{
 						type: "rectangle",
 						totalParts: correctAnswer.denominator,
-						shadedCells: Array.from({ length: correctAnswer.numerator }, (_, i) => i),
+						shadedCells: Array.from(
+							{ length: correctAnswer.numerator },
+							(_, i) => i
+						),
 						hatchedCells: [],
 						rows: 1,
 						columns: correctAnswer.denominator,
@@ -242,7 +255,12 @@ export function generateFractionAdditionQuestion(
 						content: [
 							{
 								type: "paragraph" as const,
-								content: [{ type: "math" as const, mathml: formatFractionMathML(choice.fraction) }]
+								content: [
+									{
+										type: "math" as const,
+										mathml: formatFractionMathML(choice.fraction)
+									}
+								]
 							}
 						]
 						// REMOVED: The `feedback` field is no longer supported on choices.
@@ -294,14 +312,17 @@ export function generateFractionAdditionQuestion(
 										summary: [
 											{
 												type: "text",
-												content: "You correctly added the fractions and simplified the result."
+												content:
+													"You correctly added the fractions and simplified the result."
 											}
 										]
 									},
 									steps: [
 										{
 											type: "step",
-											title: [{ type: "text", content: "Find Common Denominator" }],
+											title: [
+												{ type: "text", content: "Find Common Denominator" }
+											],
 											content: [
 												{
 													type: "paragraph",
@@ -349,7 +370,10 @@ export function generateFractionAdditionQuestion(
 															mathml: `<mfrac><mn>${sumNumerator}</mn><mn>${commonDenom}</mn></mfrac>`
 														},
 														{ type: "text", content: " = " },
-														{ type: "math", mathml: formatFractionMathML(correctAnswer) }
+														{
+															type: "math",
+															mathml: formatFractionMathML(correctAnswer)
+														}
 													]
 												}
 											]
@@ -394,7 +418,10 @@ export function generateFractionAdditionQuestion(
 												{
 													type: "paragraph",
 													content: [
-														{ type: "text", content: "Find common denominator: " },
+														{
+															type: "text",
+															content: "Find common denominator: "
+														},
 														{
 															type: "math",
 															mathml: `<mn>${f1.denominator}</mn><mo>×</mo><mn>${f2.denominator}</mn><mo>=</mo><mn>${commonDenom}</mn>`
@@ -432,7 +459,9 @@ export function generateFractionAdditionQuestion(
 									steps: [
 										{
 											type: "step",
-											title: [{ type: "text", content: "Identify the Mistake" }],
+											title: [
+												{ type: "text", content: "Identify the Mistake" }
+											],
 											content: [
 												{
 													type: "paragraph",
@@ -448,12 +477,17 @@ export function generateFractionAdditionQuestion(
 										},
 										{
 											type: "step",
-											title: [{ type: "text", content: "Apply Correct Method" }],
+											title: [
+												{ type: "text", content: "Apply Correct Method" }
+											],
 											content: [
 												{
 													type: "paragraph",
 													content: [
-														{ type: "text", content: "Convert both to common denominator " },
+														{
+															type: "text",
+															content: "Convert both to common denominator "
+														},
 														{ type: "math", mathml: `<mn>${commonDenom}</mn>` },
 														{ type: "text", content: ", then add: " },
 														{
@@ -483,7 +517,12 @@ export function generateFractionAdditionQuestion(
 									steps: [
 										{
 											type: "step",
-											title: [{ type: "text", content: "Understanding Equivalent Fractions" }],
+											title: [
+												{
+													type: "text",
+													content: "Understanding Equivalent Fractions"
+												}
+											],
 											content: [
 												{
 													type: "paragraph",
@@ -504,7 +543,9 @@ export function generateFractionAdditionQuestion(
 										},
 										{
 											type: "step",
-											title: [{ type: "text", content: "Complete the Calculation" }],
+											title: [
+												{ type: "text", content: "Complete the Calculation" }
+											],
 											content: [
 												{
 													type: "paragraph",
@@ -514,7 +555,10 @@ export function generateFractionAdditionQuestion(
 															mathml: `<mfrac><mn>${num1Expanded}</mn><mn>${commonDenom}</mn></mfrac><mo>+</mo><mfrac><mn>${num2Expanded}</mn><mn>${commonDenom}</mn></mfrac><mo>=</mo><mfrac><mn>${sumNumerator}</mn><mn>${commonDenom}</mn></mfrac>`
 														},
 														{ type: "text", content: " = " },
-														{ type: "math", mathml: formatFractionMathML(correctAnswer) }
+														{
+															type: "math",
+															mathml: formatFractionMathML(correctAnswer)
+														}
 													]
 												}
 											]
@@ -544,9 +588,15 @@ export function generateFractionAdditionQuestion(
 													type: "paragraph",
 													content: [
 														{ type: "text", content: "Your answer " },
-														{ type: "math", mathml: formatFractionMathML(choice.fraction) },
+														{
+															type: "math",
+															mathml: formatFractionMathML(choice.fraction)
+														},
 														{ type: "text", content: " equals " },
-														{ type: "math", mathml: formatFractionMathML(correctAnswer) },
+														{
+															type: "math",
+															mathml: formatFractionMathML(correctAnswer)
+														},
 														{ type: "text", content: " when simplified." }
 													]
 												}
@@ -575,7 +625,9 @@ export function generateFractionAdditionQuestion(
 								feedbackContent = {
 									preamble: {
 										correctness: "incorrect",
-										summary: [{ type: "text", content: "Your answer is incorrect." }]
+										summary: [
+											{ type: "text", content: "Your answer is incorrect." }
+										]
 									},
 									steps: [
 										{
@@ -585,7 +637,10 @@ export function generateFractionAdditionQuestion(
 												{
 													type: "paragraph",
 													content: [
-														{ type: "text", content: "Find common denominator: " },
+														{
+															type: "text",
+															content: "Find common denominator: "
+														},
 														{ type: "math", mathml: `<mn>${commonDenom}</mn>` }
 													]
 												}
@@ -603,7 +658,10 @@ export function generateFractionAdditionQuestion(
 															mathml: `<mfrac><mn>${num1Expanded}</mn><mn>${commonDenom}</mn></mfrac><mo>+</mo><mfrac><mn>${num2Expanded}</mn><mn>${commonDenom}</mn></mfrac><mo>=</mo><mfrac><mn>${sumNumerator}</mn><mn>${commonDenom}</mn></mfrac>`
 														},
 														{ type: "text", content: " = " },
-														{ type: "math", mathml: formatFractionMathML(correctAnswer) }
+														{
+															type: "math",
+															mathml: formatFractionMathML(correctAnswer)
+														}
 													]
 												}
 											]
@@ -634,7 +692,8 @@ const templateModule: TemplateModule<typeof PropsSchema, TemplateWidgets> = {
 	templateId,
 	version,
 	propsSchema: PropsSchema,
-	generate: (props: z.input<typeof PropsSchema>) => generateFractionAdditionQuestion(props)
+	generate: (props: z.input<typeof PropsSchema>) =>
+		generateFractionAdditionQuestion(props)
 }
 
 export default templateModule

@@ -1,14 +1,14 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { PADDING } from "../utils/constants"
-import { CSS_COLOR_PATTERN } from "../utils/css-color"
-import { Path2D } from "../utils/path-builder"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { estimateWrappedTextDimensions } from "../utils/text"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { PADDING } from "@/widgets/utils/constants"
+import { CSS_COLOR_PATTERN } from "@/widgets/utils/css-color"
+import { Path2D } from "@/widgets/utils/path-builder"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { estimateWrappedTextDimensions } from "@/widgets/utils/text"
+import { theme } from "@/widgets/utils/theme"
 
 // Defines a line segment, such as a radius, innerRadius, or a diameter.
 const SegmentSchema = z
@@ -21,13 +21,18 @@ const SegmentSchema = z
 		label: z
 			.string()
 			.nullable()
-			.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
+			.transform((val) =>
+				val === "null" || val === "NULL" || val === "" ? null : val
+			)
 			.describe(
 				"Text label for the segment measurement. Examples: 'r', 'd', '5 cm', 'radius = 3', '10 units'. Set to null for unlabeled segments. Label appears along the segment line."
 			),
 		color: z
 			.string()
-			.regex(CSS_COLOR_PATTERN, "invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)")
+			.regex(
+				CSS_COLOR_PATTERN,
+				"invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)"
+			)
 			.describe(
 				"CSS color value for the segment line. Examples: '#FF0000' (red), '#000000' (black), '#0066CC' (blue). Choose colors that contrast well with the circle fill and background."
 			),
@@ -57,14 +62,19 @@ const SectorSchema = z
 			),
 		fillColor: z
 			.string()
-			.regex(CSS_COLOR_PATTERN, "invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)")
+			.regex(
+				CSS_COLOR_PATTERN,
+				"invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)"
+			)
 			.describe(
 				"CSS fill color for the pie slice sector. Examples: '#FFE5B4' (light orange), '#87CEEB' (sky blue), '#FF69B4' (hot pink). Use alpha channel for transparency effects."
 			),
 		label: z
 			.string()
 			.nullable()
-			.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
+			.transform((val) =>
+				val === "null" || val === "NULL" || val === "" ? null : val
+			)
 			.describe(
 				"Text label for the sector content. Examples: '90°', '¼', '25%', 'Section A', '30°'. Set to null for unlabeled sectors. Label appears inside the sector area."
 			),
@@ -75,7 +85,9 @@ const SectorSchema = z
 			)
 	})
 	.strict()
-	.describe("Sector (pie slice) definition for filling and labeling portions of the circle.")
+	.describe(
+		"Sector (pie slice) definition for filling and labeling portions of the circle."
+	)
 
 // Defines an arc (a portion of the circle's circumference).
 const ArcSchema = z
@@ -92,27 +104,36 @@ const ArcSchema = z
 			),
 		strokeColor: z
 			.string()
-			.regex(CSS_COLOR_PATTERN, "invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)")
+			.regex(
+				CSS_COLOR_PATTERN,
+				"invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)"
+			)
 			.describe(
 				"CSS color for the arc line stroke. Examples: '#FF6B6B' (coral), '#4169E1' (royal blue), '#32CD32' (lime green). Use bold colors for visibility against circle background."
 			),
 		label: z
 			.string()
 			.nullable()
-			.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
+			.transform((val) =>
+				val === "null" || val === "NULL" || val === "" ? null : val
+			)
 			.describe(
 				"Text label for arc measurement or identification. Examples: '90°', '2πr/4', 's = 5.2 cm', 'Arc AB'. Set to null for unlabeled arcs. Positioned along the arc curve."
 			)
 	})
 	.strict()
-	.describe("Arc definition for highlighting specific portions of the circle's circumference.")
+	.describe(
+		"Arc definition for highlighting specific portions of the circle's circumference."
+	)
 
 // The main Zod schema for the circleDiagram function
 export const CircleDiagramPropsSchema = z
 	.object({
 		type: z
 			.literal("circleDiagram")
-			.describe("Widget type identifier for circle-based geometric diagrams and visualizations."),
+			.describe(
+				"Widget type identifier for circle-based geometric diagrams and visualizations."
+			),
 		shape: z
 			.enum(["circle", "semicircle", "quarter-circle"])
 			.describe(
@@ -133,13 +154,19 @@ export const CircleDiagramPropsSchema = z
 			),
 		fillColor: z
 			.string()
-			.regex(CSS_COLOR_PATTERN, "invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)")
+			.regex(
+				CSS_COLOR_PATTERN,
+				"invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)"
+			)
 			.describe(
 				"CSS fill color for the main circle interior. Examples: '#E8F4FD' (light blue), '#FFFFFF' (white), 'transparent' (outline only). Use alpha channel for semi-transparent effects."
 			),
 		strokeColor: z
 			.string()
-			.regex(CSS_COLOR_PATTERN, "invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)")
+			.regex(
+				CSS_COLOR_PATTERN,
+				"invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)"
+			)
 			.describe(
 				"CSS color for the circle's border outline. Examples: '#000000' (black), '#666666' (gray), '#0066CC' (blue). Use 'transparent' to hide the border."
 			),
@@ -179,7 +206,9 @@ export const CircleDiagramPropsSchema = z
 		areaLabel: z
 			.string()
 			.nullable()
-			.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
+			.transform((val) =>
+				val === "null" || val === "NULL" || val === "" ? null : val
+			)
 			.describe(
 				"Text label for the circle's area, displayed at the center. Examples: 'A = πr²', 'Area = 78.5 cm²', '314 sq units', 'π × 5² = 25π'. Set to null for no area label."
 			)
@@ -194,9 +223,9 @@ export type CircleDiagramProps = z.infer<typeof CircleDiagramPropsSchema>
 /**
  * Generates an SVG diagram of a circle and its components.
  */
-export const generateCircleDiagram: WidgetGenerator<typeof CircleDiagramPropsSchema> = async (
-	props
-) => {
+export const generateCircleDiagram: WidgetGenerator<
+	typeof CircleDiagramPropsSchema
+> = async (props) => {
 	const {
 		shape,
 		rotation,
@@ -224,7 +253,8 @@ export const generateCircleDiagram: WidgetGenerator<typeof CircleDiagramPropsSch
 		x: cx + r * Math.cos(toRad(angleDeg)),
 		y: cy + r * Math.sin(toRad(angleDeg)) // +y is down in SVG
 	})
-	const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(value, max))
+	const clamp = (value: number, min: number, max: number) =>
+		Math.max(min, Math.min(value, max))
 
 	const canvas = new CanvasImpl({
 		chartArea: { left: 0, top: 0, width, height },
@@ -235,8 +265,16 @@ export const generateCircleDiagram: WidgetGenerator<typeof CircleDiagramPropsSch
 	const rInnerOpt = innerRadius ? innerRadius * scale : null
 
 	// Collision detection utilities
-	const avoidSegments: Array<{ a: { x: number; y: number }; b: { x: number; y: number } }> = []
-	const placedLabels: Array<{ x: number; y: number; width: number; height: number }> = []
+	const avoidSegments: Array<{
+		a: { x: number; y: number }
+		b: { x: number; y: number }
+	}> = []
+	const placedLabels: Array<{
+		x: number
+		y: number
+		width: number
+		height: number
+	}> = []
 
 	function orient(
 		p: { x: number; y: number },
@@ -300,13 +338,23 @@ export const generateCircleDiagram: WidgetGenerator<typeof CircleDiagramPropsSch
 		)
 	}
 
-	function withinBounds(rect: { x: number; y: number; width: number; height: number }) {
+	function withinBounds(rect: {
+		x: number
+		y: number
+		width: number
+		height: number
+	}) {
 		const pad = 2
 		const lft = rect.x - pad
 		const rgt = rect.x + rect.width + pad
 		const top = rect.y - pad
 		const bot = rect.y + rect.height + pad
-		return lft >= PADDING && rgt <= width - PADDING && top >= PADDING && bot <= height - PADDING
+		return (
+			lft >= PADDING &&
+			rgt <= width - PADDING &&
+			top >= PADDING &&
+			bot <= height - PADDING
+		)
 	}
 
 	function rectIntersectsAnySegment(rect: {
@@ -426,8 +474,10 @@ export const generateCircleDiagram: WidgetGenerator<typeof CircleDiagramPropsSch
 
 			while (currentDistance <= maxDistance) {
 				// Position along the normal at current distance
-				const testX = centerX + (radius + currentDistance * dirMultiplier) * normalX
-				const testY = centerY + (radius + currentDistance * dirMultiplier) * normalY
+				const testX =
+					centerX + (radius + currentDistance * dirMultiplier) * normalX
+				const testY =
+					centerY + (radius + currentDistance * dirMultiplier) * normalY
 
 				const testRect = {
 					x: testX - halfW,
@@ -482,7 +532,11 @@ export const generateCircleDiagram: WidgetGenerator<typeof CircleDiagramPropsSch
 		const startY = baseY + radialNudge * dirY
 
 		// Try both tangential directions
-		function tryTangential(multiplier: number): { x: number; y: number; iterations: number } {
+		function tryTangential(multiplier: number): {
+			x: number
+			y: number
+			iterations: number
+		} {
 			let px = startX
 			let py = startY
 			let iterations = 0
@@ -518,7 +572,10 @@ export const generateCircleDiagram: WidgetGenerator<typeof CircleDiagramPropsSch
 		const counterclockwise = tryTangential(-1)
 
 		// Choose the direction that required fewer iterations (found a good spot faster)
-		const chosen = counterclockwise.iterations < clockwise.iterations ? counterclockwise : clockwise
+		const chosen =
+			counterclockwise.iterations < clockwise.iterations
+				? counterclockwise
+				: clockwise
 
 		// Only return if we found a valid position (not at max iterations)
 		if (chosen.iterations < 60) {
@@ -565,9 +622,15 @@ export const generateCircleDiagram: WidgetGenerator<typeof CircleDiagramPropsSch
 			if (sector.showRightAngleMarker && Math.abs(angleDiff - 90) < 0.1) {
 				const markerSize = Math.min(r, 20) * 0.8
 				const p1 = pointOnCircle(sector.startAngle, markerSize)
-				const p3 = pointOnCircle(sector.startAngle + 45, markerSize * Math.sqrt(2))
+				const p3 = pointOnCircle(
+					sector.startAngle + 45,
+					markerSize * Math.sqrt(2)
+				)
 				const p2 = pointOnCircle(sector.endAngle, markerSize)
-				const markerPath = new Path2D().moveTo(p1.x, p1.y).lineTo(p3.x, p3.y).lineTo(p2.x, p2.y)
+				const markerPath = new Path2D()
+					.moveTo(p1.x, p1.y)
+					.lineTo(p3.x, p3.y)
+					.lineTo(p2.x, p2.y)
 				canvas.drawPath(markerPath, {
 					fill: "none",
 					stroke: theme.colors.black,
@@ -686,7 +749,8 @@ export const generateCircleDiagram: WidgetGenerator<typeof CircleDiagramPropsSch
 		for (const arc of arcs) {
 			const start = pointOnCircle(arc.startAngle, r)
 			const end = pointOnCircle(arc.endAngle, r)
-			const largeArcFlag: 0 | 1 = Math.abs(arc.endAngle - arc.startAngle) > 180 ? 1 : 0
+			const largeArcFlag: 0 | 1 =
+				Math.abs(arc.endAngle - arc.startAngle) > 180 ? 1 : 0
 			const arcPath = new Path2D()
 				.moveTo(start.x, start.y)
 				.arcTo(r, r, 0, largeArcFlag, 1, end.x, end.y)
@@ -713,12 +777,13 @@ export const generateCircleDiagram: WidgetGenerator<typeof CircleDiagramPropsSch
 				const midAngleRad = (midAngle * Math.PI) / 180
 
 				// Estimate label dimensions
-				const { maxWidth: labelWidth, height: labelHeight } = estimateWrappedTextDimensions(
-					arc.label,
-					Number.POSITIVE_INFINITY,
-					theme.font.size.medium,
-					1.2
-				)
+				const { maxWidth: labelWidth, height: labelHeight } =
+					estimateWrappedTextDimensions(
+						arc.label,
+						Number.POSITIVE_INFINITY,
+						theme.font.size.medium,
+						1.2
+					)
 
 				// Try normal-based positioning first (best for avoiding line intersections)
 				const normalPos = findNormalBasedLabelPosition(
@@ -747,7 +812,12 @@ export const generateCircleDiagram: WidgetGenerator<typeof CircleDiagramPropsSch
 				// If both failed, try radial positioning as last resort
 				if (!finalPos) {
 					const labelPos = pointOnCircle(midAngle, r + PADDING)
-					finalPos = findSafeLabelPosition(labelPos.x, labelPos.y, labelWidth, labelHeight)
+					finalPos = findSafeLabelPosition(
+						labelPos.x,
+						labelPos.y,
+						labelWidth,
+						labelHeight
+					)
 				}
 
 				if (finalPos) {
@@ -815,7 +885,8 @@ export const generateCircleDiagram: WidgetGenerator<typeof CircleDiagramPropsSch
 				seg.type === "diameter" ? seg.angle + 180 : seg.angle,
 				seg.type === "diameter" ? r : 0
 			)
-			const targetRadius = seg.type === "innerRadius" && rInnerOpt !== null ? rInnerOpt : r
+			const targetRadius =
+				seg.type === "innerRadius" && rInnerOpt !== null ? rInnerOpt : r
 			const lineEnd = pointOnCircle(seg.angle, targetRadius)
 
 			// Correction for radius start point: pointOnCircle with r=0 correctly returns the center (cx,cy)
@@ -845,7 +916,8 @@ export const generateCircleDiagram: WidgetGenerator<typeof CircleDiagramPropsSch
 
 				const mid = pointOnCircle(seg.angle, labelAnchorRadius)
 				const angleRad = toRad(seg.angle)
-				const verticalOffsetMultiplier = seg.angle > 270 && seg.angle < 360 ? -1 : 1
+				const verticalOffsetMultiplier =
+					seg.angle > 270 && seg.angle < 360 ? -1 : 1
 				const offsetX = -Math.sin(angleRad) * 10
 				const offsetY = Math.cos(angleRad) * 10 * verticalOffsetMultiplier
 				const idealX = mid.x + offsetX
@@ -867,15 +939,21 @@ export const generateCircleDiagram: WidgetGenerator<typeof CircleDiagramPropsSch
 				}
 
 				// Estimate label dimensions
-				const { maxWidth: labelWidth, height: labelHeight } = estimateWrappedTextDimensions(
-					seg.label,
-					Number.POSITIVE_INFINITY,
-					theme.font.size.base,
-					1.2
-				)
+				const { maxWidth: labelWidth, height: labelHeight } =
+					estimateWrappedTextDimensions(
+						seg.label,
+						Number.POSITIVE_INFINITY,
+						theme.font.size.base,
+						1.2
+					)
 
 				// Find safe position using collision detection
-				const safePos = findSafeLabelPosition(idealX, idealY, labelWidth, labelHeight)
+				const safePos = findSafeLabelPosition(
+					idealX,
+					idealY,
+					labelWidth,
+					labelHeight
+				)
 				if (safePos) {
 					// Track this label's position to avoid future collisions
 					placedLabels.push({
@@ -938,15 +1016,22 @@ export const generateCircleDiagram: WidgetGenerator<typeof CircleDiagramPropsSch
 		const idealY = cy + yOffset
 
 		// Estimate label dimensions
-		const { maxWidth: labelWidth, height: labelHeight } = estimateWrappedTextDimensions(
-			areaLabel,
-			Number.POSITIVE_INFINITY,
-			theme.font.size.large,
-			1.2
-		)
+		const { maxWidth: labelWidth, height: labelHeight } =
+			estimateWrappedTextDimensions(
+				areaLabel,
+				Number.POSITIVE_INFINITY,
+				theme.font.size.large,
+				1.2
+			)
 
 		// Find safe position using collision detection
-		const safePos = findSafeLabelPosition(idealX, idealY, labelWidth, labelHeight, 50) // Larger search radius for area label
+		const safePos = findSafeLabelPosition(
+			idealX,
+			idealY,
+			labelWidth,
+			labelHeight,
+			50
+		) // Larger search radius for area label
 		if (safePos) {
 			// Track this label's position to avoid future collisions
 			placedLabels.push({

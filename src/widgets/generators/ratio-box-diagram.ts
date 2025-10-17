@@ -1,10 +1,10 @@
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { PADDING } from "../utils/constants"
-import { CSS_COLOR_PATTERN } from "../utils/css-color"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { PADDING } from "@/widgets/utils/constants"
+import { CSS_COLOR_PATTERN } from "@/widgets/utils/css-color"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
 
 const Item = z
 	.object({
@@ -17,7 +17,10 @@ const Item = z
 			),
 		color: z
 			.string()
-			.regex(CSS_COLOR_PATTERN, "invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)")
+			.regex(
+				CSS_COLOR_PATTERN,
+				"invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)"
+			)
 			.describe(
 				"Hex-only color for icons of this type (e.g., '#0C7F99' for teal, '#BC2612' for red, '#00000080' for 50% alpha). Each type should have distinct color for clarity."
 			),
@@ -62,7 +65,9 @@ const Box = z
 		label: z
 			.string()
 			.nullable()
-			.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
+			.transform((val) =>
+				val === "null" || val === "NULL" || val === "" ? null : val
+			)
 			.describe(
 				"Text label for this box (e.g., '1/3', 'Group A', '25%', null). Null means no label. Positioned inside the box. Plaintext only; no markdown or HTML."
 			)
@@ -117,9 +122,9 @@ export type RatioBoxDiagramProps = z.infer<typeof RatioBoxDiagramPropsSchema>
 /**
  * Generates an SVG diagram of items in a grid with box overlays to illustrate ratios.
  */
-export const generateRatioBoxDiagram: WidgetGenerator<typeof RatioBoxDiagramPropsSchema> = async (
-	props
-) => {
+export const generateRatioBoxDiagram: WidgetGenerator<
+	typeof RatioBoxDiagramPropsSchema
+> = async (props) => {
 	const { width, height, items, itemsPerRow, boxes, partitions, layout } = props
 
 	const totalItems = items.reduce((sum, item) => sum + item.count, 0)
@@ -153,9 +158,8 @@ export const generateRatioBoxDiagram: WidgetGenerator<typeof RatioBoxDiagramProp
 		const iconRadiusY = iconRadiusX
 
 		// Create a position map for specific placement
-		const grid: Array<{ color: string; style: "filled" | "outline" } | null> = new Array(
-			numRows * numCols
-		).fill(null)
+		const grid: Array<{ color: string; style: "filled" | "outline" } | null> =
+			new Array(numRows * numCols).fill(null)
 
 		// Place blue circles in first 3 columns (positions 0-2, 5-7, 10-12)
 		const bluePositions = [0, 1, 2, 5, 6, 7, 10, 11, 12] // First 3 columns in each row
@@ -164,7 +168,11 @@ export const generateRatioBoxDiagram: WidgetGenerator<typeof RatioBoxDiagramProp
 		// Fill blue positions
 		const blueGroup = items[0]
 		if (blueGroup) {
-			for (let i = 0; i < Math.min(blueGroup.count, bluePositions.length); i++) {
+			for (
+				let i = 0;
+				i < Math.min(blueGroup.count, bluePositions.length);
+				i++
+			) {
 				const position = bluePositions[i]
 				if (position !== undefined) {
 					grid[position] = { color: blueGroup.color, style: blueGroup.style }
@@ -280,7 +288,12 @@ export const generateRatioBoxDiagram: WidgetGenerator<typeof RatioBoxDiagramProp
 		}
 
 		// Helper function to draw a box based on grid cell coordinates
-		const drawBox = (startRow: number, endRow: number, startCol: number, endCol: number) => {
+		const drawBox = (
+			startRow: number,
+			endRow: number,
+			startCol: number,
+			endCol: number
+		) => {
 			const boxPadding = cellWidth * 0.2
 			const x = padding.left + startCol * cellWidth + boxPadding / 2
 			const y = padding.top + startRow * cellHeight + boxPadding / 2

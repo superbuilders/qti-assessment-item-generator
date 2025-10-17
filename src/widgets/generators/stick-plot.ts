@@ -1,28 +1,35 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { AXIS_VIEWBOX_PADDING } from "../utils/constants"
-import { setupCoordinatePlaneBaseV2 } from "../utils/coordinate-plane-utils"
-import { CSS_COLOR_PATTERN } from "../utils/css-color"
-import { abbreviateMonth } from "../utils/labels"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { AXIS_VIEWBOX_PADDING } from "@/widgets/utils/constants"
+import { setupCoordinatePlaneBaseV2 } from "@/widgets/utils/coordinate-plane-utils"
+import { CSS_COLOR_PATTERN } from "@/widgets/utils/css-color"
+import { abbreviateMonth } from "@/widgets/utils/labels"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
 
 // A single vertical stick at an x-category with a height determined by y value
 const StickSchema = z
 	.object({
 		xLabel: z
 			.string()
-			.describe("Label for the position along the x-axis (e.g., isotope mass label)."),
+			.describe(
+				"Label for the position along the x-axis (e.g., isotope mass label)."
+			),
 		yValue: z
 			.number()
 			.nonnegative()
-			.describe("Height of the stick along the y-axis. Typically a percentage or count."),
+			.describe(
+				"Height of the stick along the y-axis. Typically a percentage or count."
+			),
 		color: z
 			.string()
-			.regex(CSS_COLOR_PATTERN, "invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)")
+			.regex(
+				CSS_COLOR_PATTERN,
+				"invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)"
+			)
 			.describe("Hex-only color for the stick stroke.")
 	})
 	.strict()
@@ -30,11 +37,18 @@ const StickSchema = z
 // Optional reference lines such as mean/average
 const ReferenceLineSchema = z
 	.object({
-		xLabel: z.string().describe("Category label at which to draw a vertical reference line."),
-		label: z.string().describe("Text to annotate near the reference line (e.g., 'Average')."),
+		xLabel: z
+			.string()
+			.describe("Category label at which to draw a vertical reference line."),
+		label: z
+			.string()
+			.describe("Text to annotate near the reference line (e.g., 'Average')."),
 		color: z
 			.string()
-			.regex(CSS_COLOR_PATTERN, "invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)")
+			.regex(
+				CSS_COLOR_PATTERN,
+				"invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)"
+			)
 			.describe("Color of the reference line and label.")
 	})
 	.strict()
@@ -47,21 +61,36 @@ export const StickPlotPropsSchema = z
 		title: z.string().describe("Main title displayed above the plot."),
 		xAxis: z
 			.object({
-				label: z.string().describe("Label for the horizontal axis (e.g., 'Atomic mass (u)')."),
+				label: z
+					.string()
+					.describe("Label for the horizontal axis (e.g., 'Atomic mass (u)')."),
 				categories: z
 					.array(z.string().min(1))
 					.min(1)
-					.describe("Complete ordered list of category labels along the x-axis."),
-				showGridLines: z.boolean().describe("Whether to display vertical grid lines.")
+					.describe(
+						"Complete ordered list of category labels along the x-axis."
+					),
+				showGridLines: z
+					.boolean()
+					.describe("Whether to display vertical grid lines.")
 			})
 			.strict(),
 		yAxis: z
 			.object({
-				label: z.string().describe("Label for the vertical axis (e.g., 'Relative abundance (%)')."),
+				label: z
+					.string()
+					.describe(
+						"Label for the vertical axis (e.g., 'Relative abundance (%)')."
+					),
 				min: z.number().describe("Minimum numeric value on the y-axis."),
 				max: z.number().describe("Maximum numeric value on the y-axis."),
-				tickInterval: z.number().positive().describe("Spacing between y-axis ticks."),
-				showGridLines: z.boolean().describe("Whether to display horizontal grid lines.")
+				tickInterval: z
+					.number()
+					.positive()
+					.describe("Spacing between y-axis ticks."),
+				showGridLines: z
+					.boolean()
+					.describe("Whether to display horizontal grid lines.")
 			})
 			.strict(),
 		sticks: z.array(StickSchema),
@@ -75,8 +104,19 @@ export const StickPlotPropsSchema = z
 
 export type StickPlotProps = z.infer<typeof StickPlotPropsSchema>
 
-export const generateStickPlot: WidgetGenerator<typeof StickPlotPropsSchema> = async (props) => {
-	const { width, height, title, xAxis, yAxis, sticks, stickWidthPx, references } = props
+export const generateStickPlot: WidgetGenerator<
+	typeof StickPlotPropsSchema
+> = async (props) => {
+	const {
+		width,
+		height,
+		title,
+		xAxis,
+		yAxis,
+		sticks,
+		stickWidthPx,
+		references
+	} = props
 
 	// Validate that all sticks map to known categories and values are within range
 	const categoryToIndex = new Map<string, number>()
@@ -89,7 +129,11 @@ export const generateStickPlot: WidgetGenerator<typeof StickPlotPropsSchema> = a
 			throw errors.new("stick plot: xLabel must exist in xAxis.categories")
 		}
 		if (s.yValue < yAxis.min || s.yValue > yAxis.max) {
-			logger.error("stick yValue out of bounds", { y: s.yValue, min: yAxis.min, max: yAxis.max })
+			logger.error("stick yValue out of bounds", {
+				y: s.yValue,
+				min: yAxis.min,
+				max: yAxis.max
+			})
 			throw errors.new("stick plot: yValue out of y-axis bounds")
 		}
 	}
@@ -162,8 +206,12 @@ export const generateStickPlot: WidgetGenerator<typeof StickPlotPropsSchema> = a
 	for (const ref of references) {
 		const idx = categoryToIndex.get(ref.xLabel)
 		if (idx === undefined) {
-			logger.error("reference xLabel missing from categories", { xLabel: ref.xLabel })
-			throw errors.new("stick plot: reference xLabel must exist in xAxis.categories")
+			logger.error("reference xLabel missing from categories", {
+				xLabel: ref.xLabel
+			})
+			throw errors.new(
+				"stick plot: reference xLabel must exist in xAxis.categories"
+			)
 		}
 		const x = baseInfo.toSvgX(idx)
 		canvas.drawLine(

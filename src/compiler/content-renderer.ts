@@ -1,5 +1,6 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
+import { sanitizeXmlAttributeValue } from "@/compiler/utils/xml-utils"
 import type {
 	BlockContent,
 	FeedbackContent,
@@ -7,7 +8,6 @@ import type {
 	InlineContentItem,
 	StepBlock
 } from "@/core/content"
-import { sanitizeXmlAttributeValue } from "./utils/xml-utils"
 
 /**
  * Escapes text content for safe inclusion in XML PCDATA.
@@ -20,7 +20,9 @@ function escapeXmlText(text: string): string {
 		.replace(/>/g, "&gt;")
 }
 
-export function renderInlineContent<E extends readonly string[] = readonly string[]>(
+export function renderInlineContent<
+	E extends readonly string[] = readonly string[]
+>(
 	inlineItems: InlineContent<E> | null,
 	widgetSlots: Map<string, string>,
 	interactionSlots: Map<string, string>
@@ -66,7 +68,9 @@ export function renderInlineContent<E extends readonly string[] = readonly strin
 		.join("")
 }
 
-export function renderBlockContent<E extends readonly string[] = readonly string[]>(
+export function renderBlockContent<
+	E extends readonly string[] = readonly string[]
+>(
 	blockItems: BlockContent<E> | null,
 	widgetSlots: Map<string, string>,
 	interactionSlots: Map<string, string>
@@ -78,15 +82,23 @@ export function renderBlockContent<E extends readonly string[] = readonly string
 				case "paragraph":
 					return `<p>${renderInlineContent(item.content, widgetSlots, interactionSlots)}</p>`
 				case "blockquote": {
-					const inline = renderInlineContent(item.content, widgetSlots, interactionSlots)
+					const inline = renderInlineContent(
+						item.content,
+						widgetSlots,
+						interactionSlots
+					)
 					return `<blockquote class="qti-blockquote" style="margin:12px 0; padding:12px 16px; border-left:4px solid #D1D5DB; background:#F9FAFB; color:#111827;">${inline}</blockquote>`
 				}
 				case "tableRich": {
 					const tableStyle = "border-collapse: collapse; width: 100%;"
 					const thStyle =
 						"border: 1px solid #ddd; padding: 8px 12px; text-align: left; vertical-align: top;"
-					const tdStyle = "border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;"
-					const renderRow = (row: Array<InlineContent<E> | null>, asHeader = false) =>
+					const tdStyle =
+						"border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;"
+					const renderRow = (
+						row: Array<InlineContent<E> | null>,
+						asHeader = false
+					) =>
 						`<tr>${row
 							.map((cell) => {
 								const tag = asHeader ? "th" : "td"
@@ -161,9 +173,12 @@ export function renderFeedbackContent<E extends readonly string[]>(
 	if (!feedback) return ""
 
 	const preambleCorrectness = feedback.preamble.correctness
-	const preambleColor = preambleCorrectness === "correct" ? "#047857" : "#B91C1C"
+	const preambleColor =
+		preambleCorrectness === "correct" ? "#047857" : "#B91C1C"
 	const preambleHeadline =
-		preambleCorrectness === "correct" ? "Correct! Fantastic work." : "Not quite! Try again."
+		preambleCorrectness === "correct"
+			? "Correct! Fantastic work."
+			: "Not quite! Try again."
 
 	const preambleSummary = renderInlineContent(
 		feedback.preamble.summary,
@@ -186,8 +201,16 @@ export function renderFeedbackContent<E extends readonly string[]>(
 	const stepItems = feedback.steps
 		.map((step: StepBlock<E>, idx: number) => {
 			const colors = palette[idx % palette.length]
-			const title = renderInlineContent(step.title, widgetSlots, interactionSlots)
-			const content = renderBlockContent(step.content, widgetSlots, interactionSlots)
+			const title = renderInlineContent(
+				step.title,
+				widgetSlots,
+				interactionSlots
+			)
+			const content = renderBlockContent(
+				step.content,
+				widgetSlots,
+				interactionSlots
+			)
 			return `<li class="qti-step" style="position:relative; margin:16px 0; padding:16px 16px 16px 56px; border:1px solid #E5E7EB; border-left:6px solid ${colors.accent}; border-radius:12px; background:#F9FAFB; box-shadow:0 1px 2px rgba(0,0,0,0.04);">
         <span class="qti-step-index" style="position:absolute; left:16px; top:16px; width:28px; height:28px; border-radius:9999px; background:${colors.accent}; color:#FFFFFF; display:inline-flex; align-items:center; justify-content:center; font-weight:700; font-size:14px;">${idx + 1}</span>
         <p class="qti-step-title" style="margin:0 0 8px 0; font-weight:700; font-size:16px; color:#111827;">${title}</p>

@@ -117,7 +117,8 @@ export const mathCoreCollection: WidgetCollection<
 		threeDIntersectionDiagram: allWidgetDefinitions.threeDIntersectionDiagram,
 		quadrantDiagram: allWidgetDefinitions.quadrantDiagram,
 		angleDiagram: allWidgetDefinitions.angleDiagram,
-		radiallyConstrainedAngleDiagram: allWidgetDefinitions.radiallyConstrainedAngleDiagram,
+		radiallyConstrainedAngleDiagram:
+			allWidgetDefinitions.radiallyConstrainedAngleDiagram,
 		barChart: allWidgetDefinitions.barChart,
 		boxGrid: allWidgetDefinitions.boxGrid,
 		boxPlot: allWidgetDefinitions.boxPlot,
@@ -138,11 +139,14 @@ export const mathCoreCollection: WidgetCollection<
 		lineEquationGraph: allWidgetDefinitions.lineEquationGraph,
 		numberLine: allWidgetDefinitions.numberLine,
 		numberLineWithAction: allWidgetDefinitions.numberLineWithAction,
-		numberLineWithFractionGroups: allWidgetDefinitions.numberLineWithFractionGroups,
+		numberLineWithFractionGroups:
+			allWidgetDefinitions.numberLineWithFractionGroups,
 		numberSetDiagram: allWidgetDefinitions.numberSetDiagram,
-		parallelogramTrapezoidDiagram: allWidgetDefinitions.parallelogramTrapezoidDiagram,
+		parallelogramTrapezoidDiagram:
+			allWidgetDefinitions.parallelogramTrapezoidDiagram,
 		partitionedShape: allWidgetDefinitions.partitionedShape,
-		pentagonIntersectionDiagram: allWidgetDefinitions.pentagonIntersectionDiagram,
+		pentagonIntersectionDiagram:
+			allWidgetDefinitions.pentagonIntersectionDiagram,
 		pictograph: allWidgetDefinitions.pictograph,
 		integerChipModel: allWidgetDefinitions.integerChipModel,
 		integerChipLegend: allWidgetDefinitions.integerChipLegend,

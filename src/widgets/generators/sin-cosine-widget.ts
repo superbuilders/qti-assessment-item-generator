@@ -1,25 +1,40 @@
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { createAxisOptionsSchema, createPlotPointSchema, renderPoints } from "../utils/canvas-utils"
-import { PADDING, TICK_LABEL_FONT_PX, X_AXIS_MIN_LABEL_PADDING_PX } from "../utils/constants"
-import { CSS_COLOR_PATTERN } from "../utils/css-color"
-import { selectAxisLabels } from "../utils/layout"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { theme } from "../utils/theme"
-import { buildTicks } from "../utils/ticks"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import {
+	createAxisOptionsSchema,
+	createPlotPointSchema,
+	renderPoints
+} from "@/widgets/utils/canvas-utils"
+import {
+	PADDING,
+	TICK_LABEL_FONT_PX,
+	X_AXIS_MIN_LABEL_PADDING_PX
+} from "@/widgets/utils/constants"
+import { CSS_COLOR_PATTERN } from "@/widgets/utils/css-color"
+import { selectAxisLabels } from "@/widgets/utils/layout"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
+import { buildTicks } from "@/widgets/utils/ticks"
 
 // Factory functions to prevent Zod schema reuse issues ($ref)
 const createPlotConfigSchema = () =>
 	z
 		.object({
-			type: z.enum(["sin", "cos"]).describe("The type of trigonometric function to plot."),
+			type: z
+				.enum(["sin", "cos"])
+				.describe("The type of trigonometric function to plot."),
 			color: z
 				.string()
 				.regex(CSS_COLOR_PATTERN, "invalid css color")
 				.describe("The color of the curve."),
-			strokeWidth: z.number().positive().describe("The thickness of the curve in pixels."),
-			style: z.enum(["solid", "dashed"]).describe("The line style for the curve.")
+			strokeWidth: z
+				.number()
+				.positive()
+				.describe("The thickness of the curve in pixels."),
+			style: z
+				.enum(["solid", "dashed"])
+				.describe("The line style for the curve.")
 		})
 		.strict()
 
@@ -126,7 +141,9 @@ function setupTrigCoordinatePlane(
 	const toSvgX = (val: number) =>
 		margin.left + ((val - xAxis.min) / (xAxis.max - xAxis.min)) * chartWidth
 	const toSvgY = (val: number) =>
-		margin.top + chartHeight - ((val - yAxis.min) / (yAxis.max - yAxis.min)) * chartHeight
+		margin.top +
+		chartHeight -
+		((val - yAxis.min) / (yAxis.max - yAxis.min)) * chartHeight
 
 	const zeroX = toSvgX(0)
 	const zeroY = toSvgY(0)
@@ -166,7 +183,11 @@ function setupTrigCoordinatePlane(
 	})
 
 	// X-axis ticks and π labels
-	const { values: xValues } = buildTicks(xAxis.min, xAxis.max, xAxis.tickInterval)
+	const { values: xValues } = buildTicks(
+		xAxis.min,
+		xAxis.max,
+		xAxis.tickInterval
+	)
 	const xTickPositions = xValues.map(toSvgX)
 	const xPiLabels = xValues.map(formatPiLabel)
 
@@ -199,7 +220,11 @@ function setupTrigCoordinatePlane(
 	})
 
 	// Y-axis ticks and labels (standard numeric)
-	const { values: yValues, labels: yLabels } = buildTicks(yAxis.min, yAxis.max, yAxis.tickInterval)
+	const { values: yValues, labels: yLabels } = buildTicks(
+		yAxis.min,
+		yAxis.max,
+		yAxis.tickInterval
+	)
 	const yTickPositions = yValues.map(toSvgY)
 
 	const selectedYTicks = selectAxisLabels({
@@ -257,9 +282,9 @@ function setupTrigCoordinatePlane(
 	return { toSvgX, toSvgY }
 }
 
-export const generateSinCosineWidget: WidgetGenerator<typeof SinCosineWidgetPropsSchema> = async (
-	props
-) => {
+export const generateSinCosineWidget: WidgetGenerator<
+	typeof SinCosineWidgetPropsSchema
+> = async (props) => {
 	const { width, height, xAxis, yAxis, plots, points } = props
 
 	const canvas = new CanvasImpl({

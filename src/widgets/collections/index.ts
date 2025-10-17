@@ -1,9 +1,9 @@
-import { allWidgetsCollection } from "./all"
-import { fourthGradeMathCollection } from "./fourth-grade-math"
-import { mathCoreCollection } from "./math-core"
-import { scienceCollection } from "./science"
-import { simpleVisualCollection } from "./simple-visual"
-import { teksMath4Collection } from "./teks-math-4"
+import { allWidgetsCollection } from "@/widgets/collections/all"
+import { fourthGradeMathCollection } from "@/widgets/collections/fourth-grade-math"
+import { mathCoreCollection } from "@/widgets/collections/math-core"
+import { scienceCollection } from "@/widgets/collections/science"
+import { simpleVisualCollection } from "@/widgets/collections/simple-visual"
+import { teksMath4Collection } from "@/widgets/collections/teks-math-4"
 
 export const widgetCollections: {
 	readonly all: typeof allWidgetsCollection
@@ -21,4 +21,4 @@ export const widgetCollections: {
 	"math-core": mathCoreCollection
 }
 
-export type { WidgetCollection } from "./types"
+export type { WidgetCollection } from "@/widgets/collections/types"

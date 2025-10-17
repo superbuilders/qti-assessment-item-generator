@@ -1,9 +1,9 @@
 import { describe, expect, test } from "bun:test"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import { parallelogramTrapezoidDiagramExamples } from "../../examples/parallelogram-trapezoid-diagram"
-import type { WidgetInput } from "../../src/widgets/registry"
-import { generateWidgetForTest } from "../helpers/generateWidgetForTest"
+import { parallelogramTrapezoidDiagramExamples } from "@/examples/parallelogram-trapezoid-diagram"
+import { generateWidgetForTest } from "@/testing/helpers/generateWidgetForTest"
+import type { WidgetInput } from "@/widgets/registry"
 
 describe("Widget: parallelogram-trapezoid-diagram", () => {
 	const examples: WidgetInput[] = parallelogramTrapezoidDiagramExamples

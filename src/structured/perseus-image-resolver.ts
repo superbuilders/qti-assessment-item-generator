@@ -36,7 +36,11 @@ function findPerseusUrls(obj: unknown, urls: Set<string>): void {
 		return
 	}
 	for (const [key, value] of Object.entries(obj)) {
-		if (key === "url" && typeof value === "string" && value.startsWith("web+graphie://")) {
+		if (
+			key === "url" &&
+			typeof value === "string" &&
+			value.startsWith("web+graphie://")
+		) {
 			urls.add(value)
 		} else {
 			findPerseusUrls(value, urls)
@@ -44,7 +48,9 @@ function findPerseusUrls(obj: unknown, urls: Set<string>): void {
 	}
 }
 
-export async function buildImageContext(perseusData: unknown): Promise<ImageContext> {
+export async function buildImageContext(
+	perseusData: unknown
+): Promise<ImageContext> {
 	logger.debug("starting perseus url resolution for ai context")
 	const originalUrls = new Set<string>()
 	findPerseusUrls(perseusData, originalUrls)
@@ -60,31 +66,33 @@ export async function buildImageContext(perseusData: unknown): Promise<ImageCont
 		return context
 	}
 
-	const resolutionPromises = Array.from(originalUrls).map(async (originalUrl) => {
-		const baseUrl = originalUrl.replace("web+graphie://", "https://")
-		const resolved = await resolvePerseusUrl(baseUrl)
+	const resolutionPromises = Array.from(originalUrls).map(
+		async (originalUrl) => {
+			const baseUrl = originalUrl.replace("web+graphie://", "https://")
+			const resolved = await resolvePerseusUrl(baseUrl)
 
-		if (!resolved) {
-			logger.warn("failed to resolve perseus url, skipping from context", {
-				url: originalUrl
-			})
-			return
-		}
-
-		context.resolvedUrlMap.set(originalUrl, resolved.resolvedUrl)
-
-		if (resolved.type === "svg") {
-			const downloadResult = await errors.try(fetch(resolved.resolvedUrl))
-			if (!downloadResult.error && downloadResult.data.ok) {
-				const textResult = await errors.try(downloadResult.data.text())
-				if (!textResult.error) {
-					context.svgContentMap.set(originalUrl, textResult.data)
-				}
+			if (!resolved) {
+				logger.warn("failed to resolve perseus url, skipping from context", {
+					url: originalUrl
+				})
+				return
 			}
-		} else {
-			context.rasterImageUrls.push(resolved.resolvedUrl)
+
+			context.resolvedUrlMap.set(originalUrl, resolved.resolvedUrl)
+
+			if (resolved.type === "svg") {
+				const downloadResult = await errors.try(fetch(resolved.resolvedUrl))
+				if (!downloadResult.error && downloadResult.data.ok) {
+					const textResult = await errors.try(downloadResult.data.text())
+					if (!textResult.error) {
+						context.svgContentMap.set(originalUrl, textResult.data)
+					}
+				}
+			} else {
+				context.rasterImageUrls.push(resolved.resolvedUrl)
+			}
 		}
-	})
+	)
 
 	await Promise.all(resolutionPromises)
 	logger.info("finished building image context for ai", {

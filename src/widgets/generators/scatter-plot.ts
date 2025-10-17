@@ -1,15 +1,15 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { AXIS_VIEWBOX_PADDING } from "../utils/constants"
-import { setupCoordinatePlaneV2 } from "../utils/coordinate-plane-v2"
-import { CSS_COLOR_PATTERN } from "../utils/css-color"
-import { abbreviateMonth } from "../utils/labels"
-import { Path2D } from "../utils/path-builder"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { AXIS_VIEWBOX_PADDING } from "@/widgets/utils/constants"
+import { setupCoordinatePlaneV2 } from "@/widgets/utils/coordinate-plane-v2"
+import { CSS_COLOR_PATTERN } from "@/widgets/utils/css-color"
+import { abbreviateMonth } from "@/widgets/utils/labels"
+import { Path2D } from "@/widgets/utils/path-builder"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
 
 // Defines a single data point on the scatter plot
 const ScatterPointSchema = z
@@ -56,7 +56,10 @@ const createLineStyleSchema = () =>
 		.object({
 			color: z
 				.string()
-				.regex(CSS_COLOR_PATTERN, "invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)")
+				.regex(
+					CSS_COLOR_PATTERN,
+					"invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)"
+				)
 				.describe(
 					"Hex-only color for the line stroke (e.g., '#FF6B6B', '#1E90FF', '#00000080' for 50% alpha). Should contrast with background and points."
 				),
@@ -108,7 +111,9 @@ const LineBestFitSchema = z
 	.object({
 		type: z
 			.literal("bestFit")
-			.describe("Line computed from the scatter plot data using regression analysis."),
+			.describe(
+				"Line computed from the scatter plot data using regression analysis."
+			),
 		method: z
 			.enum(["linear", "quadratic", "exponential"])
 			.describe(
@@ -116,7 +121,9 @@ const LineBestFitSchema = z
 			),
 		label: z
 			.string()
-			.describe("Text label for the regression line (e.g., 'Best Fit', 'Trend', 'y = 0.5x + 10')."),
+			.describe(
+				"Text label for the regression line (e.g., 'Best Fit', 'Trend', 'y = 0.5x + 10')."
+			),
 		style: createLineStyleSchema().describe(
 			"Visual styling for the regression line. Often uses distinct color or dash pattern."
 		)
@@ -202,14 +209,18 @@ export const ScatterPlotPropsSchema = z
 					)
 			})
 			.strict()
-			.describe("Configuration for the vertical axis including scale, labels, and optional grid."),
+			.describe(
+				"Configuration for the vertical axis including scale, labels, and optional grid."
+			),
 		points: z
 			.array(ScatterPointSchema)
 			.describe(
 				"Data points to plot. Each point can have an optional label. Empty array creates blank plot for exercises. Order doesn't affect display."
 			),
 		lines: z
-			.array(z.discriminatedUnion("type", [LineBestFitSchema, LineTwoPointsSchema]))
+			.array(
+				z.discriminatedUnion("type", [LineBestFitSchema, LineTwoPointsSchema])
+			)
 			.describe(
 				"Optional lines to overlay on the scatter plot. Can include regression lines, reference lines, or user-defined lines. Empty array means no lines."
 			)
@@ -287,7 +298,9 @@ function computeQuadraticRegression(
 		m32: number,
 		m33: number
 	): number =>
-		m11 * (m22 * m33 - m23 * m32) - m12 * (m21 * m33 - m23 * m31) + m13 * (m21 * m32 - m22 * m31)
+		m11 * (m22 * m33 - m23 * m32) -
+		m12 * (m21 * m33 - m23 * m31) +
+		m13 * (m21 * m32 - m22 * m31)
 
 	const D = det3(Sx4, Sx3, Sx2, Sx3, Sx2, Sx, Sx2, Sx, count)
 	if (D === 0) return null
@@ -328,13 +341,21 @@ function computeExponentialRegression(
 
 // type LineStyle = z.infer<ReturnType<typeof createLineStyleSchema>> // Unused type
 
-export const generateScatterPlot: WidgetGenerator<typeof ScatterPlotPropsSchema> = async (data) => {
+export const generateScatterPlot: WidgetGenerator<
+	typeof ScatterPlotPropsSchema
+> = async (data) => {
 	const { width, height, title, xAxis, yAxis, points, lines } = data
 
 	// Validation logic moved from schema
-	const hasLinear = lines.some((l) => l.type === "bestFit" && l.method === "linear")
-	const hasQuadratic = lines.some((l) => l.type === "bestFit" && l.method === "quadratic")
-	const hasExponential = lines.some((l) => l.type === "bestFit" && l.method === "exponential")
+	const hasLinear = lines.some(
+		(l) => l.type === "bestFit" && l.method === "linear"
+	)
+	const hasQuadratic = lines.some(
+		(l) => l.type === "bestFit" && l.method === "quadratic"
+	)
+	const hasExponential = lines.some(
+		(l) => l.type === "bestFit" && l.method === "exponential"
+	)
 
 	if (hasLinear && points.length < 2) {
 		logger.error("linear best fit requires at least 2 points", {
@@ -355,14 +376,23 @@ export const generateScatterPlot: WidgetGenerator<typeof ScatterPlotPropsSchema>
 		throw errors.new("exponential best fit requires at least 2 points")
 	}
 	if (hasExponential && points.some((p) => p.y <= 0)) {
-		logger.error("exponential regression requires all y-values to be positive", {
-			negativePoints: points.filter((p) => p.y <= 0)
-		})
-		throw errors.new("exponential regression requires all y-values to be positive")
+		logger.error(
+			"exponential regression requires all y-values to be positive",
+			{
+				negativePoints: points.filter((p) => p.y <= 0)
+			}
+		)
+		throw errors.new(
+			"exponential regression requires all y-values to be positive"
+		)
 	}
 	// Validate twoPoints lines have different endpoints
 	for (const line of lines) {
-		if (line.type === "twoPoints" && line.a.x === line.b.x && line.a.y === line.b.y) {
+		if (
+			line.type === "twoPoints" &&
+			line.a.x === line.b.x &&
+			line.a.y === line.b.y
+		) {
 			logger.error("line endpoints must differ", {
 				lineA: line.a,
 				lineB: line.b
@@ -373,7 +403,8 @@ export const generateScatterPlot: WidgetGenerator<typeof ScatterPlotPropsSchema>
 
 	// Validate all data points lie within the declared axis domains
 	const outOfDomainPoints = points.filter(
-		(p) => p.x < xAxis.min || p.x > xAxis.max || p.y < yAxis.min || p.y > yAxis.max
+		(p) =>
+			p.x < xAxis.min || p.x > xAxis.max || p.y < yAxis.min || p.y > yAxis.max
 	)
 	if (outOfDomainPoints.length > 0) {
 		logger.error("points outside domain", {
@@ -440,11 +471,17 @@ export const generateScatterPlot: WidgetGenerator<typeof ScatterPlotPropsSchema>
 					const x1Svg = baseInfo.toSvgX(xAxis.min)
 					const x2Svg = baseInfo.toSvgX(xAxis.max)
 
-					canvas.drawLine(x1Svg, baseInfo.toSvgY(y1), x2Svg, baseInfo.toSvgY(y2), {
-						stroke: line.style.color,
-						strokeWidth: line.style.strokeWidth,
-						dash: line.style.dash ? "5 5" : undefined
-					})
+					canvas.drawLine(
+						x1Svg,
+						baseInfo.toSvgY(y1),
+						x2Svg,
+						baseInfo.toSvgY(y2),
+						{
+							stroke: line.style.color,
+							strokeWidth: line.style.strokeWidth,
+							dash: line.style.dash ? "5 5" : undefined
+						}
+					)
 				}
 			}
 			if (line.method === "quadratic") {
@@ -508,11 +545,17 @@ export const generateScatterPlot: WidgetGenerator<typeof ScatterPlotPropsSchema>
 			if (a.x === b.x) {
 				// vertical line across full y-domain - draw directly with canvas
 				const xSvg = baseInfo.toSvgX(a.x)
-				canvas.drawLine(xSvg, baseInfo.toSvgY(yAxis.min), xSvg, baseInfo.toSvgY(yAxis.max), {
-					stroke: line.style.color,
-					strokeWidth: line.style.strokeWidth,
-					dash: line.style.dash ? "5 5" : undefined
-				})
+				canvas.drawLine(
+					xSvg,
+					baseInfo.toSvgY(yAxis.min),
+					xSvg,
+					baseInfo.toSvgY(yAxis.max),
+					{
+						stroke: line.style.color,
+						strokeWidth: line.style.strokeWidth,
+						dash: line.style.dash ? "5 5" : undefined
+					}
+				)
 			} else {
 				// twoPoints lines can extend beyond bounds - add to clipped content
 				clippedLines.push(() => {

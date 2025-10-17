@@ -1,7 +1,7 @@
 import * as errors from "@superbuilders/errors"
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
 import {
 	createAxisOptionsSchema,
 	createDistanceSchema,
@@ -14,11 +14,11 @@ import {
 	renderPoints,
 	renderPolygons,
 	renderPolylines
-} from "../utils/canvas-utils"
-import { AXIS_VIEWBOX_PADDING } from "../utils/constants"
-import { setupCoordinatePlaneV2 } from "../utils/coordinate-plane-v2"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { theme } from "../utils/theme"
+} from "@/widgets/utils/canvas-utils"
+import { AXIS_VIEWBOX_PADDING } from "@/widgets/utils/constants"
+import { setupCoordinatePlaneV2 } from "@/widgets/utils/coordinate-plane-v2"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
 
 export const ErrInvalidDimensions = errors.new("invalid dimensions")
 
@@ -160,7 +160,13 @@ export const generateCoordinatePlaneComprehensive: WidgetGenerator<
 		renderPoints(points, baseInfo.toSvgX, baseInfo.toSvgY, canvas)
 	}
 	if (distances.length > 0) {
-		renderDistances(distances, pointMap, baseInfo.toSvgX, baseInfo.toSvgY, canvas)
+		renderDistances(
+			distances,
+			pointMap,
+			baseInfo.toSvgX,
+			baseInfo.toSvgY,
+			canvas
+		)
 	}
 
 	// NEW: Finalize the canvas and construct the root SVG element

@@ -5,7 +5,9 @@ import tar from "tar-stream"
 import { validateIntegrity } from "@/cartridge/client"
 import type { CartridgeReader } from "@/cartridge/reader"
 
-export async function createTarZstReader(filePath: string): Promise<CartridgeReader> {
+export async function createTarZstReader(
+	filePath: string
+): Promise<CartridgeReader> {
 	const fileIndex = new Map<string, Buffer>()
 
 	const extract = tar.extract()
@@ -29,7 +31,10 @@ export async function createTarZstReader(filePath: string): Promise<CartridgeRea
 		})
 
 		extract.on("finish", () => {
-			logger.debug("tar.zst extraction complete", { file: filePath, entryCount: fileIndex.size })
+			logger.debug("tar.zst extraction complete", {
+				file: filePath,
+				entryCount: fileIndex.size
+			})
 			resolve()
 		})
 
@@ -49,7 +54,10 @@ export async function createTarZstReader(filePath: string): Promise<CartridgeRea
 
 	const pres = await errors.try(p)
 	if (pres.error) {
-		logger.error("failed to create tar.zst reader", { file: filePath, error: pres.error })
+		logger.error("failed to create tar.zst reader", {
+			file: filePath,
+			error: pres.error
+		})
 		throw errors.wrap(pres.error, "tar.zst reader creation")
 	}
 
@@ -80,11 +88,16 @@ export async function createTarZstReader(filePath: string): Promise<CartridgeRea
 	}
 }
 
-export async function openCartridgeTarZst(filePath: string): Promise<CartridgeReader> {
+export async function openCartridgeTarZst(
+	filePath: string
+): Promise<CartridgeReader> {
 	const reader = await createTarZstReader(filePath)
 	const validation = await validateIntegrity(reader)
 	if (!validation.ok) {
-		logger.error("integrity validation failed", { file: filePath, issues: validation.issues })
+		logger.error("integrity validation failed", {
+			file: filePath,
+			issues: validation.issues
+		})
 		throw errors.new("integrity validation failed")
 	}
 	return reader

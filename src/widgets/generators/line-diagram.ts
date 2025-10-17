@@ -1,14 +1,14 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { PADDING } from "../utils/constants"
-import { CSS_COLOR_PATTERN } from "../utils/css-color"
-import { Path2D } from "../utils/path-builder"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { estimateWrappedTextDimensions } from "../utils/text"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { PADDING } from "@/widgets/utils/constants"
+import { CSS_COLOR_PATTERN } from "@/widgets/utils/css-color"
+import { Path2D } from "@/widgets/utils/path-builder"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { estimateWrappedTextDimensions } from "@/widgets/utils/text"
+import { theme } from "@/widgets/utils/theme"
 
 const ErrInvalidBounds = errors.new("gridBounds min must be less than max")
 const ErrLineNotPerpendicular = errors.new("lines are not perpendicular")
@@ -45,7 +45,9 @@ const LineSchema = z
 		label: z
 			.string()
 			.nullable()
-			.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
+			.transform((val) =>
+				val === "null" || val === "NULL" || val === "" ? null : val
+			)
 			.describe(
 				"Optional text label for the line. Examples: 'r', 's', 'm', 'AB', 'perpendicular'. Set to null for unlabeled lines."
 			),
@@ -136,7 +138,12 @@ type Point = { x: number; y: number }
  * Finds the intersection point of two infinite lines.
  * Returns null if lines are parallel.
  */
-const findLineIntersection = (l1p1: Point, l1p2: Point, l2p1: Point, l2p2: Point): Point | null => {
+const findLineIntersection = (
+	l1p1: Point,
+	l1p2: Point,
+	l2p1: Point,
+	l2p2: Point
+): Point | null => {
 	const a1 = l1p2.y - l1p1.y
 	const b1 = l1p1.x - l1p2.x
 	const c1 = a1 * l1p1.x + b1 * l1p1.y
@@ -193,20 +200,28 @@ const clipLineToBox = (
 		if (x >= minX && x <= maxX) intersections.push({ x, y: maxY })
 	}
 
-	return intersections.length >= 2 ? { p1: intersections[0], p2: intersections[1] } : null
+	return intersections.length >= 2
+		? { p1: intersections[0], p2: intersections[1] }
+		: null
 }
 
 /**
  * Generates an SVG diagram of lines on a grid, with optional perpendicular indicators.
  */
-export const generateLineDiagram: WidgetGenerator<typeof LineDiagramPropsSchema> = async (
-	props
-) => {
+export const generateLineDiagram: WidgetGenerator<
+	typeof LineDiagramPropsSchema
+> = async (props) => {
 	const { width, height, gridBounds, lines, perpendicularIndicators } = props
 
-	if (gridBounds.minX >= gridBounds.maxX || gridBounds.minY >= gridBounds.maxY) {
+	if (
+		gridBounds.minX >= gridBounds.maxX ||
+		gridBounds.minY >= gridBounds.maxY
+	) {
 		logger.error("invalid grid bounds for line diagram", { gridBounds })
-		throw errors.wrap(ErrInvalidBounds, "min must be less than max for grid bounds")
+		throw errors.wrap(
+			ErrInvalidBounds,
+			"min must be less than max for grid bounds"
+		)
 	}
 
 	const canvas = new CanvasImpl({
@@ -227,17 +242,37 @@ export const generateLineDiagram: WidgetGenerator<typeof LineDiagramPropsSchema>
 	const toSvgY = (gridY: number) => PADDING + (gridBounds.maxY - gridY) * scaleY // Y is inverted in SVG
 
 	// Draw Grid
-	for (let y = Math.ceil(gridBounds.minY); y <= Math.floor(gridBounds.maxY); y++) {
-		canvas.drawLine(toSvgX(gridBounds.minX), toSvgY(y), toSvgX(gridBounds.maxX), toSvgY(y), {
-			stroke: theme.colors.gridMinor,
-			strokeWidth: 1
-		})
+	for (
+		let y = Math.ceil(gridBounds.minY);
+		y <= Math.floor(gridBounds.maxY);
+		y++
+	) {
+		canvas.drawLine(
+			toSvgX(gridBounds.minX),
+			toSvgY(y),
+			toSvgX(gridBounds.maxX),
+			toSvgY(y),
+			{
+				stroke: theme.colors.gridMinor,
+				strokeWidth: 1
+			}
+		)
 	}
-	for (let x = Math.ceil(gridBounds.minX); x <= Math.floor(gridBounds.maxX); x++) {
-		canvas.drawLine(toSvgX(x), toSvgY(gridBounds.minY), toSvgX(x), toSvgY(gridBounds.maxY), {
-			stroke: theme.colors.gridMinor,
-			strokeWidth: 1
-		})
+	for (
+		let x = Math.ceil(gridBounds.minX);
+		x <= Math.floor(gridBounds.maxX);
+		x++
+	) {
+		canvas.drawLine(
+			toSvgX(x),
+			toSvgY(gridBounds.minY),
+			toSvgX(x),
+			toSvgY(gridBounds.maxY),
+			{
+				stroke: theme.colors.gridMinor,
+				strokeWidth: 1
+			}
+		)
 	}
 
 	// Draw Lines and Labels
@@ -273,10 +308,18 @@ export const generateLineDiagram: WidgetGenerator<typeof LineDiagramPropsSchema>
 			)
 		}
 
-		const intersection = findLineIntersection(line1.from, line1.to, line2.from, line2.to)
+		const intersection = findLineIntersection(
+			line1.from,
+			line1.to,
+			line2.from,
+			line2.to
+		)
 		if (!intersection) continue
 
-		const svgIntersection = { x: toSvgX(intersection.x), y: toSvgY(intersection.y) }
+		const svgIntersection = {
+			x: toSvgX(intersection.x),
+			y: toSvgY(intersection.y)
+		}
 
 		const len1 = Math.hypot(v1.x, v1.y)
 		const u1 = { x: v1.x / len1, y: v1.y / len1 }
@@ -311,7 +354,10 @@ export const generateLineDiagram: WidgetGenerator<typeof LineDiagramPropsSchema>
 		})
 	}
 	// Keep a list of screen-space segments for collision checks when placing labels
-	const screenSegments: Array<{ a: { x: number; y: number }; b: { x: number; y: number } }> = []
+	const screenSegments: Array<{
+		a: { x: number; y: number }
+		b: { x: number; y: number }
+	}> = []
 	for (const line of lines) {
 		const extendedPoints = clipLineToBox(line.from, line.to, gridBounds)
 		if (!extendedPoints) continue
@@ -344,7 +390,10 @@ export const generateLineDiagram: WidgetGenerator<typeof LineDiagramPropsSchema>
 			if (line.labelPosition === "start") t = 0.1
 			if (line.labelPosition === "end") t = 0.9
 
-			const labelPoint = { x: p1.x + t * (p2.x - p1.x), y: p1.y + t * (p2.y - p1.y) }
+			const labelPoint = {
+				x: p1.x + t * (p2.x - p1.x),
+				y: p1.y + t * (p2.y - p1.y)
+			}
 
 			// Compute screen-space basis for this line
 			const sx = toSvgX(labelPoint.x)
@@ -363,7 +412,12 @@ export const generateLineDiagram: WidgetGenerator<typeof LineDiagramPropsSchema>
 			let ly = sy + ny * baseOffset
 
 			const fontPx = 18
-			const dims = estimateWrappedTextDimensions(line.label, Number.POSITIVE_INFINITY, fontPx, 1.2)
+			const dims = estimateWrappedTextDimensions(
+				line.label,
+				Number.POSITIVE_INFINITY,
+				fontPx,
+				1.2
+			)
 			const halfW = dims.maxWidth / 2
 			const halfH = dims.height / 2
 

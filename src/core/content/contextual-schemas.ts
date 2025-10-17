@@ -1,5 +1,8 @@
 import { z } from "zod"
-import { CHOICE_IDENTIFIER_REGEX, SLOT_IDENTIFIER_REGEX } from "@/compiler/qti-constants"
+import {
+	CHOICE_IDENTIFIER_REGEX,
+	SLOT_IDENTIFIER_REGEX
+} from "@/compiler/qti-constants"
 import { MATHML_INNER_PATTERN } from "@/widgets/utils/mathml"
 
 // Banned characters validation for text content
@@ -37,7 +40,10 @@ const InlineInteractionRefSchema = z
 		type: z.literal("inlineInteractionRef"),
 		interactionId: z
 			.string()
-			.regex(SLOT_IDENTIFIER_REGEX, "invalid slot identifier: must be lowercase with underscores")
+			.regex(
+				SLOT_IDENTIFIER_REGEX,
+				"invalid slot identifier: must be lowercase with underscores"
+			)
 			.describe("Unique identifier that matches an interaction key")
 	})
 	.strict()
@@ -45,22 +51,34 @@ const InlineInteractionRefSchema = z
 
 const GapInlineSchema = z
 	.object({
-		type: z.literal("gap").describe("Identifies this as a gap for gap match interaction"),
+		type: z
+			.literal("gap")
+			.describe("Identifies this as a gap for gap match interaction"),
 		gapId: z
 			.string()
-			.regex(CHOICE_IDENTIFIER_REGEX, "invalid gap identifier: must be uppercase")
+			.regex(
+				CHOICE_IDENTIFIER_REGEX,
+				"invalid gap identifier: must be uppercase"
+			)
 			.describe("References a gap defined in a gapMatchInteraction")
 	})
 	.strict()
-	.describe("A gap placeholder that users can drag items into in a gap match interaction")
+	.describe(
+		"A gap placeholder that users can drag items into in a gap match interaction"
+	)
 
-function createInlineWidgetRefSchema<const E extends readonly string[]>(widgetTypeKeys: E) {
+function createInlineWidgetRefSchema<const E extends readonly string[]>(
+	widgetTypeKeys: E
+) {
 	return z
 		.object({
 			type: z.literal("inlineWidgetRef"),
 			widgetId: z
 				.string()
-				.regex(SLOT_IDENTIFIER_REGEX, "invalid slot identifier: must be lowercase with underscores")
+				.regex(
+					SLOT_IDENTIFIER_REGEX,
+					"invalid slot identifier: must be lowercase with underscores"
+				)
 				.describe("Unique identifier that matches a widget key"),
 			widgetType: z.enum(widgetTypeKeys)
 		})
@@ -69,18 +87,25 @@ function createInlineWidgetRefSchema<const E extends readonly string[]>(widgetTy
 
 // ---[ MODULAR BUILDING BLOCKS (BLOCK) ]---
 
-function createWidgetRefBlockSchema<const E extends readonly string[]>(widgetTypeKeys: E) {
+function createWidgetRefBlockSchema<const E extends readonly string[]>(
+	widgetTypeKeys: E
+) {
 	return z
 		.object({
 			type: z.literal("widgetRef"),
 			widgetId: z
 				.string()
-				.regex(SLOT_IDENTIFIER_REGEX, "invalid slot identifier: must be lowercase with underscores")
+				.regex(
+					SLOT_IDENTIFIER_REGEX,
+					"invalid slot identifier: must be lowercase with underscores"
+				)
 				.describe("Unique identifier that matches a widget key"),
 			widgetType: z.enum(widgetTypeKeys)
 		})
 		.strict()
-		.describe("Reference to a generated widget by id, to be rendered as a block")
+		.describe(
+			"Reference to a generated widget by id, to be rendered as a block"
+		)
 }
 
 const InteractionRefBlockSchema = z
@@ -88,17 +113,26 @@ const InteractionRefBlockSchema = z
 		type: z.literal("interactionRef"),
 		interactionId: z
 			.string()
-			.regex(SLOT_IDENTIFIER_REGEX, "invalid slot identifier: must be lowercase with underscores")
+			.regex(
+				SLOT_IDENTIFIER_REGEX,
+				"invalid slot identifier: must be lowercase with underscores"
+			)
 			.describe("Unique identifier that matches an interaction key")
 	})
 	.strict()
-	.describe("Reference to a compiled interaction by id, to be rendered as a block")
+	.describe(
+		"Reference to a compiled interaction by id, to be rendered as a block"
+	)
 
 // Generic factory for paragraph blocks accepting a specific inline schema
-function createParagraphBlockSchema<TInline extends z.ZodTypeAny>(allowedInlinesSchema: TInline) {
+function createParagraphBlockSchema<TInline extends z.ZodTypeAny>(
+	allowedInlinesSchema: TInline
+) {
 	return z
 		.object({
-			type: z.literal("paragraph").describe("Identifies this as a paragraph block"),
+			type: z
+				.literal("paragraph")
+				.describe("Identifies this as a paragraph block"),
 			content: z
 				.array(allowedInlinesSchema)
 				.describe("The inline content contained within this paragraph")
@@ -112,20 +146,28 @@ function createUnorderedListBlockSchema<TInline extends z.ZodTypeAny>(
 ) {
 	return z
 		.object({
-			type: z.literal("unorderedList").describe("Identifies this as an unordered list"),
+			type: z
+				.literal("unorderedList")
+				.describe("Identifies this as an unordered list"),
 			items: z
 				.array(z.array(allowedInlinesSchema))
 				.min(1)
 				.describe("List items as arrays of inline content")
 		})
 		.strict()
-		.describe("An unordered list with each item rendered as a list item containing a paragraph")
+		.describe(
+			"An unordered list with each item rendered as a list item containing a paragraph"
+		)
 }
 
-function createOrderedListBlockSchema<TInline extends z.ZodTypeAny>(allowedInlinesSchema: TInline) {
+function createOrderedListBlockSchema<TInline extends z.ZodTypeAny>(
+	allowedInlinesSchema: TInline
+) {
 	return z
 		.object({
-			type: z.literal("orderedList").describe("Identifies this as an ordered list"),
+			type: z
+				.literal("orderedList")
+				.describe("Identifies this as an ordered list"),
 			items: z
 				.array(z.array(allowedInlinesSchema))
 				.min(1)
@@ -137,7 +179,9 @@ function createOrderedListBlockSchema<TInline extends z.ZodTypeAny>(allowedInlin
 		)
 }
 
-function createTableRichBlockSchema<TInline extends z.ZodTypeAny>(allowedInlinesSchema: TInline) {
+function createTableRichBlockSchema<TInline extends z.ZodTypeAny>(
+	allowedInlinesSchema: TInline
+) {
 	const TableRichCellSchema = z.array(allowedInlinesSchema).nullable()
 	const TableRichRowSchema = z.array(TableRichCellSchema)
 
@@ -150,15 +194,21 @@ function createTableRichBlockSchema<TInline extends z.ZodTypeAny>(allowedInlines
 		.strict()
 }
 
-function createBlockQuoteBlockSchema<TInline extends z.ZodTypeAny>(allowedInlinesSchema: TInline) {
+function createBlockQuoteBlockSchema<TInline extends z.ZodTypeAny>(
+	allowedInlinesSchema: TInline
+) {
 	return z
 		.object({
 			type: z
 				.literal("blockquote")
-				.describe("A semantic block quotation. Use ONLY for direct quotations of source text."),
+				.describe(
+					"A semantic block quotation. Use ONLY for direct quotations of source text."
+				),
 			content: z
 				.array(allowedInlinesSchema)
-				.describe("Directly quoted inline content from a source. Do not invent or paraphrase.")
+				.describe(
+					"Directly quoted inline content from a source. Do not invent or paraphrase."
+				)
 		})
 		.strict()
 		.describe("A blockquote used strictly for direct quotes.")
@@ -166,7 +216,9 @@ function createBlockQuoteBlockSchema<TInline extends z.ZodTypeAny>(allowedInline
 
 // ---[ CONTEXT-SPECIFIC SCHEMA FACTORIES ]---
 
-export function createBodyContentSchema<const E extends readonly string[]>(widgetTypeKeys: E) {
+export function createBodyContentSchema<const E extends readonly string[]>(
+	widgetTypeKeys: E
+) {
 	const InlineWidgetRefSchema = createInlineWidgetRefSchema(widgetTypeKeys)
 
 	const AllowedBodyInlines = z.discriminatedUnion("type", [
@@ -178,8 +230,10 @@ export function createBodyContentSchema<const E extends readonly string[]>(widge
 	])
 
 	const ParagraphBlockSchema = createParagraphBlockSchema(AllowedBodyInlines)
-	const UnorderedListBlockSchema = createUnorderedListBlockSchema(AllowedBodyInlines)
-	const OrderedListBlockSchema = createOrderedListBlockSchema(AllowedBodyInlines)
+	const UnorderedListBlockSchema =
+		createUnorderedListBlockSchema(AllowedBodyInlines)
+	const OrderedListBlockSchema =
+		createOrderedListBlockSchema(AllowedBodyInlines)
 	const TableRichBlockSchema = createTableRichBlockSchema(AllowedBodyInlines)
 	const BlockQuoteBlockSchema = createBlockQuoteBlockSchema(AllowedBodyInlines)
 	const WidgetRefBlockSchema = createWidgetRefBlockSchema(widgetTypeKeys)
@@ -197,23 +251,33 @@ export function createBodyContentSchema<const E extends readonly string[]>(widge
 	return z.array(AllowedBodyBlocks)
 }
 
-export function createFeedbackContentSchema<const E extends readonly string[]>(widgetTypeKeys: E) {
+export function createFeedbackContentSchema<const E extends readonly string[]>(
+	widgetTypeKeys: E
+) {
 	const InlineWidgetRefSchema = createInlineWidgetRefSchema(widgetTypeKeys)
 
 	const AllowedFeedbackInlines = z
-		.discriminatedUnion("type", [TextInlineSchema, MathInlineSchema, InlineWidgetRefSchema])
+		.discriminatedUnion("type", [
+			TextInlineSchema,
+			MathInlineSchema,
+			InlineWidgetRefSchema
+		])
 		.describe(
 			"Inline items permitted in feedback (text, math, inline widget references). Interactions are banned."
 		)
 
-	const ParagraphBlockSchema = createParagraphBlockSchema(AllowedFeedbackInlines).describe(
+	const ParagraphBlockSchema = createParagraphBlockSchema(
+		AllowedFeedbackInlines
+	).describe(
 		"Paragraph of inline content within feedback steps. Use for sentences and brief explanations."
 	)
 	// Lists are intentionally not constructed for steps to prevent list usage inside steps
-	const TableRichBlockSchema = createTableRichBlockSchema(AllowedFeedbackInlines).describe(
-		"Table for structured information in a step (no interactions)."
-	)
-	const WidgetRefBlockSchema = createWidgetRefBlockSchema(widgetTypeKeys).describe(
+	const TableRichBlockSchema = createTableRichBlockSchema(
+		AllowedFeedbackInlines
+	).describe("Table for structured information in a step (no interactions).")
+	const WidgetRefBlockSchema = createWidgetRefBlockSchema(
+		widgetTypeKeys
+	).describe(
 		"Embedded widget block used for diagrams or visuals that support the step."
 	)
 
@@ -221,13 +285,19 @@ export function createFeedbackContentSchema<const E extends readonly string[]>(w
 		.object({
 			type: z
 				.literal("blockquote")
-				.describe("A semantic block quotation. Use ONLY for direct quotations of source text."),
+				.describe(
+					"A semantic block quotation. Use ONLY for direct quotations of source text."
+				),
 			content: z
 				.array(AllowedFeedbackInlines)
-				.describe("Directly quoted inline content from a source. Do not invent or paraphrase.")
+				.describe(
+					"Directly quoted inline content from a source. Do not invent or paraphrase."
+				)
 		})
 		.strict()
-		.describe("A blockquote used strictly for direct quotes within a step. No attribution field.")
+		.describe(
+			"A blockquote used strictly for direct quotes within a step. No attribution field."
+		)
 
 	const AllowedFeedbackBlocks = z
 		.discriminatedUnion("type", [
@@ -236,15 +306,21 @@ export function createFeedbackContentSchema<const E extends readonly string[]>(w
 			WidgetRefBlockSchema,
 			BlockQuoteBlockSchema
 		])
-		.describe("Blocks permitted inside feedback steps: paragraphs, tables, widgets, blockquotes.")
+		.describe(
+			"Blocks permitted inside feedback steps: paragraphs, tables, widgets, blockquotes."
+		)
 
 	const StepBlockSchema = z
 		.object({
-			type: z.literal("step").describe("Identifies a pedagogical step in the feedback sequence."),
+			type: z
+				.literal("step")
+				.describe("Identifies a pedagogical step in the feedback sequence."),
 			title: z
 				.array(AllowedFeedbackInlines)
 				.min(1)
-				.describe("Short, imperative title for the step (e.g., 'Find the value of the box')."),
+				.describe(
+					"Short, imperative title for the step (e.g., 'Find the value of the box')."
+				),
 			content: z
 				.array(AllowedFeedbackBlocks)
 				.describe(
@@ -252,7 +328,9 @@ export function createFeedbackContentSchema<const E extends readonly string[]>(w
 				)
 		})
 		.strict()
-		.describe("A single feedback step with a concise title and explanatory body.")
+		.describe(
+			"A single feedback step with a concise title and explanatory body."
+		)
 
 	const PreambleSchema = z
 		.object({
@@ -269,7 +347,9 @@ export function createFeedbackContentSchema<const E extends readonly string[]>(w
 				)
 		})
 		.strict()
-		.describe("A mandatory preamble that communicates the verdict and a succinct rationale.")
+		.describe(
+			"A mandatory preamble that communicates the verdict and a succinct rationale."
+		)
 
 	return z
 		.object({
@@ -287,9 +367,9 @@ export function createFeedbackContentSchema<const E extends readonly string[]>(w
 		)
 }
 
-export function createChoiceInteractionPromptSchema<const E extends readonly string[]>(
-	widgetTypeKeys: E
-) {
+export function createChoiceInteractionPromptSchema<
+	const E extends readonly string[]
+>(widgetTypeKeys: E) {
 	const InlineWidgetRefSchema = createInlineWidgetRefSchema(widgetTypeKeys)
 
 	const AllowedPromptInlines = z.discriminatedUnion("type", [
@@ -302,9 +382,9 @@ export function createChoiceInteractionPromptSchema<const E extends readonly str
 	return z.array(AllowedPromptInlines)
 }
 
-export function createChoiceInteractionChoiceContentSchema<const E extends readonly string[]>(
-	widgetTypeKeys: E
-) {
+export function createChoiceInteractionChoiceContentSchema<
+	const E extends readonly string[]
+>(widgetTypeKeys: E) {
 	const InlineWidgetRefSchema = createInlineWidgetRefSchema(widgetTypeKeys)
 
 	const AllowedChoiceInlines = z.discriminatedUnion("type", [
@@ -315,10 +395,13 @@ export function createChoiceInteractionChoiceContentSchema<const E extends reado
 	])
 
 	const ParagraphBlockSchema = createParagraphBlockSchema(AllowedChoiceInlines)
-	const UnorderedListBlockSchema = createUnorderedListBlockSchema(AllowedChoiceInlines)
-	const OrderedListBlockSchema = createOrderedListBlockSchema(AllowedChoiceInlines)
+	const UnorderedListBlockSchema =
+		createUnorderedListBlockSchema(AllowedChoiceInlines)
+	const OrderedListBlockSchema =
+		createOrderedListBlockSchema(AllowedChoiceInlines)
 	const TableRichBlockSchema = createTableRichBlockSchema(AllowedChoiceInlines)
-	const BlockQuoteBlockSchema = createBlockQuoteBlockSchema(AllowedChoiceInlines)
+	const BlockQuoteBlockSchema =
+		createBlockQuoteBlockSchema(AllowedChoiceInlines)
 	const WidgetRefBlockSchema = createWidgetRefBlockSchema(widgetTypeKeys)
 
 	const AllowedChoiceBlocks = z.discriminatedUnion("type", [
@@ -334,9 +417,9 @@ export function createChoiceInteractionChoiceContentSchema<const E extends reado
 	return z.array(AllowedChoiceBlocks)
 }
 
-export function createInlineChoiceContentSchema<const E extends readonly string[]>(
-	widgetTypeKeys: E
-) {
+export function createInlineChoiceContentSchema<
+	const E extends readonly string[]
+>(widgetTypeKeys: E) {
 	const InlineWidgetRefSchema = createInlineWidgetRefSchema(widgetTypeKeys)
 
 	const AllowedInlineChoiceInlines = z.discriminatedUnion("type", [
@@ -349,7 +432,9 @@ export function createInlineChoiceContentSchema<const E extends readonly string[
 	return z.array(AllowedInlineChoiceInlines)
 }
 
-export function createGapMatchContentSchema<const E extends readonly string[]>(_widgetTypeKeys: E) {
+export function createGapMatchContentSchema<const E extends readonly string[]>(
+	_widgetTypeKeys: E
+) {
 	// Gap match content MUST allow gaps inline
 	const AllowedGapMatchInlines = z.discriminatedUnion("type", [
 		TextInlineSchema,
@@ -358,11 +443,21 @@ export function createGapMatchContentSchema<const E extends readonly string[]>(_
 		// InlineWidgetRefSchema, InlineInteractionRefSchema are BANNED
 	])
 
-	const ParagraphBlockSchema = createParagraphBlockSchema(AllowedGapMatchInlines)
-	const UnorderedListBlockSchema = createUnorderedListBlockSchema(AllowedGapMatchInlines)
-	const OrderedListBlockSchema = createOrderedListBlockSchema(AllowedGapMatchInlines)
-	const TableRichBlockSchema = createTableRichBlockSchema(AllowedGapMatchInlines)
-	const BlockQuoteBlockSchema = createBlockQuoteBlockSchema(AllowedGapMatchInlines)
+	const ParagraphBlockSchema = createParagraphBlockSchema(
+		AllowedGapMatchInlines
+	)
+	const UnorderedListBlockSchema = createUnorderedListBlockSchema(
+		AllowedGapMatchInlines
+	)
+	const OrderedListBlockSchema = createOrderedListBlockSchema(
+		AllowedGapMatchInlines
+	)
+	const TableRichBlockSchema = createTableRichBlockSchema(
+		AllowedGapMatchInlines
+	)
+	const BlockQuoteBlockSchema = createBlockQuoteBlockSchema(
+		AllowedGapMatchInlines
+	)
 
 	const AllowedGapMatchBlocks = z.discriminatedUnion("type", [
 		ParagraphBlockSchema,

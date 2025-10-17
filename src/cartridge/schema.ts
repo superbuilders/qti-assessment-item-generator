@@ -9,7 +9,12 @@ export const QuestionRefSchema = z
 	.strict()
 
 export const ResourceArticleSchema = z
-	.object({ id: z.string(), title: z.string(), type: z.literal("article"), path: z.string() })
+	.object({
+		id: z.string(),
+		title: z.string(),
+		type: z.literal("article"),
+		path: z.string()
+	})
 	.strict()
 
 export const ResourceQuizSchema = z
@@ -64,7 +69,11 @@ export const UnitSchema = z
 			.strict()
 			.optional(),
 		counts: z
-			.object({ lessonCount: z.number(), resourceCount: z.number(), questionCount: z.number() })
+			.object({
+				lessonCount: z.number(),
+				resourceCount: z.number(),
+				questionCount: z.number()
+			})
 			.strict()
 	})
 	.strict()
@@ -74,7 +83,11 @@ export const IndexV1Schema = z
 		version: z.literal(1),
 		generatedAt: z.string(),
 		generator: z
-			.object({ name: z.string(), version: z.string(), commit: z.string().optional() })
+			.object({
+				name: z.string(),
+				version: z.string(),
+				commit: z.string().optional()
+			})
 			.strict(),
 		course: z.object({ title: z.string(), subject: z.string() }).strict(),
 		units: z.array(
@@ -93,6 +106,9 @@ export const IndexV1Schema = z
 export const IntegritySchema = z
 	.object({
 		algorithm: z.literal("sha256"),
-		files: z.record(z.string(), z.object({ size: z.number(), sha256: z.string() }).strict())
+		files: z.record(
+			z.string(),
+			z.object({ size: z.number(), sha256: z.string() }).strict()
+		)
 	})
 	.strict()

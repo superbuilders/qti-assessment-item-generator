@@ -1,8 +1,11 @@
 import { describe, expect, test } from "bun:test"
 import { compile } from "@/compiler/compiler"
 import type { AssessmentItemInput } from "@/core/item"
+import {
+	MINIMAL_CORRECT_FEEDBACK,
+	MINIMAL_INCORRECT_FEEDBACK
+} from "@/testing/helpers/feedback-fixtures"
 import { allWidgetsCollection } from "@/widgets/collections/all"
-import { MINIMAL_CORRECT_FEEDBACK, MINIMAL_INCORRECT_FEEDBACK } from "../helpers/feedback-fixtures"
 
 describe("Compiler: gapMatchInteraction validation", () => {
 	const baseValidItem: AssessmentItemInput<[]> = {
@@ -34,7 +37,11 @@ describe("Compiler: gapMatchInteraction validation", () => {
 					}
 				],
 				gapTexts: [
-					{ identifier: "TOKEN_A", matchMax: 1, content: [{ type: "text", content: "A" }] }
+					{
+						identifier: "TOKEN_A",
+						matchMax: 1,
+						content: [{ type: "text", content: "A" }]
+					}
 				],
 				gaps: [{ identifier: "GAP_1", required: true }]
 			}
@@ -48,7 +55,10 @@ describe("Compiler: gapMatchInteraction validation", () => {
 				}
 			],
 			combinations: [
-				{ id: "FB__RESPONSE_CORRECT", path: [{ responseIdentifier: "RESPONSE", key: "CORRECT" }] },
+				{
+					id: "FB__RESPONSE_CORRECT",
+					path: [{ responseIdentifier: "RESPONSE", key: "CORRECT" }]
+				},
 				{
 					id: "FB__RESPONSE_INCORRECT",
 					path: [{ responseIdentifier: "RESPONSE", key: "INCORRECT" }]
@@ -79,20 +89,30 @@ describe("Compiler: gapMatchInteraction validation", () => {
 
 	test("should reject when gap count in content mismatches gaps array (too few)", async () => {
 		const invalidItem = JSON.parse(JSON.stringify(baseValidItem))
-		invalidItem.interactions.gap_match.gaps.push({ identifier: "GAP_2", required: true }) // Declared 2, used 1
-		invalidItem.responseDeclarations[0].correct.push({ source: "TOKEN_A", target: "GAP_2" })
+		invalidItem.interactions.gap_match.gaps.push({
+			identifier: "GAP_2",
+			required: true
+		}) // Declared 2, used 1
+		invalidItem.responseDeclarations[0].correct.push({
+			source: "TOKEN_A",
+			target: "GAP_2"
+		})
 		await expect(compile(invalidItem, allWidgetsCollection)).rejects.toThrow()
 	})
 
 	test("should reject when gap count in content mismatches gaps array (too many)", async () => {
 		const invalidItem = JSON.parse(JSON.stringify(baseValidItem))
-		invalidItem.interactions.gap_match.content[0].content.push({ type: "gap", gapId: "GAP_1" }) // Used 2, declared 1
+		invalidItem.interactions.gap_match.content[0].content.push({
+			type: "gap",
+			gapId: "GAP_1"
+		}) // Used 2, declared 1
 		await expect(compile(invalidItem, allWidgetsCollection)).rejects.toThrow()
 	})
 
 	test("should reject when a gapId in content is not declared in gaps array", async () => {
 		const invalidItem = JSON.parse(JSON.stringify(baseValidItem))
-		invalidItem.interactions.gap_match.content[0].content[1].gapId = "GAP_UNDECLARED"
+		invalidItem.interactions.gap_match.content[0].content[1].gapId =
+			"GAP_UNDECLARED"
 		await expect(compile(invalidItem, allWidgetsCollection)).rejects.toThrow()
 	})
 
@@ -120,9 +140,18 @@ describe("Compiler: gapMatchInteraction validation", () => {
 	test("should reject when correct source usage exceeds matchMax", async () => {
 		const invalidItem = JSON.parse(JSON.stringify(baseValidItem))
 		invalidItem.interactions.gap_match.gapTexts[0].matchMax = 1
-		invalidItem.interactions.gap_match.gaps.push({ identifier: "GAP_2", required: true })
-		invalidItem.interactions.gap_match.content[0].content.push({ type: "text", content: " and " })
-		invalidItem.interactions.gap_match.content[0].content.push({ type: "gap", gapId: "GAP_2" })
+		invalidItem.interactions.gap_match.gaps.push({
+			identifier: "GAP_2",
+			required: true
+		})
+		invalidItem.interactions.gap_match.content[0].content.push({
+			type: "text",
+			content: " and "
+		})
+		invalidItem.interactions.gap_match.content[0].content.push({
+			type: "gap",
+			gapId: "GAP_2"
+		})
 		invalidItem.responseDeclarations[0].correct = [
 			{ source: "TOKEN_A", target: "GAP_1" },
 			{ source: "TOKEN_A", target: "GAP_2" }
@@ -156,9 +185,18 @@ describe("Compiler: gapMatchInteraction validation", () => {
 	test("should allow matchMax=0 (unlimited) with multiple usages", async () => {
 		const validItem = JSON.parse(JSON.stringify(baseValidItem))
 		validItem.interactions.gap_match.gapTexts[0].matchMax = 0 // Unlimited
-		validItem.interactions.gap_match.gaps.push({ identifier: "GAP_2", required: true })
-		validItem.interactions.gap_match.content[0].content.push({ type: "text", content: " and " })
-		validItem.interactions.gap_match.content[0].content.push({ type: "gap", gapId: "GAP_2" })
+		validItem.interactions.gap_match.gaps.push({
+			identifier: "GAP_2",
+			required: true
+		})
+		validItem.interactions.gap_match.content[0].content.push({
+			type: "text",
+			content: " and "
+		})
+		validItem.interactions.gap_match.content[0].content.push({
+			type: "gap",
+			gapId: "GAP_2"
+		})
 		validItem.responseDeclarations[0].correct = [
 			{ source: "TOKEN_A", target: "GAP_1" },
 			{ source: "TOKEN_A", target: "GAP_2" }

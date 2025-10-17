@@ -1,8 +1,11 @@
 import { describe, expect, test } from "bun:test"
 import { compile } from "@/compiler/compiler"
 import type { AssessmentItemInput } from "@/core/item"
+import {
+	MINIMAL_CORRECT_FEEDBACK,
+	MINIMAL_INCORRECT_FEEDBACK
+} from "@/testing/helpers/feedback-fixtures"
 import { allWidgetsCollection } from "@/widgets/collections/all"
-import { MINIMAL_CORRECT_FEEDBACK, MINIMAL_INCORRECT_FEEDBACK } from "../helpers/feedback-fixtures"
 
 describe("Compiler: blockquote", () => {
 	test("should render blockquote in body with escaped content", async () => {
@@ -18,10 +21,18 @@ describe("Compiler: blockquote", () => {
 				}
 			],
 			body: [
-				{ type: "paragraph", content: [{ type: "text", content: "Consider this quote:" }] },
+				{
+					type: "paragraph",
+					content: [{ type: "text", content: "Consider this quote:" }]
+				},
 				{
 					type: "blockquote",
-					content: [{ type: "text", content: "To be or not to be, that is the question." }]
+					content: [
+						{
+							type: "text",
+							content: "To be or not to be, that is the question."
+						}
+					]
 				}
 			],
 			widgets: null,
@@ -78,7 +89,12 @@ describe("Compiler: blockquote", () => {
 			body: [
 				{
 					type: "blockquote",
-					content: [{ type: "text", content: "Remember to find the common denominator first!" }]
+					content: [
+						{
+							type: "text",
+							content: "Remember to find the common denominator first!"
+						}
+					]
 				}
 			],
 			widgets: null,
@@ -90,11 +106,21 @@ describe("Compiler: blockquote", () => {
 					choices: [
 						{
 							identifier: "A",
-							content: [{ type: "paragraph", content: [{ type: "text", content: "Option A" }] }]
+							content: [
+								{
+									type: "paragraph",
+									content: [{ type: "text", content: "Option A" }]
+								}
+							]
 						},
 						{
 							identifier: "B",
-							content: [{ type: "paragraph", content: [{ type: "text", content: "Option B" }] }]
+							content: [
+								{
+									type: "paragraph",
+									content: [{ type: "text", content: "Option B" }]
+								}
+							]
 						}
 					],
 					shuffle: true,

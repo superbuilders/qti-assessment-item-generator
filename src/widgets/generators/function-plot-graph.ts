@@ -1,17 +1,17 @@
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
 import {
 	createAxisOptionsSchema,
 	createPlotPointSchema,
 	createPolylineSchema,
 	renderPoints,
 	renderPolylines
-} from "../utils/canvas-utils"
-import { AXIS_VIEWBOX_PADDING } from "../utils/constants"
-import { setupCoordinatePlaneV2 } from "../utils/coordinate-plane-v2"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { theme } from "../utils/theme"
+} from "@/widgets/utils/canvas-utils"
+import { AXIS_VIEWBOX_PADDING } from "@/widgets/utils/constants"
+import { setupCoordinatePlaneV2 } from "@/widgets/utils/coordinate-plane-v2"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
 
 // Use shared axis schema from utils
 
@@ -51,12 +51,15 @@ export const FunctionPlotGraphPropsSchema = z
 		"Creates a coordinate plane optimized for plotting mathematical functions as connected line segments (polylines). Supports multiple functions, highlighted points, and full axis configuration. Perfect for graphing polynomials, piecewise functions, and any curve that can be approximated by line segments."
 	)
 
-export type FunctionPlotGraphProps = z.infer<typeof FunctionPlotGraphPropsSchema>
+export type FunctionPlotGraphProps = z.infer<
+	typeof FunctionPlotGraphPropsSchema
+>
 
 export const generateFunctionPlotGraph: WidgetGenerator<
 	typeof FunctionPlotGraphPropsSchema
 > = async (props) => {
-	const { width, height, xAxis, yAxis, showQuadrantLabels, polylines, points } = props
+	const { width, height, xAxis, yAxis, showQuadrantLabels, polylines, points } =
+		props
 
 	// 1. Call the base generator and get the body content and extents object
 	const canvas = new CanvasImpl({

@@ -52,7 +52,8 @@ export function transformObjectsToArrays(data: unknown): unknown {
 			return []
 		}
 
-		const isArrayLike = keys.length > 0 && keys.every((k) => k.startsWith(ARRAY_KEY_PREFIX))
+		const isArrayLike =
+			keys.length > 0 && keys.every((k) => k.startsWith(ARRAY_KEY_PREFIX))
 
 		if (isArrayLike) {
 			const newArr: unknown[] = []
@@ -62,7 +63,10 @@ export function transformObjectsToArrays(data: unknown): unknown {
 					Number.parseInt(b.substring(ARRAY_KEY_PREFIX.length), 10)
 			)
 			for (const key of sortedKeys) {
-				const index = Number.parseInt(key.substring(ARRAY_KEY_PREFIX.length), 10)
+				const index = Number.parseInt(
+					key.substring(ARRAY_KEY_PREFIX.length),
+					10
+				)
 				newArr[index] = transformObjectsToArrays(obj[key])
 			}
 			return newArr

@@ -2,7 +2,10 @@ import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
 import { toJSONSchemaPromptSafe } from "@/core/json-schema"
-import type { WidgetCollection, WidgetDefinition } from "@/widgets/collections/types"
+import type {
+	WidgetCollection,
+	WidgetDefinition
+} from "@/widgets/collections/types"
 
 // Runtime type guard to ensure values are Zod schemas without using type assertions
 function isZodSchema(value: unknown): value is z.ZodType<unknown> {
@@ -13,7 +16,10 @@ function isZodSchema(value: unknown): value is z.ZodType<unknown> {
  * Generates the reusable markdown section for widget selection instructions.
  */
 export function createWidgetSelectionPromptSection<
-	C extends WidgetCollection<Record<string, WidgetDefinition<unknown, unknown>>, readonly string[]>
+	C extends WidgetCollection<
+		Record<string, WidgetDefinition<unknown, unknown>>,
+		readonly string[]
+	>
 >(collection: C): string {
 	const allowedWidgetTypes = collection.widgetTypeKeys
 	const widgetSchemas: Record<string, object> = {}
@@ -22,13 +28,19 @@ export function createWidgetSelectionPromptSection<
 	for (const key of collection.widgetTypeKeys) {
 		const schemaEntry = collection.widgets[key].schema
 		if (!isZodSchema(schemaEntry)) {
-			logger.error("collection schema not a zod type", { key, collectionName: collection.name })
+			logger.error("collection schema not a zod type", {
+				key,
+				collectionName: collection.name
+			})
 			throw errors.new("invalid widget schema")
 		}
 
 		const jsonResult = errors.trySync(() => toJSONSchemaPromptSafe(schemaEntry))
 		if (jsonResult.error) {
-			logger.error("widget schema json conversion", { key, error: jsonResult.error })
+			logger.error("widget schema json conversion", {
+				key,
+				error: jsonResult.error
+			})
 			throw errors.wrap(jsonResult.error, "widget schema json conversion")
 		}
 		widgetSchemas[key] = jsonResult.data
@@ -37,7 +49,9 @@ export function createWidgetSelectionPromptSection<
 
 	return `
 ## Available Widget Types and Schemas
-You MUST choose a \`widgetType\` from this exact list: \`[${Array.from(allowedWidgetTypes)
+You MUST choose a \`widgetType\` from this exact list: \`[${Array.from(
+		allowedWidgetTypes
+	)
 		.map((t) => `"${t}"`)
 		.join(", ")}]\`.
 Here are the FULL JSON schemas for each available widget:
@@ -61,7 +75,10 @@ export function formatUnifiedContextSections(
 	sections.push(envelope.primaryContent)
 	sections.push("```")
 
-	if (envelope.supplementaryContent && envelope.supplementaryContent.length > 0) {
+	if (
+		envelope.supplementaryContent &&
+		envelope.supplementaryContent.length > 0
+	) {
 		sections.push("\n## Supplementary Content:")
 		for (let i = 0; i < envelope.supplementaryContent.length; i++) {
 			sections.push(`\n### Supplement ${i + 1}:`)

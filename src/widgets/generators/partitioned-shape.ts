@@ -1,22 +1,26 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { PADDING } from "../utils/constants"
-import { CSS_COLOR_PATTERN } from "../utils/css-color"
-import { Path2D } from "../utils/path-builder"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { PADDING } from "@/widgets/utils/constants"
+import { CSS_COLOR_PATTERN } from "@/widgets/utils/css-color"
+import { Path2D } from "@/widgets/utils/path-builder"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
 
-export const ErrInvalidPartitionGeometry = errors.new("invalid partition geometry")
+export const ErrInvalidPartitionGeometry = errors.new(
+	"invalid partition geometry"
+)
 
 function createPartitionShapeSchema() {
 	return z
 		.object({
 			type: z
 				.enum(["rectangle", "circle"])
-				.describe("Shape type. 'rectangle' creates a grid, 'circle' creates pie-like sectors."),
+				.describe(
+					"Shape type. 'rectangle' creates a grid, 'circle' creates pie-like sectors."
+				),
 			totalParts: z
 				.number()
 				.int()
@@ -47,7 +51,10 @@ function createPartitionShapeSchema() {
 				),
 			shadeColor: z
 				.string()
-				.regex(CSS_COLOR_PATTERN, "invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)")
+				.regex(
+					CSS_COLOR_PATTERN,
+					"invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)"
+				)
 				.describe(
 					"Hex-only color for shaded cells (e.g., '#4472C4', '#1E90FF', '#FF000080' for 50% alpha). Applies to all shaded cells."
 				),
@@ -84,11 +91,15 @@ function createLineOverlaySchema() {
 					row: z
 						.number()
 						.int()
-						.describe("Ending row index (0-based). Creates line from 'from' to this point."),
+						.describe(
+							"Ending row index (0-based). Creates line from 'from' to this point."
+						),
 					col: z
 						.number()
 						.int()
-						.describe("Ending column index (0-based). Creates line from 'from' to this point.")
+						.describe(
+							"Ending column index (0-based). Creates line from 'from' to this point."
+						)
 				})
 				.strict(),
 			style: z
@@ -98,7 +109,10 @@ function createLineOverlaySchema() {
 				),
 			color: z
 				.string()
-				.regex(CSS_COLOR_PATTERN, "invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)")
+				.regex(
+					CSS_COLOR_PATTERN,
+					"invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)"
+				)
 				.describe(
 					"Hex-only color for the line (e.g., '#000000', '#FF0000', '#00000080' for 50% alpha). Should contrast with background."
 				)
@@ -133,14 +147,20 @@ function createFigureSchema() {
 				),
 			fillColor: z
 				.string()
-				.regex(CSS_COLOR_PATTERN, "invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)")
+				.regex(
+					CSS_COLOR_PATTERN,
+					"invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)"
+				)
 				.nullable()
 				.describe(
 					"Hex-only fill color for the polygon (e.g., '#FFC8004D' for ~30% alpha). Use transparency via 8-digit hex to show grid. null for no fill."
 				),
 			strokeColor: z
 				.string()
-				.regex(CSS_COLOR_PATTERN, "invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)")
+				.regex(
+					CSS_COLOR_PATTERN,
+					"invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)"
+				)
 				.nullable()
 				.describe(
 					"Hex-only color for polygon outline (e.g., '#000000', '#00008B'). null for no outline."
@@ -158,7 +178,9 @@ export const PartitionedShapePropsSchema = z
 				height: createHeightSchema(),
 				mode: z
 					.literal("partition")
-					.describe("Partition mode: shows shapes divided into equal parts for fractions."),
+					.describe(
+						"Partition mode: shows shapes divided into equal parts for fractions."
+					),
 				shapes: z
 					.array(createPartitionShapeSchema())
 					.describe(
@@ -183,17 +205,23 @@ export const PartitionedShapePropsSchema = z
 				height: createHeightSchema(),
 				mode: z
 					.literal("geometry")
-					.describe("Geometry mode: shows a coordinate grid with polygons and lines."),
+					.describe(
+						"Geometry mode: shows a coordinate grid with polygons and lines."
+					),
 				grid: z
 					.object({
 						rows: z
 							.number()
 							.int()
-							.describe("Number of grid rows (e.g., 10, 8, 12). Creates horizontal lines."),
+							.describe(
+								"Number of grid rows (e.g., 10, 8, 12). Creates horizontal lines."
+							),
 						columns: z
 							.number()
 							.int()
-							.describe("Number of grid columns (e.g., 10, 12, 8). Creates vertical lines."),
+							.describe(
+								"Number of grid columns (e.g., 10, 12, 8). Creates vertical lines."
+							),
 						opacity: z
 							.number()
 							.describe(
@@ -226,11 +254,20 @@ type PartitionModeProps = Extract<PartitionedShapeProps, { mode: "partition" }>
 type GeometryModeProps = Extract<PartitionedShapeProps, { mode: "geometry" }>
 
 const generatePartitionView = (props: PartitionModeProps): string => {
-	const { shapes, width: shapeWidth, height: shapeHeight, layout, overlays } = props
+	const {
+		shapes,
+		width: shapeWidth,
+		height: shapeHeight,
+		layout,
+		overlays
+	} = props
 
 	// Validate rectangle geometry
 	for (const shape of shapes) {
-		if (shape.type === "rectangle" && shape.rows * shape.columns !== shape.totalParts) {
+		if (
+			shape.type === "rectangle" &&
+			shape.rows * shape.columns !== shape.totalParts
+		) {
 			logger.error("invalid rectangle partition geometry", {
 				rows: shape.rows,
 				columns: shape.columns,
@@ -247,9 +284,13 @@ const generatePartitionView = (props: PartitionModeProps): string => {
 	const rad = (deg: number) => (deg * Math.PI) / 180
 	const gap = 20
 	const totalWidth =
-		layout === "horizontal" ? shapes.length * shapeWidth + (shapes.length - 1) * gap : shapeWidth
+		layout === "horizontal"
+			? shapes.length * shapeWidth + (shapes.length - 1) * gap
+			: shapeWidth
 	const totalHeight =
-		layout === "vertical" ? shapes.length * shapeHeight + (shapes.length - 1) * gap : shapeHeight
+		layout === "vertical"
+			? shapes.length * shapeHeight + (shapes.length - 1) * gap
+			: shapeHeight
 
 	const canvas = new CanvasImpl({
 		chartArea: { left: 0, top: 0, width: totalWidth, height: totalHeight },
@@ -489,9 +530,9 @@ const generateGeometryView = (props: GeometryModeProps): string => {
 }
 
 // MODIFIED: The main generator function is now a switcher
-export const generatePartitionedShape: WidgetGenerator<typeof PartitionedShapePropsSchema> = async (
-	props
-) => {
+export const generatePartitionedShape: WidgetGenerator<
+	typeof PartitionedShapePropsSchema
+> = async (props) => {
 	switch (props.mode) {
 		case "partition":
 			return generatePartitionView(props)

@@ -25,7 +25,10 @@ function processExampleFile(filePath: string): void {
 
 	const contentResult = errors.trySync(() => readFileSync(filePath, "utf-8"))
 	if (contentResult.error) {
-		logger.error("failed to read file", { error: contentResult.error, filePath })
+		logger.error("failed to read file", {
+			error: contentResult.error,
+			filePath
+		})
 		throw errors.wrap(contentResult.error, "file read")
 	}
 
@@ -36,7 +39,11 @@ function processExampleFile(filePath: string): void {
 	const widthRegex = /(\s+(?:")?width(?:")?\s*:\s*)(\d+(?:\.\d+)?)([,\s])/g
 	content = content.replace(widthRegex, (_match, prefix, widthStr, suffix) => {
 		const originalWidth = Number.parseFloat(widthStr)
-		const clampedWidth = clampValue(originalWidth, SVG_DIAGRAM_WIDTH_MIN, SVG_DIAGRAM_WIDTH_MAX)
+		const clampedWidth = clampValue(
+			originalWidth,
+			SVG_DIAGRAM_WIDTH_MIN,
+			SVG_DIAGRAM_WIDTH_MAX
+		)
 
 		if (originalWidth !== clampedWidth) {
 			logger.debug("clamping width", {
@@ -52,26 +59,38 @@ function processExampleFile(filePath: string): void {
 
 	// Match height: <number> patterns (both with and without quotes)
 	const heightRegex = /(\s+(?:")?height(?:")?\s*:\s*)(\d+(?:\.\d+)?)([,\s])/g
-	content = content.replace(heightRegex, (_match, prefix, heightStr, suffix) => {
-		const originalHeight = Number.parseFloat(heightStr)
-		const clampedHeight = clampValue(originalHeight, SVG_DIAGRAM_HEIGHT_MIN, SVG_DIAGRAM_HEIGHT_MAX)
+	content = content.replace(
+		heightRegex,
+		(_match, prefix, heightStr, suffix) => {
+			const originalHeight = Number.parseFloat(heightStr)
+			const clampedHeight = clampValue(
+				originalHeight,
+				SVG_DIAGRAM_HEIGHT_MIN,
+				SVG_DIAGRAM_HEIGHT_MAX
+			)
 
-		if (originalHeight !== clampedHeight) {
-			logger.debug("clamping height", {
-				filePath,
-				original: originalHeight,
-				clamped: clampedHeight
-			})
-			modified = true
+			if (originalHeight !== clampedHeight) {
+				logger.debug("clamping height", {
+					filePath,
+					original: originalHeight,
+					clamped: clampedHeight
+				})
+				modified = true
+			}
+
+			return `${prefix}${clampedHeight}${suffix}`
 		}
-
-		return `${prefix}${clampedHeight}${suffix}`
-	})
+	)
 
 	if (modified) {
-		const writeResult = errors.trySync(() => writeFileSync(filePath, content, "utf-8"))
+		const writeResult = errors.trySync(() =>
+			writeFileSync(filePath, content, "utf-8")
+		)
 		if (writeResult.error) {
-			logger.error("failed to write file", { error: writeResult.error, filePath })
+			logger.error("failed to write file", {
+				error: writeResult.error,
+				filePath
+			})
 			throw errors.wrap(writeResult.error, "file write")
 		}
 		logger.info("updated file with clamped dimensions", { filePath })
@@ -93,11 +112,15 @@ function main(): void {
 
 	const readExamplesDirResult = errors.trySync(() => readdirSync(examplesDir))
 	if (readExamplesDirResult.error) {
-		logger.error("failed to read examples directory", { error: readExamplesDirResult.error })
+		logger.error("failed to read examples directory", {
+			error: readExamplesDirResult.error
+		})
 		throw errors.wrap(readExamplesDirResult.error, "directory read")
 	}
 
-	const exampleFiles = readExamplesDirResult.data.filter((file) => file.endsWith(".ts"))
+	const exampleFiles = readExamplesDirResult.data.filter((file) =>
+		file.endsWith(".ts")
+	)
 	logger.info("found example files", { count: exampleFiles.length })
 
 	let processedCount = 0
@@ -112,11 +135,15 @@ function main(): void {
 
 	const readTestDirResult = errors.trySync(() => readdirSync(testWidgetsDir))
 	if (readTestDirResult.error) {
-		logger.error("failed to read test widgets directory", { error: readTestDirResult.error })
+		logger.error("failed to read test widgets directory", {
+			error: readTestDirResult.error
+		})
 		throw errors.wrap(readTestDirResult.error, "directory read")
 	}
 
-	const testFiles = readTestDirResult.data.filter((file) => file.endsWith(".test.ts"))
+	const testFiles = readTestDirResult.data.filter((file) =>
+		file.endsWith(".test.ts")
+	)
 	logger.info("found test files", { count: testFiles.length })
 
 	for (const file of testFiles) {

@@ -14,7 +14,10 @@ const MFENCED_REGEX = /<mfenced(?:\s+[^>]*)?>/i
  * @param htmlFragment The string to validate.
  * @param logger The logger instance.
  */
-export function checkNoLatex(htmlFragment: string, logger: logger.Logger): void {
+export function checkNoLatex(
+	htmlFragment: string,
+	logger: logger.Logger
+): void {
 	const latexCommandMatch = htmlFragment.match(LATEX_LIKE_REGEX)
 	if (latexCommandMatch) {
 		const contextIndex = latexCommandMatch.index ?? 0
@@ -33,7 +36,8 @@ export function checkNoLatex(htmlFragment: string, logger: logger.Logger): void 
 
 	// First, check if dollar signs are properly tagged as currency - if so, skip LaTeX validation
 	// This handles cases like <span class="currency">$</span>
-	const currencyTaggedDollar = /<span\s+class\s*=\s*["']currency["']\s*>\s*\$\s*<\/span>/gi
+	const currencyTaggedDollar =
+		/<span\s+class\s*=\s*["']currency["']\s*>\s*\$\s*<\/span>/gi
 	const fragmentWithoutCurrencyTags = htmlFragment.replace(
 		currencyTaggedDollar,
 		"CURRENCY_PLACEHOLDER"
@@ -52,7 +56,10 @@ export function checkNoLatex(htmlFragment: string, logger: logger.Logger): void 
 
 	let processedFragment = fragmentWithoutCurrencyTags
 	for (const pattern of currencyPatterns) {
-		processedFragment = processedFragment.replace(pattern, "CURRENCY_PLACEHOLDER")
+		processedFragment = processedFragment.replace(
+			pattern,
+			"CURRENCY_PLACEHOLDER"
+		)
 	}
 
 	// Now check for LaTeX-style dollar delimiters in the processed fragment
@@ -107,7 +114,10 @@ export function checkNoLatex(htmlFragment: string, logger: logger.Logger): void 
  * @param htmlFragment The string to validate.
  * @param logger The logger instance.
  */
-export function checkNoPerseusArtifacts(htmlFragment: string, logger: logger.Logger): void {
+export function checkNoPerseusArtifacts(
+	htmlFragment: string,
+	logger: logger.Logger
+): void {
 	const match = htmlFragment.match(PERSEUS_ARTIFACT_REGEX)
 	if (match) {
 		const contextIndex = match.index ?? 0
@@ -131,7 +141,10 @@ export function checkNoPerseusArtifacts(htmlFragment: string, logger: logger.Log
  * @param htmlFragment The string to validate.
  * @param logger The logger instance.
  */
-export function checkNoMfencedElements(htmlFragment: string, logger: logger.Logger): void {
+export function checkNoMfencedElements(
+	htmlFragment: string,
+	logger: logger.Logger
+): void {
 	const match = htmlFragment.match(MFENCED_REGEX)
 	if (match) {
 		const contextIndex = match.index ?? 0
@@ -178,8 +191,12 @@ export function sanitizeMathMLOperators(htmlFragment: string): string {
 	fixedXml = fixedXml.replace(/<mo(?:\s+[^>]*)?>><\/mo>/gi, (match) =>
 		match.replace("></mo>", "&gt;</mo>")
 	)
-	fixedXml = fixedXml.replace(/<mo(?:\s+[^>]?)?><=(\/mo>)/gi, (match) => match.replace("<=", "≤"))
-	fixedXml = fixedXml.replace(/<mo(?:\s+[^>]*)?>>=(<\/mo>)/gi, (match) => match.replace(">=", "≥"))
+	fixedXml = fixedXml.replace(/<mo(?:\s+[^>]?)?><=(\/mo>)/gi, (match) =>
+		match.replace("<=", "≤")
+	)
+	fixedXml = fixedXml.replace(/<mo(?:\s+[^>]*)?>>=(<\/mo>)/gi, (match) =>
+		match.replace(">=", "≥")
+	)
 	return fixedXml
 }
 
@@ -194,7 +211,10 @@ export function sanitizeMathMLOperators(htmlFragment: string): string {
  * @param fragment The text or markup fragment to validate
  * @param logger The logger instance
  */
-export function checkNoInvalidXmlChars(fragment: string, logger: logger.Logger): void {
+export function checkNoInvalidXmlChars(
+	fragment: string,
+	logger: logger.Logger
+): void {
 	const invalidCodePoints: Array<{ index: number; codePoint: number }> = []
 
 	// Iterate by code points to handle surrogate pairs correctly
@@ -223,13 +243,19 @@ export function checkNoInvalidXmlChars(fragment: string, logger: logger.Logger):
 
 		// Detect unpaired surrogate halves explicitly
 		const codeUnit = fragment.charCodeAt(i)
-		const nextCodeUnit = i + 1 < fragment.length ? fragment.charCodeAt(i + 1) : 0
+		const nextCodeUnit =
+			i + 1 < fragment.length ? fragment.charCodeAt(i + 1) : 0
 		const isHighSurrogate = codeUnit >= 0xd800 && codeUnit <= 0xdbff
 		const isLowSurrogate = codeUnit >= 0xdc00 && codeUnit <= 0xdfff
-		const isUnpairedHigh = isHighSurrogate && !(nextCodeUnit >= 0xdc00 && nextCodeUnit <= 0xdfff)
+		const isUnpairedHigh =
+			isHighSurrogate && !(nextCodeUnit >= 0xdc00 && nextCodeUnit <= 0xdfff)
 		const isUnpairedLow =
 			isLowSurrogate &&
-			!(i > 0 && fragment.charCodeAt(i - 1) >= 0xd800 && fragment.charCodeAt(i - 1) <= 0xdbff)
+			!(
+				i > 0 &&
+				fragment.charCodeAt(i - 1) >= 0xd800 &&
+				fragment.charCodeAt(i - 1) <= 0xdbff
+			)
 
 		if (!isAllowed || isBmpNonCharacter || isUnpairedHigh || isUnpairedLow) {
 			invalidCodePoints.push({ index: i, codePoint })
@@ -283,7 +309,10 @@ export function checkNoInvalidXmlChars(fragment: string, logger: logger.Logger):
  * @param fragment The text or markup fragment to validate
  * @param logger The logger instance
  */
-export function checkNoCDataSections(fragment: string, logger: logger.Logger): void {
+export function checkNoCDataSections(
+	fragment: string,
+	logger: logger.Logger
+): void {
 	const openIdx = fragment.indexOf("<![CDATA[")
 	const closeIdx = fragment.indexOf("]]>")
 	if (openIdx !== -1 || closeIdx !== -1) {

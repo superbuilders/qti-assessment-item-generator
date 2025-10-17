@@ -1,12 +1,12 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { PADDING } from "../utils/constants"
-import { abbreviateMonth } from "../utils/labels"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { type Theme, theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { PADDING } from "@/widgets/utils/constants"
+import { abbreviateMonth } from "@/widgets/utils/labels"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { type Theme, theme } from "@/widgets/utils/theme"
 
 export const ErrMismatchedTickCounts = errors.new(
 	"top and bottom lines must have the same number of ticks"
@@ -26,7 +26,9 @@ export const DoubleNumberLinePropsSchema = z
 				label: z
 					.string()
 					.nullable()
-					.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
+					.transform((val) =>
+						val === "null" || val === "NULL" || val === "" ? null : val
+					)
 					.describe(
 						"Label for this number line shown on the left side (e.g., 'Cups of Flour', 'Cost ($)', 'Miles', 'Time (minutes)', null). Keep concise to fit. Null shows no label."
 					),
@@ -45,7 +47,9 @@ export const DoubleNumberLinePropsSchema = z
 				label: z
 					.string()
 					.nullable()
-					.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
+					.transform((val) =>
+						val === "null" || val === "NULL" || val === "" ? null : val
+					)
 					.describe(
 						"Label for this number line shown on the left side (e.g., 'Cups of Flour', 'Cost ($)', 'Miles', 'Time (minutes)', null). Keep concise to fit. Null shows no label."
 					),
@@ -148,9 +152,9 @@ function drawClippedDottedLine(
  * This visualization tool is excellent for illustrating the relationship between two
  * different quantities that share a constant ratio.
  */
-export const generateDoubleNumberLine: WidgetGenerator<typeof DoubleNumberLinePropsSchema> = async (
-	data
-) => {
+export const generateDoubleNumberLine: WidgetGenerator<
+	typeof DoubleNumberLinePropsSchema
+> = async (data) => {
 	const { width, height, topLine, bottomLine } = data
 	const lineLength = width - 2 * PADDING
 
@@ -164,7 +168,10 @@ export const generateDoubleNumberLine: WidgetGenerator<typeof DoubleNumberLinePr
 
 	// Calculate minimum height needed to prevent label clipping
 	const requiredMinHeight =
-		Math.abs(TOP_LINE_LABEL_Y_OFFSET) + LINE_SEPARATION + BOTTOM_LINE_LABEL_Y_OFFSET + 10 // +10 buffer
+		Math.abs(TOP_LINE_LABEL_Y_OFFSET) +
+		LINE_SEPARATION +
+		BOTTOM_LINE_LABEL_Y_OFFSET +
+		10 // +10 buffer
 	const adjustedHeight = Math.max(height, requiredMinHeight)
 
 	// Calculate the vertical center of the SVG and position the lines symmetrically around it.
@@ -196,7 +203,9 @@ export const generateDoubleNumberLine: WidgetGenerator<typeof DoubleNumberLinePr
 		lineHeightDefault: 1.2
 	})
 
-	canvas.addStyle(".line-label { font-size: 14px; font-weight: bold; text-anchor: middle; }")
+	canvas.addStyle(
+		".line-label { font-size: 14px; font-weight: bold; text-anchor: middle; }"
+	)
 
 	// Collect label bounds for intelligent clipping
 	const labelBounds: Array<{
@@ -285,10 +294,16 @@ export const generateDoubleNumberLine: WidgetGenerator<typeof DoubleNumberLinePr
 	}
 	bottomLine.ticks.forEach((t, i) => {
 		const x = PADDING + i * tickSpacing
-		canvas.drawLine(x, bottomY - TICK_MARK_HEIGHT, x, bottomY + TICK_MARK_HEIGHT, {
-			stroke: theme.colors.axis,
-			strokeWidth: theme.stroke.width.base
-		})
+		canvas.drawLine(
+			x,
+			bottomY - TICK_MARK_HEIGHT,
+			x,
+			bottomY + TICK_MARK_HEIGHT,
+			{
+				stroke: theme.colors.axis,
+				strokeWidth: theme.stroke.width.base
+			}
+		)
 		const labelText = String(t)
 		const labelY = bottomY + BOTTOM_LINE_TICK_LABEL_Y_OFFSET
 		canvas.drawText({

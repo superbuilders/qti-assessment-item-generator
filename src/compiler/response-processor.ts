@@ -1,9 +1,9 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
+import { escapeXmlAttribute } from "@/compiler/utils/xml-utils"
 import type { FeedbackContent } from "@/core/content"
 import type { FeedbackDimension, FeedbackPlan } from "@/core/feedback"
 import type { AssessmentItem } from "@/core/item"
-import { escapeXmlAttribute } from "./utils/xml-utils"
 
 // Internal type for compilation after nested feedback has been flattened
 type AssessmentItemWithFeedbackBlocks<E extends readonly string[]> = Omit<
@@ -27,7 +27,9 @@ export function compileResponseDeclarations<E extends readonly string[]>(
 						identifier: decl.identifier,
 						correctType: typeof decl.correct
 					})
-					throw errors.new("directedPair response must have array of correct values")
+					throw errors.new(
+						"directedPair response must have array of correct values"
+					)
 				}
 				const pairs = decl.correct
 				const correctXml = pairs
@@ -91,7 +93,9 @@ export function compileResponseDeclarations<E extends readonly string[]>(
 			}
 
 			// Handle other base types (original code)
-			const correctValues = Array.isArray(decl.correct) ? decl.correct : [decl.correct]
+			const correctValues = Array.isArray(decl.correct)
+				? decl.correct
+				: [decl.correct]
 
 			// Directly map the provided correct values without generating any alternatives.
 			const correctXml = correctValues
@@ -111,11 +115,14 @@ export function compileResponseDeclarations<E extends readonly string[]>(
 			// For single-cardinality responses, also emit a mapping that awards 1 point.
 			const isSingleResponse =
 				decl.cardinality === "single" &&
-				(decl.baseType === "string" || decl.baseType === "integer" || decl.baseType === "float")
+				(decl.baseType === "string" ||
+					decl.baseType === "integer" ||
+					decl.baseType === "float")
 			if (isSingleResponse) {
 				const mappingXml = correctValues
 					.map((v: unknown): string => {
-						const key = typeof v === "string" || typeof v === "number" ? String(v) : ""
+						const key =
+							typeof v === "string" || typeof v === "number" ? String(v) : ""
 						return `\n            <qti-map-entry map-key="${escapeXmlAttribute(key)}" mapped-value="1"/>`
 					})
 					.join("")
@@ -143,7 +150,10 @@ function generateComboModeProcessing<E extends readonly string[]>(
 				(combo: FeedbackPlan["combinations"][number]): boolean => {
 					if (combo.path.length !== pathSegments.length) return false
 					return combo.path.every(
-						(seg: FeedbackPlan["combinations"][number]["path"][number], i: number): boolean =>
+						(
+							seg: FeedbackPlan["combinations"][number]["path"][number],
+							i: number
+						): boolean =>
 							seg.responseIdentifier === pathSegments[i].responseIdentifier &&
 							seg.key === pathSegments[i].key
 					)
@@ -222,7 +232,9 @@ function generateFallbackModeProcessing<E extends readonly string[]>(
 	item: AssessmentItemWithFeedbackBlocks<E>
 ): string {
 	if (item.feedbackPlan.dimensions.length === 0) {
-		logger.error("no dimensions for fallback mode processing", { itemIdentifier: item.identifier })
+		logger.error("no dimensions for fallback mode processing", {
+			itemIdentifier: item.identifier
+		})
 		throw errors.new("fallback mode requires at least one dimension")
 	}
 

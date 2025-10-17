@@ -1,10 +1,10 @@
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { PADDING } from "../utils/constants"
-import { CSS_COLOR_PATTERN } from "../utils/css-color"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { PADDING } from "@/widgets/utils/constants"
+import { CSS_COLOR_PATTERN } from "@/widgets/utils/css-color"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
 
 // Factory functions to avoid schema instance reuse
 function createVectorSchema() {
@@ -43,11 +43,15 @@ function createMarkerSchema() {
 				.describe("Position of the marker"),
 			shape: z
 				.enum(["circle", "square", "rightAngle"])
-				.describe("Shape of the marker - rightAngle creates a 90-degree angle indicator"),
+				.describe(
+					"Shape of the marker - rightAngle creates a 90-degree angle indicator"
+				),
 			size: z
 				.number()
 				.positive()
-				.describe("Size of the marker in pixels (or side length for rightAngle)"),
+				.describe(
+					"Size of the marker in pixels (or side length for rightAngle)"
+				),
 			color: z
 				.string()
 				.regex(CSS_COLOR_PATTERN, "invalid css color")
@@ -58,10 +62,15 @@ function createMarkerSchema() {
 
 export const VectorDiagramPropsSchema = z
 	.object({
-		type: z.literal("vectorDiagram").describe("Identifies this as a vector diagram widget"),
+		type: z
+			.literal("vectorDiagram")
+			.describe("Identifies this as a vector diagram widget"),
 		width: createWidthSchema(),
 		height: createHeightSchema(),
-		gridSpacing: z.number().positive().describe("Spacing between grid lines in pixels"),
+		gridSpacing: z
+			.number()
+			.positive()
+			.describe("Spacing between grid lines in pixels"),
 		showGrid: z.boolean().describe("Whether to show the background grid"),
 		gridColor: z
 			.string()
@@ -72,7 +81,9 @@ export const VectorDiagramPropsSchema = z
 		// NOTE: Avoid setting a default here because OpenAI's JSON Schema parser
 		// rejects $ref nodes that also include keywords like `default`/`description`.
 		// Keeping only the description ensures compatibility.
-		markers: z.array(createMarkerSchema()).describe("Array of markers to place on the diagram")
+		markers: z
+			.array(createMarkerSchema())
+			.describe("Array of markers to place on the diagram")
 	})
 	.strict()
 	.describe(
@@ -81,10 +92,11 @@ export const VectorDiagramPropsSchema = z
 
 export type VectorDiagramProps = z.infer<typeof VectorDiagramPropsSchema>
 
-export const generateVectorDiagram: WidgetGenerator<typeof VectorDiagramPropsSchema> = async (
-	props
-) => {
-	const { width, height, gridSpacing, showGrid, gridColor, vectors, markers } = props
+export const generateVectorDiagram: WidgetGenerator<
+	typeof VectorDiagramPropsSchema
+> = async (props) => {
+	const { width, height, gridSpacing, showGrid, gridColor, vectors, markers } =
+		props
 
 	const canvas = new CanvasImpl({
 		chartArea: { left: 0, top: 0, width, height },
@@ -135,11 +147,17 @@ export const generateVectorDiagram: WidgetGenerator<typeof VectorDiagramPropsSch
 		} else if (marker.shape === "rightAngle") {
 			// Draw a small square in the upper-right quadrant to indicate 90-degree angle
 			const offset = marker.size / 2
-			canvas.drawRect(marker.position.x, marker.position.y - offset, offset, offset, {
-				fill: "none",
-				stroke: marker.color,
-				strokeWidth: 2
-			})
+			canvas.drawRect(
+				marker.position.x,
+				marker.position.y - offset,
+				offset,
+				offset,
+				{
+					fill: "none",
+					stroke: marker.color,
+					strokeWidth: 2
+				}
+			)
 		}
 	}
 
@@ -166,12 +184,18 @@ export const generateVectorDiagram: WidgetGenerator<typeof VectorDiagramPropsSch
 	for (const vector of vectors) {
 		const markerEnd = SHOW_ARROW ? `url(#arrow-${vector.id})` : undefined
 
-		canvas.drawLine(vector.start.x, vector.start.y, vector.end.x, vector.end.y, {
-			stroke: vector.color,
-			strokeWidth: VECTOR_STROKE_WIDTH,
-			markerEnd: markerEnd,
-			strokeLinecap: "round"
-		})
+		canvas.drawLine(
+			vector.start.x,
+			vector.start.y,
+			vector.end.x,
+			vector.end.y,
+			{
+				stroke: vector.color,
+				strokeWidth: VECTOR_STROKE_WIDTH,
+				markerEnd: markerEnd,
+				strokeLinecap: "round"
+			}
+		)
 	}
 
 	const {

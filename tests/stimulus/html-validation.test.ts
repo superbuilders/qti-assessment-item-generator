@@ -12,10 +12,15 @@ interface StimulusFixture {
 }
 
 function collectStimulusFixtures(): StimulusFixture[] {
-	const fixturesRoot = path.resolve(process.cwd(), "tests/fixtures/stimulus/page-data")
+	const fixturesRoot = path.resolve(
+		process.cwd(),
+		"tests/fixtures/stimulus/page-data"
+	)
 	if (!fs.existsSync(fixturesRoot)) {
 		logger.error("stimulus fixtures missing", { fixturesRoot })
-		throw errors.new("stimulus fixtures directory missing; run fixture sync or restore test assets")
+		throw errors.new(
+			"stimulus fixtures directory missing; run fixture sync or restore test assets"
+		)
 	}
 
 	const pageDataFiles: string[] = []
@@ -40,7 +45,10 @@ function collectStimulusFixtures(): StimulusFixture[] {
 		const raw = fs.readFileSync(filePath, "utf8")
 		const parsedResult = errors.trySync<unknown>(() => JSON.parse(raw))
 		if (parsedResult.error) {
-			logger.error("stimulus fixture parse failed", { filePath, error: parsedResult.error })
+			logger.error("stimulus fixture parse failed", {
+				filePath,
+				error: parsedResult.error
+			})
 			throw errors.wrap(parsedResult.error, `failed to parse ${filePath}`)
 		}
 		const parsedValue = parsedResult.data
@@ -70,10 +78,14 @@ describe("Canvas stimulus HTML generation", () => {
 			expect(result).toBeDefined()
 			if (!result) return
 
-			const fatalIssues = result.issues.filter((issue) => issue.severity === "error")
+			const fatalIssues = result.issues.filter(
+				(issue) => issue.severity === "error"
+			)
 			expect(fatalIssues).toHaveLength(0)
 
-			const warnings = result.issues.filter((issue) => issue.severity === "warning")
+			const warnings = result.issues.filter(
+				(issue) => issue.severity === "warning"
+			)
 			expect(warnings).toHaveLength(0)
 
 			expect(result.html.startsWith("<article")).toBeTrue()
@@ -91,7 +103,11 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 function isCanvasPageData(value: unknown): value is CanvasPageData {
 	if (!isRecord(value)) return false
-	if ("title" in value && value.title !== undefined && typeof value.title !== "string") {
+	if (
+		"title" in value &&
+		value.title !== undefined &&
+		typeof value.title !== "string"
+	) {
 		return false
 	}
 	if (!("mainContent" in value) || value.mainContent === undefined) {

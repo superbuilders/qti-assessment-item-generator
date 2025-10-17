@@ -1,16 +1,22 @@
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { AXIS_VIEWBOX_PADDING } from "../utils/constants"
-import { setupCoordinatePlaneBaseV2 } from "../utils/coordinate-plane-utils"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { AXIS_VIEWBOX_PADDING } from "@/widgets/utils/constants"
+import { setupCoordinatePlaneBaseV2 } from "@/widgets/utils/coordinate-plane-utils"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
 
 const AnnotationSchema = z.object({
-	year: z.number().describe("The year on the x-axis that the annotation arrow should point to."),
+	year: z
+		.number()
+		.describe(
+			"The year on the x-axis that the annotation arrow should point to."
+		),
 	text: z
 		.array(z.string())
-		.describe("The annotation text, with each string in the array representing a new line.")
+		.describe(
+			"The annotation text, with each string in the array representing a new line."
+		)
 })
 
 export const KeelingCurvePropsSchema = z
@@ -19,10 +25,14 @@ export const KeelingCurvePropsSchema = z
 		width: createWidthSchema(),
 		height: createHeightSchema(),
 		xAxisLabel: z.string().describe("Label for the horizontal axis."),
-		yAxisLabel: z.string().describe("Label for the vertical axis, including units."),
+		yAxisLabel: z
+			.string()
+			.describe("Label for the vertical axis, including units."),
 		annotations: z
 			.array(AnnotationSchema)
-			.describe("An array of declarative annotations pointing to specific years on the curve.")
+			.describe(
+				"An array of declarative annotations pointing to specific years on the curve."
+			)
 	})
 	.strict()
 	.describe(
@@ -132,9 +142,9 @@ const CO2_DATA = [
 
 // Removed unused function renderMultiLineText
 
-export const generateKeelingCurve: WidgetGenerator<typeof KeelingCurvePropsSchema> = async (
-	props
-) => {
+export const generateKeelingCurve: WidgetGenerator<
+	typeof KeelingCurvePropsSchema
+> = async (props) => {
 	const { width, height, xAxisLabel, yAxisLabel, annotations } = props
 
 	// Helper to find PPM for a given year via linear interpolation
@@ -169,7 +179,13 @@ export const generateKeelingCurve: WidgetGenerator<typeof KeelingCurvePropsSchem
 				showGridLines: false,
 				showTickLabels: true,
 				labelFormatter: (val: number) => {
-					if (val === 1 || val === 500 || val === 1000 || val === 1500 || val === 2021) {
+					if (
+						val === 1 ||
+						val === 500 ||
+						val === 1000 ||
+						val === 1500 ||
+						val === 2021
+					) {
 						return String(Math.round(val))
 					}
 					return ""

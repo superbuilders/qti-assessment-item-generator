@@ -1,10 +1,13 @@
 import { describe, expect, mock, test } from "bun:test"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import type { AssessmentItemInput } from "../../src/core/item"
-import { differentiateAssessmentItem } from "../../src/structured/differentiator"
-import { allWidgetsCollection } from "../../src/widgets/collections/all"
-import { MINIMAL_CORRECT_FEEDBACK, MINIMAL_INCORRECT_FEEDBACK } from "../helpers/feedback-fixtures"
+import type { AssessmentItemInput } from "@/core/item"
+import { differentiateAssessmentItem } from "@/structured/differentiator"
+import {
+	MINIMAL_CORRECT_FEEDBACK,
+	MINIMAL_INCORRECT_FEEDBACK
+} from "@/testing/helpers/feedback-fixtures"
+import { allWidgetsCollection } from "@/widgets/collections/all"
 
 // MODIFIED: Mock the OpenAI client for Responses API
 mock.module("openai", () => {
@@ -43,8 +46,14 @@ mock.module("openai", () => {
 										mode: "fallback",
 										dimensions: { __sb_empty_array__: true },
 										combinations: {
-											__sb_idx__0: { id: "CORRECT", path: { __sb_empty_array__: true } },
-											__sb_idx__1: { id: "INCORRECT", path: { __sb_empty_array__: true } }
+											__sb_idx__0: {
+												id: "CORRECT",
+												path: { __sb_empty_array__: true }
+											},
+											__sb_idx__1: {
+												id: "INCORRECT",
+												path: { __sb_empty_array__: true }
+											}
 										}
 									},
 									feedback: {
@@ -53,26 +62,42 @@ mock.module("openai", () => {
 												content: {
 													preamble: {
 														correctness: "correct",
-														summary: { __sb_idx__0: { type: "text", content: "Correct!" } }
+														summary: {
+															__sb_idx__0: { type: "text", content: "Correct!" }
+														}
 													},
 													steps: {
 														__sb_idx__0: {
 															type: "step",
-															title: { __sb_idx__0: { type: "text", content: "Step 1" } },
+															title: {
+																__sb_idx__0: { type: "text", content: "Step 1" }
+															},
 															content: {
 																__sb_idx__0: {
 																	type: "paragraph",
-																	content: { __sb_idx__0: { type: "text", content: "Do this." } }
+																	content: {
+																		__sb_idx__0: {
+																			type: "text",
+																			content: "Do this."
+																		}
+																	}
 																}
 															}
 														},
 														__sb_idx__1: {
 															type: "step",
-															title: { __sb_idx__0: { type: "text", content: "Step 2" } },
+															title: {
+																__sb_idx__0: { type: "text", content: "Step 2" }
+															},
 															content: {
 																__sb_idx__0: {
 																	type: "paragraph",
-																	content: { __sb_idx__0: { type: "text", content: "Then this." } }
+																	content: {
+																		__sb_idx__0: {
+																			type: "text",
+																			content: "Then this."
+																		}
+																	}
 																}
 															}
 														}
@@ -83,27 +108,47 @@ mock.module("openai", () => {
 												content: {
 													preamble: {
 														correctness: "incorrect",
-														summary: { __sb_idx__0: { type: "text", content: "Incorrect." } }
+														summary: {
+															__sb_idx__0: {
+																type: "text",
+																content: "Incorrect."
+															}
+														}
 													},
 													steps: {
 														__sb_idx__0: {
 															type: "step",
-															title: { __sb_idx__0: { type: "text", content: "Hint" } },
+															title: {
+																__sb_idx__0: { type: "text", content: "Hint" }
+															},
 															content: {
 																__sb_idx__0: {
 																	type: "paragraph",
-																	content: { __sb_idx__0: { type: "text", content: "Review." } }
+																	content: {
+																		__sb_idx__0: {
+																			type: "text",
+																			content: "Review."
+																		}
+																	}
 																}
 															}
 														},
 														__sb_idx__1: {
 															type: "step",
-															title: { __sb_idx__0: { type: "text", content: "Example" } },
+															title: {
+																__sb_idx__0: {
+																	type: "text",
+																	content: "Example"
+																}
+															},
 															content: {
 																__sb_idx__0: {
 																	type: "paragraph",
 																	content: {
-																		__sb_idx__0: { type: "text", content: "Solve like this." }
+																		__sb_idx__0: {
+																			type: "text",
+																			content: "Solve like this."
+																		}
 																	}
 																}
 															}
@@ -176,7 +221,13 @@ describe("Differentiation Pipeline", () => {
 		}
 
 		const result = await errors.try(
-			differentiateAssessmentItem(mockOpenAI, logger, originalItem, 1, allWidgetsCollection)
+			differentiateAssessmentItem(
+				mockOpenAI,
+				logger,
+				originalItem,
+				1,
+				allWidgetsCollection
+			)
 		)
 		expect(result.error).toBeFalsy()
 
@@ -198,7 +249,9 @@ describe("Differentiation Pipeline", () => {
 			if (firstBodyBlock?.type === "paragraph") {
 				expect(Array.isArray(firstBodyBlock.content)).toBe(true)
 			} else {
-				logger.error("first body block validation failed", { type: firstBodyBlock?.type })
+				logger.error("first body block validation failed", {
+					type: firstBodyBlock?.type
+				})
 				throw errors.new("First body block is not a paragraph")
 			}
 		}

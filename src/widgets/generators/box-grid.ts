@@ -1,14 +1,14 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { PADDING } from "../utils/constants"
-import { CSS_COLOR_PATTERN } from "../utils/css-color"
-import { MATHML_INNER_PATTERN } from "../utils/mathml"
-import { numberContentToInnerMathML } from "../utils/number-to-mathml"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { PADDING } from "@/widgets/utils/constants"
+import { CSS_COLOR_PATTERN } from "@/widgets/utils/css-color"
+import { MATHML_INNER_PATTERN } from "@/widgets/utils/mathml"
+import { numberContentToInnerMathML } from "@/widgets/utils/number-to-mathml"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
 
 // Defines the content and styling for a single cell in the grid.
 const BoxGridCellSchema = z
@@ -18,7 +18,9 @@ const BoxGridCellSchema = z
 				// text-only removed: we render numbers/math as MathML for consistent typography
 				z
 					.object({
-						type: z.literal("math").describe("Identifies this as mathematical content"),
+						type: z
+							.literal("math")
+							.describe("Identifies this as mathematical content"),
 						mathml: z
 							.string()
 							.regex(
@@ -32,7 +34,10 @@ const BoxGridCellSchema = z
 				z
 					.object({
 						type: z.literal("whole").describe("Whole number content"),
-						value: z.number().int().describe("Integer magnitude (non-directional)"),
+						value: z
+							.number()
+							.int()
+							.describe("Integer magnitude (non-directional)"),
 						sign: z.enum(["+", "-"]).describe("Sign of the number")
 					})
 					.strict()
@@ -40,17 +45,35 @@ const BoxGridCellSchema = z
 				z
 					.object({
 						type: z.literal("fraction").describe("Fractional number content"),
-						numerator: z.number().int().min(0).describe("Numerator (non-negative)"),
-						denominator: z.number().int().positive().describe("Denominator (positive)"),
+						numerator: z
+							.number()
+							.int()
+							.min(0)
+							.describe("Numerator (non-negative)"),
+						denominator: z
+							.number()
+							.int()
+							.positive()
+							.describe("Denominator (positive)"),
 						sign: z.enum(["+", "-"]).describe("Sign of the fraction")
 					})
 					.strict()
 					.describe("Fractional number content with explicit sign"),
 				z
 					.object({
-						type: z.literal("mixed").describe("Mixed number content like 1 1/4"),
-						whole: z.number().int().min(0).describe("Whole part (non-negative)"),
-						numerator: z.number().int().min(0).describe("Numerator of the fractional part"),
+						type: z
+							.literal("mixed")
+							.describe("Mixed number content like 1 1/4"),
+						whole: z
+							.number()
+							.int()
+							.min(0)
+							.describe("Whole part (non-negative)"),
+						numerator: z
+							.number()
+							.int()
+							.min(0)
+							.describe("Numerator of the fractional part"),
 						denominator: z
 							.number()
 							.int()
@@ -61,12 +84,19 @@ const BoxGridCellSchema = z
 					.strict()
 					.describe("Mixed number content with explicit sign")
 			])
-			.describe("Inline content for the cell: math (MathML) or number (whole/fraction/mixed)"),
+			.describe(
+				"Inline content for the cell: math (MathML) or number (whole/fraction/mixed)"
+			),
 		backgroundColor: z
 			.string()
-			.regex(CSS_COLOR_PATTERN, "invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)")
+			.regex(
+				CSS_COLOR_PATTERN,
+				"invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)"
+			)
 			.nullable()
-			.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
+			.transform((val) =>
+				val === "null" || val === "NULL" || val === "" ? null : val
+			)
 			.describe(
 				"Hex-only color for the cell background (e.g., '#FFE5B4', '#1E90FF', '#FF00004D' for ~30% alpha, null). Null means no background color (transparent)."
 			)
@@ -105,7 +135,9 @@ export type BoxGridProps = z.infer<typeof BoxGridPropsSchema>
  * Generates an SVG diagram of a grid of cells, with each cell capable of
  * displaying data and having a custom background color for highlighting.
  */
-export const generateBoxGrid: WidgetGenerator<typeof BoxGridPropsSchema> = async (props) => {
+export const generateBoxGrid: WidgetGenerator<
+	typeof BoxGridPropsSchema
+> = async (props) => {
 	const { width, height, data, showGridLines } = props
 
 	const numRows = data.length

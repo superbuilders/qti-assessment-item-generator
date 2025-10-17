@@ -41,10 +41,14 @@ export function abbreviateMonth(text: string): string {
  * Compute label indices using smart interval selection.
  * Prefers clean intervals (every 2nd, 3rd, etc.) over rigid label count limits.
  */
-export function computeEquallySpacedIndices(totalCount: number, maxCount: number): number[] {
+export function computeEquallySpacedIndices(
+	totalCount: number,
+	maxCount: number
+): number[] {
 	if (totalCount <= 0) return []
 	if (maxCount <= 1) return [0]
-	if (totalCount <= maxCount) return Array.from({ length: totalCount }, (_, i) => i)
+	if (totalCount <= maxCount)
+		return Array.from({ length: totalCount }, (_, i) => i)
 
 	// Try clean intervals, allowing slight tolerance over maxCount for better spacing
 	const tolerance = Math.max(1, Math.ceil(maxCount * 0.2)) // Allow 20% more labels for clean intervals
@@ -95,7 +99,10 @@ export function computeLabelSelection(
 	chartWidthPx: number,
 	minLabelSpacingPx: number
 ): Set<number> {
-	const maxLabels = Math.max(1, Math.floor(chartWidthPx / Math.max(1, minLabelSpacingPx)))
+	const maxLabels = Math.max(
+		1,
+		Math.floor(chartWidthPx / Math.max(1, minLabelSpacingPx))
+	)
 	const ideal = computeEquallySpacedIndices(totalCount, maxLabels)
 	if (candidates.length === 0) {
 		return new Set<number>(ideal)

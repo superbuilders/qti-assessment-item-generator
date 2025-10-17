@@ -1,10 +1,10 @@
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { PADDING } from "../utils/constants"
-import { CSS_COLOR_PATTERN } from "../utils/css-color"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { PADDING } from "@/widgets/utils/constants"
+import { CSS_COLOR_PATTERN } from "@/widgets/utils/css-color"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
 
 const Node = z
 	.object({
@@ -16,7 +16,9 @@ const Node = z
 		label: z
 			.string()
 			.nullable()
-			.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
+			.transform((val) =>
+				val === "null" || val === "NULL" || val === "" ? null : val
+			)
 			.describe(
 				"Text content displayed in the node (e.g., '24', '2 × 12', 'H', '0.5', 'Yes', null). Keep concise to fit within node circle. Null for unlabeled nodes."
 			),
@@ -117,9 +119,9 @@ export type TreeDiagramProps = z.infer<typeof TreeDiagramPropsSchema>
  * Generates a flexible SVG tree diagram from a set of nodes and edges.
  * Ideal for factor trees, probability trees, and other hierarchical structures.
  */
-export const generateTreeDiagram: WidgetGenerator<typeof TreeDiagramPropsSchema> = async (
-	props
-) => {
+export const generateTreeDiagram: WidgetGenerator<
+	typeof TreeDiagramPropsSchema
+> = async (props) => {
 	const { width, height, nodes, edges, nodeFontSize, nodeRadius } = props
 
 	const canvas = new CanvasImpl({

@@ -1,9 +1,9 @@
 import { describe, expect, test } from "bun:test"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import { radiallyConstrainedAngleDiagramExamples } from "../../examples/radially-constrained-angle-diagram"
-import type { WidgetInput } from "../../src/widgets/registry"
-import { generateWidgetForTest } from "../helpers/generateWidgetForTest"
+import { radiallyConstrainedAngleDiagramExamples } from "@/examples/radially-constrained-angle-diagram"
+import { generateWidgetForTest } from "@/testing/helpers/generateWidgetForTest"
+import type { WidgetInput } from "@/widgets/registry"
 
 describe("Widget: radially-constrained-angle-diagram", () => {
 	const examples: WidgetInput[] = radiallyConstrainedAngleDiagramExamples
@@ -27,7 +27,9 @@ describe("Widget: radially-constrained-angle-diagram", () => {
 				height: 400,
 				centerLabel: "O",
 				rayLabels: ["A", "B"],
-				angles: [{ fromRayLabel: "A", toRayLabel: "C", value: 60, color: "#ff6b6b" }]
+				angles: [
+					{ fromRayLabel: "A", toRayLabel: "C", value: 60, color: "#ff6b6b" }
+				]
 			})
 		)
 		expect(result.error).toBeTruthy()
@@ -58,7 +60,9 @@ describe("Widget: radially-constrained-angle-diagram", () => {
 				height: 400,
 				centerLabel: "O",
 				rayLabels: ["A", "B", "C"],
-				angles: [{ fromRayLabel: "C", toRayLabel: "A", value: 60, color: "#ff6b6b" }]
+				angles: [
+					{ fromRayLabel: "C", toRayLabel: "A", value: 60, color: "#ff6b6b" }
+				]
 			})
 		)
 		expect(result.error).toBeTruthy()

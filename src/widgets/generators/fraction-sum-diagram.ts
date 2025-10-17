@@ -1,17 +1,19 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { PADDING } from "../utils/constants"
-import { CSS_COLOR_PATTERN } from "../utils/css-color"
-import { Path2D } from "../utils/path-builder"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { estimateWrappedTextDimensions } from "../utils/text"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { PADDING } from "@/widgets/utils/constants"
+import { CSS_COLOR_PATTERN } from "@/widgets/utils/css-color"
+import { Path2D } from "@/widgets/utils/path-builder"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { estimateWrappedTextDimensions } from "@/widgets/utils/text"
+import { theme } from "@/widgets/utils/theme"
 
 // Custom error for this widget
-export const ErrInvalidFractionSum = errors.new("sum of numerators cannot exceed denominator")
+export const ErrInvalidFractionSum = errors.new(
+	"sum of numerators cannot exceed denominator"
+)
 
 /**
  * Defines a group of colored segments, corresponding to a single fraction addend.
@@ -61,7 +63,9 @@ export const FractionSumDiagramPropsSchema = z
 		"Creates visual tape diagrams for adding fractions with common denominators. Shows colored segments for each addend with mathematical expressions above and below. Perfect for teaching fraction addition concepts and visual fraction arithmetic."
 	)
 
-export type FractionSumDiagramProps = z.infer<typeof FractionSumDiagramPropsSchema>
+export type FractionSumDiagramProps = z.infer<
+	typeof FractionSumDiagramPropsSchema
+>
 
 /**
  * Generates an SVG diagram for summing fractions using a tape model.
@@ -100,8 +104,14 @@ export const generateFractionSumDiagram: WidgetGenerator<
 
 	// Compute dynamic heights
 	// Emphasize height over width so cells are taller than they are wide
-	let tapeHeight = Math.max(64, Math.min(nominalTapeHeight, Math.floor(height * 0.36)))
-	let bracketHeight = Math.max(18, Math.min(nominalBracketHeight, Math.floor(height * 0.12)))
+	let tapeHeight = Math.max(
+		64,
+		Math.min(nominalTapeHeight, Math.floor(height * 0.36))
+	)
+	let bracketHeight = Math.max(
+		18,
+		Math.min(nominalBracketHeight, Math.floor(height * 0.12))
+	)
 	const topExprFontStart = 26
 	const bottomExprFontStart = 26
 	let archLabelClearance = 40 // extra px gap between arch and its fraction label
@@ -181,8 +191,18 @@ export const generateFractionSumDiagram: WidgetGenerator<
 	): number => {
 		let fontPx = Math.max(10, start)
 		for (;;) {
-			const numMetrics = estimateWrappedTextDimensions(num, Number.POSITIVE_INFINITY, fontPx, 1.1)
-			const denMetrics = estimateWrappedTextDimensions(den, Number.POSITIVE_INFINITY, fontPx, 1.1)
+			const numMetrics = estimateWrappedTextDimensions(
+				num,
+				Number.POSITIVE_INFINITY,
+				fontPx,
+				1.1
+			)
+			const denMetrics = estimateWrappedTextDimensions(
+				den,
+				Number.POSITIVE_INFINITY,
+				fontPx,
+				1.1
+			)
 			const barWidth = Math.max(numMetrics.maxWidth, denMetrics.maxWidth) + 6
 			const fracHeight = Math.ceil(numMetrics.height + denMetrics.height + 8)
 			const fits = barWidth <= maxWidth && fracHeight <= maxHeight
@@ -192,15 +212,46 @@ export const generateFractionSumDiagram: WidgetGenerator<
 	}
 
 	/** Renders a fraction with a horizontal bar (vinculum). */
-	const drawFraction = (num: string, den: string, cx: number, y: number, fontPx: number) => {
-		const numMetrics = estimateWrappedTextDimensions(num, Number.POSITIVE_INFINITY, fontPx, 1.1)
-		const denMetrics = estimateWrappedTextDimensions(den, Number.POSITIVE_INFINITY, fontPx, 1.1)
+	const drawFraction = (
+		num: string,
+		den: string,
+		cx: number,
+		y: number,
+		fontPx: number
+	) => {
+		const numMetrics = estimateWrappedTextDimensions(
+			num,
+			Number.POSITIVE_INFINITY,
+			fontPx,
+			1.1
+		)
+		const denMetrics = estimateWrappedTextDimensions(
+			den,
+			Number.POSITIVE_INFINITY,
+			fontPx,
+			1.1
+		)
 		const barWidth = Math.max(numMetrics.maxWidth, denMetrics.maxWidth) + 6
 		const barHalf = barWidth / 2
 
-		canvas.drawText({ x: cx, y: y - (4 + fontPx * 0.05), text: num, fontPx, anchor: "middle" })
-		canvas.drawLine(cx - barHalf, y, cx + barHalf, y, { stroke: "black", strokeWidth: 1.5 })
-		canvas.drawText({ x: cx, y: y + (6 + fontPx * 0.6), text: den, fontPx, anchor: "middle" })
+		canvas.drawText({
+			x: cx,
+			y: y - (4 + fontPx * 0.05),
+			text: num,
+			fontPx,
+			anchor: "middle"
+		})
+		canvas.drawLine(cx - barHalf, y, cx + barHalf, y, {
+			stroke: "black",
+			strokeWidth: 1.5
+		})
+		canvas.drawText({
+			x: cx,
+			y: y + (6 + fontPx * 0.6),
+			text: den,
+			fontPx,
+			anchor: "middle"
+		})
 	}
 
 	// removed unused helper that measured fraction bar width
@@ -210,8 +261,14 @@ export const generateFractionSumDiagram: WidgetGenerator<
 		const midX = (x1 + x2) / 2
 		const dir = isUpward ? -1 : 1
 		const h = bracketHeight
-		const path = new Path2D().moveTo(x1, y).quadraticCurveTo(midX, y + dir * h, x2, y)
-		canvas.drawPath(path, { stroke: theme.colors.black, strokeWidth: 2, fill: "none" })
+		const path = new Path2D()
+			.moveTo(x1, y)
+			.quadraticCurveTo(midX, y + dir * h, x2, y)
+		canvas.drawPath(path, {
+			stroke: theme.colors.black,
+			strokeWidth: 2,
+			fill: "none"
+		})
 	}
 
 	// --- Drawing Logic ---
@@ -301,7 +358,13 @@ export const generateFractionSumDiagram: WidgetGenerator<
 	// Draw arches and fractions
 	topFractions.forEach((tf, i) => {
 		drawArch(tf.startX, tf.endX, topBracketY, true)
-		drawFraction(String(groups[i].numerator), String(denominator), tf.cx, tf.y, tf.fontPx)
+		drawFraction(
+			String(groups[i].numerator),
+			String(denominator),
+			tf.cx,
+			tf.y,
+			tf.fontPx
+		)
 	})
 
 	// Draw '+' signs centered between adjacent fractions with gap from bars
@@ -331,7 +394,8 @@ export const generateFractionSumDiagram: WidgetGenerator<
 	// 3. Draw Bottom Bracket and Sum
 	if (totalNumerator > 0) {
 		const bottomBracketY = tapeY + tapeHeight + gapBetweenBracketAndTape
-		const bottomExpressionY = bottomBracketY + bracketHeight + gapBetweenExprAndBracket
+		const bottomExpressionY =
+			bottomBracketY + bracketHeight + gapBetweenExprAndBracket
 		const coloredWidth = totalNumerator * segmentWidth
 		const startX = tapeStartX
 		const endX = tapeStartX + coloredWidth

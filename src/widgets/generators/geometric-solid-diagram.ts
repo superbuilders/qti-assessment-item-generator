@@ -1,11 +1,11 @@
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { PADDING } from "../utils/constants"
-import { Path2D } from "../utils/path-builder"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { estimateWrappedTextDimensions } from "../utils/text"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { PADDING } from "@/widgets/utils/constants"
+import { Path2D } from "@/widgets/utils/path-builder"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { estimateWrappedTextDimensions } from "@/widgets/utils/text"
+import { theme } from "@/widgets/utils/theme"
 
 // Factory functions for label schemas to avoid $ref in OpenAI JSON Schema
 const createRadiusLabelSchema = () =>
@@ -26,7 +26,9 @@ const createHeightLabelSchema = () =>
 
 const Cylinder = z
 	.object({
-		type: z.literal("cylinder").describe("Specifies a circular cylinder shape."),
+		type: z
+			.literal("cylinder")
+			.describe("Specifies a circular cylinder shape."),
 		radiusLabel: createRadiusLabelSchema(),
 		heightLabel: createHeightLabelSchema()
 	})
@@ -65,7 +67,9 @@ export const GeometricSolidDiagramPropsSchema = z
 		"Creates 3D geometric solids (cylinder, cone, sphere) with optional dimension labels. Uses isometric-style projection to show depth. Essential for teaching volume, surface area, and 3D geometry concepts. Labels help identify key measurements for calculations."
 	)
 
-export type GeometricSolidDiagramProps = z.infer<typeof GeometricSolidDiagramPropsSchema>
+export type GeometricSolidDiagramProps = z.infer<
+	typeof GeometricSolidDiagramPropsSchema
+>
 
 /**
  * Generates a 3D diagram of a geometric solid with curved surfaces (e.g., cylinder, cone).
@@ -96,7 +100,10 @@ export const generateGeometricSolidDiagram: WidgetGenerator<
 	if (shape.type === "cylinder") {
 		const radius = 5 // default radius
 		const shapeHeight = 6 // default height
-		let scale = Math.min(availableWidth / (radius * 2), availableHeight / shapeHeight)
+		let scale = Math.min(
+			availableWidth / (radius * 2),
+			availableHeight / shapeHeight
+		)
 		let r = radius * scale
 		let h = shapeHeight * scale
 		let ry = r * 0.25 // Ellipse perspective ratio
@@ -105,7 +112,10 @@ export const generateGeometricSolidDiagram: WidgetGenerator<
 		{
 			const contentWidth = 2 * r
 			const contentHeight = h + ry
-			const availableMin = Math.max(1, Math.min(availableWidth, availableHeight))
+			const availableMin = Math.max(
+				1,
+				Math.min(availableWidth, availableHeight)
+			)
 			const occupancy = Math.min(contentWidth, contentHeight) / availableMin
 			const targetOccupancy = 0.7
 			if (occupancy > 0 && occupancy < targetOccupancy) {
@@ -194,7 +204,10 @@ export const generateGeometricSolidDiagram: WidgetGenerator<
 	} else if (shape.type === "cone") {
 		const radius = 4 // default radius
 		const shapeHeight = 6 // default height
-		let scale = Math.min(availableWidth / (radius * 2), availableHeight / shapeHeight)
+		let scale = Math.min(
+			availableWidth / (radius * 2),
+			availableHeight / shapeHeight
+		)
 		let r = radius * scale
 		let h = shapeHeight * scale
 		let ry = r * 0.25 // Ellipse perspective ratio
@@ -203,7 +216,10 @@ export const generateGeometricSolidDiagram: WidgetGenerator<
 		{
 			const contentWidth = 2 * r
 			const contentHeight = h + ry
-			const availableMin = Math.max(1, Math.min(availableWidth, availableHeight))
+			const availableMin = Math.max(
+				1,
+				Math.min(availableWidth, availableHeight)
+			)
 			const occupancy = Math.min(contentWidth, contentHeight) / availableMin
 			const targetOccupancy = 0.7
 			if (occupancy > 0 && occupancy < targetOccupancy) {
@@ -232,13 +248,17 @@ export const generateGeometricSolidDiagram: WidgetGenerator<
 		})
 
 		// Base (draw back dashed part first, then front solid part)
-		const baseBackPath = new Path2D().moveTo(cx - r, baseY).arcTo(r, ry, 0, 0, 0, cx + r, baseY)
+		const baseBackPath = new Path2D()
+			.moveTo(cx - r, baseY)
+			.arcTo(r, ry, 0, 0, 0, cx + r, baseY)
 		canvas.drawPath(baseBackPath, {
 			stroke: theme.colors.black,
 			strokeWidth: theme.stroke.width.thick,
 			dash: theme.stroke.dasharray.dashed
 		})
-		const baseFrontPath = new Path2D().moveTo(cx - r, baseY).arcTo(r, ry, 0, 0, 1, cx + r, baseY)
+		const baseFrontPath = new Path2D()
+			.moveTo(cx - r, baseY)
+			.arcTo(r, ry, 0, 0, 1, cx + r, baseY)
 		canvas.drawPath(baseFrontPath, {
 			fill: "rgba(200, 200, 200, 0.2)",
 			stroke: theme.colors.black,
@@ -288,7 +308,10 @@ export const generateGeometricSolidDiagram: WidgetGenerator<
 		}
 	} else if (shape.type === "sphere") {
 		const radius = 5 // default radius
-		let scale = Math.min(availableWidth / (radius * 2), availableHeight / (radius * 2))
+		let scale = Math.min(
+			availableWidth / (radius * 2),
+			availableHeight / (radius * 2)
+		)
 		let r = radius * scale
 		let ry = r * 0.3 // Ellipse perspective ratio for equator
 
@@ -296,7 +319,10 @@ export const generateGeometricSolidDiagram: WidgetGenerator<
 		{
 			const contentWidth = 2 * r
 			const contentHeight = 2 * r
-			const availableMin = Math.max(1, Math.min(availableWidth, availableHeight))
+			const availableMin = Math.max(
+				1,
+				Math.min(availableWidth, availableHeight)
+			)
 			const occupancy = Math.min(contentWidth, contentHeight) / availableMin
 			const targetOccupancy = 0.7
 			if (occupancy > 0 && occupancy < targetOccupancy) {
@@ -320,13 +346,17 @@ export const generateGeometricSolidDiagram: WidgetGenerator<
 		})
 
 		// Internal equator for 3D effect (dashed back, solid front)
-		const equatorBackPath = new Path2D().moveTo(cx - r, cy).arcTo(r, ry, 0, 0, 0, cx + r, cy)
+		const equatorBackPath = new Path2D()
+			.moveTo(cx - r, cy)
+			.arcTo(r, ry, 0, 0, 0, cx + r, cy)
 		canvas.drawPath(equatorBackPath, {
 			stroke: theme.colors.black,
 			strokeWidth: theme.stroke.width.base,
 			dash: theme.stroke.dasharray.dashed
 		})
-		const equatorFrontPath = new Path2D().moveTo(cx - r, cy).arcTo(r, ry, 0, 0, 1, cx + r, cy)
+		const equatorFrontPath = new Path2D()
+			.moveTo(cx - r, cy)
+			.arcTo(r, ry, 0, 0, 1, cx + r, cy)
 		canvas.drawPath(equatorFrontPath, {
 			stroke: theme.colors.black,
 			strokeWidth: theme.stroke.width.base

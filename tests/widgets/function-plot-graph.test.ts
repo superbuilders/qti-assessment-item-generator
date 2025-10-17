@@ -1,9 +1,9 @@
 import { describe, expect, test } from "bun:test"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import { functionPlotGraphExamples } from "../../examples/function-plot-graph"
-import type { WidgetInput } from "../../src/widgets/registry"
-import { generateWidgetForTest } from "../helpers/generateWidgetForTest"
+import { functionPlotGraphExamples } from "@/examples/function-plot-graph"
+import { generateWidgetForTest } from "@/testing/helpers/generateWidgetForTest"
+import type { WidgetInput } from "@/widgets/registry"
 
 describe("Widget: function-plot-graph", () => {
 	const examples: WidgetInput[] = functionPlotGraphExamples

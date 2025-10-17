@@ -1,12 +1,12 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
-import type { WidgetGenerator } from "../types"
-import { CanvasImpl } from "../utils/canvas-impl"
-import { AXIS_VIEWBOX_PADDING } from "../utils/constants"
-import { setupCoordinatePlaneBaseV2 } from "../utils/coordinate-plane-utils"
-import { createHeightSchema, createWidthSchema } from "../utils/schemas"
-import { theme } from "../utils/theme"
+import type { WidgetGenerator } from "@/widgets/types"
+import { CanvasImpl } from "@/widgets/utils/canvas-impl"
+import { AXIS_VIEWBOX_PADDING } from "@/widgets/utils/constants"
+import { setupCoordinatePlaneBaseV2 } from "@/widgets/utils/coordinate-plane-utils"
+import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
 
 const Bin = z
 	.object({
@@ -24,7 +24,9 @@ export const HistogramPropsSchema = z
 	.object({
 		type: z
 			.literal("histogram")
-			.describe("Identifies this as a histogram widget for displaying frequency distributions."),
+			.describe(
+				"Identifies this as a histogram widget for displaying frequency distributions."
+			),
 		width: createWidthSchema(),
 		height: createHeightSchema(),
 		title: z
@@ -90,7 +92,9 @@ export type HistogramProps = z.infer<typeof HistogramPropsSchema>
  * Histograms are used to visualize the distribution of continuous numerical data by dividing it into intervals (bins).
  * Unlike bar charts, histogram bars are adjacent to each other.
  */
-export const generateHistogram: WidgetGenerator<typeof HistogramPropsSchema> = async (data) => {
+export const generateHistogram: WidgetGenerator<
+	typeof HistogramPropsSchema
+> = async (data) => {
 	const { width, height, title, xAxis, yAxis, bins, separators } = data
 
 	// Runtime validation (no refine allowed in schema for structured outputs)
