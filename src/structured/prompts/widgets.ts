@@ -281,9 +281,9 @@ CORRECT (triangle diagram without revealing labels):
 }\`
 
 **Duplicate Choice Visuals BANNED (Every Option Must Be Distinct):**
-When a single interaction uses multiple widget-driven visuals, each choice MUST present a unique configuration. Our rule is simple: **no two answers should be the same**. Duplicated visuals make the task impossible because students cannot distinguish options. Never reuse the same orientation, measure, or state across choices, especially for geometry diagrams or measurement tools like protractors.
+Every widget-driven choice is a teaching opportunity. When several answers rely on visuals, each option MUST surface a different conceptual cue so the student demonstrates understanding. Our shorthand rule of thumb — **no two answers should be the same** — exists to enforce that pedagogy. Even if duplicate visuals technically align with the answer key, they read as lazy authoring and rob the student of feedback signals. If multiple answers legitimately share the same measurement (for example, several right angles), vary the orientation (\`startingReading\`) or other non-answer properties so learners compare distinct scenarios instead of staring at clones.
 
-WRONG (three identical protractor widgets—students cannot tell the choices apart):
+WRONG (three right-angle visuals reuse the same protractor orientation, so the question never tests different misconceptions):
 \`\`\`json
 {
   "identifier": "angles-not-right-multiselect",
@@ -405,30 +405,44 @@ WRONG (three identical protractor widgets—students cannot tell the choices apa
 }
 \`\`\`
 
-CORRECT (each protractor shows a distinct angle, so students can evaluate the choices):
+CORRECT (same stem, answer key, and widget slots—only the right angles rotate so students analyze distinct visuals instead of clones. Widget payload shown; other fields stay the same):
 \`\`\`json
 {
   "widgets": {
-    "choice_a_visual": {
+    "repl__choice_interaction__choice__a__visual__0": {
       "type": "protractorAngleDiagram",
       "width": 380,
       "height": 380,
       "startingReading": 0,
-      "angleDegrees": 55
+      "angleDegrees": 60
     },
-    "choice_b_visual": {
+    "repl__choice_interaction__choice__b__visual__0": {
       "type": "protractorAngleDiagram",
       "width": 380,
       "height": 380,
       "startingReading": 0,
       "angleDegrees": 90
     },
-    "choice_c_visual": {
+    "repl__choice_interaction__choice__c__visual__0": {
       "type": "protractorAngleDiagram",
       "width": 380,
       "height": 380,
       "startingReading": 0,
-      "angleDegrees": 125
+      "angleDegrees": 120
+    },
+    "repl__choice_interaction__choice__d__visual__0": {
+      "type": "protractorAngleDiagram",
+      "width": 380,
+      "height": 380,
+      "startingReading": 30,
+      "angleDegrees": 90
+    },
+    "repl__choice_interaction__choice__e__visual__0": {
+      "type": "protractorAngleDiagram",
+      "width": 380,
+      "height": 380,
+      "startingReading": 240,
+      "angleDegrees": 90
     }
   }
 }
