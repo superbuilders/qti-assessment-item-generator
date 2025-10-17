@@ -1,30 +1,31 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import * as he from "he"
 import { VOID_ELEMENTS } from "@/stimulus/constants"
+import { isElementNode, isTextNode, NODE_TYPE } from "@/stimulus/dom-utils"
 
 export function serializeArticle(article: Element): string {
 	const clone = article.cloneNode(true)
-	if (!(clone instanceof Element)) {
+	if (!isElementNode(clone)) {
 		return serializeNode(article)
 	}
 	return serializeNode(clone)
 }
 
 function serializeNode(node: Node): string {
-	if (node instanceof Element) {
+	if (isElementNode(node)) {
 		return serializeElement(node)
 	}
-	if (node instanceof Text) {
+	if (isTextNode(node)) {
 		const value = readTextValue(node, "serializeNode:text")
-		return he.encode(value, {
-			useNamedReferences: false
-		})
+		return escapeTextContent(value)
 	}
-	if (node instanceof CDATASection) {
-		return he.encode(node.data, {
-			useNamedReferences: false
+	if (node.nodeType === NODE_TYPE.CDATA_SECTION) {
+		const preview = node.nodeValue ?? ""
+		logger.error("serializeNode encountered cdata node", {
+			preview: preview.slice(0, 200),
+			previewLength: preview.length
 		})
+		throw errors.new("serializeNode encountered cdata")
 	}
 	return ""
 }
@@ -46,12 +47,6 @@ function serializeElement(element: Element): string {
 	return `<${tag}${attrString}>${childString}</${tag}>`
 }
 
-function escapeAttribute(value: string): string {
-	return he.encode(value, {
-		useNamedReferences: false
-	})
-}
-
 function readTextValue(node: Text, context: string): string {
 	const value = node.nodeValue
 	if (value === null) {
@@ -61,4 +56,20 @@ function readTextValue(node: Text, context: string): string {
 		throw errors.new("serializeNode: text node missing value")
 	}
 	return value
+}
+
+function escapeTextContent(value: string): string {
+	return value
+		.replace(/&/g, "&amp;")
+		.replace(/</g, "&lt;")
+		.replace(/>/g, "&gt;")
+}
+
+function escapeAttribute(value: string): string {
+	return value
+		.replace(/&/g, "&amp;")
+		.replace(/</g, "&lt;")
+		.replace(/>/g, "&gt;")
+		.replace(/"/g, "&quot;")
+		.replace(/'/g, "&apos;")
 }

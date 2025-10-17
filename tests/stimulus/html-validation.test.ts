@@ -5,6 +5,7 @@ import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import type { CanvasPageData } from "@/stimulus/builder"
 import { buildStimulusFromPageData } from "@/stimulus/builder"
+import { VOID_ELEMENTS } from "@/stimulus/constants"
 
 interface StimulusFixture {
 	slugPath: string
@@ -93,6 +94,39 @@ describe("Canvas stimulus HTML generation", () => {
 			expect(articleOpenIndex).toBe(0)
 			const articleCloseIndex = result.html.lastIndexOf("</article>")
 			expect(articleCloseIndex).toBeGreaterThan(articleOpenIndex)
+
+			for (const tag of VOID_ELEMENTS) {
+				const pattern = new RegExp(`<${tag}\\b[^>]*>`, "gi")
+				for (const match of result.html.matchAll(pattern)) {
+					const snippet = match[0]
+					expect(
+						snippet.trim().endsWith("/>"),
+						`void element <${tag}> must be self-closing; found "${snippet}" in ${fixture.slugPath}`
+					).toBeTrue()
+				}
+			}
+
+			const disallowedNamed = result.html.match(/&[a-zA-Z][a-zA-Z0-9]+;/g) ?? []
+			const allowedNamed = new Set([
+				"&amp;",
+				"&lt;",
+				"&gt;",
+				"&quot;",
+				"&apos;"
+			])
+			for (const entity of disallowedNamed) {
+				expect(
+					allowedNamed.has(entity),
+					`disallowed named entity ${entity} in ${fixture.slugPath}`
+				).toBeTrue()
+			}
+
+			const numericEntities =
+				result.html.match(/&#(?:\d+|x[0-9a-fA-F]+);/gi) ?? []
+			expect(
+				numericEntities.length,
+				`numeric entities not permitted in ${fixture.slugPath}: ${numericEntities.join(", ")}`
+			).toBe(0)
 		})
 	}
 })

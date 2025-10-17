@@ -1,8 +1,9 @@
 import * as errors from "@superbuilders/errors"
+import * as logger from "@superbuilders/slog"
 import { XMLParser } from "fast-xml-parser"
-import * as he from "he"
 import { VOID_ELEMENTS } from "@/stimulus/constants"
 import { createDocument } from "@/stimulus/dom"
+import { NODE_TYPE, isElementNode, isTextNode } from "@/stimulus/dom-utils"
 import type { StimulusIssue } from "@/stimulus/types"
 
 const ALLOWED_NAMED_ENTITIES = new Set(["amp", "lt", "gt", "quot", "apos"])
@@ -63,15 +64,10 @@ export function validateHtml(html: string): StimulusIssue[] {
 		]
 	}
 
+	assertNoCdata(article, html.length)
+
 	const issues: StimulusIssue[] = []
 	issues.push(...collectEntityIssues(html))
-	if (containsCdata(article)) {
-		issues.push({
-			severity: "error",
-			code: "cdata-not-allowed",
-			message: "Found CDATA section in stimulus HTML; CDATA is not permitted."
-		})
-	}
 
 	const xmlString = `<?xml version="1.0" encoding="UTF-8"?>${serializeElementToXml(article)}`
 	const xmlParseResult = errors.trySync(() => xmlParser.parse(xmlString))
@@ -136,32 +132,53 @@ function serializeElementToXml(element: Element): string {
 }
 
 function serializeNodeToXml(node: Node): string {
-	if (node instanceof Element) {
+	if (isElementNode(node)) {
 		return serializeElementToXml(node)
 	}
-	if (node instanceof Text) {
+	if (isTextNode(node)) {
 		return escapeXmlText(node.nodeValue ?? "")
 	}
-	if (node instanceof CDATASection) {
-		return escapeXmlText(node.data)
+	if (node.nodeType === NODE_TYPE.CDATA_SECTION) {
+		const preview = node.nodeValue ?? ""
+		logger.error("serializeNodeToXml encountered cdata node", {
+			preview: preview.slice(0, 200),
+			previewLength: preview.length
+		})
+		throw errors.new("stimulus xml serialization encountered cdata")
 	}
 	return ""
 }
 
 function escapeXmlAttribute(value: string): string {
-	return he.encode(value, { useNamedReferences: false })
+	return value
+		.replace(/&/g, "&amp;")
+		.replace(/</g, "&lt;")
+		.replace(/>/g, "&gt;")
+		.replace(/"/g, "&quot;")
+		.replace(/'/g, "&apos;")
 }
 
 function escapeXmlText(value: string): string {
-	return he.encode(value, { useNamedReferences: false })
+	return value
+		.replace(/&/g, "&amp;")
+		.replace(/</g, "&lt;")
+		.replace(/>/g, "&gt;")
 }
 
 function getErrorMessage(error: unknown): string {
 	return error instanceof Error ? error.message : String(error)
 }
 
+function assertNoCdata(root: Node, htmlLength: number): void {
+	if (!containsCdata(root)) {
+		return
+	}
+	logger.error("cdata found in stimulus html", { htmlLength })
+	throw errors.new("stimulus html contains cdata")
+}
+
 function containsCdata(root: Node): boolean {
-	if (root instanceof CDATASection) {
+	if (root.nodeType === NODE_TYPE.CDATA_SECTION) {
 		return true
 	}
 	for (const child of Array.from(root.childNodes)) {

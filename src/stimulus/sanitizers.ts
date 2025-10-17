@@ -3,6 +3,11 @@ import {
 	DEFAULT_REMOVAL_SELECTORS,
 	TAG_ATTRIBUTE_WHITELIST
 } from "@/stimulus/constants"
+import {
+	isCommentNode,
+	isElementNode,
+	isTextNode
+} from "@/stimulus/dom-utils"
 import type { StimulusIssue, StimulusOptions } from "@/stimulus/types"
 
 const BOOLEAN_ATTRIBUTES = new Set(["allowfullscreen"])
@@ -35,7 +40,7 @@ function stripComments(document: Document) {
 	const nodes: Comment[] = []
 	let current = walker.nextNode()
 	while (current) {
-		if (current instanceof Comment) {
+		if (isCommentNode(current)) {
 			nodes.push(current)
 		}
 		current = walker.nextNode()
@@ -52,7 +57,7 @@ function stripDisallowedAttributes(
 	const walker = document.createTreeWalker(document, NODE_FILTER.SHOW_ELEMENT)
 	let current = walker.nextNode()
 	while (current) {
-		if (!(current instanceof Element)) {
+		if (!isElementNode(current)) {
 			current = walker.nextNode()
 			continue
 		}
@@ -87,7 +92,7 @@ function collapseWhitespace(root: Element | null) {
 	const nodes: Text[] = []
 	let current = walker.nextNode()
 	while (current) {
-		if (current instanceof Text) {
+		if (isTextNode(current)) {
 			nodes.push(current)
 		}
 		current = walker.nextNode()

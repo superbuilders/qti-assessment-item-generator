@@ -1,7 +1,8 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import { BLOCK_ELEMENTS, INLINE_ELEMENTS } from "@/stimulus/constants"
+import { BLOCK_ELEMENTS, INLINE_ELEMENTS, VOID_ELEMENTS } from "@/stimulus/constants"
 import { createDocument } from "@/stimulus/dom"
+import { isElementNode, isTextNode } from "@/stimulus/dom-utils"
 import type { StimulusIssue } from "@/stimulus/types"
 
 const NODE_FILTER = {
@@ -25,7 +26,7 @@ export function normalizeStructure(
 	const articleDocument = article.ownerDocument
 
 	for (const child of Array.from(sourceRoot.childNodes)) {
-		if (child instanceof Text) {
+		if (isTextNode(child)) {
 			const text = readTextValue(child, "normalizeStructure:sourceRootChild")
 			if (text.trim().length === 0) continue
 		}
@@ -45,6 +46,8 @@ export function normalizeStructure(
 	return article
 }
 
+const PRESERVE_IF_EMPTY = new Set(["iframe", "svg", "math", "video", "audio", "canvas"])
+
 function removeEmptyElements(root: Element) {
 	const walker = root.ownerDocument.createTreeWalker(
 		root,
@@ -53,17 +56,38 @@ function removeEmptyElements(root: Element) {
 	const empty: Element[] = []
 	let current = walker.nextNode()
 	while (current) {
-		if (current instanceof Element) {
-			if (current.childNodes.length === 0) {
-				empty.push(current)
-			} else if (
+		if (isElementNode(current)) {
+			const tag = current.tagName.toLowerCase()
+			const hasNoChildren = current.childNodes.length === 0
+			const hasOnlyEmptyText =
 				current.childNodes.length === 1 &&
-				current.firstChild instanceof Text &&
+				isTextNode(current.firstChild) &&
 				readTextValue(
 					current.firstChild,
 					"removeEmptyElements:firstChild"
 				).trim().length === 0
-			) {
+
+			if (!hasNoChildren && !hasOnlyEmptyText) {
+				current = walker.nextNode()
+				continue
+			}
+
+			const hasAttributes = current.attributes.length > 0
+			const isVoid = VOID_ELEMENTS.has(tag)
+			const isPreserved = hasAttributes || isVoid || PRESERVE_IF_EMPTY.has(tag)
+
+			if (isPreserved) {
+				current = walker.nextNode()
+				continue
+			}
+
+			if (hasNoChildren) {
+				empty.push(current)
+				current = walker.nextNode()
+				continue
+			}
+
+			if (hasOnlyEmptyText) {
 				empty.push(current)
 			}
 		}
@@ -80,7 +104,7 @@ function fixParagraphChildren(root: Element, issues: StimulusIssue[]) {
 	for (const p of Array.from(root.querySelectorAll("p"))) {
 		let containsBlock = false
 		for (const child of Array.from(p.childNodes)) {
-			if (!(child instanceof Element)) continue
+			if (!isElementNode(child)) continue
 			const tag = child.tagName.toLowerCase()
 			if (BLOCK_ELEMENTS.has(tag) && tag !== "a" && tag !== "span") {
 				containsBlock = true
@@ -115,7 +139,7 @@ function normalizeLists(root: Element, issues: StimulusIssue[]) {
 		if (needsWrap.length === 0 && list.children.length > 0) continue
 		const replacement: Element[] = []
 		for (const child of Array.from(list.childNodes)) {
-			if (child instanceof Text) {
+			if (isTextNode(child)) {
 				const value = readTextValue(child, "normalizeLists:listChild")
 				if (value.trim().length === 0) continue
 				const li = root.ownerDocument.createElement("li")
@@ -124,7 +148,7 @@ function normalizeLists(root: Element, issues: StimulusIssue[]) {
 				child.remove()
 				continue
 			}
-			if (child instanceof Element) {
+			if (isElementNode(child)) {
 				if (child.tagName.toLowerCase() === "li") continue
 				const li = root.ownerDocument.createElement("li")
 				li.appendChild(child)
