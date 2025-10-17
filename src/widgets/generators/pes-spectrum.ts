@@ -53,7 +53,9 @@ export const PESSpectrumPropsSchema = z
 			.array(PeakSchema)
 			.min(1)
 			.max(20)
-			.describe("Array of PES peaks. Order is irrelevant for layout; positions come from energy values.")
+			.describe(
+				"Array of PES peaks. Order is irrelevant for layout; positions come from energy values."
+			)
 	})
 	.strict()
 	.describe(
@@ -68,7 +70,9 @@ const X_TICK_LABELS = ["1000", "100", "10", "1", "0"]
 // Shape parameter to reduce compression near higher-decade bounds (1.0 = pure log)
 const LOG_GAMMA = 1.5
 
-export const generatePESSpectrum: WidgetGenerator<typeof PESSpectrumPropsSchema> = async (props) => {
+export const generatePESSpectrum: WidgetGenerator<typeof PESSpectrumPropsSchema> = async (
+	props
+) => {
 	const { width, height, peaks, title, yAxisLabel } = props
 
 	// Create canvas
@@ -106,20 +110,39 @@ export const generatePESSpectrum: WidgetGenerator<typeof PESSpectrumPropsSchema>
 	// Draw faint horizontal grid lines (opacity .1, stroke-width 2)
 	for (let i = 0; i < GRID_LINE_COUNT; i++) {
 		const y = chartTop + (i * chartHeight) / (GRID_LINE_COUNT - 1)
-		canvas.drawLine(chartLeft, y, chartRight, y, { stroke: theme.colors.black, strokeWidth: 2, opacity: 0.1 })
+		canvas.drawLine(chartLeft, y, chartRight, y, {
+			stroke: theme.colors.black,
+			strokeWidth: 2,
+			opacity: 0.1
+		})
 	}
 
 	// Axes: bottom x-axis and left y-axis (stroke-width 2)
-	canvas.drawLine(chartLeft, chartBottom, chartRight, chartBottom, { stroke: theme.colors.black, strokeWidth: 2 })
-	canvas.drawLine(chartLeft, chartBottom, chartLeft, chartTop, { stroke: theme.colors.black, strokeWidth: 2 })
+	canvas.drawLine(chartLeft, chartBottom, chartRight, chartBottom, {
+		stroke: theme.colors.black,
+		strokeWidth: 2
+	})
+	canvas.drawLine(chartLeft, chartBottom, chartLeft, chartTop, {
+		stroke: theme.colors.black,
+		strokeWidth: 2
+	})
 
 	// X-axis ticks and labels at equal spacing with labels 1000,100,10,1,0
 	const xTickCount = X_TICK_LABELS.length
 	for (let i = 0; i < xTickCount; i++) {
 		const frac = i / (xTickCount - 1)
 		const x = chartLeft + frac * chartWidth
-		canvas.drawLine(x, chartBottom, x, chartBottom + 5, { stroke: theme.colors.black, strokeWidth: 1.5 })
-		canvas.drawText({ x, y: chartBottom + 17, text: X_TICK_LABELS[i] ?? "", anchor: "middle", fontPx: 10 })
+		canvas.drawLine(x, chartBottom, x, chartBottom + 5, {
+			stroke: theme.colors.black,
+			strokeWidth: 1.5
+		})
+		canvas.drawText({
+			x,
+			y: chartBottom + 17,
+			text: X_TICK_LABELS[i] ?? "",
+			anchor: "middle",
+			fontPx: 10
+		})
 	}
 
 	// Optional title
@@ -233,11 +256,23 @@ export const generatePESSpectrum: WidgetGenerator<typeof PESSpectrumPropsSchema>
 
 		// Optional top label
 		if (peak.topLabel !== null && peak.topLabel !== "") {
-			canvas.drawText({ x: xCenter, y: yTop - 6, text: peak.topLabel, anchor: "middle", fontPx: 10 })
+			canvas.drawText({
+				x: xCenter,
+				y: yTop - 6,
+				text: peak.topLabel,
+				anchor: "middle",
+				fontPx: 10
+			})
 		}
 	}
 
 	// Finalize
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(PADDING)
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.base}">${svgBody}</svg>`
 }

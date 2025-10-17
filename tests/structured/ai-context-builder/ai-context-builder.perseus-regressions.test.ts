@@ -21,7 +21,12 @@ describe("buildPerseusEnvelope (regressions)", () => {
 		global.fetch = previousFetch
 	})
 
-	const fixtures = [soupVolumeEstimation, rectangularPrismVolume, numberLineMatcher, interactiveGraphPlotting]
+	const fixtures = [
+		soupVolumeEstimation,
+		rectangularPrismVolume,
+		numberLineMatcher,
+		interactiveGraphPlotting
+	]
 
 	for (const fixture of fixtures) {
 		test(`fixture: ${fixture.question?.content?.slice(0, 32) ?? "unnamed"}`, async () => {

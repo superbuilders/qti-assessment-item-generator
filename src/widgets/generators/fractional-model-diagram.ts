@@ -26,8 +26,15 @@ function createPartitionedShapeSchema() {
 	return z
 		.object({
 			numerator: z.number().int().min(0).describe("The number of shaded pieces in the shape."),
-			denominator: z.number().int().positive().describe("The total number of equal pieces the shape is divided into."),
-			color: z.string().regex(CSS_COLOR_PATTERN, "invalid css color").describe("The fill color for the shaded pieces.")
+			denominator: z
+				.number()
+				.int()
+				.positive()
+				.describe("The total number of equal pieces the shape is divided into."),
+			color: z
+				.string()
+				.regex(CSS_COLOR_PATTERN, "invalid css color")
+				.describe("The fill color for the shaded pieces.")
 		})
 		.strict()
 }
@@ -35,7 +42,9 @@ function createPartitionedShapeSchema() {
 // The main Zod schema for the widget.
 export const FractionModelDiagramPropsSchema = z
 	.object({
-		type: z.literal("fractionModelDiagram").describe("Identifies this as a fraction model diagram widget."),
+		type: z
+			.literal("fractionModelDiagram")
+			.describe("Identifies this as a fraction model diagram widget."),
 		width: createWidthSchema(),
 		height: createHeightSchema(),
 		shapeType: ShapeTypeEnum,
@@ -61,7 +70,9 @@ export type FractionModelDiagramProps = z.infer<typeof FractionModelDiagramProps
  * Generates an SVG diagram showing a sequence of fractions, represented as partitioned shapes,
  * with operators between them.
  */
-export const generateFractionModelDiagram: WidgetGenerator<typeof FractionModelDiagramPropsSchema> = async (props) => {
+export const generateFractionModelDiagram: WidgetGenerator<
+	typeof FractionModelDiagramPropsSchema
+> = async (props) => {
 	const { width, height, shapeType, shapes, operators } = props
 
 	// --- Runtime Validation ---
@@ -248,6 +259,12 @@ export const generateFractionModelDiagram: WidgetGenerator<typeof FractionModelD
 		}
 	})
 
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(PADDING)
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}">${svgBody}</svg>`
 }

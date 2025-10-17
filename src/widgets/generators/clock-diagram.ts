@@ -33,7 +33,9 @@ export type ClockDiagramProps = z.infer<typeof ClockDiagramPropsSchema>
 /**
  * Generates an SVG diagram of an analog clock.
  */
-export const generateClockDiagram: WidgetGenerator<typeof ClockDiagramPropsSchema> = async (props) => {
+export const generateClockDiagram: WidgetGenerator<typeof ClockDiagramPropsSchema> = async (
+	props
+) => {
 	const { width, height, hour, minute } = props
 
 	const canvas = new CanvasImpl({
@@ -92,11 +94,17 @@ export const generateClockDiagram: WidgetGenerator<typeof ClockDiagramPropsSchem
 	// Minute hand
 	const minuteAngle = (minute / 60) * 2 * Math.PI - Math.PI / 2
 	const minuteLen = radius * 0.66
-	canvas.drawLine(cx, cy, cx + minuteLen * Math.cos(minuteAngle), cy + minuteLen * Math.sin(minuteAngle), {
-		stroke: theme.colors.black,
-		strokeWidth: 4,
-		strokeLinecap: "round"
-	})
+	canvas.drawLine(
+		cx,
+		cy,
+		cx + minuteLen * Math.cos(minuteAngle),
+		cy + minuteLen * Math.sin(minuteAngle),
+		{
+			stroke: theme.colors.black,
+			strokeWidth: 4,
+			strokeLinecap: "round"
+		}
+	)
 
 	// Hour hand (moves with minute)
 	const hourAngle = ((hour % 12) / 12 + minute / (12 * 60)) * 2 * Math.PI - Math.PI / 2
@@ -110,6 +118,12 @@ export const generateClockDiagram: WidgetGenerator<typeof ClockDiagramPropsSchem
 	// Center hub
 	canvas.drawCircle(cx, cy, 6, { fill: theme.colors.black })
 
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(PADDING)
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}">${svgBody}</svg>`
 }

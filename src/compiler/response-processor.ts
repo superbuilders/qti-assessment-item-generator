@@ -6,7 +6,10 @@ import type { AssessmentItem } from "@/core/item"
 import { escapeXmlAttribute } from "./utils/xml-utils"
 
 // Internal type for compilation after nested feedback has been flattened
-type AssessmentItemWithFeedbackBlocks<E extends readonly string[]> = Omit<AssessmentItem<E>, "feedback"> & {
+type AssessmentItemWithFeedbackBlocks<E extends readonly string[]> = Omit<
+	AssessmentItem<E>,
+	"feedback"
+> & {
 	feedbackBlocks: Record<string, FeedbackContent<E>>
 }
 
@@ -30,13 +33,19 @@ export function compileResponseDeclarations<E extends readonly string[]>(
 				const correctXml = pairs
 					.map((p: unknown): string => {
 						if (typeof p !== "object" || p === null) {
-							logger.error("invalid directedPair correct value", { identifier: decl.identifier, value: p })
+							logger.error("invalid directedPair correct value", {
+								identifier: decl.identifier,
+								value: p
+							})
 							throw errors.new("invalid directedPair correct value structure")
 						}
 						const sourceDesc = Object.getOwnPropertyDescriptor(p, "source")
 						const targetDesc = Object.getOwnPropertyDescriptor(p, "target")
 						if (!sourceDesc || !targetDesc) {
-							logger.error("invalid directedPair correct value", { identifier: decl.identifier, value: p })
+							logger.error("invalid directedPair correct value", {
+								identifier: decl.identifier,
+								value: p
+							})
 							throw errors.new("invalid directedPair correct value structure")
 						}
 						const source = String(sourceDesc.value)
@@ -49,13 +58,19 @@ export function compileResponseDeclarations<E extends readonly string[]>(
 				const mappingXml = pairs
 					.map((p: unknown): string => {
 						if (typeof p !== "object" || p === null) {
-							logger.error("invalid directedPair value for mapping", { identifier: decl.identifier, value: p })
+							logger.error("invalid directedPair value for mapping", {
+								identifier: decl.identifier,
+								value: p
+							})
 							throw errors.new("invalid directedPair correct value for mapping")
 						}
 						const sourceDesc = Object.getOwnPropertyDescriptor(p, "source")
 						const targetDesc = Object.getOwnPropertyDescriptor(p, "target")
 						if (!sourceDesc || !targetDesc) {
-							logger.error("invalid directedPair value for mapping", { identifier: decl.identifier, value: p })
+							logger.error("invalid directedPair value for mapping", {
+								identifier: decl.identifier,
+								value: p
+							})
 							throw errors.new("invalid directedPair correct value for mapping")
 						}
 						const source = String(sourceDesc.value)
@@ -114,7 +129,9 @@ export function compileResponseDeclarations<E extends readonly string[]>(
 		.join("")
 }
 
-function generateComboModeProcessing<E extends readonly string[]>(item: AssessmentItemWithFeedbackBlocks<E>): string {
+function generateComboModeProcessing<E extends readonly string[]>(
+	item: AssessmentItemWithFeedbackBlocks<E>
+): string {
 	const { dimensions, combinations } = item.feedbackPlan
 
 	function buildConditionTree(
@@ -122,13 +139,16 @@ function generateComboModeProcessing<E extends readonly string[]>(item: Assessme
 		pathSegments: Array<{ responseIdentifier: string; key: string }>
 	): string {
 		if (dims.length === 0) {
-			const matchingCombo = combinations.find((combo: FeedbackPlan["combinations"][number]): boolean => {
-				if (combo.path.length !== pathSegments.length) return false
-				return combo.path.every(
-					(seg: FeedbackPlan["combinations"][number]["path"][number], i: number): boolean =>
-						seg.responseIdentifier === pathSegments[i].responseIdentifier && seg.key === pathSegments[i].key
-				)
-			})
+			const matchingCombo = combinations.find(
+				(combo: FeedbackPlan["combinations"][number]): boolean => {
+					if (combo.path.length !== pathSegments.length) return false
+					return combo.path.every(
+						(seg: FeedbackPlan["combinations"][number]["path"][number], i: number): boolean =>
+							seg.responseIdentifier === pathSegments[i].responseIdentifier &&
+							seg.key === pathSegments[i].key
+					)
+				}
+			)
 			if (!matchingCombo) {
 				logger.error("no combination found for path", { pathSegments })
 				throw errors.new("no combination found for path")
@@ -151,7 +171,10 @@ function generateComboModeProcessing<E extends readonly string[]>(item: Assessme
 				.map((key, index): string => {
 					const tag = index === 0 ? "qti-response-if" : "qti-response-else-if"
 					const choiceId = escapeXmlAttribute(key)
-					const newPathSegments = [...pathSegments, { responseIdentifier: currentDim.responseIdentifier, key }]
+					const newPathSegments = [
+						...pathSegments,
+						{ responseIdentifier: currentDim.responseIdentifier, key }
+					]
 					const innerContent = buildConditionTree(restDims, newPathSegments)
 
 					return `
@@ -168,8 +191,14 @@ function generateComboModeProcessing<E extends readonly string[]>(item: Assessme
     </qti-response-condition>`
 		}
 
-		const correctPath = [...pathSegments, { responseIdentifier: currentDim.responseIdentifier, key: "CORRECT" }]
-		const incorrectPath = [...pathSegments, { responseIdentifier: currentDim.responseIdentifier, key: "INCORRECT" }]
+		const correctPath = [
+			...pathSegments,
+			{ responseIdentifier: currentDim.responseIdentifier, key: "CORRECT" }
+		]
+		const incorrectPath = [
+			...pathSegments,
+			{ responseIdentifier: currentDim.responseIdentifier, key: "INCORRECT" }
+		]
 		const correctBranch = buildConditionTree(restDims, correctPath)
 		const incorrectBranch = buildConditionTree(restDims, incorrectPath)
 

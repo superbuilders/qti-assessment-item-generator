@@ -38,7 +38,12 @@ export function sanitizeXmlAttributeValue(value: string): string {
  * @param title The title attribute value
  * @returns The modified XML string
  */
-export function replaceRootAttributes(xml: string, elementName: string, identifier: string, title: string): string {
+export function replaceRootAttributes(
+	xml: string,
+	elementName: string,
+	identifier: string,
+	title: string
+): string {
 	// Use robust named capture groups; fail fast if not found
 	const openTagRegex = new RegExp(`(?<open><\\s*${elementName}\\b)(?<attrs>[^>]*)>`, "i")
 	const openMatch = openTagRegex.exec(xml)
@@ -57,7 +62,10 @@ export function replaceRootAttributes(xml: string, elementName: string, identifi
 	const idAttrMatch = idAttrRegex.exec(updatedAttrs)
 	if (idAttrMatch?.groups) {
 		const quote: string = String(idAttrMatch.groups.q)
-		updatedAttrs = updatedAttrs.replace(idAttrRegex, ` identifier=${quote}${escapeXmlAttribute(identifier)}${quote}`)
+		updatedAttrs = updatedAttrs.replace(
+			idAttrRegex,
+			` identifier=${quote}${escapeXmlAttribute(identifier)}${quote}`
+		)
 	} else {
 		updatedAttrs += ` identifier="${escapeXmlAttribute(identifier)}"`
 	}
@@ -67,7 +75,10 @@ export function replaceRootAttributes(xml: string, elementName: string, identifi
 	const titleAttrMatch = titleAttrRegex.exec(updatedAttrs)
 	if (titleAttrMatch?.groups) {
 		const quote: string = String(titleAttrMatch.groups.q)
-		updatedAttrs = updatedAttrs.replace(titleAttrRegex, ` title=${quote}${escapeXmlAttribute(title)}${quote}`)
+		updatedAttrs = updatedAttrs.replace(
+			titleAttrRegex,
+			` title=${quote}${escapeXmlAttribute(title)}${quote}`
+		)
 	} else {
 		updatedAttrs += ` title="${escapeXmlAttribute(title)}"`
 	}

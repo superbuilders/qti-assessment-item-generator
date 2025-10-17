@@ -27,8 +27,14 @@ describe("Compiler: feedback-as-steps", () => {
 					responseIdentifier: "RESPONSE",
 					prompt: [{ type: "text", content: "Choose:" }],
 					choices: [
-						{ identifier: "A", content: [{ type: "paragraph", content: [{ type: "text", content: "4" }] }] },
-						{ identifier: "B", content: [{ type: "paragraph", content: [{ type: "text", content: "5" }] }] }
+						{
+							identifier: "A",
+							content: [{ type: "paragraph", content: [{ type: "text", content: "4" }] }]
+						},
+						{
+							identifier: "B",
+							content: [{ type: "paragraph", content: [{ type: "text", content: "5" }] }]
+						}
 					],
 					shuffle: true,
 					minChoices: 1,
@@ -39,8 +45,14 @@ describe("Compiler: feedback-as-steps", () => {
 				mode: "combo",
 				dimensions: [{ responseIdentifier: "RESPONSE", kind: "binary" }],
 				combinations: [
-					{ id: "FB__RESPONSE_CORRECT", path: [{ responseIdentifier: "RESPONSE", key: "CORRECT" }] },
-					{ id: "FB__RESPONSE_INCORRECT", path: [{ responseIdentifier: "RESPONSE", key: "INCORRECT" }] }
+					{
+						id: "FB__RESPONSE_CORRECT",
+						path: [{ responseIdentifier: "RESPONSE", key: "CORRECT" }]
+					},
+					{
+						id: "FB__RESPONSE_INCORRECT",
+						path: [{ responseIdentifier: "RESPONSE", key: "INCORRECT" }]
+					}
 				]
 			},
 			feedback: {
@@ -59,7 +71,9 @@ describe("Compiler: feedback-as-steps", () => {
 										content: [
 											{
 												type: "paragraph",
-												content: [{ type: "text", content: "2 + 2 means combining two groups of 2." }]
+												content: [
+													{ type: "text", content: "2 + 2 means combining two groups of 2." }
+												]
 											}
 										]
 									},
@@ -93,7 +107,9 @@ describe("Compiler: feedback-as-steps", () => {
 										content: [
 											{
 												type: "paragraph",
-												content: [{ type: "text", content: "When adding, count all items together." }]
+												content: [
+													{ type: "text", content: "When adding, count all items together." }
+												]
 											}
 										]
 									},
@@ -207,7 +223,9 @@ describe("Compiler: feedback-as-steps", () => {
 								{
 									type: "step",
 									title: [{ type: "text", content: "Only Step" }],
-									content: [{ type: "paragraph", content: [{ type: "text", content: "Try again." }] }]
+									content: [
+										{ type: "paragraph", content: [{ type: "text", content: "Try again." }] }
+									]
 								}
 							]
 						}

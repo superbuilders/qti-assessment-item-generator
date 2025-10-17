@@ -20,7 +20,9 @@ export function buildFeedbackPlanFromInteractions<E extends readonly string[]>(
 		return 0
 	})
 
-	const declMap: Map<string, ResponseDeclaration> = new Map(responseDeclarations.map((d) => [d.identifier, d]))
+	const declMap: Map<string, ResponseDeclaration> = new Map(
+		responseDeclarations.map((d) => [d.identifier, d])
+	)
 
 	const dimensions: FeedbackPlan["dimensions"] = []
 	for (const interaction of sortedInteractions) {
@@ -28,7 +30,10 @@ export function buildFeedbackPlanFromInteractions<E extends readonly string[]>(
 		if (!decl) continue
 
 		if (decl.baseType === "identifier" && decl.cardinality === "single") {
-			if (interaction.type === "choiceInteraction" || interaction.type === "inlineChoiceInteraction") {
+			if (
+				interaction.type === "choiceInteraction" ||
+				interaction.type === "inlineChoiceInteraction"
+			) {
 				dimensions.push({
 					responseIdentifier: interaction.responseIdentifier,
 					kind: "enumerated",

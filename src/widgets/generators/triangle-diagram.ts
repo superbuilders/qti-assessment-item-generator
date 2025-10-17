@@ -33,7 +33,9 @@ function createAngleValueSchema() {
 				.strict(),
 			z
 				.object({
-					type: z.literal("symbolic").describe("Indicates this is a symbolic angle representation."),
+					type: z
+						.literal("symbolic")
+						.describe("Indicates this is a symbolic angle representation."),
 					symbol: z
 						.string()
 						.describe(
@@ -63,7 +65,9 @@ function createSideValueSchema() {
 				.strict(),
 			z
 				.object({
-					type: z.literal("symbolic").describe("Indicates this is a symbolic side length representation."),
+					type: z
+						.literal("symbolic")
+						.describe("Indicates this is a symbolic side length representation."),
 					symbol: z
 						.string()
 						.describe(
@@ -75,10 +79,15 @@ function createSideValueSchema() {
 				.object({
 					type: z
 						.literal("mathml")
-						.describe("Indicates this is a MathML-formatted side length with an associated numeric value."),
+						.describe(
+							"Indicates this is a MathML-formatted side length with an associated numeric value."
+						),
 					mathml: z
 						.string()
-						.regex(MATHML_INNER_PATTERN, "invalid mathml snippet; must be inner MathML without outer <math> wrapper")
+						.regex(
+							MATHML_INNER_PATTERN,
+							"invalid mathml snippet; must be inner MathML without outer <math> wrapper"
+						)
 						.describe(
 							"Inner MathML content for rendering complex mathematical expressions (e.g., square roots, fractions). Do not include the outer <math> wrapper tags. Example for √2: '<msqrt><mn>2</mn></msqrt>'"
 						),
@@ -126,10 +135,14 @@ function createAngleMarkSchema() {
 				.describe(
 					"CSS color for the angle arc. Use distinct colors to differentiate multiple angles or highlight specific angles. Common choices: 'red' for important angles, 'blue' for given angles, 'green' for calculated angles."
 				),
-			showArc: z.boolean().describe("Whether to render the arc for this angle. Does not affect geometry."),
+			showArc: z
+				.boolean()
+				.describe("Whether to render the arc for this angle. Does not affect geometry."),
 			showLabel: z
 				.boolean()
-				.describe("Whether to render the label for this angle (numeric text or symbol). Does not affect geometry.")
+				.describe(
+					"Whether to render the label for this angle (numeric text or symbol). Does not affect geometry."
+				)
 		})
 		.strict()
 		.describe(
@@ -348,7 +361,9 @@ export const TriangleDiagramPropsSchema = z
 	.object({
 		type: z
 			.literal("triangleDiagram")
-			.describe("Identifies this widget as a triangle diagram. Always use the exact value 'triangleDiagram'."),
+			.describe(
+				"Identifies this widget as a triangle diagram. Always use the exact value 'triangleDiagram'."
+			),
 		width: createWidthSchema(),
 		height: createHeightSchema(),
 		points: createTrianglePointsSchema().describe(
@@ -388,11 +403,15 @@ export const TriangleDiagramPropsSchema = z
 						vertex: z
 							.string()
 							.regex(TRI_POINT_ID)
-							.describe("The point ID where the right angle is located. This is the vertex of the 90-degree angle."),
+							.describe(
+								"The point ID where the right angle is located. This is the vertex of the 90-degree angle."
+							),
 						from: z
 							.string()
 							.regex(TRI_POINT_ID)
-							.describe("Point ID defining the first ray of the right angle, extending from the vertex."),
+							.describe(
+								"Point ID defining the first ray of the right angle, extending from the vertex."
+							),
 						to: z
 							.string()
 							.regex(TRI_POINT_ID)
@@ -408,7 +427,9 @@ export const TriangleDiagramPropsSchema = z
 							)
 					})
 					.strict()
-					.describe("Defines a right angle (90-degree) marker shown as a small square at the vertex between two rays.")
+					.describe(
+						"Defines a right angle (90-degree) marker shown as a small square at the vertex between two rays."
+					)
 			)
 			.nullable()
 			.describe(
@@ -460,7 +481,14 @@ function angleOf(v: Vec): number {
 	return Math.atan2(v.y, v.x)
 }
 
-function drawArc(canvas: CanvasImpl, center: Vec, r: number, start: number, end: number, color: string): void {
+function drawArc(
+	canvas: CanvasImpl,
+	center: Vec,
+	r: number,
+	start: number,
+	end: number,
+	color: string
+): void {
 	// Normalize
 	let s = start
 	let e = end
@@ -492,7 +520,9 @@ function sideValueToString(v: SideValue): string {
 
 // forward-only schema: no legacy normalization helpers
 
-export const generateTriangleDiagram: WidgetGenerator<typeof TriangleDiagramPropsSchema> = async (props) => {
+export const generateTriangleDiagram: WidgetGenerator<typeof TriangleDiagramPropsSchema> = async (
+	props
+) => {
 	const {
 		width,
 		height,
@@ -531,7 +561,13 @@ export const generateTriangleDiagram: WidgetGenerator<typeof TriangleDiagramProp
 		return false
 	}
 
-	type AngleMarkNormalized = { vertex: string; from: string; to: string; value: AngleValue; color: string }
+	type AngleMarkNormalized = {
+		vertex: string
+		from: string
+		to: string
+		value: AngleValue
+		color: string
+	}
 	const angleMarks: AngleMarkNormalized[] = angleArcs.map((m) => ({
 		vertex: m.vertex,
 		from: m.from,
@@ -580,7 +616,9 @@ export const generateTriangleDiagram: WidgetGenerator<typeof TriangleDiagramProp
 	const AinProvided = numericInteriorFromInput(idA)
 	const BinProvided = numericInteriorFromInput(idB)
 	const CinProvided = numericInteriorFromInput(idC)
-	const providedCount = [AinProvided, BinProvided, CinProvided].filter((x): x is number => x != null).length
+	const providedCount = [AinProvided, BinProvided, CinProvided].filter(
+		(x): x is number => x != null
+	).length
 	if (providedCount === 3 && AinProvided != null && BinProvided != null && CinProvided != null) {
 		const sumProvided = AinProvided + BinProvided + CinProvided
 		if (Math.abs(sumProvided - 180) > 1e-6) {
@@ -679,7 +717,10 @@ export const generateTriangleDiagram: WidgetGenerator<typeof TriangleDiagramProp
 		const maxY = Math.max(...pointsList.map((p) => p.y))
 		const rawW = maxX - minX
 		const rawH = maxY - minY
-		const scale = Math.min((width - 2 * PADDING) / (rawW || 1), (height - 2 * PADDING) / (rawH || 1))
+		const scale = Math.min(
+			(width - 2 * PADDING) / (rawW || 1),
+			(height - 2 * PADDING) / (rawH || 1)
+		)
 		const offsetX = (width - scale * rawW) / 2 - scale * minX
 		const offsetY = (height - scale * rawH) / 2 - scale * minY
 		const project = (p: Vec) => ({ x: offsetX + scale * p.x, y: offsetY + scale * p.y })
@@ -748,13 +789,15 @@ export const generateTriangleDiagram: WidgetGenerator<typeof TriangleDiagramProp
 				const prev = idToPoint.get(line[i - 1])
 				const curId = line[i]
 				if (!prev) break
-				if (!idToPoint.has(curId)) idToPoint.set(curId, { x: prev.x + step * ux, y: prev.y + step * uy })
+				if (!idToPoint.has(curId))
+					idToPoint.set(curId, { x: prev.x + step * ux, y: prev.y + step * uy })
 			}
 			for (let i = anchor - 1; i >= 0; i--) {
 				const next = idToPoint.get(line[i + 1])
 				const curId = line[i]
 				if (!next) break
-				if (!idToPoint.has(curId)) idToPoint.set(curId, { x: next.x - step * ux, y: next.y - step * uy })
+				if (!idToPoint.has(curId))
+					idToPoint.set(curId, { x: next.x - step * ux, y: next.y - step * uy })
 			}
 
 			// Do not draw base lines yet; arcs will be drawn first
@@ -929,7 +972,12 @@ export const generateTriangleDiagram: WidgetGenerator<typeof TriangleDiagramProp
 		if (!drawLabelVisible) continue
 		const text = angleValueToString(mark.value)
 		const fontPx = theme.font.size.medium
-		const { maxWidth, height: textH } = estimateWrappedTextDimensions(text, Number.POSITIVE_INFINITY, fontPx, 1.2)
+		const { maxWidth, height: textH } = estimateWrappedTextDimensions(
+			text,
+			Number.POSITIVE_INFINITY,
+			fontPx,
+			1.2
+		)
 		const halfW = maxWidth / 2
 		const halfH = textH / 2
 		let best = { x: center.x + baseR * Math.cos(mid), y: center.y + baseR * Math.sin(mid) }
@@ -976,14 +1024,21 @@ export const generateTriangleDiagram: WidgetGenerator<typeof TriangleDiagramProp
 	}
 
 	// After arcs: draw triangle lines and any explicit base lines so lines sit on top
-	canvas.drawPolygon([A, B, C], { fill: "none", stroke: theme.colors.black, strokeWidth: theme.stroke.width.thick })
+	canvas.drawPolygon([A, B, C], {
+		fill: "none",
+		stroke: theme.colors.black,
+		strokeWidth: theme.stroke.width.thick
+	})
 	if (lines) {
 		for (const line of lines) {
 			for (let i = 1; i < line.length; i++) {
 				const a = idToPoint.get(line[i - 1])
 				const b = idToPoint.get(line[i])
 				if (a && b)
-					canvas.drawLine(a.x, a.y, b.x, b.y, { stroke: theme.colors.black, strokeWidth: theme.stroke.width.thick })
+					canvas.drawLine(a.x, a.y, b.x, b.y, {
+						stroke: theme.colors.black,
+						strokeWidth: theme.stroke.width.thick
+					})
 			}
 		}
 	}
@@ -992,7 +1047,11 @@ export const generateTriangleDiagram: WidgetGenerator<typeof TriangleDiagramProp
 	if (altitudes) {
 		for (const { alt, v, foot } of precomputedAltitudes) {
 			const dash = alt.style === "dashed" ? "4 3" : "2 4"
-			canvas.drawLine(v.x, v.y, foot.x, foot.y, { stroke: alt.color, strokeWidth: theme.stroke.width.base, dash })
+			canvas.drawLine(v.x, v.y, foot.x, foot.y, {
+				stroke: alt.color,
+				strokeWidth: theme.stroke.width.base,
+				dash
+			})
 			if (alt.withRightAngle) {
 				// Draw right angle square at foot using base direction and altitude direction
 				const bx = foot.x - v.x
@@ -1068,7 +1127,11 @@ export const generateTriangleDiagram: WidgetGenerator<typeof TriangleDiagramProp
 		const r2 = { x: rx + rw, y: ry }
 		const r3 = { x: rx + rw, y: ry + rh }
 		const r4 = { x: rx, y: ry + rh }
-		const orient = (p: { x: number; y: number }, q: { x: number; y: number }, r: { x: number; y: number }) => {
+		const orient = (
+			p: { x: number; y: number },
+			q: { x: number; y: number },
+			r: { x: number; y: number }
+		) => {
 			const val = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y)
 			if (val > 1e-9) return 1
 			if (val < -1e-9) return -1
@@ -1114,7 +1177,12 @@ export const generateTriangleDiagram: WidgetGenerator<typeof TriangleDiagramProp
 
 	function placePointLabel(pos: Vec, text: string, preferredAngleRad?: number) {
 		const fontPx = vertexFont
-		const { maxWidth: w, height: h } = estimateWrappedTextDimensions(text, Number.POSITIVE_INFINITY, fontPx, 1.2)
+		const { maxWidth: w, height: h } = estimateWrappedTextDimensions(
+			text,
+			Number.POSITIVE_INFINITY,
+			fontPx,
+			1.2
+		)
 		const halfW = w / 2
 		const halfH = h / 2
 		let best = { x: pos.x, y: pos.y }
@@ -1169,7 +1237,11 @@ export const generateTriangleDiagram: WidgetGenerator<typeof TriangleDiagramProp
 
 	// Optional side labels (screen space)
 	if (sideLabels) {
-		const placeSideLabel = (p1: Vec, p2: Vec, lbl: z.infer<ReturnType<typeof createSideValueSchema>> | null) => {
+		const placeSideLabel = (
+			p1: Vec,
+			p2: Vec,
+			lbl: z.infer<ReturnType<typeof createSideValueSchema>> | null
+		) => {
 			if (!lbl) return
 			const mid = vecScale(vecAdd(p1, p2), 0.5)
 			const dx = p2.x - p1.x
@@ -1225,6 +1297,12 @@ export const generateTriangleDiagram: WidgetGenerator<typeof TriangleDiagramProp
 		placeSideLabel(C, A, sideLabels.CA)
 	}
 
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(PADDING)
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.medium}">${svgBody}</svg>`
 }

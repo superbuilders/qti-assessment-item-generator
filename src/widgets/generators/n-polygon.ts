@@ -97,7 +97,12 @@ export const generateNPolygon: WidgetGenerator<typeof NPolygonPropsSchema> = asy
 		}
 
 		const regularSides: Record<
-			"regularTriangle" | "regularSquare" | "regularPentagon" | "regularHexagon" | "regularHeptagon" | "regularOctagon",
+			| "regularTriangle"
+			| "regularSquare"
+			| "regularPentagon"
+			| "regularHexagon"
+			| "regularHeptagon"
+			| "regularOctagon",
 			number
 		> = {
 			regularTriangle: 3,
@@ -203,7 +208,13 @@ export const generateNPolygon: WidgetGenerator<typeof NPolygonPropsSchema> = asy
 		drawSinglePolygon(tileLeft, 0, tileWidth, tileHeight, poly.shape, poly.fillColor)
 	}
 
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(PADDING)
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg">${svgBody}</svg>`
 }

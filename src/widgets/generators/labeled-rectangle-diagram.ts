@@ -43,12 +43,18 @@ export const LabeledRectangleDiagramPropsSchema = z
 			.regex(MATHML_INNER_PATTERN, "invalid mathml inner content")
 			.nullable()
 			.describe("MathML INNER content (no <math>) centered inside the rectangle."),
-		fillColor: z.string().regex(CSS_COLOR_PATTERN, "invalid css color").describe("The fill color of the rectangle."),
+		fillColor: z
+			.string()
+			.regex(CSS_COLOR_PATTERN, "invalid css color")
+			.describe("The fill color of the rectangle."),
 		borderColor: z
 			.string()
 			.regex(CSS_COLOR_PATTERN, "invalid css color")
 			.describe("The border color of the rectangle."),
-		textColor: z.string().regex(CSS_COLOR_PATTERN, "invalid css color").describe("The color of the text labels.")
+		textColor: z
+			.string()
+			.regex(CSS_COLOR_PATTERN, "invalid css color")
+			.describe("The color of the text labels.")
 	})
 	.strict()
 
@@ -57,11 +63,21 @@ export type LabeledRectangleDiagramProps = z.infer<typeof LabeledRectangleDiagra
 /**
  * Generates an SVG diagram of a labeled rectangle.
  */
-export const generateLabeledRectangleDiagram: WidgetGenerator<typeof LabeledRectangleDiagramPropsSchema> = async (
-	props
-) => {
-	const { width, height, topLabel, bottomLabel, leftLabel, rightLabel, areaLabel, fillColor, borderColor, textColor } =
-		props
+export const generateLabeledRectangleDiagram: WidgetGenerator<
+	typeof LabeledRectangleDiagramPropsSchema
+> = async (props) => {
+	const {
+		width,
+		height,
+		topLabel,
+		bottomLabel,
+		leftLabel,
+		rightLabel,
+		areaLabel,
+		fillColor,
+		borderColor,
+		textColor
+	} = props
 
 	const canvas = new CanvasImpl({
 		chartArea: { left: 0, top: 0, width, height },
@@ -162,7 +178,13 @@ export const generateLabeledRectangleDiagram: WidgetGenerator<typeof LabeledRect
 		})
 	}
 
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(PADDING)
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg">${svgBody}</svg>`
 }

@@ -38,7 +38,9 @@ const SegmentSchema = z
 			)
 	})
 	.strict()
-	.describe("Line segment definition for drawing radii, inner radii, or diameters on the circle diagram.")
+	.describe(
+		"Line segment definition for drawing radii, inner radii, or diameters on the circle diagram."
+	)
 
 // Defines a sector (a pie slice) of the circle.
 const SectorSchema = z
@@ -192,7 +194,9 @@ export type CircleDiagramProps = z.infer<typeof CircleDiagramPropsSchema>
 /**
  * Generates an SVG diagram of a circle and its components.
  */
-export const generateCircleDiagram: WidgetGenerator<typeof CircleDiagramPropsSchema> = async (props) => {
+export const generateCircleDiagram: WidgetGenerator<typeof CircleDiagramPropsSchema> = async (
+	props
+) => {
 	const {
 		shape,
 		rotation,
@@ -234,7 +238,11 @@ export const generateCircleDiagram: WidgetGenerator<typeof CircleDiagramPropsSch
 	const avoidSegments: Array<{ a: { x: number; y: number }; b: { x: number; y: number } }> = []
 	const placedLabels: Array<{ x: number; y: number; width: number; height: number }> = []
 
-	function orient(p: { x: number; y: number }, q: { x: number; y: number }, r: { x: number; y: number }) {
+	function orient(
+		p: { x: number; y: number },
+		q: { x: number; y: number },
+		r: { x: number; y: number }
+	) {
 		const v = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y)
 		if (v > 1e-9) return 1
 		if (v < -1e-9) return -1
@@ -325,7 +333,13 @@ export const generateCircleDiagram: WidgetGenerator<typeof CircleDiagramPropsSch
 		const halfH = labelHeight / 2
 
 		// Try the ideal position first
-		const idealRect = { x: idealX - halfW, y: idealY - halfH, width: labelWidth, height: labelHeight, pad: 1 }
+		const idealRect = {
+			x: idealX - halfW,
+			y: idealY - halfH,
+			width: labelWidth,
+			height: labelHeight,
+			pad: 1
+		}
 		if (withinBounds(idealRect)) {
 			const hasSegmentCollision = rectIntersectsAnySegment(idealRect)
 			let hasLabelCollision = false
@@ -353,7 +367,13 @@ export const generateCircleDiagram: WidgetGenerator<typeof CircleDiagramPropsSch
 			for (let angle = 0; angle < 2 * Math.PI; angle += angleStep) {
 				const testX = idealX + Math.cos(angle) * radius
 				const testY = idealY + Math.sin(angle) * radius
-				const testRect = { x: testX - halfW, y: testY - halfH, width: labelWidth, height: labelHeight, pad: 1 }
+				const testRect = {
+					x: testX - halfW,
+					y: testY - halfH,
+					width: labelWidth,
+					height: labelHeight,
+					pad: 1
+				}
 
 				if (!withinBounds(testRect)) continue
 
@@ -470,7 +490,13 @@ export const generateCircleDiagram: WidgetGenerator<typeof CircleDiagramPropsSch
 			const step = 3
 
 			while (iterations < maxIterations) {
-				const testRect = { x: px - halfW, y: py - halfH, width: labelWidth, height: labelHeight, pad: 1 }
+				const testRect = {
+					x: px - halfW,
+					y: py - halfH,
+					width: labelWidth,
+					height: labelHeight,
+					pad: 1
+				}
 
 				if (
 					withinBounds(testRect) &&
@@ -559,7 +585,10 @@ export const generateCircleDiagram: WidgetGenerator<typeof CircleDiagramPropsSch
 			const endAngle = 180 + rotation
 			const start = pointOnCircle(startAngle, r)
 			const end = pointOnCircle(endAngle, r)
-			const semicirclePath = new Path2D().moveTo(start.x, start.y).arcTo(r, r, 0, 0, 1, end.x, end.y).closePath()
+			const semicirclePath = new Path2D()
+				.moveTo(start.x, start.y)
+				.arcTo(r, r, 0, 0, 1, end.x, end.y)
+				.closePath()
 			canvas.drawPath(semicirclePath, {
 				fill: fillColor,
 				stroke: strokeColor,
@@ -658,7 +687,9 @@ export const generateCircleDiagram: WidgetGenerator<typeof CircleDiagramPropsSch
 			const start = pointOnCircle(arc.startAngle, r)
 			const end = pointOnCircle(arc.endAngle, r)
 			const largeArcFlag: 0 | 1 = Math.abs(arc.endAngle - arc.startAngle) > 180 ? 1 : 0
-			const arcPath = new Path2D().moveTo(start.x, start.y).arcTo(r, r, 0, largeArcFlag, 1, end.x, end.y)
+			const arcPath = new Path2D()
+				.moveTo(start.x, start.y)
+				.arcTo(r, r, 0, largeArcFlag, 1, end.x, end.y)
 			canvas.drawPath(arcPath, {
 				fill: "none",
 				stroke: arc.strokeColor,
@@ -690,13 +721,27 @@ export const generateCircleDiagram: WidgetGenerator<typeof CircleDiagramPropsSch
 				)
 
 				// Try normal-based positioning first (best for avoiding line intersections)
-				const normalPos = findNormalBasedLabelPosition(cx, cy, midAngleRad, r, labelWidth, labelHeight)
+				const normalPos = findNormalBasedLabelPosition(
+					cx,
+					cy,
+					midAngleRad,
+					r,
+					labelWidth,
+					labelHeight
+				)
 
 				let finalPos: { x: number; y: number } | null = normalPos
 
 				// If normal positioning failed, try tangential positioning
 				if (!finalPos) {
-					finalPos = findTangentialLabelPosition(cx, cy, midAngleRad, r + PADDING, labelWidth, labelHeight)
+					finalPos = findTangentialLabelPosition(
+						cx,
+						cy,
+						midAngleRad,
+						r + PADDING,
+						labelWidth,
+						labelHeight
+					)
 				}
 
 				// If both failed, try radial positioning as last resort
@@ -760,7 +805,9 @@ export const generateCircleDiagram: WidgetGenerator<typeof CircleDiagramPropsSch
 	if (segments.length > 0) {
 		for (const seg of segments) {
 			if (seg.type === "innerRadius" && rInnerOpt === null) {
-				logger.error("innerRadius segment requires innerRadius", { hasInnerRadius: Boolean(innerRadius) })
+				logger.error("innerRadius segment requires innerRadius", {
+					hasInnerRadius: Boolean(innerRadius)
+				})
 				throw errors.new("inner radius segment without innerRadius")
 			}
 
@@ -850,7 +897,10 @@ export const generateCircleDiagram: WidgetGenerator<typeof CircleDiagramPropsSch
 					})
 				} else {
 					// Fallback to clamped position if no safe position found
-					logger.warn("segment label placement failed, using fallback", { segmentType: seg.type, angle: seg.angle })
+					logger.warn("segment label placement failed, using fallback", {
+						segmentType: seg.type,
+						angle: seg.angle
+					})
 					const fallbackX = clamp(idealX, PADDING, width - PADDING)
 					const fallbackY = clamp(idealY, PADDING, height - PADDING)
 
@@ -941,7 +991,13 @@ export const generateCircleDiagram: WidgetGenerator<typeof CircleDiagramPropsSch
 	}
 
 	// NEW: Finalize the canvas and construct the root SVG element
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(PADDING)
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.base}">${svgBody}</svg>`
 }

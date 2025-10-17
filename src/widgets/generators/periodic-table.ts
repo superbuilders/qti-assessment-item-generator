@@ -8255,7 +8255,9 @@ const PERIODIC_TABLE_SVG = `
 
 const PERIODIC_TABLE_SVG_BASE64 = Buffer.from(PERIODIC_TABLE_SVG).toString("base64")
 
-export const generatePeriodicTable: WidgetGenerator<typeof PeriodicTableWidgetPropsSchema> = async (props) => {
+export const generatePeriodicTable: WidgetGenerator<typeof PeriodicTableWidgetPropsSchema> = async (
+	props
+) => {
 	const { alt, caption } = props
 
 	const containerStyles = "display: inline-block; text-align: center;"

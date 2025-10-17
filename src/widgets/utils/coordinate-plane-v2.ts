@@ -45,8 +45,14 @@ export function setupCoordinatePlaneV2(
 
 	// ADD dynamic margin calculation logic
 	const yAxisTickInfo = buildTicks(yAxis.min, yAxis.max, yAxis.tickInterval)
-	const maxTickLabelWidth = Math.max(...yAxisTickInfo.labels.map((l) => l.length * LABEL_AVG_CHAR_WIDTH_PX))
-	const { height: wrappedTitleHeight } = estimateWrappedTextDimensions(yAxis.label ?? "", height, 14)
+	const maxTickLabelWidth = Math.max(
+		...yAxisTickInfo.labels.map((l) => l.length * LABEL_AVG_CHAR_WIDTH_PX)
+	)
+	const { height: wrappedTitleHeight } = estimateWrappedTextDimensions(
+		yAxis.label ?? "",
+		height,
+		14
+	)
 	// Note: For v2 (4-quadrant), use similar logic but adjust if needed for centered axes.
 
 	const TICK_LENGTH = 4
@@ -54,13 +60,22 @@ export function setupCoordinatePlaneV2(
 	const AXIS_TITLE_PADDING = 12
 
 	const dynamicLeftMargin =
-		TICK_LENGTH + TICK_LABEL_PADDING + maxTickLabelWidth + AXIS_TITLE_PADDING + wrappedTitleHeight / 2 + PADDING
+		TICK_LENGTH +
+		TICK_LABEL_PADDING +
+		maxTickLabelWidth +
+		AXIS_TITLE_PADDING +
+		wrappedTitleHeight / 2 +
+		PADDING
 
 	// Calculate dynamic top margin based on title height
 	let dynamicTopMargin = 40 // Default top margin
 	if (title) {
 		// Measure wrapped title dimensions with the available width
-		const titleDimensions = estimateWrappedTextDimensions(title, width - dynamicLeftMargin - PADDING, 18)
+		const titleDimensions = estimateWrappedTextDimensions(
+			title,
+			width - dynamicLeftMargin - PADDING,
+			18
+		)
 		// Add padding above and below the title
 		dynamicTopMargin = Math.max(40, titleDimensions.height + 20 + 15) // top padding + title + bottom padding
 	}
@@ -227,7 +242,12 @@ export function setupCoordinatePlaneV2(
 
 	// ADD new dynamic and wrapped axis label logic
 	const yAxisTitleX =
-		margin.left - (AXIS_TITLE_PADDING + maxTickLabelWidth + TICK_LABEL_PADDING + TICK_LENGTH + wrappedTitleHeight / 2)
+		margin.left -
+		(AXIS_TITLE_PADDING +
+			maxTickLabelWidth +
+			TICK_LABEL_PADDING +
+			TICK_LENGTH +
+			wrappedTitleHeight / 2)
 	const yAxisTitleY = margin.top + chartHeight / 2
 	canvas.drawWrappedText({
 		x: yAxisTitleX,

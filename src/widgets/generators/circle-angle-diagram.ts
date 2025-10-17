@@ -22,7 +22,9 @@ export const CircleAngleDiagramPropsSchema = z
 			.number()
 			.min(0)
 			.max(360)
-			.describe("The measure of the central angle in degrees, which determines the size of the shaded sector."),
+			.describe(
+				"The measure of the central angle in degrees, which determines the size of the shaded sector."
+			),
 		rotation: z
 			.number()
 			.describe(
@@ -33,10 +35,14 @@ export const CircleAngleDiagramPropsSchema = z
 				center: z.string().describe("The label for the center point of the circle (e.g., 'O')."),
 				point1: z
 					.string()
-					.describe("The label for the point on the circumference where the first ray ends (e.g., 'A')."),
+					.describe(
+						"The label for the point on the circumference where the first ray ends (e.g., 'A')."
+					),
 				point2: z
 					.string()
-					.describe("The label for the point on the circumference where the second ray ends (e.g., 'B').")
+					.describe(
+						"The label for the point on the circumference where the second ray ends (e.g., 'B')."
+					)
 			})
 			.strict()
 			.describe("Labels for the three points defining the angle."),
@@ -52,7 +58,9 @@ export type CircleAngleDiagramProps = z.infer<typeof CircleAngleDiagramPropsSche
 /**
  * Generates an SVG diagram of a circle with a central angle.
  */
-export const generateCircleAngleDiagram: WidgetGenerator<typeof CircleAngleDiagramPropsSchema> = async (props) => {
+export const generateCircleAngleDiagram: WidgetGenerator<
+	typeof CircleAngleDiagramPropsSchema
+> = async (props) => {
 	const { width, height, angle, rotation, labels, shadeColor } = props
 
 	const canvas = new CanvasImpl({
@@ -139,7 +147,11 @@ export const generateCircleAngleDiagram: WidgetGenerator<typeof CircleAngleDiagr
 		const r2 = { x: rx + rw, y: ry }
 		const r3 = { x: rx + rw, y: ry + rh }
 		const r4 = { x: rx, y: ry + rh }
-		const orient = (p: { x: number; y: number }, q: { x: number; y: number }, r: { x: number; y: number }) => {
+		const orient = (
+			p: { x: number; y: number },
+			q: { x: number; y: number },
+			r: { x: number; y: number }
+		) => {
 			const val = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y)
 			if (val > 1e-9) return 1
 			if (val < -1e-9) return -1
@@ -198,7 +210,12 @@ export const generateCircleAngleDiagram: WidgetGenerator<typeof CircleAngleDiagr
 	{
 		const text = labels.center
 		const fontPx = 16
-		const { maxWidth: w, height: h } = estimateWrappedTextDimensions(text, Number.POSITIVE_INFINITY, fontPx, 1.2)
+		const { maxWidth: w, height: h } = estimateWrappedTextDimensions(
+			text,
+			Number.POSITIVE_INFINITY,
+			fontPx,
+			1.2
+		)
 		const halfW = w / 2
 		const halfH = h / 2
 		const labelOffset = 20
@@ -240,7 +257,13 @@ export const generateCircleAngleDiagram: WidgetGenerator<typeof CircleAngleDiagr
 	placeLabel(p1, labels.point1, startAngleRad)
 	placeLabel(p2, labels.point2, endAngleRad)
 
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(PADDING)
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}">${svgBody}</svg>`
 }

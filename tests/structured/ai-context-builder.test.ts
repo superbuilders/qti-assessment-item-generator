@@ -2,7 +2,10 @@
 import { beforeAll, describe, expect, mock, test } from "bun:test"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import { buildMathacademyEnvelope, buildPerseusEnvelope } from "../../src/structured/ai-context-builder"
+import {
+	buildMathacademyEnvelope,
+	buildPerseusEnvelope
+} from "../../src/structured/ai-context-builder"
 
 // NOTE: Additional comprehensive tests have been split into:
 // - tests/structured/ai-context-builder/ai-context-builder.perseus.unit.test.ts

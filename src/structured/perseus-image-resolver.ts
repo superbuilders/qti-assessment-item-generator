@@ -10,10 +10,14 @@ export interface ImageContext {
 	resolvedUrlMap: Map<string, string>
 }
 
-async function resolvePerseusUrl(baseUrl: string): Promise<{ resolvedUrl: string; type: ImageType } | undefined> {
+async function resolvePerseusUrl(
+	baseUrl: string
+): Promise<{ resolvedUrl: string; type: ImageType } | undefined> {
 	for (const ext of SUPPORTED_EXTENSIONS) {
 		const urlWithExt = `${baseUrl}.${ext}`
-		const result = await errors.try(fetch(urlWithExt, { method: "HEAD", signal: AbortSignal.timeout(5000) }))
+		const result = await errors.try(
+			fetch(urlWithExt, { method: "HEAD", signal: AbortSignal.timeout(5000) })
+		)
 		if (!result.error && result.data.ok) {
 			logger.debug("successfully resolved perseus url", {
 				originalUrl: baseUrl,

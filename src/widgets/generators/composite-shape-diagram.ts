@@ -99,15 +99,21 @@ function createBoundaryEdgeSchema() {
 	return z.discriminatedUnion("type", [
 		z
 			.object({
-				type: z.literal("simple").describe("Single straight line edge connecting two vertices directly."),
+				type: z
+					.literal("simple")
+					.describe("Single straight line edge connecting two vertices directly."),
 				from: z
 					.string()
 					.regex(identifierRegex)
-					.describe("Starting vertex ID for this edge. Must reference a valid vertex ID from the vertices array."),
+					.describe(
+						"Starting vertex ID for this edge. Must reference a valid vertex ID from the vertices array."
+					),
 				to: z
 					.string()
 					.regex(identifierRegex)
-					.describe("Ending vertex ID for this edge. Must reference a valid vertex ID from the vertices array."),
+					.describe(
+						"Ending vertex ID for this edge. Must reference a valid vertex ID from the vertices array."
+					),
 				label: createLabelSchema().describe(
 					"Measurement label for the entire edge length. Set to null for unlabeled edges."
 				)
@@ -115,7 +121,9 @@ function createBoundaryEdgeSchema() {
 			.strict(),
 		z
 			.object({
-				type: z.literal("partitioned").describe("Multi-segment edge path with individual labels for each segment."),
+				type: z
+					.literal("partitioned")
+					.describe("Multi-segment edge path with individual labels for each segment."),
 				path: z
 					.array(z.string().regex(identifierRegex))
 					.min(3)
@@ -143,11 +151,15 @@ function createInternalSegmentSchema() {
 			fromVertexId: z
 				.string()
 				.regex(identifierRegex)
-				.describe("Starting vertex ID for the internal line segment. Must reference a vertex from the vertices array."),
+				.describe(
+					"Starting vertex ID for the internal line segment. Must reference a vertex from the vertices array."
+				),
 			toVertexId: z
 				.string()
 				.regex(identifierRegex)
-				.describe("Ending vertex ID for the internal line segment. Must reference a vertex from the vertices array."),
+				.describe(
+					"Ending vertex ID for the internal line segment. Must reference a vertex from the vertices array."
+				),
 			style: z
 				.enum(["solid", "dashed"])
 				.describe(
@@ -200,7 +212,9 @@ function createShadedPathRegionSchema() {
 					z
 						.object({
 							shapeId: z.string().describe("ID of a shape in the shapes array"),
-							pathType: z.enum(["outer", "inner"]).describe("whether to traverse this shape's outer or inner boundary")
+							pathType: z
+								.enum(["outer", "inner"])
+								.describe("whether to traverse this shape's outer or inner boundary")
 						})
 						.strict()
 				)
@@ -305,7 +319,9 @@ export const CompositeShapeDiagramPropsSchema = z
 	.object({
 		type: z
 			.literal("compositeShapeDiagram")
-			.describe("Widget type identifier for composite shape diagrams with complex polygons and annotations."),
+			.describe(
+				"Widget type identifier for composite shape diagrams with complex polygons and annotations."
+			),
 		width: createWidthSchema(),
 		height: createHeightSchema(),
 		vertices: z
@@ -538,7 +554,9 @@ function computeSafeBasePointForRadius(
  * Generates a diagram of a composite polygon from a set of vertices. Ideal for area
  * problems involving the decomposition of a complex shape into simpler figures.
  */
-export const generateCompositeShapeDiagram: WidgetGenerator<typeof CompositeShapeDiagramPropsSchema> = async (data) => {
+export const generateCompositeShapeDiagram: WidgetGenerator<
+	typeof CompositeShapeDiagramPropsSchema
+> = async (data) => {
 	const { width, height, vertices, boundaryEdges } = data
 	const internalSegments = data.internalSegments
 	const shadedRegions = data.shadedRegions
@@ -627,7 +645,9 @@ export const generateCompositeShapeDiagram: WidgetGenerator<typeof CompositeShap
 					.filter((p): p is Point => !!p)
 					.map(project)
 				if (regionPoints.length < 3) {
-					logger.error("composite-shape: shaded polygon insufficient vertices", { count: regionPoints.length })
+					logger.error("composite-shape: shaded polygon insufficient vertices", {
+						count: regionPoints.length
+					})
 					throw errors.new("composite-shape: shaded polygon insufficient vertices")
 				}
 				canvas.drawPolygon(regionPoints, { fill: r.fillColor, stroke: "none" })
@@ -653,7 +673,10 @@ export const generateCompositeShapeDiagram: WidgetGenerator<typeof CompositeShap
 						}
 						const first = vertexMap.get(ids[0])
 						if (!first) {
-							logger.error("composite-shape: polygon shading missing vertex", { shapeId: shape.id, vertexId: ids[0] })
+							logger.error("composite-shape: polygon shading missing vertex", {
+								shapeId: shape.id,
+								vertexId: ids[0]
+							})
 							throw errors.new("composite-shape: polygon missing vertex")
 						}
 						const q0 = project(first)
@@ -661,7 +684,10 @@ export const generateCompositeShapeDiagram: WidgetGenerator<typeof CompositeShap
 						for (let i = 1; i < ids.length; i++) {
 							const p = vertexMap.get(ids[i])
 							if (!p) {
-								logger.error("composite-shape: polygon shading missing vertex", { shapeId: shape.id, vertexId: ids[i] })
+								logger.error("composite-shape: polygon shading missing vertex", {
+									shapeId: shape.id,
+									vertexId: ids[i]
+								})
 								throw errors.new("composite-shape: polygon missing vertex")
 							}
 							const q = project(p)
@@ -677,7 +703,10 @@ export const generateCompositeShapeDiagram: WidgetGenerator<typeof CompositeShap
 						const center = project(c)
 						const rData = shape.radius * scale
 						if (!(rData > 0)) {
-							logger.error("composite-shape: invalid circle radius", { shapeId: shape.id, radius: shape.radius })
+							logger.error("composite-shape: invalid circle radius", {
+								shapeId: shape.id,
+								radius: shape.radius
+							})
 							throw errors.new("composite-shape: invalid circle radius")
 						}
 						// approximate full circle using arcTo API provided by Path2D helper
@@ -696,16 +725,24 @@ export const generateCompositeShapeDiagram: WidgetGenerator<typeof CompositeShap
 							for (const id of shape.vertexIds) {
 								const v = vertexMap.get(id)
 								if (!v) {
-									logger.error("composite-shape: polygon outline missing vertex", { vertexId: id, shapeId: shape.id })
+									logger.error("composite-shape: polygon outline missing vertex", {
+										vertexId: id,
+										shapeId: shape.id
+									})
 									throw errors.new("composite-shape: polygon missing vertex")
 								}
 								pts.push(project(v))
 							}
-							canvas.drawPolyline(pts, { stroke: theme.colors.axis, strokeWidth: theme.stroke.width.base })
+							canvas.drawPolyline(pts, {
+								stroke: theme.colors.axis,
+								strokeWidth: theme.stroke.width.base
+							})
 						} else {
 							const c = vertexMap.get(shape.centerId)
 							if (!c) {
-								logger.error("composite-shape: circle outline missing center", { shapeId: shape.id })
+								logger.error("composite-shape: circle outline missing center", {
+									shapeId: shape.id
+								})
 								throw errors.new("composite-shape: circle center missing")
 							}
 							const center = project(c)
@@ -734,7 +771,10 @@ export const generateCompositeShapeDiagram: WidgetGenerator<typeof CompositeShap
 			const from = vertexMap.get(edge.from)
 			const to = vertexMap.get(edge.to)
 			if (!from || !to) {
-				logger.error("composite-shape: boundary simple edge missing vertex", { from: edge.from, to: edge.to })
+				logger.error("composite-shape: boundary simple edge missing vertex", {
+					from: edge.from,
+					to: edge.to
+				})
 				throw errors.new("composite-shape: boundary simple missing vertex")
 			}
 
@@ -812,7 +852,10 @@ export const generateCompositeShapeDiagram: WidgetGenerator<typeof CompositeShap
 		const from = vertexMap.get(edge.from)
 		const to = vertexMap.get(edge.to)
 		if (!from || !to) {
-			logger.error("composite-shape: simple edge label missing vertex", { from: edge.from, to: edge.to })
+			logger.error("composite-shape: simple edge label missing vertex", {
+				from: edge.from,
+				to: edge.to
+			})
 			throw errors.new("composite-shape: simple edge label missing vertex")
 		}
 		const labelText = formatLabel(edge.label)
@@ -827,8 +870,12 @@ export const generateCompositeShapeDiagram: WidgetGenerator<typeof CompositeShap
 		if (len === 0) continue
 		let nx = -dy / len
 		let ny = dx / len
-		const polyCenterX = transformedPerimeter.reduce((sum, v) => sum + v.x, 0) / Math.max(transformedPerimeter.length, 1)
-		const polyCenterY = transformedPerimeter.reduce((sum, v) => sum + v.y, 0) / Math.max(transformedPerimeter.length, 1)
+		const polyCenterX =
+			transformedPerimeter.reduce((sum, v) => sum + v.x, 0) /
+			Math.max(transformedPerimeter.length, 1)
+		const polyCenterY =
+			transformedPerimeter.reduce((sum, v) => sum + v.y, 0) /
+			Math.max(transformedPerimeter.length, 1)
 		const toCenterX = polyCenterX - midX
 		const toCenterY = polyCenterY - midY
 		const dot = nx * toCenterX + ny * toCenterY
@@ -837,7 +884,12 @@ export const generateCompositeShapeDiagram: WidgetGenerator<typeof CompositeShap
 			ny = -ny
 		}
 		const fontPx = theme.font.size.medium
-		const { maxWidth: w, height: h } = estimateWrappedTextDimensions(labelText, Number.POSITIVE_INFINITY, fontPx, 1.2)
+		const { maxWidth: w, height: h } = estimateWrappedTextDimensions(
+			labelText,
+			Number.POSITIVE_INFINITY,
+			fontPx,
+			1.2
+		)
 		const halfW = w / 2
 		const halfH = h / 2
 		const baseOffsetPx = 12
@@ -907,9 +959,11 @@ export const generateCompositeShapeDiagram: WidgetGenerator<typeof CompositeShap
 			let nx = -dy / len
 			let ny = dx / len
 			const polyCenterX =
-				transformedPerimeter.reduce((sum, v) => sum + v.x, 0) / Math.max(transformedPerimeter.length, 1)
+				transformedPerimeter.reduce((sum, v) => sum + v.x, 0) /
+				Math.max(transformedPerimeter.length, 1)
 			const polyCenterY =
-				transformedPerimeter.reduce((sum, v) => sum + v.y, 0) / Math.max(transformedPerimeter.length, 1)
+				transformedPerimeter.reduce((sum, v) => sum + v.y, 0) /
+				Math.max(transformedPerimeter.length, 1)
 			const toCenterX = polyCenterX - midX
 			const toCenterY = polyCenterY - midY
 			const dot = nx * toCenterX + ny * toCenterY
@@ -918,7 +972,12 @@ export const generateCompositeShapeDiagram: WidgetGenerator<typeof CompositeShap
 				ny = -ny
 			}
 			const fontPx = theme.font.size.base
-			const { maxWidth: w, height: h } = estimateWrappedTextDimensions(labelText, Number.POSITIVE_INFINITY, fontPx, 1.2)
+			const { maxWidth: w, height: h } = estimateWrappedTextDimensions(
+				labelText,
+				Number.POSITIVE_INFINITY,
+				fontPx,
+				1.2
+			)
 			const halfW = w / 2
 			const halfH = h / 2
 			const baseOffsetPx = 10
@@ -1024,7 +1083,13 @@ export const generateCompositeShapeDiagram: WidgetGenerator<typeof CompositeShap
 	}
 
 	// 3b. Internal segment labels with collision avoidance against all lines
-	function rectIntersectsAnyLine(rect: { x: number; y: number; width: number; height: number; pad?: number }): boolean {
+	function rectIntersectsAnyLine(rect: {
+		x: number
+		y: number
+		width: number
+		height: number
+		pad?: number
+	}): boolean {
 		for (const seg of perimeterSegments) {
 			if (segmentIntersectsRect(seg.a, seg.b, rect)) return true
 		}
@@ -1047,7 +1112,12 @@ export const generateCompositeShapeDiagram: WidgetGenerator<typeof CompositeShap
 		const nx = -dy / len
 		const ny = dx / len
 		const fontPx = theme.font.size.base
-		const { maxWidth: w, height: h } = estimateWrappedTextDimensions(labelText, Number.POSITIVE_INFINITY, fontPx, 1.2)
+		const { maxWidth: w, height: h } = estimateWrappedTextDimensions(
+			labelText,
+			Number.POSITIVE_INFINITY,
+			fontPx,
+			1.2
+		)
 		const halfW = w / 2
 		const halfH = h / 2
 		const baseOffsetPx = 8
@@ -1130,7 +1200,12 @@ export const generateCompositeShapeDiagram: WidgetGenerator<typeof CompositeShap
 		for (const l of regionLabels) {
 			const pos0 = project({ x: l.position.x, y: l.position.y })
 			const fontPx = theme.font.size.medium
-			const { maxWidth: w, height: h } = estimateWrappedTextDimensions(l.text, Number.POSITIVE_INFINITY, fontPx, 1.2)
+			const { maxWidth: w, height: h } = estimateWrappedTextDimensions(
+				l.text,
+				Number.POSITIVE_INFINITY,
+				fontPx,
+				1.2
+			)
 			const halfW = w / 2
 			const halfH = h / 2
 
@@ -1308,7 +1383,13 @@ export const generateCompositeShapeDiagram: WidgetGenerator<typeof CompositeShap
 		}
 
 	// Finalize and return SVG
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(PADDING)
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.small}">${svgBody}</svg>`
 }
 
@@ -1376,7 +1457,14 @@ function polygonIntersectsRect(
 	return false
 }
 
-function pointInRect(x: number, y: number, rx: number, ry: number, rw: number, rh: number): boolean {
+function pointInRect(
+	x: number,
+	y: number,
+	rx: number,
+	ry: number,
+	rw: number,
+	rh: number
+): boolean {
 	return x >= rx && x <= rx + rw && y >= ry && y <= ry + rh
 }
 
@@ -1386,15 +1474,26 @@ function segmentsIntersect(
 	p3: { x: number; y: number },
 	p4: { x: number; y: number }
 ): boolean {
-	function orientation(a: { x: number; y: number }, b: { x: number; y: number }, c: { x: number; y: number }): number {
+	function orientation(
+		a: { x: number; y: number },
+		b: { x: number; y: number },
+		c: { x: number; y: number }
+	): number {
 		const val = (b.y - a.y) * (c.x - b.x) - (b.x - a.x) * (c.y - b.y)
 		if (val > 0) return 1
 		if (val < 0) return -1
 		return 0
 	}
-	function onSegment(a: { x: number; y: number }, b: { x: number; y: number }, c: { x: number; y: number }): boolean {
+	function onSegment(
+		a: { x: number; y: number },
+		b: { x: number; y: number },
+		c: { x: number; y: number }
+	): boolean {
 		return (
-			Math.min(a.x, c.x) <= b.x && b.x <= Math.max(a.x, c.x) && Math.min(a.y, c.y) <= b.y && b.y <= Math.max(a.y, c.y)
+			Math.min(a.x, c.x) <= b.x &&
+			b.x <= Math.max(a.x, c.x) &&
+			Math.min(a.y, c.y) <= b.y &&
+			b.y <= Math.max(a.y, c.y)
 		)
 	}
 	const o1 = orientation(p1, p2, p3)
@@ -1410,7 +1509,10 @@ function segmentsIntersect(
 	return false
 }
 
-function pointInPolygon(point: { x: number; y: number }, polygon: Array<{ x: number; y: number }>): boolean {
+function pointInPolygon(
+	point: { x: number; y: number },
+	polygon: Array<{ x: number; y: number }>
+): boolean {
 	if (polygon.length < 3) return false
 	let inside = false
 	for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
@@ -1421,7 +1523,8 @@ function pointInPolygon(point: { x: number; y: number }, polygon: Array<{ x: num
 		const yi = pi.y
 		const xj = pj.x
 		const yj = pj.y
-		const intersect = yi > point.y !== yj > point.y && point.x < ((xj - xi) * (point.y - yi)) / (yj - yi) + xi
+		const intersect =
+			yi > point.y !== yj > point.y && point.x < ((xj - xi) * (point.y - yi)) / (yj - yi) + xi
 		if (intersect) inside = !inside
 	}
 	return inside

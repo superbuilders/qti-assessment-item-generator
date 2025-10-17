@@ -16,7 +16,10 @@ const createLabelValueSchema = () =>
 		z.object({ type: z.literal("none") })
 	])
 
-type LabelValue = { type: "number"; value: number } | { type: "string"; value: string } | { type: "none" }
+type LabelValue =
+	| { type: "number"; value: number }
+	| { type: "string"; value: string }
+	| { type: "none" }
 
 const Parallelogram = z
 	.object({
@@ -24,7 +27,9 @@ const Parallelogram = z
 		base: z
 			.number()
 			.positive()
-			.describe("Length of the base (bottom side) in arbitrary units (e.g., 8, 10, 6.5). Parallel to the top side."),
+			.describe(
+				"Length of the base (bottom side) in arbitrary units (e.g., 8, 10, 6.5). Parallel to the top side."
+			),
 		height: z
 			.number()
 			.positive()
@@ -33,7 +38,9 @@ const Parallelogram = z
 			.number()
 			.min(1, "slant angle must be at least 1°")
 			.max(89, "slant angle must be at most 89°")
-			.describe("Angle between the base and the slanted side in degrees (acute). Defined at the bottom-left vertex."),
+			.describe(
+				"Angle between the base and the slanted side in degrees (acute). Defined at the bottom-left vertex."
+			),
 		labels: z
 			.object({
 				base: createLabelValueSchema().describe(
@@ -47,25 +54,35 @@ const Parallelogram = z
 				)
 			})
 			.strict()
-			.describe("Labels for dimensions as numbers or single-letter variables. Use type 'none' to hide.")
+			.describe(
+				"Labels for dimensions as numbers or single-letter variables. Use type 'none' to hide."
+			)
 	})
 	.strict()
 
 const RightTrapezoid = z
 	.object({
-		type: z.literal("trapezoidRight").describe("Specifies a right trapezoid (one perpendicular side)."),
+		type: z
+			.literal("trapezoidRight")
+			.describe("Specifies a right trapezoid (one perpendicular side)."),
 		topBase: z
 			.number()
 			.positive()
-			.describe("Length of the top parallel side in arbitrary units (e.g., 6, 8, 4.5). Usually shorter than bottom."),
+			.describe(
+				"Length of the top parallel side in arbitrary units (e.g., 6, 8, 4.5). Usually shorter than bottom."
+			),
 		bottomBase: z
 			.number()
 			.positive()
-			.describe("Length of the bottom parallel side in arbitrary units (e.g., 10, 12, 8). Usually longer than top."),
+			.describe(
+				"Length of the bottom parallel side in arbitrary units (e.g., 10, 12, 8). Usually longer than top."
+			),
 		height: z
 			.number()
 			.positive()
-			.describe("Perpendicular distance between parallel sides in arbitrary units (e.g., 5, 7, 4.5)"),
+			.describe(
+				"Perpendicular distance between parallel sides in arbitrary units (e.g., 5, 7, 4.5)"
+			),
 		labels: z
 			.object({
 				topBase: createLabelValueSchema().describe(
@@ -85,7 +102,9 @@ const RightTrapezoid = z
 				)
 			})
 			.strict()
-			.describe("Labels for dimensions as numbers or single-letter variables. Use type 'none' to hide.")
+			.describe(
+				"Labels for dimensions as numbers or single-letter variables. Use type 'none' to hide."
+			)
 	})
 	.strict()
 
@@ -95,19 +114,27 @@ const GeneralTrapezoid = z
 		topBase: z
 			.number()
 			.positive()
-			.describe("Length of the top parallel side in arbitrary units (e.g., 5, 7, 4). Usually shorter than bottom."),
+			.describe(
+				"Length of the top parallel side in arbitrary units (e.g., 5, 7, 4). Usually shorter than bottom."
+			),
 		bottomBase: z
 			.number()
 			.positive()
-			.describe("Length of the bottom parallel side in arbitrary units (e.g., 9, 12, 8). Usually longer than top."),
+			.describe(
+				"Length of the bottom parallel side in arbitrary units (e.g., 9, 12, 8). Usually longer than top."
+			),
 		height: z
 			.number()
 			.positive()
-			.describe("Perpendicular distance between parallel sides in arbitrary units (e.g., 4, 6, 5.5)"),
+			.describe(
+				"Perpendicular distance between parallel sides in arbitrary units (e.g., 4, 6, 5.5)"
+			),
 		leftSideLength: z
 			.number()
 			.positive()
-			.describe("Length of the left slanted side in arbitrary units (e.g., 5, 7, 4.5). Can differ from right side."),
+			.describe(
+				"Length of the left slanted side in arbitrary units (e.g., 5, 7, 4.5). Can differ from right side."
+			),
 		labels: z
 			.object({
 				topBase: createLabelValueSchema().describe(
@@ -127,7 +154,9 @@ const GeneralTrapezoid = z
 				)
 			})
 			.strict()
-			.describe("Labels for dimensions as numbers or single-letter variables. Use type 'none' to hide.")
+			.describe(
+				"Labels for dimensions as numbers or single-letter variables. Use type 'none' to hide."
+			)
 	})
 	.strict()
 
@@ -147,7 +176,9 @@ export const ParallelogramTrapezoidDiagramPropsSchema = z
 		"Creates accurate diagrams of parallelograms and trapezoids with labeled dimensions. Supports three types: parallelograms (opposite sides parallel and equal), right trapezoids (one perpendicular side), and general trapezoids (both sides slanted). Essential for geometry education, area calculations, and quadrilateral properties."
 	)
 
-export type ParallelogramTrapezoidDiagramProps = z.infer<typeof ParallelogramTrapezoidDiagramPropsSchema>
+export type ParallelogramTrapezoidDiagramProps = z.infer<
+	typeof ParallelogramTrapezoidDiagramPropsSchema
+>
 
 /**
  * Generates an SVG diagram for a parallelogram or trapezoid directly with layout utilities.
@@ -219,7 +250,9 @@ export const generateParallelogramTrapezoidDiagram: WidgetGenerator<
 		]
 
 		// Draw outer boundary polygon
-		const outerPoints = [vertices[0], vertices[1], vertices[2], vertices[3]].filter((p) => p !== undefined)
+		const outerPoints = [vertices[0], vertices[1], vertices[2], vertices[3]].filter(
+			(p) => p !== undefined
+		)
 		canvas.drawPolygon(outerPoints, {
 			stroke: theme.colors.black,
 			strokeWidth: theme.stroke.width.thick
@@ -379,7 +412,9 @@ export const generateParallelogramTrapezoidDiagram: WidgetGenerator<
 		]
 
 		// Draw outer boundary polygon
-		const outerPoints = [vertices[0], vertices[1], vertices[2], vertices[3]].filter((p) => p !== undefined)
+		const outerPoints = [vertices[0], vertices[1], vertices[2], vertices[3]].filter(
+			(p) => p !== undefined
+		)
 		canvas.drawPolygon(outerPoints, {
 			stroke: theme.colors.black,
 			strokeWidth: theme.stroke.width.thick
@@ -510,7 +545,9 @@ export const generateParallelogramTrapezoidDiagram: WidgetGenerator<
 		]
 
 		// Draw outer boundary polygon
-		const outerPoints = [vertices[0], vertices[1], vertices[2], vertices[3]].filter((p) => p !== undefined)
+		const outerPoints = [vertices[0], vertices[1], vertices[2], vertices[3]].filter(
+			(p) => p !== undefined
+		)
 		canvas.drawPolygon(outerPoints, {
 			stroke: theme.colors.black,
 			strokeWidth: theme.stroke.width.thick
@@ -615,7 +652,13 @@ export const generateParallelogramTrapezoidDiagram: WidgetGenerator<
 	}
 
 	// NEW: Finalize the canvas and construct the root SVG element
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(PADDING)
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}">${svgBody}</svg>`
 }

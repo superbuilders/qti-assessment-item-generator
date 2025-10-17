@@ -110,9 +110,9 @@ function performSubtractionWithRegrouping(minuend: number, subtrahend: number) {
 /**
  * Generates an HTML representation of a subtraction problem with optional regrouping visualization
  */
-export const generateSubtractionWithRegrouping: WidgetGenerator<typeof SubtractionWithRegroupingPropsSchema> = async (
-	data
-) => {
+export const generateSubtractionWithRegrouping: WidgetGenerator<
+	typeof SubtractionWithRegroupingPropsSchema
+> = async (data) => {
 	const { minuend, subtrahend, showRegrouping, showAnswer, revealUpTo = "complete" } = data
 
 	// Validate that minuend > subtrahend
@@ -205,7 +205,8 @@ export const generateSubtractionWithRegrouping: WidgetGenerator<typeof Subtracti
 
 			// Don't show leading zeros
 			const isLeadingZero =
-				index < differenceDigits.length - 1 && differenceDigits.slice(0, index + 1).every((d) => d === 0)
+				index < differenceDigits.length - 1 &&
+				differenceDigits.slice(0, index + 1).every((d) => d === 0)
 			html += '<td style="padding: 2px 8px; color: #4472c4; font-weight: bold;">'
 			html += shouldReveal && !isLeadingZero ? String(digit) : ""
 			html += "</td>"

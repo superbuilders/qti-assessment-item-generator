@@ -7,7 +7,11 @@ import { convertFeedbackObjectToBlocks, validateFeedbackObject } from "@/core/fe
 import type { AssessmentItem, AssessmentItemInput } from "@/core/item"
 import { createDynamicAssessmentItemSchema } from "@/core/item"
 import { ErrUnsupportedInteraction } from "../structured/client"
-import type { WidgetCollection, WidgetDefinition, WidgetTypeTupleFrom } from "../widgets/collections/types"
+import type {
+	WidgetCollection,
+	WidgetDefinition,
+	WidgetTypeTupleFrom
+} from "../widgets/collections/types"
 import { renderBlockContent, renderFeedbackContent } from "./content-renderer"
 import { compileInteraction } from "./interaction-compiler"
 import { compileResponseDeclarations, compileResponseProcessing } from "./response-processor"
@@ -25,7 +29,10 @@ export const ErrDuplicateResponseIdentifier = errors.new("duplicate response ide
 export const ErrDuplicateChoiceIdentifier = errors.new("duplicate choice identifiers")
 
 // Internal type used during compilation after nested feedback is flattened
-type AssessmentItemWithFlatFeedback<E extends readonly string[]> = Omit<AssessmentItem<E>, "feedback"> & {
+type AssessmentItemWithFlatFeedback<E extends readonly string[]> = Omit<
+	AssessmentItem<E>,
+	"feedback"
+> & {
 	feedbackBlocks: Record<string, FeedbackContent<E>>
 }
 
@@ -37,7 +44,9 @@ function isValidWidgetTypeInCollection<
 	return type in collection.widgets
 }
 
-function dedupePromptTextFromBody<E extends readonly string[]>(item: AssessmentItemWithFlatFeedback<E>): void {
+function dedupePromptTextFromBody<E extends readonly string[]>(
+	item: AssessmentItemWithFlatFeedback<E>
+): void {
 	if (!item.interactions || !item.body) return
 
 	// --- normalization helpers ---
@@ -60,7 +69,8 @@ function dedupePromptTextFromBody<E extends readonly string[]>(item: AssessmentI
 			// Remove common punctuation including parentheses and dashes
 			.replace(/[.,;:!?()[\]{}]/g, " ")
 			.replace(/[-–—]/g, " ")
-	const toComparable = (s: string): string => collapseWhitespace(stripPunct(decodeEntities(s.toLowerCase())))
+	const toComparable = (s: string): string =>
+		collapseWhitespace(stripPunct(decodeEntities(s.toLowerCase())))
 
 	// Tokenization helpers for fuzzy matching
 	const STOPWORDS = new Set<string>([
@@ -122,7 +132,9 @@ function dedupePromptTextFromBody<E extends readonly string[]>(item: AssessmentI
 			const cleaned = p.endsWith("'s") ? p.slice(0, -2) : p
 			// naive stemming for simple plural/3rd-person 's' endings to improve fuzzy match
 			const stemmed =
-				cleaned.length >= 4 && cleaned.endsWith("s") && !cleaned.endsWith("ss") ? cleaned.slice(0, -1) : cleaned
+				cleaned.length >= 4 && cleaned.endsWith("s") && !cleaned.endsWith("ss")
+					? cleaned.slice(0, -1)
+					: cleaned
 			if (stemmed) tokens.push(stemmed)
 		}
 		return tokens
@@ -136,7 +148,11 @@ function dedupePromptTextFromBody<E extends readonly string[]>(item: AssessmentI
 		const union = a.size + b.size - intersection
 		return union === 0 ? 0 : intersection / union
 	}
-	const tokensNearlyEqual = (aTokens: string[], bTokens: string[], jaccardThreshold: number): boolean => {
+	const tokensNearlyEqual = (
+		aTokens: string[],
+		bTokens: string[],
+		jaccardThreshold: number
+	): boolean => {
 		if (!lengthRatioOk(aTokens, bTokens)) return false
 		const jac = jaccardSimilarity(aTokens, bTokens)
 		if (jac >= jaccardThreshold) return true
@@ -149,7 +165,11 @@ function dedupePromptTextFromBody<E extends readonly string[]>(item: AssessmentI
 		if (minSize >= 3 && intersection >= minSize - 1) return true
 		return false
 	}
-	const tokensStrictlySimilar = (aTokens: string[], bTokens: string[], jaccardThreshold: number): boolean => {
+	const tokensStrictlySimilar = (
+		aTokens: string[],
+		bTokens: string[],
+		jaccardThreshold: number
+	): boolean => {
 		if (!lengthRatioOk(aTokens, bTokens)) return false
 		return jaccardSimilarity(aTokens, bTokens) >= jaccardThreshold
 	}
@@ -162,7 +182,9 @@ function dedupePromptTextFromBody<E extends readonly string[]>(item: AssessmentI
 	}
 	const normalizeMath = (mathml: string): string => {
 		// prefer <mo> text; otherwise strip tags
-		const moMatches = Array.from(mathml.matchAll(/<mo[^>]*>([\s\S]*?)<\/mo>/g)).map((m) => m[1] ?? "")
+		const moMatches = Array.from(mathml.matchAll(/<mo[^>]*>([\s\S]*?)<\/mo>/g)).map(
+			(m) => m[1] ?? ""
+		)
 		const raw = moMatches.length > 0 ? moMatches.join(" ") : mathml.replace(/<[^>]+>/g, " ")
 		return toComparable(raw)
 	}
@@ -237,7 +259,12 @@ function dedupePromptTextFromBody<E extends readonly string[]>(item: AssessmentI
 	if (slotIndices.length === 0) return
 
 	// Helper to try to remove paragraphs in [start, end) that match the given prompt
-	const markMatchingParagraphs = (start: number, end: number, prompt: string, toDelete: Set<number>): void => {
+	const markMatchingParagraphs = (
+		start: number,
+		end: number,
+		prompt: string,
+		toDelete: Set<number>
+	): void => {
 		const promptTokens = tokenizeForFuzzy(prompt)
 		// strategy A: single paragraph equals prompt (exact comparable equality)
 		for (let i = start; i < end; i++) {
@@ -340,7 +367,9 @@ function dedupePromptTextFromBody<E extends readonly string[]>(item: AssessmentI
 	const isQuestionish = (s: string): boolean => {
 		if (s.trim().endsWith("?")) return true
 		const tokens = tokenizeForFuzzy(s)
-		return tokens.some((t) => t === "which" || t === "what" || t === "why" || t === "how" || t === "where")
+		return tokens.some(
+			(t) => t === "which" || t === "what" || t === "why" || t === "how" || t === "where"
+		)
 	}
 
 	regionStart = 0
@@ -393,7 +422,9 @@ function dedupePromptTextFromBody<E extends readonly string[]>(item: AssessmentI
 					if (left !== "") newInline.push({ type: "text", content: left })
 					if (right !== "") newInline.push({ type: "text", content: right })
 				}
-				const compacted = newInline.filter((p) => !(p.type === "text" && String(p.content).trim() === ""))
+				const compacted = newInline.filter(
+					(p) => !(p.type === "text" && String(p.content).trim() === "")
+				)
 				if (compacted.length === 0) {
 					toDelete.add(i)
 				} else {
@@ -418,7 +449,9 @@ function dedupePromptTextFromBody<E extends readonly string[]>(item: AssessmentI
 	}
 }
 
-function enforceIdentifierOnlyMatching<E extends readonly string[]>(item: AssessmentItemWithFlatFeedback<E>): void {
+function enforceIdentifierOnlyMatching<E extends readonly string[]>(
+	item: AssessmentItemWithFlatFeedback<E>
+): void {
 	// Build allowed identifiers per responseIdentifier from interactions
 	const allowed: Record<string, Set<string>> = {}
 	const responseIdOwners = new Map<string, string>()
@@ -548,7 +581,8 @@ function collectRefs<E extends readonly string[]>(
 			if (node.type === "blockquote") {
 				walkInline(node.content)
 			}
-			if (node.type === "unorderedList" || node.type === "orderedList") node.items.forEach(walkInline)
+			if (node.type === "unorderedList" || node.type === "orderedList")
+				node.items.forEach(walkInline)
 			if (node.type === "tableRich") {
 				const walkRows = (rows: Array<Array<InlineContent<E> | null>> | null) => {
 					if (!rows) return
@@ -597,7 +631,9 @@ function collectRefs<E extends readonly string[]>(
 	return { widgetRefs, interactionRefs }
 }
 
-function collectWidgetIds<E extends readonly string[]>(item: AssessmentItemWithFlatFeedback<E>): Set<string> {
+function collectWidgetIds<E extends readonly string[]>(
+	item: AssessmentItemWithFlatFeedback<E>
+): Set<string> {
 	return collectRefs(item).widgetRefs
 }
 
@@ -628,7 +664,9 @@ export async function compile<
 			collectionName: widgetCollection.name,
 			availableTypes: widgetCollection.widgetTypeKeys
 		})
-		throw errors.new(`Invalid widget type "${type}" for slot "${key}" not in collection '${widgetCollection.name}'`)
+		throw errors.new(
+			`Invalid widget type "${type}" for slot "${key}" not in collection '${widgetCollection.name}'`
+		)
 	}
 
 	// Decouple schema creation from global registry - build schemas from widgetTypeKeys
@@ -661,8 +699,13 @@ export async function compile<
 		enforcedItem.feedbackPlan,
 		widgetCollection.widgetTypeKeys
 	)
-	const feedbackBlocks = convertFeedbackObjectToBlocks(validatedFeedbackObject, enforcedItem.feedbackPlan)
-	logger.debug("converted nested feedback to flat blocks", { blockCount: Object.keys(feedbackBlocks).length })
+	const feedbackBlocks = convertFeedbackObjectToBlocks(
+		validatedFeedbackObject,
+		enforcedItem.feedbackPlan
+	)
+	logger.debug("converted nested feedback to flat blocks", {
+		blockCount: Object.keys(feedbackBlocks).length
+	})
 
 	// Create a normalized item with flat feedbackBlocks for downstream processing
 	const normalizedItem: AssessmentItemWithFlatFeedback<WidgetTypeTupleFrom<C>> = {
@@ -684,7 +727,10 @@ export async function compile<
 					perseusType: perseusType
 				})
 				// Throw the specific, non-retriable error
-				throw errors.wrap(ErrUnsupportedInteraction, `item contains unsupported Perseus interaction: ${perseusType}`)
+				throw errors.wrap(
+					ErrUnsupportedInteraction,
+					`item contains unsupported Perseus interaction: ${perseusType}`
+				)
 			}
 		}
 	}
@@ -705,7 +751,9 @@ export async function compile<
 		count: requiredWidgetIds.size,
 		ids: Array.from(requiredWidgetIds)
 	})
-	logger.debug("available widget definitions", { availableWidgets: Object.keys(normalizedItem.widgets || {}) })
+	logger.debug("available widget definitions", {
+		availableWidgets: Object.keys(normalizedItem.widgets || {})
+	})
 
 	// Step 2: Generate content ONLY for the required widgets
 	if (enforcedItem.widgets) {
@@ -725,19 +773,28 @@ export async function compile<
 					widgetType,
 					collectionName: widgetCollection.name
 				})
-				throw errors.new(`Widget type '${widgetType}' not found in collection '${widgetCollection.name}'`)
+				throw errors.new(
+					`Widget type '${widgetType}' not found in collection '${widgetCollection.name}'`
+				)
 			}
 
 			// Validate widget data against its schema before generation to satisfy per-type contracts
 			const parsed = definition.schema.safeParse(widgetData)
 			if (!parsed.success) {
-				logger.error("widget validation failed before generation", { widgetId, widgetType, error: parsed.error })
+				logger.error("widget validation failed before generation", {
+					widgetId,
+					widgetType,
+					error: parsed.error
+				})
 				throw errors.wrap(parsed.error, "widget validation")
 			}
 			const widgetHtml = await definition.generator(parsed.data)
 
 			if (widgetHtml.trim().startsWith("<svg")) {
-				widgetSlots.set(widgetId, `<img src="${encodeDataUri(widgetHtml)}" alt="Widget visualization" />`)
+				widgetSlots.set(
+					widgetId,
+					`<img src="${encodeDataUri(widgetHtml)}" alt="Widget visualization" />`
+				)
 			} else {
 				widgetSlots.set(widgetId, widgetHtml)
 			}
@@ -747,7 +804,10 @@ export async function compile<
 	// Step 3: Compile interactions and populate interactionSlots (after widgets are generated)
 	if (enforcedItem.interactions) {
 		for (const [interactionId, interactionDef] of Object.entries(enforcedItem.interactions)) {
-			interactionSlots.set(interactionId, compileInteraction(interactionDef, widgetSlots, interactionSlots))
+			interactionSlots.set(
+				interactionId,
+				compileInteraction(interactionDef, widgetSlots, interactionSlots)
+			)
 		}
 	}
 
@@ -755,7 +815,10 @@ export async function compile<
 	const { widgetRefs, interactionRefs } = collectRefs(normalizedItem)
 	for (const id of widgetRefs) {
 		if (!widgetSlots.has(id)) {
-			logger.error("unresolved widget reference", { widgetId: id, availableSlots: Array.from(widgetSlots.keys()) })
+			logger.error("unresolved widget reference", {
+				widgetId: id,
+				availableSlots: Array.from(widgetSlots.keys())
+			})
 			throw errors.new("unresolved widget reference")
 		}
 	}
@@ -770,7 +833,9 @@ export async function compile<
 	}
 
 	// Step 5: Render final body and feedback with the populated slots
-	const filledBody = enforcedItem.body ? renderBlockContent(enforcedItem.body, widgetSlots, interactionSlots) : ""
+	const filledBody = enforcedItem.body
+		? renderBlockContent(enforcedItem.body, widgetSlots, interactionSlots)
+		: ""
 
 	const outcomeDeclarationsXml =
 		'    <qti-outcome-declaration identifier="FEEDBACK__OVERALL" cardinality="single" base-type="identifier"/>'
@@ -780,7 +845,9 @@ export async function compile<
 		.map((combination: FeedbackPlan["combinations"][number]) => {
 			const content = feedbackBlocks[combination.id]
 			if (!content) {
-				logger.error("missing feedback content for expected identifier", { identifier: combination.id })
+				logger.error("missing feedback content for expected identifier", {
+					identifier: combination.id
+				})
 				throw errors.new("ErrMissingFeedbackContent")
 			}
 

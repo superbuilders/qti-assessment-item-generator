@@ -4,7 +4,10 @@ export function expectSortedUrls(envelope: { multimodalImageUrls: string[] }): v
 	expect([...envelope.multimodalImageUrls]).toEqual([...envelope.multimodalImageUrls].sort())
 }
 
-export function expectSupplementaryContentCount(envelope: { supplementaryContent: string[] }, count: number): void {
+export function expectSupplementaryContentCount(
+	envelope: { supplementaryContent: string[] },
+	count: number
+): void {
 	expect(envelope.supplementaryContent).toHaveLength(count)
 }
 

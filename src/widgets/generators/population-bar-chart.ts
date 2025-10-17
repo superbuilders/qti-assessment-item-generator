@@ -31,7 +31,10 @@ const YAxisOptionsSchema = z
 		label: z.string().describe("The title for the vertical axis (e.g., 'Number of elk')."),
 		min: z.number().describe("The minimum value shown on the y-axis."),
 		max: z.number().describe("The maximum value shown on the y-axis."),
-		tickInterval: z.number().positive().describe("The spacing between tick marks and grid lines on the y-axis.")
+		tickInterval: z
+			.number()
+			.positive()
+			.describe("The spacing between tick marks and grid lines on the y-axis.")
 	})
 	.strict()
 
@@ -44,7 +47,9 @@ export const PopulationBarChartPropsSchema = z
 		width: createWidthSchema(),
 		height: createHeightSchema(),
 		xAxisLabel: z.string().describe("The label for the horizontal axis (e.g., 'Year')."),
-		yAxis: YAxisOptionsSchema.describe("Configuration for the vertical axis including scale and labels."),
+		yAxis: YAxisOptionsSchema.describe(
+			"Configuration for the vertical axis including scale and labels."
+		),
 		xAxisVisibleLabels: z
 			.array(z.string().min(1, "visible label cannot be empty"))
 			.describe(
@@ -74,7 +79,9 @@ export type PopulationBarChartProps = z.infer<typeof PopulationBarChartPropsSche
 /**
  * Generates a vertical bar chart styled to replicate the provided elk population graph.
  */
-export const generatePopulationBarChart: WidgetGenerator<typeof PopulationBarChartPropsSchema> = async (data) => {
+export const generatePopulationBarChart: WidgetGenerator<
+	typeof PopulationBarChartPropsSchema
+> = async (data) => {
 	const { width, height, xAxisLabel, yAxis, data: chartData, barColor, gridColor } = data
 	// xAxisVisibleLabels unused from destructuring
 
@@ -119,16 +126,24 @@ export const generatePopulationBarChart: WidgetGenerator<typeof PopulationBarCha
 	for (let t = yAxis.min; t <= yAxis.max; t += yAxis.tickInterval) {
 		if (t === 0) continue
 		const y = baseInfo.toSvgY(t)
-		canvas.drawLine(baseInfo.chartArea.left, y, baseInfo.chartArea.left + baseInfo.chartArea.width, y, {
-			stroke: gridColor,
-			strokeWidth: 1
-		})
+		canvas.drawLine(
+			baseInfo.chartArea.left,
+			y,
+			baseInfo.chartArea.left + baseInfo.chartArea.width,
+			y,
+			{
+				stroke: gridColor,
+				strokeWidth: 1
+			}
+		)
 	}
 
 	// Bar rendering
 	const bandWidth = baseInfo.bandWidth
 	if (bandWidth === undefined) {
-		logger.error("bandWidth missing for categorical x-axis in population bar chart", { length: chartData.length })
+		logger.error("bandWidth missing for categorical x-axis in population bar chart", {
+			length: chartData.length
+		})
 		throw errors.wrap(ErrInvalidDimensions, "categorical x-axis requires defined bandWidth")
 	}
 	const barPadding = 0.3
@@ -150,7 +165,13 @@ export const generatePopulationBarChart: WidgetGenerator<typeof PopulationBarCha
 	})
 
 	// NEW: Finalize the canvas and construct the root SVG element
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(AXIS_VIEWBOX_PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(AXIS_VIEWBOX_PADDING)
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}">${svgBody}</svg>`
 }

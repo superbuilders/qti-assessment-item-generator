@@ -20,7 +20,9 @@ const createHeightLabelSchema = () =>
 	z
 		.string()
 		.nullable()
-		.describe("Nullable height label text (e.g., 'h = 8', '6 cm'). Can include units, equations, or simple values.")
+		.describe(
+			"Nullable height label text (e.g., 'h = 8', '6 cm'). Can include units, equations, or simple values."
+		)
 
 const Cylinder = z
 	.object({
@@ -49,7 +51,9 @@ export const GeometricSolidDiagramPropsSchema = z
 	.object({
 		type: z
 			.literal("geometricSolidDiagram")
-			.describe("Identifies this as a geometric solid diagram showing 3D shapes with dimension labels."),
+			.describe(
+				"Identifies this as a geometric solid diagram showing 3D shapes with dimension labels."
+			),
 		width: createWidthSchema(),
 		height: createHeightSchema(),
 		shape: z
@@ -67,7 +71,9 @@ export type GeometricSolidDiagramProps = z.infer<typeof GeometricSolidDiagramPro
  * Generates a 3D diagram of a geometric solid with curved surfaces (e.g., cylinder, cone).
  * Supports dimension labels for volume and surface area problems.
  */
-export const generateGeometricSolidDiagram: WidgetGenerator<typeof GeometricSolidDiagramPropsSchema> = async (data) => {
+export const generateGeometricSolidDiagram: WidgetGenerator<
+	typeof GeometricSolidDiagramPropsSchema
+> = async (data) => {
 	const { width, height, shape } = data
 
 	// --- NEW SCALING AND DRAWING LOGIC ---
@@ -128,13 +134,17 @@ export const generateGeometricSolidDiagram: WidgetGenerator<typeof GeometricSoli
 		})
 
 		// Bottom base (draw back dashed part first, then front solid part)
-		const bottomBackPath = new Path2D().moveTo(cx - r, bottomY).arcTo(r, ry, 0, 0, 0, cx + r, bottomY)
+		const bottomBackPath = new Path2D()
+			.moveTo(cx - r, bottomY)
+			.arcTo(r, ry, 0, 0, 0, cx + r, bottomY)
 		canvas.drawPath(bottomBackPath, {
 			stroke: theme.colors.black,
 			strokeWidth: theme.stroke.width.thick,
 			dash: theme.stroke.dasharray.dashed
 		})
-		const bottomFrontPath = new Path2D().moveTo(cx - r, bottomY).arcTo(r, ry, 0, 0, 1, cx + r, bottomY)
+		const bottomFrontPath = new Path2D()
+			.moveTo(cx - r, bottomY)
+			.arcTo(r, ry, 0, 0, 1, cx + r, bottomY)
 		canvas.drawPath(bottomFrontPath, {
 			fill: "rgba(200, 200, 200, 0.2)",
 			stroke: theme.colors.black,
@@ -332,7 +342,12 @@ export const generateGeometricSolidDiagram: WidgetGenerator<typeof GeometricSoli
 
 			// Place label centered above the dashed radius with a minimal non-overlapping gap
 			const fontPx = theme.font.size.base
-			const dims = estimateWrappedTextDimensions(shape.radiusLabel, Number.POSITIVE_INFINITY, fontPx, 1.2)
+			const dims = estimateWrappedTextDimensions(
+				shape.radiusLabel,
+				Number.POSITIVE_INFINITY,
+				fontPx,
+				1.2
+			)
 			const minGap = theme.stroke.width.base + 2
 			const labelX = cx + r / 2
 			const labelY = cy - (dims.height / 2 + minGap)
@@ -349,7 +364,13 @@ export const generateGeometricSolidDiagram: WidgetGenerator<typeof GeometricSoli
 	}
 
 	// NEW: Finalize the canvas and construct the root SVG element
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(PADDING)
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.medium}">${svgBody}</svg>`
 }

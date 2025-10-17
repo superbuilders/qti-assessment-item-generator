@@ -23,7 +23,9 @@ const DataPointSchema = z
 			),
 		value: z
 			.number()
-			.describe("The numerical value. Positive values are drawn above the zero line, negative values below.")
+			.describe(
+				"The numerical value. Positive values are drawn above the zero line, negative values below."
+			)
 	})
 	.strict()
 
@@ -36,10 +38,15 @@ export const DivergentBarChartPropsSchema = z
 		xAxisLabel: z.string().describe("The label for the horizontal axis (e.g., 'Century')."),
 		yAxis: z
 			.object({
-				label: z.string().describe("The title for the vertical axis (e.g., 'Change in sea level (cm)')."),
+				label: z
+					.string()
+					.describe("The title for the vertical axis (e.g., 'Change in sea level (cm)')."),
 				min: z.number().describe("The minimum value on the y-axis (can be negative)."),
 				max: z.number().describe("The maximum value on the y-axis."),
-				tickInterval: z.number().positive().describe("The spacing between tick marks on the y-axis.")
+				tickInterval: z
+					.number()
+					.positive()
+					.describe("The spacing between tick marks on the y-axis.")
 			})
 			.strict()
 			.describe("Configuration for the vertical axis."),
@@ -71,15 +78,29 @@ export type DivergentBarChartProps = z.infer<typeof DivergentBarChartPropsSchema
 /**
  * Generates a divergent bar chart styled to replicate the provided sea level change graph.
  */
-export const generateDivergentBarChart: WidgetGenerator<typeof DivergentBarChartPropsSchema> = async (data) => {
-	const { width, height, xAxisLabel, yAxis, data: chartData, positiveBarColor, negativeBarColor, gridColor } = data
+export const generateDivergentBarChart: WidgetGenerator<
+	typeof DivergentBarChartPropsSchema
+> = async (data) => {
+	const {
+		width,
+		height,
+		xAxisLabel,
+		yAxis,
+		data: chartData,
+		positiveBarColor,
+		negativeBarColor,
+		gridColor
+	} = data
 
 	if (chartData.length === 0 || yAxis.min >= yAxis.max) {
 		logger.error("invalid data for divergent bar chart", {
 			dataLength: chartData.length,
 			yAxis
 		})
-		throw errors.wrap(ErrInvalidDimensions, "chart data must not be empty and y-axis min must be less than max")
+		throw errors.wrap(
+			ErrInvalidDimensions,
+			"chart data must not be empty and y-axis min must be less than max"
+		)
 	}
 
 	const canvas = new CanvasImpl({
@@ -116,23 +137,37 @@ export const generateDivergentBarChart: WidgetGenerator<typeof DivergentBarChart
 	for (let t = yAxis.min; t <= yAxis.max; t += yAxis.tickInterval) {
 		if (t === 0) continue // Skip zero line, we'll draw it separately
 		const y = baseInfo.toSvgY(t)
-		canvas.drawLine(baseInfo.chartArea.left, y, baseInfo.chartArea.left + baseInfo.chartArea.width, y, {
-			stroke: gridColor,
-			strokeWidth: 1
-		})
+		canvas.drawLine(
+			baseInfo.chartArea.left,
+			y,
+			baseInfo.chartArea.left + baseInfo.chartArea.width,
+			y,
+			{
+				stroke: gridColor,
+				strokeWidth: 1
+			}
+		)
 	}
 
 	// Prominent zero line
 	const yZero = baseInfo.toSvgY(0)
-	canvas.drawLine(baseInfo.chartArea.left, yZero, baseInfo.chartArea.left + baseInfo.chartArea.width, yZero, {
-		stroke: theme.colors.axis,
-		strokeWidth: 2
-	})
+	canvas.drawLine(
+		baseInfo.chartArea.left,
+		yZero,
+		baseInfo.chartArea.left + baseInfo.chartArea.width,
+		yZero,
+		{
+			stroke: theme.colors.axis,
+			strokeWidth: 2
+		}
+	)
 
 	// Bar rendering
 	const bandWidth = baseInfo.bandWidth
 	if (bandWidth === undefined) {
-		logger.error("bandWidth missing for categorical x-axis in divergent bar chart", { length: chartData.length })
+		logger.error("bandWidth missing for categorical x-axis in divergent bar chart", {
+			length: chartData.length
+		})
 		throw errors.wrap(ErrInvalidDimensions, "categorical x-axis requires defined bandWidth")
 	}
 	const barPadding = 0.4
@@ -163,7 +198,13 @@ export const generateDivergentBarChart: WidgetGenerator<typeof DivergentBarChart
 	})
 
 	// NEW: Finalize the canvas and construct the root SVG element
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(AXIS_VIEWBOX_PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(AXIS_VIEWBOX_PADDING)
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}">${svgBody}</svg>`
 }

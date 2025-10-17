@@ -11,7 +11,9 @@ export const PointPlotGraphPropsSchema = z
 	.object({
 		type: z
 			.literal("pointPlotGraph")
-			.describe("Identifies this as a point plot graph for displaying individual coordinate points."),
+			.describe(
+				"Identifies this as a point plot graph for displaying individual coordinate points."
+			),
 		width: createWidthSchema(),
 		height: createHeightSchema(),
 		xAxis: createAxisOptionsSchema().describe(
@@ -38,7 +40,9 @@ export const PointPlotGraphPropsSchema = z
 
 export type PointPlotGraphProps = z.infer<typeof PointPlotGraphPropsSchema>
 
-export const generatePointPlotGraph: WidgetGenerator<typeof PointPlotGraphPropsSchema> = async (props) => {
+export const generatePointPlotGraph: WidgetGenerator<typeof PointPlotGraphPropsSchema> = async (
+	props
+) => {
 	const { width, height, xAxis, yAxis, showQuadrantLabels, points } = props
 
 	// 1. Call the base generator and get the body content and extents object
@@ -75,7 +79,13 @@ export const generatePointPlotGraph: WidgetGenerator<typeof PointPlotGraphPropsS
 	renderPoints(points, baseInfo.toSvgX, baseInfo.toSvgY, canvas)
 
 	// NEW: Finalize the canvas and construct the root SVG element
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(AXIS_VIEWBOX_PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(AXIS_VIEWBOX_PADDING)
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.base}">${svgBody}</svg>`
 }

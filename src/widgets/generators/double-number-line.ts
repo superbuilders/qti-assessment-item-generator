@@ -8,13 +8,17 @@ import { abbreviateMonth } from "../utils/labels"
 import { createHeightSchema, createWidthSchema } from "../utils/schemas"
 import { type Theme, theme } from "../utils/theme"
 
-export const ErrMismatchedTickCounts = errors.new("top and bottom lines must have the same number of ticks")
+export const ErrMismatchedTickCounts = errors.new(
+	"top and bottom lines must have the same number of ticks"
+)
 
 export const DoubleNumberLinePropsSchema = z
 	.object({
 		type: z
 			.literal("doubleNumberLine")
-			.describe("Identifies this as a double number line widget for showing proportional relationships."),
+			.describe(
+				"Identifies this as a double number line widget for showing proportional relationships."
+			),
 		width: createWidthSchema(),
 		height: createHeightSchema(),
 		topLine: z
@@ -33,7 +37,9 @@ export const DoubleNumberLinePropsSchema = z
 					)
 			})
 			.strict()
-			.describe("Configuration for the upper number line. Represents one quantity in the proportional relationship."),
+			.describe(
+				"Configuration for the upper number line. Represents one quantity in the proportional relationship."
+			),
 		bottomLine: z
 			.object({
 				label: z
@@ -142,7 +148,9 @@ function drawClippedDottedLine(
  * This visualization tool is excellent for illustrating the relationship between two
  * different quantities that share a constant ratio.
  */
-export const generateDoubleNumberLine: WidgetGenerator<typeof DoubleNumberLinePropsSchema> = async (data) => {
+export const generateDoubleNumberLine: WidgetGenerator<typeof DoubleNumberLinePropsSchema> = async (
+	data
+) => {
 	const { width, height, topLine, bottomLine } = data
 	const lineLength = width - 2 * PADDING
 
@@ -155,7 +163,8 @@ export const generateDoubleNumberLine: WidgetGenerator<typeof DoubleNumberLinePr
 	const LINE_SEPARATION = 100 // Increased to ensure sufficient vertical space between lines and labels
 
 	// Calculate minimum height needed to prevent label clipping
-	const requiredMinHeight = Math.abs(TOP_LINE_LABEL_Y_OFFSET) + LINE_SEPARATION + BOTTOM_LINE_LABEL_Y_OFFSET + 10 // +10 buffer
+	const requiredMinHeight =
+		Math.abs(TOP_LINE_LABEL_Y_OFFSET) + LINE_SEPARATION + BOTTOM_LINE_LABEL_Y_OFFSET + 10 // +10 buffer
 	const adjustedHeight = Math.max(height, requiredMinHeight)
 
 	// Calculate the vertical center of the SVG and position the lines symmetrically around it.
@@ -318,11 +327,25 @@ export const generateDoubleNumberLine: WidgetGenerator<typeof DoubleNumberLinePr
 	// Alignment lines with intelligent clipping around labels
 	for (let i = 0; i < numTicks; i++) {
 		const x = PADDING + i * tickSpacing
-		drawClippedDottedLine(canvas, x, topY + TICK_MARK_HEIGHT, x, bottomY - TICK_MARK_HEIGHT, labelBounds, theme)
+		drawClippedDottedLine(
+			canvas,
+			x,
+			topY + TICK_MARK_HEIGHT,
+			x,
+			bottomY - TICK_MARK_HEIGHT,
+			labelBounds,
+			theme
+		)
 	}
 
 	// NEW: Finalize the canvas and construct the root SVG element
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(PADDING)
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.base}">${svgBody}</svg>`
 }

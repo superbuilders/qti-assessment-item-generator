@@ -22,12 +22,18 @@ export const ErrFeedbackSchemaValidation = errors.new("feedback schema validatio
 
 // --- Nested Schema Builder ---
 
-export function createFeedbackObjectSchema<P extends FeedbackPlan, const E extends readonly string[]>(
+export function createFeedbackObjectSchema<
+	P extends FeedbackPlan,
+	const E extends readonly string[]
+>(
 	feedbackPlan: P,
 	widgetTypeKeys: E
 ): z.ZodType<{ FEEDBACK__OVERALL: AuthoringFeedbackOverall<P, E> }> {
-	const FeedbackContentSchema: z.ZodType<FeedbackContent<E>> = createFeedbackContentSchema(widgetTypeKeys)
-	const LeafNodeSchema: z.ZodType<AuthoringNestedLeaf<E>> = z.object({ content: FeedbackContentSchema }).strict()
+	const FeedbackContentSchema: z.ZodType<FeedbackContent<E>> =
+		createFeedbackContentSchema(widgetTypeKeys)
+	const LeafNodeSchema: z.ZodType<AuthoringNestedLeaf<E>> = z
+		.object({ content: FeedbackContentSchema })
+		.strict()
 
 	let OverallSchema: z.ZodType<AuthoringFeedbackOverall<P, E>>
 	if (feedbackPlan.mode === "fallback") {
@@ -54,7 +60,8 @@ export function createFeedbackObjectSchema<P extends FeedbackPlan, const E exten
 				})
 				throw errors.new("undefined dimension in feedback plan")
 			}
-			const keys: readonly string[] = dimension.kind === "enumerated" ? dimension.keys : ["CORRECT", "INCORRECT"]
+			const keys: readonly string[] =
+				dimension.kind === "enumerated" ? dimension.keys : ["CORRECT", "INCORRECT"]
 
 			const innerShape: Record<string, z.ZodType<LeafT | NodeT>> = {}
 			for (const key of keys) {
@@ -148,7 +155,9 @@ export function convertFeedbackObjectToBlocks<P extends FeedbackPlan, E extends 
 					c.path.length === path.length &&
 					c.path.every(
 						(seg: FeedbackPlan["combinations"][number]["path"][number], i: number) =>
-							path[i] !== undefined && seg.responseIdentifier === path[i].responseIdentifier && seg.key === path[i].key
+							path[i] !== undefined &&
+							seg.responseIdentifier === path[i].responseIdentifier &&
+							seg.key === path[i].key
 					)
 			)
 			if (!combination) {
@@ -178,7 +187,9 @@ export function convertFeedbackObjectToBlocks<P extends FeedbackPlan, E extends 
 	walk(overallFeedback, [])
 
 	const producedIds = new Set(Object.keys(blocks))
-	const expectedIds = new Set(feedbackPlan.combinations.map((c: FeedbackPlan["combinations"][number]) => c.id))
+	const expectedIds = new Set(
+		feedbackPlan.combinations.map((c: FeedbackPlan["combinations"][number]) => c.id)
+	)
 
 	if (producedIds.size > expectedIds.size) {
 		const extraKeys = [...producedIds].filter((id) => !expectedIds.has(id))
@@ -203,10 +214,13 @@ export function convertFeedbackObjectToBlocks<P extends FeedbackPlan, E extends 
 	return blocks
 }
 
-export function buildEmptyNestedFeedback<P extends FeedbackPlan, E extends readonly string[] = readonly string[]>(
-	feedbackPlan: P
-): { FEEDBACK__OVERALL: AuthoringFeedbackOverall<FeedbackPlan, E> } {
-	function buildNode(dims: readonly FeedbackPlan["dimensions"][number][]): AuthoringNestedNode<FeedbackPlan, E> {
+export function buildEmptyNestedFeedback<
+	P extends FeedbackPlan,
+	E extends readonly string[] = readonly string[]
+>(feedbackPlan: P): { FEEDBACK__OVERALL: AuthoringFeedbackOverall<FeedbackPlan, E> } {
+	function buildNode(
+		dims: readonly FeedbackPlan["dimensions"][number][]
+	): AuthoringNestedNode<FeedbackPlan, E> {
 		if (dims.length === 0) {
 			logger.error("no dimensions to build nested node")
 			throw errors.new("no dimensions to build nested node")

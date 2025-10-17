@@ -21,12 +21,14 @@ function classifyError(error: Error): { retriable: boolean; reason: string } {
 	if (typeof status === "number" && [408, 429, 500, 502, 503, 504].includes(status)) {
 		return { retriable: true, reason: "http-transient" }
 	}
-	if (/\b(408|429|500|502|503|504)\b/.test(message)) return { retriable: true, reason: "http-transient" }
+	if (/\b(408|429|500|502|503|504)\b/.test(message))
+		return { retriable: true, reason: "http-transient" }
 
 	// Treat all timeout/network hiccups as retriable; broaden phrasing coverage
 	const timeoutLike =
 		/(timeout|timed out|deadline exceeded|context deadline exceeded|gateway timeout|operation timed out)/i
-	const networkLike = /(ETIMEDOUT|ENETUNREACH|ECONNRESET|EAI_AGAIN|ECONNABORTED|ENETDOWN|EHOSTUNREACH|EPIPE)/i
+	const networkLike =
+		/(ETIMEDOUT|ENETUNREACH|ECONNRESET|EAI_AGAIN|ECONNABORTED|ENETDOWN|EHOSTUNREACH|EPIPE)/i
 	if (timeoutLike.test(message) || networkLike.test(message) || error.name === "TimeoutError") {
 		return { retriable: true, reason: "network-timeout" }
 	}
@@ -48,7 +50,12 @@ export async function callOpenAIWithRetry<T>(label: string, fn: () => Promise<T>
 			throw result.error
 		}
 		const classification = classifyError(result.error)
-		logger.warn("openai request failed", { label, attempt, reason: classification.reason, error: result.error })
+		logger.warn("openai request failed", {
+			label,
+			attempt,
+			reason: classification.reason,
+			error: result.error
+		})
 		if (!classification.retriable) {
 			logger.error("openai non-retriable error", { label, attempt, error: result.error })
 			throw result.error

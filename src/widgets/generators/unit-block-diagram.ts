@@ -9,7 +9,9 @@ export const UnitBlockDiagramPropsSchema = z
 	.object({
 		type: z
 			.literal("unitBlockDiagram")
-			.describe("Identifies this as a unit block diagram for visualizing place value and decimal concepts."),
+			.describe(
+				"Identifies this as a unit block diagram for visualizing place value and decimal concepts."
+			),
 		totalBlocks: z
 			.number()
 			.int()
@@ -66,8 +68,11 @@ export type UnitBlockDiagramProps = z.infer<typeof UnitBlockDiagramPropsSchema>
  * place value and percentages of large numbers that are multiples of 100.
  * It is particularly effective for explaining concepts like "1% of 800" in a concrete, countable manner.
  */
-export const generateUnitBlockDiagram: WidgetGenerator<typeof UnitBlockDiagramPropsSchema> = async (data) => {
-	const { totalBlocks, shadedUnitsPerBlock, blocksPerRow, blockWidth, blockHeight, shadeColor } = data
+export const generateUnitBlockDiagram: WidgetGenerator<typeof UnitBlockDiagramPropsSchema> = async (
+	data
+) => {
+	const { totalBlocks, shadedUnitsPerBlock, blocksPerRow, blockWidth, blockHeight, shadeColor } =
+		data
 	const gap = 10
 	const numRows = Math.ceil(totalBlocks / blocksPerRow)
 	const svgWidth = blocksPerRow * blockWidth + (blocksPerRow - 1) * gap
@@ -107,7 +112,13 @@ export const generateUnitBlockDiagram: WidgetGenerator<typeof UnitBlockDiagramPr
 	}
 
 	// NEW: Finalize the canvas and construct the root SVG element
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(PADDING)
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg">${svgBody}</svg>`
 }

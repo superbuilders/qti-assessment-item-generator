@@ -42,7 +42,14 @@ export class Path2D {
 		return this
 	}
 
-	bezierCurveTo(cp1x: number, cp1y: number, cp2x: number, cp2y: number, x: number, y: number): this {
+	bezierCurveTo(
+		cp1x: number,
+		cp1y: number,
+		cp2x: number,
+		cp2y: number,
+		x: number,
+		y: number
+	): this {
 		this.d += `C ${cp1x} ${cp1y} ${cp2x} ${cp2y} ${x} ${y} `
 		// For bounding box, we need to consider both control points and endpoint
 		this.updateExtents(cp1x, cp1y)

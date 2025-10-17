@@ -49,7 +49,9 @@ export const PolygonGraphPropsSchema = z
 
 export type PolygonGraphProps = z.infer<typeof PolygonGraphPropsSchema>
 
-export const generatePolygonGraph: WidgetGenerator<typeof PolygonGraphPropsSchema> = async (props) => {
+export const generatePolygonGraph: WidgetGenerator<typeof PolygonGraphPropsSchema> = async (
+	props
+) => {
 	const { width, height, xAxis, yAxis, showQuadrantLabels, points, polygons } = props
 
 	// 1. Call the base generator and get the body content and extents object
@@ -90,7 +92,13 @@ export const generatePolygonGraph: WidgetGenerator<typeof PolygonGraphPropsSchem
 	renderPoints(points, baseInfo.toSvgX, baseInfo.toSvgY, canvas)
 
 	// NEW: Finalize the canvas and construct the root SVG element
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(AXIS_VIEWBOX_PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(AXIS_VIEWBOX_PADDING)
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.base}">${svgBody}</svg>`
 }

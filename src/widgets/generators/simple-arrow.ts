@@ -30,7 +30,9 @@ export type SimpleArrowProps = z.infer<typeof SimpleArrowPropsSchema>
 /**
  * generates a simple arrow with configurable direction, optionally with circles along the line
  */
-export const generateSimpleArrow: WidgetGenerator<typeof SimpleArrowPropsSchema> = async (props) => {
+export const generateSimpleArrow: WidgetGenerator<typeof SimpleArrowPropsSchema> = async (
+	props
+) => {
 	const { width, height, orientation, direction, color, strokeWidth, arrowSize, circles } = props
 
 	const canvas = new CanvasImpl({
@@ -111,7 +113,13 @@ export const generateSimpleArrow: WidgetGenerator<typeof SimpleArrowPropsSchema>
 		}
 	}
 
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(PADDING)
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}">${svgBody}</svg>`
 }

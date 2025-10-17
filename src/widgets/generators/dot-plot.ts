@@ -32,7 +32,9 @@ const DataPoint = z
 
 export const DotPlotPropsSchema = z
 	.object({
-		type: z.literal("dotPlot").describe("Identifies this as a dot plot widget for displaying frequency distributions."),
+		type: z
+			.literal("dotPlot")
+			.describe("Identifies this as a dot plot widget for displaying frequency distributions."),
 		width: createWidthSchema(),
 		height: createHeightSchema(),
 		axis: z
@@ -119,7 +121,10 @@ export const generateDotPlot: WidgetGenerator<typeof DotPlotPropsSchema> = async
 			axisMin: axis.min,
 			axisMax: axis.max
 		})
-		throw errors.wrap(ErrInvalidDimensions, `width: ${width}, height: ${height}, axis range: ${axis.min}-${axis.max}`)
+		throw errors.wrap(
+			ErrInvalidDimensions,
+			`width: ${width}, height: ${height}, axis range: ${axis.min}-${axis.max}`
+		)
 	}
 
 	const scale = chartWidth / (axis.max - axis.min)
@@ -197,7 +202,13 @@ export const generateDotPlot: WidgetGenerator<typeof DotPlotPropsSchema> = async
 	}
 
 	// NEW: Finalize the canvas and construct the root SVG element
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(PADDING)
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.base}">${svgBody}</svg>`
 }

@@ -20,7 +20,10 @@ export interface WidgetDefinition<Output, Input = Output> {
  * @template T A record mapping widget type names to their WidgetDefinition.
  */
 export type WidgetCollection<
-	T extends Record<string, WidgetDefinition<unknown, unknown>> = Record<string, WidgetDefinition<unknown, unknown>>,
+	T extends Record<string, WidgetDefinition<unknown, unknown>> = Record<
+		string,
+		WidgetDefinition<unknown, unknown>
+	>,
 	K extends ReadonlyArray<keyof T & string> = ReadonlyArray<keyof T & string>
 > = {
 	readonly name: string
@@ -32,8 +35,9 @@ export type WidgetCollection<
  * A helper type to infer a readonly tuple of widget type names from a collection.
  * This replaces the previous redundant `widgetTypeKeys` array.
  */
-export type WidgetTypeTupleFrom<C extends WidgetCollection<Record<string, WidgetDefinition<unknown, unknown>>>> =
-	C["widgetTypeKeys"]
+export type WidgetTypeTupleFrom<
+	C extends WidgetCollection<Record<string, WidgetDefinition<unknown, unknown>>>
+> = C["widgetTypeKeys"]
 
 /**
  * Generic widget type tuple used by content/item generics.

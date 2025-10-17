@@ -38,7 +38,12 @@ describe("compileResponseDeclarations", () => {
 
 	test("emits identifier list without mapping when cardinality multiple", () => {
 		const decls: AssessmentItem<[]>["responseDeclarations"] = [
-			{ identifier: "RESPONSE", cardinality: "multiple", baseType: "identifier", correct: ["A", "C"] }
+			{
+				identifier: "RESPONSE",
+				cardinality: "multiple",
+				baseType: "identifier",
+				correct: ["A", "C"]
+			}
 		]
 		const xml = compileResponseDeclarations(decls)
 		expect(xml).toContain('base-type="identifier"')

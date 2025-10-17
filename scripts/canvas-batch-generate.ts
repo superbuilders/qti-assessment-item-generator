@@ -282,7 +282,10 @@ async function gatherSupplementaryContent(quizDir: string): Promise<{
 		const pageDataPath = path.join(lessonDir, "page-data.json")
 		const pageDataResult = await errors.try(Bun.file(pageDataPath).json())
 		if (pageDataResult.error) {
-			logger.debug("no lesson page-data.json found or unreadable", { file: pageDataPath, error: pageDataResult.error })
+			logger.debug("no lesson page-data.json found or unreadable", {
+				file: pageDataPath,
+				error: pageDataResult.error
+			})
 		} else {
 			const parsed = LessonPageDataSchema.safeParse(pageDataResult.data)
 			if (!parsed.success) {
@@ -293,7 +296,10 @@ async function gatherSupplementaryContent(quizDir: string): Promise<{
 					if (html.length > 0) {
 						content.push(html)
 						filesIncluded.push(pageDataPath)
-						logger.debug("included lesson page-data.json", { file: pageDataPath, htmlLength: html.length })
+						logger.debug("included lesson page-data.json", {
+							file: pageDataPath,
+							htmlLength: html.length
+						})
 					}
 				}
 			}
@@ -322,7 +328,10 @@ async function gatherSupplementaryContent(quizDir: string): Promise<{
 			filesIncluded.push(unitMetaPath)
 			logger.debug("included unit metadata.json", { file: unitMetaPath })
 		} else {
-			logger.debug("no unit metadata.json found or unreadable", { file: unitMetaPath, error: unitMetaResult.error })
+			logger.debug("no unit metadata.json found or unreadable", {
+				file: unitMetaPath,
+				error: unitMetaResult.error
+			})
 		}
 	}
 
@@ -334,7 +343,10 @@ async function gatherSupplementaryContent(quizDir: string): Promise<{
 		filesIncluded.push(quizMetaPath)
 		logger.debug("included quiz metadata.json", { file: quizMetaPath })
 	} else {
-		logger.debug("no quiz metadata.json found or unreadable", { file: quizMetaPath, error: quizMetaResult.error })
+		logger.debug("no quiz metadata.json found or unreadable", {
+			file: quizMetaPath,
+			error: quizMetaResult.error
+		})
 	}
 
 	return { content, lessonDirs, unitDir, quizRootDir, filesIncluded }
@@ -457,7 +469,10 @@ async function discoverAndLoadPdfs(
 		}
 	}
 
-	logger.debug("pdf matching complete", { matchedCount: matched.length, matchedNames: matched.map((m) => m.name) })
+	logger.debug("pdf matching complete", {
+		matchedCount: matched.length,
+		matchedNames: matched.map((m) => m.name)
+	})
 
 	if (matched.length === 0) return []
 
@@ -465,7 +480,9 @@ async function discoverAndLoadPdfs(
 	for (const m of matched) {
 		const file = Bun.file(m.path)
 		if (!(await file.exists())) {
-			logger.error("referenced pdf not found on disk, this is a critical invariant", { file: m.path })
+			logger.error("referenced pdf not found on disk, this is a critical invariant", {
+				file: m.path
+			})
 			throw errors.new("referenced pdf not found")
 		}
 		const dataResult = await errors.try(file.arrayBuffer())
@@ -479,7 +496,10 @@ async function discoverAndLoadPdfs(
 			logger.debug("loaded pdf file", { name: m.name, byteLength: dataResult.data.byteLength })
 		}
 	}
-	logger.info("pdf loading complete", { pdfCount: payloads.length, pdfNames: payloads.map((p) => p.name) })
+	logger.info("pdf loading complete", {
+		pdfCount: payloads.length,
+		pdfNames: payloads.map((p) => p.name)
+	})
 	return payloads
 }
 
@@ -496,7 +516,10 @@ async function processQuestion(
 	const questionNumberStr = String(questionNumber).padStart(2, "0")
 	const kebabCaseName = path.basename(assessmentDirs.outputDir)
 	const questionId = `${kebabCaseName}-q${questionNumberStr}`
-	logger.info("processing question", { assessmentName: kebabCaseName, questionNumber: questionNumberStr })
+	logger.info("processing question", {
+		assessmentName: kebabCaseName,
+		questionNumber: questionNumberStr
+	})
 
 	const primaryContent = JSON.stringify(question, null, 2)
 	const gathered = await gatherSupplementaryContent(assessmentDirs.quizDir)
@@ -652,7 +675,9 @@ async function processQuestion(
 
 	const pdfSearchDirs: string[] = [...gathered.lessonDirs, gathered.quizRootDir]
 	logger.debug("searching for pdfs in directories", { questionId, pdfSearchDirs })
-	const pdfPayloadsResult = await errors.try(discoverAndLoadPdfs(question, supplementaryContent, pdfSearchDirs))
+	const pdfPayloadsResult = await errors.try(
+		discoverAndLoadPdfs(question, supplementaryContent, pdfSearchDirs)
+	)
 	if (pdfPayloadsResult.error) {
 		logger.error("failed to process pdfs for question, stopping this question", {
 			questionId,
@@ -680,7 +705,9 @@ async function processQuestion(
 		pdfPayloads
 	}
 
-	const structuredResult = await errors.try(generateFromEnvelope(openai, logger, envelope, WIDGET_COLLECTION))
+	const structuredResult = await errors.try(
+		generateFromEnvelope(openai, logger, envelope, WIDGET_COLLECTION)
+	)
 	if (structuredResult.error) {
 		if (
 			structuredResult.error instanceof Error &&
@@ -691,19 +718,34 @@ async function processQuestion(
 			logger.error("provider rejected payload (400), failing fast for this question", {
 				questionId,
 				error: structuredResult.error,
-				diagnostics: { imageCount: multimodalImagePayloads.length, pdfCount: pdfPayloads.length, totalBytes }
+				diagnostics: {
+					imageCount: multimodalImagePayloads.length,
+					pdfCount: pdfPayloads.length,
+					totalBytes
+				}
 			})
 			return
 		}
-		logger.error("failed to generate structured item", { questionId, error: structuredResult.error })
+		logger.error("failed to generate structured item", {
+			questionId,
+			error: structuredResult.error
+		})
 		return
 	}
 	const structuredItem = structuredResult.data
 
-	const jsonPath = path.join(assessmentDirs.outputDir, `question-${questionNumberStr}-structured.json`)
-	const writeJsonResult = await errors.try(Bun.write(jsonPath, JSON.stringify(structuredItem, null, 2)))
+	const jsonPath = path.join(
+		assessmentDirs.outputDir,
+		`question-${questionNumberStr}-structured.json`
+	)
+	const writeJsonResult = await errors.try(
+		Bun.write(jsonPath, JSON.stringify(structuredItem, null, 2))
+	)
 	if (writeJsonResult.error) {
-		logger.error("failed to write structured json", { file: jsonPath, error: writeJsonResult.error })
+		logger.error("failed to write structured json", {
+			file: jsonPath,
+			error: writeJsonResult.error
+		})
 		return
 	}
 
@@ -740,13 +782,19 @@ async function processAssessmentDir(dir: string, openai: OpenAI): Promise<void> 
 	const quizDataPath = path.join(quizDir, "quiz-data.json")
 	const quizDataJsonResult = await errors.try(fs.readFile(quizDataPath, "utf8"))
 	if (quizDataJsonResult.error) {
-		logger.warn("quiz-data.json not found, skipping assessment", { assessmentName, error: quizDataJsonResult.error })
+		logger.warn("quiz-data.json not found, skipping assessment", {
+			assessmentName,
+			error: quizDataJsonResult.error
+		})
 		return
 	}
 
 	const quizDataUnknown = errors.trySync(() => JSON.parse(quizDataJsonResult.data))
 	if (quizDataUnknown.error) {
-		logger.warn("failed to parse quiz-data.json, skipping", { assessmentName, error: quizDataUnknown.error })
+		logger.warn("failed to parse quiz-data.json, skipping", {
+			assessmentName,
+			error: quizDataUnknown.error
+		})
 		return
 	}
 	const quizDataParsed = QuizDataSchema.safeParse(quizDataUnknown.data)
@@ -757,7 +805,9 @@ async function processAssessmentDir(dir: string, openai: OpenAI): Promise<void> 
 
 	await fs.mkdir(assessmentOutputDir, { recursive: true })
 
-	const sortedQuestions = quizDataParsed.data.questions.sort((a, b) => a.questionNumber - b.questionNumber)
+	const sortedQuestions = quizDataParsed.data.questions.sort(
+		(a, b) => a.questionNumber - b.questionNumber
+	)
 
 	// Special-case: Only for Unit 1 Test, supplement missing questions from per-question screenshots
 	let allQuestions: CanvasQuestion[] = [...sortedQuestions]
@@ -780,7 +830,9 @@ async function processAssessmentDir(dir: string, openai: OpenAI): Promise<void> 
 					if (Number.isFinite(n)) imageQuestionNumbers.push(n)
 				}
 			}
-			const missing = imageQuestionNumbers.filter((n) => !existingNumbers.has(n)).sort((a, b) => a - b)
+			const missing = imageQuestionNumbers
+				.filter((n) => !existingNumbers.has(n))
+				.sort((a, b) => a - b)
 			if (missing.length > 0) {
 				logger.info("using screenshot fallback for missing questions", {
 					assessmentName,
@@ -788,7 +840,9 @@ async function processAssessmentDir(dir: string, openai: OpenAI): Promise<void> 
 					questionNumbers: missing
 				})
 				const fallbackQuestions: CanvasQuestion[] = missing.map((n) => ({ questionNumber: n }))
-				allQuestions = [...allQuestions, ...fallbackQuestions].sort((a, b) => a.questionNumber - b.questionNumber)
+				allQuestions = [...allQuestions, ...fallbackQuestions].sort(
+					(a, b) => a.questionNumber - b.questionNumber
+				)
 			}
 		}
 	}
@@ -806,12 +860,16 @@ async function processAssessmentDir(dir: string, openai: OpenAI): Promise<void> 
 	)
 
 	const questionResults = await runWithConcurrency(questionTasks, CONCURRENCY_LIMIT)
-	const questionFailures = questionResults.filter((r): r is PromiseRejectedResult => r.status === "rejected")
+	const questionFailures = questionResults.filter(
+		(r): r is PromiseRejectedResult => r.status === "rejected"
+	)
 	if (questionFailures.length > 0) {
 		// If any question in Unit 1 Test failed due to missing fallback screenshot, hard-fail this assessment.
 		const unit1FallbackFailure =
 			assessmentName === "Unit 1 Test" &&
-			questionFailures.some((f) => String(f.reason).includes("unit 1 test fallback screenshot missing"))
+			questionFailures.some((f) =>
+				String(f.reason).includes("unit 1 test fallback screenshot missing")
+			)
 		if (unit1FallbackFailure) {
 			logger.error("unit 1 test: aborting due to missing fallback screenshot", {
 				failureCount: questionFailures.length
@@ -876,7 +934,9 @@ async function main() {
 			reasons: failures.map((f) => f.reason)
 		})
 		// Hard fail the entire script if any failure indicates the unit 1 test fallback condition
-		const hardFail = failures.some((f) => String(f.reason).includes("unit 1 test fallback screenshot missing"))
+		const hardFail = failures.some((f) =>
+			String(f.reason).includes("unit 1 test fallback screenshot missing")
+		)
 		if (hardFail) {
 			logger.error("unit 1 test: hard fail due to missing fallback screenshot")
 			throw errors.new("unit 1 test fallback screenshot missing")

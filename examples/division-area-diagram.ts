@@ -576,7 +576,11 @@ export const divisionAreaDiagramExamples_809_div_4: DivisionAreaDiagramProps[] =
 					{ type: "boxedDigit", value: 0, color: null }
 				],
 				differenceTokens: [{ type: "digit", value: 9, color: "red" }],
-				rightPanel: { tokensTop: [{ type: "digit", value: 9, color: "red" }], minusTokens: null, bottomTokens: null }
+				rightPanel: {
+					tokensTop: [{ type: "digit", value: 9, color: "red" }],
+					minusTokens: null,
+					bottomTokens: null
+				}
 			},
 			{
 				subtrahend: null,
@@ -643,7 +647,11 @@ export const divisionAreaDiagramExamples_809_div_4: DivisionAreaDiagramProps[] =
 					{ type: "digit", value: 0, color: null }
 				],
 				differenceTokens: [{ type: "digit", value: 9, color: "red" }],
-				rightPanel: { tokensTop: [{ type: "digit", value: 9, color: "red" }], minusTokens: null, bottomTokens: null }
+				rightPanel: {
+					tokensTop: [{ type: "digit", value: 9, color: "red" }],
+					minusTokens: null,
+					bottomTokens: null
+				}
 			},
 			{
 				subtrahend: 8,

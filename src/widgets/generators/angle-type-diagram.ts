@@ -35,7 +35,11 @@ export const AngleTypeDiagramPropsSchema = z
 				z
 					.object({
 						type: z.literal("acute"),
-						value: z.number().gt(0).lt(90).describe("Angle measure in degrees (exclusive 0° and 90°).")
+						value: z
+							.number()
+							.gt(0)
+							.lt(90)
+							.describe("Angle measure in degrees (exclusive 0° and 90°).")
 					})
 					.strict(),
 				z
@@ -47,7 +51,11 @@ export const AngleTypeDiagramPropsSchema = z
 				z
 					.object({
 						type: z.literal("obtuse"),
-						value: z.number().gt(90).lt(180).describe("Angle measure in degrees (exclusive 90° and 180°).")
+						value: z
+							.number()
+							.gt(90)
+							.lt(180)
+							.describe("Angle measure in degrees (exclusive 90° and 180°).")
 					})
 					.strict(),
 				z
@@ -59,7 +67,11 @@ export const AngleTypeDiagramPropsSchema = z
 				z
 					.object({
 						type: z.literal("reflex"),
-						value: z.number().gt(180).lt(360).describe("Angle measure in degrees (exclusive 180° and 360°).")
+						value: z
+							.number()
+							.gt(180)
+							.lt(360)
+							.describe("Angle measure in degrees (exclusive 180° and 360°).")
 					})
 					.strict(),
 				z
@@ -69,7 +81,9 @@ export const AngleTypeDiagramPropsSchema = z
 					})
 					.strict()
 			])
-			.describe("Angle classification with an explicit degree value and category-specific constraints."),
+			.describe(
+				"Angle classification with an explicit degree value and category-specific constraints."
+			),
 		rotation: z
 			.number()
 			.describe(
@@ -80,7 +94,9 @@ export const AngleTypeDiagramPropsSchema = z
 				ray1Point: createLabelValueSchema().describe(
 					"Label for the point on the first ray (e.g., 'P'). This ray is rotated from the baseline ray. Can be null."
 				),
-				vertex: createLabelValueSchema().describe("Label for the vertex of the angle (e.g., 'Q'). Can be null."),
+				vertex: createLabelValueSchema().describe(
+					"Label for the vertex of the angle (e.g., 'Q'). Can be null."
+				),
 				ray2Point: createLabelValueSchema().describe(
 					"Label for the point on the second, baseline ray (e.g., 'R'). Can be null."
 				)
@@ -102,7 +118,9 @@ export type AngleTypeDiagramProps = z.infer<typeof AngleTypeDiagramPropsSchema>
 /**
  * Generates an SVG diagram for a specific type of angle.
  */
-export const generateAngleTypeDiagram: WidgetGenerator<typeof AngleTypeDiagramPropsSchema> = async (props) => {
+export const generateAngleTypeDiagram: WidgetGenerator<typeof AngleTypeDiagramPropsSchema> = async (
+	props
+) => {
 	const { width, height, angleType, labels, showAngleArc, rotation, sectorColor } = props
 
 	const canvas = new CanvasImpl({
@@ -126,18 +144,27 @@ export const generateAngleTypeDiagram: WidgetGenerator<typeof AngleTypeDiagramPr
 	// Define ray endpoints based on rotation and angle
 	// Ray 2 (baseline) is set by the `rotation` property.
 	const ray2AngleRad = rotationRadians
-	const p2 = { x: cx + rayLength * Math.cos(ray2AngleRad), y: cy + rayLength * Math.sin(ray2AngleRad) }
+	const p2 = {
+		x: cx + rayLength * Math.cos(ray2AngleRad),
+		y: cy + rayLength * Math.sin(ray2AngleRad)
+	}
 
 	// Ray 1 is rotated from Ray 2 by the angle value.
 	const ray1AngleRad = ray2AngleRad + angleRadians
-	let p1 = { x: cx + rayLength * Math.cos(ray1AngleRad), y: cy + rayLength * Math.sin(ray1AngleRad) }
+	let p1 = {
+		x: cx + rayLength * Math.cos(ray1AngleRad),
+		y: cy + rayLength * Math.sin(ray1AngleRad)
+	}
 	let p2Adjusted = { ...p2 }
 	// For a full 360° angle, place A and C along the baseline such that |AB| = |AC|.
 	// Make A at half the baseline length, and C at the full baseline length (colinear).
 	if (angleType.type === "full") {
 		const halfLen = rayLength * 0.5
 		p1 = { x: cx + halfLen * Math.cos(ray2AngleRad), y: cy + halfLen * Math.sin(ray2AngleRad) } // A at half length
-		p2Adjusted = { x: cx + rayLength * Math.cos(ray2AngleRad), y: cy + rayLength * Math.sin(ray2AngleRad) } // C at full length
+		p2Adjusted = {
+			x: cx + rayLength * Math.cos(ray2AngleRad),
+			y: cy + rayLength * Math.sin(ray2AngleRad)
+		} // C at full length
 	}
 
 	// Extend the ray lines slightly beyond the point markers so arrowheads sit away from the dots
@@ -198,7 +225,11 @@ export const generateAngleTypeDiagram: WidgetGenerator<typeof AngleTypeDiagramPr
 		const r2 = { x: rx + rw, y: ry }
 		const r3 = { x: rx + rw, y: ry + rh }
 		const r4 = { x: rx, y: ry + rh }
-		const orient = (p: { x: number; y: number }, q: { x: number; y: number }, r: { x: number; y: number }) => {
+		const orient = (
+			p: { x: number; y: number },
+			q: { x: number; y: number },
+			r: { x: number; y: number }
+		) => {
 			const val = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y)
 			if (val > 1e-9) return 1
 			if (val < -1e-9) return -1
@@ -224,13 +255,24 @@ export const generateAngleTypeDiagram: WidgetGenerator<typeof AngleTypeDiagramPr
 		)
 	}
 
-	const placedLabelRects: Array<{ x: number; y: number; width: number; height: number; pad?: number }> = []
+	const placedLabelRects: Array<{
+		x: number
+		y: number
+		width: number
+		height: number
+		pad?: number
+	}> = []
 
 	function rectsOverlap(
 		a: { x: number; y: number; width: number; height: number },
 		b: { x: number; y: number; width: number; height: number }
 	): boolean {
-		return !(a.x + a.width < b.x || b.x + b.width < a.x || a.y + a.height < b.y || b.y + b.height < a.y)
+		return !(
+			a.x + a.width < b.x ||
+			b.x + b.width < a.x ||
+			a.y + a.height < b.y ||
+			b.y + b.height < a.y
+		)
 	}
 
 	function rectIntersectsAnyObstacle(rect: {
@@ -278,8 +320,14 @@ export const generateAngleTypeDiagram: WidgetGenerator<typeof AngleTypeDiagramPr
 			})
 		} else if (angleType.type === "right") {
 			const markerSize = arcRadius * 0.8
-			const m1 = { x: cx + markerSize * Math.cos(ray2AngleRad), y: cy + markerSize * Math.sin(ray2AngleRad) }
-			const m2 = { x: cx + markerSize * Math.cos(ray1AngleRad), y: cy + markerSize * Math.sin(ray1AngleRad) }
+			const m1 = {
+				x: cx + markerSize * Math.cos(ray2AngleRad),
+				y: cy + markerSize * Math.sin(ray2AngleRad)
+			}
+			const m2 = {
+				x: cx + markerSize * Math.cos(ray1AngleRad),
+				y: cy + markerSize * Math.sin(ray1AngleRad)
+			}
 			const corner = {
 				x: cx + markerSize * (Math.cos(ray1AngleRad) + Math.cos(ray2AngleRad)),
 				y: cy + markerSize * (Math.sin(ray1AngleRad) + Math.sin(ray2AngleRad))
@@ -299,15 +347,24 @@ export const generateAngleTypeDiagram: WidgetGenerator<typeof AngleTypeDiagramPr
 			})
 
 			// Outline
-			const outlinePath = new Path2D().moveTo(m1.x, m1.y).lineTo(corner.x, corner.y).lineTo(m2.x, m2.y)
+			const outlinePath = new Path2D()
+				.moveTo(m1.x, m1.y)
+				.lineTo(corner.x, corner.y)
+				.lineTo(m2.x, m2.y)
 			canvas.drawPath(outlinePath, {
 				fill: "none",
 				stroke: sectorColor,
 				strokeWidth: theme.stroke.width.base
 			})
 		} else {
-			const startPoint = { x: cx + arcRadius * Math.cos(ray2AngleRad), y: cy + arcRadius * Math.sin(ray2AngleRad) }
-			const endPoint = { x: cx + arcRadius * Math.cos(ray1AngleRad), y: cy + arcRadius * Math.sin(ray1AngleRad) }
+			const startPoint = {
+				x: cx + arcRadius * Math.cos(ray2AngleRad),
+				y: cy + arcRadius * Math.sin(ray2AngleRad)
+			}
+			const endPoint = {
+				x: cx + arcRadius * Math.cos(ray1AngleRad),
+				y: cy + arcRadius * Math.sin(ray1AngleRad)
+			}
 
 			const largeArcFlag: 0 | 1 = angleDegrees > 180 ? 1 : 0
 			const sweepFlag: 0 | 1 = 1 // Always draw counter-clockwise for positive angles
@@ -340,12 +397,21 @@ export const generateAngleTypeDiagram: WidgetGenerator<typeof AngleTypeDiagramPr
 	const labelOffset = 16
 	const pointRadius = 4
 
-	function placeLabelNear(point: { x: number; y: number }, baseAngleRad: number, text: string | null) {
+	function placeLabelNear(
+		point: { x: number; y: number },
+		baseAngleRad: number,
+		text: string | null
+	) {
 		if (text === null) {
 			return
 		}
 		const fontPx = 18
-		const { maxWidth: w, height: h } = estimateWrappedTextDimensions(text, Number.POSITIVE_INFINITY, fontPx, 1.2)
+		const { maxWidth: w, height: h } = estimateWrappedTextDimensions(
+			text,
+			Number.POSITIVE_INFINITY,
+			fontPx,
+			1.2
+		)
 		const halfW = w / 2
 		const halfH = h / 2
 		const rectPad = 4
@@ -389,7 +455,13 @@ export const generateAngleTypeDiagram: WidgetGenerator<typeof AngleTypeDiagramPr
 			fontPx,
 			fontWeight: theme.font.weight.bold
 		})
-		placedLabelRects.push({ x: best.x - halfW, y: best.y - halfH, width: w, height: h, pad: rectPad })
+		placedLabelRects.push({
+			x: best.x - halfW,
+			y: best.y - halfH,
+			width: w,
+			height: h,
+			pad: rectPad
+		})
 	}
 
 	// Point 1 (on rotated ray or offset along baseline for full)
@@ -404,12 +476,18 @@ export const generateAngleTypeDiagram: WidgetGenerator<typeof AngleTypeDiagramPr
 	canvas.drawCircle(cx, cy, 4, { fill: theme.colors.black })
 	// Position vertex label to not interfere with the angle
 	const midAngle = ray2AngleRad + angleRadians / 2
-	const vertexDefaultAngle = angleType.type === "full" ? ray2AngleRad - Math.PI / 2 : midAngle + Math.PI
+	const vertexDefaultAngle =
+		angleType.type === "full" ? ray2AngleRad - Math.PI / 2 : midAngle + Math.PI
 	// Vertex label with simple collision-aware adjustment
 	if (labels.vertex !== null) {
 		const fontPx = 18
 		const text = labels.vertex
-		const { maxWidth: w, height: h } = estimateWrappedTextDimensions(text, Number.POSITIVE_INFINITY, fontPx, 1.2)
+		const { maxWidth: w, height: h } = estimateWrappedTextDimensions(
+			text,
+			Number.POSITIVE_INFINITY,
+			fontPx,
+			1.2
+		)
 		const halfW = w / 2
 		const halfH = h / 2
 		let angle = vertexDefaultAngle
@@ -435,7 +513,13 @@ export const generateAngleTypeDiagram: WidgetGenerator<typeof AngleTypeDiagramPr
 		placedLabelRects.push({ x: result.x - halfW, y: result.y - halfH, width: w, height: h, pad: 2 })
 	}
 
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(PADDING)
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}">${svgBody}</svg>`
 }

@@ -30,7 +30,9 @@ export const DiscreteObjectRatioDiagramPropsSchema = z
 	.object({
 		type: z
 			.literal("discreteObjectRatioDiagram")
-			.describe("Identifies this as a discrete object ratio diagram for visualizing ratios with countable objects."),
+			.describe(
+				"Identifies this as a discrete object ratio diagram for visualizing ratios with countable objects."
+			),
 		width: createWidthSchema(),
 		height: createHeightSchema(),
 		objects: z
@@ -59,9 +61,9 @@ export type DiscreteObjectRatioDiagramProps = z.infer<typeof DiscreteObjectRatio
  * of discrete, countable objects. It is perfect for introductory ratio problems where
  * students can directly count the items to understand the relationship.
  */
-export const generateDiscreteObjectRatioDiagram: WidgetGenerator<typeof DiscreteObjectRatioDiagramPropsSchema> = async (
-	data
-) => {
+export const generateDiscreteObjectRatioDiagram: WidgetGenerator<
+	typeof DiscreteObjectRatioDiagramPropsSchema
+> = async (data) => {
 	const { width, height, title } = data
 
 	// Titles float above the chart content area.
@@ -114,7 +116,9 @@ export const generateDiscreteObjectRatioDiagram: WidgetGenerator<typeof Discrete
 	const rowHeight = chartHeight / rowCount
 	const heightBased = rowHeight * 0.8
 	const widthBasedAllRows = Math.min(
-		...data.objects.map((o) => (o.count > 0 ? chartWidth / (o.count * (1 + spacingRatio)) : heightBased))
+		...data.objects.map((o) =>
+			o.count > 0 ? chartWidth / (o.count * (1 + spacingRatio)) : heightBased
+		)
 	)
 	const iconSize = Math.max(12, Math.floor(Math.min(heightBased, widthBasedAllRows)))
 	const iconPadding = Math.floor(iconSize * spacingRatio)

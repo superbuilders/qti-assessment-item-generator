@@ -36,7 +36,9 @@ function createPartitionShapeSchema() {
 			rows: z
 				.number()
 				.int()
-				.describe("Number of rows for rectangle partition (e.g., 3, 4, 2). Ignored for circles. Must be positive."),
+				.describe(
+					"Number of rows for rectangle partition (e.g., 3, 4, 2). Ignored for circles. Must be positive."
+				),
 			columns: z
 				.number()
 				.int()
@@ -66,22 +68,34 @@ function createLineOverlaySchema() {
 					row: z
 						.number()
 						.int()
-						.describe("Starting row index (0-based). For grid intersections, can equal grid rows for bottom edge."),
+						.describe(
+							"Starting row index (0-based). For grid intersections, can equal grid rows for bottom edge."
+						),
 					col: z
 						.number()
 						.int()
-						.describe("Starting column index (0-based). For grid intersections, can equal grid columns for right edge.")
+						.describe(
+							"Starting column index (0-based). For grid intersections, can equal grid columns for right edge."
+						)
 				})
 				.strict(),
 			to: z
 				.object({
-					row: z.number().int().describe("Ending row index (0-based). Creates line from 'from' to this point."),
-					col: z.number().int().describe("Ending column index (0-based). Creates line from 'from' to this point.")
+					row: z
+						.number()
+						.int()
+						.describe("Ending row index (0-based). Creates line from 'from' to this point."),
+					col: z
+						.number()
+						.int()
+						.describe("Ending column index (0-based). Creates line from 'from' to this point.")
 				})
 				.strict(),
 			style: z
 				.enum(["solid", "dashed", "dotted"])
-				.describe("Line style. 'solid' for main divisions, 'dashed' for auxiliary lines, 'dotted' for guidelines."),
+				.describe(
+					"Line style. 'solid' for main divisions, 'dashed' for auxiliary lines, 'dotted' for guidelines."
+				),
 			color: z
 				.string()
 				.regex(CSS_COLOR_PATTERN, "invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)")
@@ -102,11 +116,15 @@ function createFigureSchema() {
 							row: z
 								.number()
 								.int()
-								.describe("Row coordinate of vertex (0-based). Can be fractional for positions between grid lines."),
+								.describe(
+									"Row coordinate of vertex (0-based). Can be fractional for positions between grid lines."
+								),
 							col: z
 								.number()
 								.int()
-								.describe("Column coordinate of vertex (0-based). Can be fractional for positions between grid lines.")
+								.describe(
+									"Column coordinate of vertex (0-based). Can be fractional for positions between grid lines."
+								)
 						})
 						.strict()
 				)
@@ -124,7 +142,9 @@ function createFigureSchema() {
 				.string()
 				.regex(CSS_COLOR_PATTERN, "invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)")
 				.nullable()
-				.describe("Hex-only color for polygon outline (e.g., '#000000', '#00008B'). null for no outline.")
+				.describe(
+					"Hex-only color for polygon outline (e.g., '#000000', '#00008B'). null for no outline."
+				)
 		})
 		.strict()
 }
@@ -136,7 +156,9 @@ export const PartitionedShapePropsSchema = z
 				type: z.literal("partitionedShape").describe("Widget type identifier."),
 				width: createWidthSchema(),
 				height: createHeightSchema(),
-				mode: z.literal("partition").describe("Partition mode: shows shapes divided into equal parts for fractions."),
+				mode: z
+					.literal("partition")
+					.describe("Partition mode: shows shapes divided into equal parts for fractions."),
 				shapes: z
 					.array(createPartitionShapeSchema())
 					.describe(
@@ -159,11 +181,19 @@ export const PartitionedShapePropsSchema = z
 				type: z.literal("partitionedShape").describe("Widget type identifier."),
 				width: createWidthSchema(),
 				height: createHeightSchema(),
-				mode: z.literal("geometry").describe("Geometry mode: shows a coordinate grid with polygons and lines."),
+				mode: z
+					.literal("geometry")
+					.describe("Geometry mode: shows a coordinate grid with polygons and lines."),
 				grid: z
 					.object({
-						rows: z.number().int().describe("Number of grid rows (e.g., 10, 8, 12). Creates horizontal lines."),
-						columns: z.number().int().describe("Number of grid columns (e.g., 10, 12, 8). Creates vertical lines."),
+						rows: z
+							.number()
+							.int()
+							.describe("Number of grid rows (e.g., 10, 8, 12). Creates horizontal lines."),
+						columns: z
+							.number()
+							.int()
+							.describe("Number of grid columns (e.g., 10, 12, 8). Creates vertical lines."),
 						opacity: z
 							.number()
 							.describe(
@@ -216,8 +246,10 @@ const generatePartitionView = (props: PartitionModeProps): string => {
 
 	const rad = (deg: number) => (deg * Math.PI) / 180
 	const gap = 20
-	const totalWidth = layout === "horizontal" ? shapes.length * shapeWidth + (shapes.length - 1) * gap : shapeWidth
-	const totalHeight = layout === "vertical" ? shapes.length * shapeHeight + (shapes.length - 1) * gap : shapeHeight
+	const totalWidth =
+		layout === "horizontal" ? shapes.length * shapeWidth + (shapes.length - 1) * gap : shapeWidth
+	const totalHeight =
+		layout === "vertical" ? shapes.length * shapeHeight + (shapes.length - 1) * gap : shapeHeight
 
 	const canvas = new CanvasImpl({
 		chartArea: { left: 0, top: 0, width: totalWidth, height: totalHeight },
@@ -302,7 +334,11 @@ const generatePartitionView = (props: PartitionModeProps): string => {
 				const x2 = cx + r * Math.cos(endRad)
 				const y2 = cy + r * Math.sin(endRad)
 
-				const sectorPath = new Path2D().moveTo(cx, cy).lineTo(x1, y1).arcTo(r, r, 0, largeArc, 1, x2, y2).closePath()
+				const sectorPath = new Path2D()
+					.moveTo(cx, cy)
+					.lineTo(x1, y1)
+					.arcTo(r, r, 0, largeArc, 1, x2, y2)
+					.closePath()
 
 				if (isHatched) {
 					const cellId = `hatch-circle-${idx}-${i}`
@@ -360,7 +396,13 @@ const generatePartitionView = (props: PartitionModeProps): string => {
 	}
 
 	// NEW: Finalize the canvas and construct the root SVG element
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(PADDING)
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg">${svgBody}</svg>`
 }
@@ -435,13 +477,21 @@ const generateGeometryView = (props: GeometryModeProps): string => {
 	}
 
 	// NEW: Finalize the canvas and construct the root SVG element
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(PADDING)
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg">${svgBody}</svg>`
 }
 
 // MODIFIED: The main generator function is now a switcher
-export const generatePartitionedShape: WidgetGenerator<typeof PartitionedShapePropsSchema> = async (props) => {
+export const generatePartitionedShape: WidgetGenerator<typeof PartitionedShapePropsSchema> = async (
+	props
+) => {
 	switch (props.mode) {
 		case "partition":
 			return generatePartitionView(props)

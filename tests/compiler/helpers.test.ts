@@ -10,6 +10,8 @@ describe("helpers", () => {
 	test("deriveComboIdentifier joins parts with FB__ prefix", () => {
 		expect(deriveComboIdentifier(["RESPONSE_1_A"]).startsWith("FB__")).toBe(true)
 		expect(deriveComboIdentifier(["RESPONSE_1_A"])).toBe("FB__RESPONSE_1_A")
-		expect(deriveComboIdentifier(["RESPONSE_1_A", "RESPONSE_2_CORRECT"])).toBe("FB__RESPONSE_1_A__RESPONSE_2_CORRECT")
+		expect(deriveComboIdentifier(["RESPONSE_1_A", "RESPONSE_2_CORRECT"])).toBe(
+			"FB__RESPONSE_1_A__RESPONSE_2_CORRECT"
+		)
 	})
 })

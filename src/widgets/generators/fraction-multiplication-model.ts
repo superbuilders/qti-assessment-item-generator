@@ -28,7 +28,11 @@ const createBaseFractionModelSchema = () =>
 				})
 			])
 			.describe("The geometric shape and its partitioning style."),
-		totalParts: z.number().int().positive().describe("The total number of equal parts (the denominator)."),
+		totalParts: z
+			.number()
+			.int()
+			.positive()
+			.describe("The total number of equal parts (the denominator)."),
 		shadedParts: z.number().int().min(0).describe("The number of parts to shade (the numerator)."),
 		shadeColor: z
 			.string()
@@ -54,18 +58,26 @@ export const FractionMultiplicationModelPropsSchema = z
 	.object({
 		type: z
 			.literal("fractionMultiplicationModel")
-			.describe("Identifies this as a widget for showing a fraction multiplication equation using visual models."),
+			.describe(
+				"Identifies this as a widget for showing a fraction multiplication equation using visual models."
+			),
 		width: createWidthSchema(),
 		height: createHeightSchema(),
-		leftOperand: createBaseFractionModelSchema().describe("The fraction model on the left side of the equation."),
-		middleTerm: createMiddleTermSchema().describe("The multiplier, which can be a number or a placeholder."),
+		leftOperand: createBaseFractionModelSchema().describe(
+			"The fraction model on the left side of the equation."
+		),
+		middleTerm: createMiddleTermSchema().describe(
+			"The multiplier, which can be a number or a placeholder."
+		),
 		rightOperand: createBaseFractionModelSchema().describe(
 			"The fraction model on the right side of the equation (the product)."
 		)
 	})
 	.strict()
 
-export type FractionMultiplicationModelProps = z.infer<typeof FractionMultiplicationModelPropsSchema>
+export type FractionMultiplicationModelProps = z.infer<
+	typeof FractionMultiplicationModelPropsSchema
+>
 type FractionModel = z.infer<ReturnType<typeof createBaseFractionModelSchema>>
 
 // Helper function to find the intersection of a ray from a center point with a polygon's edge
@@ -99,7 +111,13 @@ function findRayPolygonIntersection(
 /**
  * Internal helper to draw a single fractional model directly onto the canvas at a given location.
  */
-function drawSingleModel(canvas: CanvasImpl, modelProps: FractionModel, cx: number, cy: number, size: number) {
+function drawSingleModel(
+	canvas: CanvasImpl,
+	modelProps: FractionModel,
+	cx: number,
+	cy: number,
+	size: number
+) {
 	const { shape, totalParts, shadedParts, shadeColor } = modelProps
 	const toRad = (deg: number) => (deg * Math.PI) / 180
 
@@ -113,7 +131,9 @@ function drawSingleModel(canvas: CanvasImpl, modelProps: FractionModel, cx: numb
 			for (let i = 0; i < shadedParts; i++) {
 				const row = Math.floor(i / columns)
 				const col = i % columns
-				canvas.drawRect(rectX + col * cellWidth, rectY + row * cellHeight, cellWidth, cellHeight, { fill: shadeColor })
+				canvas.drawRect(rectX + col * cellWidth, rectY + row * cellHeight, cellWidth, cellHeight, {
+					fill: shadeColor
+				})
 			}
 			for (let r = 0; r <= rows; r++) {
 				canvas.drawLine(rectX, rectY + r * cellHeight, rectX + size, rectY + r * cellHeight, {
@@ -243,7 +263,13 @@ function drawSingleModel(canvas: CanvasImpl, modelProps: FractionModel, cx: numb
  * Draw a fraction model, repeating horizontally when shadedParts exceeds totalParts.
  * Each repeated tile uses the same granularity (shape params and totalParts) to ensure consistency.
  */
-function drawModelWithOverflow(canvas: CanvasImpl, modelProps: FractionModel, cx: number, cy: number, size: number) {
+function drawModelWithOverflow(
+	canvas: CanvasImpl,
+	modelProps: FractionModel,
+	cx: number,
+	cy: number,
+	size: number
+) {
 	const repeatCount = Math.max(1, Math.ceil(modelProps.shadedParts / modelProps.totalParts))
 	if (repeatCount === 1) {
 		drawSingleModel(canvas, modelProps, cx, cy, size)
@@ -366,6 +392,12 @@ export const generateFractionMultiplicationModel: WidgetGenerator<
 	const rightCx = currentX + rightWidth / 2
 	drawModelWithOverflow(canvas, rightOperand, rightCx, verticalCenter, modelSize)
 
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(PADDING)
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}">${svgBody}</svg>`
 }

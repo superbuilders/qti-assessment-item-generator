@@ -119,7 +119,9 @@ const AngleArc = z
 
 const AngleRight = z
 	.object({
-		type: z.literal("right").describe("Right angle (90°) visualization using a small square marker at the vertex."),
+		type: z
+			.literal("right")
+			.describe("Right angle (90°) visualization using a small square marker at the vertex."),
 		pointOnFirstRay: z
 			.string()
 			.describe(
@@ -174,8 +176,14 @@ export const AngleDiagramPropsSchema = z
 					.object({
 						from: z
 							.string()
-							.describe("Starting point ID for this ray. Must reference a valid point from the points array."),
-						to: z.string().describe("Ending point ID for this ray. Must reference a valid point from the points array.")
+							.describe(
+								"Starting point ID for this ray. Must reference a valid point from the points array."
+							),
+						to: z
+							.string()
+							.describe(
+								"Ending point ID for this ray. Must reference a valid point from the points array."
+							)
 					})
 					.strict()
 			)
@@ -199,7 +207,9 @@ export type AngleDiagramProps = z.infer<typeof AngleDiagramPropsSchema>
  * Generates a flexible diagram of angles from a set of points and rays.
  * Ideal for a wide range of geometry problems.
  */
-export const generateAngleDiagram: WidgetGenerator<typeof AngleDiagramPropsSchema> = async (props) => {
+export const generateAngleDiagram: WidgetGenerator<typeof AngleDiagramPropsSchema> = async (
+	props
+) => {
 	const { width, height, points, rays, angles } = props
 
 	// Validate that every point is connected to at least one ray
@@ -248,7 +258,8 @@ export const generateAngleDiagram: WidgetGenerator<typeof AngleDiagramPropsSchem
 		const rh = rect.height + 2 * pad
 
 		// Fast reject: if either segment endpoint lies inside the rectangle, we have a collision
-		const pointInsideRect = (p: { x: number; y: number }) => p.x >= rx && p.x <= rx + rw && p.y >= ry && p.y <= ry + rh
+		const pointInsideRect = (p: { x: number; y: number }) =>
+			p.x >= rx && p.x <= rx + rw && p.y >= ry && p.y <= ry + rh
 		if (pointInsideRect(A) || pointInsideRect(B)) return true
 
 		const minX = Math.min(A.x, B.x)
@@ -261,7 +272,11 @@ export const generateAngleDiagram: WidgetGenerator<typeof AngleDiagramPropsSchem
 		const r2 = { x: rx + rw, y: ry }
 		const r3 = { x: rx + rw, y: ry + rh }
 		const r4 = { x: rx, y: ry + rh }
-		const orient = (p: { x: number; y: number }, q: { x: number; y: number }, r: { x: number; y: number }) => {
+		const orient = (
+			p: { x: number; y: number },
+			q: { x: number; y: number },
+			r: { x: number; y: number }
+		) => {
 			const val = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y)
 			if (val > 1e-9) return 1
 			if (val < -1e-9) return -1
@@ -481,17 +496,28 @@ export const generateAngleDiagram: WidgetGenerator<typeof AngleDiagramPropsSchem
 			fontWeight: "500"
 		})
 
-		placedLabelRects.push({ x: chosen.x - halfW, y: chosen.y - halfH, width: dims.maxWidth, height: dims.height })
+		placedLabelRects.push({
+			x: chosen.x - halfW,
+			y: chosen.y - halfH,
+			width: dims.maxWidth,
+			height: dims.height
+		})
 	}
 
 	// Draw points and their labels (drawn last to be on top)
 	for (const point of points) {
 		if (point.shape === "ellipse") {
-			canvas.drawEllipse(point.x, point.y, theme.geometry.pointRadius.base, theme.geometry.pointRadius.base, {
-				fill: theme.colors.black,
-				stroke: theme.colors.black,
-				strokeWidth: theme.stroke.width.thick
-			})
+			canvas.drawEllipse(
+				point.x,
+				point.y,
+				theme.geometry.pointRadius.base,
+				theme.geometry.pointRadius.base,
+				{
+					fill: theme.colors.black,
+					stroke: theme.colors.black,
+					strokeWidth: theme.stroke.width.thick
+				}
+			)
 		} else {
 			canvas.drawCircle(point.x, point.y, theme.geometry.pointRadius.base, {
 				fill: theme.colors.black
@@ -506,7 +532,8 @@ export const generateAngleDiagram: WidgetGenerator<typeof AngleDiagramPropsSchem
 					if (toPoint) connectedAngles.push(Math.atan2(toPoint.y - point.y, toPoint.x - point.x))
 				} else if (ray.to === point.id) {
 					const fromPoint = pointMap.get(ray.from)
-					if (fromPoint) connectedAngles.push(Math.atan2(fromPoint.y - point.y, fromPoint.x - point.x))
+					if (fromPoint)
+						connectedAngles.push(Math.atan2(fromPoint.y - point.y, fromPoint.x - point.x))
 				}
 			}
 
@@ -587,12 +614,23 @@ export const generateAngleDiagram: WidgetGenerator<typeof AngleDiagramPropsSchem
 				fontWeight: theme.font.weight.bold
 			})
 
-			placedLabelRects.push({ x: chosen.x - halfW, y: chosen.y - halfH, width: dims.maxWidth, height: dims.height })
+			placedLabelRects.push({
+				x: chosen.x - halfW,
+				y: chosen.y - halfH,
+				width: dims.maxWidth,
+				height: dims.height
+			})
 		}
 	}
 
 	// NEW: Finalize the canvas and construct the root SVG element
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(PADDING)
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.base}">${svgBody}</svg>`
 }

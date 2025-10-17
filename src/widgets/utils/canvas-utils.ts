@@ -24,7 +24,9 @@ export const createAxisOptionsSchema = () =>
 				.describe('The text title for the axis (e.g., "Number of Days"). Null hides the label.'),
 			min: z.number().describe("The minimum value displayed on the axis."),
 			max: z.number().describe("The maximum value displayed on the axis."),
-			tickInterval: z.number().describe("The numeric interval between labeled tick marks on the axis."),
+			tickInterval: z
+				.number()
+				.describe("The numeric interval between labeled tick marks on the axis."),
 			showGridLines: z.boolean().describe("If true, display grid lines for this axis.")
 		})
 		.strict()
@@ -36,7 +38,11 @@ export type AxisOptions = z.infer<typeof AxisOptionsSchema>
 export const createPlotPointSchema = () =>
 	z
 		.object({
-			id: z.string().describe("A unique identifier for this point, used to reference it when creating polygons."),
+			id: z
+				.string()
+				.describe(
+					"A unique identifier for this point, used to reference it when creating polygons."
+				),
 			x: z.number().describe("The value of the point on the horizontal (X) axis."),
 			y: z.number().describe("The value of the point on the vertical (Y) axis."),
 			label: z.string().describe('A text label to display near the point (e.g., "A", "(m, n)").'),
@@ -157,7 +163,9 @@ export const createDistanceSchema = () =>
 		.object({
 			pointId1: z.string().describe("The ID of the first point."),
 			pointId2: z.string().describe("The ID of the second point."),
-			showLegs: z.boolean().describe("If true, draws the 'rise' and 'run' legs of the right triangle."),
+			showLegs: z
+				.boolean()
+				.describe("If true, draws the 'rise' and 'run' legs of the right triangle."),
 			showLegLabels: z.boolean().describe("If true, labels the legs with their lengths."),
 			hypotenuseLabel: z.string().describe("A label for the hypotenuse (the distance line)."),
 			color: z
@@ -179,7 +187,9 @@ export const createPolylineSchema = () =>
 	z.discriminatedUnion("type", [
 		z
 			.object({
-				type: z.literal("points").describe("Indicates this polyline is defined by explicit points."),
+				type: z
+					.literal("points")
+					.describe("Indicates this polyline is defined by explicit points."),
 				id: z
 					.string()
 					.regex(POLYLINE_ID, "invalid polyline id; must match ^polyline_[A-Za-z0-9_]+$")
@@ -199,12 +209,16 @@ export const createPolylineSchema = () =>
 					.string()
 					.nullable()
 					.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
-					.describe("Optional text label to place near the rendered polyline. Use null for no label.")
+					.describe(
+						"Optional text label to place near the rendered polyline. Use null for no label."
+					)
 			})
 			.strict(),
 		z
 			.object({
-				type: z.literal("function").describe("Indicates this polyline is defined by a polynomial function."),
+				type: z
+					.literal("function")
+					.describe("Indicates this polyline is defined by a polynomial function."),
 				id: z
 					.string()
 					.regex(POLYLINE_ID, "invalid polyline id; must match ^polyline_[A-Za-z0-9_]+$")
@@ -234,7 +248,9 @@ export const createPolylineSchema = () =>
 					.string()
 					.nullable()
 					.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
-					.describe("Optional text label to place near the rendered polyline. Use null for no label.")
+					.describe(
+						"Optional text label to place near the rendered polyline. Use null for no label."
+					)
 			})
 			.strict()
 	])
@@ -361,7 +377,12 @@ export function renderLines(
 				const normalOffset = 14
 
 				const fontPx = theme.font.size.medium
-				const { maxWidth: w, height: h } = estimateWrappedTextDimensions(text, Number.POSITIVE_INFINITY, fontPx, 1.2)
+				const { maxWidth: w, height: h } = estimateWrappedTextDimensions(
+					text,
+					Number.POSITIVE_INFINITY,
+					fontPx,
+					1.2
+				)
 				const halfW = w / 2
 				const halfH = h / 2
 
@@ -375,7 +396,11 @@ export function renderLines(
 					const bot = rect.y + rect.height + pad
 					return lft >= chartLeft && rgt <= chartRight && top >= chartTop && bot <= chartBottom
 				}
-				function orient(p: { x: number; y: number }, q: { x: number; y: number }, r: { x: number; y: number }) {
+				function orient(
+					p: { x: number; y: number },
+					q: { x: number; y: number },
+					r: { x: number; y: number }
+				) {
 					const v = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y)
 					if (v > 1e-9) return 1
 					if (v < -1e-9) return -1
@@ -435,7 +460,10 @@ export function renderLines(
 				const near = distA >= distB ? seg.b : seg.a
 				// Anchor 15% inward from the far endpoint to avoid edges
 				const fracInward = 0.15
-				const farAnchor = { x: far.x + (near.x - far.x) * fracInward, y: far.y + (near.y - far.y) * fracInward }
+				const farAnchor = {
+					x: far.x + (near.x - far.x) * fracInward,
+					y: far.y + (near.y - far.y) * fracInward
+				}
 				const anchors = [farAnchor, midAnchor]
 
 				let chosen: { x: number; y: number; i: number } | null = null
@@ -496,10 +524,17 @@ export function renderLines(
 				}
 				if (!chosen) {
 					// fallback: use the last valid anchor position we found
-					logger.warn("no optimal label placement found, using fallback", { type: "line", id: l.id })
+					logger.warn("no optimal label placement found, using fallback", {
+						type: "line",
+						id: l.id
+					})
 					if (anchors.length > 0) {
 						const fallbackAnchor = anchors[anchors.length - 1]
-						chosen = { x: fallbackAnchor.x + nx * normalOffset, y: fallbackAnchor.y + ny * normalOffset, i: 0 }
+						chosen = {
+							x: fallbackAnchor.x + nx * normalOffset,
+							y: fallbackAnchor.y + ny * normalOffset,
+							i: 0
+						}
 					} else {
 						// ultimate fallback: use line midpoint
 						const midX = (x1Svg + x2Svg) / 2
@@ -517,7 +552,12 @@ export function renderLines(
 						const maxExtra = 120
 						let extra = 0
 						// Choose nudge direction that increases distance from the y-axis
-						const dir: 1 | -1 = yAxisVisible ? ((chosen.x - x0 >= 0 ? 1 : -1) * (tx >= 0 ? 1 : -1) > 0 ? 1 : -1) : 1
+						let dir: 1 | -1 = 1
+						if (yAxisVisible) {
+							const chosenSide = chosen.x - x0 >= 0 ? 1 : -1
+							const tangentSide = tx >= 0 ? 1 : -1
+							dir = chosenSide * tangentSide > 0 ? 1 : -1
+						}
 						while (extra <= maxExtra) {
 							const cx = chosen.x + dir * tx * step
 							const cy = chosen.y + dir * ty * step
@@ -803,7 +843,11 @@ export function renderPolylines(
 						const halfW = w / 2
 						const halfH = h / 2
 
-						function orient(p: { x: number; y: number }, q: { x: number; y: number }, r: { x: number; y: number }) {
+						function orient(
+							p: { x: number; y: number },
+							q: { x: number; y: number },
+							r: { x: number; y: number }
+						) {
 							const v = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y)
 							if (v > 1e-9) return 1
 							if (v < -1e-9) return -1
@@ -825,7 +869,12 @@ export function renderPolylines(
 							rect: { x: number; y: number; width: number; height: number },
 							s: { a: { x: number; y: number }; b: { x: number; y: number } }
 						) {
-							const r = { x1: rect.x, y1: rect.y, x2: rect.x + rect.width, y2: rect.y + rect.height }
+							const r = {
+								x1: rect.x,
+								y1: rect.y,
+								x2: rect.x + rect.width,
+								y2: rect.y + rect.height
+							}
 							const edges = [
 								{ a: { x: r.x1, y: r.y1 }, b: { x: r.x2, y: r.y1 } },
 								{ a: { x: r.x2, y: r.y1 }, b: { x: r.x2, y: r.y2 } },
@@ -863,7 +912,10 @@ export function renderPolylines(
 						}
 						if (!chosen) {
 							// fallback: use the midpoint of the polyline
-							logger.warn("no optimal label placement found, using fallback", { type: "polyline", id: polyline.id })
+							logger.warn("no optimal label placement found, using fallback", {
+								type: "polyline",
+								id: polyline.id
+							})
 							if (polyline.type === "points" && polyline.points.length > 0) {
 								const midIdx = Math.floor(polyline.points.length / 2)
 								const midPoint = polyline.points[midIdx]
@@ -873,7 +925,9 @@ export function renderPolylines(
 							} else {
 								// for function polylines, use the first point with offset
 								const firstPoint =
-									polyline.type === "function" && polyline.xRange ? { x: polyline.xRange.min, y: 0 } : { x: 0, y: 0 }
+									polyline.type === "function" && polyline.xRange
+										? { x: polyline.xRange.min, y: 0 }
+										: { x: 0, y: 0 }
 								chosen = { x: toSvgX(firstPoint.x), y: toSvgY(firstPoint.y) - 20, i: 0 }
 							}
 						}

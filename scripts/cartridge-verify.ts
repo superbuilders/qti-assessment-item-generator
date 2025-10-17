@@ -42,7 +42,10 @@ async function main() {
 	const validation = await validateIntegrity(reader)
 	const integrityMs = performance.now() - startIntegrity
 	if (!validation.ok) {
-		logger.error("integrity validation failed", { issueCount: validation.issues.length, issues: validation.issues })
+		logger.error("integrity validation failed", {
+			issueCount: validation.issues.length,
+			issues: validation.issues
+		})
 		throw errors.new("integrity validation failed")
 	}
 	logger.info("integrity validated", { durationMs: integrityMs.toFixed(2) })
@@ -98,7 +101,8 @@ async function main() {
 						totalQuestions++
 						const xml = await readQuestionXml(reader, q.xml)
 						const jsonData = await readQuestionJson(reader, q.json)
-						const jsonKeys = typeof jsonData === "object" && jsonData !== null ? Object.keys(jsonData) : []
+						const jsonKeys =
+							typeof jsonData === "object" && jsonData !== null ? Object.keys(jsonData) : []
 						logger.debug("question verified", {
 							unitId: unit.id,
 							lessonId: lesson.id,
@@ -130,7 +134,8 @@ async function main() {
 			for (const q of unit.unitTest.questions) {
 				const xml = await readQuestionXml(reader, q.xml)
 				const jsonData = await readQuestionJson(reader, q.json)
-				const jsonKeys = typeof jsonData === "object" && jsonData !== null ? Object.keys(jsonData) : []
+				const jsonKeys =
+					typeof jsonData === "object" && jsonData !== null ? Object.keys(jsonData) : []
 				logger.debug("unit test question verified", {
 					unitId: unit.id,
 					questionNumber: q.number,

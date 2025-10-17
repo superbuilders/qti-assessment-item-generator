@@ -15,19 +15,28 @@ export const WheelDiagramPropsSchema = z
 		type: z.literal("wheelDiagram"),
 		width: createWidthSchema(),
 		height: createHeightSchema(),
-		spokeCount: z.number().int().positive().describe("Total number of spokes (number of equal sectors)."),
+		spokeCount: z
+			.number()
+			.int()
+			.positive()
+			.describe("Total number of spokes (number of equal sectors)."),
 		shadedSectorCount: z
 			.number()
 			.int()
 			.min(0)
 			.describe("Number of contiguous sectors to shade from the top (12 o'clock)."),
-		shadeColor: z.string().regex(CSS_COLOR_PATTERN, "invalid css color").describe("CSS color for shaded sectors.")
+		shadeColor: z
+			.string()
+			.regex(CSS_COLOR_PATTERN, "invalid css color")
+			.describe("CSS color for shaded sectors.")
 	})
 	.strict()
 
 export type WheelDiagramProps = z.infer<typeof WheelDiagramPropsSchema>
 
-export const generateWheelDiagram: WidgetGenerator<typeof WheelDiagramPropsSchema> = async (props) => {
+export const generateWheelDiagram: WidgetGenerator<typeof WheelDiagramPropsSchema> = async (
+	props
+) => {
 	const { width, height, spokeCount, shadedSectorCount, shadeColor } = props
 
 	const canvas = new CanvasImpl({
@@ -44,7 +53,10 @@ export const generateWheelDiagram: WidgetGenerator<typeof WheelDiagramPropsSchem
 
 	// Tire (outer ring)
 	canvas.drawCircle(cx, cy, outerRadius, { fill: theme.colors.black, stroke: "none" })
-	canvas.drawCircle(cx, cy, outerRadius - tireThickness, { fill: theme.colors.background, stroke: "none" })
+	canvas.drawCircle(cx, cy, outerRadius - tireThickness, {
+		fill: theme.colors.background,
+		stroke: "none"
+	})
 
 	const angleStep = (2 * Math.PI) / spokeCount
 	// Colored sectors extend only halfway out from the center
@@ -58,7 +70,10 @@ export const generateWheelDiagram: WidgetGenerator<typeof WheelDiagramPropsSchem
 
 			const path = new Path2D()
 				.moveTo(cx + hubRadius * Math.cos(startAngle), cy + hubRadius * Math.sin(startAngle))
-				.lineTo(cx + shadeOuterRadius * Math.cos(startAngle), cy + shadeOuterRadius * Math.sin(startAngle))
+				.lineTo(
+					cx + shadeOuterRadius * Math.cos(startAngle),
+					cy + shadeOuterRadius * Math.sin(startAngle)
+				)
 				.arcTo(
 					shadeOuterRadius,
 					shadeOuterRadius,
@@ -91,7 +106,10 @@ export const generateWheelDiagram: WidgetGenerator<typeof WheelDiagramPropsSchem
 		const y1 = cy + hubRadius * Math.sin(angle)
 		const x2 = cx + outerRadius * Math.cos(angle)
 		const y2 = cy + outerRadius * Math.sin(angle)
-		canvas.drawLine(x1, y1, x2, y2, { stroke: theme.colors.black, strokeWidth: theme.stroke.width.base })
+		canvas.drawLine(x1, y1, x2, y2, {
+			stroke: theme.colors.black,
+			strokeWidth: theme.stroke.width.base
+		})
 	}
 
 	// Hub
@@ -108,6 +126,12 @@ export const generateWheelDiagram: WidgetGenerator<typeof WheelDiagramPropsSchem
 		strokeWidth: theme.stroke.width.xxthick
 	})
 
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(PADDING)
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}">${svgBody}</svg>`
 }

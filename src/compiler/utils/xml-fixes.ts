@@ -340,7 +340,10 @@ export function fixInequalityOperators(xml: string, logger: logger.Logger): stri
 		// CRITICAL: Skip if this might be inside a qti-value element
 		// Check a wider context to be absolutely sure
 		const startIndex = xmlAfterQtiValueFix.lastIndexOf("<", xmlAfterQtiValueFix.indexOf(fullMatch))
-		const contextBefore = xmlAfterQtiValueFix.substring(Math.max(0, startIndex - 20), startIndex + 20)
+		const contextBefore = xmlAfterQtiValueFix.substring(
+			Math.max(0, startIndex - 20),
+			startIndex + 20
+		)
 		if (contextBefore.includes("qti-value>")) {
 			return fullMatch
 		}

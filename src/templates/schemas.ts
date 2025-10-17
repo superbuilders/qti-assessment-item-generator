@@ -82,7 +82,12 @@ export type NumericValue = z.infer<typeof NumericValueSchema>
 
 // Subset limited to exact rationals (excludes decimal and pi forms)
 export const RationalValueSchema = z
-	.discriminatedUnion("type", [IntegerSchema, PositiveIntegerSchema, FractionSchema, MixedNumberSchema])
+	.discriminatedUnion("type", [
+		IntegerSchema,
+		PositiveIntegerSchema,
+		FractionSchema,
+		MixedNumberSchema
+	])
 	.describe("Exact rational numeric value (integer, positiveInteger, fraction, mixed)")
 
 export type RationalValue = z.infer<typeof RationalValueSchema>

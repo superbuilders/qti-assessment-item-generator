@@ -3,28 +3,36 @@
 	"plugins": [
 		"./gritql/logger-structured-args.grit",
 		"./gritql/no-as-type-assertion.grit",
-		"./gritql/no-new-error.grit",
-		"./gritql/no-try.grit",
 		"./gritql/no-iife.grit",
-		"./gritql/require-logger-before-throw.grit",
-		"./gritql/no-relative-imports.grit"
+		"./gritql/no-new-error.grit",
+		"./gritql/no-relative-imports.grit",
+		"./gritql/no-try.grit",
+		"./gritql/require-logger-before-throw.grit"
 	],
 	"vcs": {
-		"enabled": false,
+		"enabled": true,
 		"clientKind": "git",
-		"useIgnoreFile": false,
-		"defaultBranch": "main"
+		"defaultBranch": "main",
+		"useIgnoreFile": true
 	},
 	"files": {
 		"ignoreUnknown": false,
-		"includes": ["**", "!**/node_modules", "!**/.next", "!**/.expo", "!**/dist", "!**/out", "!**/src/components/ui"],
+		"includes": [
+			"**",
+			"!**/node_modules",
+			"!**/.next",
+			"!**/.expo",
+			"!**/dist",
+			"!**/out",
+			"!**/src/components/ui"
+		],
 		"maxSize": 5000000
 	},
 	"formatter": {
 		"enabled": true,
 		"indentStyle": "tab",
 		"indentWidth": 2,
-		"lineWidth": 120
+		"lineWidth": 100
 	},
 	"assist": { "actions": { "source": { "organizeImports": "on" } } },
 	"linter": {

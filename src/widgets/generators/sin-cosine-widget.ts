@@ -14,7 +14,10 @@ const createPlotConfigSchema = () =>
 	z
 		.object({
 			type: z.enum(["sin", "cos"]).describe("The type of trigonometric function to plot."),
-			color: z.string().regex(CSS_COLOR_PATTERN, "invalid css color").describe("The color of the curve."),
+			color: z
+				.string()
+				.regex(CSS_COLOR_PATTERN, "invalid css color")
+				.describe("The color of the curve."),
 			strokeWidth: z.number().positive().describe("The thickness of the curve in pixels."),
 			style: z.enum(["solid", "dashed"]).describe("The line style for the curve.")
 		})
@@ -26,7 +29,9 @@ const createPlotConfigSchema = () =>
  */
 export const SinCosineWidgetPropsSchema = z
 	.object({
-		type: z.literal("sinCosineWidget").describe("Identifies this as a sine/cosine wave plotting widget."),
+		type: z
+			.literal("sinCosineWidget")
+			.describe("Identifies this as a sine/cosine wave plotting widget."),
 		width: createWidthSchema(),
 		height: createHeightSchema(),
 		xAxis: createAxisOptionsSchema().describe(
@@ -35,8 +40,13 @@ export const SinCosineWidgetPropsSchema = z
 		yAxis: createAxisOptionsSchema().describe(
 			"Configuration for the vertical y-axis (usually representing amplitude)."
 		),
-		plots: z.array(createPlotConfigSchema()).min(1).describe("An array of sine and/or cosine functions to plot."),
-		points: z.array(createPlotPointSchema()).describe("An array of specific points to highlight on the graph.")
+		plots: z
+			.array(createPlotConfigSchema())
+			.min(1)
+			.describe("An array of sine and/or cosine functions to plot."),
+		points: z
+			.array(createPlotPointSchema())
+			.describe("An array of specific points to highlight on the graph.")
 	})
 	.strict()
 
@@ -113,8 +123,10 @@ function setupTrigCoordinatePlane(
 	const chartHeight = height - margin.top - margin.bottom
 
 	// Coordinate transformation functions
-	const toSvgX = (val: number) => margin.left + ((val - xAxis.min) / (xAxis.max - xAxis.min)) * chartWidth
-	const toSvgY = (val: number) => margin.top + chartHeight - ((val - yAxis.min) / (yAxis.max - yAxis.min)) * chartHeight
+	const toSvgX = (val: number) =>
+		margin.left + ((val - xAxis.min) / (xAxis.max - xAxis.min)) * chartWidth
+	const toSvgY = (val: number) =>
+		margin.top + chartHeight - ((val - yAxis.min) / (yAxis.max - yAxis.min)) * chartHeight
 
 	const zeroX = toSvgX(0)
 	const zeroY = toSvgY(0)
@@ -245,7 +257,9 @@ function setupTrigCoordinatePlane(
 	return { toSvgX, toSvgY }
 }
 
-export const generateSinCosineWidget: WidgetGenerator<typeof SinCosineWidgetPropsSchema> = async (props) => {
+export const generateSinCosineWidget: WidgetGenerator<typeof SinCosineWidgetPropsSchema> = async (
+	props
+) => {
 	const { width, height, xAxis, yAxis, plots, points } = props
 
 	const canvas = new CanvasImpl({
@@ -291,7 +305,13 @@ export const generateSinCosineWidget: WidgetGenerator<typeof SinCosineWidgetProp
 	// Draw any highlighted points
 	renderPoints(points, toSvgX, toSvgY, canvas)
 
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(PADDING)
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}">${svgBody}</svg>`
 }

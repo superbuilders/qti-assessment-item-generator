@@ -85,7 +85,10 @@ class ClippedCanvas implements Canvas {
 		this.drawAndCapture(() => this.mainCanvas.drawEllipse(...args))
 	}
 
-	drawPath(path: Parameters<Canvas["drawPath"]>[0], style: Parameters<Canvas["drawPath"]>[1]): void {
+	drawPath(
+		path: Parameters<Canvas["drawPath"]>[0],
+		style: Parameters<Canvas["drawPath"]>[1]
+	): void {
 		this.drawAndCapture(() => this.mainCanvas.drawPath(path, style))
 	}
 
@@ -284,13 +287,18 @@ export class CanvasImpl implements Canvas {
 			logger.error("invalid maxWidth", { maxWidth: opts.maxWidth })
 			throw errors.new("maxWidth must be finite and > 0")
 		}
-		if (opts.lineHeight !== undefined && (!Number.isFinite(opts.lineHeight) || opts.lineHeight <= 0)) {
+		if (
+			opts.lineHeight !== undefined &&
+			(!Number.isFinite(opts.lineHeight) || opts.lineHeight <= 0)
+		) {
 			logger.error("invalid lineHeight", { lineHeight: opts.lineHeight })
 			throw errors.new("lineHeight must be finite and > 0")
 		}
 		if (
 			opts.rotate &&
-			(!Number.isFinite(opts.rotate.angle) || !Number.isFinite(opts.rotate.cx) || !Number.isFinite(opts.rotate.cy))
+			(!Number.isFinite(opts.rotate.angle) ||
+				!Number.isFinite(opts.rotate.cx) ||
+				!Number.isFinite(opts.rotate.cy))
 		) {
 			logger.error("invalid rotate parameters", { rotate: opts.rotate })
 			throw errors.new("rotate.angle, rotate.cx, rotate.cy must be finite numbers")
@@ -452,7 +460,10 @@ export class CanvasImpl implements Canvas {
 			logger.error("invalid fontPx", { fontPx: opts.fontPx })
 			throw errors.new("fontPx must be finite and > 0")
 		}
-		if (opts.lineHeight !== undefined && (!Number.isFinite(opts.lineHeight) || opts.lineHeight <= 0)) {
+		if (
+			opts.lineHeight !== undefined &&
+			(!Number.isFinite(opts.lineHeight) || opts.lineHeight <= 0)
+		) {
 			logger.error("invalid lineHeight", { lineHeight: opts.lineHeight })
 			throw errors.new("lineHeight must be finite and > 0")
 		}
@@ -481,7 +492,9 @@ export class CanvasImpl implements Canvas {
 		// by offsetting the first line upward by half the block height in em units.
 		const totalLines = lines.length
 		const firstLineDyEm =
-			opts.dominantBaseline === "middle" && totalLines > 1 ? -((totalLines - 1) * lineHeight) / 2 : 0
+			opts.dominantBaseline === "middle" && totalLines > 1
+				? -((totalLines - 1) * lineHeight) / 2
+				: 0
 		const tspans = lines
 			.map((line, i) => {
 				const dy = i === 0 ? `${firstLineDyEm}em` : `${lineHeight}em`
@@ -664,7 +677,10 @@ export class CanvasImpl implements Canvas {
 		}
 	): void {
 		// Validate parameters
-		if (style.strokeWidth !== undefined && (!Number.isFinite(style.strokeWidth) || style.strokeWidth < 0)) {
+		if (
+			style.strokeWidth !== undefined &&
+			(!Number.isFinite(style.strokeWidth) || style.strokeWidth < 0)
+		) {
 			logger.error("invalid strokeWidth", { strokeWidth: style.strokeWidth })
 			throw errors.new("strokeWidth must be finite and >= 0")
 		}
@@ -672,7 +688,12 @@ export class CanvasImpl implements Canvas {
 		// Calculate circle bounds with stroke expansion
 		const strokeWidth = style.strokeWidth || 0
 		const expansion = strokeWidth / 2
-		this.updateExtents(cx - r - expansion, cx + r + expansion, cy - r - expansion, cy + r + expansion)
+		this.updateExtents(
+			cx - r - expansion,
+			cx + r + expansion,
+			cy - r - expansion,
+			cy + r + expansion
+		)
 
 		// Build SVG attributes
 		let attrs = `cx="${cx}" cy="${cy}" r="${r}"`
@@ -707,7 +728,10 @@ export class CanvasImpl implements Canvas {
 		}
 	): void {
 		// Validate parameters
-		if (style.strokeWidth !== undefined && (!Number.isFinite(style.strokeWidth) || style.strokeWidth < 0)) {
+		if (
+			style.strokeWidth !== undefined &&
+			(!Number.isFinite(style.strokeWidth) || style.strokeWidth < 0)
+		) {
 			logger.error("invalid strokeWidth", { strokeWidth: style.strokeWidth })
 			throw errors.new("strokeWidth must be finite and >= 0")
 		}
@@ -750,7 +774,10 @@ export class CanvasImpl implements Canvas {
 		}
 	): void {
 		// Validate parameters
-		if (style.strokeWidth !== undefined && (!Number.isFinite(style.strokeWidth) || style.strokeWidth < 0)) {
+		if (
+			style.strokeWidth !== undefined &&
+			(!Number.isFinite(style.strokeWidth) || style.strokeWidth < 0)
+		) {
 			logger.error("invalid strokeWidth", { strokeWidth: style.strokeWidth })
 			throw errors.new("strokeWidth must be finite and >= 0")
 		}
@@ -758,7 +785,12 @@ export class CanvasImpl implements Canvas {
 		// Calculate ellipse bounds with stroke expansion
 		const strokeWidth = style.strokeWidth || 0
 		const expansion = strokeWidth / 2
-		this.updateExtents(cx - rx - expansion, cx + rx + expansion, cy - ry - expansion, cy + ry + expansion)
+		this.updateExtents(
+			cx - rx - expansion,
+			cx + rx + expansion,
+			cy - ry - expansion,
+			cy + ry + expansion
+		)
 
 		// Build SVG attributes
 		let attrs = `cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}"`
@@ -1055,7 +1087,13 @@ export class CanvasImpl implements Canvas {
 		this.svgBody += "</g>"
 	}
 
-	addHatchPattern(opts: { id: string; color: string; strokeWidth: number; spacing?: number; angleDeg?: number }): void {
+	addHatchPattern(opts: {
+		id: string
+		color: string
+		strokeWidth: number
+		spacing?: number
+		angleDeg?: number
+	}): void {
 		const spacing = opts.spacing || 4
 		const angleDeg = opts.angleDeg || 45
 
@@ -1080,7 +1118,9 @@ export class CanvasImpl implements Canvas {
 		if (opts.y2) attrs += ` y2="${opts.y2}"`
 		if (opts.gradientUnits) attrs += ` gradientUnits="${opts.gradientUnits}"`
 
-		const stops = opts.stops.map((stop) => `<stop offset="${stop.offset}" stop-color="${stop.color}"/>`).join("")
+		const stops = opts.stops
+			.map((stop) => `<stop offset="${stop.offset}" stop-color="${stop.color}"/>`)
+			.join("")
 		this.defs += `<linearGradient ${attrs}>${stops}</linearGradient>`
 	}
 
@@ -1102,7 +1142,9 @@ export class CanvasImpl implements Canvas {
 		if (opts.fy) attrs += ` fy="${opts.fy}"`
 		if (opts.gradientUnits) attrs += ` gradientUnits="${opts.gradientUnits}"`
 
-		const stops = opts.stops.map((stop) => `<stop offset="${stop.offset}" stop-color="${stop.color}"/>`).join("")
+		const stops = opts.stops
+			.map((stop) => `<stop offset="${stop.offset}" stop-color="${stop.color}"/>`)
+			.join("")
 		this.defs += `<radialGradient ${attrs}>${stops}</radialGradient>`
 	}
 

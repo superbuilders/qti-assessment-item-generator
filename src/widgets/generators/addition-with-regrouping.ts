@@ -115,9 +115,9 @@ function performAdditionWithRegrouping(addend1: number, addend2: number) {
 /**
  * Generates an HTML representation of an addition problem with optional regrouping visualization
  */
-export const generateAdditionWithRegrouping: WidgetGenerator<typeof AdditionWithRegroupingPropsSchema> = async (
-	data
-) => {
+export const generateAdditionWithRegrouping: WidgetGenerator<
+	typeof AdditionWithRegroupingPropsSchema
+> = async (data) => {
 	const { addend1, addend2, showCarrying, showAnswer, revealUpTo = "complete" } = data
 
 	const result = performAdditionWithRegrouping(addend1, addend2)
@@ -182,7 +182,8 @@ export const generateAdditionWithRegrouping: WidgetGenerator<typeof AdditionWith
 	for (let index = 0; index < addend1Digits.length; index++) {
 		const digit = addend1Digits[index]
 		// Don't show leading zeros for the first addend
-		const isLeadingZero = index < addend1Digits.length - 1 && addend1Digits.slice(0, index + 1).every((d) => d === 0)
+		const isLeadingZero =
+			index < addend1Digits.length - 1 && addend1Digits.slice(0, index + 1).every((d) => d === 0)
 		html += `<td style="padding: 2px 8px;">${isLeadingZero ? "" : String(digit)}</td>`
 	}
 	html += "</tr>"
@@ -199,7 +200,8 @@ export const generateAdditionWithRegrouping: WidgetGenerator<typeof AdditionWith
 	for (let index = 0; index < addend2Digits.length; index++) {
 		const digit = addend2Digits[index]
 		// Don't show leading zeros for the second addend
-		const isLeadingZero = index < addend2Digits.length - 1 && addend2Digits.slice(0, index + 1).every((d) => d === 0)
+		const isLeadingZero =
+			index < addend2Digits.length - 1 && addend2Digits.slice(0, index + 1).every((d) => d === 0)
 		html += `<td style="padding: 2px 8px; border-bottom: 2px solid ${theme.colors.black};">${isLeadingZero ? "" : String(digit)}</td>`
 	}
 	html += "</tr>"

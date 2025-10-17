@@ -23,7 +23,10 @@ function createVectorSchema() {
 					y: z.number().describe("Ending y coordinate")
 				})
 				.describe("Ending point of the vector"),
-			color: z.string().regex(CSS_COLOR_PATTERN, "invalid css color").describe("Color of the vector line and arrow")
+			color: z
+				.string()
+				.regex(CSS_COLOR_PATTERN, "invalid css color")
+				.describe("Color of the vector line and arrow")
 		})
 		.strict()
 }
@@ -41,8 +44,14 @@ function createMarkerSchema() {
 			shape: z
 				.enum(["circle", "square", "rightAngle"])
 				.describe("Shape of the marker - rightAngle creates a 90-degree angle indicator"),
-			size: z.number().positive().describe("Size of the marker in pixels (or side length for rightAngle)"),
-			color: z.string().regex(CSS_COLOR_PATTERN, "invalid css color").describe("Color of the marker")
+			size: z
+				.number()
+				.positive()
+				.describe("Size of the marker in pixels (or side length for rightAngle)"),
+			color: z
+				.string()
+				.regex(CSS_COLOR_PATTERN, "invalid css color")
+				.describe("Color of the marker")
 		})
 		.strict()
 }
@@ -72,7 +81,9 @@ export const VectorDiagramPropsSchema = z
 
 export type VectorDiagramProps = z.infer<typeof VectorDiagramPropsSchema>
 
-export const generateVectorDiagram: WidgetGenerator<typeof VectorDiagramPropsSchema> = async (props) => {
+export const generateVectorDiagram: WidgetGenerator<typeof VectorDiagramPropsSchema> = async (
+	props
+) => {
 	const { width, height, gridSpacing, showGrid, gridColor, vectors, markers } = props
 
 	const canvas = new CanvasImpl({
@@ -110,11 +121,17 @@ export const generateVectorDiagram: WidgetGenerator<typeof VectorDiagramPropsSch
 			})
 		} else if (marker.shape === "square") {
 			const halfSize = marker.size / 2
-			canvas.drawRect(marker.position.x - halfSize, marker.position.y - halfSize, marker.size, marker.size, {
-				fill: marker.color,
-				stroke: marker.color,
-				strokeWidth: 1
-			})
+			canvas.drawRect(
+				marker.position.x - halfSize,
+				marker.position.y - halfSize,
+				marker.size,
+				marker.size,
+				{
+					fill: marker.color,
+					stroke: marker.color,
+					strokeWidth: 1
+				}
+			)
 		} else if (marker.shape === "rightAngle") {
 			// Draw a small square in the upper-right quadrant to indicate 90-degree angle
 			const offset = marker.size / 2
@@ -157,7 +174,13 @@ export const generateVectorDiagram: WidgetGenerator<typeof VectorDiagramPropsSch
 		})
 	}
 
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(PADDING)
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}">${svgBody}</svg>`
 }

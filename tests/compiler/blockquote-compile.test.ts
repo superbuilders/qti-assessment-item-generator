@@ -19,18 +19,31 @@ describe("Compiler: blockquote", () => {
 			],
 			body: [
 				{ type: "paragraph", content: [{ type: "text", content: "Consider this quote:" }] },
-				{ type: "blockquote", content: [{ type: "text", content: "To be or not to be, that is the question." }] }
+				{
+					type: "blockquote",
+					content: [{ type: "text", content: "To be or not to be, that is the question." }]
+				}
 			],
 			widgets: null,
 			interactions: {
-				TE_INT: { type: "textEntryInteraction", responseIdentifier: "RESPONSE_TE", expectedLength: null }
+				TE_INT: {
+					type: "textEntryInteraction",
+					responseIdentifier: "RESPONSE_TE",
+					expectedLength: null
+				}
 			},
 			feedbackPlan: {
 				mode: "combo",
 				dimensions: [{ responseIdentifier: "RESPONSE_TE", kind: "binary" }],
 				combinations: [
-					{ id: "FB__RESPONSE_TE_CORRECT", path: [{ responseIdentifier: "RESPONSE_TE", key: "CORRECT" }] },
-					{ id: "FB__RESPONSE_TE_INCORRECT", path: [{ responseIdentifier: "RESPONSE_TE", key: "INCORRECT" }] }
+					{
+						id: "FB__RESPONSE_TE_CORRECT",
+						path: [{ responseIdentifier: "RESPONSE_TE", key: "CORRECT" }]
+					},
+					{
+						id: "FB__RESPONSE_TE_INCORRECT",
+						path: [{ responseIdentifier: "RESPONSE_TE", key: "INCORRECT" }]
+					}
 				]
 			},
 			feedback: {
@@ -63,7 +76,10 @@ describe("Compiler: blockquote", () => {
 				}
 			],
 			body: [
-				{ type: "blockquote", content: [{ type: "text", content: "Remember to find the common denominator first!" }] }
+				{
+					type: "blockquote",
+					content: [{ type: "text", content: "Remember to find the common denominator first!" }]
+				}
 			],
 			widgets: null,
 			interactions: {
@@ -72,8 +88,14 @@ describe("Compiler: blockquote", () => {
 					responseIdentifier: "RESPONSE",
 					prompt: [{ type: "text", content: "Choose:" }],
 					choices: [
-						{ identifier: "A", content: [{ type: "paragraph", content: [{ type: "text", content: "Option A" }] }] },
-						{ identifier: "B", content: [{ type: "paragraph", content: [{ type: "text", content: "Option B" }] }] }
+						{
+							identifier: "A",
+							content: [{ type: "paragraph", content: [{ type: "text", content: "Option A" }] }]
+						},
+						{
+							identifier: "B",
+							content: [{ type: "paragraph", content: [{ type: "text", content: "Option B" }] }]
+						}
 					],
 					shuffle: true,
 					minChoices: 1,
@@ -84,8 +106,14 @@ describe("Compiler: blockquote", () => {
 				mode: "combo",
 				dimensions: [{ responseIdentifier: "RESPONSE", kind: "binary" }],
 				combinations: [
-					{ id: "FB__RESPONSE_CORRECT", path: [{ responseIdentifier: "RESPONSE", key: "CORRECT" }] },
-					{ id: "FB__RESPONSE_INCORRECT", path: [{ responseIdentifier: "RESPONSE", key: "INCORRECT" }] }
+					{
+						id: "FB__RESPONSE_CORRECT",
+						path: [{ responseIdentifier: "RESPONSE", key: "CORRECT" }]
+					},
+					{
+						id: "FB__RESPONSE_INCORRECT",
+						path: [{ responseIdentifier: "RESPONSE", key: "INCORRECT" }]
+					}
 				]
 			},
 			feedback: {

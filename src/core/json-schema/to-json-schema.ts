@@ -59,7 +59,8 @@ function stripPropertyNames(node: z.core.JSONSchema._JSONSchema): void {
 	}
 
 	const addl = node.additionalProperties
-	if (addl !== undefined && addl !== true && addl !== false && isRecord(addl)) stripPropertyNames(addl)
+	if (addl !== undefined && addl !== true && addl !== false && isRecord(addl))
+		stripPropertyNames(addl)
 
 	const defs = node.definitions
 	if (isRecord(defs)) {
@@ -120,7 +121,8 @@ function ensureEmptyProperties(node: BaseSchema): void {
 	}
 
 	// Recurse into not
-	if (node.not && typeof node.not === "object" && !Array.isArray(node.not)) ensureEmptyProperties(node.not)
+	if (node.not && typeof node.not === "object" && !Array.isArray(node.not))
+		ensureEmptyProperties(node.not)
 
 	// Recurse into additionalProperties when it is a schema
 	if (node.additionalProperties && typeof node.additionalProperties === "object") {

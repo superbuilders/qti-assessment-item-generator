@@ -17,8 +17,13 @@ function createPointSchema() {
 
 function createSegmentSchema() {
 	return z.object({
-		points: z.array(createPointSchema()).describe("An array of {x, y} points that define this segment of the curve."),
-		color: z.string().regex(CSS_COLOR_PATTERN, "invalid css color").describe("The color of this line segment."),
+		points: z
+			.array(createPointSchema())
+			.describe("An array of {x, y} points that define this segment of the curve."),
+		color: z
+			.string()
+			.regex(CSS_COLOR_PATTERN, "invalid css color")
+			.describe("The color of this line segment."),
 		label: z.string().describe("The text label for this segment to be displayed in the legend.")
 	})
 }
@@ -29,8 +34,14 @@ export const PopulationChangeEventGraphPropsSchema = z
 		width: createWidthSchema(),
 		height: createHeightSchema(),
 		xAxisLabel: z.string().describe("The label for the horizontal axis (e.g., 'Time')."),
-		yAxisLabel: z.string().describe("The label for the vertical axis (e.g., 'Deer population size')."),
-		xAxisMin: z.number().describe("The minimum value for the x-axis. This should typically be 0 for time-based data."),
+		yAxisLabel: z
+			.string()
+			.describe("The label for the vertical axis (e.g., 'Deer population size')."),
+		xAxisMin: z
+			.number()
+			.describe(
+				"The minimum value for the x-axis. This should typically be 0 for time-based data."
+			),
 		xAxisMax: z
 			.number()
 			.describe(
@@ -46,9 +57,15 @@ export const PopulationChangeEventGraphPropsSchema = z
 			.describe(
 				"The maximum value for the y-axis. CRITICAL: Keep this consistent across all related graphs for meaningful comparison. Choose a value that accommodates all data points with some padding."
 			),
-		beforeSegment: createSegmentSchema().describe("The data and style for the 'before' period, drawn as a solid line."),
-		afterSegment: createSegmentSchema().describe("The data and style for the 'after' period, drawn as a dashed line."),
-		showLegend: z.boolean().describe("If true, a legend is displayed to identify the line segments.")
+		beforeSegment: createSegmentSchema().describe(
+			"The data and style for the 'before' period, drawn as a solid line."
+		),
+		afterSegment: createSegmentSchema().describe(
+			"The data and style for the 'after' period, drawn as a dashed line."
+		),
+		showLegend: z
+			.boolean()
+			.describe("If true, a legend is displayed to identify the line segments.")
 	})
 	.strict()
 	.describe(
@@ -57,9 +74,9 @@ export const PopulationChangeEventGraphPropsSchema = z
 
 export type PopulationChangeEventGraphProps = z.infer<typeof PopulationChangeEventGraphPropsSchema>
 
-export const generatePopulationChangeEventGraph: WidgetGenerator<typeof PopulationChangeEventGraphPropsSchema> = async (
-	props
-) => {
+export const generatePopulationChangeEventGraph: WidgetGenerator<
+	typeof PopulationChangeEventGraphPropsSchema
+> = async (props) => {
 	const {
 		width,
 		height,
@@ -190,7 +207,13 @@ export const generatePopulationChangeEventGraph: WidgetGenerator<typeof Populati
 	}
 
 	// NEW: Finalize the canvas and construct the root SVG element
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(AXIS_VIEWBOX_PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(AXIS_VIEWBOX_PADDING)
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.large}">${svgBody}</svg>`
 }

@@ -10,8 +10,14 @@ const createMarbleColorGroupSchema = () =>
 			color: z
 				.string()
 				.regex(CSS_COLOR_PATTERN, "invalid css color")
-				.describe("CSS color for the marbles in this group (e.g., '#5B8DEF', 'red', 'rgba(208,2,27,1)')"),
-			count: z.number().int().positive().describe("Number of marbles in this color group (positive integer).")
+				.describe(
+					"CSS color for the marbles in this group (e.g., '#5B8DEF', 'red', 'rgba(208,2,27,1)')"
+				),
+			count: z
+				.number()
+				.int()
+				.positive()
+				.describe("Number of marbles in this color group (positive integer).")
 		})
 		.strict()
 
@@ -32,7 +38,9 @@ export const MarbleDiagramPropsSchema = z
 
 export type MarbleDiagramProps = z.infer<typeof MarbleDiagramPropsSchema>
 
-export const generateMarbleDiagram: WidgetGenerator<typeof MarbleDiagramPropsSchema> = async (props) => {
+export const generateMarbleDiagram: WidgetGenerator<typeof MarbleDiagramPropsSchema> = async (
+	props
+) => {
 	const { groups } = props
 	const total = groups.reduce((sum, g) => sum + g.count, 0)
 	if (total === 0) {

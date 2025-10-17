@@ -27,7 +27,11 @@ export const HistogramPropsSchema = z
 			.describe("Identifies this as a histogram widget for displaying frequency distributions."),
 		width: createWidthSchema(),
 		height: createHeightSchema(),
-		title: z.string().describe("Title displayed above the histogram (e.g., 'Test Score Distribution', 'Age Groups')."),
+		title: z
+			.string()
+			.describe(
+				"Title displayed above the histogram (e.g., 'Test Score Distribution', 'Age Groups')."
+			),
 		xAxis: z
 			.object({
 				label: z
@@ -202,7 +206,13 @@ export const generateHistogram: WidgetGenerator<typeof HistogramPropsSchema> = a
 	})
 
 	// NEW: Finalize the canvas and construct the root SVG element
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(AXIS_VIEWBOX_PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(AXIS_VIEWBOX_PADDING)
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.base}">${svgBody}</svg>`
 }

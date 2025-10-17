@@ -16,7 +16,9 @@ export const UrlImageWidgetPropsSchema = z
 				/^https:\/\/.+\.(?:svg|png|jpe?g|gif)$/,
 				"url must start with https:// and end with .svg, .png, .jpg, .jpeg, or .gif"
 			)
-			.describe("The direct HTTPS URL to the image resource (must end with .svg, .png, .jpg, .jpeg, or .gif)."),
+			.describe(
+				"The direct HTTPS URL to the image resource (must end with .svg, .png, .jpg, .jpeg, or .gif)."
+			),
 		alt: z
 			.string()
 			.describe(
@@ -44,7 +46,9 @@ export const UrlImageWidgetPropsSchema = z
 		"Static image widget rendered from a direct HTTPS URL. Use 'alt' for accessibility, optional 'width'/'height' for sizing, 'caption' for descriptive figure text, and 'attribution' for source/credit/licensing. Keep captions strictly descriptive; place any credits or licensing details in 'attribution'."
 	)
 
-export const generateUrlImage: WidgetGenerator<typeof UrlImageWidgetPropsSchema> = async (props) => {
+export const generateUrlImage: WidgetGenerator<typeof UrlImageWidgetPropsSchema> = async (
+	props
+) => {
 	const { url, alt, width, height, caption: _caption } = props
 	// Temporarily disable caption rendering: we deliberately do not render captions right now.
 	// We still accept the field in the schema, but force it to be ignored at generation time
@@ -84,14 +88,21 @@ export const generateUrlImage: WidgetGenerator<typeof UrlImageWidgetPropsSchema>
 	}
 
 	const containerStyles = "display: inline-block; text-align: center;"
-	const imgStyles = ["display: block;", width ? `width: ${width}px;` : "", height ? `height: ${height}px;` : ""]
+	const imgStyles = [
+		"display: block;",
+		width ? `width: ${width}px;` : "",
+		height ? `height: ${height}px;` : ""
+	]
 		.filter(Boolean)
 		.join(" ")
 	const captionStyles = `font-size: 0.9em; color: ${theme.colors.text}; margin-top: 8px;`
 
 	// Escape helpers for XML contexts
 	const escapeXmlText = (text: string): string =>
-		sanitizeXmlAttributeValue(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+		sanitizeXmlAttributeValue(text)
+			.replace(/&/g, "&amp;")
+			.replace(/</g, "&lt;")
+			.replace(/>/g, "&gt;")
 
 	const sanitizedAlt = stripMarkdownToPlaintext(alt)
 	const normalizedAlt = stripWrappingDelimiters(sanitizedAlt)

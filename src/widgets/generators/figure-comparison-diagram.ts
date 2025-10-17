@@ -96,7 +96,9 @@ export const FigureComparisonDiagramPropsSchema = z
 	.object({
 		type: z
 			.literal("figureComparisonDiagram")
-			.describe("Identifies this as a figure comparison diagram for displaying multiple polygons side by side."),
+			.describe(
+				"Identifies this as a figure comparison diagram for displaying multiple polygons side by side."
+			),
 		width: createWidthSchema(),
 		height: createHeightSchema(),
 		figures: z
@@ -127,9 +129,9 @@ export type FigureComparisonDiagramProps = z.infer<typeof FigureComparisonDiagra
  * Generates diagrams for comparing multiple independent geometric figures.
  * Perfect for scale copies, similarity problems, and geometric comparisons.
  */
-export const generateFigureComparisonDiagram: WidgetGenerator<typeof FigureComparisonDiagramPropsSchema> = async (
-	data
-) => {
+export const generateFigureComparisonDiagram: WidgetGenerator<
+	typeof FigureComparisonDiagramPropsSchema
+> = async (data) => {
 	const { width, height, figures, layout, spacing } = data
 
 	if (figures.length === 0) return `<svg width="${width}" height="${height}" />`
@@ -301,8 +303,10 @@ export const generateFigureComparisonDiagram: WidgetGenerator<typeof FigureCompa
 				normalY = edgeDx / edgeLen
 			}
 
-			const polyCenterX = transformedVertices.reduce((sum, v) => sum + v.x, 0) / transformedVertices.length
-			const polyCenterY = transformedVertices.reduce((sum, v) => sum + v.y, 0) / transformedVertices.length
+			const polyCenterX =
+				transformedVertices.reduce((sum, v) => sum + v.x, 0) / transformedVertices.length
+			const polyCenterY =
+				transformedVertices.reduce((sum, v) => sum + v.y, 0) / transformedVertices.length
 			// Use edge midpoint for initial candidate placement
 			const midX = (projectedFrom.x + projectedTo.x) / 2
 			const midY = (projectedFrom.y + projectedTo.y) / 2
@@ -393,7 +397,8 @@ export const generateFigureComparisonDiagram: WidgetGenerator<typeof FigureCompa
 		// Add clearance for external side labels to avoid overlap with the figure label.
 		// This pushes the figure label further out if side labels are present and positioned externally.
 		const hasExternalSideLabels =
-			figure.sideLabels.some((l) => typeof l === "string" && l.trim() !== "") && figure.sideLabelOffset > 0
+			figure.sideLabels.some((l) => typeof l === "string" && l.trim() !== "") &&
+			figure.sideLabelOffset > 0
 		const clearance = hasExternalSideLabels ? figure.sideLabelOffset + 20 : 0 // Increased buffer to 20px to account for font sizes.
 
 		switch (figure.figureLabel.position) {
@@ -499,7 +504,13 @@ export const generateFigureComparisonDiagram: WidgetGenerator<typeof FigureCompa
 	}
 
 	// Finalize the canvas and construct the root SVG element
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(PADDING)
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}">${svgBody}</svg>`
 }
@@ -590,8 +601,10 @@ function collectFigureGeometry(
 		const normalY = dx / length
 
 		// Determine outward direction
-		const centerX = transformedVertices.reduce((sum, v) => sum + v.x, 0) / transformedVertices.length
-		const centerY = transformedVertices.reduce((sum, v) => sum + v.y, 0) / transformedVertices.length
+		const centerX =
+			transformedVertices.reduce((sum, v) => sum + v.x, 0) / transformedVertices.length
+		const centerY =
+			transformedVertices.reduce((sum, v) => sum + v.y, 0) / transformedVertices.length
 		const toCenterX = centerX - midX
 		const toCenterY = centerY - midY
 		const dotProduct = normalX * toCenterX + normalY * toCenterY
@@ -630,7 +643,8 @@ function collectFigureGeometry(
 	// Add clearance for external side labels to avoid overlap with the figure label.
 	// This pushes the figure label further out if side labels are present and positioned externally.
 	const hasExternalSideLabels =
-		figure.sideLabels.some((l) => typeof l === "string" && l.trim() !== "") && figure.sideLabelOffset > 0
+		figure.sideLabels.some((l) => typeof l === "string" && l.trim() !== "") &&
+		figure.sideLabelOffset > 0
 	const clearance = hasExternalSideLabels ? figure.sideLabelOffset + 20 : 0 // Increased buffer to 20px to account for font sizes.
 
 	switch (figure.figureLabel.position) {
@@ -743,7 +757,14 @@ function polygonIntersectsRect(
 	return false
 }
 
-function pointInRect(x: number, y: number, rx: number, ry: number, rw: number, rh: number): boolean {
+function pointInRect(
+	x: number,
+	y: number,
+	rx: number,
+	ry: number,
+	rw: number,
+	rh: number
+): boolean {
 	return x >= rx && x <= rx + rw && y >= ry && y <= ry + rh
 }
 
@@ -753,15 +774,26 @@ function segmentsIntersect(
 	p3: { x: number; y: number },
 	p4: { x: number; y: number }
 ): boolean {
-	function orientation(a: { x: number; y: number }, b: { x: number; y: number }, c: { x: number; y: number }): number {
+	function orientation(
+		a: { x: number; y: number },
+		b: { x: number; y: number },
+		c: { x: number; y: number }
+	): number {
 		const val = (b.y - a.y) * (c.x - b.x) - (b.x - a.x) * (c.y - b.y)
 		if (val > 0) return 1
 		if (val < 0) return -1
 		return 0
 	}
-	function onSegment(a: { x: number; y: number }, b: { x: number; y: number }, c: { x: number; y: number }): boolean {
+	function onSegment(
+		a: { x: number; y: number },
+		b: { x: number; y: number },
+		c: { x: number; y: number }
+	): boolean {
 		return (
-			Math.min(a.x, c.x) <= b.x && b.x <= Math.max(a.x, c.x) && Math.min(a.y, c.y) <= b.y && b.y <= Math.max(a.y, c.y)
+			Math.min(a.x, c.x) <= b.x &&
+			b.x <= Math.max(a.x, c.x) &&
+			Math.min(a.y, c.y) <= b.y &&
+			b.y <= Math.max(a.y, c.y)
 		)
 	}
 	const o1 = orientation(p1, p2, p3)
@@ -777,7 +809,10 @@ function segmentsIntersect(
 	return false
 }
 
-function pointInPolygon(point: { x: number; y: number }, polygon: Array<{ x: number; y: number }>): boolean {
+function pointInPolygon(
+	point: { x: number; y: number },
+	polygon: Array<{ x: number; y: number }>
+): boolean {
 	if (polygon.length < 3) return false
 	let inside = false
 	for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
@@ -788,7 +823,8 @@ function pointInPolygon(point: { x: number; y: number }, polygon: Array<{ x: num
 		const yi = pi.y
 		const xj = pj.x
 		const yj = pj.y
-		const intersect = yi > point.y !== yj > point.y && point.x < ((xj - xi) * (point.y - yi)) / (yj - yi) + xi
+		const intersect =
+			yi > point.y !== yj > point.y && point.x < ((xj - xi) * (point.y - yi)) / (yj - yi) + xi
 		if (intersect) inside = !inside
 	}
 	return inside

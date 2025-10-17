@@ -101,7 +101,10 @@ export function computeAndRenderYAxis(
 	if (!isCategorical) {
 		if (spec.domain.min >= spec.domain.max) {
 			logger.error("invalid y-axis domain", { domain: spec.domain })
-			throw errors.wrap(ErrInvalidAxisDomain, `y-axis min ${spec.domain.min} must be less than max ${spec.domain.max}`)
+			throw errors.wrap(
+				ErrInvalidAxisDomain,
+				`y-axis min ${spec.domain.min} must be less than max ${spec.domain.max}`
+			)
 		}
 		if (spec.tickInterval <= 0) {
 			logger.error("invalid y-axis tick interval", {
@@ -373,7 +376,8 @@ export function computeAndRenderXAxis(
 		}
 	}
 
-	const xAxisLabelY = axisY + TICK_LENGTH_PX + TICK_LABEL_PADDING_PX + TICK_LABEL_FONT_PX + X_AXIS_TITLE_PADDING_PX
+	const xAxisLabelY =
+		axisY + TICK_LENGTH_PX + TICK_LABEL_PADDING_PX + TICK_LABEL_FONT_PX + X_AXIS_TITLE_PADDING_PX
 	canvas.drawWrappedText({
 		x: chartArea.left + chartArea.width / 2,
 		y: xAxisLabelY,

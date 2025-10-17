@@ -47,7 +47,11 @@ const createAnchorSchema = () =>
 		z
 			.object({
 				type: z.literal("edgeMidpoint"),
-				a: z.number().int().min(0).describe("Index of the first vertex that defines one endpoint of the edge."),
+				a: z
+					.number()
+					.int()
+					.min(0)
+					.describe("Index of the first vertex that defines one endpoint of the edge."),
 				b: z
 					.number()
 					.int()
@@ -63,12 +67,18 @@ const createAnchorSchema = () =>
 		z
 			.object({
 				type: z.literal("edgePoint"),
-				a: z.number().int().min(0).describe("Index of the first vertex defining the edge's starting point."),
+				a: z
+					.number()
+					.int()
+					.min(0)
+					.describe("Index of the first vertex defining the edge's starting point."),
 				b: z
 					.number()
 					.int()
 					.min(0)
-					.describe("Index of the second vertex defining the edge's ending point. Must be different from 'a'."),
+					.describe(
+						"Index of the second vertex defining the edge's ending point. Must be different from 'a'."
+					),
 				t: z
 					.number()
 					.min(0)
@@ -119,7 +129,9 @@ const AngleMarker = z
 	.object({
 		type: z
 			.literal("right")
-			.describe("Marker type identifier. Currently only 'right' is supported for right-angle square markers."),
+			.describe(
+				"Marker type identifier. Currently only 'right' is supported for right-angle square markers."
+			),
 		at: createAnchorSchema().describe(
 			"The anchor point where the angle marker will be positioned. This is the vertex of the angle."
 		),
@@ -181,29 +193,41 @@ const Diagonal = z
 		toVertexIndex: z
 			.number()
 			.int()
-			.describe("Ending vertex index (0-based) for the diagonal. Must be different from fromVertexIndex."),
+			.describe(
+				"Ending vertex index (0-based) for the diagonal. Must be different from fromVertexIndex."
+			),
 		label: z
 			.string()
 			.nullable()
 			.transform((val) => (val === "null" || val === "NULL" || val === "" ? null : val))
-			.describe("Text label for the diagonal's length (e.g., '12.7 cm', 'd = 15', '√50', null). Null means no label.")
+			.describe(
+				"Text label for the diagonal's length (e.g., '12.7 cm', 'd = 15', '√50', null). Null means no label."
+			)
 	})
 	.strict()
 
 // The main Zod schema for the polyhedronDiagram function
 export const PolyhedronDiagramPropsSchema = z
 	.object({
-		type: z.literal("polyhedronDiagram").describe("Identifies this as a 3D polyhedron diagram widget."),
+		type: z
+			.literal("polyhedronDiagram")
+			.describe("Identifies this as a 3D polyhedron diagram widget."),
 		width: createWidthSchema(),
 		height: createHeightSchema(),
 		shape: z
 			.discriminatedUnion("type", [
 				RectangularPrismDataSchema.describe("A box-shaped prism with rectangular faces."),
 				TriangularPrismDataSchema.describe("A prism with triangular bases and rectangular sides."),
-				RectangularPyramidDataSchema.describe("A pyramid with a rectangular base and triangular faces."),
-				TriangularPyramidDataSchema.describe("A pyramid with a triangular base (tetrahedron when regular).")
+				RectangularPyramidDataSchema.describe(
+					"A pyramid with a rectangular base and triangular faces."
+				),
+				TriangularPyramidDataSchema.describe(
+					"A pyramid with a triangular base (tetrahedron when regular)."
+				)
 			])
-			.describe("The specific 3D shape to render with its dimensions. Each type has different dimension requirements."),
+			.describe(
+				"The specific 3D shape to render with its dimensions. Each type has different dimension requirements."
+			),
 		labels: z
 			.array(DimensionLabel)
 			.describe(
@@ -251,8 +275,20 @@ export type PolyhedronDiagramProps = z.infer<typeof PolyhedronDiagramPropsSchema
  * polyhedra with flat faces, such as prisms and pyramids. It renders the shapes in a
  * standard isometric or perspective view to provide depth perception.
  */
-export const generatePolyhedronDiagram: WidgetGenerator<typeof PolyhedronDiagramPropsSchema> = async (data) => {
-	const { width, height, shape, labels, diagonals, segments, angleMarkers, shadedFace, showHiddenEdges } = data
+export const generatePolyhedronDiagram: WidgetGenerator<
+	typeof PolyhedronDiagramPropsSchema
+> = async (data) => {
+	const {
+		width,
+		height,
+		shape,
+		labels,
+		diagonals,
+		segments,
+		angleMarkers,
+		shadedFace,
+		showHiddenEdges
+	} = data
 
 	const canvas = new CanvasImpl({
 		chartArea: { left: 0, top: 0, width, height },
@@ -268,7 +304,10 @@ export const generatePolyhedronDiagram: WidgetGenerator<typeof PolyhedronDiagram
 		const maxY = Math.max(...points.map((p) => p.y))
 		const rawW = maxX - minX
 		const rawH = maxY - minY
-		const scale = Math.min((width - 2 * PADDING) / (rawW || 1), (height - 2 * PADDING) / (rawH || 1))
+		const scale = Math.min(
+			(width - 2 * PADDING) / (rawW || 1),
+			(height - 2 * PADDING) / (rawH || 1)
+		)
 		const offsetX = (width - scale * rawW) / 2 - scale * minX
 		const offsetY = (height - scale * rawH) / 2 - scale * minY
 		const project = (p: { x: number; y: number }) => ({
@@ -938,7 +977,13 @@ export const generatePolyhedronDiagram: WidgetGenerator<typeof PolyhedronDiagram
 		}
 	}
 	// Final assembly with dynamic width
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(PADDING)
 	const viewBox = `${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}`
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${viewBox}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.base}">${svgBody}</svg>`
 }

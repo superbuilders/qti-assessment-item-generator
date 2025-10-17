@@ -170,7 +170,8 @@ export const generateBarChart: WidgetGenerator<typeof BarChartPropsSchema> = asy
 		chartData.forEach((d, i) => {
 			const xCenter = baseInfo.toSvgX(i)
 			const barX = xCenter - innerBarWidth / 2
-			const barHeight = ((d.value - yAxis.min) / (yAxis.max - yAxis.min)) * baseInfo.chartArea.height
+			const barHeight =
+				((d.value - yAxis.min) / (yAxis.max - yAxis.min)) * baseInfo.chartArea.height
 			const y = baseInfo.chartArea.top + baseInfo.chartArea.height - barHeight
 
 			if (d.state === "normal") {
@@ -189,7 +190,13 @@ export const generateBarChart: WidgetGenerator<typeof BarChartPropsSchema> = asy
 	})
 
 	// NEW: Finalize the canvas and construct the root SVG element.
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(AXIS_VIEWBOX_PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(AXIS_VIEWBOX_PADDING)
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.base}">${svgBody}</svg>`
 }

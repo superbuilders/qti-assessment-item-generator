@@ -23,7 +23,10 @@ export const ResourceQuizSchema = z
 	})
 	.strict()
 
-export const ResourceSchema = z.discriminatedUnion("type", [ResourceArticleSchema, ResourceQuizSchema])
+export const ResourceSchema = z.discriminatedUnion("type", [
+	ResourceArticleSchema,
+	ResourceQuizSchema
+])
 
 export const LessonSchema = z
 	.object({
@@ -60,7 +63,9 @@ export const UnitSchema = z
 			})
 			.strict()
 			.optional(),
-		counts: z.object({ lessonCount: z.number(), resourceCount: z.number(), questionCount: z.number() }).strict()
+		counts: z
+			.object({ lessonCount: z.number(), resourceCount: z.number(), questionCount: z.number() })
+			.strict()
 	})
 	.strict()
 
@@ -68,7 +73,9 @@ export const IndexV1Schema = z
 	.object({
 		version: z.literal(1),
 		generatedAt: z.string(),
-		generator: z.object({ name: z.string(), version: z.string(), commit: z.string().optional() }).strict(),
+		generator: z
+			.object({ name: z.string(), version: z.string(), commit: z.string().optional() })
+			.strict(),
 		course: z.object({ title: z.string(), subject: z.string() }).strict(),
 		units: z.array(
 			z

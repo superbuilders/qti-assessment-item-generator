@@ -34,7 +34,9 @@ const Node = z
 					)
 			})
 			.strict()
-			.describe("Exact position for the node center. No automatic layout - positions must be explicitly calculated."),
+			.describe(
+				"Exact position for the node center. No automatic layout - positions must be explicitly calculated."
+			),
 		style: z
 			.enum(["circled", "default"])
 			.describe(
@@ -76,7 +78,9 @@ export const TreeDiagramPropsSchema = z
 	.object({
 		type: z
 			.literal("treeDiagram")
-			.describe("Identifies this as a tree diagram widget for hierarchical structures and decision trees."),
+			.describe(
+				"Identifies this as a tree diagram widget for hierarchical structures and decision trees."
+			),
 		width: createWidthSchema(),
 		height: createHeightSchema(),
 		nodes: z
@@ -113,7 +117,9 @@ export type TreeDiagramProps = z.infer<typeof TreeDiagramPropsSchema>
  * Generates a flexible SVG tree diagram from a set of nodes and edges.
  * Ideal for factor trees, probability trees, and other hierarchical structures.
  */
-export const generateTreeDiagram: WidgetGenerator<typeof TreeDiagramPropsSchema> = async (props) => {
+export const generateTreeDiagram: WidgetGenerator<typeof TreeDiagramPropsSchema> = async (
+	props
+) => {
 	const { width, height, nodes, edges, nodeFontSize, nodeRadius } = props
 
 	const canvas = new CanvasImpl({
@@ -137,11 +143,17 @@ export const generateTreeDiagram: WidgetGenerator<typeof TreeDiagramPropsSchema>
 		if (!fromNode || !toNode) continue
 
 		const dash = edge.style === "dashed" ? "5 3" : undefined
-		canvas.drawLine(fromNode.position.x, fromNode.position.y, toNode.position.x, toNode.position.y, {
-			stroke: theme.colors.black,
-			strokeWidth: theme.stroke.width.thick,
-			dash: dash
-		})
+		canvas.drawLine(
+			fromNode.position.x,
+			fromNode.position.y,
+			toNode.position.x,
+			toNode.position.y,
+			{
+				stroke: theme.colors.black,
+				strokeWidth: theme.stroke.width.thick,
+				dash: dash
+			}
+		)
 	}
 
 	// 2. Draw Nodes (on top of edges)
@@ -175,7 +187,13 @@ export const generateTreeDiagram: WidgetGenerator<typeof TreeDiagramPropsSchema>
 	}
 
 	// NEW: Finalize the canvas and construct the root SVG element
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(PADDING)
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}">${svgBody}</svg>`
 }

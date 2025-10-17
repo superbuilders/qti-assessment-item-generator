@@ -13,10 +13,16 @@ import { buildTicks } from "../utils/ticks"
 // Additional overlays to subsume fraction-number-line without adding new tick modes
 const Segment = z
 	.object({
-		start: z.number().describe("Starting value of the highlighted segment along the axis. Must lie within [min, max]."),
+		start: z
+			.number()
+			.describe(
+				"Starting value of the highlighted segment along the axis. Must lie within [min, max]."
+			),
 		end: z
 			.number()
-			.describe("Ending value of the highlighted segment along the axis. Must lie within [min, max] and >= start."),
+			.describe(
+				"Ending value of the highlighted segment along the axis. Must lie within [min, max] and >= start."
+			),
 		color: z
 			.string()
 			.regex(CSS_COLOR_PATTERN, "invalid css color")
@@ -31,19 +37,28 @@ const ModelCellGroup = z
 			.int()
 			.positive()
 			.describe("Number of consecutive cells in this group. Sum across groups equals totalCells."),
-		color: z.string().regex(CSS_COLOR_PATTERN, "invalid css color").describe("CSS fill color for cells in this group.")
+		color: z
+			.string()
+			.regex(CSS_COLOR_PATTERN, "invalid css color")
+			.describe("CSS fill color for cells in this group.")
 	})
 	.strict()
 
 const Model = z
 	.object({
-		totalCells: z.number().int().positive().describe("Total number of cells in the model bar (e.g., 8 for eighths)."),
+		totalCells: z
+			.number()
+			.int()
+			.positive()
+			.describe("Total number of cells in the model bar (e.g., 8 for eighths)."),
 		cellGroups: z
 			.array(ModelCellGroup)
 			.describe("Groups of colored cells shown left-to-right. Sum of counts equals totalCells."),
 		bracketLabel: z
 			.string()
-			.describe("Label for a bracket spanning the entire model bar (e.g., '1 whole'). Empty string to omit.")
+			.describe(
+				"Label for a bracket spanning the entire model bar (e.g., '1 whole'). Empty string to omit."
+			)
 	})
 	.strict()
 
@@ -99,7 +114,9 @@ const createHighlightedPointSchema = () =>
 						),
 					style: z
 						.literal("dot")
-						.describe("Visual representation style. Currently only 'dot' (circular marker) is supported."),
+						.describe(
+							"Visual representation style. Currently only 'dot' (circular marker) is supported."
+						),
 					value: z
 						.number()
 						.int()
@@ -129,7 +146,9 @@ const createHighlightedPointSchema = () =>
 						),
 					style: z
 						.literal("dot")
-						.describe("Visual representation style. Currently only 'dot' (circular marker) is supported."),
+						.describe(
+							"Visual representation style. Currently only 'dot' (circular marker) is supported."
+						),
 					numerator: z
 						.number()
 						.int()
@@ -167,7 +186,9 @@ const createHighlightedPointSchema = () =>
 						),
 					style: z
 						.literal("dot")
-						.describe("Visual representation style. Currently only 'dot' (circular marker) is supported."),
+						.describe(
+							"Visual representation style. Currently only 'dot' (circular marker) is supported."
+						),
 					whole: z
 						.number()
 						.int()
@@ -212,10 +233,15 @@ const createHighlightedPointSchema = () =>
 						),
 					style: z
 						.literal("dot")
-						.describe("Visual representation style. Currently only 'dot' (circular marker) is supported."),
+						.describe(
+							"Visual representation style. Currently only 'dot' (circular marker) is supported."
+						),
 					mathml: z
 						.string()
-						.regex(MATHML_INNER_PATTERN, "invalid mathml snippet; must be inner MathML without outer <math> wrapper")
+						.regex(
+							MATHML_INNER_PATTERN,
+							"invalid mathml snippet; must be inner MathML without outer <math> wrapper"
+						)
 						.describe(
 							"Inner MathML markup for complex mathematical expressions. Examples: '<msqrt><mn>2</mn></msqrt>' for √2, '<mfrac><mn>22</mn><mn>7</mn></mfrac>' for 22/7. Do not include outer <math> wrapper tags."
 						)
@@ -285,12 +311,17 @@ export const NumberLinePropsSchema = z
 export type NumberLineProps = z.infer<typeof NumberLinePropsSchema>
 
 // Helper to convert the schema object to a numeric value
-const getNumericInterval = (interval: z.infer<ReturnType<typeof createTickIntervalSchema>>): number => {
+const getNumericInterval = (
+	interval: z.infer<ReturnType<typeof createTickIntervalSchema>>
+): number => {
 	return interval.type === "whole" ? interval.interval : 1 / interval.denominator
 }
 
 // Helper to format tick labels based on interval type
-const formatTickLabel = (value: number, tickInterval: z.infer<ReturnType<typeof createTickIntervalSchema>>): string => {
+const formatTickLabel = (
+	value: number,
+	tickInterval: z.infer<ReturnType<typeof createTickIntervalSchema>>
+): string => {
 	if (tickInterval.type === "whole") {
 		// For whole number intervals, show integers or decimals as appropriate
 		return Number.isInteger(value) ? String(value) : value.toString()
@@ -651,6 +682,12 @@ export const generateNumberLine: WidgetGenerator<typeof NumberLinePropsSchema> =
 
 	// arrows removed: only 'dot' style is supported; no marker defs needed
 
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(PADDING)
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="12">${svgBody}</svg>`
 }

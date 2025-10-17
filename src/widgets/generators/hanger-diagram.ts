@@ -36,7 +36,9 @@ export const HangerDiagramPropsSchema = z
 	.object({
 		type: z
 			.literal("hangerDiagram")
-			.describe("Identifies this as a hanger diagram (balance scale) for visualizing algebraic equations."),
+			.describe(
+				"Identifies this as a hanger diagram (balance scale) for visualizing algebraic equations."
+			),
 		width: createWidthSchema(),
 		height: createHeightSchema(),
 		leftSide: z
@@ -62,7 +64,9 @@ export type HangerDiagramProps = z.infer<typeof HangerDiagramPropsSchema>
  * algebraic equation, rendered as an SVG graphic. This diagram is ideal for introducing
  * students to the concept of solving equations by maintaining balance.
  */
-export const generateHangerDiagram: WidgetGenerator<typeof HangerDiagramPropsSchema> = async (data) => {
+export const generateHangerDiagram: WidgetGenerator<typeof HangerDiagramPropsSchema> = async (
+	data
+) => {
 	const { width, height, leftSide, rightSide } = data
 	const centerX = width / 2
 
@@ -178,10 +182,16 @@ export const generateHangerDiagram: WidgetGenerator<typeof HangerDiagramPropsSch
 		const sideCenterX = isLeft ? beamStartX + beamWidth / 4 : beamEndX - beamWidth / 4
 		weights.forEach((_w, i) => {
 			const weightY = weightYStart + i * weightHeight
-			canvas.drawLine(sideCenterX, i === 0 ? beamY : weightY - weightHeight + weightGap, sideCenterX, weightY, {
-				stroke: theme.colors.axis,
-				strokeWidth: theme.stroke.width.base
-			})
+			canvas.drawLine(
+				sideCenterX,
+				i === 0 ? beamY : weightY - weightHeight + weightGap,
+				sideCenterX,
+				weightY,
+				{
+					stroke: theme.colors.axis,
+					strokeWidth: theme.stroke.width.base
+				}
+			)
 		})
 	}
 
@@ -203,7 +213,13 @@ export const generateHangerDiagram: WidgetGenerator<typeof HangerDiagramPropsSch
 	renderShapes(rightSide, false)
 
 	// NEW: Finalize the canvas and construct the root SVG element
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(PADDING)
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="12">${svgBody}</svg>`
 }

@@ -35,7 +35,9 @@ const Box = z
 			.number()
 			.int()
 			.min(0)
-			.describe("Top row index (0-based) where this box begins. Row 0 is the first row. Must be >= 0 and <= endRow."),
+			.describe(
+				"Top row index (0-based) where this box begins. Row 0 is the first row. Must be >= 0 and <= endRow."
+			),
 		endRow: z
 			.number()
 			.int()
@@ -71,7 +73,9 @@ export const RatioBoxDiagramPropsSchema = z
 	.object({
 		type: z
 			.literal("ratioBoxDiagram")
-			.describe("Identifies this as a ratio box diagram for visualizing part-to-part and part-to-whole relationships."),
+			.describe(
+				"Identifies this as a ratio box diagram for visualizing part-to-part and part-to-whole relationships."
+			),
 		width: createWidthSchema(),
 		height: createHeightSchema(),
 		items: z
@@ -113,7 +117,9 @@ export type RatioBoxDiagramProps = z.infer<typeof RatioBoxDiagramPropsSchema>
 /**
  * Generates an SVG diagram of items in a grid with box overlays to illustrate ratios.
  */
-export const generateRatioBoxDiagram: WidgetGenerator<typeof RatioBoxDiagramPropsSchema> = async (props) => {
+export const generateRatioBoxDiagram: WidgetGenerator<typeof RatioBoxDiagramPropsSchema> = async (
+	props
+) => {
 	const { width, height, items, itemsPerRow, boxes, partitions, layout } = props
 
 	const totalItems = items.reduce((sum, item) => sum + item.count, 0)
@@ -147,7 +153,9 @@ export const generateRatioBoxDiagram: WidgetGenerator<typeof RatioBoxDiagramProp
 		const iconRadiusY = iconRadiusX
 
 		// Create a position map for specific placement
-		const grid: Array<{ color: string; style: "filled" | "outline" } | null> = new Array(numRows * numCols).fill(null)
+		const grid: Array<{ color: string; style: "filled" | "outline" } | null> = new Array(
+			numRows * numCols
+		).fill(null)
 
 		// Place blue circles in first 3 columns (positions 0-2, 5-7, 10-12)
 		const bluePositions = [0, 1, 2, 5, 6, 7, 10, 11, 12] // First 3 columns in each row
@@ -201,7 +209,13 @@ export const generateRatioBoxDiagram: WidgetGenerator<typeof RatioBoxDiagramProp
 		// Draw boxes
 		if (boxes.length > 0) {
 			// Helper function to draw a box based on grid cell coordinates
-			const drawBox = (startRow: number, endRow: number, startCol: number, endCol: number, extraPadding = 0) => {
+			const drawBox = (
+				startRow: number,
+				endRow: number,
+				startCol: number,
+				endCol: number,
+				extraPadding = 0
+			) => {
 				const boxPadding = cellWidth * 0.1 + extraPadding
 				const x = padding.left + startCol * cellWidth - boxPadding / 2
 				const y = padding.top + startRow * cellHeight - boxPadding / 2
@@ -314,7 +328,13 @@ export const generateRatioBoxDiagram: WidgetGenerator<typeof RatioBoxDiagramProp
 	}
 
 	// NEW: Finalize the canvas and construct the root SVG element
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(PADDING)
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg">${svgBody}</svg>`
 }

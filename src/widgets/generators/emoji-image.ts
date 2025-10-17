@@ -7,7 +7,9 @@ export const EmojiImagePropsSchema = z
 	.object({
 		type: z
 			.literal("emojiImage")
-			.describe("Identifies this as an emoji image widget for displaying a single emoji character."),
+			.describe(
+				"Identifies this as an emoji image widget for displaying a single emoji character."
+			),
 		emoji: z
 			.string()
 			.describe(
@@ -54,7 +56,13 @@ export const generateEmojiImage: WidgetGenerator<typeof EmojiImagePropsSchema> =
 	})
 
 	// NEW: Finalize the canvas and construct the root SVG element
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(PADDING)
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg">${svgBody}</svg>`
 }

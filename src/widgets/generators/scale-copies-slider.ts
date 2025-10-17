@@ -35,7 +35,9 @@ function createGroupSchema() {
 				.describe(
 					"Label for this shape transformation (e.g., 'Shape A', 'Rectangle 1', 'Original', null). Displayed as a header for the shape pair. Null for no label."
 				),
-			before: createRectSchema().describe("Dimensions of the original rectangle before transformation."),
+			before: createRectSchema().describe(
+				"Dimensions of the original rectangle before transformation."
+			),
 			after: createRectSchema().describe(
 				"Dimensions of the rectangle after transformation. Compare proportions to 'before' to show scaling type."
 			),
@@ -79,7 +81,9 @@ export type ScaleCopiesSliderProps = z.infer<typeof ScaleCopiesSliderPropsSchema
  * Generates an SVG diagram to visually compare a proportional scaling
  * transformation against a non-proportional one.
  */
-export const generateScaleCopiesSlider: WidgetGenerator<typeof ScaleCopiesSliderPropsSchema> = async (props) => {
+export const generateScaleCopiesSlider: WidgetGenerator<
+	typeof ScaleCopiesSliderPropsSchema
+> = async (props) => {
 	const { width, height, shapeA, shapeB } = props
 
 	const padding = {
@@ -110,7 +114,9 @@ export const generateScaleCopiesSlider: WidgetGenerator<typeof ScaleCopiesSlider
 		lineHeightDefault: 1.2
 	})
 
-	canvas.addStyle(".label { font-size: 14px; font-weight: bold; } .sub-label { font-size: 12px; fill: #555; }")
+	canvas.addStyle(
+		".label { font-size: 14px; font-weight: bold; } .sub-label { font-size: 12px; fill: #555; }"
+	)
 
 	/**
 	 * Helper function to draw a single row (e.g., for Shape A) containing
@@ -189,7 +195,13 @@ export const generateScaleCopiesSlider: WidgetGenerator<typeof ScaleCopiesSlider
 	drawShapeGroup(shapeB, shapeB_Y_Offset)
 
 	// NEW: Finalize the canvas and construct the root SVG element
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(PADDING)
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.base}">${svgBody}</svg>`
 }

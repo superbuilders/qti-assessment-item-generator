@@ -16,14 +16,24 @@ describe("Widget Ref Collection: Feedback Traversal", () => {
 							correctness: "correct",
 							summary: [
 								{ type: "text", content: "Good job! " },
-								{ type: "inlineWidgetRef", widgetId: "widget_inline_correct", widgetType: "numberLine" }
+								{
+									type: "inlineWidgetRef",
+									widgetId: "widget_inline_correct",
+									widgetType: "numberLine"
+								}
 							]
 						},
 						steps: [
 							{
 								type: "step",
 								title: [{ type: "text", content: "Review" }],
-								content: [{ type: "widgetRef", widgetId: "widget_block_correct", widgetType: "coordinatePlane" }]
+								content: [
+									{
+										type: "widgetRef",
+										widgetId: "widget_block_correct",
+										widgetType: "coordinatePlane"
+									}
+								]
 							}
 						]
 					}
@@ -38,7 +48,13 @@ describe("Widget Ref Collection: Feedback Traversal", () => {
 							{
 								type: "step",
 								title: [{ type: "text", content: "Check Diagram" }],
-								content: [{ type: "widgetRef", widgetId: "widget_block_incorrect", widgetType: "numberLine" }]
+								content: [
+									{
+										type: "widgetRef",
+										widgetId: "widget_block_incorrect",
+										widgetType: "numberLine"
+									}
+								]
 							}
 						]
 					}
@@ -74,7 +90,9 @@ describe("Widget Ref Collection: Feedback Traversal", () => {
 										{
 											type: "step",
 											title: [{ type: "text", content: "Step" }],
-											content: [{ type: "widgetRef", widgetId: "widget_r1c_r2a", widgetType: "numberLine" }]
+											content: [
+												{ type: "widgetRef", widgetId: "widget_r1c_r2a", widgetType: "numberLine" }
+											]
 										}
 									]
 								}
@@ -89,7 +107,13 @@ describe("Widget Ref Collection: Feedback Traversal", () => {
 										{
 											type: "step",
 											title: [{ type: "text", content: "Step" }],
-											content: [{ type: "widgetRef", widgetId: "widget_r1c_r2b", widgetType: "coordinatePlane" }]
+											content: [
+												{
+													type: "widgetRef",
+													widgetId: "widget_r1c_r2b",
+													widgetType: "coordinatePlane"
+												}
+											]
 										}
 									]
 								}
@@ -102,13 +126,21 @@ describe("Widget Ref Collection: Feedback Traversal", () => {
 								content: {
 									preamble: {
 										correctness: "incorrect",
-										summary: [{ type: "inlineWidgetRef", widgetId: "widget_r1i_r2a", widgetType: "numberLine" }]
+										summary: [
+											{
+												type: "inlineWidgetRef",
+												widgetId: "widget_r1i_r2a",
+												widgetType: "numberLine"
+											}
+										]
 									},
 									steps: [
 										{
 											type: "step",
 											title: [{ type: "text", content: "Step 1" }],
-											content: [{ type: "paragraph", content: [{ type: "text", content: "Review." }] }]
+											content: [
+												{ type: "paragraph", content: [{ type: "text", content: "Review." }] }
+											]
 										}
 									]
 								}
@@ -123,7 +155,9 @@ describe("Widget Ref Collection: Feedback Traversal", () => {
 										{
 											type: "step",
 											title: [{ type: "text", content: "Step 1" }],
-											content: [{ type: "paragraph", content: [{ type: "text", content: "Review." }] }]
+											content: [
+												{ type: "paragraph", content: [{ type: "text", content: "Review." }] }
+											]
 										}
 									]
 								}
@@ -147,7 +181,9 @@ describe("Widget Ref Collection: Feedback Traversal", () => {
 	})
 
 	test("should collect widget refs from both body and feedback", () => {
-		const body: BlockContent<typeof W> = [{ type: "widgetRef", widgetId: "body_widget", widgetType: "numberLine" }]
+		const body: BlockContent<typeof W> = [
+			{ type: "widgetRef", widgetId: "body_widget", widgetType: "numberLine" }
+		]
 
 		const feedback: { FEEDBACK__OVERALL: AuthoringFeedbackOverall<FeedbackPlan, typeof W> } = {
 			FEEDBACK__OVERALL: {
@@ -161,7 +197,9 @@ describe("Widget Ref Collection: Feedback Traversal", () => {
 							{
 								type: "step",
 								title: [{ type: "text", content: "Diagram" }],
-								content: [{ type: "widgetRef", widgetId: "feedback_widget", widgetType: "coordinatePlane" }]
+								content: [
+									{ type: "widgetRef", widgetId: "feedback_widget", widgetType: "coordinatePlane" }
+								]
 							}
 						]
 					}

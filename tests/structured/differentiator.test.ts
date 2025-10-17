@@ -102,7 +102,9 @@ mock.module("openai", () => {
 															content: {
 																__sb_idx__0: {
 																	type: "paragraph",
-																	content: { __sb_idx__0: { type: "text", content: "Solve like this." } }
+																	content: {
+																		__sb_idx__0: { type: "text", content: "Solve like this." }
+																	}
 																}
 															}
 														}

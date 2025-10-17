@@ -51,7 +51,9 @@ export async function buildPerseusEnvelope(
 				if (headResult.error || !headResult.data.ok) continue
 
 				if (ext === "svg") {
-					const dl = await errors.try(fetchFn(urlWithExt, { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) }))
+					const dl = await errors.try(
+						fetchFn(urlWithExt, { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) })
+					)
 					if (dl.error || !dl.data.ok) continue
 					const text = await errors.try(dl.data.text())
 					if (text.error) continue
@@ -126,7 +128,10 @@ export async function buildMathacademyEnvelope(
 		}
 		const normalized = result.data
 		if (normalized.protocol !== "http:" && normalized.protocol !== "https:") {
-			logger.error("unsupported screenshot url scheme", { screenshotUrl, protocol: normalized.protocol })
+			logger.error("unsupported screenshot url scheme", {
+				screenshotUrl,
+				protocol: normalized.protocol
+			})
 			throw errors.new("unsupported screenshot url scheme")
 		}
 		multimodalImageUrls.add(normalized.toString())
@@ -165,7 +170,9 @@ export async function buildMathacademyEnvelope(
 	if (svgUrlsToFetch.size > 0) {
 		logger.debug("fetching svg urls from html", { count: svgUrlsToFetch.size })
 		const promises = Array.from(svgUrlsToFetch).map(async (url) => {
-			const result = await errors.try(fetchFn(url, { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) }))
+			const result = await errors.try(
+				fetchFn(url, { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) })
+			)
 			if (result.error || !result.data.ok) {
 				logger.warn("failed to fetch svg from html", { url, error: result.error })
 				return

@@ -2,7 +2,11 @@ import { afterAll, beforeAll, describe, expect, test } from "bun:test"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { buildPerseusEnvelope } from "../../../src/structured/ai-context-builder"
-import { expectEmptyPayloads, expectSortedUrls, expectSupplementaryContentCount } from "./helpers/assertions"
+import {
+	expectEmptyPayloads,
+	expectSortedUrls,
+	expectSupplementaryContentCount
+} from "./helpers/assertions"
 import { createAlwaysFailFetch, createPrdMockFetch } from "./helpers/mock-fetch"
 
 describe("buildPerseusEnvelope (unit)", () => {
@@ -34,7 +38,11 @@ describe("buildPerseusEnvelope (unit)", () => {
 			widgets: {
 				"image 1": {
 					type: "image",
-					options: { backgroundImage: { url: "web+graphie://cdn.kastatic.org/ka-perseus-graphie/resolves-to" } }
+					options: {
+						backgroundImage: {
+							url: "web+graphie://cdn.kastatic.org/ka-perseus-graphie/resolves-to"
+						}
+					}
 				}
 			}
 		}
@@ -59,7 +67,9 @@ describe("buildPerseusEnvelope (unit)", () => {
 				"image 1": {
 					type: "image",
 					options: {
-						backgroundImage: { url: "web+graphie://cdn.kastatic.org/ka-perseus-graphie/svg-head-ok-get-fail" }
+						backgroundImage: {
+							url: "web+graphie://cdn.kastatic.org/ka-perseus-graphie/svg-head-ok-get-fail"
+						}
 					}
 				}
 			}
@@ -99,7 +109,11 @@ describe("buildPerseusEnvelope (unit)", () => {
 		const perseusJson = {
 			widgets: {
 				"image 1": {
-					options: { backgroundImage: { url: "web+graphie://cdn.kastatic.org/ka-perseus-graphie/fails-to-resolve" } }
+					options: {
+						backgroundImage: {
+							url: "web+graphie://cdn.kastatic.org/ka-perseus-graphie/fails-to-resolve"
+						}
+					}
 				}
 			}
 		}
@@ -116,7 +130,8 @@ describe("buildPerseusEnvelope (unit)", () => {
 
 	test("extracts direct https raster and vector URLs", async () => {
 		const perseusJson = {
-			content: "Here is a raster image: https://example.com/foo.png and a vector image: https://example.com/diagram.svg"
+			content:
+				"Here is a raster image: https://example.com/foo.png and a vector image: https://example.com/diagram.svg"
 		}
 		const result = await errors.try(buildPerseusEnvelope(perseusJson))
 		expect(result.error).toBeFalsy()
@@ -137,7 +152,11 @@ describe("buildPerseusEnvelope (unit)", () => {
 			widgets: {
 				"image 1": {
 					type: "image",
-					options: { backgroundImage: { url: "web+graphie://cdn.kastatic.org/ka-perseus-graphie/resolves-to" } }
+					options: {
+						backgroundImage: {
+							url: "web+graphie://cdn.kastatic.org/ka-perseus-graphie/resolves-to"
+						}
+					}
 				}
 			}
 		}
@@ -160,7 +179,11 @@ describe("buildPerseusEnvelope (unit)", () => {
 				widgets: {
 					"image 1": {
 						type: "image",
-						options: { backgroundImage: { url: "web+graphie://cdn.kastatic.org/ka-perseus-graphie/some-hash" } }
+						options: {
+							backgroundImage: {
+								url: "web+graphie://cdn.kastatic.org/ka-perseus-graphie/some-hash"
+							}
+						}
 					}
 				}
 			},
@@ -182,7 +205,12 @@ describe("buildPerseusEnvelope (unit)", () => {
 		const simplePerseusJson = {
 			question: {
 				content: "What is 2 + 2?",
-				widgets: { "numeric-input 1": { type: "numeric-input", options: { answers: [{ value: 4, correct: true }] } } }
+				widgets: {
+					"numeric-input 1": {
+						type: "numeric-input",
+						options: { answers: [{ value: 4, correct: true }] }
+					}
+				}
 			}
 		}
 		const result = await errors.try(buildPerseusEnvelope(simplePerseusJson))
@@ -304,7 +332,8 @@ describe("buildPerseusEnvelope (unit)", () => {
 	test("extracts multiple markdown links without adding to context", async () => {
 		const perseusJsonWithMultipleLinks = {
 			question: {
-				content: "Check [source A](https://example.com/a) and [source B](https://example.com/b) for more information."
+				content:
+					"Check [source A](https://example.com/a) and [source B](https://example.com/b) for more information."
 			}
 		}
 		const result = await errors.try(buildPerseusEnvelope(perseusJsonWithMultipleLinks))
@@ -343,7 +372,11 @@ describe("buildPerseusEnvelope (unit)", () => {
 					widgets: {
 						"image 1": {
 							type: "image",
-							options: { backgroundImage: { url: "web+graphie://cdn.kastatic.org/ka-perseus-graphie/hint-image" } }
+							options: {
+								backgroundImage: {
+									url: "web+graphie://cdn.kastatic.org/ka-perseus-graphie/hint-image"
+								}
+							}
 						}
 					}
 				}
@@ -362,7 +395,9 @@ describe("buildPerseusEnvelope (unit)", () => {
 
 	test("uses failing fetch mock when provided", async () => {
 		const failing = createAlwaysFailFetch()
-		const perseusJsonWithSvg = { question: { content: "Here is an SVG: https://example.com/diagram.svg" } }
+		const perseusJsonWithSvg = {
+			question: { content: "Here is an SVG: https://example.com/diagram.svg" }
+		}
 		const result = await errors.try(buildPerseusEnvelope(perseusJsonWithSvg, failing))
 		expect(result.error).toBeFalsy()
 		if (result.error) {

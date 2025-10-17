@@ -38,7 +38,9 @@ export const VennDiagramPropsSchema = z
 	.object({
 		type: z
 			.literal("vennDiagram")
-			.describe("Identifies this as a Venn diagram widget for visualizing set relationships and overlaps."),
+			.describe(
+				"Identifies this as a Venn diagram widget for visualizing set relationships and overlaps."
+			),
 		width: createWidthSchema(),
 		height: createHeightSchema(),
 		circleA: createCircleSchema().describe(
@@ -122,8 +124,14 @@ export const generateVennDiagram: WidgetGenerator<typeof VennDiagramPropsSchema>
 	// Compute side-constrained max widths so labels never collide or bleed to edges
 	const midX = (cxA + cxB) / 2
 	const labelPaddingX = PADDING
-	const leftHalfWidth = Math.max(0, Math.min(labelA_X - labelPaddingX, midX - labelA_X - labelPaddingX))
-	const rightHalfWidth = Math.max(0, Math.min(width - labelPaddingX - labelB_X, labelB_X - midX - labelPaddingX))
+	const leftHalfWidth = Math.max(
+		0,
+		Math.min(labelA_X - labelPaddingX, midX - labelA_X - labelPaddingX)
+	)
+	const rightHalfWidth = Math.max(
+		0,
+		Math.min(width - labelPaddingX - labelB_X, labelB_X - midX - labelPaddingX)
+	)
 	const labelA_MaxWidth = leftHalfWidth * 2
 	const labelB_MaxWidth = rightHalfWidth * 2
 
@@ -210,7 +218,13 @@ export const generateVennDiagram: WidgetGenerator<typeof VennDiagramPropsSchema>
 	})
 
 	// NEW: Finalize the canvas and construct the root SVG element
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(PADDING)
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}">${svgBody}</svg>`
 }

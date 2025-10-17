@@ -114,7 +114,11 @@ export function ceilDiv(a: number, b: number): number {
  * Generates ticks by performing calculations in a scaled integer space to avoid floating-point drift.
  * Now supports exact rational intervals for multiples of 1/3 and 1/6.
  */
-export function buildTicks(min: number, max: number, interval: number): { values: number[]; labels: string[] } {
+export function buildTicks(
+	min: number,
+	max: number,
+	interval: number
+): { values: number[]; labels: string[] } {
 	if (min > max || interval <= 0) {
 		logger.error("invalid tick parameters", { min, max, interval })
 		return { values: [], labels: [] }
@@ -149,7 +153,8 @@ export function buildTicks(min: number, max: number, interval: number): { values
 		const k = k6 !== null ? k6 : (k3 ?? 0)
 
 		const decimalScaleForMinMax =
-			10 ** Math.max((String(min).split(".")[1] || "").length, (String(max).split(".")[1] || "").length)
+			10 **
+			Math.max((String(min).split(".")[1] || "").length, (String(max).split(".")[1] || "").length)
 		const D = BigInt(baseDenominator * decimalScaleForMinMax)
 
 		const minBI = toGridInt(min, D)

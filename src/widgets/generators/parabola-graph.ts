@@ -41,7 +41,10 @@ export const ParabolaGraphPropsSchema = z
 					.number()
 					.positive()
 					.describe("Positive y-intercept at x = 0 (must be > 0 and less than vertex.y)."),
-				color: z.string().regex(CSS_COLOR_PATTERN, "invalid css color").describe("The color of the parabola curve."),
+				color: z
+					.string()
+					.regex(CSS_COLOR_PATTERN, "invalid css color")
+					.describe("The color of the parabola curve."),
 				style: z.enum(["solid", "dashed"]).describe("The line style of the parabola curve.")
 			})
 			.strict()
@@ -53,7 +56,9 @@ export const ParabolaGraphPropsSchema = z
 
 export type ParabolaGraphProps = z.infer<typeof ParabolaGraphPropsSchema>
 
-export const generateParabolaGraph: WidgetGenerator<typeof ParabolaGraphPropsSchema> = async (props) => {
+export const generateParabolaGraph: WidgetGenerator<typeof ParabolaGraphPropsSchema> = async (
+	props
+) => {
 	const { width, height, xAxis, yAxis, parabola } = props
 
 	// Vertex-form parabola: y = a (x - h)^2 + k
@@ -146,7 +151,13 @@ export const generateParabolaGraph: WidgetGenerator<typeof ParabolaGraphPropsSch
 	}
 
 	// NEW: Finalize the canvas and construct the root SVG element
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(AXIS_VIEWBOX_PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(AXIS_VIEWBOX_PADDING)
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="12">${svgBody}</svg>`
 }

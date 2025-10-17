@@ -73,7 +73,9 @@ export const RectangularFrameDiagramPropsSchema = z
 			),
 		outerHeight: z
 			.number()
-			.describe("Outer height of the frame in units (e.g., 4, 8, 5). The vertical dimension of the frame."),
+			.describe(
+				"Outer height of the frame in units (e.g., 4, 8, 5). The vertical dimension of the frame."
+			),
 		thickness: z
 			.number()
 			.describe(
@@ -114,9 +116,9 @@ export type RectangularFrameDiagramProps = z.infer<typeof RectangularFrameDiagra
  * (like picture frames with depth). It renders the frame in an isometric view to provide
  * depth perception.
  */
-export const generateRectangularFrameDiagram: WidgetGenerator<typeof RectangularFrameDiagramPropsSchema> = async (
-	data
-) => {
+export const generateRectangularFrameDiagram: WidgetGenerator<
+	typeof RectangularFrameDiagramPropsSchema
+> = async (data) => {
 	const {
 		width,
 		height,
@@ -442,7 +444,13 @@ export const generateRectangularFrameDiagram: WidgetGenerator<typeof Rectangular
 	}
 
 	// NEW: Finalize the canvas and construct the root SVG element
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(PADDING)
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.base}">${svgBody}</svg>`
 }

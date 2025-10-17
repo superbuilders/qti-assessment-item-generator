@@ -25,7 +25,9 @@ const LabelSchema = z
 		unit: z
 			.string()
 			.nullable()
-			.describe("An optional unit for the value (e.g., 'cm', '°'). Set to null if no unit is applicable.")
+			.describe(
+				"An optional unit for the value (e.g., 'cm', '°'). Set to null if no unit is applicable."
+			)
 	})
 	.strict()
 	.nullable()
@@ -72,10 +74,14 @@ const LineSchema = z
 				"If true, the line starts at 'from' and extends infinitely in the direction of 'to'. If false, it is a finite segment connecting the two vertices."
 			),
 		style: z.enum(["solid", "dashed"]).describe("The visual style of the line for rendering."),
-		label: LabelSchema.describe("An optional structured label for the line, typically used to display its length.")
+		label: LabelSchema.describe(
+			"An optional structured label for the line, typically used to display its length."
+		)
 	})
 	.strict()
-	.describe("Represents a linear element, which can be a finite segment or an infinite ray, connecting two vertices.")
+	.describe(
+		"Represents a linear element, which can be a finite segment or an infinite ray, connecting two vertices."
+	)
 
 const AngleVisualizationSchema = z
 	.object({
@@ -88,7 +94,9 @@ const AngleVisualizationSchema = z
 			.number()
 			.positive()
 			.nullable()
-			.describe("For 'arc' type, the radius of the arc in pixels. If not provided, a default will be used."),
+			.describe(
+				"For 'arc' type, the radius of the arc in pixels. If not provided, a default will be used."
+			),
 		color: z
 			.string()
 			.regex(CSS_COLOR_PATTERN, "Invalid CSS color; use hex (#RGB, #RRGGBB, #RRGGBBAA)")
@@ -101,7 +109,9 @@ const AngleVisualizationSchema = z
 		largeArcFlag: z
 			.literal(0)
 			.or(z.literal(1))
-			.describe("The SVG large-arc-flag: 0 for angles less than 180°, 1 for angles greater than 180°."),
+			.describe(
+				"The SVG large-arc-flag: 0 for angles less than 180°, 1 for angles greater than 180°."
+			),
 		sweepFlag: z
 			.literal(0)
 			.or(z.literal(1))
@@ -111,7 +121,9 @@ const AngleVisualizationSchema = z
 		label: z
 			.string()
 			.nullable()
-			.describe("The text label to display near the angle marker (e.g., '108°', 'θ'). If null, no label is rendered."),
+			.describe(
+				"The text label to display near the angle marker (e.g., '108°', 'θ'). If null, no label is rendered."
+			),
 		labelPositionHint: z
 			.enum(["auto", "outside", "inside"])
 			.describe(
@@ -131,13 +143,26 @@ const ConstraintSchema = z
 				id: z
 					.string()
 					.regex(angleIdRegex)
-					.describe("A unique identifier for this angle constraint, prefixed with 'angle_' (e.g., 'angle_ABC')."),
-				vertex: z.string().regex(vertexIdRegex).describe("The ID of the vertex where the angle is formed."),
-				line1: z.string().regex(lineIdRegex).describe("The ID of the first line forming the angle."),
-				line2: z.string().regex(lineIdRegex).describe("The ID of the second line forming the angle."),
+					.describe(
+						"A unique identifier for this angle constraint, prefixed with 'angle_' (e.g., 'angle_ABC')."
+					),
+				vertex: z
+					.string()
+					.regex(vertexIdRegex)
+					.describe("The ID of the vertex where the angle is formed."),
+				line1: z
+					.string()
+					.regex(lineIdRegex)
+					.describe("The ID of the first line forming the angle."),
+				line2: z
+					.string()
+					.regex(lineIdRegex)
+					.describe("The ID of the second line forming the angle."),
 				measure: z
 					.number()
-					.describe("The measure of the angle in degrees (e.g., 90, 108). This value must be numeric."),
+					.describe(
+						"The measure of the angle in degrees (e.g., 90, 108). This value must be numeric."
+					),
 				visualization: AngleVisualizationSchema.describe(
 					"Configuration for how the angle should be drawn (e.g., with an arc, its color, and label)."
 				)
@@ -150,11 +175,15 @@ const ConstraintSchema = z
 				lines: z
 					.array(z.string().regex(lineIdRegex))
 					.min(2)
-					.describe("An array of two or more line IDs that should be constrained to have the same length."),
+					.describe(
+						"An array of two or more line IDs that should be constrained to have the same length."
+					),
 				value: z
 					.number()
 					.nullable()
-					.describe("An optional numeric value. If provided, all specified lines will be forced to this exact length.")
+					.describe(
+						"An optional numeric value. If provided, all specified lines will be forced to this exact length."
+					)
 			})
 			.strict()
 			.describe("Forces multiple lines to have the same length."),
@@ -164,7 +193,9 @@ const ConstraintSchema = z
 				angles: z
 					.array(z.string().regex(angleIdRegex))
 					.min(2)
-					.describe("An array of two or more angle IDs that should be constrained to have the same measure."),
+					.describe(
+						"An array of two or more angle IDs that should be constrained to have the same measure."
+					),
 				value: z
 					.number()
 					.nullable()
@@ -190,7 +221,9 @@ const ConstraintSchema = z
 				lines: z
 					.array(z.string().regex(lineIdRegex))
 					.min(2)
-					.describe("An array of two or more line IDs that must be perpendicular (form 90° angles) to each other.")
+					.describe(
+						"An array of two or more line IDs that must be perpendicular (form 90° angles) to each other."
+					)
 			})
 			.strict()
 			.describe("Forces a set of lines to be perpendicular."),
@@ -245,7 +278,10 @@ const ConstraintSchema = z
 					.describe(
 						"A new, unique ID for the virtual vertex that will be created at the midpoint, prefixed with 'vertex_'."
 					),
-				line: z.string().regex(lineIdRegex).describe("The ID of the line on which to create the midpoint."),
+				line: z
+					.string()
+					.regex(lineIdRegex)
+					.describe("The ID of the line on which to create the midpoint."),
 				label: z
 					.string()
 					.nullable()
@@ -272,7 +308,9 @@ const ConstraintSchema = z
 					.describe(
 						"An optional numeric value for the side length. If provided, all sides of the polygon will be set to this length."
 					),
-				closed: z.boolean().describe("If true, the last vertex is connected to the first to form a closed shape.")
+				closed: z
+					.boolean()
+					.describe("If true, the last vertex is connected to the first to form a closed shape.")
 			})
 			.strict()
 			.describe(
@@ -288,11 +326,15 @@ const ShadedRegionSchema = z
 		vertices: z
 			.array(z.string().regex(vertexIdRegex))
 			.min(3)
-			.describe("An ordered list of at least three vertex IDs that form the boundary of the region to be shaded."),
+			.describe(
+				"An ordered list of at least three vertex IDs that form the boundary of the region to be shaded."
+			),
 		fillColor: z
 			.string()
 			.regex(CSS_COLOR_PATTERN)
-			.describe("The CSS fill color for the shaded area (e.g., '#FFE5CC', '#RRGGBBAA' for transparency).")
+			.describe(
+				"The CSS fill color for the shaded area (e.g., '#FFE5CC', '#RRGGBBAA' for transparency)."
+			)
 		// Opacity is not exposed; encode via alpha in fillColor (e.g., #RRGGBBAA)
 	})
 	.strict()
@@ -300,7 +342,9 @@ const ShadedRegionSchema = z
 
 const RegionLabelSchema = z
 	.object({
-		text: z.string().describe("The content of the label to be displayed (e.g., 'Area A', '108°', 'x')."),
+		text: z
+			.string()
+			.describe("The content of the label to be displayed (e.g., 'Area A', '108°', 'x')."),
 		placement: z
 			.union([
 				z
@@ -317,7 +361,10 @@ const RegionLabelSchema = z
 				z
 					.object({
 						type: z.literal("alongLine"),
-						line: z.string().regex(lineIdRegex).describe("The ID of the line along which the label should be placed."),
+						line: z
+							.string()
+							.regex(lineIdRegex)
+							.describe("The ID of the line along which the label should be placed."),
 						offset: z
 							.number()
 							.describe(
@@ -333,7 +380,9 @@ const RegionLabelSchema = z
 			.string()
 			.regex(CSS_COLOR_PATTERN)
 			.nullable()
-			.describe("An optional CSS color for the label text. If not provided, a default theme color will be used.")
+			.describe(
+				"An optional CSS color for the label text. If not provided, a default theme color will be used."
+			)
 	})
 	.strict()
 	.describe(
@@ -353,7 +402,10 @@ export const ConstraintGeometryDiagramPropsSchema = z
 			.describe(
 				"An array of all vertices to be used in the diagram. Their coordinates are not specified here; they are determined by the solver."
 			),
-		lines: z.array(LineSchema).min(0).describe("An array of all lines (segments or rays) connecting the vertices."),
+		lines: z
+			.array(LineSchema)
+			.min(0)
+			.describe("An array of all lines (segments or rays) connecting the vertices."),
 		constraints: z
 			.array(ConstraintSchema)
 			.min(1)
@@ -395,7 +447,9 @@ type ConstraintDef = z.infer<typeof ConstraintSchema>
  * Translates the geometric schema into a set of mathematical constraints
  * and solves for the vertex coordinates using the Z3 SMT solver.
  */
-async function solveWithZ3(props: z.infer<typeof ConstraintGeometryDiagramPropsSchema>): Promise<SolvedPositions> {
+async function solveWithZ3(
+	props: z.infer<typeof ConstraintGeometryDiagramPropsSchema>
+): Promise<SolvedPositions> {
 	const initResult = await errors.try<Awaited<ReturnType<typeof initZ3>>>(initZ3())
 	if (initResult.error) {
 		logger.error("z3 init", { error: initResult.error })
@@ -627,8 +681,14 @@ async function solveWithZ3(props: z.infer<typeof ConstraintGeometryDiagramPropsS
 				}
 				const t = Z.Real.const(`${c.id}_t`)
 				const u = Z.Real.const(`${c.id}_u`)
-				solver.add(vX.x.eq(vA.x.add(vB.x.sub(vA.x).mul(t))), vX.y.eq(vA.y.add(vB.y.sub(vA.y).mul(t))))
-				solver.add(vX.x.eq(vC.x.add(vD.x.sub(vC.x).mul(u))), vX.y.eq(vC.y.add(vD.y.sub(vC.y).mul(u))))
+				solver.add(
+					vX.x.eq(vA.x.add(vB.x.sub(vA.x).mul(t))),
+					vX.y.eq(vA.y.add(vB.y.sub(vA.y).mul(t)))
+				)
+				solver.add(
+					vX.x.eq(vC.x.add(vD.x.sub(vC.x).mul(u))),
+					vX.y.eq(vC.y.add(vD.y.sub(vC.y).mul(u)))
+				)
 				break
 			}
 			case "equalAngle": {
@@ -998,7 +1058,9 @@ export const generateConstraintGeometryDiagram = async (
 	// --- Drawing Phase ---
 	if (props.shadedRegions) {
 		for (const region of props.shadedRegions) {
-			const points = region.vertices.map((vid) => solvedPositions.get(vid)).filter((p): p is Point => !!p)
+			const points = region.vertices
+				.map((vid) => solvedPositions.get(vid))
+				.filter((p): p is Point => !!p)
 			if (points.length >= 3)
 				canvas.drawPolygon(points, {
 					fill: region.fillColor
@@ -1045,7 +1107,9 @@ export const generateConstraintGeometryDiagram = async (
 		}
 	}
 
-	const angleConstraints = constraints.filter((c): c is Extract<ConstraintDef, { type: "angle" }> => c.type === "angle")
+	const angleConstraints = constraints.filter(
+		(c): c is Extract<ConstraintDef, { type: "angle" }> => c.type === "angle"
+	)
 	for (const angle of angleConstraints) {
 		const viz = angle.visualization
 		if (viz.type === "none") continue
@@ -1109,7 +1173,8 @@ export const generateConstraintGeometryDiagram = async (
 			let angleDiff = endAngle - startAngle
 			while (angleDiff > Math.PI) angleDiff -= 2 * Math.PI
 			while (angleDiff < -Math.PI) angleDiff += 2 * Math.PI
-			if (Math.abs(angleDiff) > Math.PI) angleDiff = angleDiff > 0 ? angleDiff - 2 * Math.PI : angleDiff + 2 * Math.PI
+			if (Math.abs(angleDiff) > Math.PI)
+				angleDiff = angleDiff > 0 ? angleDiff - 2 * Math.PI : angleDiff + 2 * Math.PI
 			const angleSize = Math.abs(angleDiff)
 			const midAngle = startAngle + angleDiff / 2
 			let labelRadius: number
@@ -1217,7 +1282,9 @@ export const generateConstraintGeometryDiagram = async (
 						width: textMetrics.width,
 						height: textMetrics.height
 					}
-					const collisions = allLinesForCollision.filter((l) => segmentIntersectsRect(l.a, l.b, rect)).length
+					const collisions = allLinesForCollision.filter((l) =>
+						segmentIntersectsRect(l.a, l.b, rect)
+					).length
 					if (collisions < minCollisions) {
 						minCollisions = collisions
 						bestPos = testPos
@@ -1241,7 +1308,9 @@ export const generateConstraintGeometryDiagram = async (
 		}
 		for (const label of props.regionLabels) {
 			if (label.placement.type === "centroid") {
-				const points = label.placement.vertices.map((vid) => solvedPositions.get(vid)).filter((p): p is Point => !!p)
+				const points = label.placement.vertices
+					.map((vid) => solvedPositions.get(vid))
+					.filter((p): p is Point => !!p)
 				if (points.length > 0) {
 					const centroid = {
 						x: points.reduce((s, p) => s + p.x, 0) / points.length,
@@ -1263,6 +1332,12 @@ export const generateConstraintGeometryDiagram = async (
 		}
 	}
 
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(PADDING)
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.base}">${svgBody}</svg>`
 }

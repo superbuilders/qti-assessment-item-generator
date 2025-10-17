@@ -80,10 +80,14 @@ export const BoxPlotPropsSchema = z
 	.object({
 		type: z
 			.literal("boxPlot")
-			.describe("Identifies this as a box plot widget for displaying five-number summary statistics."),
+			.describe(
+				"Identifies this as a box plot widget for displaying five-number summary statistics."
+			),
 		width: createWidthSchema(),
 		height: createHeightSchema(),
-		axis: BoxPlotAxisSchema.describe("Configuration for the horizontal scale including range and tick marks."),
+		axis: BoxPlotAxisSchema.describe(
+			"Configuration for the horizontal scale including range and tick marks."
+		),
 		summary: BoxPlotSummarySchema.describe("The five-number summary used to draw the plot."),
 		boxColor: z
 			.string()
@@ -131,7 +135,10 @@ export const generateBoxPlot: WidgetGenerator<typeof BoxPlotPropsSchema> = async
 			axisMin: axis.min,
 			axisMax: axis.max
 		})
-		throw errors.wrap(ErrInvalidRange, `axis.min (${axis.min}) must be less than axis.max (${axis.max})`)
+		throw errors.wrap(
+			ErrInvalidRange,
+			`axis.min (${axis.min}) must be less than axis.max (${axis.max})`
+		)
 	}
 
 	const canvas = new CanvasImpl({
@@ -243,7 +250,13 @@ export const generateBoxPlot: WidgetGenerator<typeof BoxPlotPropsSchema> = async
 	})
 
 	// NEW: Finalize the canvas and construct the root SVG element
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(PADDING)
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.base}">${svgBody}</svg>`
 }

@@ -23,8 +23,16 @@ export const QuantityFractionalDiagramPropsSchema = z
 			.discriminatedUnion("type", [
 				z.object({
 					type: z.literal("rectangle"),
-					rows: z.number().int().positive().describe("Number of rows in the grid partition for each shape."),
-					columns: z.number().int().positive().describe("Number of columns in the grid partition for each shape.")
+					rows: z
+						.number()
+						.int()
+						.positive()
+						.describe("Number of rows in the grid partition for each shape."),
+					columns: z
+						.number()
+						.int()
+						.positive()
+						.describe("Number of columns in the grid partition for each shape.")
 				}),
 				z.object({
 					type: z.literal("circle").describe("A circular shape partitioned into equal sectors.")
@@ -35,7 +43,9 @@ export const QuantityFractionalDiagramPropsSchema = z
 						.number()
 						.int()
 						.gte(3)
-						.describe("Number of sides for the regular polygon (e.g., 3 for triangle, 8 for octagon)."),
+						.describe(
+							"Number of sides for the regular polygon (e.g., 3 for triangle, 8 for octagon)."
+						),
 					rotation: z.number().describe("Rotation angle in degrees to orient the polygon.")
 				})
 			])
@@ -44,17 +54,25 @@ export const QuantityFractionalDiagramPropsSchema = z
 			.number()
 			.int()
 			.min(0)
-			.describe("The total numerator of the quantity (e.g., for 2 3/4, the total numerator is 11)."),
+			.describe(
+				"The total numerator of the quantity (e.g., for 2 3/4, the total numerator is 11)."
+			),
 		denominator: z
 			.number()
 			.int()
 			.positive()
-			.describe("The denominator that defines the partitioning of each shape (e.g., for 2 3/4, this is 4)."),
+			.describe(
+				"The denominator that defines the partitioning of each shape (e.g., for 2 3/4, this is 4)."
+			),
 		shadeColor: z
 			.string()
 			.regex(CSS_COLOR_PATTERN, "invalid css color")
 			.describe("The CSS hex color for the shaded parts."),
-		shapesPerRow: z.number().int().positive().describe("How many shapes to display in each row before wrapping.")
+		shapesPerRow: z
+			.number()
+			.int()
+			.positive()
+			.describe("How many shapes to display in each row before wrapping.")
 	})
 	.strict()
 
@@ -119,7 +137,9 @@ function drawSingleModel(
 			for (let i = 0; i < shadedParts; i++) {
 				const row = Math.floor(i / columns)
 				const col = i % columns
-				canvas.drawRect(rectX + col * cellWidth, rectY + row * cellHeight, cellWidth, cellHeight, { fill: shadeColor })
+				canvas.drawRect(rectX + col * cellWidth, rectY + row * cellHeight, cellWidth, cellHeight, {
+					fill: shadeColor
+				})
 			}
 			for (let r = 0; r <= rows; r++)
 				canvas.drawLine(rectX, rectY + r * cellHeight, rectX + size, rectY + r * cellHeight, {
@@ -241,9 +261,9 @@ function drawSingleModel(
 	}
 }
 
-export const generateQuantityFractionalDiagram: WidgetGenerator<typeof QuantityFractionalDiagramPropsSchema> = async (
-	props
-) => {
+export const generateQuantityFractionalDiagram: WidgetGenerator<
+	typeof QuantityFractionalDiagramPropsSchema
+> = async (props) => {
 	const { width, height, shape, numerator, denominator, shadeColor, shapesPerRow } = props
 
 	const canvas = new CanvasImpl({
@@ -260,7 +280,13 @@ export const generateQuantityFractionalDiagram: WidgetGenerator<typeof QuantityF
 		// Render a single, unshaded shape if the quantity is zero.
 		const shapeSize = Math.min(width, height) - PADDING * 2
 		drawSingleModel(canvas, shape, denominator, 0, shadeColor, width / 2, height / 2, shapeSize)
-		const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+		const {
+			svgBody,
+			vbMinX,
+			vbMinY,
+			width: finalWidth,
+			height: finalHeight
+		} = canvas.finalize(PADDING)
 		return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}">${svgBody}</svg>`
 	}
 
@@ -291,6 +317,12 @@ export const generateQuantityFractionalDiagram: WidgetGenerator<typeof QuantityF
 		drawSingleModel(canvas, shape, denominator, shaded, shadeColor, cx, cy, shapeSize)
 	}
 
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(PADDING)
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}">${svgBody}</svg>`
 }

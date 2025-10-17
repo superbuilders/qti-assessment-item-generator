@@ -28,7 +28,9 @@ const PlaneSchema = z.discriminatedUnion("orientation", [
 		.object({
 			orientation: z
 				.literal("horizontal")
-				.describe("A plane parallel to the base, cutting through the solid horizontally like slicing a cake layer."),
+				.describe(
+					"A plane parallel to the base, cutting through the solid horizontally like slicing a cake layer."
+				),
 			position: z
 				.number()
 				.min(0)
@@ -58,7 +60,9 @@ const PlaneSchema = z.discriminatedUnion("orientation", [
 		.object({
 			orientation: z
 				.literal("oblique")
-				.describe("A plane at an angle, neither purely horizontal nor vertical, creating diagonal cross-sections."),
+				.describe(
+					"A plane at an angle, neither purely horizontal nor vertical, creating diagonal cross-sections."
+				),
 			position: z
 				.number()
 				.min(0)
@@ -100,16 +104,22 @@ export const ThreeDIntersectionDiagramPropsSchema = z
 						CSS_COLOR_PATTERN,
 						"invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA), rgb/rgba(), hsl/hsla(), or a common named color"
 					)
-					.describe("The fill color for the cross-section area where the plane cuts the solid. Use CSS color format."),
+					.describe(
+						"The fill color for the cross-section area where the plane cuts the solid. Use CSS color format."
+					),
 				showHiddenEdges: z
 					.boolean()
 					.describe("Whether to show edges that would be hidden behind the solid as dashed lines."),
 				showLabels: z
 					.boolean()
-					.describe("Whether to display measurement labels on the solid's dimensions and the cross-section.")
+					.describe(
+						"Whether to display measurement labels on the solid's dimensions and the cross-section."
+					)
 			})
 			.strict()
-			.describe("Visual presentation options that control how the 3D solid and its cross-section are rendered.")
+			.describe(
+				"Visual presentation options that control how the 3D solid and its cross-section are rendered."
+			)
 	})
 	.strict()
 	.describe(
@@ -170,9 +180,9 @@ const makeColorTransparent = (color: string, opacity: number): string => {
  * Generates an SVG diagram of a 3D solid being intersected by a plane,
  * showing the semi-transparent plane cutting through the solid.
  */
-export const generateThreeDIntersectionDiagram: WidgetGenerator<typeof ThreeDIntersectionDiagramPropsSchema> = async (
-	props
-) => {
+export const generateThreeDIntersectionDiagram: WidgetGenerator<
+	typeof ThreeDIntersectionDiagramPropsSchema
+> = async (props) => {
 	const { width, height, solid, plane, viewOptions } = props
 	const { intersectionColor: rawIntersectionColor } = viewOptions
 
@@ -626,6 +636,12 @@ export const generateThreeDIntersectionDiagram: WidgetGenerator<typeof ThreeDInt
 	}
 
 	// Finalize and return SVG
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(PADDING)
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}">${svgBody}</svg>`
 }

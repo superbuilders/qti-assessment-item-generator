@@ -12,7 +12,10 @@ export function validateNoLatex(xml: string, logger: logger.Logger): void {
 	const latexCommandMatch = xml.match(latexCommandRegex)
 	if (latexCommandMatch) {
 		const contextIndex = latexCommandMatch.index ?? 0
-		const errorContext = xml.substring(Math.max(0, contextIndex - 50), Math.min(xml.length, contextIndex + 100))
+		const errorContext = xml.substring(
+			Math.max(0, contextIndex - 50),
+			Math.min(xml.length, contextIndex + 100)
+		)
 		logger.error("found latex command-like content in compiled xml", {
 			match: latexCommandMatch[0],
 			context: errorContext
@@ -59,7 +62,10 @@ export function validateNoLatex(xml: string, logger: logger.Logger): void {
 
 				if (hasMathIndicators) {
 					const contextIndex = match.index ?? 0
-					const errorContext = xml.substring(Math.max(0, contextIndex - 50), Math.min(xml.length, contextIndex + 100))
+					const errorContext = xml.substring(
+						Math.max(0, contextIndex - 50),
+						Math.min(xml.length, contextIndex + 100)
+					)
 					logger.error("found dollar-sign delimited latex content in compiled xml", {
 						match: match[0],
 						content: content,

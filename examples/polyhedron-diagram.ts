@@ -828,7 +828,8 @@ export const polyhedronDiagramExamples: PolyhedronDiagramProps[] = [
 		],
 		segments: null,
 		diagonals: [],
-		shadedFace: "]}'}  } }}}} }}}} } }  } }  } } } } } } }  } } } }}}  } } }  }  } } } } } } }  }  } }  }}",
+		shadedFace:
+			"]}'}  } }}}} }}}} } }  } }  } } } } } } }  } } } }}}  } } }  }  } } } } } } }  }  } }  }}",
 		angleMarkers: null,
 		showHiddenEdges: true
 	},

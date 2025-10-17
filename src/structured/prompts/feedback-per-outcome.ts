@@ -6,7 +6,11 @@ import { createFeedbackContentSchema } from "@/core/content"
 import type { FeedbackCombination, FeedbackPlan } from "@/core/feedback"
 import type { AnyInteraction } from "@/core/interactions"
 import type { AssessmentItemShell } from "@/core/item"
-import type { WidgetCollection, WidgetDefinition, WidgetTypeTupleFrom } from "@/widgets/collections/types"
+import type {
+	WidgetCollection,
+	WidgetDefinition,
+	WidgetTypeTupleFrom
+} from "@/widgets/collections/types"
 import { createMathmlComplianceSection } from "./shared/mathml"
 
 type ShallowFeedbackPayload<E extends readonly string[]> = {
@@ -31,16 +35,18 @@ export function createPerOutcomeNestedFeedbackPrompt<
 	userContent: string
 	ShallowSchema: z.ZodType<ShallowFeedbackPayload<WidgetTypeTupleFrom<C>>>
 } {
-	const ContentSchema: z.ZodType<FeedbackContent<WidgetTypeTupleFrom<C>>> = createFeedbackContentSchema(
-		widgetCollection.widgetTypeKeys
-	)
+	const ContentSchema: z.ZodType<FeedbackContent<WidgetTypeTupleFrom<C>>> =
+		createFeedbackContentSchema(widgetCollection.widgetTypeKeys)
 
 	const ShallowSchema = z.object({ content: ContentSchema }).strict()
 
 	const outcomePathText =
 		combination.path.length > 0
 			? combination.path
-					.map((seg, i) => `  ${i + 1}. Interaction '${seg.responseIdentifier}': Student chose '${seg.key}'`)
+					.map(
+						(seg, i) =>
+							`  ${i + 1}. Interaction '${seg.responseIdentifier}': Student chose '${seg.key}'`
+					)
 					.join("\n")
 			: "N/A (Fallback Mode)"
 
@@ -49,8 +55,14 @@ export function createPerOutcomeNestedFeedbackPrompt<
 			return `Overall outcome: ${combination.id}`
 		}
 		for (const seg of combination.path) {
-			const decl = assessmentShell.responseDeclarations.find((d) => d.identifier === seg.responseIdentifier)
-			if (decl?.baseType === "identifier" && decl.cardinality === "single" && typeof decl.correct === "string") {
+			const decl = assessmentShell.responseDeclarations.find(
+				(d) => d.identifier === seg.responseIdentifier
+			)
+			if (
+				decl?.baseType === "identifier" &&
+				decl.cardinality === "single" &&
+				typeof decl.correct === "string"
+			) {
 				if (decl.correct !== seg.key) {
 					return "Overall outcome for this path: INCORRECT"
 				}

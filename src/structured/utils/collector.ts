@@ -9,7 +9,10 @@ import type {
 import type { FeedbackPlan } from "@/core/feedback/plan"
 import type { AnyInteraction } from "@/core/interactions"
 
-function walkInline<E extends readonly string[]>(inline: InlineContent<E> | null, out: Map<string, string>): void {
+function walkInline<E extends readonly string[]>(
+	inline: InlineContent<E> | null,
+	out: Map<string, string>
+): void {
 	if (!inline) return
 	for (const node of inline) {
 		if (node.type === "inlineWidgetRef") {
@@ -27,7 +30,10 @@ function walkInline<E extends readonly string[]>(inline: InlineContent<E> | null
 	}
 }
 
-function walkBlock<E extends readonly string[]>(blocks: BlockContent<E> | null, out: Map<string, string>): void {
+function walkBlock<E extends readonly string[]>(
+	blocks: BlockContent<E> | null,
+	out: Map<string, string>
+): void {
 	if (!blocks) return
 	for (const node of blocks) {
 		switch (node.type) {
@@ -110,7 +116,12 @@ function walkInteractions<E extends readonly string[]>(
 function isLeafNode<E extends readonly string[]>(
 	node: AuthoringNestedLeaf<E> | AuthoringNestedNode<FeedbackPlan, E>
 ): node is AuthoringNestedLeaf<E> {
-	return "content" in node && typeof node.content === "object" && node.content !== null && "steps" in node.content
+	return (
+		"content" in node &&
+		typeof node.content === "object" &&
+		node.content !== null &&
+		"steps" in node.content
+	)
 }
 
 function walkFeedbackNode<E extends readonly string[]>(

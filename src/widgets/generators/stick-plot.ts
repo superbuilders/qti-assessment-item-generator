@@ -13,8 +13,13 @@ import { theme } from "../utils/theme"
 // A single vertical stick at an x-category with a height determined by y value
 const StickSchema = z
 	.object({
-		xLabel: z.string().describe("Label for the position along the x-axis (e.g., isotope mass label)."),
-		yValue: z.number().nonnegative().describe("Height of the stick along the y-axis. Typically a percentage or count."),
+		xLabel: z
+			.string()
+			.describe("Label for the position along the x-axis (e.g., isotope mass label)."),
+		yValue: z
+			.number()
+			.nonnegative()
+			.describe("Height of the stick along the y-axis. Typically a percentage or count."),
 		color: z
 			.string()
 			.regex(CSS_COLOR_PATTERN, "invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)")
@@ -123,7 +128,9 @@ export const generateStickPlot: WidgetGenerator<typeof StickPlotPropsSchema> = a
 	// Render sticks within clipped chart area
 	const bandWidth = baseInfo.bandWidth
 	if (bandWidth === undefined) {
-		logger.error("stick plot requires bandWidth for categorical x-axis", { categoriesCount: xAxis.categories.length })
+		logger.error("stick plot requires bandWidth for categorical x-axis", {
+			categoriesCount: xAxis.categories.length
+		})
 		throw errors.new("stick plot: missing bandWidth for categorical x-axis")
 	}
 
@@ -159,10 +166,16 @@ export const generateStickPlot: WidgetGenerator<typeof StickPlotPropsSchema> = a
 			throw errors.new("stick plot: reference xLabel must exist in xAxis.categories")
 		}
 		const x = baseInfo.toSvgX(idx)
-		canvas.drawLine(x, baseInfo.chartArea.top, x, baseInfo.chartArea.top + baseInfo.chartArea.height, {
-			stroke: ref.color,
-			strokeWidth: theme.stroke.width.thin
-		})
+		canvas.drawLine(
+			x,
+			baseInfo.chartArea.top,
+			x,
+			baseInfo.chartArea.top + baseInfo.chartArea.height,
+			{
+				stroke: ref.color,
+				strokeWidth: theme.stroke.width.thin
+			}
+		)
 		canvas.drawText({
 			x: x + 4,
 			y: baseInfo.chartArea.top + 12,
@@ -172,6 +185,12 @@ export const generateStickPlot: WidgetGenerator<typeof StickPlotPropsSchema> = a
 		})
 	}
 
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(AXIS_VIEWBOX_PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(AXIS_VIEWBOX_PADDING)
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.base}">${svgBody}</svg>`
 }

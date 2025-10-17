@@ -53,7 +53,10 @@ export async function readLesson(reader: CartridgeReader, lessonPath: string): P
 	return parseRes.data
 }
 
-export async function readArticleContent(reader: CartridgeReader, articlePath: string): Promise<string> {
+export async function readArticleContent(
+	reader: CartridgeReader,
+	articlePath: string
+): Promise<string> {
 	const res = await errors.try(reader.readText(articlePath))
 	if (res.error) {
 		logger.error("article read", { path: articlePath, error: res.error })
@@ -71,7 +74,10 @@ export async function readQuestionXml(reader: CartridgeReader, xmlPath: string):
 	return res.data
 }
 
-export async function readQuestionJson(reader: CartridgeReader, jsonPath: string): Promise<unknown> {
+export async function readQuestionJson(
+	reader: CartridgeReader,
+	jsonPath: string
+): Promise<unknown> {
 	const res = await errors.try(reader.readText(jsonPath))
 	if (res.error) {
 		logger.error("question json read", { path: jsonPath, error: res.error })
@@ -98,7 +104,10 @@ export async function* iterUnitLessons(reader: CartridgeReader, unit: Unit): Asy
 	}
 }
 
-export async function* iterLessonResources(_reader: CartridgeReader, lesson: Lesson): AsyncIterable<Resource> {
+export async function* iterLessonResources(
+	_reader: CartridgeReader,
+	lesson: Lesson
+): AsyncIterable<Resource> {
 	for (const r of lesson.resources) {
 		yield r
 	}
@@ -111,13 +120,18 @@ export async function validateIntegrity(
 
 	const manifestText = await errors.try(reader.readText("integrity.json"))
 	if (manifestText.error)
-		return { ok: false, issues: [{ path: "integrity.json", reason: "file not found or unreadable" }] }
+		return {
+			ok: false,
+			issues: [{ path: "integrity.json", reason: "file not found or unreadable" }]
+		}
 
 	const manifestParsed = errors.trySync(() => JSON.parse(manifestText.data))
-	if (manifestParsed.error) return { ok: false, issues: [{ path: "integrity.json", reason: "JSON parse failed" }] }
+	if (manifestParsed.error)
+		return { ok: false, issues: [{ path: "integrity.json", reason: "JSON parse failed" }] }
 
 	const validated = IntegritySchema.safeParse(manifestParsed.data)
-	if (!validated.success) return { ok: false, issues: [{ path: "integrity.json", reason: "schema validation failed" }] }
+	if (!validated.success)
+		return { ok: false, issues: [{ path: "integrity.json", reason: "schema validation failed" }] }
 
 	const manifest = validated.data
 

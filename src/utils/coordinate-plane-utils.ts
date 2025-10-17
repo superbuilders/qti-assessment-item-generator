@@ -1,4 +1,9 @@
-import { type AxisSpec, type AxisSpecX, computeAndRenderXAxis, computeAndRenderYAxis } from "../utils/axes"
+import {
+	type AxisSpec,
+	type AxisSpecX,
+	computeAndRenderXAxis,
+	computeAndRenderYAxis
+} from "../utils/axes"
 import {
 	AXIS_TITLE_FONT_PX,
 	AXIS_TITLE_PADDING_PX,
@@ -100,10 +105,15 @@ export function setupCoordinatePlaneBaseV2(
 	const yTicks = buildTicks(data.yAxis.min, data.yAxis.max, data.yAxis.tickInterval)
 	const maxYTickWidth = Math.max(0, ...yTicks.labels.map((l) => l.length * LABEL_AVG_CHAR_WIDTH_PX))
 	// Since Y-axis title is rotated, its "width" is its measured height.
-	const yLabelDimensions = estimateWrappedTextDimensions(data.yAxis.label, chartArea.height, AXIS_TITLE_FONT_PX)
+	const yLabelDimensions = estimateWrappedTextDimensions(
+		data.yAxis.label,
+		chartArea.height,
+		AXIS_TITLE_FONT_PX
+	)
 	const yLabelWidth = yLabelDimensions.height
 
-	const leftOffset = yLabelWidth + AXIS_TITLE_PADDING_PX + TICK_LABEL_PADDING_PX + TICK_LENGTH_PX + maxYTickWidth
+	const leftOffset =
+		yLabelWidth + AXIS_TITLE_PADDING_PX + TICK_LABEL_PADDING_PX + TICK_LENGTH_PX + maxYTickWidth
 	// The Y-axis title's final X position is computed to place it correctly to the left of all other axis hardware.
 	const yAxisLabelX = chartArea.left - (leftOffset - yLabelWidth / 2)
 

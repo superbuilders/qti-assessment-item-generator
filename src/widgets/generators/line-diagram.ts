@@ -161,7 +161,11 @@ const findLineIntersection = (l1p1: Point, l1p2: Point, l2p1: Point, l2p2: Point
  * Clips an infinite line defined by two points to a bounding box.
  * Returns the two intersection points with the box edges.
  */
-const clipLineToBox = (p1: Point, p2: Point, box: { minX: number; maxX: number; minY: number; maxY: number }) => {
+const clipLineToBox = (
+	p1: Point,
+	p2: Point,
+	box: { minX: number; maxX: number; minY: number; maxY: number }
+) => {
 	const { minX, maxX, minY, maxY } = box
 	const dx = p2.x - p1.x
 	const dy = p2.y - p1.y
@@ -195,7 +199,9 @@ const clipLineToBox = (p1: Point, p2: Point, box: { minX: number; maxX: number; 
 /**
  * Generates an SVG diagram of lines on a grid, with optional perpendicular indicators.
  */
-export const generateLineDiagram: WidgetGenerator<typeof LineDiagramPropsSchema> = async (props) => {
+export const generateLineDiagram: WidgetGenerator<typeof LineDiagramPropsSchema> = async (
+	props
+) => {
 	const { width, height, gridBounds, lines, perpendicularIndicators } = props
 
 	if (gridBounds.minX >= gridBounds.maxX || gridBounds.minY >= gridBounds.maxY) {
@@ -238,7 +244,13 @@ export const generateLineDiagram: WidgetGenerator<typeof LineDiagramPropsSchema>
 	const lineMap = new Map(lines.map((line) => [line.id, line]))
 
 	// Keep track of placed text labels to avoid text-to-text collisions
-	const placedLabels: Array<{ x: number; y: number; width: number; height: number; padding: number }> = []
+	const placedLabels: Array<{
+		x: number
+		y: number
+		width: number
+		height: number
+		padding: number
+	}> = []
 
 	// Draw Perpendicular Indicators UNDER the lines for better aesthetics
 	for (const indicator of perpendicularIndicators) {
@@ -250,8 +262,15 @@ export const generateLineDiagram: WidgetGenerator<typeof LineDiagramPropsSchema>
 		const v2 = { x: line2.to.x - line2.from.x, y: line2.to.y - line2.from.y }
 		const dotProduct = v1.x * v2.x + v1.y * v2.y
 		if (Math.abs(dotProduct) > 1e-6) {
-			logger.error("lines are not perpendicular", { line1Id: line1.id, line2Id: line2.id, dotProduct })
-			throw errors.wrap(ErrLineNotPerpendicular, `Lines '${line1.id}' and '${line2.id}' are not perpendicular.`)
+			logger.error("lines are not perpendicular", {
+				line1Id: line1.id,
+				line2Id: line2.id,
+				dotProduct
+			})
+			throw errors.wrap(
+				ErrLineNotPerpendicular,
+				`Lines '${line1.id}' and '${line2.id}' are not perpendicular.`
+			)
 		}
 
 		const intersection = findLineIntersection(line1.from, line1.to, line2.from, line2.to)
@@ -279,8 +298,17 @@ export const generateLineDiagram: WidgetGenerator<typeof LineDiagramPropsSchema>
 		const p2 = { x: p1.x + n2.x * markerSize, y: p1.y + n2.y * markerSize }
 		const p3 = { x: p0.x + n2.x * markerSize, y: p0.y + n2.y * markerSize }
 
-		const path = new Path2D().moveTo(p0.x, p0.y).lineTo(p1.x, p1.y).lineTo(p2.x, p2.y).lineTo(p3.x, p3.y).closePath()
-		canvas.drawPath(path, { fill: "none", stroke: indicator.color, strokeWidth: theme.stroke.width.thick })
+		const path = new Path2D()
+			.moveTo(p0.x, p0.y)
+			.lineTo(p1.x, p1.y)
+			.lineTo(p2.x, p2.y)
+			.lineTo(p3.x, p3.y)
+			.closePath()
+		canvas.drawPath(path, {
+			fill: "none",
+			stroke: indicator.color,
+			strokeWidth: theme.stroke.width.thick
+		})
 	}
 	// Keep a list of screen-space segments for collision checks when placing labels
 	const screenSegments: Array<{ a: { x: number; y: number }; b: { x: number; y: number } }> = []
@@ -371,7 +399,11 @@ export const generateLineDiagram: WidgetGenerator<typeof LineDiagramPropsSchema>
 				const r2 = { x: rx + rw, y: ry }
 				const r3 = { x: rx + rw, y: ry + rh }
 				const r4 = { x: rx, y: ry + rh }
-				const orient = (p: { x: number; y: number }, q: { x: number; y: number }, r: { x: number; y: number }) => {
+				const orient = (
+					p: { x: number; y: number },
+					q: { x: number; y: number },
+					r: { x: number; y: number }
+				) => {
 					const val = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y)
 					if (val > 1e-9) return 1
 					if (val < -1e-9) return -1
@@ -457,7 +489,13 @@ export const generateLineDiagram: WidgetGenerator<typeof LineDiagramPropsSchema>
 
 	// no global arrowhead; per-line colored markers are defined above
 
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(PADDING)
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}">${svgBody}</svg>`
 }

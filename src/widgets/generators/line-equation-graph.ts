@@ -19,7 +19,9 @@ export const LineEquationGraphPropsSchema = z
 	.object({
 		type: z
 			.literal("lineEquationGraph")
-			.describe("Identifies this as a line equation graph for plotting linear functions and points."),
+			.describe(
+				"Identifies this as a line equation graph for plotting linear functions and points."
+			),
 		width: createWidthSchema(),
 		height: createHeightSchema(),
 		xAxis: createAxisOptionsSchema().describe(
@@ -51,7 +53,9 @@ export const LineEquationGraphPropsSchema = z
 
 export type LineEquationGraphProps = z.infer<typeof LineEquationGraphPropsSchema>
 
-export const generateLineEquationGraph: WidgetGenerator<typeof LineEquationGraphPropsSchema> = async (props) => {
+export const generateLineEquationGraph: WidgetGenerator<
+	typeof LineEquationGraphPropsSchema
+> = async (props) => {
 	const { width, height, xAxis, yAxis, showQuadrantLabels, lines, points } = props
 
 	// Validate that all points are within axis bounds
@@ -116,7 +120,13 @@ export const generateLineEquationGraph: WidgetGenerator<typeof LineEquationGraph
 	renderPoints(points, baseInfo.toSvgX, baseInfo.toSvgY, canvas)
 
 	// NEW: Finalize the canvas and construct the root SVG element
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(AXIS_VIEWBOX_PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(AXIS_VIEWBOX_PADDING)
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.base}">${svgBody}</svg>`
 }

@@ -33,7 +33,9 @@ describe("Compiler: gapMatchInteraction validation", () => {
 						]
 					}
 				],
-				gapTexts: [{ identifier: "TOKEN_A", matchMax: 1, content: [{ type: "text", content: "A" }] }],
+				gapTexts: [
+					{ identifier: "TOKEN_A", matchMax: 1, content: [{ type: "text", content: "A" }] }
+				],
 				gaps: [{ identifier: "GAP_1", required: true }]
 			}
 		},
@@ -47,7 +49,10 @@ describe("Compiler: gapMatchInteraction validation", () => {
 			],
 			combinations: [
 				{ id: "FB__RESPONSE_CORRECT", path: [{ responseIdentifier: "RESPONSE", key: "CORRECT" }] },
-				{ id: "FB__RESPONSE_INCORRECT", path: [{ responseIdentifier: "RESPONSE", key: "INCORRECT" }] }
+				{
+					id: "FB__RESPONSE_INCORRECT",
+					path: [{ responseIdentifier: "RESPONSE", key: "INCORRECT" }]
+				}
 			]
 		},
 		feedback: {

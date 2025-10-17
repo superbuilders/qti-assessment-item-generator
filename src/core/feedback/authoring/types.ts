@@ -1,9 +1,13 @@
 import type { FeedbackContent } from "@/core/content"
 import type { FeedbackPlan } from "@/core/feedback/plan"
 
-export type ResponseIdentifierLiteral<P extends FeedbackPlan> = P["dimensions"][number]["responseIdentifier"]
+export type ResponseIdentifierLiteral<P extends FeedbackPlan> =
+	P["dimensions"][number]["responseIdentifier"]
 
-export type AuthoringNestedLeaf<E extends readonly string[] = readonly string[], ContentT = FeedbackContent<E>> = {
+export type AuthoringNestedLeaf<
+	E extends readonly string[] = readonly string[],
+	ContentT = FeedbackContent<E>
+> = {
 	content: ContentT
 }
 

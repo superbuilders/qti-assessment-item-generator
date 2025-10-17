@@ -49,7 +49,10 @@ function processInlineContent<E extends readonly string[]>(
 }
 
 // NEW: Recursive walker function for block content
-function processBlockContent<E extends readonly string[]>(items: BlockContent<E> | null, logger: logger.Logger): void {
+function processBlockContent<E extends readonly string[]>(
+	items: BlockContent<E> | null,
+	logger: logger.Logger
+): void {
 	if (!items) return
 	for (const item of items) {
 		if (item.type === "paragraph") {
@@ -93,7 +96,9 @@ export function validateAndSanitizeHtmlFields<E extends readonly string[]>(
 		return "content" in node
 	}
 
-	function processFeedbackNode(node: AuthoringNestedLeaf<E> | AuthoringNestedNode<FeedbackPlan, E>): void {
+	function processFeedbackNode(
+		node: AuthoringNestedLeaf<E> | AuthoringNestedNode<FeedbackPlan, E>
+	): void {
 		if (isLeafNode(node)) {
 			processFeedbackContent(node.content, logger)
 			return
@@ -153,7 +158,10 @@ export function validateAndSanitizeHtmlFields<E extends readonly string[]>(
 					for (const choice of interaction.choices) {
 						processInlineContent(choice.content, logger)
 					}
-				} else if (interaction.type === "choiceInteraction" || interaction.type === "orderInteraction") {
+				} else if (
+					interaction.type === "choiceInteraction" ||
+					interaction.type === "orderInteraction"
+				) {
 					// Now TypeScript knows this is a choice/order interaction
 					for (const choice of interaction.choices) {
 						processBlockContent(choice.content, logger)

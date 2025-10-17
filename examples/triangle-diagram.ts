@@ -508,7 +508,14 @@ export const triangleDiagramExamples: TriangleDiagramProps[] = [
 		lines: null,
 		rightAngleMarks: null,
 		altitudes: [
-			{ vertex: "pt_tri_C8", toSide: "AB", value: null, style: "dashed", color: "#777777", withRightAngle: true }
+			{
+				vertex: "pt_tri_C8",
+				toSide: "AB",
+				value: null,
+				style: "dashed",
+				color: "#777777",
+				withRightAngle: true
+			}
 		]
 	},
 	// New: MathML side labels on slanted sides, known altitude 3 and base symbolic x

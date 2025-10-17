@@ -74,7 +74,9 @@ export function formatUnifiedContextSections(
 	if (imageContext.imageUrls && imageContext.imageUrls.length > 0) {
 		sections.push("\n## Visual Context:")
 		sections.push("Raster images are attached as multimodal inputs for vision.")
-		sections.push("Use these images to understand visual content that will be represented by widgets.")
+		sections.push(
+			"Use these images to understand visual content that will be represented by widgets."
+		)
 	}
 
 	return sections.join("\n")

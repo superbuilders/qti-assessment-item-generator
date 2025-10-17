@@ -21,8 +21,12 @@ function createHighlightPointSchema() {
 			.number()
 			.min(0)
 			.max(1)
-			.describe("Position along the curve as a fraction of total arc length; 0 = start of curve, 1 = end of curve."),
-		label: z.string().describe("The text label to display next to this point (e.g., 'A', 'B', 'C').")
+			.describe(
+				"Position along the curve as a fraction of total arc length; 0 = start of curve, 1 = end of curve."
+			),
+		label: z
+			.string()
+			.describe("The text label to display next to this point (e.g., 'A', 'B', 'C').")
 	})
 }
 
@@ -32,12 +36,17 @@ export const ConceptualGraphPropsSchema = z
 		width: createWidthSchema(),
 		height: createHeightSchema(),
 		xAxisLabel: z.string().describe("The label for the horizontal axis (e.g., 'Time')."),
-		yAxisLabel: z.string().describe("The label for the vertical axis (e.g., 'Frog population size')."),
+		yAxisLabel: z
+			.string()
+			.describe("The label for the vertical axis (e.g., 'Frog population size')."),
 		curvePoints: z
 			.array(createPointSchema())
 			.min(2)
 			.describe("An array of {x, y} points that define the curve to be drawn."),
-		curveColor: z.string().regex(CSS_COLOR_PATTERN, "invalid css color").describe("The color of the plotted curve."),
+		curveColor: z
+			.string()
+			.regex(CSS_COLOR_PATTERN, "invalid css color")
+			.describe("The color of the plotted curve."),
 		highlightPoints: z
 			.array(createHighlightPointSchema())
 			.describe("An array of specific, labeled points to highlight on the graph."),
@@ -45,7 +54,10 @@ export const ConceptualGraphPropsSchema = z
 			.string()
 			.regex(CSS_COLOR_PATTERN, "invalid css color")
 			.describe("The color of the highlighted points and their labels."),
-		highlightPointRadius: z.number().positive().describe("The radius of the highlighted points in pixels.")
+		highlightPointRadius: z
+			.number()
+			.positive()
+			.describe("The radius of the highlighted points in pixels.")
 	})
 	.strict()
 	.describe(
@@ -54,7 +66,9 @@ export const ConceptualGraphPropsSchema = z
 
 export type ConceptualGraphProps = z.infer<typeof ConceptualGraphPropsSchema>
 
-export const generateConceptualGraph: WidgetGenerator<typeof ConceptualGraphPropsSchema> = async (props) => {
+export const generateConceptualGraph: WidgetGenerator<typeof ConceptualGraphPropsSchema> = async (
+	props
+) => {
 	const {
 		width,
 		height,
@@ -225,7 +239,13 @@ export const generateConceptualGraph: WidgetGenerator<typeof ConceptualGraphProp
 	}
 
 	// NEW: Finalize the canvas and construct the root SVG element
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(AXIS_VIEWBOX_PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(AXIS_VIEWBOX_PADDING)
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.large}">${svgBody}</svg>`
 }

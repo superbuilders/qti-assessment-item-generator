@@ -25,7 +25,8 @@
 			"@/structured/*": ["src/structured/*"],
 			"@/compiler/*": ["src/compiler/*"],
 			"@/widgets/*": ["src/widgets/*"],
-			"@/cartridge/*": ["src/cartridge/*"]
+			"@/cartridge/*": ["src/cartridge/*"],
+			"@/stimulus/*": ["src/stimulus/*"]
 		}
 	},
 	"include": ["src/**/*", "tests/**/*", "scripts/**/*"],

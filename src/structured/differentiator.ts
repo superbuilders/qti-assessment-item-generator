@@ -4,7 +4,11 @@ import type OpenAI from "openai"
 import { z } from "zod"
 import { type AssessmentItemInput, createDynamicAssessmentItemSchema } from "@/core/item"
 import { toJSONSchemaPromptSafe } from "@/core/json-schema"
-import type { WidgetCollection, WidgetDefinition, WidgetTypeTupleFrom } from "@/widgets/collections/types"
+import type {
+	WidgetCollection,
+	WidgetDefinition,
+	WidgetTypeTupleFrom
+} from "@/widgets/collections/types"
 import { allWidgetSchemas, type Widget, WidgetSchema } from "@/widgets/registry"
 import { callOpenAIWithRetry } from "./utils/openai"
 import { transformArraysToObjects, transformObjectsToArrays } from "./utils/shape-helpers"
@@ -108,7 +112,9 @@ function buildShot1WidgetInfoSection<E extends readonly string[]>(
 			throw errors.new("widget json schema missing required")
 		}
 		const digest = { properties, required }
-		digestSections.push(`#### ${typeName} \n\n\`\`\`json\n${JSON.stringify(digest, null, 2)}\n\`\`\``)
+		digestSections.push(
+			`#### ${typeName} \n\n\`\`\`json\n${JSON.stringify(digest, null, 2)}\n\`\`\``
+		)
 	}
 
 	return [
@@ -141,7 +147,10 @@ async function planContentDifferentiation<const E extends readonly string[]>(
 	assessmentItem: AssessmentItemInput<E>,
 	n: number
 ): Promise<Array<ContentPlan<E>>> {
-	logger.info("starting differentiation planning", { identifier: assessmentItem.identifier, variations: n })
+	logger.info("starting differentiation planning", {
+		identifier: assessmentItem.identifier,
+		variations: n
+	})
 
 	// Create a pure content payload by explicitly removing widget and identifier fields at runtime.
 	// This ensures the LLM focuses only on the content to be varied.
@@ -397,7 +406,9 @@ async function planContentDifferentiation<const E extends readonly string[]>(
 	}
 
 	// Convert the object-based structures from the AI back into our standard array-based format.
-	const transformedPlans = validation.data.plans.map((plan: unknown) => transformObjectsToArrays(plan))
+	const transformedPlans = validation.data.plans.map((plan: unknown) =>
+		transformObjectsToArrays(plan)
+	)
 	const finalPlans: Array<ContentPlan<E>> = []
 
 	// Post-validation: Ensure structural integrity of the generated plans.
@@ -444,7 +455,11 @@ async function planContentDifferentiation<const E extends readonly string[]>(
 			const planChoicesLen = arrayLengthOfKey(planInteraction, "choices")
 			if (srcChoicesLen !== -1 || planChoicesLen !== -1) {
 				if (srcChoicesLen !== planChoicesLen) {
-					logger.error("plan interaction choices length mismatch", { key, srcChoicesLen, planChoicesLen })
+					logger.error("plan interaction choices length mismatch", {
+						key,
+						srcChoicesLen,
+						planChoicesLen
+					})
 					throw errors.new("structural validation failed: interaction choices length mismatch")
 				}
 			}
@@ -495,7 +510,9 @@ async function regenerateWidgetsViaLLM<const E extends readonly string[]>(
 ): Promise<Record<string, Widget>> {
 	const widgetKeys = Object.keys(widgetTypes)
 	logger.info("shot 2 widget generation starting", { widgetKeysCount: widgetKeys.length })
-	const WidgetsEnvelopeSchema = z.object({ widgets: buildWidgetsResponseSchema(logger, widgetTypes) }).strict()
+	const WidgetsEnvelopeSchema = z
+		.object({ widgets: buildWidgetsResponseSchema(logger, widgetTypes) })
+		.strict()
 
 	const systemInstruction = [
 		"You are an expert in generating QTI widget objects that strictly conform to their Zod schemas.",
@@ -645,14 +662,23 @@ export async function differentiateAssessmentItem<
 			widgetKeys: Object.keys(widgetTypes)
 		})
 
-		const widgetsResult = await errors.try(regenerateWidgetsViaLLM(openai, logger, sourceItem, plan, widgetTypes))
+		const widgetsResult = await errors.try(
+			regenerateWidgetsViaLLM(openai, logger, sourceItem, plan, widgetTypes)
+		)
 		if (widgetsResult.error) {
-			logger.error("shot 2 widget generation failed", { error: widgetsResult.error, itemIdentifier: identifier })
+			logger.error("shot 2 widget generation failed", {
+				error: widgetsResult.error,
+				itemIdentifier: identifier
+			})
 			throw errors.wrap(widgetsResult.error, "widget generation")
 		}
 		const regeneratedWidgets = widgetsResult.data
 
-		const finalItem: AssessmentItemInput<WidgetTypeTupleFrom<C>> = { ...plan, identifier, widgets: regeneratedWidgets }
+		const finalItem: AssessmentItemInput<WidgetTypeTupleFrom<C>> = {
+			...plan,
+			identifier,
+			widgets: regeneratedWidgets
+		}
 
 		// Use the collection's widget schemas for validation
 		const widgetSchemasForCollection: Record<string, z.ZodType<unknown, unknown>> = {}
@@ -671,7 +697,10 @@ export async function differentiateAssessmentItem<
 		)
 		const finalValidation = finalItemSchema.safeParse(finalItem)
 		if (!finalValidation.success) {
-			logger.error("final differentiated item failed schema validation", { identifier, error: finalValidation.error })
+			logger.error("final differentiated item failed schema validation", {
+				identifier,
+				error: finalValidation.error
+			})
 			throw errors.wrap(finalValidation.error, "final item validation")
 		}
 		finalItems.push(finalValidation.data)

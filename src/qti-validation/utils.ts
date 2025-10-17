@@ -34,7 +34,10 @@ export function checkNoLatex(htmlFragment: string, logger: logger.Logger): void 
 	// First, check if dollar signs are properly tagged as currency - if so, skip LaTeX validation
 	// This handles cases like <span class="currency">$</span>
 	const currencyTaggedDollar = /<span\s+class\s*=\s*["']currency["']\s*>\s*\$\s*<\/span>/gi
-	const fragmentWithoutCurrencyTags = htmlFragment.replace(currencyTaggedDollar, "CURRENCY_PLACEHOLDER")
+	const fragmentWithoutCurrencyTags = htmlFragment.replace(
+		currencyTaggedDollar,
+		"CURRENCY_PLACEHOLDER"
+	)
 
 	// Also handle cases where $ appears right before a number or math tag (likely currency)
 	// Examples: $50, $<math>, <mo>$</mo>
@@ -169,8 +172,12 @@ export function sanitizeHtmlEntities(htmlFragment: string): string {
  */
 export function sanitizeMathMLOperators(htmlFragment: string): string {
 	let fixedXml = htmlFragment
-	fixedXml = fixedXml.replace(/<mo(?:\s+[^>]?)?>(<)<\/mo>/gi, (match) => match.replace("<</mo>", "&lt;</mo>"))
-	fixedXml = fixedXml.replace(/<mo(?:\s+[^>]*)?>><\/mo>/gi, (match) => match.replace("></mo>", "&gt;</mo>"))
+	fixedXml = fixedXml.replace(/<mo(?:\s+[^>]?)?>(<)<\/mo>/gi, (match) =>
+		match.replace("<</mo>", "&lt;</mo>")
+	)
+	fixedXml = fixedXml.replace(/<mo(?:\s+[^>]*)?>><\/mo>/gi, (match) =>
+		match.replace("></mo>", "&gt;</mo>")
+	)
 	fixedXml = fixedXml.replace(/<mo(?:\s+[^>]?)?><=(\/mo>)/gi, (match) => match.replace("<=", "≤"))
 	fixedXml = fixedXml.replace(/<mo(?:\s+[^>]*)?>>=(<\/mo>)/gi, (match) => match.replace(">=", "≥"))
 	return fixedXml
@@ -221,7 +228,8 @@ export function checkNoInvalidXmlChars(fragment: string, logger: logger.Logger):
 		const isLowSurrogate = codeUnit >= 0xdc00 && codeUnit <= 0xdfff
 		const isUnpairedHigh = isHighSurrogate && !(nextCodeUnit >= 0xdc00 && nextCodeUnit <= 0xdfff)
 		const isUnpairedLow =
-			isLowSurrogate && !(i > 0 && fragment.charCodeAt(i - 1) >= 0xd800 && fragment.charCodeAt(i - 1) <= 0xdbff)
+			isLowSurrogate &&
+			!(i > 0 && fragment.charCodeAt(i - 1) >= 0xd800 && fragment.charCodeAt(i - 1) <= 0xdbff)
 
 		if (!isAllowed || isBmpNonCharacter || isUnpairedHigh || isUnpairedLow) {
 			invalidCodePoints.push({ index: i, codePoint })

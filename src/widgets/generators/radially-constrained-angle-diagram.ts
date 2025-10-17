@@ -58,7 +58,9 @@ export const RadiallyConstrainedAngleDiagramPropsSchema = z
 		"Creates a diagram with rays originating from a central point, showing the angles between them. Each angle explicitly defines which rays it spans, making the relationships clear and unambiguous. Supports layered visualization: primary angles (between adjacent rays) appear as filled sectors, while secondary angles (spanning multiple rays) appear as arc overlays at different radii. Multiple secondary angles are automatically stacked for clear visual separation."
 	)
 
-export type RadiallyConstrainedAngleDiagramProps = z.infer<typeof RadiallyConstrainedAngleDiagramPropsSchema>
+export type RadiallyConstrainedAngleDiagramProps = z.infer<
+	typeof RadiallyConstrainedAngleDiagramPropsSchema
+>
 
 /**
  * Generates an SVG diagram of angles constrained around a central point.
@@ -99,7 +101,10 @@ export const generateRadiallyConstrainedAngleDiagram: WidgetGenerator<
 			primaryForTotal.push(angle)
 		}
 	}
-	const totalPrimaryAngle = primaryForTotal.reduce((sum: number, a: { value: number }) => sum + a.value, 0)
+	const totalPrimaryAngle = primaryForTotal.reduce(
+		(sum: number, a: { value: number }) => sum + a.value,
+		0
+	)
 	if (totalPrimaryAngle <= 0 || totalPrimaryAngle >= 360) {
 		logger.error("invalid total primary angle", { totalPrimaryAngle })
 		throw errors.new("sum of primary angles must be less than 360 degrees")
@@ -170,7 +175,11 @@ export const generateRadiallyConstrainedAngleDiagram: WidgetGenerator<
 			const seg = primaryBetween[key]
 			if (seg === undefined) {
 				// Should be unreachable due to earlier validation, but fail loud if encountered
-				logger.error("missing primary segment for secondary validation", { key, fromIndex, toIndex })
+				logger.error("missing primary segment for secondary validation", {
+					key,
+					fromIndex,
+					toIndex
+				})
 				throw errors.new("missing primary angle between adjacent rays")
 			}
 			expected += seg
@@ -183,7 +192,9 @@ export const generateRadiallyConstrainedAngleDiagram: WidgetGenerator<
 				expected,
 				actual: angle.value
 			})
-			throw errors.new(`angle from '${angle.fromRayLabel}' to '${angle.toRayLabel}' must equal sum of primary angles`)
+			throw errors.new(
+				`angle from '${angle.fromRayLabel}' to '${angle.toRayLabel}' must equal sum of primary angles`
+			)
 		}
 	}
 
@@ -252,8 +263,14 @@ export const generateRadiallyConstrainedAngleDiagram: WidgetGenerator<
 			angleDiff += 2 * Math.PI
 		}
 
-		const startPoint = { x: cx + primaryArcRadius * Math.cos(fromRad), y: cy + primaryArcRadius * Math.sin(fromRad) }
-		const endPoint = { x: cx + primaryArcRadius * Math.cos(toRad), y: cy + primaryArcRadius * Math.sin(toRad) }
+		const startPoint = {
+			x: cx + primaryArcRadius * Math.cos(fromRad),
+			y: cy + primaryArcRadius * Math.sin(fromRad)
+		}
+		const endPoint = {
+			x: cx + primaryArcRadius * Math.cos(toRad),
+			y: cy + primaryArcRadius * Math.sin(toRad)
+		}
 
 		const largeArcFlag = angleDiff > Math.PI ? 1 : 0
 		const path = new Path2D()
@@ -278,7 +295,8 @@ export const generateRadiallyConstrainedAngleDiagram: WidgetGenerator<
 	const baseSecondaryRadius = Math.min(innerArcMaxRadius, innerArcMinRadius + 16)
 	// Widen spacing so the outer arc sits farther out as well
 	const radiusStep = 44
-	const pendingSecondaryLabels: Array<{ x: number; y: number; text: string; midAngleRad: number }> = []
+	const pendingSecondaryLabels: Array<{ x: number; y: number; text: string; midAngleRad: number }> =
+		[]
 
 	let i = 0
 	for (const angle of secondaryAngles) {
@@ -299,8 +317,14 @@ export const generateRadiallyConstrainedAngleDiagram: WidgetGenerator<
 		if (secondaryRadius > innerArcMaxRadius) {
 			secondaryRadius = innerArcMaxRadius
 		}
-		const startPoint = { x: cx + secondaryRadius * Math.cos(fromRad), y: cy + secondaryRadius * Math.sin(fromRad) }
-		const endPoint = { x: cx + secondaryRadius * Math.cos(toRad), y: cy + secondaryRadius * Math.sin(toRad) }
+		const startPoint = {
+			x: cx + secondaryRadius * Math.cos(fromRad),
+			y: cy + secondaryRadius * Math.sin(fromRad)
+		}
+		const endPoint = {
+			x: cx + secondaryRadius * Math.cos(toRad),
+			y: cy + secondaryRadius * Math.sin(toRad)
+		}
 		const largeArcFlag = angleDiff > Math.PI ? 1 : 0
 		const arcPath = new Path2D()
 			.moveTo(startPoint.x, startPoint.y)
@@ -374,7 +398,11 @@ export const generateRadiallyConstrainedAngleDiagram: WidgetGenerator<
 		const r2 = { x: rx + rw, y: ry }
 		const r3 = { x: rx + rw, y: ry + rh }
 		const r4 = { x: rx, y: ry + rh }
-		const orient = (p: { x: number; y: number }, q: { x: number; y: number }, r: { x: number; y: number }) => {
+		const orient = (
+			p: { x: number; y: number },
+			q: { x: number; y: number },
+			r: { x: number; y: number }
+		) => {
 			const val = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y)
 			if (val > 1e-9) return 1
 			if (val < -1e-9) return -1
@@ -432,7 +460,12 @@ export const generateRadiallyConstrainedAngleDiagram: WidgetGenerator<
 	// keeping labels close to their arcs instead of pushing them radially outward
 	for (const lbl of pendingSecondaryLabels) {
 		const fontPx = 18
-		const { maxWidth: w, height: h } = estimateWrappedTextDimensions(lbl.text, Number.POSITIVE_INFINITY, fontPx, 1.2)
+		const { maxWidth: w, height: h } = estimateWrappedTextDimensions(
+			lbl.text,
+			Number.POSITIVE_INFINITY,
+			fontPx,
+			1.2
+		)
 		const halfW = w / 2
 		const halfH = h / 2
 		const dirX = Math.cos(lbl.midAngleRad)
@@ -449,7 +482,10 @@ export const generateRadiallyConstrainedAngleDiagram: WidgetGenerator<
 			let it = 0
 			const maxIt = 80
 			const step = 3
-			while (rectIntersectsAnySegment({ x: px - halfW, y: py - halfH, width: w, height: h, pad: 1 }) && it < maxIt) {
+			while (
+				rectIntersectsAnySegment({ x: px - halfW, y: py - halfH, width: w, height: h, pad: 1 }) &&
+				it < maxIt
+			) {
 				px += mult * step * tanX
 				py += mult * step * tanY
 				it++
@@ -492,7 +528,13 @@ export const generateRadiallyConstrainedAngleDiagram: WidgetGenerator<
 		})
 	}
 
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(PADDING)
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}">${svgBody}</svg>`
 }

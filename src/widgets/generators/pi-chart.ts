@@ -27,7 +27,9 @@ const SliceSchema = z
 		color: z
 			.string()
 			.regex(CSS_COLOR_PATTERN, "invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)")
-			.describe("The hex-only fill color for the slice (e.g., '#4472C4', '#1E90FF', '#FF000080' for 50% alpha).")
+			.describe(
+				"The hex-only fill color for the slice (e.g., '#4472C4', '#1E90FF', '#FF000080' for 50% alpha)."
+			)
 	})
 	.strict()
 
@@ -55,8 +57,12 @@ export const PieChartWidgetPropsSchema = z
 		charts: z
 			.array(PieChartDataSchema)
 			.min(1)
-			.describe("An array of pie chart definitions to render. Multiple charts are stacked vertically."),
-		layout: z.literal("vertical").describe("Pie charts stack vertically only. Horizontal layout is not supported."),
+			.describe(
+				"An array of pie chart definitions to render. Multiple charts are stacked vertically."
+			),
+		layout: z
+			.literal("vertical")
+			.describe("Pie charts stack vertically only. Horizontal layout is not supported."),
 		spacing: z.number().min(0).describe("The gap in pixels between stacked charts.")
 	})
 	.strict()
@@ -69,7 +75,9 @@ export type PieChartWidgetProps = z.infer<typeof PieChartWidgetPropsSchema>
 /**
  * Generates one or more SVG pie charts from a declarative JSON structure.
  */
-export const generatePieChart: WidgetGenerator<typeof PieChartWidgetPropsSchema> = async (props) => {
+export const generatePieChart: WidgetGenerator<typeof PieChartWidgetPropsSchema> = async (
+	props
+) => {
 	const { width, height, charts, spacing } = props
 	const numCharts = charts.length
 
@@ -257,7 +265,13 @@ export const generatePieChart: WidgetGenerator<typeof PieChartWidgetPropsSchema>
 	}
 
 	// NEW: Finalize the canvas and construct the root SVG element
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(PADDING)
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.medium}">${styleTag}${svgBody}</svg>`
 }

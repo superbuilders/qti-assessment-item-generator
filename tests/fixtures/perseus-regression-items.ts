@@ -15,11 +15,17 @@ export const soupVolumeEstimation = {
 			replace: false,
 			widgets: {}
 		},
-		{ images: {}, content: "The volume of a bowl of soup is about $3$ cups.", replace: false, widgets: {} }
+		{
+			images: {},
+			content: "The volume of a bowl of soup is about $3$ cups.",
+			replace: false,
+			widgets: {}
+		}
 	],
 	question: {
 		images: {},
-		content: "**Which is closer to the volume of a bowl of soup?**\n\n\n[[☃ radio 1]]\n\n\n\n[[☃ image 1]]\n\n",
+		content:
+			"**Which is closer to the volume of a bowl of soup?**\n\n\n[[☃ radio 1]]\n\n\n\n[[☃ image 1]]\n\n",
 		widgets: {
 			"image 1": {
 				type: "image",
@@ -66,7 +72,13 @@ export const soupVolumeEstimation = {
 			}
 		}
 	},
-	answerArea: { tTable: false, zTable: false, chi2Table: false, calculator: false, periodicTable: false },
+	answerArea: {
+		tTable: false,
+		zTable: false,
+		chi2Table: false,
+		calculator: false,
+		periodicTable: false
+	},
 	itemDataVersion: { major: 0, minor: 1 }
 }
 
@@ -213,7 +225,14 @@ export const rectangularPrismVolume = {
 					size: "normal",
 					static: false,
 					answers: [
-						{ value: 210, status: "correct", strict: false, message: "", maxError: null, simplify: "required" }
+						{
+							value: 210,
+							status: "correct",
+							strict: false,
+							message: "",
+							maxError: null,
+							simplify: "required"
+						}
 					],
 					labelText: "",
 					rightAlign: false,
@@ -225,7 +244,13 @@ export const rectangularPrismVolume = {
 			}
 		}
 	},
-	answerArea: { tTable: false, zTable: false, chi2Table: false, calculator: false, periodicTable: false },
+	answerArea: {
+		tTable: false,
+		zTable: false,
+		chi2Table: false,
+		calculator: false,
+		periodicTable: false
+	},
 	itemDataVersion: { major: 0, minor: 1 }
 }
 
@@ -303,7 +328,8 @@ export const numberLineMatcher = {
 	],
 	question: {
 		images: {},
-		content: "**Match each expression with the correct description.**\n\n[[☃ image 1]]\n\n\n\n[[☃ matcher 1]]\n\n\n\n",
+		content:
+			"**Match each expression with the correct description.**\n\n[[☃ image 1]]\n\n\n\n[[☃ matcher 1]]\n\n\n\n",
 		widgets: {
 			"image 1": {
 				type: "image",
@@ -428,7 +454,8 @@ export const interactiveGraphPlotting = {
 	],
 	question: {
 		images: {},
-		content: "**Graph a line with a slope of $\\dfrac65$ that contains the point $(2,-6)$.**\n\n[[☃ grapher 1]]",
+		content:
+			"**Graph a line with a slope of $\\dfrac65$ that contains the point $(2,-6)$.**\n\n[[☃ grapher 1]]",
 		widgets: {
 			"grapher 1": {
 				type: "grapher",

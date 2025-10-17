@@ -37,9 +37,14 @@ export const AreaGraphPropsSchema = z
 				label: z.string().describe("The label for the vertical axis (e.g., 'Percent of total')."),
 				min: z.number().describe("The minimum value for the y-axis scale."),
 				max: z.number().describe("The maximum value for the y-axis scale."),
-				tickInterval: z.number().positive().describe("The numeric interval between labeled tick marks on the y-axis."),
+				tickInterval: z
+					.number()
+					.positive()
+					.describe("The numeric interval between labeled tick marks on the y-axis."),
 				// REMOVED: tickFormat field is no longer supported.
-				showGridLines: z.boolean().describe("If true, displays horizontal grid lines for the y-axis.")
+				showGridLines: z
+					.boolean()
+					.describe("If true, displays horizontal grid lines for the y-axis.")
 			})
 			.strict(),
 		dataPoints: z
@@ -49,13 +54,19 @@ export const AreaGraphPropsSchema = z
 		bottomArea: z
 			.object({
 				label: z.string().describe("Text label to display within the bottom area."),
-				color: z.string().regex(CSS_COLOR_PATTERN, "invalid css color").describe("The fill color for the bottom area.")
+				color: z
+					.string()
+					.regex(CSS_COLOR_PATTERN, "invalid css color")
+					.describe("The fill color for the bottom area.")
 			})
 			.strict(),
 		topArea: z
 			.object({
 				label: z.string().describe("Text label to display within the top area."),
-				color: z.string().regex(CSS_COLOR_PATTERN, "invalid css color").describe("The fill color for the top area.")
+				color: z
+					.string()
+					.regex(CSS_COLOR_PATTERN, "invalid css color")
+					.describe("The fill color for the top area.")
 			})
 			.strict(),
 		boundaryLine: z
@@ -64,7 +75,10 @@ export const AreaGraphPropsSchema = z
 					.string()
 					.regex(CSS_COLOR_PATTERN, "invalid css color")
 					.describe("The color of the line separating the areas."),
-				strokeWidth: z.number().positive().describe("The thickness of the line separating the areas.")
+				strokeWidth: z
+					.number()
+					.positive()
+					.describe("The thickness of the line separating the areas.")
 			})
 			.strict()
 	})
@@ -76,7 +90,8 @@ export const AreaGraphPropsSchema = z
 export type AreaGraphProps = z.infer<typeof AreaGraphPropsSchema>
 
 export const generateAreaGraph: WidgetGenerator<typeof AreaGraphPropsSchema> = async (props) => {
-	const { width, height, title, xAxis, yAxis, dataPoints, bottomArea, topArea, boundaryLine } = props
+	const { width, height, title, xAxis, yAxis, dataPoints, bottomArea, topArea, boundaryLine } =
+		props
 
 	if (xAxis.tickValues.length < 2) {
 		logger.error("area graph invalid tickValues", {
@@ -102,7 +117,9 @@ export const generateAreaGraph: WidgetGenerator<typeof AreaGraphPropsSchema> = a
 	const first = deltas[0] ?? 0
 	const nonUniform = deltas.some((d) => Math.abs(d - first) > 1e-9)
 	// Relaxed: if non-uniform, we won't throw; we use a reasonable tickInterval fallback
-	const tickInterval = nonUniform ? Math.max(1e-9, Math.min(...deltas.map((d) => Math.abs(d)))) : Math.abs(first)
+	const tickInterval = nonUniform
+		? Math.max(1e-9, Math.min(...deltas.map((d) => Math.abs(d))))
+		: Math.abs(first)
 
 	const canvas = new CanvasImpl({
 		chartArea: { left: 0, top: 0, width, height },
@@ -300,7 +317,13 @@ export const generateAreaGraph: WidgetGenerator<typeof AreaGraphPropsSchema> = a
 	})
 
 	// NEW: Finalize the canvas and construct the root SVG element
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(AXIS_VIEWBOX_PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(AXIS_VIEWBOX_PADDING)
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.medium}">${svgBody}</svg>`
 }

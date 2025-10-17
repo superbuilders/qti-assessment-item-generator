@@ -18,7 +18,12 @@ mock.module("openai", () => {
 							title: "title",
 							body: [{ type: "interactionRef", interactionId: "choice_interaction" }],
 							responseDeclarations: [
-								{ identifier: "RESPONSE", cardinality: "single", baseType: "identifier", correct: "A" }
+								{
+									identifier: "RESPONSE",
+									cardinality: "single",
+									baseType: "identifier",
+									correct: "A"
+								}
 							]
 						})
 					}
@@ -31,8 +36,14 @@ mock.module("openai", () => {
 								responseIdentifier: "RESPONSE",
 								prompt: [{ type: "text", content: "Select one." }],
 								choices: [
-									{ identifier: "A", content: [{ type: "paragraph", content: [{ type: "text", content: "A" }] }] },
-									{ identifier: "B", content: [{ type: "paragraph", content: [{ type: "text", content: "B" }] }] }
+									{
+										identifier: "A",
+										content: [{ type: "paragraph", content: [{ type: "text", content: "A" }] }]
+									},
+									{
+										identifier: "B",
+										content: [{ type: "paragraph", content: [{ type: "text", content: "B" }] }]
+									}
 								],
 								shuffle: true,
 								minChoices: 1,
@@ -56,12 +67,16 @@ mock.module("openai", () => {
 									{
 										type: "step",
 										title: [{ type: "text", content: "Step 1" }],
-										content: [{ type: "paragraph", content: [{ type: "text", content: "Do this." }] }]
+										content: [
+											{ type: "paragraph", content: [{ type: "text", content: "Do this." }] }
+										]
 									},
 									{
 										type: "step",
 										title: [{ type: "text", content: "Step 2" }],
-										content: [{ type: "paragraph", content: [{ type: "text", content: "Then this." }] }]
+										content: [
+											{ type: "paragraph", content: [{ type: "text", content: "Then this." }] }
+										]
 									}
 								]
 							}
@@ -84,11 +99,15 @@ describe("Responses shots wiring", () => {
 			primaryContent: "<html>hello</html>",
 			supplementaryContent: ["s1"],
 			multimodalImageUrls: ["data:image/png;base64,AAAA"],
-			multimodalImagePayloads: [{ data: new Uint8Array([1, 2, 3]).buffer, mimeType: "image/png" as const }],
+			multimodalImagePayloads: [
+				{ data: new Uint8Array([1, 2, 3]).buffer, mimeType: "image/png" as const }
+			],
 			pdfPayloads: [{ name: "doc", data: new Uint8Array([9, 9]).buffer }]
 		}
 
-		const itemResult = await errors.try(generateFromEnvelope(openai, logger, envelope, allWidgetsCollection))
+		const itemResult = await errors.try(
+			generateFromEnvelope(openai, logger, envelope, allWidgetsCollection)
+		)
 		expect(itemResult.error).toBeFalsy()
 		const item = itemResult.data
 		expect(item?.identifier).toBe("item_1")

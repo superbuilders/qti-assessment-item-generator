@@ -16,7 +16,8 @@ const sourceItem: AssessmentItemInput<["boxPlot"]> = {
 			content: [
 				{
 					type: "text",
-					content: "Before sending track and field athletes to the Olympics, the U.S. holds a qualifying meet."
+					content:
+						"Before sending track and field athletes to the Olympics, the U.S. holds a qualifying meet."
 				}
 			]
 		},
@@ -25,7 +26,8 @@ const sourceItem: AssessmentItemInput<["boxPlot"]> = {
 			content: [
 				{
 					type: "text",
-					content: "The box plots below show the distances (in meters) achieved in the final round by the top "
+					content:
+						"The box plots below show the distances (in meters) achieved in the final round by the top "
 				},
 				{ type: "math", mathml: "<mn>11</mn>" },
 				{ type: "text", content: " women's discus throwers at the " },
@@ -36,13 +38,21 @@ const sourceItem: AssessmentItemInput<["boxPlot"]> = {
 			]
 		},
 		{ type: "widgetRef", widgetId: "image_1", widgetType: "boxPlot" },
-		{ type: "paragraph", content: [{ type: "text", content: "Which conclusion is supported by these box plots?" }] },
+		{
+			type: "paragraph",
+			content: [{ type: "text", content: "Which conclusion is supported by these box plots?" }]
+		},
 		{ type: "interactionRef", interactionId: "choice_interaction" }
 	],
 	title: "Interpret box plots for discus throw distances",
 	widgets: {
 		image_1: {
-			axis: { max: 69, min: 54, label: "Distance, in meters", tickLabels: [54, 56, 58, 60, 62, 64, 66, 68, 69] },
+			axis: {
+				max: 69,
+				min: 54,
+				label: "Distance, in meters",
+				tickLabels: [54, 56, 58, 60, 62, 64, 66, 68, 69]
+			},
 			type: "boxPlot",
 			width: 480,
 			height: 320,
@@ -80,7 +90,12 @@ const sourceItem: AssessmentItemInput<["boxPlot"]> = {
 							content: [
 								{
 									type: "paragraph",
-									content: [{ type: "text", content: "The Olympic final center is higher on the dot plot scale." }]
+									content: [
+										{
+											type: "text",
+											content: "The Olympic final center is higher on the dot plot scale."
+										}
+									]
 								}
 							]
 						},
@@ -90,7 +105,12 @@ const sourceItem: AssessmentItemInput<["boxPlot"]> = {
 							content: [
 								{
 									type: "paragraph",
-									content: [{ type: "text", content: "The Olympic final distances were greater on average." }]
+									content: [
+										{
+											type: "text",
+											content: "The Olympic final distances were greater on average."
+										}
+									]
 								}
 							]
 						}
@@ -104,7 +124,8 @@ const sourceItem: AssessmentItemInput<["boxPlot"]> = {
 						summary: [
 							{
 								type: "text",
-								content: "The distributions overlap, so not all Olympic final distances are greater."
+								content:
+									"The distributions overlap, so not all Olympic final distances are greater."
 							}
 						]
 					},
@@ -150,13 +171,23 @@ const sourceItem: AssessmentItemInput<["boxPlot"]> = {
 	interactions: {
 		choice_interaction: {
 			type: "choiceInteraction",
-			prompt: [{ type: "text", content: "Which conclusion is supported by these box plots? Select one answer." }],
+			prompt: [
+				{
+					type: "text",
+					content: "Which conclusion is supported by these box plots? Select one answer."
+				}
+			],
 			choices: [
 				{
 					content: [
 						{
 							type: "paragraph",
-							content: [{ type: "text", content: "The distances in the Olympic final were farther on average." }]
+							content: [
+								{
+									type: "text",
+									content: "The distances in the Olympic final were farther on average."
+								}
+							]
 						}
 					],
 					identifier: "A"
@@ -192,7 +223,9 @@ const sourceItem: AssessmentItemInput<["boxPlot"]> = {
 					identifier: "C"
 				},
 				{
-					content: [{ type: "paragraph", content: [{ type: "text", content: "None of the above." }] }],
+					content: [
+						{ type: "paragraph", content: [{ type: "text", content: "None of the above." }] }
+					],
 					identifier: "D"
 				}
 			],
@@ -203,7 +236,12 @@ const sourceItem: AssessmentItemInput<["boxPlot"]> = {
 		}
 	},
 	responseDeclarations: [
-		{ correct: "A", baseType: "identifier", identifier: "choice_interaction", cardinality: "single" }
+		{
+			correct: "A",
+			baseType: "identifier",
+			identifier: "choice_interaction",
+			cardinality: "single"
+		}
 	]
 }
 
@@ -300,7 +338,10 @@ async function main() {
 
 	// Save differentiated items as JSON
 	const outputDir = "./test-output"
-	await Bun.write(`${outputDir}/differentiated-items.json`, JSON.stringify(differentiatedItems, null, 2))
+	await Bun.write(
+		`${outputDir}/differentiated-items.json`,
+		JSON.stringify(differentiatedItems, null, 2)
+	)
 	logger.info("saved differentiated items", { path: `${outputDir}/differentiated-items.json` })
 
 	// Save first XML

@@ -11,7 +11,9 @@ export const EquivalentFractionModelPropsSchema = z
 	.object({
 		type: z
 			.literal("equivalentFractionModel")
-			.describe("Identifies this as a widget for comparing equivalent fractions (tenths and hundredths)."),
+			.describe(
+				"Identifies this as a widget for comparing equivalent fractions (tenths and hundredths)."
+			),
 		width: createWidthSchema(),
 		height: createHeightSchema(),
 		numerator: z
@@ -19,7 +21,9 @@ export const EquivalentFractionModelPropsSchema = z
 			.int()
 			.min(0)
 			.max(10)
-			.describe("The numerator for the tenths fraction (e.g., for 3/10, this value is 3). Must be between 0 and 10."),
+			.describe(
+				"The numerator for the tenths fraction (e.g., for 3/10, this value is 3). Must be between 0 and 10."
+			),
 		tenthsColor: z
 			.string()
 			.regex(CSS_COLOR_PATTERN, "invalid css color")
@@ -39,9 +43,9 @@ export type EquivalentFractionModelProps = z.infer<typeof EquivalentFractionMode
 /**
  * Generates an SVG diagram comparing a fraction in tenths to its equivalent in hundredths.
  */
-export const generateEquivalentFractionModel: WidgetGenerator<typeof EquivalentFractionModelPropsSchema> = async (
-	props
-) => {
+export const generateEquivalentFractionModel: WidgetGenerator<
+	typeof EquivalentFractionModelPropsSchema
+> = async (props) => {
 	const { width, height, numerator, tenthsColor, hundredthsColor } = props
 
 	const canvas = new CanvasImpl({
@@ -130,7 +134,13 @@ export const generateEquivalentFractionModel: WidgetGenerator<typeof EquivalentF
 		fontWeight: theme.font.weight.light
 	})
 
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(PADDING)
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg">${svgBody}</svg>`
 }

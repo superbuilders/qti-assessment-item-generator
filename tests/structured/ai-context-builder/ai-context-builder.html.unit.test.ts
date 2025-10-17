@@ -2,7 +2,11 @@ import { afterAll, beforeAll, describe, expect, test } from "bun:test"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { buildMathacademyEnvelope } from "../../../src/structured/ai-context-builder"
-import { expectEmptyPayloads, expectSortedUrls, expectSupplementaryContentCount } from "./helpers/assertions"
+import {
+	expectEmptyPayloads,
+	expectSortedUrls,
+	expectSupplementaryContentCount
+} from "./helpers/assertions"
 import { createPrdMockFetch } from "./helpers/mock-fetch"
 
 describe("buildMathacademyEnvelope (unit)", () => {
@@ -39,7 +43,9 @@ describe("buildMathacademyEnvelope (unit)", () => {
 	})
 
 	test("throws for unsupported screenshot scheme", async () => {
-		const result = await errors.try(buildMathacademyEnvelope("<div>...</div>", "ftp://example.com/file.png"))
+		const result = await errors.try(
+			buildMathacademyEnvelope("<div>...</div>", "ftp://example.com/file.png")
+		)
 		expect(result.error).toBeTruthy()
 	})
 
@@ -79,7 +85,9 @@ describe("buildMathacademyEnvelope (unit)", () => {
 				<img src="https://example.com/broken.svg">
 				<img src="/relative/path.jpg">
 			`
-		const result = await errors.try(buildMathacademyEnvelope(html, "https://example.com/screen.jpg"))
+		const result = await errors.try(
+			buildMathacademyEnvelope(html, "https://example.com/screen.jpg")
+		)
 		expect(result.error).toBeFalsy()
 		if (result.error) {
 			logger.error("test failed", { error: result.error })
@@ -88,7 +96,10 @@ describe("buildMathacademyEnvelope (unit)", () => {
 		const envelope = result.data
 		expect(envelope.primaryContent).toBeTruthy()
 		expectSupplementaryContentCount(envelope, 1)
-		expect(envelope.multimodalImageUrls).toEqual(["https://example.com/photo.png", "https://example.com/screen.jpg"])
+		expect(envelope.multimodalImageUrls).toEqual([
+			"https://example.com/photo.png",
+			"https://example.com/screen.jpg"
+		])
 		expectSortedUrls(envelope)
 	})
 

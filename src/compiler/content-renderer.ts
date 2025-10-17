@@ -1,6 +1,12 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import type { BlockContent, FeedbackContent, InlineContent, InlineContentItem, StepBlock } from "@/core/content"
+import type {
+	BlockContent,
+	FeedbackContent,
+	InlineContent,
+	InlineContentItem,
+	StepBlock
+} from "@/core/content"
 import { sanitizeXmlAttributeValue } from "./utils/xml-utils"
 
 /**
@@ -77,7 +83,8 @@ export function renderBlockContent<E extends readonly string[] = readonly string
 				}
 				case "tableRich": {
 					const tableStyle = "border-collapse: collapse; width: 100%;"
-					const thStyle = "border: 1px solid #ddd; padding: 8px 12px; text-align: left; vertical-align: top;"
+					const thStyle =
+						"border: 1px solid #ddd; padding: 8px 12px; text-align: left; vertical-align: top;"
 					const tdStyle = "border: 1px solid #ddd; padding: 8px 12px; vertical-align: top;"
 					const renderRow = (row: Array<InlineContent<E> | null>, asHeader = false) =>
 						`<tr>${row
@@ -92,7 +99,9 @@ export function renderBlockContent<E extends readonly string[] = readonly string
 					const thead = item.header?.length
 						? `<thead>${item.header.map((r: Array<InlineContent<E> | null>) => renderRow(r, true)).join("")}</thead>`
 						: ""
-					let tbodyRows = item.rows.map((r: Array<InlineContent<E> | null>) => renderRow(r)).join("")
+					let tbodyRows = item.rows
+						.map((r: Array<InlineContent<E> | null>) => renderRow(r))
+						.join("")
 					// Footer support removed: do not emit <tfoot>; if footer provided by older data, fold into tbody as a final bold row is no longer supported
 					return `<table style="${tableStyle}">${thead}<tbody>${tbodyRows}</tbody></table>`
 				}
@@ -153,9 +162,14 @@ export function renderFeedbackContent<E extends readonly string[]>(
 
 	const preambleCorrectness = feedback.preamble.correctness
 	const preambleColor = preambleCorrectness === "correct" ? "#047857" : "#B91C1C"
-	const preambleHeadline = preambleCorrectness === "correct" ? "Correct! Fantastic work." : "Not quite! Try again."
+	const preambleHeadline =
+		preambleCorrectness === "correct" ? "Correct! Fantastic work." : "Not quite! Try again."
 
-	const preambleSummary = renderInlineContent(feedback.preamble.summary, widgetSlots, interactionSlots)
+	const preambleSummary = renderInlineContent(
+		feedback.preamble.summary,
+		widgetSlots,
+		interactionSlots
+	)
 	const preambleHtml = `<div class="qti-feedback-preamble" data-correctness="${preambleCorrectness}" style="margin-bottom:16px;">
       <p style="margin:0; font-weight:700; color:${preambleColor};">${preambleHeadline}</p>
       <p style="margin:8px 0 0 0; color:#111827;">${preambleSummary}</p>

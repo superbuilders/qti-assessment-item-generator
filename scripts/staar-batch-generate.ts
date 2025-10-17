@@ -59,7 +59,10 @@ async function processQuestionDir(dir: string, openai: OpenAI): Promise<void> {
 
 	const htmlFilenameResult = await errors.try(findHtmlFilename(dir))
 	if (htmlFilenameResult.error) {
-		logger.error("failed to find html filename", { questionDir: questionDirName, error: htmlFilenameResult.error })
+		logger.error("failed to find html filename", {
+			questionDir: questionDirName,
+			error: htmlFilenameResult.error
+		})
 		throw htmlFilenameResult.error // Propagate error up
 	}
 	const htmlFilename = htmlFilenameResult.data
@@ -79,15 +82,24 @@ async function processQuestionDir(dir: string, openai: OpenAI): Promise<void> {
 		throw errors.wrap(htmlBytesResult.error, "html read")
 	}
 	const html = htmlBytesResult.data.toString("utf8")
-	logger.debug("loaded html content", { questionDir: questionDirName, htmlLength: html.length, htmlPath })
+	logger.debug("loaded html content", {
+		questionDir: questionDirName,
+		htmlLength: html.length,
+		htmlPath
+	})
 
 	// 2. Read Supplementary SVG Content
 	let supplementaryContent: string[] = []
 	const svgEntriesResult = await errors.try(fs.readdir(svgsDir, { withFileTypes: true }))
 	if (svgEntriesResult.error) {
-		logger.debug("svgs directory not found or unreadable, skipping", { questionDir: questionDirName, svgsDir })
+		logger.debug("svgs directory not found or unreadable, skipping", {
+			questionDir: questionDirName,
+			svgsDir
+		})
 	} else {
-		const svgFiles = svgEntriesResult.data.filter((e) => e.isFile() && e.name.toLowerCase().endsWith(".svg"))
+		const svgFiles = svgEntriesResult.data.filter(
+			(e) => e.isFile() && e.name.toLowerCase().endsWith(".svg")
+		)
 		logger.debug("found svg files", {
 			questionDir: questionDirName,
 			svgFileCount: svgFiles.length,
@@ -120,7 +132,10 @@ async function processQuestionDir(dir: string, openai: OpenAI): Promise<void> {
 			questionDir: questionDirName,
 			svgCount: supplementaryContent.length,
 			totalSvgLength,
-			avgSvgLength: supplementaryContent.length > 0 ? Math.round(totalSvgLength / supplementaryContent.length) : 0
+			avgSvgLength:
+				supplementaryContent.length > 0
+					? Math.round(totalSvgLength / supplementaryContent.length)
+					: 0
 		})
 	}
 
@@ -133,7 +148,8 @@ async function processQuestionDir(dir: string, openai: OpenAI): Promise<void> {
 		pdfPayloads: []
 	}
 
-	const totalTextLength = html.length + supplementaryContent.reduce((sum, content) => sum + content.length, 0)
+	const totalTextLength =
+		html.length + supplementaryContent.reduce((sum, content) => sum + content.length, 0)
 	logger.info("constructed ai context envelope", {
 		questionDir: questionDirName,
 		primaryContentLength: html.length,
@@ -161,7 +177,9 @@ async function processQuestionDir(dir: string, openai: OpenAI): Promise<void> {
 		questionDir: questionDirName,
 		collection: WIDGET_COLLECTION.name
 	})
-	const structuredResult = await errors.try(generateFromEnvelope(openai, logger, envelope, WIDGET_COLLECTION))
+	const structuredResult = await errors.try(
+		generateFromEnvelope(openai, logger, envelope, WIDGET_COLLECTION)
+	)
 	if (structuredResult.error) {
 		logger.error("failed to generate structured item from envelope", {
 			questionDir: questionDirName,
@@ -186,7 +204,10 @@ async function processQuestionDir(dir: string, openai: OpenAI): Promise<void> {
 		})
 		throw errors.wrap(writeJsonResult.error, "json write")
 	}
-	logger.info("wrote structured item json", { questionDir: questionDirName, file: structuredJsonPath })
+	logger.info("wrote structured item json", {
+		questionDir: questionDirName,
+		file: structuredJsonPath
+	})
 
 	// 5. Compile Structured Item to QTI XML
 	logger.info("compiling structured item to qti xml", { questionDir: questionDirName })
@@ -199,7 +220,10 @@ async function processQuestionDir(dir: string, openai: OpenAI): Promise<void> {
 		throw errors.wrap(compileResult.error, "qti compilation")
 	}
 	const compiledXml = compileResult.data
-	logger.info("successfully compiled to qti xml", { questionDir: questionDirName, xmlLength: compiledXml.length })
+	logger.info("successfully compiled to qti xml", {
+		questionDir: questionDirName,
+		xmlLength: compiledXml.length
+	})
 
 	const compiledXmlPath = path.join(OUTPUT_DIR, `${questionDirName}-compiled.xml`)
 	const writeXmlResult = await errors.try(fs.writeFile(compiledXmlPath, compiledXml, "utf8"))
@@ -228,7 +252,10 @@ async function main() {
 	logger.info("validating output directory", { outputDir: OUTPUT_DIR })
 	const outputDirResult = await errors.try(fs.access(OUTPUT_DIR, fs.constants.F_OK))
 	if (outputDirResult.error) {
-		logger.error("output directory does not exist", { outputDir: OUTPUT_DIR, error: outputDirResult.error })
+		logger.error("output directory does not exist", {
+			outputDir: OUTPUT_DIR,
+			error: outputDirResult.error
+		})
 		throw errors.wrap(outputDirResult.error, "output directory validation")
 	}
 
@@ -236,7 +263,10 @@ async function main() {
 
 	const rootEntriesResult = await errors.try(fs.readdir(ROOT, { withFileTypes: true }))
 	if (rootEntriesResult.error) {
-		logger.error("failed to read root staar scrape directory", { path: ROOT, error: rootEntriesResult.error })
+		logger.error("failed to read root staar scrape directory", {
+			path: ROOT,
+			error: rootEntriesResult.error
+		})
 		throw errors.wrap(rootEntriesResult.error, "root directory read")
 	}
 
@@ -244,14 +274,21 @@ async function main() {
 		.filter((e) => e.isDirectory() && /^question_\d{2}$/.test(e.name))
 		.map((e) => path.join(ROOT, e.name))
 
-	logger.info("starting staar batch generation", { count: questionDirs.length, collection: WIDGET_COLLECTION.name })
+	logger.info("starting staar batch generation", {
+		count: questionDirs.length,
+		collection: WIDGET_COLLECTION.name
+	})
 
 	const results = await Promise.allSettled(
 		questionDirs.map(async (dir) => {
 			const questionDirName = path.basename(dir)
 			const res = await errors.try(processQuestionDir(dir, openai))
 			if (res.error) {
-				logger.error("question processing failed", { questionDir: questionDirName, fullPath: dir, error: res.error })
+				logger.error("question processing failed", {
+					questionDir: questionDirName,
+					fullPath: dir,
+					error: res.error
+				})
 				throw res.error
 			}
 			return { questionDir: questionDirName, fullPath: dir }

@@ -19,7 +19,9 @@ export const VideoPropsSchema = z
 			.string()
 			.max(200)
 			.nullable()
-			.describe("Optional fallback text displayed if the video cannot be rendered. Null for no text.")
+			.describe(
+				"Optional fallback text displayed if the video cannot be rendered. Null for no text."
+			)
 	})
 	.strict()
 

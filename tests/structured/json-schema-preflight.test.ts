@@ -35,7 +35,9 @@ describe("JSON Schema Preflight", () => {
 		if (failures.length > 0) {
 			const breakdown = failures.map((f) => `${f.key}: ${f.message}`).join("\n")
 			logger.error("widget schema conversion failures", { count: failures.length, breakdown })
-			throw errors.new(`widget hack json schema conversion failures (count=${failures.length}):\n${breakdown}`)
+			throw errors.new(
+				`widget hack json schema conversion failures (count=${failures.length}):\n${breakdown}`
+			)
 		}
 		expect(failures.length).toBe(0)
 	})

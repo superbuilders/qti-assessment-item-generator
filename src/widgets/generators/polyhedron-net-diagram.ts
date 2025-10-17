@@ -16,7 +16,9 @@ function createSquareBase() {
 			type: z.literal("square").describe("Specifies a square base shape."),
 			side: z
 				.number()
-				.describe("Side length of the square in arbitrary units (e.g., 5, 8, 6.5). All four sides are equal.")
+				.describe(
+					"Side length of the square in arbitrary units (e.g., 5, 8, 6.5). All four sides are equal."
+				)
 		})
 		.strict()
 }
@@ -27,10 +29,14 @@ function createRectangleBase() {
 			type: z.literal("rectangle").describe("Specifies a rectangular base shape."),
 			length: z
 				.number()
-				.describe("Length of the rectangle in arbitrary units (e.g., 8, 10, 5.5). The longer dimension by convention."),
+				.describe(
+					"Length of the rectangle in arbitrary units (e.g., 8, 10, 5.5). The longer dimension by convention."
+				),
 			width: z
 				.number()
-				.describe("Width of the rectangle in arbitrary units (e.g., 4, 6, 3). The shorter dimension by convention.")
+				.describe(
+					"Width of the rectangle in arbitrary units (e.g., 4, 6, 3). The shorter dimension by convention."
+				)
 		})
 		.strict()
 }
@@ -69,7 +75,9 @@ function createPentagonBase() {
 			type: z.literal("pentagon").describe("Specifies a regular pentagon base shape."),
 			side: z
 				.number()
-				.describe("Side length of the regular pentagon in arbitrary units (e.g., 4, 6, 3.5). All five sides are equal.")
+				.describe(
+					"Side length of the regular pentagon in arbitrary units (e.g., 4, 6, 3.5). All five sides are equal."
+				)
 		})
 		.strict()
 }
@@ -77,14 +85,20 @@ function createPentagonBase() {
 // Polyhedron type variants
 const Cube = z
 	.object({
-		polyhedronType: z.literal("cube").describe("A cube net with 6 identical square faces in cross pattern."),
+		polyhedronType: z
+			.literal("cube")
+			.describe("A cube net with 6 identical square faces in cross pattern."),
 		width: createWidthSchema(),
 		height: createHeightSchema(),
-		base: createSquareBase().describe("Dimensions of the square faces. All 6 faces are identical squares."),
+		base: createSquareBase().describe(
+			"Dimensions of the square faces. All 6 faces are identical squares."
+		),
 		showLabels: z
 			.boolean()
 			.nullable()
-			.describe("Whether to show edge measurements on the net. True adds dimension labels for calculation exercises.")
+			.describe(
+				"Whether to show edge measurements on the net. True adds dimension labels for calculation exercises."
+			)
 	})
 	.strict()
 
@@ -122,7 +136,9 @@ const TriPrism = z
 		),
 		lateralHeight: z
 			.number()
-			.describe("Height/length of the prism in arbitrary units (e.g., 6, 10, 7.5). Length of the rectangular faces."),
+			.describe(
+				"Height/length of the prism in arbitrary units (e.g., 6, 10, 7.5). Length of the rectangular faces."
+			),
 		showLabels: z
 			.boolean()
 			.nullable()
@@ -137,14 +153,20 @@ const SquarePyr = z
 			.describe("A square pyramid net with 1 square base and 4 triangular faces."),
 		width: createWidthSchema(),
 		height: createHeightSchema(),
-		base: createSquareBase().describe("Dimensions of the square base. The central square in the net."),
+		base: createSquareBase().describe(
+			"Dimensions of the square base. The central square in the net."
+		),
 		lateralHeight: z
 			.number()
-			.describe("Slant height of the triangular faces in arbitrary units (e.g., 6, 8, 7). From base edge to apex."),
+			.describe(
+				"Slant height of the triangular faces in arbitrary units (e.g., 6, 8, 7). From base edge to apex."
+			),
 		showLabels: z
 			.boolean()
 			.nullable()
-			.describe("Whether to label dimensions. Important for distinguishing base edges from slant heights.")
+			.describe(
+				"Whether to label dimensions. Important for distinguishing base edges from slant heights."
+			)
 	})
 	.strict()
 
@@ -177,10 +199,14 @@ const PentPyr = z
 			.describe("A pentagonal pyramid net with 1 pentagon base and 5 triangular faces."),
 		width: createWidthSchema(),
 		height: createHeightSchema(),
-		base: createPentagonBase().describe("Dimensions of the regular pentagon base. The central pentagon in the net."),
+		base: createPentagonBase().describe(
+			"Dimensions of the regular pentagon base. The central pentagon in the net."
+		),
 		lateralHeight: z
 			.number()
-			.describe("Slant height of triangular faces in arbitrary units (e.g., 5, 7, 6.5). From base edge to apex."),
+			.describe(
+				"Slant height of triangular faces in arbitrary units (e.g., 5, 7, 6.5). From base edge to apex."
+			),
 		showLabels: z
 			.boolean()
 			.nullable()
@@ -226,7 +252,9 @@ export type PolyhedronNetDiagramProps = z.infer<typeof PolyhedronNetDiagramProps
  * A net is a 2D pattern that can be folded to form the 3D shape, and this template is
  * essential for questions about surface area and the relationship between 2D and 3D geometry.
  */
-export const generatePolyhedronNetDiagram: WidgetGenerator<typeof PolyhedronNetDiagramPropsSchema> = async (data) => {
+export const generatePolyhedronNetDiagram: WidgetGenerator<
+	typeof PolyhedronNetDiagramPropsSchema
+> = async (data) => {
 	const { width, height, polyhedronType, base, showLabels } = data
 	const lateralHeight = "lateralHeight" in data ? data.lateralHeight : undefined
 
@@ -262,7 +290,10 @@ export const generatePolyhedronNetDiagram: WidgetGenerator<typeof PolyhedronNetD
 		const maxY = Math.max(...allPoints.map((p) => p.y))
 		const rawW = maxX - minX
 		const rawH = maxY - minY
-		const scale = Math.min((width - 2 * PADDING) / (rawW || 1), (height - 2 * PADDING) / (rawH || 1))
+		const scale = Math.min(
+			(width - 2 * PADDING) / (rawW || 1),
+			(height - 2 * PADDING) / (rawH || 1)
+		)
 		const offsetX = (width - scale * rawW) / 2 - scale * minX
 		const offsetY = (height - scale * rawH) / 2 - scale * minY
 		const project = (p: Point) => ({
@@ -283,11 +314,21 @@ export const generatePolyhedronNetDiagram: WidgetGenerator<typeof PolyhedronNetD
 				const [x, y] = p.split(",").map(Number)
 				return { x: x || 0, y: y || 0 }
 			})
-			.filter((p) => !Number.isNaN(p.x) && !Number.isNaN(p.y) && Number.isFinite(p.x) && Number.isFinite(p.y))
+			.filter(
+				(p) =>
+					!Number.isNaN(p.x) && !Number.isNaN(p.y) && Number.isFinite(p.x) && Number.isFinite(p.y)
+			)
 		polys.push(polygonPoints)
 	}
 
-	const drawGridLines = (x: number, y: number, w: number, h: number, dim_w: number, dim_h: number) => {
+	const drawGridLines = (
+		x: number,
+		y: number,
+		w: number,
+		h: number,
+		dim_w: number,
+		dim_h: number
+	) => {
 		const unit_w = w / dim_w
 		const unit_h = h / dim_h
 		for (let i = 1; i < dim_w; i++) {
@@ -319,7 +360,10 @@ export const generatePolyhedronNetDiagram: WidgetGenerator<typeof PolyhedronNetD
 					baseType: base.type,
 					expected: "square"
 				})
-				throw errors.wrap(ErrInvalidBaseShape, `cube must have a square base, but received type '${base.type}'`)
+				throw errors.wrap(
+					ErrInvalidBaseShape,
+					`cube must have a square base, but received type '${base.type}'`
+				)
 			}
 			const side = base.side
 			const a = side
@@ -500,11 +544,15 @@ export const generatePolyhedronNetDiagram: WidgetGenerator<typeof PolyhedronNetD
 			const left_base_x = base_x
 			const left_apex_x = base_x - lat_u
 			const left_apex_y = base_y + apex_d * unit
-			poly(`${left_base_x},${left_base_top_y} ${left_base_x},${left_base_bot_y} ${left_apex_x},${left_apex_y}`)
+			poly(
+				`${left_base_x},${left_base_top_y} ${left_base_x},${left_base_bot_y} ${left_apex_x},${left_apex_y}`
+			)
 			const right_base_x = base_x + s_u
 			const right_apex_x = right_base_x + lat_u
 			const right_apex_y = base_y + apex_d * unit
-			poly(`${right_base_x},${left_base_top_y} ${right_base_x},${left_base_bot_y} ${right_apex_x},${right_apex_y}`)
+			poly(
+				`${right_base_x},${left_base_top_y} ${right_base_x},${left_base_bot_y} ${right_apex_x},${right_apex_y}`
+			)
 			if (showLabels === true) {
 				drawGridLines(base_x, base_y, s_u, s_u, side, side)
 			}
@@ -713,6 +761,12 @@ export const generatePolyhedronNetDiagram: WidgetGenerator<typeof PolyhedronNetD
 	}
 
 	// Finalize the canvas and construct the root SVG element
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(PADDING)
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.base}">${svgBody}</svg>`
 }

@@ -16,7 +16,10 @@ export function createSubsetCollection<
 >(
 	parentCollection: C,
 	widgetTypeNames: ReadonlyArray<C["widgetTypeKeys"][number]>
-): WidgetCollection<Record<string, WidgetDefinition<unknown, unknown>>, ReadonlyArray<C["widgetTypeKeys"][number]>> {
+): WidgetCollection<
+	Record<string, WidgetDefinition<unknown, unknown>>,
+	ReadonlyArray<C["widgetTypeKeys"][number]>
+> {
 	// Validate all requested types exist in parent
 	for (const typeName of widgetTypeNames) {
 		if (!(typeName in parentCollection.widgets)) {
@@ -25,7 +28,9 @@ export function createSubsetCollection<
 				parentCollection: parentCollection.name,
 				availableTypes: parentCollection.widgetTypeKeys
 			})
-			throw errors.new(`widget type '${typeName}' not found in collection '${parentCollection.name}'`)
+			throw errors.new(
+				`widget type '${typeName}' not found in collection '${parentCollection.name}'`
+			)
 		}
 	}
 

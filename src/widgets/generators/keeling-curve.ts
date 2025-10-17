@@ -8,7 +8,9 @@ import { theme } from "../utils/theme"
 
 const AnnotationSchema = z.object({
 	year: z.number().describe("The year on the x-axis that the annotation arrow should point to."),
-	text: z.array(z.string()).describe("The annotation text, with each string in the array representing a new line.")
+	text: z
+		.array(z.string())
+		.describe("The annotation text, with each string in the array representing a new line.")
 })
 
 export const KeelingCurvePropsSchema = z
@@ -130,7 +132,9 @@ const CO2_DATA = [
 
 // Removed unused function renderMultiLineText
 
-export const generateKeelingCurve: WidgetGenerator<typeof KeelingCurvePropsSchema> = async (props) => {
+export const generateKeelingCurve: WidgetGenerator<typeof KeelingCurvePropsSchema> = async (
+	props
+) => {
 	const { width, height, xAxisLabel, yAxisLabel, annotations } = props
 
 	// Helper to find PPM for a given year via linear interpolation
@@ -225,7 +229,13 @@ export const generateKeelingCurve: WidgetGenerator<typeof KeelingCurvePropsSchem
 	})
 
 	// NEW: Finalize the canvas and construct the root SVG element
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(AXIS_VIEWBOX_PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(AXIS_VIEWBOX_PADDING)
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.medium}">${svgBody}</svg>`
 }

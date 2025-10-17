@@ -30,7 +30,9 @@ describe("Widget: composite-shape-diagram", () => {
 	})
 
 	test("should produce consistent output for circleWithRectangleExample", async () => {
-		const result = await errors.try(generateWidgetForTest(ensureWidgetInput(circleWithRectangleExample)))
+		const result = await errors.try(
+			generateWidgetForTest(ensureWidgetInput(circleWithRectangleExample))
+		)
 		if (result.error) {
 			logger.error("widget generation failed", { error: result.error })
 			throw result.error
@@ -87,8 +89,18 @@ describe("Widget: composite-shape-diagram", () => {
 				{ to: "p14", from: "p13", type: "simple", label: null },
 				{ to: "p15", from: "p14", type: "simple", label: null },
 				{ to: "p0", from: "p15", type: "simple", label: null },
-				{ to: "rectTopRight", from: "rectTopLeft", type: "simple", label: { unit: "cm", value: 5 } },
-				{ to: "rectBottomRight", from: "rectTopRight", type: "simple", label: { unit: "cm", value: 11 } },
+				{
+					to: "rectTopRight",
+					from: "rectTopLeft",
+					type: "simple",
+					label: { unit: "cm", value: 5 }
+				},
+				{
+					to: "rectBottomRight",
+					from: "rectTopRight",
+					type: "simple",
+					label: { unit: "cm", value: 11 }
+				},
 				{ to: "rectBottomLeft", from: "rectBottomRight", type: "simple", label: null },
 				{ to: "rectTopLeft", from: "rectBottomLeft", type: "simple", label: null }
 			],
@@ -120,14 +132,22 @@ describe("Widget: composite-shape-diagram", () => {
 				}
 			],
 			internalSegments: [
-				{ label: { unit: "cm", value: 12 }, style: "solid", toVertexId: "p0", fromVertexId: "center" }
+				{
+					label: { unit: "cm", value: 12 },
+					style: "solid",
+					toVertexId: "p0",
+					fromVertexId: "center"
+				}
 			],
 			rightAngleMarkers: null
 		})
 
 		const result = await errors.try(generateWidgetForTest(input))
 		if (result.error) {
-			logger.error("widget generation failed for compositeShapeDiagram", { error: result.error, inputData: input })
+			logger.error("widget generation failed for compositeShapeDiagram", {
+				error: result.error,
+				inputData: input
+			})
 			throw errors.wrap(result.error, "widget generation")
 		}
 		expect(result.data).toMatchSnapshot()
@@ -139,7 +159,10 @@ describe("Widget: composite-shape-diagram", () => {
 			const input = ensureWidgetInput(example)
 			const result = await errors.try(generateWidgetForTest(input))
 			if (result.error) {
-				logger.error("widget generation failed for migrated composite example", { error: result.error, index })
+				logger.error("widget generation failed for migrated composite example", {
+					error: result.error,
+					index
+				})
 				throw errors.wrap(result.error, "widget generation")
 			}
 			expect(result.data).toMatchSnapshot()
@@ -255,7 +278,10 @@ describe("Widget: composite-shape-diagram", () => {
 
 		const result = await errors.try(generateWidgetForTest(input))
 		if (result.error) {
-			logger.error("widget generation failed for compositeShapeDiagram", { error: result.error, inputData: input })
+			logger.error("widget generation failed for compositeShapeDiagram", {
+				error: result.error,
+				inputData: input
+			})
 			throw errors.wrap(result.error, "widget generation")
 		}
 		expect(result.data).toMatchSnapshot()
@@ -314,14 +340,22 @@ describe("Widget: composite-shape-diagram", () => {
 				{ label: null, style: "solid", toVertexId: "R3", fromVertexId: "R2" },
 				{ label: null, style: "solid", toVertexId: "R4", fromVertexId: "R3" },
 				{ label: { unit: "cm", value: 5 }, style: "solid", toVertexId: "R1", fromVertexId: "R4" },
-				{ label: { unit: "cm", value: 6 }, style: "solid", toVertexId: "C0", fromVertexId: "center" }
+				{
+					label: { unit: "cm", value: 6 },
+					style: "solid",
+					toVertexId: "C0",
+					fromVertexId: "center"
+				}
 			],
 			rightAngleMarkers: null
 		})
 
 		const result = await errors.try(generateWidgetForTest(input))
 		if (result.error) {
-			logger.error("widget generation failed for compositeShapeDiagram", { error: result.error, inputData: input })
+			logger.error("widget generation failed for compositeShapeDiagram", {
+				error: result.error,
+				inputData: input
+			})
 			throw errors.wrap(result.error, "widget generation")
 		}
 		expect(result.data).toMatchSnapshot()
@@ -379,13 +413,18 @@ describe("Widget: composite-shape-diagram", () => {
 				},
 				{ fillColor: "#ffffff", vertexIds: ["R1", "R2", "R3", "R4"] }
 			],
-			internalSegments: [{ label: { unit: "cm", value: 4 }, style: "solid", toVertexId: "C0", fromVertexId: "O" }],
+			internalSegments: [
+				{ label: { unit: "cm", value: 4 }, style: "solid", toVertexId: "C0", fromVertexId: "O" }
+			],
 			rightAngleMarkers: null
 		})
 
 		const result = await errors.try(generateWidgetForTest(input))
 		if (result.error) {
-			logger.error("widget generation failed for compositeShapeDiagram", { error: result.error, inputData: input })
+			logger.error("widget generation failed for compositeShapeDiagram", {
+				error: result.error,
+				inputData: input
+			})
 			throw errors.wrap(result.error, "widget generation")
 		}
 		expect(result.data).toMatchSnapshot()
@@ -417,16 +456,34 @@ describe("Widget: composite-shape-diagram", () => {
 			],
 			shadedRegions: null,
 			internalSegments: [
-				{ label: { unit: "units", value: 7 }, style: "dashed", toVertexId: "right", fromVertexId: "left" },
-				{ label: { unit: "units", value: 9 }, style: "dashed", toVertexId: "bottom", fromVertexId: "mid" },
-				{ label: { unit: "units", value: 5 }, style: "dashed", toVertexId: "top", fromVertexId: "mid" }
+				{
+					label: { unit: "units", value: 7 },
+					style: "dashed",
+					toVertexId: "right",
+					fromVertexId: "left"
+				},
+				{
+					label: { unit: "units", value: 9 },
+					style: "dashed",
+					toVertexId: "bottom",
+					fromVertexId: "mid"
+				},
+				{
+					label: { unit: "units", value: 5 },
+					style: "dashed",
+					toVertexId: "top",
+					fromVertexId: "mid"
+				}
 			],
 			rightAngleMarkers: null
 		})
 
 		const result = await errors.try(generateWidgetForTest(input))
 		if (result.error) {
-			logger.error("widget generation failed for compositeShapeDiagram", { error: result.error, inputData: input })
+			logger.error("widget generation failed for compositeShapeDiagram", {
+				error: result.error,
+				inputData: input
+			})
 			throw errors.wrap(result.error, "widget generation")
 		}
 		expect(result.data).toMatchSnapshot()
@@ -468,11 +525,36 @@ describe("Widget: composite-shape-diagram", () => {
 				{ fillColor: "#01a9954d", vertexIds: ["H2", "BR", "R"] }
 			],
 			internalSegments: [
-				{ label: { unit: "units", value: 2 }, style: "dashed", toVertexId: "H1", fromVertexId: "L" },
-				{ label: { unit: "units", value: 2 }, style: "dashed", toVertexId: "H2", fromVertexId: "H1" },
-				{ label: { unit: "units", value: 6 }, style: "dashed", toVertexId: "R", fromVertexId: "H2" },
-				{ label: { unit: "units", value: 2 }, style: "dashed", toVertexId: "BL", fromVertexId: "H1" },
-				{ label: { unit: "units", value: 2 }, style: "dashed", toVertexId: "BR", fromVertexId: "H2" }
+				{
+					label: { unit: "units", value: 2 },
+					style: "dashed",
+					toVertexId: "H1",
+					fromVertexId: "L"
+				},
+				{
+					label: { unit: "units", value: 2 },
+					style: "dashed",
+					toVertexId: "H2",
+					fromVertexId: "H1"
+				},
+				{
+					label: { unit: "units", value: 6 },
+					style: "dashed",
+					toVertexId: "R",
+					fromVertexId: "H2"
+				},
+				{
+					label: { unit: "units", value: 2 },
+					style: "dashed",
+					toVertexId: "BL",
+					fromVertexId: "H1"
+				},
+				{
+					label: { unit: "units", value: 2 },
+					style: "dashed",
+					toVertexId: "BR",
+					fromVertexId: "H2"
+				}
 			],
 			rightAngleMarkers: [
 				{ cornerVertexId: "L", adjacentVertex1Id: "T", adjacentVertex2Id: "H1" },
@@ -483,7 +565,10 @@ describe("Widget: composite-shape-diagram", () => {
 
 		const result = await errors.try(generateWidgetForTest(input))
 		if (result.error) {
-			logger.error("widget generation failed for compositeShapeDiagram", { error: result.error, inputData: input })
+			logger.error("widget generation failed for compositeShapeDiagram", {
+				error: result.error,
+				inputData: input
+			})
 			throw errors.wrap(result.error, "widget generation")
 		}
 		expect(result.data).toMatchSnapshot()
@@ -515,14 +600,24 @@ describe("Widget: composite-shape-diagram", () => {
 			shadedRegions: null,
 			internalSegments: [
 				{ label: null, style: "dashed", toVertexId: "C", fromVertexId: "D" },
-				{ label: { unit: "units", value: 3 }, style: "dashed", toVertexId: "midBase", fromVertexId: "apex" }
+				{
+					label: { unit: "units", value: 3 },
+					style: "dashed",
+					toVertexId: "midBase",
+					fromVertexId: "apex"
+				}
 			],
-			rightAngleMarkers: [{ cornerVertexId: "midBase", adjacentVertex1Id: "apex", adjacentVertex2Id: "D" }]
+			rightAngleMarkers: [
+				{ cornerVertexId: "midBase", adjacentVertex1Id: "apex", adjacentVertex2Id: "D" }
+			]
 		})
 
 		const result = await errors.try(generateWidgetForTest(input))
 		if (result.error) {
-			logger.error("widget generation failed for compositeShapeDiagram", { error: result.error, inputData: input })
+			logger.error("widget generation failed for compositeShapeDiagram", {
+				error: result.error,
+				inputData: input
+			})
 			throw errors.wrap(result.error, "widget generation")
 		}
 		expect(result.data).toMatchSnapshot()
@@ -548,7 +643,12 @@ describe("Widget: composite-shape-diagram", () => {
 			regionLabels: null,
 			boundaryEdges: [
 				{ to: "B_topRight", from: "A_topLeft", type: "simple", label: { unit: "units", value: 9 } },
-				{ to: "C_rightCut", from: "B_topRight", type: "simple", label: { unit: "units", value: 4 } },
+				{
+					to: "C_rightCut",
+					from: "B_topRight",
+					type: "simple",
+					label: { unit: "units", value: 4 }
+				},
 				{ to: "D_bottomRightInner", from: "C_rightCut", type: "simple", label: null },
 				{ to: "E_bottomLeftInner", from: "D_bottomRightInner", type: "simple", label: null },
 				{ to: "F_leftCut", from: "E_bottomLeftInner", type: "simple", label: null },
@@ -582,7 +682,11 @@ describe("Widget: composite-shape-diagram", () => {
 				}
 			],
 			rightAngleMarkers: [
-				{ cornerVertexId: "G_bottomLeftRect", adjacentVertex1Id: "F_leftCut", adjacentVertex2Id: "E_bottomLeftInner" },
+				{
+					cornerVertexId: "G_bottomLeftRect",
+					adjacentVertex1Id: "F_leftCut",
+					adjacentVertex2Id: "E_bottomLeftInner"
+				},
 				{
 					cornerVertexId: "H_bottomRightRect",
 					adjacentVertex1Id: "C_rightCut",
@@ -593,7 +697,10 @@ describe("Widget: composite-shape-diagram", () => {
 
 		const result = await errors.try(generateWidgetForTest(input))
 		if (result.error) {
-			logger.error("widget generation failed for compositeShapeDiagram", { error: result.error, inputData: input })
+			logger.error("widget generation failed for compositeShapeDiagram", {
+				error: result.error,
+				inputData: input
+			})
 			throw errors.wrap(result.error, "widget generation")
 		}
 		expect(result.data).toMatchSnapshot()
@@ -633,16 +740,34 @@ describe("Widget: composite-shape-diagram", () => {
 			],
 			shadedRegions: null,
 			internalSegments: [
-				{ label: { unit: "units", value: 5 }, style: "dashed", toVertexId: "F_bottomAtC", fromVertexId: "C_step1" },
-				{ label: { unit: "units", value: 5 }, style: "dashed", toVertexId: "G_bottomAtD", fromVertexId: "D_step2" },
-				{ label: { unit: "units", value: 8 }, style: "dashed", toVertexId: "F_bottomAtC", fromVertexId: "B_apex" }
+				{
+					label: { unit: "units", value: 5 },
+					style: "dashed",
+					toVertexId: "F_bottomAtC",
+					fromVertexId: "C_step1"
+				},
+				{
+					label: { unit: "units", value: 5 },
+					style: "dashed",
+					toVertexId: "G_bottomAtD",
+					fromVertexId: "D_step2"
+				},
+				{
+					label: { unit: "units", value: 8 },
+					style: "dashed",
+					toVertexId: "F_bottomAtC",
+					fromVertexId: "B_apex"
+				}
 			],
 			rightAngleMarkers: null
 		})
 
 		const result = await errors.try(generateWidgetForTest(input))
 		if (result.error) {
-			logger.error("widget generation failed for compositeShapeDiagram", { error: result.error, inputData: input })
+			logger.error("widget generation failed for compositeShapeDiagram", {
+				error: result.error,
+				inputData: input
+			})
 			throw errors.wrap(result.error, "widget generation")
 		}
 		expect(result.data).toMatchSnapshot()

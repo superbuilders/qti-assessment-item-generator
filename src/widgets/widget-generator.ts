@@ -17,7 +17,10 @@ export async function generateWidget<
 	K extends keyof C["widgets"] & string
 >(collection: C, widgetType: K, data: z.infer<C["widgets"][K]["schema"]>): Promise<string> {
 	if (!hasWidget(collection, widgetType)) {
-		logger.error("widget type not found in provided collection", { widgetType, collectionName: collection.name })
+		logger.error("widget type not found in provided collection", {
+			widgetType,
+			collectionName: collection.name
+		})
 		throw errors.new("widget type not found in collection")
 	}
 	const definition = collection.widgets[widgetType]

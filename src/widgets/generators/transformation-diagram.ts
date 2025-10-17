@@ -22,7 +22,9 @@ function createShapeSchema() {
 				.string()
 				.nullable()
 				.transform((val) =>
-					val === null || val.trim() === "" || val.trim().toLowerCase() === "null" ? null : val.trim()
+					val === null || val.trim() === "" || val.trim().toLowerCase() === "null"
+						? null
+						: val.trim()
 				)
 				.describe(
 					"Shape identifier (e.g., 'ABCD', 'Figure 1', 'P', 'P''', null). Null means no label. Positioned near shape's center."
@@ -54,7 +56,9 @@ function createShapeSchema() {
 								.string()
 								.nullable()
 								.transform((val) =>
-									val === null || val.trim() === "" || val.trim().toLowerCase() === "null" ? null : val.trim()
+									val === null || val.trim() === "" || val.trim().toLowerCase() === "null"
+										? null
+										: val.trim()
 								),
 							labelDistance: z.number()
 						})
@@ -133,14 +137,20 @@ function createTransformationSchema() {
 			.object({
 				type: z.literal("rotation"),
 				centerOfRotation: createPoint().describe("Fixed point around which rotation occurs."),
-				angle: z.number().describe("Rotation angle in degrees. Positive is counter-clockwise (e.g., 90, -45, 180).")
+				angle: z
+					.number()
+					.describe(
+						"Rotation angle in degrees. Positive is counter-clockwise (e.g., 90, -45, 180)."
+					)
 			})
 			.strict(),
 		z
 			.object({
 				type: z.literal("dilation"),
 				centerOfDilation: createPoint().describe("Fixed point from which scaling occurs."),
-				scaleFactor: z.number().describe("Scaling factor for dilation. Values > 1 enlarge, 0 < values < 1 shrink.")
+				scaleFactor: z
+					.number()
+					.describe("Scaling factor for dilation. Values > 1 enlarge, 0 < values < 1 shrink.")
 			})
 			.strict()
 	])
@@ -201,9 +211,9 @@ export type TransformationDiagramProps = z.infer<typeof TransformationDiagramPro
 /**
  * Generates an SVG diagram illustrating a geometric transformation.
  */
-export const generateTransformationDiagram: WidgetGenerator<typeof TransformationDiagramPropsSchema> = async (
-	props
-) => {
+export const generateTransformationDiagram: WidgetGenerator<
+	typeof TransformationDiagramPropsSchema
+> = async (props) => {
 	const { width, height, preImage, transformation } = props
 
 	const canvas = new CanvasImpl({
@@ -213,13 +223,20 @@ export const generateTransformationDiagram: WidgetGenerator<typeof Transformatio
 	})
 
 	const calculateCentroid = (vertices: Array<{ x: number; y: number }>) => {
-		const centroid = vertices.reduce((acc, p) => ({ x: acc.x + p.x, y: acc.y + p.y }), { x: 0, y: 0 })
+		const centroid = vertices.reduce((acc, p) => ({ x: acc.x + p.x, y: acc.y + p.y }), {
+			x: 0,
+			y: 0
+		})
 		centroid.x /= vertices.length
 		centroid.y /= vertices.length
 		return centroid
 	}
 
-	const rotatePoint = (p: { x: number; y: number }, center: { x: number; y: number }, angleDeg: number) => {
+	const rotatePoint = (
+		p: { x: number; y: number },
+		center: { x: number; y: number },
+		angleDeg: number
+	) => {
 		const rad = (angleDeg * Math.PI) / 180
 		const tx = p.x - center.x
 		const ty = p.y - center.y
@@ -345,7 +362,10 @@ export const generateTransformationDiagram: WidgetGenerator<typeof Transformatio
 	}
 
 	function addSegment(from: { x: number; y: number }, to: { x: number; y: number }) {
-		screenSegments.push({ a: { x: toSvgX(from.x), y: toSvgY(from.y) }, b: { x: toSvgX(to.x), y: toSvgY(to.y) } })
+		screenSegments.push({
+			a: { x: toSvgX(from.x), y: toSvgY(from.y) },
+			b: { x: toSvgX(to.x), y: toSvgY(to.y) }
+		})
 	}
 
 	// Add polygon edges for both shapes
@@ -384,7 +404,11 @@ export const generateTransformationDiagram: WidgetGenerator<typeof Transformatio
 		const r2 = { x: rx + rw, y: ry }
 		const r3 = { x: rx + rw, y: ry + rh }
 		const r4 = { x: rx, y: ry + rh }
-		const orient = (p: { x: number; y: number }, q: { x: number; y: number }, r: { x: number; y: number }) => {
+		const orient = (
+			p: { x: number; y: number },
+			q: { x: number; y: number },
+			r: { x: number; y: number }
+		) => {
 			const val = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y)
 			if (val > 1e-9) return 1
 			if (val < -1e-9) return -1
@@ -432,7 +456,12 @@ export const generateTransformationDiagram: WidgetGenerator<typeof Transformatio
 			height: number
 		}
 	): boolean {
-		return !(a.x + a.width < b.x || b.x + b.width < a.x || a.y + a.height < b.y || b.y + b.height < a.y)
+		return !(
+			a.x + a.width < b.x ||
+			b.x + b.width < a.x ||
+			a.y + a.height < b.y ||
+			b.y + b.height < a.y
+		)
 	}
 
 	function rectsOverlapInflated(
@@ -486,18 +515,27 @@ export const generateTransformationDiagram: WidgetGenerator<typeof Transformatio
 		if (line.style === "dashed") dash = "8 6"
 		else if (line.style === "dotted") dash = "2 4"
 
-		canvas.drawLine(toSvgX(line.from.x), toSvgY(line.from.y), toSvgX(line.to.x), toSvgY(line.to.y), {
-			stroke: line.color,
-			strokeWidth: theme.stroke.width.thick,
-			dash
-		})
+		canvas.drawLine(
+			toSvgX(line.from.x),
+			toSvgY(line.from.y),
+			toSvgX(line.to.x),
+			toSvgY(line.to.y),
+			{
+				stroke: line.color,
+				strokeWidth: theme.stroke.width.thick,
+				dash
+			}
+		)
 	}
 
 	// Removed unused function drawRotationArc
 
 	const placedLabelRects: Array<{ x: number; y: number; width: number; height: number }> = []
 
-	const drawVertexLabels = (shape: TransformationDiagramProps["preImage"], extraOffset: number | Array<number> = 0) => {
+	const drawVertexLabels = (
+		shape: TransformationDiagramProps["preImage"],
+		extraOffset: number | Array<number> = 0
+	) => {
 		for (let i = 0; i < shape.vertices.length; i++) {
 			const vertex = shape.vertices[i]
 			const label = shape.vertexLabels[i]
@@ -551,7 +589,12 @@ export const generateTransformationDiagram: WidgetGenerator<typeof Transformatio
 			const baseY = toSvgY(vertex.y) + screenRadY * labelOffset
 
 			const fontPx = theme.font.size.medium
-			const { maxWidth: w, height: h } = estimateWrappedTextDimensions(label, Number.POSITIVE_INFINITY, fontPx, 1.2)
+			const { maxWidth: w, height: h } = estimateWrappedTextDimensions(
+				label,
+				Number.POSITIVE_INFINITY,
+				fontPx,
+				1.2
+			)
 			const halfW = w / 2
 			const halfH = h / 2
 
@@ -569,8 +612,16 @@ export const generateTransformationDiagram: WidgetGenerator<typeof Transformatio
 				const maxIt = 80
 				const step = 3
 				while (
-					(rectIntersectsAnySegment({ x: px - halfW, y: py - halfH, width: w, height: h, pad: 1 }) ||
-						placedLabelRects.some((r) => rectsOverlap({ x: px - halfW, y: py - halfH, width: w, height: h }, r))) &&
+					(rectIntersectsAnySegment({
+						x: px - halfW,
+						y: py - halfH,
+						width: w,
+						height: h,
+						pad: 1
+					}) ||
+						placedLabelRects.some((r) =>
+							rectsOverlap({ x: px - halfW, y: py - halfH, width: w, height: h }, r)
+						)) &&
 					it < maxIt
 				) {
 					px += mult * step * tx
@@ -614,7 +665,8 @@ export const generateTransformationDiagram: WidgetGenerator<typeof Transformatio
 		let angle2 = Math.atan2(nextVertex.y - vertex.y, nextVertex.x - vertex.x)
 
 		const crossProduct =
-			(nextVertex.x - vertex.x) * (prevVertex.y - vertex.y) - (nextVertex.y - vertex.y) * (prevVertex.x - vertex.x)
+			(nextVertex.x - vertex.x) * (prevVertex.y - vertex.y) -
+			(nextVertex.y - vertex.y) * (prevVertex.x - vertex.x)
 		if (crossProduct > 0) [angle1, angle2] = [angle2, angle1]
 
 		const svgRadius = mark.radius * scale
@@ -742,7 +794,10 @@ export const generateTransformationDiagram: WidgetGenerator<typeof Transformatio
 			let finalPerpX = perpX
 			let finalPerpY = perpY
 
-			if ((sideLength.position === "inside" && dot > 0) || (sideLength.position === "outside" && dot < 0)) {
+			if (
+				(sideLength.position === "inside" && dot > 0) ||
+				(sideLength.position === "outside" && dot < 0)
+			) {
 				finalPerpX = -perpX
 				finalPerpY = -perpY
 			}
@@ -812,7 +867,12 @@ export const generateTransformationDiagram: WidgetGenerator<typeof Transformatio
 		const svgX = toSvgX(centerPoint.x)
 		const svgY = toSvgY(centerPoint.y)
 		const fontPx = theme.font.size.medium
-		const { maxWidth: w, height: h } = estimateWrappedTextDimensions("P", Number.POSITIVE_INFINITY, fontPx, 1.2)
+		const { maxWidth: w, height: h } = estimateWrappedTextDimensions(
+			"P",
+			Number.POSITIVE_INFINITY,
+			fontPx,
+			1.2
+		)
 		const textX = svgX
 		const textY = svgY - 12 // baseline offset in drawPoint
 		placedLabelRects.push({ x: textX - w / 2, y: textY - h, width: w, height: h })
@@ -833,7 +893,12 @@ export const generateTransformationDiagram: WidgetGenerator<typeof Transformatio
 		// Label styling and margins
 		const fontPx = theme.font.size.medium
 		const margin = preferBelow ? 28 : 24
-		const { maxWidth: w, height: h } = estimateWrappedTextDimensions(shape.label, Number.POSITIVE_INFINITY, fontPx, 1.2)
+		const { maxWidth: w, height: h } = estimateWrappedTextDimensions(
+			shape.label,
+			Number.POSITIVE_INFINITY,
+			fontPx,
+			1.2
+		)
 		const halfW = w / 2
 		const halfH = h / 2
 
@@ -847,7 +912,14 @@ export const generateTransformationDiagram: WidgetGenerator<typeof Transformatio
 			if (rectIntersectsAnySegment(rect)) return false
 			for (const r of placedLabelRects) {
 				// add extra separation so shape labels don't stack on top of vertex labels
-				if (rectsOverlapInflated({ x: rect.x, y: rect.y, width: rect.width, height: rect.height }, r, 10)) return false
+				if (
+					rectsOverlapInflated(
+						{ x: rect.x, y: rect.y, width: rect.width, height: rect.height },
+						r,
+						10
+					)
+				)
+					return false
 			}
 			return true
 		}
@@ -962,6 +1034,12 @@ export const generateTransformationDiagram: WidgetGenerator<typeof Transformatio
 
 	// no-op: general markers removed
 
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(PADDING)
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}">${svgBody}</svg>`
 }

@@ -22,19 +22,25 @@ function createResponseDeclarationSchema(): z.ZodType<ResponseDeclaration> {
 
 	const TextualResponseDeclarationSchema = BaseResponseDeclarationSchema.extend({
 		baseType: z.enum(["string", "integer", "float"]),
-		correct: z.union([z.string(), z.number()]).describe("The single correct answer for a text or numeric entry.")
+		correct: z
+			.union([z.string(), z.number()])
+			.describe("The single correct answer for a text or numeric entry.")
 	}).strict()
 
 	const IdentifierResponseDeclarationSchema = BaseResponseDeclarationSchema.extend({
 		baseType: z.literal("identifier"),
 		correct: z
 			.union([z.string(), z.array(z.string())])
-			.describe("The correct identifier(s). For multiple correct answers, provide an array of identifiers.")
+			.describe(
+				"The correct identifier(s). For multiple correct answers, provide an array of identifiers."
+			)
 	}).strict()
 
 	const DirectedPairResponseDeclarationSchema = BaseResponseDeclarationSchema.extend({
 		baseType: z.literal("directedPair"),
-		cardinality: z.enum(["multiple", "ordered"]).describe("Gap match always uses multiple or ordered cardinality."),
+		cardinality: z
+			.enum(["multiple", "ordered"])
+			.describe("Gap match always uses multiple or ordered cardinality."),
 		correct: z
 			.array(
 				z.object({
@@ -79,7 +85,9 @@ export function createAssessmentItemShellSchema<const E extends readonly string[
 			body: BodySchema.nullable().describe("The main content with ref placeholders.")
 		})
 		.strict()
-		.describe("Initial assessment item structure with ref placeholders from the first AI generation shot.")
+		.describe(
+			"Initial assessment item structure with ref placeholders from the first AI generation shot."
+		)
 }
 
 export function createDynamicAssessmentItemSchema<const E extends readonly string[]>(
@@ -152,7 +160,9 @@ export function createDynamicAssessmentItemSchema<const E extends readonly strin
 			for (const [interactionKey, interaction] of Object.entries(data.interactions)) {
 				if (interaction.type !== "gapMatchInteraction") continue
 
-				const decl = data.responseDeclarations.find((d) => d.identifier === interaction.responseIdentifier)
+				const decl = data.responseDeclarations.find(
+					(d) => d.identifier === interaction.responseIdentifier
+				)
 				if (!decl) continue
 				if (decl.baseType !== "directedPair") continue
 

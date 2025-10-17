@@ -8,12 +8,20 @@ import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import tar from "tar-stream"
 import { z } from "zod"
-import { IndexV1Schema, IntegritySchema, LessonSchema, QuestionRefSchema, UnitSchema } from "@/cartridge/schema"
+import {
+	IndexV1Schema,
+	IntegritySchema,
+	LessonSchema,
+	QuestionRefSchema,
+	UnitSchema
+} from "@/cartridge/schema"
 
 export type GeneratorInfo = { name: string; version: string; commit?: string }
 
 // Runtime schemas for strict validation (no extra fields allowed)
-const GeneratorInfoSchema = z.object({ name: z.string(), version: z.string(), commit: z.string().optional() }).strict()
+const GeneratorInfoSchema = z
+	.object({ name: z.string(), version: z.string(), commit: z.string().optional() })
+	.strict()
 const CourseInfoSchema = z.object({ title: z.string(), subject: z.string() }).strict()
 
 const UnitTestSchema = z
@@ -54,9 +62,9 @@ const BuildUnitNonNumericSchema = z
 export const BuildUnitSchema = z.union([BuildUnitNumericSchema, BuildUnitNonNumericSchema])
 export type BuildUnit = z.infer<typeof BuildUnitSchema>
 
-const CartridgePathSchema = z
-	.string()
-	.refine((p) => !p.startsWith("/") && !p.includes("\\"), { message: "paths must be POSIX relative" })
+const CartridgePathSchema = z.string().refine((p) => !p.startsWith("/") && !p.includes("\\"), {
+	message: "paths must be POSIX relative"
+})
 
 export const CartridgeBuildInputSchema = z
 	.object({
@@ -191,7 +199,11 @@ export async function buildCartridgeToBytes(input: CartridgeBuildInput): Promise
 			return sum + lessonQuizQuestions
 		}, 0)
 		const unitTestQuestionCount = u.unitTest ? u.unitTest.questionCount : 0
-		const counts = { lessonCount, resourceCount, questionCount: quizQuestionCount + unitTestQuestionCount }
+		const counts = {
+			lessonCount,
+			resourceCount,
+			questionCount: quizQuestionCount + unitTestQuestionCount
+		}
 
 		const unitJson: Record<string, unknown> = {
 			id: u.id,
@@ -280,7 +292,10 @@ export async function buildCartridgeToBytes(input: CartridgeBuildInput): Promise
 	return streamResult.data
 }
 
-export async function buildCartridgeToFile(input: CartridgeBuildInput, outFile: string): Promise<void> {
+export async function buildCartridgeToFile(
+	input: CartridgeBuildInput,
+	outFile: string
+): Promise<void> {
 	// Ensure directory exists
 	const dir = path.dirname(outFile)
 	const mk = await errors.try(fs.mkdir(dir, { recursive: true }))
@@ -357,7 +372,11 @@ export async function buildCartridgeToFile(input: CartridgeBuildInput, outFile: 
 				return sum + lessonQuizQuestions
 			}, 0)
 			const unitTestQuestionCount = u.unitTest ? u.unitTest.questionCount : 0
-			const counts = { lessonCount, resourceCount, questionCount: quizQuestionCount + unitTestQuestionCount }
+			const counts = {
+				lessonCount,
+				resourceCount,
+				questionCount: quizQuestionCount + unitTestQuestionCount
+			}
 			const unitJson = {
 				id: u.id,
 				unitNumber: u.unitNumber,
@@ -545,7 +564,11 @@ export async function buildCartridgeFromFileMap(
 			return sum + lessonQuizQuestions
 		}, 0)
 		const unitTestQuestionCount = u.unitTest ? u.unitTest.questionCount : 0
-		const counts = { lessonCount, resourceCount, questionCount: quizQuestionCount + unitTestQuestionCount }
+		const counts = {
+			lessonCount,
+			resourceCount,
+			questionCount: quizQuestionCount + unitTestQuestionCount
+		}
 		const uv = UnitSchema.safeParse({
 			id: u.id,
 			unitNumber: u.unitNumber,
@@ -601,7 +624,11 @@ export async function buildCartridgeFromFileMap(
 	await writeJson("integrity.json", integ.data)
 
 	// tar | zstd
-	const procTar = Bun.spawn({ cmd: ["tar", "-C", stageRoot, "-cf", "-", "."], stdout: "pipe", stderr: "pipe" })
+	const procTar = Bun.spawn({
+		cmd: ["tar", "-C", stageRoot, "-cf", "-", "."],
+		stdout: "pipe",
+		stderr: "pipe"
+	})
 	const procZstd = Bun.spawn({
 		cmd: ["zstd", "--fast=3", "-T0", "-q", "-o", outFile],
 		stdin: "pipe",

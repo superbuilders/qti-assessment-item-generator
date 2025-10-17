@@ -11,14 +11,18 @@ function createSquarePropsSchema() {
 	return z.discriminatedUnion("type", [
 		z
 			.object({
-				type: z.literal("unknown").describe("Square with unknown area, displays '?' as placeholder text"),
+				type: z
+					.literal("unknown")
+					.describe("Square with unknown area, displays '?' as placeholder text"),
 				color: z
 					.string()
 					.regex(
 						CSS_COLOR_PATTERN,
 						"invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA), rgb/rgba(), hsl/hsla(), or a common named color"
 					)
-					.describe("Fill color for the square background (e.g., '#ff6b6b', 'lightblue', 'rgba(255,0,0,0.5)')")
+					.describe(
+						"Fill color for the square background (e.g., '#ff6b6b', 'lightblue', 'rgba(255,0,0,0.5)')"
+					)
 			})
 			.strict()
 			.describe(
@@ -26,15 +30,22 @@ function createSquarePropsSchema() {
 			),
 		z
 			.object({
-				type: z.literal("value").describe("Square with known numeric area, displays the calculated area value"),
-				area: z.number().positive().describe("Numeric area rendered inside the square (e.g., 144, 25)."),
+				type: z
+					.literal("value")
+					.describe("Square with known numeric area, displays the calculated area value"),
+				area: z
+					.number()
+					.positive()
+					.describe("Numeric area rendered inside the square (e.g., 144, 25)."),
 				color: z
 					.string()
 					.regex(
 						CSS_COLOR_PATTERN,
 						"invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA), rgb/rgba(), hsl/hsla(), or a common named color"
 					)
-					.describe("Fill color for the square background (e.g., '#ff6b6b', 'lightblue', 'rgba(255,0,0,0.5)')")
+					.describe(
+						"Fill color for the square background (e.g., '#ff6b6b', 'lightblue', 'rgba(255,0,0,0.5)')"
+					)
 			})
 			.strict()
 			.describe(
@@ -49,7 +60,9 @@ function createTriangleSidePropsSchema() {
 			label: z
 				.string()
 				.nullable()
-				.describe("Optional text label for this triangle side (e.g., 'a', 'b', 'c', '5', '13'). Null to hide."),
+				.describe(
+					"Optional text label for this triangle side (e.g., 'a', 'b', 'c', '5', '13'). Null to hide."
+				),
 			square: createSquarePropsSchema()
 				.nullable()
 				.describe("Optional square attached to this side. Null to hide the square.")
@@ -62,7 +75,9 @@ const NewPythagoreanPropsSchema = z
 	.object({
 		type: z
 			.literal("pythagoreanProofDiagram")
-			.describe("Identifies this as a Pythagorean proof diagram widget demonstrating a² + b² = c²."),
+			.describe(
+				"Identifies this as a Pythagorean proof diagram widget demonstrating a² + b² = c²."
+			),
 		width: createWidthSchema(),
 		height: createHeightSchema(),
 		sideA: createTriangleSidePropsSchema().describe(
@@ -88,23 +103,36 @@ export type PythagoreanProofDiagramProps = z.infer<typeof PythagoreanProofDiagra
  * Generates a visual diagram to illustrate the Pythagorean theorem by rendering a
  * right triangle with a square constructed on each side, labeled with its area.
  */
-export const generatePythagoreanProofDiagram: WidgetGenerator<typeof PythagoreanProofDiagramPropsSchema> = async (
-	data
-) => {
+export const generatePythagoreanProofDiagram: WidgetGenerator<
+	typeof PythagoreanProofDiagramPropsSchema
+> = async (data) => {
 	const { width, height, sideA, sideB, sideC } = data
 
-	const aAreaNum = sideA?.square?.type === "value" && sideA.square.area > 0 ? sideA.square.area : undefined
-	const bAreaNum = sideB?.square?.type === "value" && sideB.square.area > 0 ? sideB.square.area : undefined
-	const cAreaNum = sideC?.square?.type === "value" && sideC.square.area > 0 ? sideC.square.area : undefined
+	const aAreaNum =
+		sideA?.square?.type === "value" && sideA.square.area > 0 ? sideA.square.area : undefined
+	const bAreaNum =
+		sideB?.square?.type === "value" && sideB.square.area > 0 ? sideB.square.area : undefined
+	const cAreaNum =
+		sideC?.square?.type === "value" && sideC.square.area > 0 ? sideC.square.area : undefined
 
 	let aLen: number | undefined = aAreaNum !== undefined ? Math.sqrt(aAreaNum) : undefined
 	let bLen: number | undefined = bAreaNum !== undefined ? Math.sqrt(bAreaNum) : undefined
 	let cLen: number | undefined = cAreaNum !== undefined ? Math.sqrt(cAreaNum) : undefined
 
-	if (aLen === undefined && bAreaNum !== undefined && cAreaNum !== undefined && cAreaNum > bAreaNum) {
+	if (
+		aLen === undefined &&
+		bAreaNum !== undefined &&
+		cAreaNum !== undefined &&
+		cAreaNum > bAreaNum
+	) {
 		aLen = Math.sqrt(cAreaNum - bAreaNum)
 	}
-	if (bLen === undefined && aAreaNum !== undefined && cAreaNum !== undefined && cAreaNum > aAreaNum) {
+	if (
+		bLen === undefined &&
+		aAreaNum !== undefined &&
+		cAreaNum !== undefined &&
+		cAreaNum > aAreaNum
+	) {
 		bLen = Math.sqrt(cAreaNum - aAreaNum)
 	}
 	if (cLen === undefined && aAreaNum !== undefined && bAreaNum !== undefined) {
@@ -157,7 +185,10 @@ export const generatePythagoreanProofDiagram: WidgetGenerator<typeof Pythagorean
 		const maxY = Math.max(...points.map((p) => p.y))
 		const rawW = maxX - minX
 		const rawH = maxY - minY
-		const scale = Math.min((width - 2 * PADDING) / (rawW || 1), (height - 2 * PADDING) / (rawH || 1))
+		const scale = Math.min(
+			(width - 2 * PADDING) / (rawW || 1),
+			(height - 2 * PADDING) / (rawH || 1)
+		)
 		const offsetX = (width - scale * rawW) / 2 - scale * minX
 		const offsetY = (height - scale * rawH) / 2 - scale * minY
 		const project = (p: Point) => ({
@@ -240,7 +271,8 @@ export const generatePythagoreanProofDiagram: WidgetGenerator<typeof Pythagorean
 			x: (v_a_end.x + v_c1.x) / 2,
 			y: (v_a_end.y + v_c1.y) / 2
 		})
-		const cText = sideC.square.type === "unknown" ? "?" : toSuperscript(String(Math.round(sideC.square.area)))
+		const cText =
+			sideC.square.type === "unknown" ? "?" : toSuperscript(String(Math.round(sideC.square.area)))
 		canvas.drawText({
 			x: centerC.x,
 			y: centerC.y,
@@ -267,7 +299,8 @@ export const generatePythagoreanProofDiagram: WidgetGenerator<typeof Pythagorean
 		// (No grid lines)
 
 		const centerB = project({ x: v_right.x + b / 2, y: v_b_end.y + b / 2 })
-		const bText = sideB.square.type === "unknown" ? "?" : toSuperscript(String(Math.round(sideB.square.area)))
+		const bText =
+			sideB.square.type === "unknown" ? "?" : toSuperscript(String(Math.round(sideB.square.area)))
 		canvas.drawText({
 			x: centerB.x,
 			y: centerB.y,
@@ -294,7 +327,8 @@ export const generatePythagoreanProofDiagram: WidgetGenerator<typeof Pythagorean
 		// (No grid lines)
 
 		const centerA = project({ x: v_a_end.x + a / 2, y: v_a_end.y + a / 2 })
-		const aText = sideA.square.type === "unknown" ? "?" : toSuperscript(String(Math.round(sideA.square.area)))
+		const aText =
+			sideA.square.type === "unknown" ? "?" : toSuperscript(String(Math.round(sideA.square.area)))
 		canvas.drawText({
 			x: centerA.x,
 			y: centerA.y,
@@ -390,7 +424,13 @@ export const generatePythagoreanProofDiagram: WidgetGenerator<typeof Pythagorean
 	}
 
 	// NEW: Finalize the canvas and construct the root SVG element
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(PADDING)
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}">${svgBody}</svg>`
 }

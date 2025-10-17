@@ -73,7 +73,15 @@ export function renderRotatedWrappedYAxisLabel(
 	paddingPx = 10
 ): string {
 	const maxWrappedWidth = Math.max(20, chartHeightPx - 2 * paddingPx)
-	let wrapped = renderWrappedText(text, x, yCenter, className, lineHeight, maxWrappedWidth, approxCharWidthPx)
+	let wrapped = renderWrappedText(
+		text,
+		x,
+		yCenter,
+		className,
+		lineHeight,
+		maxWrappedWidth,
+		approxCharWidthPx
+	)
 	// Inject rotation transform with pivot
 	wrapped = wrapped.replace("<text ", `<text transform="rotate(-90, ${x}, ${yCenter})" `)
 	return wrapped

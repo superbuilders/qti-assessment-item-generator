@@ -80,8 +80,16 @@ export function generateFractionAdditionQuestion(
 
 	// --- 3b. Core Logic: Calculate Answer and Pedagogically-Sound Distractors ---
 	// Convert input fraction schema to computation form
-	const toFraction = (v: { type: "fraction"; numerator: number; denominator: number; sign?: "+" | "-" }): Fraction => {
-		return { numerator: v.numerator * ((v.sign ?? "+") === "-" ? -1 : 1), denominator: v.denominator }
+	const toFraction = (v: {
+		type: "fraction"
+		numerator: number
+		denominator: number
+		sign?: "+" | "-"
+	}): Fraction => {
+		return {
+			numerator: v.numerator * ((v.sign ?? "+") === "-" ? -1 : 1),
+			denominator: v.denominator
+		}
 	}
 
 	const f1 = toFraction(addend1)
@@ -140,7 +148,8 @@ export function generateFractionAdditionQuestion(
 			index ===
 			self.findIndex(
 				(c) =>
-					c.fraction.numerator === choice.fraction.numerator && c.fraction.denominator === choice.fraction.denominator
+					c.fraction.numerator === choice.fraction.numerator &&
+					c.fraction.denominator === choice.fraction.denominator
 			)
 	)
 
@@ -159,7 +168,11 @@ export function generateFractionAdditionQuestion(
 	// Sort choices by their decimal value to ensure a deterministic, non-random order.
 	const finalChoices = uniqueChoices
 		.slice(0, 4)
-		.sort((a, b) => a.fraction.numerator / a.fraction.denominator - b.fraction.numerator / b.fraction.denominator)
+		.sort(
+			(a, b) =>
+				a.fraction.numerator / a.fraction.denominator -
+				b.fraction.numerator / b.fraction.denominator
+		)
 
 	const correctChoiceIndex = finalChoices.findIndex((c) => c.isCorrect)
 
@@ -173,7 +186,10 @@ export function generateFractionAdditionQuestion(
 			{
 				type: "paragraph",
 				content: [
-					{ type: "text", content: "What is the sum of the fractions below? Give your answer in simplest form." }
+					{
+						type: "text",
+						content: "What is the sum of the fractions below? Give your answer in simplest form."
+					}
 				]
 			},
 			{
@@ -247,7 +263,11 @@ export function generateFractionAdditionQuestion(
 		feedbackPlan: {
 			mode: "combo",
 			dimensions: [
-				{ responseIdentifier: "RESPONSE", kind: "enumerated", keys: finalChoices.map((_, i) => `CHOICE_${i}`) }
+				{
+					responseIdentifier: "RESPONSE",
+					kind: "enumerated",
+					keys: finalChoices.map((_, i) => `CHOICE_${i}`)
+				}
 			],
 			combinations: finalChoices.map((_, i) => ({
 				id: `FB__RESPONSE_CHOICE_${i}`,
@@ -307,11 +327,17 @@ export function generateFractionAdditionQuestion(
 													content: [
 														{ type: "math", mathml: formatFractionMathML(f1) },
 														{ type: "text", content: " = " },
-														{ type: "math", mathml: `<mfrac><mn>${num1Expanded}</mn><mn>${commonDenom}</mn></mfrac>` },
+														{
+															type: "math",
+															mathml: `<mfrac><mn>${num1Expanded}</mn><mn>${commonDenom}</mn></mfrac>`
+														},
 														{ type: "text", content: " and " },
 														{ type: "math", mathml: formatFractionMathML(f2) },
 														{ type: "text", content: " = " },
-														{ type: "math", mathml: `<mfrac><mn>${num2Expanded}</mn><mn>${commonDenom}</mn></mfrac>` }
+														{
+															type: "math",
+															mathml: `<mfrac><mn>${num2Expanded}</mn><mn>${commonDenom}</mn></mfrac>`
+														}
 													]
 												},
 												{
@@ -398,7 +424,8 @@ export function generateFractionAdditionQuestion(
 										summary: [
 											{
 												type: "text",
-												content: "You added the numerators but kept one denominator without converting both fractions."
+												content:
+													"You added the numerators but kept one denominator without converting both fractions."
 											}
 										]
 									},
@@ -412,7 +439,8 @@ export function generateFractionAdditionQuestion(
 													content: [
 														{
 															type: "text",
-															content: "You can only add numerators directly when denominators are already the same."
+															content:
+																"You can only add numerators directly when denominators are already the same."
 														}
 													]
 												}
@@ -447,7 +475,8 @@ export function generateFractionAdditionQuestion(
 										summary: [
 											{
 												type: "text",
-												content: "You found the common denominator but didn't adjust the numerators proportionally."
+												content:
+													"You found the common denominator but didn't adjust the numerators proportionally."
 											}
 										]
 									},
@@ -461,7 +490,8 @@ export function generateFractionAdditionQuestion(
 													content: [
 														{
 															type: "text",
-															content: "When changing denominator, multiply numerator by the same factor: "
+															content:
+																"When changing denominator, multiply numerator by the same factor: "
 														},
 														{
 															type: "math",
@@ -500,7 +530,8 @@ export function generateFractionAdditionQuestion(
 										summary: [
 											{
 												type: "text",
-												content: "You found the right sum but forgot to simplify it to lowest terms."
+												content:
+													"You found the right sum but forgot to simplify it to lowest terms."
 											}
 										]
 									},

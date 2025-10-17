@@ -29,11 +29,15 @@ export const ProtractorAngleDiagramPropsSchema = z
 			.min(0)
 			.max(180)
 			.describe("angle size in degrees measured counterclockwise from the starting ray"),
-		startPointLabel: z.string().describe("label for the starting point (e.g., 'A'). use empty string for no label."),
+		startPointLabel: z
+			.string()
+			.describe("label for the starting point (e.g., 'A'). use empty string for no label."),
 		centerPointLabel: z
 			.string()
 			.describe("label for the center vertex point (e.g., 'B'). use empty string for no label."),
-		endPointLabel: z.string().describe("label for the ending point (e.g., 'C'). use empty string for no label.")
+		endPointLabel: z
+			.string()
+			.describe("label for the ending point (e.g., 'C'). use empty string for no label.")
 	})
 	.strict()
 	.describe("creates a protractor diagram with two lines showing a specific angle measurement")
@@ -43,10 +47,18 @@ export type ProtractorAngleDiagramProps = z.infer<typeof ProtractorAngleDiagramP
 /**
  * generates a protractor diagram with two lines showing a specific angle
  */
-export const generateProtractorAngleDiagram: WidgetGenerator<typeof ProtractorAngleDiagramPropsSchema> = async (
-	props
-) => {
-	const { width, height, startingReading, angleDegrees, startPointLabel, centerPointLabel, endPointLabel } = props
+export const generateProtractorAngleDiagram: WidgetGenerator<
+	typeof ProtractorAngleDiagramPropsSchema
+> = async (props) => {
+	const {
+		width,
+		height,
+		startingReading,
+		angleDegrees,
+		startPointLabel,
+		centerPointLabel,
+		endPointLabel
+	} = props
 
 	const canvas = new CanvasImpl({
 		chartArea: { left: 0, top: 0, width, height },
@@ -134,7 +146,9 @@ export const generateProtractorAngleDiagram: WidgetGenerator<typeof ProtractorAn
 		const y = centerY - arcRadius * Math.sin(a)
 		sectorPoints.push({ x, y })
 	}
-	const fillPath = new Path2D().moveTo(centerX, centerY).lineTo(sectorPoints[0].x, sectorPoints[0].y)
+	const fillPath = new Path2D()
+		.moveTo(centerX, centerY)
+		.lineTo(sectorPoints[0].x, sectorPoints[0].y)
 	for (let i = 1; i < sectorPoints.length; i++) {
 		fillPath.lineTo(sectorPoints[i].x, sectorPoints[i].y)
 	}
@@ -177,10 +191,14 @@ export const generateProtractorAngleDiagram: WidgetGenerator<typeof ProtractorAn
 	const startLineAngle = Math.atan2(startY - centerY, startX - centerX)
 	const startArrowTipX = startX
 	const startArrowTipY = startY
-	const startArrowBase1X = startX - arrowSize * Math.cos(startLineAngle) - (arrowSize / 2) * Math.sin(startLineAngle)
-	const startArrowBase1Y = startY - arrowSize * Math.sin(startLineAngle) + (arrowSize / 2) * Math.cos(startLineAngle)
-	const startArrowBase2X = startX - arrowSize * Math.cos(startLineAngle) + (arrowSize / 2) * Math.sin(startLineAngle)
-	const startArrowBase2Y = startY - arrowSize * Math.sin(startLineAngle) - (arrowSize / 2) * Math.cos(startLineAngle)
+	const startArrowBase1X =
+		startX - arrowSize * Math.cos(startLineAngle) - (arrowSize / 2) * Math.sin(startLineAngle)
+	const startArrowBase1Y =
+		startY - arrowSize * Math.sin(startLineAngle) + (arrowSize / 2) * Math.cos(startLineAngle)
+	const startArrowBase2X =
+		startX - arrowSize * Math.cos(startLineAngle) + (arrowSize / 2) * Math.sin(startLineAngle)
+	const startArrowBase2Y =
+		startY - arrowSize * Math.sin(startLineAngle) - (arrowSize / 2) * Math.cos(startLineAngle)
 
 	canvas.drawPolygon(
 		[
@@ -226,10 +244,14 @@ export const generateProtractorAngleDiagram: WidgetGenerator<typeof ProtractorAn
 	const lineAngle = Math.atan2(endY - centerY, endX - centerX)
 	const endArrowTipX = endX
 	const endArrowTipY = endY
-	const endArrowBase1X = endX - arrowSize * Math.cos(lineAngle) - (arrowSize / 2) * Math.sin(lineAngle)
-	const endArrowBase1Y = endY - arrowSize * Math.sin(lineAngle) + (arrowSize / 2) * Math.cos(lineAngle)
-	const endArrowBase2X = endX - arrowSize * Math.cos(lineAngle) + (arrowSize / 2) * Math.sin(lineAngle)
-	const endArrowBase2Y = endY - arrowSize * Math.sin(lineAngle) - (arrowSize / 2) * Math.cos(lineAngle)
+	const endArrowBase1X =
+		endX - arrowSize * Math.cos(lineAngle) - (arrowSize / 2) * Math.sin(lineAngle)
+	const endArrowBase1Y =
+		endY - arrowSize * Math.sin(lineAngle) + (arrowSize / 2) * Math.cos(lineAngle)
+	const endArrowBase2X =
+		endX - arrowSize * Math.cos(lineAngle) + (arrowSize / 2) * Math.sin(lineAngle)
+	const endArrowBase2Y =
+		endY - arrowSize * Math.sin(lineAngle) - (arrowSize / 2) * Math.cos(lineAngle)
 
 	canvas.drawPolygon(
 		[
@@ -256,7 +278,13 @@ export const generateProtractorAngleDiagram: WidgetGenerator<typeof ProtractorAn
 	}
 
 	// get canvas content
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(PADDING)
 
 	// combine protractor with angle content
 	const combinedContent = protractorGroup + svgBody

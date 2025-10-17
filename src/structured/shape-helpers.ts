@@ -44,7 +44,11 @@ export function transformObjectsToArrays(data: unknown): unknown {
 		const obj = data
 		const keys = Object.keys(obj)
 
-		if (keys.length === 1 && keys[0] === ARRAY_EMPTY_SENTINEL && obj[ARRAY_EMPTY_SENTINEL] === true) {
+		if (
+			keys.length === 1 &&
+			keys[0] === ARRAY_EMPTY_SENTINEL &&
+			obj[ARRAY_EMPTY_SENTINEL] === true
+		) {
 			return []
 		}
 

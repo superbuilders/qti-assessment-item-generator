@@ -257,7 +257,13 @@ export interface Canvas {
 	withTransform(transform: string, renderFn: () => void): void // wrap a <g transform="..."> around renderFn output
 
 	// Patterns and gradients helpers
-	addHatchPattern(opts: { id: string; color: string; strokeWidth: number; spacing?: number; angleDeg?: number }): void
+	addHatchPattern(opts: {
+		id: string
+		color: string
+		strokeWidth: number
+		spacing?: number
+		angleDeg?: number
+	}): void
 	addLinearGradient(opts: {
 		id: string
 		stops: Array<{ offset: string; color: string }>
@@ -309,7 +315,12 @@ export function calculateYAxisLayoutAxisAware(
 	const TP = opts.titlePadding ?? 12
 	const TITLE_PX = opts.axisTitleFontPx ?? 16
 
-	const { height: wrappedTitleHeight } = estimateWrappedTextDimensions(yAxis.label, chartHeightPx, TITLE_PX, 1.1)
+	const { height: wrappedTitleHeight } = estimateWrappedTextDimensions(
+		yAxis.label,
+		chartHeightPx,
+		TITLE_PX,
+		1.1
+	)
 
 	let maxTickLabelWidth = 0
 	if (yAxis.tickInterval > 0) {
@@ -405,7 +416,8 @@ export function calculateRightYAxisLayout(
 	}
 
 	const rightMargin = TICK_LENGTH + LABEL_PADDING + maxLabelWidth + titlePadding + AXIS_TITLE_HEIGHT
-	const rightYAxisLabelX = TICK_LENGTH + LABEL_PADDING + maxLabelWidth + titlePadding + AXIS_TITLE_HEIGHT / 2
+	const rightYAxisLabelX =
+		TICK_LENGTH + LABEL_PADDING + maxLabelWidth + titlePadding + AXIS_TITLE_HEIGHT / 2
 
 	return { rightMargin, rightYAxisLabelX }
 }
@@ -588,7 +600,8 @@ export function selectAxisLabels(inputs: {
 		return new Set()
 	}
 
-	const avgSize = nonEmptyIndices.reduce((sum, i) => sum + (sizesPx[i] ?? 0), 0) / nonEmptyIndices.length
+	const avgSize =
+		nonEmptyIndices.reduce((sum, i) => sum + (sizesPx[i] ?? 0), 0) / nonEmptyIndices.length
 
 	const maxLabelsThatCanFit = Math.floor(axisLengthPx / (avgSize + minGapPx))
 

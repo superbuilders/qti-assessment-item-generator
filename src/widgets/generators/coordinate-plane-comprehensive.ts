@@ -26,7 +26,9 @@ export const CoordinatePlaneComprehensivePropsSchema = z
 	.object({
 		type: z
 			.literal("coordinatePlane")
-			.describe("Identifies this as a comprehensive coordinate plane widget with full geometric features."),
+			.describe(
+				"Identifies this as a comprehensive coordinate plane widget with full geometric features."
+			),
 		width: createWidthSchema(),
 		height: createHeightSchema(),
 		xAxis: createAxisOptionsSchema().describe(
@@ -71,7 +73,9 @@ export const CoordinatePlaneComprehensivePropsSchema = z
 		"Creates a full-featured Cartesian coordinate plane supporting points, lines, polygons, distances, and polylines. Essential for graphing, geometry, and coordinate geometry lessons. Renders elements in layers: polygons (bottom) → distances → lines → polylines → points (top)."
 	)
 
-export type CoordinatePlaneComprehensiveProps = z.infer<typeof CoordinatePlaneComprehensivePropsSchema>
+export type CoordinatePlaneComprehensiveProps = z.infer<
+	typeof CoordinatePlaneComprehensivePropsSchema
+>
 
 // Error constant defined above
 
@@ -89,7 +93,18 @@ export type CoordinatePlaneComprehensiveProps = z.infer<typeof CoordinatePlaneCo
 export const generateCoordinatePlaneComprehensive: WidgetGenerator<
 	typeof CoordinatePlaneComprehensivePropsSchema
 > = async (props) => {
-	const { width, height, xAxis, yAxis, showQuadrantLabels, points, lines, polygons, distances, polylines } = props
+	const {
+		width,
+		height,
+		xAxis,
+		yAxis,
+		showQuadrantLabels,
+		points,
+		lines,
+		polygons,
+		distances,
+		polylines
+	} = props
 
 	// 1. Call the base generator and get the body content and extents object
 	const canvas = new CanvasImpl({
@@ -149,7 +164,13 @@ export const generateCoordinatePlaneComprehensive: WidgetGenerator<
 	}
 
 	// NEW: Finalize the canvas and construct the root SVG element
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(AXIS_VIEWBOX_PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(AXIS_VIEWBOX_PADDING)
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.base}">${svgBody}</svg>`
 }

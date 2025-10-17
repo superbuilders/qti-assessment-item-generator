@@ -12,7 +12,9 @@ import { estimateWrappedTextDimensions } from "../utils/text" // ADD THIS IMPORT
 import { theme } from "../utils/theme"
 import { buildTicks } from "../utils/ticks" // ADD THIS IMPORT
 
-export const ErrMismatchedDataLength = errors.new("series data must have the same length as x-axis categories")
+export const ErrMismatchedDataLength = errors.new(
+	"series data must have the same length as x-axis categories"
+)
 
 // Factory helpers to avoid schema reuse and $ref generation
 function createSeriesSchema() {
@@ -20,7 +22,9 @@ function createSeriesSchema() {
 		.object({
 			name: z
 				.string()
-				.describe("The name of this data series, which will appear in the legend (e.g., 'Bullhead City', 'Sedona')."),
+				.describe(
+					"The name of this data series, which will appear in the legend (e.g., 'Bullhead City', 'Sedona')."
+				),
 			values: z
 				.array(z.number())
 				.describe(
@@ -28,7 +32,10 @@ function createSeriesSchema() {
 				),
 			color: z
 				.string()
-				.regex(CSS_COLOR_PATTERN, "invalid css color; use hex format only (#RGB, #RRGGBB, or #RRGGBBAA)")
+				.regex(
+					CSS_COLOR_PATTERN,
+					"invalid css color; use hex format only (#RGB, #RRGGBB, or #RRGGBBAA)"
+				)
 				.describe(
 					"The color for the line and points of this series in hex format only (e.g., '#000', '#3377dd', '#ff000080')."
 				),
@@ -37,8 +44,12 @@ function createSeriesSchema() {
 				.describe(
 					"The visual style of the line. 'solid' is a continuous line, 'dashed' and 'dotted' are broken lines."
 				),
-			pointShape: z.enum(["circle", "square"]).describe("The shape of the marker for each data point."),
-			yAxis: z.enum(["left", "right"]).describe("Specifies which Y-axis this series should be plotted against.")
+			pointShape: z
+				.enum(["circle", "square"])
+				.describe("The shape of the marker for each data point."),
+			yAxis: z
+				.enum(["left", "right"])
+				.describe("Specifies which Y-axis this series should be plotted against.")
 		})
 		.strict()
 }
@@ -46,10 +57,15 @@ function createSeriesSchema() {
 function createYAxisSchema() {
 	return z
 		.object({
-			label: z.string().describe("The label for the vertical axis (e.g., 'Average temperature (°C)')."),
+			label: z
+				.string()
+				.describe("The label for the vertical axis (e.g., 'Average temperature (°C)')."),
 			min: z.number().describe("The minimum value for the y-axis scale."),
 			max: z.number().describe("The maximum value for the y-axis scale."),
-			tickInterval: z.number().positive().describe("The numeric interval between labeled tick marks on the y-axis."),
+			tickInterval: z
+				.number()
+				.positive()
+				.describe("The numeric interval between labeled tick marks on the y-axis."),
 			showGridLines: z.boolean().describe("If true, displays horizontal grid lines for the y-axis.")
 		})
 		.strict()
@@ -74,7 +90,9 @@ export const LineGraphPropsSchema = z
 		yAxis: createYAxisSchema(),
 		yAxisRight: z
 			.union([createYAxisSchema(), z.null()])
-			.describe("Configuration for an optional second Y-axis on the right side. Null for a single-axis graph."),
+			.describe(
+				"Configuration for an optional second Y-axis on the right side. Null for a single-axis graph."
+			),
 		series: z.array(createSeriesSchema()).describe("An array of data series to plot on the graph."),
 		showLegend: z.boolean().describe("If true, a legend is displayed to identify each data series.")
 	})
@@ -184,10 +202,18 @@ export const generateLineGraph: WidgetGenerator<typeof LineGraphPropsSchema> = a
 		const AXIS_TITLE_PADDING = 15
 
 		const labelX =
-			rightAxisX + TICK_LENGTH + TICK_LABEL_PADDING + maxTickLabelWidth + AXIS_TITLE_PADDING + wrappedTitleHeight / 2
+			rightAxisX +
+			TICK_LENGTH +
+			TICK_LABEL_PADDING +
+			maxTickLabelWidth +
+			AXIS_TITLE_PADDING +
+			wrappedTitleHeight / 2
 
 		// Estimate available width for text (space between axis and chart edge)
-		const availableWidth = Math.max(50, baseInfo.chartArea.width - (rightAxisX - baseInfo.chartArea.left))
+		const availableWidth = Math.max(
+			50,
+			baseInfo.chartArea.width - (rightAxisX - baseInfo.chartArea.left)
+		)
 
 		// CHANGE drawText to drawWrappedText and use new labelX
 		canvas.drawWrappedText({
@@ -264,7 +290,12 @@ export const generateLineGraph: WidgetGenerator<typeof LineGraphPropsSchema> = a
 			const TICK_LABEL_PADDING = 10
 			const AXIS_TITLE_PADDING = 15
 			const labelX =
-				rightAxisX + TICK_LENGTH + TICK_LABEL_PADDING + maxTickLabelWidth + AXIS_TITLE_PADDING + wrappedTitleHeight / 2
+				rightAxisX +
+				TICK_LENGTH +
+				TICK_LABEL_PADDING +
+				maxTickLabelWidth +
+				AXIS_TITLE_PADDING +
+				wrappedTitleHeight / 2
 			legendStartX = labelX + 20
 		}
 
@@ -290,7 +321,13 @@ export const generateLineGraph: WidgetGenerator<typeof LineGraphPropsSchema> = a
 	}
 
 	// NEW: Finalize the canvas and construct the root SVG element
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(AXIS_VIEWBOX_PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(AXIS_VIEWBOX_PADDING)
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.base}">${svgBody}</svg>`
 }

@@ -9,7 +9,11 @@ export async function createTarZstReader(filePath: string): Promise<CartridgeRea
 	const fileIndex = new Map<string, Buffer>()
 
 	const extract = tar.extract()
-	const zstdProc = Bun.spawn({ cmd: ["zstd", "-d", "-c", filePath], stdout: "pipe", stderr: "pipe" })
+	const zstdProc = Bun.spawn({
+		cmd: ["zstd", "-d", "-c", filePath],
+		stdout: "pipe",
+		stderr: "pipe"
+	})
 
 	const p = new Promise<void>((resolve, reject) => {
 		extract.on("entry", (header, stream, next) => {

@@ -65,13 +65,24 @@ const createValueOrPlaceholderSchema = () =>
 const createStepSchema = () =>
 	z
 		.object({
-			subtrahend: z.number().nullable().describe("The value being subtracted in this step (e.g., 30). Null to hide."),
-			difference: z.number().nullable().describe("The result of the subtraction (e.g., 21). Null to hide."),
+			subtrahend: z
+				.number()
+				.nullable()
+				.describe("The value being subtracted in this step (e.g., 30). Null to hide."),
+			difference: z
+				.number()
+				.nullable()
+				.describe("The result of the subtraction (e.g., 21). Null to hide."),
 			differenceColor: z
 				.string()
 				.nullable()
-				.describe("Optional CSS color for the difference text (e.g., 'red'). Null for default color."),
-			topTokens: z.array(createDigitTokenSchema()).nullable().describe("Optional digit tokens for top dividend row."),
+				.describe(
+					"Optional CSS color for the difference text (e.g., 'red'). Null for default color."
+				),
+			topTokens: z
+				.array(createDigitTokenSchema())
+				.nullable()
+				.describe("Optional digit tokens for top dividend row."),
 			subtrahendTokens: z
 				.array(createDigitTokenSchema())
 				.nullable()
@@ -116,18 +127,26 @@ export const DivisionAreaDiagramPropsSchema = z
 		quotientParts: z
 			.array(createValueOrPlaceholderSchema())
 			.describe("An array of quotient parts displayed across the top."),
-		steps: z.array(createStepSchema()).describe("An array of calculation steps. Its length must match quotientParts."),
-		showFinalRemainderBox: z.boolean().describe("If true, shows the final zero remainder with a box around it.")
+		steps: z
+			.array(createStepSchema())
+			.describe("An array of calculation steps. Its length must match quotientParts."),
+		showFinalRemainderBox: z
+			.boolean()
+			.describe("If true, shows the final zero remainder with a box around it.")
 	})
 	.strict()
-	.describe("Creates a visual area model for long division, showing partial quotients and step-by-step subtraction.")
+	.describe(
+		"Creates a visual area model for long division, showing partial quotients and step-by-step subtraction."
+	)
 
 export type DivisionAreaDiagramProps = z.infer<typeof DivisionAreaDiagramPropsSchema>
 
 /**
  * Generates an HTML table representing a division area model.
  */
-export const generateDivisionAreaDiagram: WidgetGenerator<typeof DivisionAreaDiagramPropsSchema> = async (props) => {
+export const generateDivisionAreaDiagram: WidgetGenerator<
+	typeof DivisionAreaDiagramPropsSchema
+> = async (props) => {
 	let { divisor, dividend, quotientParts, steps, showFinalRemainderBox } = props
 
 	// Helper to render string content, optionally with a color.
@@ -142,7 +161,10 @@ export const generateDivisionAreaDiagram: WidgetGenerator<typeof DivisionAreaDia
 		return `<span style="${style}">${escapedContent}</span>`
 	}
 
-	const renderTokenSpan = (token: DigitToken, opts?: { leftBorder?: boolean; rightBorder?: boolean }): string => {
+	const renderTokenSpan = (
+		token: DigitToken,
+		opts?: { leftBorder?: boolean; rightBorder?: boolean }
+	): string => {
 		const baseSpan =
 			"display:inline-block; width: 16px; text-align:center; padding: 0; margin: 0; box-sizing: border-box;"
 		if (token.type === "digit") {
@@ -232,7 +254,8 @@ export const generateDivisionAreaDiagram: WidgetGenerator<typeof DivisionAreaDia
 	html += `<td style="width: 40px; height: 40px; border: none; padding: 0;"></td>`
 	for (const part of quotientParts) {
 		const content = part.type === "value" ? renderContent(part.value) : renderPlaceholder()
-		const style = "width: 80px; height: 40px; background-color: #EBF5FB; text-align:center; padding: 10px;"
+		const style =
+			"width: 80px; height: 40px; background-color: #EBF5FB; text-align:center; padding: 10px;"
 		html += `<td style="${style}">${content}</td>`
 	}
 	html += "</tr>"

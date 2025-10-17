@@ -107,8 +107,14 @@ export const allWidgetDefinitions = {
 	quadrantDiagram: { schema: allWidgetSchemas.quadrantDiagram, generator: generateQuadrantDiagram },
 	clockDiagram: { schema: allWidgetSchemas.clockDiagram, generator: generateClockDiagram },
 	angleDiagram: { schema: allWidgetSchemas.angleDiagram, generator: generateAngleDiagram },
-	angleTypeDiagram: { schema: allWidgetSchemas.angleTypeDiagram, generator: generateAngleTypeDiagram },
-	circleAngleDiagram: { schema: allWidgetSchemas.circleAngleDiagram, generator: generateCircleAngleDiagram },
+	angleTypeDiagram: {
+		schema: allWidgetSchemas.angleTypeDiagram,
+		generator: generateAngleTypeDiagram
+	},
+	circleAngleDiagram: {
+		schema: allWidgetSchemas.circleAngleDiagram,
+		generator: generateCircleAngleDiagram
+	},
 	areaModelMultiplication: {
 		schema: allWidgetSchemas.areaModelMultiplication,
 		generator: generateAreaModelMultiplication
@@ -118,21 +124,39 @@ export const allWidgetDefinitions = {
 	boxGrid: { schema: allWidgetSchemas.boxGrid, generator: generateBoxGrid },
 	boxPlot: { schema: allWidgetSchemas.boxPlot, generator: generateBoxPlot },
 	circleDiagram: { schema: allWidgetSchemas.circleDiagram, generator: generateCircleDiagram },
-	fractionModelDiagram: { schema: allWidgetSchemas.fractionModelDiagram, generator: generateFractionModelDiagram },
+	fractionModelDiagram: {
+		schema: allWidgetSchemas.fractionModelDiagram,
+		generator: generateFractionModelDiagram
+	},
 	fractionMultiplicationModel: {
 		schema: allWidgetSchemas.fractionMultiplicationModel,
 		generator: generateFractionMultiplicationModel
 	},
-	compositeShapeDiagram: { schema: allWidgetSchemas.compositeShapeDiagram, generator: generateCompositeShapeDiagram },
+	compositeShapeDiagram: {
+		schema: allWidgetSchemas.compositeShapeDiagram,
+		generator: generateCompositeShapeDiagram
+	},
 	conceptualGraph: { schema: allWidgetSchemas.conceptualGraph, generator: generateConceptualGraph },
 	constraintGeometryDiagram: {
 		schema: allWidgetSchemas.constraintGeometryDiagram,
 		generator: generateConstraintGeometryDiagram
 	},
-	coordinatePlane: { schema: allWidgetSchemas.coordinatePlane, generator: generateCoordinatePlaneComprehensive },
-	divergentBarChart: { schema: allWidgetSchemas.divergentBarChart, generator: generateDivergentBarChart },
-	functionPlotGraph: { schema: allWidgetSchemas.functionPlotGraph, generator: generateFunctionPlotGraph },
-	lineEquationGraph: { schema: allWidgetSchemas.lineEquationGraph, generator: generateLineEquationGraph },
+	coordinatePlane: {
+		schema: allWidgetSchemas.coordinatePlane,
+		generator: generateCoordinatePlaneComprehensive
+	},
+	divergentBarChart: {
+		schema: allWidgetSchemas.divergentBarChart,
+		generator: generateDivergentBarChart
+	},
+	functionPlotGraph: {
+		schema: allWidgetSchemas.functionPlotGraph,
+		generator: generateFunctionPlotGraph
+	},
+	lineEquationGraph: {
+		schema: allWidgetSchemas.lineEquationGraph,
+		generator: generateLineEquationGraph
+	},
 	pointPlotGraph: { schema: allWidgetSchemas.pointPlotGraph, generator: generatePointPlotGraph },
 	populationChangeEventGraph: {
 		schema: allWidgetSchemas.populationChangeEventGraph,
@@ -156,45 +180,84 @@ export const allWidgetDefinitions = {
 		generator: generateDiscreteObjectRatioDiagram
 	},
 	dotPlot: { schema: allWidgetSchemas.dotPlot, generator: generateDotPlot },
-	doubleNumberLine: { schema: allWidgetSchemas.doubleNumberLine, generator: generateDoubleNumberLine },
-	populationBarChart: { schema: allWidgetSchemas.populationBarChart, generator: generatePopulationBarChart },
+	doubleNumberLine: {
+		schema: allWidgetSchemas.doubleNumberLine,
+		generator: generateDoubleNumberLine
+	},
+	populationBarChart: {
+		schema: allWidgetSchemas.populationBarChart,
+		generator: generatePopulationBarChart
+	},
 	emojiImage: { schema: allWidgetSchemas.emojiImage, generator: generateEmojiImage },
 	figureComparisonDiagram: {
 		schema: allWidgetSchemas.figureComparisonDiagram,
 		generator: generateFigureComparisonDiagram
 	},
-	fractionSumDiagram: { schema: allWidgetSchemas.fractionSumDiagram, generator: generateFractionSumDiagram },
+	fractionSumDiagram: {
+		schema: allWidgetSchemas.fractionSumDiagram,
+		generator: generateFractionSumDiagram
+	},
 	geometricPrimitiveDiagram: {
 		schema: allWidgetSchemas.geometricPrimitiveDiagram,
 		generator: generateGeometricPrimitiveDiagram
 	},
-	geometricSolidDiagram: { schema: allWidgetSchemas.geometricSolidDiagram, generator: generateGeometricSolidDiagram },
+	geometricSolidDiagram: {
+		schema: allWidgetSchemas.geometricSolidDiagram,
+		generator: generateGeometricSolidDiagram
+	},
 	hangerDiagram: { schema: allWidgetSchemas.hangerDiagram, generator: generateHangerDiagram },
 	histogram: { schema: allWidgetSchemas.histogram, generator: generateHistogram },
 	nPolygon: { schema: allWidgetSchemas.nPolygon, generator: generateNPolygon },
 	patternDiagram: { schema: allWidgetSchemas.patternDiagram, generator: generatePatternDiagram },
-	inequalityNumberLine: { schema: allWidgetSchemas.inequalityNumberLine, generator: generateInequalityNumberLine },
+	inequalityNumberLine: {
+		schema: allWidgetSchemas.inequalityNumberLine,
+		generator: generateInequalityNumberLine
+	},
 	keelingCurve: { schema: allWidgetSchemas.keelingCurve, generator: generateKeelingCurve },
 	lineGraph: { schema: allWidgetSchemas.lineGraph, generator: generateLineGraph },
 	numberLine: { schema: allWidgetSchemas.numberLine, generator: generateNumberLine },
-	numberLineWithAction: { schema: allWidgetSchemas.numberLineWithAction, generator: generateNumberLineWithAction },
+	numberLineWithAction: {
+		schema: allWidgetSchemas.numberLineWithAction,
+		generator: generateNumberLineWithAction
+	},
 	numberLineWithFractionGroups: {
 		schema: allWidgetSchemas.numberLineWithFractionGroups,
 		generator: generateNumberLineWithFractionGroups
 	},
-	numberSetDiagram: { schema: allWidgetSchemas.numberSetDiagram, generator: generateNumberSetDiagram },
+	numberSetDiagram: {
+		schema: allWidgetSchemas.numberSetDiagram,
+		generator: generateNumberSetDiagram
+	},
 	parabolaGraph: { schema: allWidgetSchemas.parabolaGraph, generator: generateParabolaGraph },
-	partitionedShape: { schema: allWidgetSchemas.partitionedShape, generator: generatePartitionedShape },
+	partitionedShape: {
+		schema: allWidgetSchemas.partitionedShape,
+		generator: generatePartitionedShape
+	},
 	pentagonIntersectionDiagram: {
 		schema: allWidgetSchemas.pentagonIntersectionDiagram,
 		generator: generatePentagonIntersectionDiagram
 	},
 	pictograph: { schema: allWidgetSchemas.pictograph, generator: generatePictograph },
-	integerChipModel: { schema: allWidgetSchemas.integerChipModel, generator: generateIntegerChipModel },
-	integerChipLegend: { schema: allWidgetSchemas.integerChipLegend, generator: generateIntegerChipLegend },
-	polyhedronDiagram: { schema: allWidgetSchemas.polyhedronDiagram, generator: generatePolyhedronDiagram },
-	probabilitySpinner: { schema: allWidgetSchemas.probabilitySpinner, generator: generateProbabilitySpinner },
-	polyhedronNetDiagram: { schema: allWidgetSchemas.polyhedronNetDiagram, generator: generatePolyhedronNetDiagram },
+	integerChipModel: {
+		schema: allWidgetSchemas.integerChipModel,
+		generator: generateIntegerChipModel
+	},
+	integerChipLegend: {
+		schema: allWidgetSchemas.integerChipLegend,
+		generator: generateIntegerChipLegend
+	},
+	polyhedronDiagram: {
+		schema: allWidgetSchemas.polyhedronDiagram,
+		generator: generatePolyhedronDiagram
+	},
+	probabilitySpinner: {
+		schema: allWidgetSchemas.probabilitySpinner,
+		generator: generateProbabilitySpinner
+	},
+	polyhedronNetDiagram: {
+		schema: allWidgetSchemas.polyhedronNetDiagram,
+		generator: generatePolyhedronNetDiagram
+	},
 	pythagoreanProofDiagram: {
 		schema: allWidgetSchemas.pythagoreanProofDiagram,
 		generator: generatePythagoreanProofDiagram
@@ -208,20 +271,32 @@ export const allWidgetDefinitions = {
 		schema: allWidgetSchemas.rectangularFrameDiagram,
 		generator: generateRectangularFrameDiagram
 	},
-	scaleCopiesSlider: { schema: allWidgetSchemas.scaleCopiesSlider, generator: generateScaleCopiesSlider },
+	scaleCopiesSlider: {
+		schema: allWidgetSchemas.scaleCopiesSlider,
+		generator: generateScaleCopiesSlider
+	},
 	simpleArrow: { schema: allWidgetSchemas.simpleArrow, generator: generateSimpleArrow },
 	sinCosineWidget: { schema: allWidgetSchemas.sinCosineWidget, generator: generateSinCosineWidget },
 	scatterPlot: { schema: allWidgetSchemas.scatterPlot, generator: generateScatterPlot },
-	stackedItemsDiagram: { schema: allWidgetSchemas.stackedItemsDiagram, generator: generateStackedItemsDiagram },
+	stackedItemsDiagram: {
+		schema: allWidgetSchemas.stackedItemsDiagram,
+		generator: generateStackedItemsDiagram
+	},
 	tapeDiagram: { schema: allWidgetSchemas.tapeDiagram, generator: generateTapeDiagram },
-	transformationDiagram: { schema: allWidgetSchemas.transformationDiagram, generator: generateTransformationDiagram },
+	transformationDiagram: {
+		schema: allWidgetSchemas.transformationDiagram,
+		generator: generateTransformationDiagram
+	},
 	transversalAngleDiagram: {
 		schema: allWidgetSchemas.transversalAngleDiagram,
 		generator: generateTransversalAngleDiagram
 	},
 	treeDiagram: { schema: allWidgetSchemas.treeDiagram, generator: generateTreeDiagram },
 	triangleDiagram: { schema: allWidgetSchemas.triangleDiagram, generator: generateTriangleDiagram },
-	unitBlockDiagram: { schema: allWidgetSchemas.unitBlockDiagram, generator: generateUnitBlockDiagram },
+	unitBlockDiagram: {
+		schema: allWidgetSchemas.unitBlockDiagram,
+		generator: generateUnitBlockDiagram
+	},
 	periodicTable: { schema: allWidgetSchemas.periodicTable, generator: generatePeriodicTable },
 	urlImage: { schema: allWidgetSchemas.urlImage, generator: generateUrlImage },
 	vennDiagram: { schema: allWidgetSchemas.vennDiagram, generator: generateVennDiagram },
@@ -235,11 +310,23 @@ export const allWidgetDefinitions = {
 		generator: generateParallelogramTrapezoidDiagram
 	},
 	pieChart: { schema: allWidgetSchemas.pieChart, generator: generatePieChart },
-	fractionFrequencyPlot: { schema: allWidgetSchemas.fractionFrequencyPlot, generator: generateFractionFrequencyPlot },
+	fractionFrequencyPlot: {
+		schema: allWidgetSchemas.fractionFrequencyPlot,
+		generator: generateFractionFrequencyPlot
+	},
 	freeBodyDiagram: { schema: allWidgetSchemas.freeBodyDiagram, generator: generateFreeBodyDiagram },
-	divisionAreaDiagram: { schema: allWidgetSchemas.divisionAreaDiagram, generator: generateDivisionAreaDiagram },
-	divisionModelDiagram: { schema: allWidgetSchemas.divisionModelDiagram, generator: generateDivisionModelDiagram },
-	factorizationDiagram: { schema: allWidgetSchemas.factorizationDiagram, generator: generateFactorizationDiagram },
+	divisionAreaDiagram: {
+		schema: allWidgetSchemas.divisionAreaDiagram,
+		generator: generateDivisionAreaDiagram
+	},
+	divisionModelDiagram: {
+		schema: allWidgetSchemas.divisionModelDiagram,
+		generator: generateDivisionModelDiagram
+	},
+	factorizationDiagram: {
+		schema: allWidgetSchemas.factorizationDiagram,
+		generator: generateFactorizationDiagram
+	},
 	equivalentFractionModel: {
 		schema: allWidgetSchemas.equivalentFractionModel,
 		generator: generateEquivalentFractionModel
@@ -257,7 +344,10 @@ export const allWidgetDefinitions = {
 		schema: allWidgetSchemas.labeledRectangleDiagram,
 		generator: generateLabeledRectangleDiagram
 	},
-	customPolygonDiagram: { schema: allWidgetSchemas.customPolygonDiagram, generator: generateCustomPolygonDiagram },
+	customPolygonDiagram: {
+		schema: allWidgetSchemas.customPolygonDiagram,
+		generator: generateCustomPolygonDiagram
+	},
 	lineDiagram: { schema: allWidgetSchemas.lineDiagram, generator: generateLineDiagram },
 	pesSpectrum: { schema: allWidgetSchemas.pesSpectrum, generator: generatePESSpectrum },
 	stickPlot: { schema: allWidgetSchemas.stickPlot, generator: generateStickPlot },

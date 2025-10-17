@@ -21,7 +21,10 @@ const BoxGridCellSchema = z
 						type: z.literal("math").describe("Identifies this as mathematical content"),
 						mathml: z
 							.string()
-							.regex(MATHML_INNER_PATTERN, "invalid mathml snippet; must be inner MathML without outer <math> wrapper")
+							.regex(
+								MATHML_INNER_PATTERN,
+								"invalid mathml snippet; must be inner MathML without outer <math> wrapper"
+							)
 							.describe("Inner MathML markup (no outer <math> element)")
 					})
 					.strict()
@@ -48,7 +51,11 @@ const BoxGridCellSchema = z
 						type: z.literal("mixed").describe("Mixed number content like 1 1/4"),
 						whole: z.number().int().min(0).describe("Whole part (non-negative)"),
 						numerator: z.number().int().min(0).describe("Numerator of the fractional part"),
-						denominator: z.number().int().positive().describe("Denominator of the fractional part (positive)"),
+						denominator: z
+							.number()
+							.int()
+							.positive()
+							.describe("Denominator of the fractional part (positive)"),
 						sign: z.enum(["+", "-"]).describe("Sign of the mixed number")
 					})
 					.strict()
@@ -71,7 +78,9 @@ export const BoxGridPropsSchema = z
 	.object({
 		type: z
 			.literal("boxGrid")
-			.describe("Identifies this as a box grid widget for displaying tabular data with optional cell highlighting."),
+			.describe(
+				"Identifies this as a box grid widget for displaying tabular data with optional cell highlighting."
+			),
 		width: createWidthSchema(),
 		height: createHeightSchema(),
 		data: z
@@ -164,7 +173,10 @@ export const generateBoxGrid: WidgetGenerator<typeof BoxGridPropsSchema> = async
 				cell.content.type === "fraction" ||
 				cell.content.type === "mixed"
 			) {
-				const inner = cell.content.type === "math" ? cell.content.mathml : numberContentToInnerMathML(cell.content)
+				const inner =
+					cell.content.type === "math"
+						? cell.content.mathml
+						: numberContentToInnerMathML(cell.content)
 
 				const fontPx = 14
 				// Increase font size for better legibility in grid cells
@@ -197,7 +209,13 @@ export const generateBoxGrid: WidgetGenerator<typeof BoxGridPropsSchema> = async
 	}
 
 	// NEW: Finalize the canvas and construct the root SVG element
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(PADDING)
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}">${svgBody}</svg>`
 }

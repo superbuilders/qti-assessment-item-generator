@@ -12,7 +12,9 @@ export const NumberLineWithActionPropsSchema = z
 	.object({
 		type: z
 			.literal("numberLineWithAction")
-			.describe("Identifies this as a number line with action arrows showing addition/subtraction operations."),
+			.describe(
+				"Identifies this as a number line with action arrows showing addition/subtraction operations."
+			),
 		width: createWidthSchema(),
 		height: createHeightSchema(),
 		orientation: z
@@ -35,7 +37,10 @@ export const NumberLineWithActionPropsSchema = z
 				z
 					.object({
 						type: z.literal("whole"),
-						interval: z.number().positive().describe("Whole number interval between major ticks (e.g., 1, 2, 5, 10)")
+						interval: z
+							.number()
+							.positive()
+							.describe("Whole number interval between major ticks (e.g., 1, 2, 5, 10)")
 					})
 					.strict(),
 				z
@@ -56,7 +61,10 @@ export const NumberLineWithActionPropsSchema = z
 				z
 					.object({
 						type: z.literal("whole"),
-						interval: z.number().positive().describe("Whole number interval between minor ticks (e.g., 0.5, 1, 2.5)")
+						interval: z
+							.number()
+							.positive()
+							.describe("Whole number interval between minor ticks (e.g., 0.5, 1, 2.5)")
 					})
 					.strict(),
 				z
@@ -104,7 +112,11 @@ export const NumberLineWithActionPropsSchema = z
 										type: z.literal("mixed").describe("Mixed number change like 1 1/4"),
 										whole: z.number().int().min(0).describe("Whole part (non-negative)"),
 										numerator: z.number().int().min(0).describe("Numerator of the fractional part"),
-										denominator: z.number().int().positive().describe("Denominator of the fractional part (positive)"),
+										denominator: z
+											.number()
+											.int()
+											.positive()
+											.describe("Denominator of the fractional part (positive)"),
 										sign: z.enum(["+", "-"]).describe("Sign of the mixed number change")
 									})
 									.strict()
@@ -327,8 +339,20 @@ function drawClippedDottedLine(
 	}
 }
 
-export const generateNumberLineWithAction: WidgetGenerator<typeof NumberLineWithActionPropsSchema> = async (data) => {
-	const { width, height, orientation, min, max, tickInterval, secondaryTickInterval, startValue, actions } = data
+export const generateNumberLineWithAction: WidgetGenerator<
+	typeof NumberLineWithActionPropsSchema
+> = async (data) => {
+	const {
+		width,
+		height,
+		orientation,
+		min,
+		max,
+		tickInterval,
+		secondaryTickInterval,
+		startValue,
+		actions
+	} = data
 	const isHorizontal = orientation === "horizontal"
 	const lineLength = (isHorizontal ? width : height) - 2 * PADDING
 
@@ -425,7 +449,9 @@ export const generateNumberLineWithAction: WidgetGenerator<typeof NumberLineWith
 	const { values: tickValues, labels: tickLabels } = generateTicks(tickInterval)
 
 	// Generate secondary ticks if specified
-	const secondaryTickValues: number[] = secondaryTickInterval ? generateTicks(secondaryTickInterval).values : []
+	const secondaryTickValues: number[] = secondaryTickInterval
+		? generateTicks(secondaryTickInterval).values
+		: []
 
 	const canvas = new CanvasImpl({
 		chartArea: { left: 0, top: 0, width, height },
@@ -819,7 +845,13 @@ export const generateNumberLineWithAction: WidgetGenerator<typeof NumberLineWith
 	}
 
 	// NEW: Finalize the canvas and construct the root SVG element
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(PADDING)
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.base}">${svgBody}</svg>`
 }

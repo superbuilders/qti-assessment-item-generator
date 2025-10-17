@@ -23,7 +23,10 @@ const MathInlineSchema = z
 		type: z.literal("math").describe("Identifies this as mathematical content"),
 		mathml: z
 			.string()
-			.regex(MATHML_INNER_PATTERN, "invalid mathml snippet; must be inner MathML without outer <math> wrapper")
+			.regex(
+				MATHML_INNER_PATTERN,
+				"invalid mathml snippet; must be inner MathML without outer <math> wrapper"
+			)
 			.describe("Inner MathML markup (no outer <math> element)")
 	})
 	.strict()
@@ -96,17 +99,24 @@ function createParagraphBlockSchema<TInline extends z.ZodTypeAny>(allowedInlines
 	return z
 		.object({
 			type: z.literal("paragraph").describe("Identifies this as a paragraph block"),
-			content: z.array(allowedInlinesSchema).describe("The inline content contained within this paragraph")
+			content: z
+				.array(allowedInlinesSchema)
+				.describe("The inline content contained within this paragraph")
 		})
 		.strict()
 		.describe("A paragraph block containing inline content")
 }
 
-function createUnorderedListBlockSchema<TInline extends z.ZodTypeAny>(allowedInlinesSchema: TInline) {
+function createUnorderedListBlockSchema<TInline extends z.ZodTypeAny>(
+	allowedInlinesSchema: TInline
+) {
 	return z
 		.object({
 			type: z.literal("unorderedList").describe("Identifies this as an unordered list"),
-			items: z.array(z.array(allowedInlinesSchema)).min(1).describe("List items as arrays of inline content")
+			items: z
+				.array(z.array(allowedInlinesSchema))
+				.min(1)
+				.describe("List items as arrays of inline content")
 		})
 		.strict()
 		.describe("An unordered list with each item rendered as a list item containing a paragraph")
@@ -116,10 +126,15 @@ function createOrderedListBlockSchema<TInline extends z.ZodTypeAny>(allowedInlin
 	return z
 		.object({
 			type: z.literal("orderedList").describe("Identifies this as an ordered list"),
-			items: z.array(z.array(allowedInlinesSchema)).min(1).describe("List items as arrays of inline content")
+			items: z
+				.array(z.array(allowedInlinesSchema))
+				.min(1)
+				.describe("List items as arrays of inline content")
 		})
 		.strict()
-		.describe("An ordered list with each item rendered as a numbered list item containing a paragraph")
+		.describe(
+			"An ordered list with each item rendered as a numbered list item containing a paragraph"
+		)
 }
 
 function createTableRichBlockSchema<TInline extends z.ZodTypeAny>(allowedInlinesSchema: TInline) {
@@ -187,7 +202,9 @@ export function createFeedbackContentSchema<const E extends readonly string[]>(w
 
 	const AllowedFeedbackInlines = z
 		.discriminatedUnion("type", [TextInlineSchema, MathInlineSchema, InlineWidgetRefSchema])
-		.describe("Inline items permitted in feedback (text, math, inline widget references). Interactions are banned.")
+		.describe(
+			"Inline items permitted in feedback (text, math, inline widget references). Interactions are banned."
+		)
 
 	const ParagraphBlockSchema = createParagraphBlockSchema(AllowedFeedbackInlines).describe(
 		"Paragraph of inline content within feedback steps. Use for sentences and brief explanations."
@@ -241,7 +258,9 @@ export function createFeedbackContentSchema<const E extends readonly string[]>(w
 		.object({
 			correctness: z
 				.enum(["correct", "incorrect"])
-				.describe("Verdict for this feedback block. Must match the outcome path (correct vs incorrect)."),
+				.describe(
+					"Verdict for this feedback block. Must match the outcome path (correct vs incorrect)."
+				),
 			summary: z
 				.array(AllowedFeedbackInlines)
 				.min(1)
@@ -268,7 +287,9 @@ export function createFeedbackContentSchema<const E extends readonly string[]>(w
 		)
 }
 
-export function createChoiceInteractionPromptSchema<const E extends readonly string[]>(widgetTypeKeys: E) {
+export function createChoiceInteractionPromptSchema<const E extends readonly string[]>(
+	widgetTypeKeys: E
+) {
 	const InlineWidgetRefSchema = createInlineWidgetRefSchema(widgetTypeKeys)
 
 	const AllowedPromptInlines = z.discriminatedUnion("type", [
@@ -281,7 +302,9 @@ export function createChoiceInteractionPromptSchema<const E extends readonly str
 	return z.array(AllowedPromptInlines)
 }
 
-export function createChoiceInteractionChoiceContentSchema<const E extends readonly string[]>(widgetTypeKeys: E) {
+export function createChoiceInteractionChoiceContentSchema<const E extends readonly string[]>(
+	widgetTypeKeys: E
+) {
 	const InlineWidgetRefSchema = createInlineWidgetRefSchema(widgetTypeKeys)
 
 	const AllowedChoiceInlines = z.discriminatedUnion("type", [
@@ -311,7 +334,9 @@ export function createChoiceInteractionChoiceContentSchema<const E extends reado
 	return z.array(AllowedChoiceBlocks)
 }
 
-export function createInlineChoiceContentSchema<const E extends readonly string[]>(widgetTypeKeys: E) {
+export function createInlineChoiceContentSchema<const E extends readonly string[]>(
+	widgetTypeKeys: E
+) {
 	const InlineWidgetRefSchema = createInlineWidgetRefSchema(widgetTypeKeys)
 
 	const AllowedInlineChoiceInlines = z.discriminatedUnion("type", [

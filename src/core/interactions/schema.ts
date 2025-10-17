@@ -23,14 +23,18 @@ export function createAnyInteractionSchema<const E extends readonly string[]>(
 				.string()
 				.regex(CHOICE_IDENTIFIER_REGEX, "invalid identifier: must be uppercase")
 				.describe("Unique identifier for this inline choice option."),
-			content: InlineChoiceContentSchema.describe("The inline content displayed in the dropdown menu.")
+			content: InlineChoiceContentSchema.describe(
+				"The inline content displayed in the dropdown menu."
+			)
 		})
 		.strict()
 		.describe("Represents a single option within an inline dropdown choice interaction.")
 
 	const ChoiceInteractionSchema = z
 		.object({
-			type: z.literal("choiceInteraction").describe("Identifies this as a multiple choice interaction."),
+			type: z
+				.literal("choiceInteraction")
+				.describe("Identifies this as a multiple choice interaction."),
 			responseIdentifier: z
 				.string()
 				.regex(RESPONSE_IDENTIFIER_REGEX, "invalid response identifier: must start with RESPONSE")
@@ -54,41 +58,70 @@ export function createAnyInteractionSchema<const E extends readonly string[]>(
 				// Enforce a minimum of 2 choices at the schema level.
 				.min(2)
 				.describe("Array of selectable choice options."),
-			shuffle: z.literal(true).describe("Whether to randomize the order of choices. Always true to ensure fairness."),
-			minChoices: z.number().int().min(0).describe("The minimum number of choices the user must select."),
-			maxChoices: z.number().int().min(1).describe("The maximum number of choices the user can select.")
+			shuffle: z
+				.literal(true)
+				.describe("Whether to randomize the order of choices. Always true to ensure fairness."),
+			minChoices: z
+				.number()
+				.int()
+				.min(0)
+				.describe("The minimum number of choices the user must select."),
+			maxChoices: z
+				.number()
+				.int()
+				.min(1)
+				.describe("The maximum number of choices the user can select.")
 		})
 		.strict()
 		.describe("A multiple choice question where users select one or more options from a list.")
 
 	const InlineChoiceInteractionSchema = z
 		.object({
-			type: z.literal("inlineChoiceInteraction").describe("Identifies this as an inline dropdown interaction."),
+			type: z
+				.literal("inlineChoiceInteraction")
+				.describe("Identifies this as an inline dropdown interaction."),
 			responseIdentifier: z
 				.string()
 				.regex(RESPONSE_IDENTIFIER_REGEX, "invalid response identifier: must start with RESPONSE")
 				.describe("Links this interaction to its response declaration for scoring."),
-			choices: z.array(InlineChoiceSchema).min(1).describe("Array of options available in the dropdown menu."),
-			shuffle: z.literal(true).describe("Whether to randomize dropdown options. Always true to ensure fairness.")
+			choices: z
+				.array(InlineChoiceSchema)
+				.min(1)
+				.describe("Array of options available in the dropdown menu."),
+			shuffle: z
+				.literal(true)
+				.describe("Whether to randomize dropdown options. Always true to ensure fairness.")
 		})
 		.strict()
-		.describe("An inline dropdown menu embedded within text, ideal for fill-in-the-blank questions.")
+		.describe(
+			"An inline dropdown menu embedded within text, ideal for fill-in-the-blank questions."
+		)
 
 	const TextEntryInteractionSchema = z
 		.object({
-			type: z.literal("textEntryInteraction").describe("Identifies this as a text input interaction."),
+			type: z
+				.literal("textEntryInteraction")
+				.describe("Identifies this as a text input interaction."),
 			responseIdentifier: z
 				.string()
 				.regex(RESPONSE_IDENTIFIER_REGEX, "invalid response identifier: must start with RESPONSE")
 				.describe("Links this interaction to its response declaration for scoring."),
-			expectedLength: z.number().int().nullable().describe("Optional hint for expected answer length in characters.")
+			expectedLength: z
+				.number()
+				.int()
+				.nullable()
+				.describe("Optional hint for expected answer length in characters.")
 		})
 		.strict()
-		.describe("A text input field where users type their answer, supporting both short and long responses.")
+		.describe(
+			"A text input field where users type their answer, supporting both short and long responses."
+		)
 
 	const OrderInteractionSchema = z
 		.object({
-			type: z.literal("orderInteraction").describe("Identifies this as an ordering/sequencing interaction."),
+			type: z
+				.literal("orderInteraction")
+				.describe("Identifies this as an ordering/sequencing interaction."),
 			responseIdentifier: z
 				.string()
 				.regex(RESPONSE_IDENTIFIER_REGEX, "invalid response identifier: must start with RESPONSE")
@@ -114,7 +147,9 @@ export function createAnyInteractionSchema<const E extends readonly string[]>(
 				.describe("Array of items to be arranged in order."),
 			shuffle: z
 				.literal(true)
-				.describe("Whether to randomize initial order. Always true to ensure varied starting points."),
+				.describe(
+					"Whether to randomize initial order. Always true to ensure varied starting points."
+				),
 			orientation: z
 				.literal("vertical")
 				.describe(
@@ -130,12 +165,16 @@ export function createAnyInteractionSchema<const E extends readonly string[]>(
 
 	const GapMatchInteractionSchema = z
 		.object({
-			type: z.literal("gapMatchInteraction").describe("Identifies this as a gap match (drag-and-drop) interaction."),
+			type: z
+				.literal("gapMatchInteraction")
+				.describe("Identifies this as a gap match (drag-and-drop) interaction."),
 			responseIdentifier: z
 				.string()
 				.regex(RESPONSE_IDENTIFIER_REGEX, "invalid response identifier: must start with RESPONSE")
 				.describe("Links this interaction to its response declaration for scoring."),
-			shuffle: z.boolean().describe("Whether to shuffle the order of gap-text items (draggable tokens)."),
+			shuffle: z
+				.boolean()
+				.describe("Whether to shuffle the order of gap-text items (draggable tokens)."),
 			content: GapMatchContentSchema.describe(
 				"Required block content (e.g., <p>) containing sentences with gap placeholders ({ type: 'gap', gapId: '...' }) to render inside the interaction. Must be non-empty."
 			),
@@ -152,7 +191,9 @@ export function createAnyInteractionSchema<const E extends readonly string[]>(
 								.int()
 								.min(0)
 								.describe("Maximum times this item can be used. 0 = unlimited, 1 = use once only."),
-							content: GapTextInlineContentSchema.describe("The content of the draggable item (text or math).")
+							content: GapTextInlineContentSchema.describe(
+								"The content of the draggable item (text or math)."
+							)
 						})
 						.strict()
 						.describe("A draggable item that can be placed into gaps")
@@ -167,7 +208,10 @@ export function createAnyInteractionSchema<const E extends readonly string[]>(
 								.string()
 								.regex(CHOICE_IDENTIFIER_REGEX, "invalid identifier: must be uppercase")
 								.describe("Unique identifier for this gap (e.g., GAP_1)."),
-							required: z.boolean().nullable().describe("Whether this gap must be filled for a correct response.")
+							required: z
+								.boolean()
+								.nullable()
+								.describe("Whether this gap must be filled for a correct response.")
 						})
 						.strict()
 						.describe("A gap definition that appears in the body content")
@@ -250,8 +294,12 @@ export function createAnyInteractionSchema<const E extends readonly string[]>(
 			type: z
 				.literal("unsupportedInteraction")
 				.describe("Identifies this as an interaction type that is not supported."),
-			perseusType: z.string().describe("The original Perseus widget type that was identified as unsupported."),
-			responseIdentifier: z.string().describe("Placeholder for the response identifier from the shell.")
+			perseusType: z
+				.string()
+				.describe("The original Perseus widget type that was identified as unsupported."),
+			responseIdentifier: z
+				.string()
+				.describe("Placeholder for the response identifier from the shell.")
 		})
 		.strict()
 		.describe(
@@ -267,5 +315,7 @@ export function createAnyInteractionSchema<const E extends readonly string[]>(
 			GapMatchInteractionSchema,
 			UnsupportedInteractionSchema
 		])
-		.describe("A discriminated union representing any possible QTI interaction type supported by the system.")
+		.describe(
+			"A discriminated union representing any possible QTI interaction type supported by the system."
+		)
 }

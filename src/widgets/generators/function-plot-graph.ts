@@ -19,7 +19,9 @@ export const FunctionPlotGraphPropsSchema = z
 	.object({
 		type: z
 			.literal("functionPlotGraph")
-			.describe("Identifies this as a function plot graph widget for displaying mathematical functions and curves."),
+			.describe(
+				"Identifies this as a function plot graph widget for displaying mathematical functions and curves."
+			),
 		width: createWidthSchema(),
 		height: createHeightSchema(),
 		xAxis: createAxisOptionsSchema().describe(
@@ -51,7 +53,9 @@ export const FunctionPlotGraphPropsSchema = z
 
 export type FunctionPlotGraphProps = z.infer<typeof FunctionPlotGraphPropsSchema>
 
-export const generateFunctionPlotGraph: WidgetGenerator<typeof FunctionPlotGraphPropsSchema> = async (props) => {
+export const generateFunctionPlotGraph: WidgetGenerator<
+	typeof FunctionPlotGraphPropsSchema
+> = async (props) => {
 	const { width, height, xAxis, yAxis, showQuadrantLabels, polylines, points } = props
 
 	// 1. Call the base generator and get the body content and extents object
@@ -109,7 +113,13 @@ export const generateFunctionPlotGraph: WidgetGenerator<typeof FunctionPlotGraph
 	renderPoints(points, baseInfo.toSvgX, baseInfo.toSvgY, canvas)
 
 	// NEW: Finalize the canvas and construct the root SVG element
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(AXIS_VIEWBOX_PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(AXIS_VIEWBOX_PADDING)
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.base}">${svgBody}</svg>`
 }

@@ -38,7 +38,9 @@ export const ProbabilitySpinnerPropsSchema = z
 	.object({
 		type: z
 			.literal("probabilitySpinner")
-			.describe("Identifies this as a probability spinner widget for demonstrating random events and likelihood."),
+			.describe(
+				"Identifies this as a probability spinner widget for demonstrating random events and likelihood."
+			),
 		width: createWidthSchema(),
 		height: createHeightSchema(),
 		groups: z
@@ -70,7 +72,9 @@ export type ProbabilitySpinnerProps = z.infer<typeof ProbabilitySpinnerPropsSche
  * Generates an SVG diagram of a probability spinner.
  * Ideal for visualizing theoretical probability problems.
  */
-export const generateProbabilitySpinner: WidgetGenerator<typeof ProbabilitySpinnerPropsSchema> = async (props) => {
+export const generateProbabilitySpinner: WidgetGenerator<
+	typeof ProbabilitySpinnerPropsSchema
+> = async (props) => {
 	const { width, height, groups, pointerAngle, title } = props
 
 	const canvas = new CanvasImpl({
@@ -183,7 +187,13 @@ export const generateProbabilitySpinner: WidgetGenerator<typeof ProbabilitySpinn
 	})
 
 	// NEW: Finalize the canvas and construct the root SVG element
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(PADDING)
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}">${svgBody}</svg>`
 }

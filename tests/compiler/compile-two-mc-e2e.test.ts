@@ -25,8 +25,14 @@ describe("E2E compile: two MC with combo feedback", () => {
 					responseIdentifier: "RESPONSE_1",
 					prompt: [{ type: "text", content: "Pick A or B" }],
 					choices: [
-						{ identifier: "A", content: [{ type: "paragraph", content: [{ type: "text", content: "A" }] }] },
-						{ identifier: "B", content: [{ type: "paragraph", content: [{ type: "text", content: "B" }] }] }
+						{
+							identifier: "A",
+							content: [{ type: "paragraph", content: [{ type: "text", content: "A" }] }]
+						},
+						{
+							identifier: "B",
+							content: [{ type: "paragraph", content: [{ type: "text", content: "B" }] }]
+						}
 					],
 					shuffle: true,
 					minChoices: 1,
@@ -37,8 +43,14 @@ describe("E2E compile: two MC with combo feedback", () => {
 					responseIdentifier: "RESPONSE_2",
 					prompt: [{ type: "text", content: "Pick A or B" }],
 					choices: [
-						{ identifier: "A", content: [{ type: "paragraph", content: [{ type: "text", content: "A" }] }] },
-						{ identifier: "B", content: [{ type: "paragraph", content: [{ type: "text", content: "B" }] }] }
+						{
+							identifier: "A",
+							content: [{ type: "paragraph", content: [{ type: "text", content: "A" }] }]
+						},
+						{
+							identifier: "B",
+							content: [{ type: "paragraph", content: [{ type: "text", content: "B" }] }]
+						}
 					],
 					shuffle: true,
 					minChoices: 1,

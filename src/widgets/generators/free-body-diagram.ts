@@ -63,7 +63,9 @@ const ensureForceLabel = (label: string): string => {
  * The client-side rendering process will transform these
  * into proper physics notation (F_subscript) using MathML.
  */
-export const generateFreeBodyDiagram: WidgetGenerator<typeof FreeBodyDiagramPropsSchema> = async (props) => {
+export const generateFreeBodyDiagram: WidgetGenerator<typeof FreeBodyDiagramPropsSchema> = async (
+	props
+) => {
 	// Normalize string "null" or whitespace-only labels to actual null (no arrow)
 	const normalize = (val: string | null): string | null => {
 		if (val === null) return null
@@ -225,7 +227,13 @@ export const generateFreeBodyDiagram: WidgetGenerator<typeof FreeBodyDiagramProp
 		}
 	}
 
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(PADDING)
 
 	return `<svg width="320" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}">${svgBody}</svg>`
 }

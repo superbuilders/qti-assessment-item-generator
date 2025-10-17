@@ -12,7 +12,9 @@ function createWidgetMappingSchema(slotNames: string[], allowedWidgetKeys: reado
 	return z.object({
 		widget_mapping: z
 			.object(shape)
-			.describe("A JSON object mapping each widget slot name to one of the allowed widget types or WIDGET_NOT_FOUND.")
+			.describe(
+				"A JSON object mapping each widget slot name to one of the allowed widget types or WIDGET_NOT_FOUND."
+			)
 	})
 }
 

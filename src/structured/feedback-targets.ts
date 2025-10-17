@@ -43,7 +43,10 @@ export function enumerateFeedbackTargets<E extends readonly string[]>(
 
 		if (baseType === "identifier") {
 			// Enumerated response - generate per-choice feedback
-			if (interaction.type === "choiceInteraction" || interaction.type === "inlineChoiceInteraction") {
+			if (
+				interaction.type === "choiceInteraction" ||
+				interaction.type === "inlineChoiceInteraction"
+			) {
 				for (const choice of interaction.choices) {
 					targets.push({
 						outcomeIdentifier,

@@ -24,7 +24,11 @@ const ScatterPointSchema = z
 			.describe(
 				"The y-coordinate value of the data point (e.g., 180, 95.5, -5, 0). Must be within yAxis min/max range."
 			),
-		label: z.string().describe("Text label for this point (e.g., 'A', 'Outlier', '(3,4)'). Positioned near the point.")
+		label: z
+			.string()
+			.describe(
+				"Text label for this point (e.g., 'A', 'Outlier', '(3,4)'). Positioned near the point."
+			)
 	})
 	.strict()
 
@@ -34,10 +38,14 @@ const createBarePointSchema = () =>
 		.object({
 			x: z
 				.number()
-				.describe("X-coordinate for line endpoint or reference point (e.g., 0, 50, -20). Used in line definitions."),
+				.describe(
+					"X-coordinate for line endpoint or reference point (e.g., 0, 50, -20). Used in line definitions."
+				),
 			y: z
 				.number()
-				.describe("Y-coordinate for line endpoint or reference point (e.g., 10, 100, -15). Used in line definitions.")
+				.describe(
+					"Y-coordinate for line endpoint or reference point (e.g., 10, 100, -15). Used in line definitions."
+				)
 		})
 		.strict()
 		.describe("A 2D coordinate used in line definitions.")
@@ -55,7 +63,9 @@ const createLineStyleSchema = () =>
 			strokeWidth: z
 				.number()
 				.positive()
-				.describe("Width of the line in pixels (e.g., 2 for standard, 3 for bold, 1 for thin). Typical range: 1-4."),
+				.describe(
+					"Width of the line in pixels (e.g., 2 for standard, 3 for bold, 1 for thin). Typical range: 1-4."
+				),
 			dash: z
 				.boolean()
 				.describe(
@@ -70,14 +80,20 @@ const LineTwoPointsSchema = z
 	.object({
 		type: z
 			.literal("twoPoints")
-			.describe("Line defined by two specific points. Extends infinitely in both directions through these points."),
-		a: createBarePointSchema().describe("First point the line passes through. Line extends beyond this point."),
+			.describe(
+				"Line defined by two specific points. Extends infinitely in both directions through these points."
+			),
+		a: createBarePointSchema().describe(
+			"First point the line passes through. Line extends beyond this point."
+		),
 		b: createBarePointSchema().describe(
 			"Second point the line passes through. Must be different from point 'a'. Determines line's slope."
 		),
 		label: z
 			.string()
-			.describe("Text label for the line (e.g., 'y = 2x + 1', 'Line A', 'Model'). Positioned along the line."),
+			.describe(
+				"Text label for the line (e.g., 'y = 2x + 1', 'Line A', 'Model'). Positioned along the line."
+			),
 		style: createLineStyleSchema().describe(
 			"Visual styling for this specific line. Overrides any default line appearance."
 		)
@@ -90,13 +106,17 @@ const LineTwoPointsSchema = z
 // A line that is computed as the best fit for the provided scatter points
 const LineBestFitSchema = z
 	.object({
-		type: z.literal("bestFit").describe("Line computed from the scatter plot data using regression analysis."),
+		type: z
+			.literal("bestFit")
+			.describe("Line computed from the scatter plot data using regression analysis."),
 		method: z
 			.enum(["linear", "quadratic", "exponential"])
 			.describe(
 				"Regression type. 'linear' fits y = mx + b. 'quadratic' fits y = ax² + bx + c. 'exponential' fits y = ae^(bx) where b > 0 indicates growth, b < 0 indicates decay."
 			),
-		label: z.string().describe("Text label for the regression line (e.g., 'Best Fit', 'Trend', 'y = 0.5x + 10')."),
+		label: z
+			.string()
+			.describe("Text label for the regression line (e.g., 'Best Fit', 'Trend', 'y = 0.5x + 10')."),
 		style: createLineStyleSchema().describe(
 			"Visual styling for the regression line. Often uses distinct color or dash pattern."
 		)
@@ -111,7 +131,9 @@ export const ScatterPlotPropsSchema = z
 	.object({
 		type: z
 			.literal("scatterPlot")
-			.describe("Identifies this as a scatter plot widget for displaying bivariate data relationships."),
+			.describe(
+				"Identifies this as a scatter plot widget for displaying bivariate data relationships."
+			),
 		width: createWidthSchema(),
 		height: createHeightSchema(),
 		title: z
@@ -148,7 +170,9 @@ export const ScatterPlotPropsSchema = z
 					)
 			})
 			.strict()
-			.describe("Configuration for the horizontal axis including scale, labels, and optional grid."),
+			.describe(
+				"Configuration for the horizontal axis including scale, labels, and optional grid."
+			),
 		yAxis: z
 			.object({
 				label: z
@@ -262,7 +286,8 @@ function computeQuadraticRegression(
 		m31: number,
 		m32: number,
 		m33: number
-	): number => m11 * (m22 * m33 - m23 * m32) - m12 * (m21 * m33 - m23 * m31) + m13 * (m21 * m32 - m22 * m31)
+	): number =>
+		m11 * (m22 * m33 - m23 * m32) - m12 * (m21 * m33 - m23 * m31) + m13 * (m21 * m32 - m22 * m31)
 
 	const D = det3(Sx4, Sx3, Sx2, Sx3, Sx2, Sx, Sx2, Sx, count)
 	if (D === 0) return null
@@ -585,7 +610,13 @@ export const generateScatterPlot: WidgetGenerator<typeof ScatterPlotPropsSchema>
 	}
 
 	// NEW: Finalize the canvas and construct the root SVG element
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(AXIS_VIEWBOX_PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(AXIS_VIEWBOX_PADDING)
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.base}">${svgBody}</svg>`
 }

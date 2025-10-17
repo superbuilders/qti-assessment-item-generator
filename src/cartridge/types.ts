@@ -18,7 +18,13 @@ export type Lesson = {
 	resources: Array<ResourceArticle | ResourceQuiz>
 }
 
-export type UnitTest = { id: string; title: string; path: string; questionCount: number; questions: QuestionRef[] }
+export type UnitTest = {
+	id: string
+	title: string
+	path: string
+	questionCount: number
+	questions: QuestionRef[]
+}
 
 export type Unit = {
 	id: string

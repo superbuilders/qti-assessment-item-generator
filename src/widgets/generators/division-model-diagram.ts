@@ -11,9 +11,20 @@ export const DivisionModelDiagramPropsSchema = z
 		type: z.literal("divisionModelDiagram").describe("Identifies this as a division model widget."),
 		width: createWidthSchema(),
 		height: createHeightSchema(),
-		dividend: z.number().int().min(0).describe("The total number of objects to be divided (the dividend)."),
-		divisor: z.number().int().positive().describe("The number of objects in each full row (the divisor)."),
-		objectColor: z.string().regex(CSS_COLOR_PATTERN, "invalid css color").describe("CSS color for the objects.")
+		dividend: z
+			.number()
+			.int()
+			.min(0)
+			.describe("The total number of objects to be divided (the dividend)."),
+		divisor: z
+			.number()
+			.int()
+			.positive()
+			.describe("The number of objects in each full row (the divisor)."),
+		objectColor: z
+			.string()
+			.regex(CSS_COLOR_PATTERN, "invalid css color")
+			.describe("CSS color for the objects.")
 	})
 	.strict()
 	.describe(
@@ -25,7 +36,9 @@ export type DivisionModelDiagramProps = z.infer<typeof DivisionModelDiagramProps
 /**
  * Generates an SVG diagram to model division with remainders.
  */
-export const generateDivisionModelDiagram: WidgetGenerator<typeof DivisionModelDiagramPropsSchema> = async (props) => {
+export const generateDivisionModelDiagram: WidgetGenerator<
+	typeof DivisionModelDiagramPropsSchema
+> = async (props) => {
 	const { width, height, dividend, divisor, objectColor } = props
 
 	if (divisor <= 0) {
@@ -77,7 +90,13 @@ export const generateDivisionModelDiagram: WidgetGenerator<typeof DivisionModelD
 	}
 
 	// Finalize the canvas to get the SVG body and calculated viewBox.
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(PADDING)
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg">${svgBody}</svg>`
 }

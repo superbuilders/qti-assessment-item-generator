@@ -70,15 +70,21 @@ const createTransformationRuleSchema = () =>
 	z.discriminatedUnion("type", [
 		z
 			.object({
-				type: z.literal("translation").describe("Slide transformation moving all points by a fixed vector."),
+				type: z
+					.literal("translation")
+					.describe("Slide transformation moving all points by a fixed vector."),
 				vector: z
 					.object({
 						x: z
 							.number()
-							.describe("Horizontal translation distance. Positive moves right, negative moves left (e.g., 5, -3, 0)."),
+							.describe(
+								"Horizontal translation distance. Positive moves right, negative moves left (e.g., 5, -3, 0)."
+							),
 						y: z
 							.number()
-							.describe("Vertical translation distance. Positive moves up, negative moves down (e.g., -2, 4, 0).")
+							.describe(
+								"Vertical translation distance. Positive moves up, negative moves down (e.g., -2, 4, 0)."
+							)
 					})
 					.strict()
 					.describe("The displacement vector for the translation.")
@@ -169,17 +175,30 @@ export const ShapeTransformationGraphPropsSchema = z
 
 export type ShapeTransformationGraphProps = z.infer<typeof ShapeTransformationGraphPropsSchema>
 
-export const generateShapeTransformationGraph: WidgetGenerator<typeof ShapeTransformationGraphPropsSchema> = async (
-	props
-) => {
-	const { width, height, xAxis, yAxis, showQuadrantLabels, preImage, transformation, points, lines } = props
+export const generateShapeTransformationGraph: WidgetGenerator<
+	typeof ShapeTransformationGraphPropsSchema
+> = async (props) => {
+	const {
+		width,
+		height,
+		xAxis,
+		yAxis,
+		showQuadrantLabels,
+		preImage,
+		transformation,
+		points,
+		lines
+	} = props
 
 	// Validate polygon has at least 3 vertices
 	if (preImage.vertices.length < 3) {
 		logger.error("shape transformation invalid polygon", {
 			vertexCount: preImage.vertices.length
 		})
-		throw errors.wrap(ErrInvalidPolygon, `polygon has ${preImage.vertices.length} vertices, requires at least 3`)
+		throw errors.wrap(
+			ErrInvalidPolygon,
+			`polygon has ${preImage.vertices.length} vertices, requires at least 3`
+		)
 	}
 
 	// 1. Call the base generator and get the body content and extents object
@@ -300,7 +319,13 @@ export const generateShapeTransformationGraph: WidgetGenerator<typeof ShapeTrans
 	renderPoints(points, baseInfo.toSvgX, baseInfo.toSvgY, canvas)
 
 	// NEW: Finalize the canvas and construct the root SVG element
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(AXIS_VIEWBOX_PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(AXIS_VIEWBOX_PADDING)
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.base}">${svgBody}</svg>`
 }

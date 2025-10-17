@@ -14,7 +14,16 @@ function createShapeItemSchema() {
 		.object({
 			type: z.literal("shape").describe("An item that is a geometric shape."),
 			shape: z
-				.enum(["triangle", "square", "rectangle", "pentagon", "hexagon", "heptagon", "octagon", "circle"])
+				.enum([
+					"triangle",
+					"square",
+					"rectangle",
+					"pentagon",
+					"hexagon",
+					"heptagon",
+					"octagon",
+					"circle"
+				])
 				.describe("The specific type of polygon or shape to render."),
 			fillColor: z
 				.string()
@@ -40,16 +49,22 @@ export const PatternDiagramPropsSchema = z
 	.object({
 		type: z
 			.literal("patternDiagram")
-			.describe("Identifies this as a widget for displaying a sequence of shapes to form a pattern."),
+			.describe(
+				"Identifies this as a widget for displaying a sequence of shapes to form a pattern."
+			),
 		width: createWidthSchema(),
 		height: createHeightSchema(),
 		items: z
 			.array(z.discriminatedUnion("type", [createShapeItemSchema(), createPlaceholderItemSchema()]))
-			.describe("An array of items representing the pattern sequence. Each item can be a shape or a placeholder."),
+			.describe(
+				"An array of items representing the pattern sequence. Each item can be a shape or a placeholder."
+			),
 		shapeSize: z
 			.number()
 			.positive()
-			.describe("The size (width and height) in pixels for each individual shape or placeholder in the sequence.")
+			.describe(
+				"The size (width and height) in pixels for each individual shape or placeholder in the sequence."
+			)
 	})
 	.strict()
 
@@ -144,7 +159,9 @@ async function renderSingleShapeSvg(
  * Generates an HTML layout for a sequence of shapes and placeholders to illustrate a pattern.
  * This widget is a compositional tool that uses an internal SVG renderer for the shapes.
  */
-export const generatePatternDiagram: WidgetGenerator<typeof PatternDiagramPropsSchema> = async (props) => {
+export const generatePatternDiagram: WidgetGenerator<typeof PatternDiagramPropsSchema> = async (
+	props
+) => {
 	const { width, height, items, shapeSize } = props
 
 	const containerStyle = `

@@ -13,7 +13,9 @@ const createPointDefinitionSchema = () =>
 			label: z
 				.string()
 				.nullable()
-				.describe("The text label to display next to the point (e.g., 'P', 'Q'). Null for no label.")
+				.describe(
+					"The text label to display next to the point (e.g., 'P', 'Q'). Null for no label."
+				)
 		})
 		.strict()
 type Point = { x: number; y: number; label: string | null }
@@ -35,7 +37,9 @@ export const GeometricPrimitiveDiagramPropsSchema = z
 			.discriminatedUnion("type", [
 				z
 					.object({
-						type: z.literal("point").describe("A single, isolated point, always centered in the diagram."),
+						type: z
+							.literal("point")
+							.describe("A single, isolated point, always centered in the diagram."),
 						pointOne: createPointDefinitionSchema().describe("The point to be displayed.")
 					})
 					.strict(),
@@ -44,20 +48,32 @@ export const GeometricPrimitiveDiagramPropsSchema = z
 						type: z.literal("segment").describe("A line segment with two defined endpoints."),
 						pointOne: createPointDefinitionSchema().describe("The starting point of the segment."),
 						pointTwo: createPointDefinitionSchema().describe("The ending point of the segment."),
-						rotation: z.number().describe("The rotation of the segment in degrees. 0 is horizontal, 90 is vertical."),
+						rotation: z
+							.number()
+							.describe("The rotation of the segment in degrees. 0 is horizontal, 90 is vertical."),
 						length: z
 							.number()
 							.positive()
 							.nullable()
-							.describe("The length of the segment in pixels. If not provided, it defaults to 60% of the canvas width.")
+							.describe(
+								"The length of the segment in pixels. If not provided, it defaults to 60% of the canvas width."
+							)
 					})
 					.strict(),
 				z
 					.object({
-						type: z.literal("ray").describe("A ray starting at one point and extending through another."),
-						pointOne: createPointDefinitionSchema().describe("The starting point (endpoint) of the ray."),
-						pointTwo: createPointDefinitionSchema().describe("A second point that defines the direction of the ray."),
-						rotation: z.number().describe("The rotation of the ray in degrees. 0 is horizontal, 90 is vertical."),
+						type: z
+							.literal("ray")
+							.describe("A ray starting at one point and extending through another."),
+						pointOne: createPointDefinitionSchema().describe(
+							"The starting point (endpoint) of the ray."
+						),
+						pointTwo: createPointDefinitionSchema().describe(
+							"A second point that defines the direction of the ray."
+						),
+						rotation: z
+							.number()
+							.describe("The rotation of the ray in degrees. 0 is horizontal, 90 is vertical."),
 						length: z
 							.number()
 							.positive()
@@ -71,9 +87,15 @@ export const GeometricPrimitiveDiagramPropsSchema = z
 					.object({
 						type: z
 							.literal("line")
-							.describe("An infinite line passing through two points, with arrowheads on both ends."),
-						pointOne: createPointDefinitionSchema().describe("A first point that the line passes through."),
-						pointTwo: createPointDefinitionSchema().describe("A second point that the line passes through."),
+							.describe(
+								"An infinite line passing through two points, with arrowheads on both ends."
+							),
+						pointOne: createPointDefinitionSchema().describe(
+							"A first point that the line passes through."
+						),
+						pointTwo: createPointDefinitionSchema().describe(
+							"A second point that the line passes through."
+						),
 						rotation: z.number().describe("The rotation of the line in degrees."),
 						length: z
 							.number()
@@ -94,7 +116,9 @@ export const GeometricPrimitiveDiagramPropsSchema = z
 							.number()
 							.positive()
 							.nullable()
-							.describe("The distance in pixels between the arc's endpoints. Defaults to 60% of canvas width."),
+							.describe(
+								"The distance in pixels between the arc's endpoints. Defaults to 60% of canvas width."
+							),
 						bulge: z
 							.number()
 							.describe(
@@ -230,9 +254,9 @@ const extendRayToBoxEnd = (
 /**
  * Generates an SVG diagram for a single geometric primitive.
  */
-export const generateGeometricPrimitiveDiagram: WidgetGenerator<typeof GeometricPrimitiveDiagramPropsSchema> = async (
-	props
-) => {
+export const generateGeometricPrimitiveDiagram: WidgetGenerator<
+	typeof GeometricPrimitiveDiagramPropsSchema
+> = async (props) => {
 	const { width, height, primitive } = props
 
 	const canvas = new CanvasImpl({
@@ -312,7 +336,9 @@ export const generateGeometricPrimitiveDiagram: WidgetGenerator<typeof Geometric
 				const controlX = midX + (perpX / length) * bulgeAmount
 				const controlY = midY + (perpY / length) * bulgeAmount
 
-				const path = new Path2D().moveTo(p1.x, p1.y).quadraticCurveTo(controlX, controlY, p2.x, p2.y)
+				const path = new Path2D()
+					.moveTo(p1.x, p1.y)
+					.quadraticCurveTo(controlX, controlY, p2.x, p2.y)
 
 				canvas.drawPath(path, {
 					stroke: theme.colors.black,
@@ -328,7 +354,13 @@ export const generateGeometricPrimitiveDiagram: WidgetGenerator<typeof Geometric
 		}
 	}
 
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(PADDING)
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.medium}">${svgBody}</svg>`
 }

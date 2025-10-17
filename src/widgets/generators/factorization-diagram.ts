@@ -9,7 +9,9 @@ import { theme } from "../utils/theme"
 // The main Zod schema for the factorization diagram.
 export const FactorizationDiagramPropsSchema = z
 	.object({
-		type: z.literal("factorizationDiagram").describe("Identifies this as a factorization diagram widget."),
+		type: z
+			.literal("factorizationDiagram")
+			.describe("Identifies this as a factorization diagram widget."),
 		width: createWidthSchema(),
 		height: createHeightSchema(),
 		numberToFactor: z
@@ -17,7 +19,10 @@ export const FactorizationDiagramPropsSchema = z
 			.int()
 			.positive()
 			.describe("The integer to be factored and displayed as a rectangular array of dots."),
-		dotColor: z.string().regex(CSS_COLOR_PATTERN, "invalid css color").describe("CSS color for the dots in the array.")
+		dotColor: z
+			.string()
+			.regex(CSS_COLOR_PATTERN, "invalid css color")
+			.describe("CSS color for the dots in the array.")
 	})
 	.strict()
 	.describe(
@@ -47,7 +52,9 @@ function findBestFactors(n: number): { rows: number; columns: number } {
 /**
  * Generates an SVG diagram of a rectangular array of numbered dots to illustrate factors.
  */
-export const generateFactorizationDiagram: WidgetGenerator<typeof FactorizationDiagramPropsSchema> = async (props) => {
+export const generateFactorizationDiagram: WidgetGenerator<
+	typeof FactorizationDiagramPropsSchema
+> = async (props) => {
 	const { width, height, numberToFactor, dotColor } = props
 
 	// The widget's logic now determines the best row and column count.
@@ -97,6 +104,12 @@ export const generateFactorizationDiagram: WidgetGenerator<typeof FactorizationD
 		})
 	}
 
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(PADDING)
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg">${svgBody}</svg>`
 }

@@ -17,7 +17,9 @@ const createValueOrUnknownSchema = () =>
 				value: z.number().int().positive().describe("The numeric value.")
 			}),
 			z.object({
-				type: z.literal("unknown").describe("An unknown value that should be represented by an empty box.")
+				type: z
+					.literal("unknown")
+					.describe("An unknown value that should be represented by an empty box.")
 			})
 		])
 		.describe("Represents either a known numeric value or an unknown value to be solved.")
@@ -27,10 +29,16 @@ const CellContentSchema = z
 	.discriminatedUnion("type", [
 		z.object({
 			type: z.literal("value").describe("The cell displays a specific positive integer value."),
-			value: z.number().int().positive().describe("The positive integer value to display in the cell.")
+			value: z
+				.number()
+				.int()
+				.positive()
+				.describe("The positive integer value to display in the cell.")
 		}),
 		z.object({
-			type: z.literal("unknown").describe("The cell's value is unknown and should be represented by an empty box.")
+			type: z
+				.literal("unknown")
+				.describe("The cell's value is unknown and should be represented by an empty box.")
 		})
 	])
 	.describe(
@@ -40,17 +48,23 @@ const CellContentSchema = z
 // The main Zod schema for the area model multiplication widget.
 export const AreaModelMultiplicationPropsSchema = z
 	.object({
-		type: z.literal("areaModelMultiplication").describe("Identifies this as an area model for multiplication."),
+		type: z
+			.literal("areaModelMultiplication")
+			.describe("Identifies this as an area model for multiplication."),
 		width: createWidthSchema(),
 		height: createHeightSchema(),
 		rowFactors: z
 			.array(createValueOrUnknownSchema())
 			.min(1)
-			.describe("An array of factors displayed vertically on the left, representing the height of each row."),
+			.describe(
+				"An array of factors displayed vertically on the left, representing the height of each row."
+			),
 		columnFactors: z
 			.array(createValueOrUnknownSchema())
 			.min(1)
-			.describe("An array of factors displayed horizontally on top, representing the width of each column."),
+			.describe(
+				"An array of factors displayed horizontally on top, representing the width of each column."
+			),
 		cellContents: z
 			.array(z.array(CellContentSchema))
 			.describe(
@@ -72,9 +86,9 @@ export type AreaModelMultiplicationProps = z.infer<typeof AreaModelMultiplicatio
 /**
  * Generates an SVG diagram of an area model for multiplication.
  */
-export const generateAreaModelMultiplication: WidgetGenerator<typeof AreaModelMultiplicationPropsSchema> = async (
-	props
-) => {
+export const generateAreaModelMultiplication: WidgetGenerator<
+	typeof AreaModelMultiplicationPropsSchema
+> = async (props) => {
 	const { width, height, rowFactors, columnFactors, cellContents, cellColors } = props
 
 	// Runtime validation to ensure 2D arrays have matching dimensions.
@@ -88,7 +102,10 @@ export const generateAreaModelMultiplication: WidgetGenerator<typeof AreaModelMu
 	}
 
 	for (let i = 0; i < cellContents.length; i++) {
-		if (cellContents[i]?.length !== columnFactors.length || cellColors[i]?.length !== columnFactors.length) {
+		if (
+			cellContents[i]?.length !== columnFactors.length ||
+			cellColors[i]?.length !== columnFactors.length
+		) {
 			logger.error("column dimension mismatch in area model", {
 				row: i,
 				cellContentsColumns: cellContents[i]?.length,
@@ -140,7 +157,9 @@ export const generateAreaModelMultiplication: WidgetGenerator<typeof AreaModelMu
 	const minCellHeight = 40 // Minimum height for readability
 
 	// Calculate column widths
-	const columnFactorValues = columnFactors.map((factor, index) => getFactorValueForLayout(factor, index, true))
+	const columnFactorValues = columnFactors.map((factor, index) =>
+		getFactorValueForLayout(factor, index, true)
+	)
 	const logFactors = columnFactorValues.map((factor) => Math.log10(factor + 1)) // +1 to handle factor=1
 	const totalLogWidth = logFactors.reduce((sum, logFactor) => sum + logFactor, 0)
 
@@ -158,12 +177,16 @@ export const generateAreaModelMultiplication: WidgetGenerator<typeof AreaModelMu
 	}
 
 	// Calculate row heights using similar approach
-	const rowFactorValues = rowFactors.map((factor, index) => getFactorValueForLayout(factor, index, false))
+	const rowFactorValues = rowFactors.map((factor, index) =>
+		getFactorValueForLayout(factor, index, false)
+	)
 	const logRowFactors = rowFactorValues.map((factor) => Math.log10(factor + 1))
 	const totalLogHeight = logRowFactors.reduce((sum, logFactor) => sum + logFactor, 0)
 
 	// Calculate base heights using log scale, then ensure minimum sizes
-	const baseHeights = logRowFactors.map((logFactor) => (logFactor / totalLogHeight) * availableHeight)
+	const baseHeights = logRowFactors.map(
+		(logFactor) => (logFactor / totalLogHeight) * availableHeight
+	)
 	const scaledRowHeights = baseHeights.map((baseHeight) => Math.max(baseHeight, minCellHeight))
 
 	// If minimum heights caused overflow, scale down proportionally
@@ -206,11 +229,17 @@ export const generateAreaModelMultiplication: WidgetGenerator<typeof AreaModelMu
 			// Draw unknown box for column factor
 			const boxWidth = 30
 			const boxHeight = 20
-			canvas.drawRect(cellCenterX - boxWidth / 2, gridStartY - PADDING - boxHeight / 2, boxWidth, boxHeight, {
-				fill: theme.colors.white,
-				stroke: theme.colors.black,
-				strokeWidth: theme.stroke.width.base
-			})
+			canvas.drawRect(
+				cellCenterX - boxWidth / 2,
+				gridStartY - PADDING - boxHeight / 2,
+				boxWidth,
+				boxHeight,
+				{
+					fill: theme.colors.white,
+					stroke: theme.colors.black,
+					strokeWidth: theme.stroke.width.base
+				}
+			)
 		}
 		currentX += colWidth
 	}
@@ -238,11 +267,17 @@ export const generateAreaModelMultiplication: WidgetGenerator<typeof AreaModelMu
 			// Draw unknown box for row factor
 			const boxWidth = 30
 			const boxHeight = 20
-			canvas.drawRect(gridStartX - PADDING - boxWidth / 2, rowCenterY - boxHeight / 2, boxWidth, boxHeight, {
-				fill: theme.colors.white,
-				stroke: theme.colors.black,
-				strokeWidth: theme.stroke.width.base
-			})
+			canvas.drawRect(
+				gridStartX - PADDING - boxWidth / 2,
+				rowCenterY - boxHeight / 2,
+				boxWidth,
+				boxHeight,
+				{
+					fill: theme.colors.white,
+					stroke: theme.colors.black,
+					strokeWidth: theme.stroke.width.base
+				}
+			)
 		}
 
 		// Draw cells in this row
@@ -281,11 +316,17 @@ export const generateAreaModelMultiplication: WidgetGenerator<typeof AreaModelMu
 				case "unknown": {
 					const boxWidth = Math.min(colWidth * 0.6, 80)
 					const boxHeight = Math.min(rowHeight * 0.6, 30)
-					canvas.drawRect(cellCenterX - boxWidth / 2, cellCenterY - boxHeight / 2, boxWidth, boxHeight, {
-						fill: theme.colors.white,
-						stroke: theme.colors.black,
-						strokeWidth: theme.stroke.width.base
-					})
+					canvas.drawRect(
+						cellCenterX - boxWidth / 2,
+						cellCenterY - boxHeight / 2,
+						boxWidth,
+						boxHeight,
+						{
+							fill: theme.colors.white,
+							stroke: theme.colors.black,
+							strokeWidth: theme.stroke.width.base
+						}
+					)
 					break
 				}
 			}
@@ -294,6 +335,12 @@ export const generateAreaModelMultiplication: WidgetGenerator<typeof AreaModelMu
 		currentY += rowHeight
 	}
 
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(PADDING)
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}">${svgBody}</svg>`
 }

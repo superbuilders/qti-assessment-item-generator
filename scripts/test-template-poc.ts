@@ -7,7 +7,9 @@ import { createSubsetCollection } from "@/widgets/collections/subset"
 
 async function main() {
 	// Create a subset collection containing only the widgets used by this template
-	const templateCollection = createSubsetCollection(allWidgetsCollection, ["partitionedShape"] as const)
+	const templateCollection = createSubsetCollection(allWidgetsCollection, [
+		"partitionedShape"
+	] as const)
 	logger.info("starting template poc test", {
 		templateId: fractionAddition.templateId,
 		version: fractionAddition.version

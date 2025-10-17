@@ -17,7 +17,10 @@ export const NumberLineWithFractionGroupsPropsSchema = z
 		height: createHeightSchema(),
 		axis: z
 			.object({
-				lowerBound: z.number().int().describe("Lower bound numerator (e.g., 0 for 0/4, -2 for -2/4)"),
+				lowerBound: z
+					.number()
+					.int()
+					.describe("Lower bound numerator (e.g., 0 for 0/4, -2 for -2/4)"),
 				upperBound: z.number().int().describe("Upper bound numerator (e.g., 8 for 8/4 = 2)"),
 				denominator: z
 					.number()
@@ -35,11 +38,16 @@ export const NumberLineWithFractionGroupsPropsSchema = z
 					.number()
 					.int()
 					.describe("Starting numerator for the boxes (e.g., 0 to start from 0/4, -2 for -2/4)"),
-				upperBound: z.number().int().describe("Ending numerator for the boxes (e.g., 7 for boxes up to 7/4)"),
+				upperBound: z
+					.number()
+					.int()
+					.describe("Ending numerator for the boxes (e.g., 7 for boxes up to 7/4)"),
 				fillTo: z
 					.number()
 					.int()
-					.describe("Numerator up to which boxes should be filled/shaded (e.g., 4 to fill up to 4/4)")
+					.describe(
+						"Numerator up to which boxes should be filled/shaded (e.g., 4 to fill up to 4/4)"
+					)
 			})
 			.strict()
 			.describe("Defines which boxes to show and how many to fill")
@@ -49,7 +57,9 @@ export const NumberLineWithFractionGroupsPropsSchema = z
 		"Creates a number line with fraction intervals and colored boxes above it. Perfect for visualizing fraction concepts like 'how many fourths make one whole?' The axis shows fraction labels above tick marks and whole number labels below. Boxes are automatically generated and filled up to the specified bound.\n\nExample: axis from 0/4 to 8/4 with denominator 4, boxes from 0 to 7 filled to 4, creates a number line from 0 to 2 with fourths marked, and boxes showing 4/4 = 1 whole."
 	)
 
-export type NumberLineWithFractionGroupsProps = z.infer<typeof NumberLineWithFractionGroupsPropsSchema>
+export type NumberLineWithFractionGroupsProps = z.infer<
+	typeof NumberLineWithFractionGroupsPropsSchema
+>
 
 function renderFraction(numerator: number, denominator: number): string {
 	return `${numerator}/${denominator}`
@@ -214,7 +224,13 @@ export const generateNumberLineWithFractionGroups: WidgetGenerator<
 	}
 
 	// Finalize the canvas and construct the root SVG element
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(PADDING)
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.base}">${svgBody}</svg>`
 }

@@ -247,7 +247,9 @@ function createBracketStyleSchema() {
 						.string()
 						.regex(CSS_COLOR_PATTERN, "invalid css color")
 						.nullable()
-						.describe("Color of the curly brace. Null uses default black. Often kept black for clarity."),
+						.describe(
+							"Color of the curly brace. Null uses default black. Often kept black for clarity."
+						),
 					strokeWidth: z
 						.number()
 						.min(0)
@@ -415,7 +417,9 @@ function clamp01(v: number): number {
 // -----------------------------
 // Generator
 // -----------------------------
-export const generateTapeDiagram: WidgetGenerator<typeof TapeDiagramPropsSchema> = async (props) => {
+export const generateTapeDiagram: WidgetGenerator<typeof TapeDiagramPropsSchema> = async (
+	props
+) => {
 	const { width, height, referenceUnitsTotal, topTape, bottomTape, brackets } = props
 
 	const canvas = new CanvasImpl({
@@ -436,7 +440,10 @@ export const generateTapeDiagram: WidgetGenerator<typeof TapeDiagramPropsSchema>
 		cellWidth: number
 	}
 
-	function computeTapeGeometry(tape: z.infer<ReturnType<typeof createTapeSchema>>, y: number): TapeGeom {
+	function computeTapeGeometry(
+		tape: z.infer<ReturnType<typeof createTapeSchema>>,
+		y: number
+	): TapeGeom {
 		// Determine extent fraction relative to the chart width
 		const extentSpan = tape.extent
 		let startFrac = 0
@@ -460,7 +467,10 @@ export const generateTapeDiagram: WidgetGenerator<typeof TapeDiagramPropsSchema>
 		return { leftX: tapeLeft, width: tapeW, y, cellWidth: cellW }
 	}
 
-	function drawGridAndBorder(tape: z.infer<ReturnType<typeof createTapeSchema>>, geom: TapeGeom): void {
+	function drawGridAndBorder(
+		tape: z.infer<ReturnType<typeof createTapeSchema>>,
+		geom: TapeGeom
+	): void {
 		if (!tape.grid.show) return
 		// Outer border
 		canvas.drawRect(geom.leftX, geom.y, geom.width, tapeHeight, {
@@ -625,7 +635,8 @@ export const generateTapeDiagram: WidgetGenerator<typeof TapeDiagramPropsSchema>
 	}
 
 	// Draw fills first so grid lines appear on top
-	for (const f of topTape.fills) drawFillSpan(topTape, topGeom, f, topBracketTopRanges, topBracketBottomRanges)
+	for (const f of topTape.fills)
+		drawFillSpan(topTape, topGeom, f, topBracketTopRanges, topBracketBottomRanges)
 	if (bottomTape && bottomGeom)
 		for (const f of bottomTape.fills)
 			drawFillSpan(bottomTape, bottomGeom, f, bottomBracketTopRanges, bottomBracketBottomRanges)
@@ -634,12 +645,27 @@ export const generateTapeDiagram: WidgetGenerator<typeof TapeDiagramPropsSchema>
 	drawGridAndBorder(topTape, topGeom)
 	if (bottomTape && bottomGeom) drawGridAndBorder(bottomTape, bottomGeom)
 
-	function drawStraightBracket(x1: number, x2: number, y: number, lbl: string | null, placeAbove: boolean): void {
+	function drawStraightBracket(
+		x1: number,
+		x2: number,
+		y: number,
+		lbl: string | null,
+		placeAbove: boolean
+	): void {
 		// Adjust label offset so it never overlaps the tape
 		const textOffset = placeAbove ? -12 : 20
-		canvas.drawLine(x1, y, x2, y, { stroke: theme.colors.black, strokeWidth: theme.stroke.width.base })
-		canvas.drawLine(x1, y - 5, x1, y + 5, { stroke: theme.colors.black, strokeWidth: theme.stroke.width.base })
-		canvas.drawLine(x2, y - 5, x2, y + 5, { stroke: theme.colors.black, strokeWidth: theme.stroke.width.base })
+		canvas.drawLine(x1, y, x2, y, {
+			stroke: theme.colors.black,
+			strokeWidth: theme.stroke.width.base
+		})
+		canvas.drawLine(x1, y - 5, x1, y + 5, {
+			stroke: theme.colors.black,
+			strokeWidth: theme.stroke.width.base
+		})
+		canvas.drawLine(x2, y - 5, x2, y + 5, {
+			stroke: theme.colors.black,
+			strokeWidth: theme.stroke.width.base
+		})
 		if (lbl) {
 			canvas.drawText({
 				x: (x1 + x2) / 2,
@@ -675,6 +701,12 @@ export const generateTapeDiagram: WidgetGenerator<typeof TapeDiagramPropsSchema>
 		}
 	}
 
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(PADDING)
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.base}">${svgBody}</svg>`
 }

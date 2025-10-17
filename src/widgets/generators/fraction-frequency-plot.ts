@@ -47,7 +47,9 @@ const TickSchema = z
 // The main Zod schema for the simplified fractionFrequencyPlot function.
 export const FractionFrequencyPlotPropsSchema = z
 	.object({
-		type: z.literal("fractionFrequencyPlot").describe("Identifies this as a fraction frequency plot widget."),
+		type: z
+			.literal("fractionFrequencyPlot")
+			.describe("Identifies this as a fraction frequency plot widget."),
 		width: createWidthSchema(),
 		height: createHeightSchema(),
 		title: z
@@ -74,7 +76,8 @@ type FractionLabel = z.infer<typeof FractionLabelSchema>
  */
 const toNumericValue = (label: FractionLabel): number => {
 	if (label.type === "whole") return label.value
-	if (label.type === "fraction") return label.denominator === 0 ? 0 : label.numerator / label.denominator
+	if (label.type === "fraction")
+		return label.denominator === 0 ? 0 : label.numerator / label.denominator
 	// mixed
 	return label.whole + (label.denominator === 0 ? 0 : label.numerator / label.denominator)
 }
@@ -84,9 +87,9 @@ const toNumericValue = (label: FractionLabel): number => {
  * represented by stacking 'X' symbols above a number line, and the axis range
  * is inferred from the data.
  */
-export const generateFractionFrequencyPlot: WidgetGenerator<typeof FractionFrequencyPlotPropsSchema> = async (
-	props
-) => {
+export const generateFractionFrequencyPlot: WidgetGenerator<
+	typeof FractionFrequencyPlotPropsSchema
+> = async (props) => {
 	const { width, height, title, ticks } = props
 
 	// Calculate the numerical values for all ticks to determine the axis range.
@@ -237,6 +240,12 @@ export const generateFractionFrequencyPlot: WidgetGenerator<typeof FractionFrequ
 		}
 	}
 
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(PADDING)
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.base}">${svgBody}</svg>`
 }

@@ -66,7 +66,9 @@ export type FractionSumDiagramProps = z.infer<typeof FractionSumDiagramPropsSche
 /**
  * Generates an SVG diagram for summing fractions using a tape model.
  */
-export const generateFractionSumDiagram: WidgetGenerator<typeof FractionSumDiagramPropsSchema> = async (props) => {
+export const generateFractionSumDiagram: WidgetGenerator<
+	typeof FractionSumDiagramPropsSchema
+> = async (props) => {
 	const { width, height, denominator, groups } = props
 
 	// --- Runtime Validation ---
@@ -153,17 +155,30 @@ export const generateFractionSumDiagram: WidgetGenerator<typeof FractionSumDiagr
 			const leftoverForTape = height - PADDING * 2 - (topBlock + bottomBlock)
 			tapeHeight = Math.max(40, Math.min(tapeHeight, leftoverForTape))
 			// Maintain desired minimum if possible
-			tapeHeight = Math.max(Math.min(tapeHeight, nominalTapeHeight), Math.min(desiredMinHeight, leftoverForTape))
+			tapeHeight = Math.max(
+				Math.min(tapeHeight, nominalTapeHeight),
+				Math.min(desiredMinHeight, leftoverForTape)
+			)
 		}
 	}
 	const tapeY = Math.floor(
-		PADDING + estimatedExprBlock(topExprFontStart) + bracketHeight + gapBetweenExprAndBracket + gapBetweenBracketAndTape
+		PADDING +
+			estimatedExprBlock(topExprFontStart) +
+			bracketHeight +
+			gapBetweenExprAndBracket +
+			gapBetweenBracketAndTape
 	)
 
 	// --- Helper Functions for Drawing ---
 
 	/** Compute a font size so the fraction fits inside the provided box. */
-	const fitFractionFont = (num: string, den: string, maxWidth: number, maxHeight: number, start: number): number => {
+	const fitFractionFont = (
+		num: string,
+		den: string,
+		maxWidth: number,
+		maxHeight: number,
+		start: number
+	): number => {
 		let fontPx = Math.max(10, start)
 		for (;;) {
 			const numMetrics = estimateWrappedTextDimensions(num, Number.POSITIVE_INFINITY, fontPx, 1.1)
@@ -218,7 +233,13 @@ export const generateFractionSumDiagram: WidgetGenerator<typeof FractionSumDiagr
 				Math.floor(tapeHeight - 6),
 				56
 			)
-			drawFraction("1", String(denominator), x + segmentWidth / 2, Math.floor(tapeY + tapeHeight / 2), cellFont)
+			drawFraction(
+				"1",
+				String(denominator),
+				x + segmentWidth / 2,
+				Math.floor(tapeY + tapeHeight / 2),
+				cellFont
+			)
 			currentSegment++
 		}
 	}
@@ -239,7 +260,13 @@ export const generateFractionSumDiagram: WidgetGenerator<typeof FractionSumDiagr
 			Math.floor(tapeHeight - 6),
 			56
 		)
-		drawFraction("1", String(denominator), x + segmentWidth / 2, Math.floor(tapeY + tapeHeight / 2), cellFont)
+		drawFraction(
+			"1",
+			String(denominator),
+			x + segmentWidth / 2,
+			Math.floor(tapeY + tapeHeight / 2),
+			cellFont
+		)
 		currentSegment++
 	}
 
@@ -249,8 +276,14 @@ export const generateFractionSumDiagram: WidgetGenerator<typeof FractionSumDiagr
 	let runningX = tapeStartX
 
 	// Precompute top fraction placements to size and collision-manage '+'
-	const topFractions: Array<{ startX: number; endX: number; cx: number; fontPx: number; barWidth: number; y: number }> =
-		[]
+	const topFractions: Array<{
+		startX: number
+		endX: number
+		cx: number
+		fontPx: number
+		barWidth: number
+		y: number
+	}> = []
 	for (const group of groups) {
 		const groupWidth = group.numerator * segmentWidth
 		const cxGroup = runningX + groupWidth / 2
@@ -285,7 +318,14 @@ export const generateFractionSumDiagram: WidgetGenerator<typeof FractionSumDiagr
 		const plusX = Math.max(minX, Math.min(naturalMid, maxX))
 		// Align the plus sign with the fraction bar (vinculum) height; center between adjacent bars
 		const plusY = Math.floor((left.y + right.y) / 2)
-		canvas.drawText({ x: plusX, y: plusY, text: "+", fontPx: plusFont, anchor: "middle", dominantBaseline: "middle" })
+		canvas.drawText({
+			x: plusX,
+			y: plusY,
+			text: "+",
+			fontPx: plusFont,
+			anchor: "middle",
+			dominantBaseline: "middle"
+		})
 	}
 
 	// 3. Draw Bottom Bracket and Sum
@@ -304,10 +344,22 @@ export const generateFractionSumDiagram: WidgetGenerator<typeof FractionSumDiagr
 			bottomExprFontStart
 		)
 		const yForBottom = bottomExpressionY + archLabelClearance // push further below the arch
-		drawFraction(String(totalNumerator), String(denominator), Math.floor((startX + endX) / 2), yForBottom, bottomFont)
+		drawFraction(
+			String(totalNumerator),
+			String(denominator),
+			Math.floor((startX + endX) / 2),
+			yForBottom,
+			bottomFont
+		)
 	}
 
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(PADDING)
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}">${svgBody}</svg>`
 }

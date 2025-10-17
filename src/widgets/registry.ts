@@ -314,7 +314,9 @@ export type CircleAngleDiagramProps = z.input<typeof CircleAngleDiagramPropsSche
 export type CompositeShapeDiagramProps = z.input<typeof CompositeShapeDiagramPropsSchema>
 export type ConceptualGraphProps = z.input<typeof ConceptualGraphPropsSchema>
 export type ConstraintGeometryDiagramProps = z.input<typeof ConstraintGeometryDiagramPropsSchema>
-export type CoordinatePlaneComprehensiveProps = z.input<typeof CoordinatePlaneComprehensivePropsSchema>
+export type CoordinatePlaneComprehensiveProps = z.input<
+	typeof CoordinatePlaneComprehensivePropsSchema
+>
 export type DiscreteObjectRatioDiagramProps = z.input<typeof DiscreteObjectRatioDiagramPropsSchema>
 export type DivergentBarChartProps = z.input<typeof DivergentBarChartPropsSchema>
 export type DivisionAreaDiagramProps = z.input<typeof DivisionAreaDiagramPropsSchema>
@@ -326,7 +328,9 @@ export type EquivalentFractionModelProps = z.input<typeof EquivalentFractionMode
 export type FactorizationDiagramProps = z.input<typeof FactorizationDiagramPropsSchema>
 export type FigureComparisonDiagramProps = z.input<typeof FigureComparisonDiagramPropsSchema>
 export type FractionFrequencyPlotProps = z.input<typeof FractionFrequencyPlotPropsSchema>
-export type FractionMultiplicationModelProps = z.input<typeof FractionMultiplicationModelPropsSchema>
+export type FractionMultiplicationModelProps = z.input<
+	typeof FractionMultiplicationModelPropsSchema
+>
 export type FractionSumDiagramProps = z.input<typeof FractionSumDiagramPropsSchema>
 export type FractionModelDiagramProps = z.input<typeof FractionModelDiagramPropsSchema>
 export type FreeBodyDiagramProps = z.input<typeof FreeBodyDiagramPropsSchema>
@@ -345,12 +349,18 @@ export type NPolygonProps = z.input<typeof NPolygonPropsSchema>
 export type PatternDiagramProps = z.input<typeof PatternDiagramPropsSchema>
 export type NumberLineProps = z.input<typeof NumberLinePropsSchema>
 export type NumberLineWithActionProps = z.input<typeof NumberLineWithActionPropsSchema>
-export type NumberLineWithFractionGroupsProps = z.input<typeof NumberLineWithFractionGroupsPropsSchema>
+export type NumberLineWithFractionGroupsProps = z.input<
+	typeof NumberLineWithFractionGroupsPropsSchema
+>
 export type NumberSetDiagramProps = z.input<typeof NumberSetDiagramPropsSchema>
 export type ParabolaGraphProps = z.input<typeof ParabolaGraphPropsSchema>
-export type ParallelogramTrapezoidDiagramProps = z.input<typeof ParallelogramTrapezoidDiagramPropsSchema>
+export type ParallelogramTrapezoidDiagramProps = z.input<
+	typeof ParallelogramTrapezoidDiagramPropsSchema
+>
 export type PartitionedShapeProps = z.input<typeof PartitionedShapePropsSchema>
-export type PentagonIntersectionDiagramProps = z.input<typeof PentagonIntersectionDiagramPropsSchema>
+export type PentagonIntersectionDiagramProps = z.input<
+	typeof PentagonIntersectionDiagramPropsSchema
+>
 export type PeriodicTableWidgetProps = z.input<typeof PeriodicTableWidgetPropsSchema>
 export type PieChartWidgetProps = z.input<typeof PieChartWidgetPropsSchema>
 export type PictographProps = z.input<typeof PictographPropsSchema>
@@ -362,7 +372,9 @@ export type PopulationBarChartProps = z.input<typeof PopulationBarChartPropsSche
 export type PopulationChangeEventGraphProps = z.input<typeof PopulationChangeEventGraphPropsSchema>
 export type ProbabilitySpinnerProps = z.input<typeof ProbabilitySpinnerPropsSchema>
 export type ProtractorAngleDiagramProps = z.input<typeof ProtractorAngleDiagramPropsSchema>
-export type RadiallyConstrainedAngleDiagramProps = z.input<typeof RadiallyConstrainedAngleDiagramPropsSchema>
+export type RadiallyConstrainedAngleDiagramProps = z.input<
+	typeof RadiallyConstrainedAngleDiagramPropsSchema
+>
 export type PythagoreanProofDiagramProps = z.input<typeof PythagoreanProofDiagramPropsSchema>
 export type QuantityFractionalDiagramProps = z.input<typeof QuantityFractionalDiagramPropsSchema>
 export type RatioBoxDiagramProps = z.input<typeof RatioBoxDiagramPropsSchema>

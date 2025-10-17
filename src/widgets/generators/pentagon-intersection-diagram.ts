@@ -13,13 +13,19 @@ const KAArc = z
 	.object({
 		startX: z
 			.number()
-			.describe("X-coordinate where the arc begins (e.g., 150, 200, 175.5). Usually on or near a line segment."),
+			.describe(
+				"X-coordinate where the arc begins (e.g., 150, 200, 175.5). Usually on or near a line segment."
+			),
 		startY: z
 			.number()
-			.describe("Y-coordinate where the arc begins (e.g., 100, 150, 125.5). Defines the arc's starting point."),
+			.describe(
+				"Y-coordinate where the arc begins (e.g., 100, 150, 125.5). Defines the arc's starting point."
+			),
 		rx: z
 			.number()
-			.describe("Horizontal radius of the elliptical arc in pixels (e.g., 20, 30, 25). Controls arc width."),
+			.describe(
+				"Horizontal radius of the elliptical arc in pixels (e.g., 20, 30, 25). Controls arc width."
+			),
 		ry: z
 			.number()
 			.describe(
@@ -27,13 +33,19 @@ const KAArc = z
 			),
 		xAxisRotation: z
 			.number()
-			.describe("Rotation of the ellipse in degrees (e.g., 0, 45, -30). Usually 0 for simple angle arcs."),
+			.describe(
+				"Rotation of the ellipse in degrees (e.g., 0, 45, -30). Usually 0 for simple angle arcs."
+			),
 		largeArcFlag: z
 			.number()
-			.describe("SVG arc flag: 0 for small arc (<180°), 1 for large arc (>180°). Typically 0 for angle markers."),
+			.describe(
+				"SVG arc flag: 0 for small arc (<180°), 1 for large arc (>180°). Typically 0 for angle markers."
+			),
 		sweepFlag: z
 			.number()
-			.describe("SVG sweep direction: 0 for counter-clockwise, 1 for clockwise. Determines arc direction."),
+			.describe(
+				"SVG sweep direction: 0 for counter-clockwise, 1 for clockwise. Determines arc direction."
+			),
 		endDeltaX: z
 			.number()
 			.describe(
@@ -41,7 +53,9 @@ const KAArc = z
 			),
 		endDeltaY: z
 			.number()
-			.describe("Y-offset from start to end point (e.g., 10, -15, 5). Defines where the arc ends relative to start."),
+			.describe(
+				"Y-offset from start to end point (e.g., 10, -15, 5). Defines where the arc ends relative to start."
+			),
 		label: z
 			.string()
 			.nullable()
@@ -75,7 +89,9 @@ const Point = z
 			),
 		y: z
 			.number()
-			.describe("Y-coordinate of the vertex in SVG space (e.g., 50, 100, 200). Positive y is downward in SVG.")
+			.describe(
+				"Y-coordinate of the vertex in SVG space (e.g., 50, 100, 200). Positive y is downward in SVG."
+			)
 	})
 	.strict()
 
@@ -83,7 +99,9 @@ export const PentagonIntersectionDiagramPropsSchema = z
 	.object({
 		type: z
 			.literal("pentagonIntersectionDiagram")
-			.describe("Identifies this as a pentagon intersection diagram showing internal angle relationships."),
+			.describe(
+				"Identifies this as a pentagon intersection diagram showing internal angle relationships."
+			),
 		width: createWidthSchema(),
 		height: createHeightSchema(),
 		pentagonPoints: z
@@ -122,7 +140,9 @@ export const PentagonIntersectionDiagramPropsSchema = z
 		"Creates a regular pentagon with optional diagonal lines forming a pentagram (5-pointed star) pattern. Shows interior angles (108°) and star point angles (36°) with customizable arc markers. Essential for teaching polygon angle sums, symmetry, and golden ratio relationships in pentagons."
 	)
 
-export type PentagonIntersectionDiagramProps = z.infer<typeof PentagonIntersectionDiagramPropsSchema>
+export type PentagonIntersectionDiagramProps = z.infer<
+	typeof PentagonIntersectionDiagramPropsSchema
+>
 
 export const generatePentagonIntersectionDiagram: WidgetGenerator<
 	typeof PentagonIntersectionDiagramPropsSchema
@@ -223,7 +243,15 @@ export const generatePentagonIntersectionDiagram: WidgetGenerator<
 		const endY = arc.startY + arc.endDeltaY
 		const arcPath = new Path2D()
 			.moveTo(arc.startX, arc.startY)
-			.arcTo(arc.rx, arc.ry, arc.xAxisRotation, arc.largeArcFlag ? 1 : 0, arc.sweepFlag ? 1 : 0, endX, endY)
+			.arcTo(
+				arc.rx,
+				arc.ry,
+				arc.xAxisRotation,
+				arc.largeArcFlag ? 1 : 0,
+				arc.sweepFlag ? 1 : 0,
+				endX,
+				endY
+			)
 		canvas.drawPath(arcPath, {
 			fill: "none",
 			stroke: arc.color,
@@ -237,8 +265,10 @@ export const generatePentagonIntersectionDiagram: WidgetGenerator<
 
 		// Calculate the perpendicular direction outward from the arc
 		// This is perpendicular to the line from start to end of arc
-		const perpX = -arc.endDeltaY / Math.sqrt(arc.endDeltaX * arc.endDeltaX + arc.endDeltaY * arc.endDeltaY)
-		const perpY = arc.endDeltaX / Math.sqrt(arc.endDeltaX * arc.endDeltaX + arc.endDeltaY * arc.endDeltaY)
+		const perpX =
+			-arc.endDeltaY / Math.sqrt(arc.endDeltaX * arc.endDeltaX + arc.endDeltaY * arc.endDeltaY)
+		const perpY =
+			arc.endDeltaX / Math.sqrt(arc.endDeltaX * arc.endDeltaX + arc.endDeltaY * arc.endDeltaY)
 
 		// Position label just outside the arc edge (radius + small offset) if label exists
 		if (arc.label) {
@@ -264,7 +294,13 @@ export const generatePentagonIntersectionDiagram: WidgetGenerator<
 	}
 
 	// NEW: Finalize the canvas and construct the root SVG element
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(PADDING)
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}">${svgBody}</svg>`
 }

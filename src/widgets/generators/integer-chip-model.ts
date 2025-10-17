@@ -25,11 +25,15 @@ export const IntegerChipModelPropsSchema = z
 			.describe("Sequence of chips in render order; 'crossedOut' draws an X overlay.")
 	})
 	.strict()
-	.describe("Displays positive (yellow) and negative (red) integer chips to visualize integer arithmetic.")
+	.describe(
+		"Displays positive (yellow) and negative (red) integer chips to visualize integer arithmetic."
+	)
 
 export type IntegerChipModelProps = z.infer<typeof IntegerChipModelPropsSchema>
 
-export const generateIntegerChipModel: WidgetGenerator<typeof IntegerChipModelPropsSchema> = async (props) => {
+export const generateIntegerChipModel: WidgetGenerator<typeof IntegerChipModelPropsSchema> = async (
+	props
+) => {
 	const { width, height, chips } = props
 
 	const chipRadius = 24

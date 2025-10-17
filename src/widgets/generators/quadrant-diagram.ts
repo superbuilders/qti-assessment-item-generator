@@ -12,11 +12,15 @@ export const QuadrantDiagramPropsSchema = z
 		height: createHeightSchema()
 	})
 	.strict()
-	.describe("Generates a basic quadrant diagram with labeled axes (x and y) and labeled quadrants (I, II, III, IV).")
+	.describe(
+		"Generates a basic quadrant diagram with labeled axes (x and y) and labeled quadrants (I, II, III, IV)."
+	)
 
 export type QuadrantDiagramProps = z.infer<typeof QuadrantDiagramPropsSchema>
 
-export const generateQuadrantDiagram: WidgetGenerator<typeof QuadrantDiagramPropsSchema> = async (props) => {
+export const generateQuadrantDiagram: WidgetGenerator<typeof QuadrantDiagramPropsSchema> = async (
+	props
+) => {
 	const { width, height } = props
 
 	const canvas = new CanvasImpl({
@@ -112,7 +116,13 @@ export const generateQuadrantDiagram: WidgetGenerator<typeof QuadrantDiagramProp
 		...labelOptions
 	})
 
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(PADDING)
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}">${svgBody}</svg>`
 }

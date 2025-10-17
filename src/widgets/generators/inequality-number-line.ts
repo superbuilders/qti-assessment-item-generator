@@ -49,12 +49,16 @@ function createStartSchema() {
 		z
 			.object({
 				type: z.literal("bounded").describe("The range has a defined starting point."),
-				at: createBoundarySchema().describe("The starting boundary with its value and open/closed type.")
+				at: createBoundarySchema().describe(
+					"The starting boundary with its value and open/closed type."
+				)
 			})
 			.strict(),
 		z
 			.object({
-				type: z.literal("unbounded").describe("The range extends infinitely to the left (negative infinity).")
+				type: z
+					.literal("unbounded")
+					.describe("The range extends infinitely to the left (negative infinity).")
 			})
 			.strict()
 	])
@@ -65,12 +69,16 @@ function createEndSchema() {
 		z
 			.object({
 				type: z.literal("bounded").describe("The range has a defined ending point."),
-				at: createBoundarySchema().describe("The ending boundary with its value and open/closed type.")
+				at: createBoundarySchema().describe(
+					"The ending boundary with its value and open/closed type."
+				)
 			})
 			.strict(),
 		z
 			.object({
-				type: z.literal("unbounded").describe("The range extends infinitely to the right (positive infinity).")
+				type: z
+					.literal("unbounded")
+					.describe("The range extends infinitely to the right (positive infinity).")
 			})
 			.strict()
 	])
@@ -115,7 +123,9 @@ export const InequalityNumberLinePropsSchema = z
 		tickInterval: z
 			.number()
 			.positive()
-			.describe("Spacing between tick marks (e.g., 1, 2, 0.5). Should evenly divide the range for clean appearance."),
+			.describe(
+				"Spacing between tick marks (e.g., 1, 2, 0.5). Should evenly divide the range for clean appearance."
+			),
 		ranges: z
 			.array(createRangeSchema())
 			.describe(
@@ -133,7 +143,9 @@ export type InequalityNumberLineProps = z.infer<typeof InequalityNumberLineProps
  * Generates an SVG number line to graph the solution set of single or compound inequalities,
  * using open/closed circles and shaded regions to represent the solution.
  */
-export const generateInequalityNumberLine: WidgetGenerator<typeof InequalityNumberLinePropsSchema> = async (data) => {
+export const generateInequalityNumberLine: WidgetGenerator<
+	typeof InequalityNumberLinePropsSchema
+> = async (data) => {
 	const { width, height, min, max, tickInterval, ranges } = data
 	const chartWidth = width - 2 * PADDING
 	const yPos = height / 2
@@ -234,7 +246,13 @@ export const generateInequalityNumberLine: WidgetGenerator<typeof InequalityNumb
 	}
 
 	// NEW: Finalize the canvas and construct the root SVG element
-	const { svgBody, vbMinX, vbMinY, width: finalWidth, height: finalHeight } = canvas.finalize(PADDING)
+	const {
+		svgBody,
+		vbMinX,
+		vbMinY,
+		width: finalWidth,
+		height: finalHeight
+	} = canvas.finalize(PADDING)
 
 	return `<svg width="${finalWidth}" height="${finalHeight}" viewBox="${vbMinX} ${vbMinY} ${finalWidth} ${finalHeight}" xmlns="http://www.w3.org/2000/svg" font-family="${theme.font.family.sans}" font-size="${theme.font.size.base}">${svgBody}</svg>`
 }
