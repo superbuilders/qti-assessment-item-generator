@@ -9,13 +9,11 @@ export const fractionModelDiagramExamples: FractionModelDiagramProps[] = [
 		shapes: [
 			{
 				numerator: 3,
-				denominator: 4,
-				color: "#4285F4"
+				denominator: 4
 			},
 			{
 				numerator: 1,
-				denominator: 4,
-				color: "#FF6B6B"
+				denominator: 4
 			}
 		],
 		operators: ["="]
@@ -28,13 +26,11 @@ export const fractionModelDiagramExamples: FractionModelDiagramProps[] = [
 		shapes: [
 			{
 				numerator: 2,
-				denominator: 3,
-				color: "#34A853"
+				denominator: 3
 			},
 			{
 				numerator: 4,
-				denominator: 6,
-				color: "#FFD93D"
+				denominator: 6
 			}
 		],
 		operators: ["="]
@@ -47,18 +43,15 @@ export const fractionModelDiagramExamples: FractionModelDiagramProps[] = [
 		shapes: [
 			{
 				numerator: 1,
-				denominator: 3,
-				color: "#9C27B0"
+				denominator: 3
 			},
 			{
 				numerator: 1,
-				denominator: 4,
-				color: "#FF5722"
+				denominator: 4
 			},
 			{
 				numerator: 3,
-				denominator: 4,
-				color: "#607D8B"
+				denominator: 4
 			}
 		],
 		operators: ["+", "="]

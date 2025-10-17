@@ -4,10 +4,11 @@ import { z } from "zod"
 import type { WidgetGenerator } from "@/widgets/types"
 import { CanvasImpl } from "@/widgets/utils/canvas-impl"
 import { PADDING } from "@/widgets/utils/constants"
-import { CSS_COLOR_PATTERN } from "@/widgets/utils/css-color"
 import { Path2D } from "@/widgets/utils/path-builder"
 import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
 import { theme } from "@/widgets/utils/theme"
+
+const SHADED_COLOR = "#3b82f6"
 
 // Defines the geometric shape used to model the fractions.
 const ShapeTypeEnum = z
@@ -36,11 +37,7 @@ function createPartitionedShapeSchema() {
 				.positive()
 				.describe(
 					"The total number of equal pieces the shape is divided into."
-				),
-			color: z
-				.string()
-				.regex(CSS_COLOR_PATTERN, "invalid css color")
-				.describe("The fill color for the shaded pieces.")
+				)
 		})
 		.strict()
 }
@@ -124,7 +121,7 @@ export const generateFractionModelDiagram: WidgetGenerator<
 		r: number,
 		fraction: z.infer<ReturnType<typeof createPartitionedShapeSchema>>
 	) => {
-		const { numerator, denominator, color } = fraction
+		const { numerator, denominator } = fraction
 		const numSides = denominator // For polygons, sides often equal denominator.
 		const vertices = []
 		const angleOffset = -Math.PI / 2 // Start from top
@@ -147,7 +144,7 @@ export const generateFractionModelDiagram: WidgetGenerator<
 				.closePath()
 			const isShaded = i < numerator
 			canvas.drawPath(path, {
-				fill: isShaded ? color : "none",
+				fill: isShaded ? SHADED_COLOR : "none",
 				fillOpacity: 0.3,
 				stroke: theme.colors.black,
 				strokeWidth: theme.stroke.width.base
@@ -166,7 +163,7 @@ export const generateFractionModelDiagram: WidgetGenerator<
 		r: number,
 		fraction: z.infer<ReturnType<typeof createPartitionedShapeSchema>>
 	) => {
-		const { numerator, denominator, color } = fraction
+		const { numerator, denominator } = fraction
 		const angleStep = 360 / denominator
 		let currentAngle = -90
 
@@ -191,7 +188,7 @@ export const generateFractionModelDiagram: WidgetGenerator<
 
 			const isShaded = i < numerator
 			canvas.drawPath(path, {
-				fill: isShaded ? color : "none",
+				fill: isShaded ? SHADED_COLOR : "none",
 				fillOpacity: 0.3,
 				stroke: theme.colors.black,
 				strokeWidth: theme.stroke.width.base
@@ -206,7 +203,7 @@ export const generateFractionModelDiagram: WidgetGenerator<
 		r: number,
 		fraction: z.infer<ReturnType<typeof createPartitionedShapeSchema>>
 	) => {
-		const { numerator, denominator, color } = fraction
+		const { numerator, denominator } = fraction
 		const boxSize = r * 2
 		const boxX = cx - r
 		const boxY = cy - r
@@ -215,7 +212,7 @@ export const generateFractionModelDiagram: WidgetGenerator<
 		for (let i = 0; i < denominator; i++) {
 			const isShaded = i < numerator
 			canvas.drawRect(boxX, boxY + i * barHeight, boxSize, barHeight, {
-				fill: isShaded ? color : "none",
+				fill: isShaded ? SHADED_COLOR : "none",
 				fillOpacity: 0.3,
 				stroke: theme.colors.black,
 				strokeWidth: theme.stroke.width.base
