@@ -38,7 +38,10 @@ async function collectCourseInfo(): Promise<{ title: string; subject: string }> 
 		.filter((name) => !name.startsWith("_") && name.trim().length > 0)
 
 	if (candidates.length !== 1) {
-		logger.error("expected exactly one course directory in canvas-scrape", { count: candidates.length, entries: candidates })
+		logger.error("expected exactly one course directory in canvas-scrape", {
+			count: candidates.length,
+			entries: candidates
+		})
 		throw errors.new("invalid canvas-scrape layout")
 	}
 	const title = candidates[0]
@@ -49,9 +52,7 @@ async function collectCourseInfo(): Promise<{ title: string; subject: string }> 
 
 function slugifyName(name: string): string {
 	const withoutApostrophes = name.replace(/[’']/g, "")
-	return withoutApostrophes
-		.toLowerCase()
-		.replace(/[^a-z0-9-]+/g, "-")
+	return withoutApostrophes.toLowerCase().replace(/[^a-z0-9-]+/g, "-")
 }
 
 async function collectPrettyMaps(courseTitle: string): Promise<{
@@ -94,7 +95,6 @@ async function collectPrettyMaps(courseTitle: string): Promise<{
 	}
 	return { unitTitleBySlug, lessonTitleByGroupAndSlug }
 }
-
 
 function numericTokens(str: string): number[] {
 	const tokens: number[] = []
@@ -310,9 +310,10 @@ async function buildAssessment(sourceDir: string, destRelBase: string): Promise<
 // Hierarchical Index Construction (Units → Lessons → Resources)
 // ----------------------
 
-type ArticleResource = { id: string; type: "article"; path: string }
+type ArticleResource = { id: string; title: string; type: "article"; path: string }
 type QuizResource = {
 	id: string
+	title: string
 	type: "quiz"
 	path: string
 	questionCount: number
@@ -327,6 +328,7 @@ type LessonRecord = {
 }
 type UnitTestRecord = {
 	id: string
+	title: string
 	path: string
 	questionCount: number
 	questions: Array<z.infer<typeof IndexQuestionSchema>>
@@ -389,18 +391,19 @@ function buildHierarchy(
 		}
 		for (const p of g.pages) {
 			const { lessonId, lessonNumber } = toLessonId(unitNum, p.slug)
+			const prettyLessonTitle = pretty.lessonTitleByGroupAndSlug[g.group]?.[p.slug]
+			if (!prettyLessonTitle) {
+				logger.error("missing pretty lesson title", { groupSlug: g.group, pageSlug: p.slug })
+				throw errors.new("missing pretty lesson title")
+			}
 			let lesson = unit.lessons.find((l) => l.lessonId === lessonId)
 			if (!lesson) {
-				const prettyLessonTitle = pretty.lessonTitleByGroupAndSlug[g.group]?.[p.slug]
-				if (!prettyLessonTitle) {
-					logger.error("missing pretty lesson title", { groupSlug: g.group, pageSlug: p.slug })
-					throw errors.new("missing pretty lesson title")
-				}
 				lesson = { unitId, lessonId, lessonNumber, title: prettyLessonTitle, resources: [] }
 				unit.lessons.push(lesson)
 			}
 			lesson.resources.push({
 				id: `article-${g.group}-${p.slug}`.replace(/[^a-z0-9-]/g, "-"),
+				title: prettyLessonTitle,
 				type: "article",
 				path: p.path
 			})
@@ -414,10 +417,11 @@ function buildHierarchy(
 		const unitNum = Number(m[1])
 		const lessonNum = Number(m[2])
 		const unitId = `unit-${unitNum}`
+		const unitSlugKey = Object.keys(pretty.unitTitleBySlug).find((k) => k.startsWith(`unit-${unitNum}`))
+		const prettyUnitTitle = unitSlugKey ? pretty.unitTitleBySlug[unitSlugKey] : undefined
+		const lessonMap = unitSlugKey ? pretty.lessonTitleByGroupAndSlug[unitSlugKey] : undefined
 		let unit = unitsMap.get(unitId)
 		if (!unit) {
-			const unitSlugKey = Object.keys(pretty.unitTitleBySlug).find((k) => k.startsWith(`unit-${unitNum}`))
-			const prettyUnitTitle = unitSlugKey ? pretty.unitTitleBySlug[unitSlugKey] : undefined
 			if (!prettyUnitTitle) {
 				logger.error("missing pretty unit title for injected unit", { unitNum })
 				throw errors.new("missing pretty unit title")
@@ -427,20 +431,30 @@ function buildHierarchy(
 		}
 		let lesson = unit.lessons.find((l) => l.lessonNumber === lessonNum)
 		if (!lesson) {
-			const unitSlugKey = Object.keys(pretty.unitTitleBySlug).find((k) => k.startsWith(`unit-${unitNum}`))
-			const lessonMap = unitSlugKey ? pretty.lessonTitleByGroupAndSlug[unitSlugKey] : undefined
 			const targetPrefix = `${unitNum}-${lessonNum}-`
 			const pageKey = lessonMap ? Object.keys(lessonMap).find((k) => k.startsWith(targetPrefix)) : undefined
-			const prettyLessonTitle = pageKey ? lessonMap![pageKey] : undefined
+			const prettyLessonTitle = pageKey ? lessonMap?.[pageKey] : undefined
 			if (!prettyLessonTitle) {
 				logger.error("missing pretty lesson title for injected lesson", { unitNum, lessonNum })
 				throw errors.new("missing pretty lesson title")
 			}
-			lesson = { unitId, lessonId: `lesson-${unitNum}-${lessonNum}`, lessonNumber: lessonNum, title: prettyLessonTitle, resources: [] }
+			lesson = {
+				unitId,
+				lessonId: `lesson-${unitNum}-${lessonNum}`,
+				lessonNumber: lessonNum,
+				title: prettyLessonTitle,
+				resources: []
+			}
 			unit.lessons.push(lesson)
+		}
+		const quizTitle = lessonMap?.[q.id]
+		if (!quizTitle) {
+			logger.error("missing pretty quiz title", { unitNum, lessonNum, quizId: q.id })
+			throw errors.new("missing pretty quiz title")
 		}
 		lesson.resources.push({
 			id: q.id,
+			title: quizTitle,
 			type: "quiz",
 			path: q.path,
 			questionCount: q.questions.length,
@@ -454,12 +468,30 @@ function buildHierarchy(
 		if (!m) continue
 		const unitNum = Number(m[1])
 		const unitId = `unit-${unitNum}`
+		const unitSlugKey = Object.keys(pretty.unitTitleBySlug).find((k) => k.startsWith(`unit-${unitNum}`))
+		const prettyUnitTitle = unitSlugKey ? pretty.unitTitleBySlug[unitSlugKey] : undefined
 		let unit = unitsMap.get(unitId)
 		if (!unit) {
-			unit = { unitId, unitNumber: unitNum, title: `unit-${unitNum}`, lessons: [] }
+			if (!prettyUnitTitle) {
+				logger.error("missing pretty unit title for unit test", { unitNum })
+				throw errors.new("missing pretty unit title")
+			}
+			unit = { unitId, unitNumber: unitNum, title: prettyUnitTitle, lessons: [] }
 			unitsMap.set(unitId, unit)
 		}
-		unit.unitTest = { id: t.id, path: t.path, questionCount: t.questions.length, questions: t.questions }
+		const lessonMap = unitSlugKey ? pretty.lessonTitleByGroupAndSlug[unitSlugKey] : undefined
+		const prettyTestTitle = lessonMap ? lessonMap[t.id] : undefined
+		if (!prettyTestTitle) {
+			logger.error("missing pretty unit test title", { unitNum, testId: t.id })
+			throw errors.new("missing pretty unit test title")
+		}
+		unit.unitTest = {
+			id: t.id,
+			title: prettyTestTitle,
+			path: t.path,
+			questionCount: t.questions.length,
+			questions: t.questions
+		}
 	}
 
 	// Sort lessons within units
@@ -494,11 +526,11 @@ async function main() {
 		throw errors.new("data directory not found")
 	}
 
-logger.info("collecting course metadata")
-const course = await collectCourseInfo()
-const prettyMaps = await collectPrettyMaps(course.title)
+	logger.info("collecting course metadata")
+	const course = await collectCourseInfo()
+	const prettyMaps = await collectPrettyMaps(course.title)
 
-logger.info("collecting stimulus content")
+	logger.info("collecting stimulus content")
 	const contentGroups = await collectStimulus()
 
 	logger.info("collecting assessments")
@@ -507,7 +539,7 @@ logger.info("collecting stimulus content")
 	logger.info("collecting file paths for on-disk staging")
 
 	// Build hierarchical Units → Lessons → Resources, and write split JSON files
-const hierarchy = buildHierarchy(contentGroups, assessments, prettyMaps)
+	const hierarchy = buildHierarchy(contentGroups, assessments, prettyMaps)
 
 	// Convert UnitRecord (staging view) to BuildUnit (builder schema) shape
 	const buildUnits: BuildUnit[] = hierarchy.map((u) => ({
@@ -568,8 +600,8 @@ const hierarchy = buildHierarchy(contentGroups, assessments, prettyMaps)
 		}
 	}
 
-    logger.info("building zstd-compressed cartridge (tar.zst) via on-disk staging")
-    await buildCartridgeFromFileMap({ generator, course, units: buildUnits, files: fileMap }, OUT_CARTRIDGE)
+	logger.info("building zstd-compressed cartridge (tar.zst) via on-disk staging")
+	await buildCartridgeFromFileMap({ generator, course, units: buildUnits, files: fileMap }, OUT_CARTRIDGE)
 	logger.info("package export complete", { cartridge: OUT_CARTRIDGE, compression: "zstd" })
 }
 

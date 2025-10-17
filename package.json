@@ -1,6 +1,6 @@
 {
 	"name": "@superbuilders/qti-assessment-item-generator",
-	"version": "4.2.4",
+	"version": "4.3.0",
 	"description": "QTI 3.0 assessment item generator (compiler + AI pipeline)",
 	"type": "module",
 	"files": [
@@ -128,30 +128,30 @@
 		"./core/item": {
 			"types": "./dist/src/core/item/index.d.ts",
 			"import": "./dist/src/core/item/index.js"
-      },
-      "./cartridge/readers/tarzst": {
-        "types": "./dist/src/cartridge/readers/tarzst.d.ts",
-        "import": "./dist/src/cartridge/readers/tarzst.js"
-      },
-      "./cartridge/client": {
-        "types": "./dist/src/cartridge/client.d.ts",
-        "import": "./dist/src/cartridge/client.js"
-      },
-      "./cartridge/types": {
-        "types": "./dist/src/cartridge/types.d.ts",
-        "import": "./dist/src/cartridge/types.js"
-      },
-      "./cartridge/reader": {
-        "types": "./dist/src/cartridge/reader.d.ts",
-        "import": "./dist/src/cartridge/reader.js"
-      },
-      "./cartridge/schema": {
-        "types": "./dist/src/cartridge/schema.d.ts",
-        "import": "./dist/src/cartridge/schema.js"
-      },
-      "./cartridge/build/builder": {
-        "types": "./dist/src/cartridge/build/builder.d.ts",
-        "import": "./dist/src/cartridge/build/builder.js"
-      }
+		},
+		"./cartridge/readers/tarzst": {
+			"types": "./dist/src/cartridge/readers/tarzst.d.ts",
+			"import": "./dist/src/cartridge/readers/tarzst.js"
+		},
+		"./cartridge/client": {
+			"types": "./dist/src/cartridge/client.d.ts",
+			"import": "./dist/src/cartridge/client.js"
+		},
+		"./cartridge/types": {
+			"types": "./dist/src/cartridge/types.d.ts",
+			"import": "./dist/src/cartridge/types.js"
+		},
+		"./cartridge/reader": {
+			"types": "./dist/src/cartridge/reader.d.ts",
+			"import": "./dist/src/cartridge/reader.js"
+		},
+		"./cartridge/schema": {
+			"types": "./dist/src/cartridge/schema.d.ts",
+			"import": "./dist/src/cartridge/schema.js"
+		},
+		"./cartridge/build/builder": {
+			"types": "./dist/src/cartridge/build/builder.d.ts",
+			"import": "./dist/src/cartridge/build/builder.js"
+		}
 	}
 }

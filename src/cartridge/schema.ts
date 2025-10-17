@@ -8,11 +8,14 @@ export const QuestionRefSchema = z
 	})
 	.strict()
 
-export const ResourceArticleSchema = z.object({ id: z.string(), type: z.literal("article"), path: z.string() }).strict()
+export const ResourceArticleSchema = z
+	.object({ id: z.string(), title: z.string(), type: z.literal("article"), path: z.string() })
+	.strict()
 
 export const ResourceQuizSchema = z
 	.object({
 		id: z.string(),
+		title: z.string(),
 		type: z.literal("quiz"),
 		path: z.string(),
 		questionCount: z.number(),
@@ -50,6 +53,7 @@ export const UnitSchema = z
 		unitTest: z
 			.object({
 				id: z.string(),
+				title: z.string(),
 				path: z.string(),
 				questionCount: z.number(),
 				questions: z.array(QuestionRefSchema)

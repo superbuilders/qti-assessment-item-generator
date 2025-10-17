@@ -19,6 +19,7 @@ const CourseInfoSchema = z.object({ title: z.string(), subject: z.string() }).st
 const UnitTestSchema = z
 	.object({
 		id: z.string(),
+		title: z.string(),
 		path: z.string(),
 		questionCount: z.number(),
 		questions: z.array(QuestionRefSchema)
@@ -309,7 +310,7 @@ export async function buildCartridgeToFile(input: CartridgeBuildInput, outFile: 
 	}
 
 	// Reuse the validated build steps by calling buildCartridgeToBytes' preparation pieces
-async function writeEntries(): Promise<true> {
+	async function writeEntries(): Promise<true> {
 		// We duplicate minimal logic to avoid buffering the whole archive
 		const inputValidation = CartridgeBuildInputSchema.safeParse(input)
 		if (!inputValidation.success) {
@@ -473,7 +474,12 @@ async function copyWithHash(src: string, dest: string): Promise<{ size: number; 
 }
 
 export async function buildCartridgeFromFileMap(
-	plan: { generator: GeneratorInfo; course: { title: string; subject: string }; units: BuildUnit[]; files: CartridgeFileMap },
+	plan: {
+		generator: GeneratorInfo
+		course: { title: string; subject: string }
+		units: BuildUnit[]
+		files: CartridgeFileMap
+	},
 	outFile: string
 ): Promise<void> {
 	// Validate plan

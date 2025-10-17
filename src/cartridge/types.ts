@@ -1,7 +1,8 @@
-export type ResourceArticle = { id: string; type: "article"; path: string }
+export type ResourceArticle = { id: string; title: string; type: "article"; path: string }
 export type QuestionRef = { number: number; xml: string; json: string }
 export type ResourceQuiz = {
 	id: string
+	title: string
 	type: "quiz"
 	path: string
 	questionCount: number
@@ -17,7 +18,7 @@ export type Lesson = {
 	resources: Array<ResourceArticle | ResourceQuiz>
 }
 
-export type UnitTest = { id: string; path: string; questionCount: number; questions: QuestionRef[] }
+export type UnitTest = { id: string; title: string; path: string; questionCount: number; questions: QuestionRef[] }
 
 export type Unit = {
 	id: string
