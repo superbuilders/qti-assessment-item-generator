@@ -244,7 +244,7 @@ WRONG (angle diagram with answer label):
 CORRECT (angle diagram without answer):
 \`{
   "angle_diagram": {
-    "type": "angleDiagram", 
+    "type": "angleDiagram",
     "angles": [{
         "label": null,  // ✅ CORRECT: No label revealing the answer
       "vertices": ["E", "A", "F"],
@@ -279,6 +279,160 @@ CORRECT (triangle diagram without revealing labels):
     }]
   }
 }\`
+
+**Duplicate Choice Visuals BANNED (Every Option Must Be Distinct):**
+When a single interaction uses multiple widget-driven visuals, each choice MUST present a unique configuration. Our rule is simple: **no two answers should be the same**. Duplicated visuals make the task impossible because students cannot distinguish options. Never reuse the same orientation, measure, or state across choices, especially for geometry diagrams or measurement tools like protractors.
+
+WRONG (three identical protractor widgets—students cannot tell the choices apart):
+\`\`\`json
+{
+  "identifier": "angles-not-right-multiselect",
+  "title": "Identify angles that are not right angles",
+  "responseDeclarations": [
+    {
+      "identifier": "RESPONSE",
+      "cardinality": "multiple",
+      "baseType": "identifier",
+      "correct": ["A", "C"]
+    }
+  ],
+  "body": [
+    { "type": "interactionRef", "interactionId": "choice_interaction" }
+  ],
+  "interactions": {
+    "choice_interaction": {
+      "type": "choiceInteraction",
+      "responseIdentifier": "RESPONSE",
+      "prompt": [
+        { "type": "text", "content": "Which angles appear not to have a measure of " },
+        { "type": "math", "mathml": "<mn>90</mn><mo>°</mo>" },
+        { "type": "text", "content": "? Select all that apply." }
+      ],
+      "choices": [
+        {
+          "identifier": "A",
+          "content": [
+            {
+              "type": "widgetRef",
+              "widgetId": "repl__choice_interaction__choice__a__visual__0",
+              "widgetType": "protractorAngleDiagram"
+            }
+          ]
+        },
+        {
+          "identifier": "B",
+          "content": [
+            {
+              "type": "widgetRef",
+              "widgetId": "repl__choice_interaction__choice__b__visual__0",
+              "widgetType": "protractorAngleDiagram"
+            }
+          ]
+        },
+        {
+          "identifier": "C",
+          "content": [
+            {
+              "type": "widgetRef",
+              "widgetId": "repl__choice_interaction__choice__c__visual__0",
+              "widgetType": "protractorAngleDiagram"
+            }
+          ]
+        },
+        {
+          "identifier": "D",
+          "content": [
+            {
+              "type": "widgetRef",
+              "widgetId": "repl__choice_interaction__choice__d__visual__0",
+              "widgetType": "protractorAngleDiagram"
+            }
+          ]
+        },
+        {
+          "identifier": "E",
+          "content": [
+            {
+              "type": "widgetRef",
+              "widgetId": "repl__choice_interaction__choice__e__visual__0",
+              "widgetType": "protractorAngleDiagram"
+            }
+          ]
+        }
+      ],
+      "shuffle": true,
+      "minChoices": 2,
+      "maxChoices": 2
+    }
+  },
+  "widgets": {
+    "repl__choice_interaction__choice__a__visual__0": {
+      "type": "protractorAngleDiagram",
+      "width": 380,
+      "height": 380,
+      "startingReading": 0,
+      "angleDegrees": 60
+    },
+    "repl__choice_interaction__choice__b__visual__0": {
+      "type": "protractorAngleDiagram",
+      "width": 380,
+      "height": 380,
+      "startingReading": 0,
+      "angleDegrees": 90
+    },
+    "repl__choice_interaction__choice__c__visual__0": {
+      "type": "protractorAngleDiagram",
+      "width": 380,
+      "height": 380,
+      "startingReading": 0,
+      "angleDegrees": 120
+    },
+    "repl__choice_interaction__choice__d__visual__0": {
+      "type": "protractorAngleDiagram",
+      "width": 380,
+      "height": 380,
+      "startingReading": 0,
+      "angleDegrees": 90
+    },
+    "repl__choice_interaction__choice__e__visual__0": {
+      "type": "protractorAngleDiagram",
+      "width": 380,
+      "height": 380,
+      "startingReading": 0,
+      "angleDegrees": 90
+    }
+  }
+}
+\`\`\`
+
+CORRECT (each protractor shows a distinct angle, so students can evaluate the choices):
+\`\`\`json
+{
+  "widgets": {
+    "choice_a_visual": {
+      "type": "protractorAngleDiagram",
+      "width": 380,
+      "height": 380,
+      "startingReading": 0,
+      "angleDegrees": 55
+    },
+    "choice_b_visual": {
+      "type": "protractorAngleDiagram",
+      "width": 380,
+      "height": 380,
+      "startingReading": 0,
+      "angleDegrees": 90
+    },
+    "choice_c_visual": {
+      "type": "protractorAngleDiagram",
+      "width": 380,
+      "height": 380,
+      "startingReading": 0,
+      "angleDegrees": 125
+    }
+  }
+}
+\`\`\`
 
 **CRITICAL: Missing Essential Widget Data BANNED:**
 WRONG (triangle with missing side labels that are needed for the question):
