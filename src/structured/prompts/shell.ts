@@ -1,6 +1,4 @@
 // imports kept minimal in this module; errors/logging handled by callers
-import type { AssessmentItemInput } from "@/core/item"
-import { allExamples } from "@/examples"
 import { caretBanPromptSection } from "@/structured/prompts/caret"
 import {
 	createWidgetSelectionPromptSection,
@@ -11,26 +9,7 @@ import { createMathmlComplianceSection } from "@/structured/prompts/shared/mathm
 // Note: do not validate example shells here; examples are illustrative only
 // import { createAssessmentItemShellSchema } from "@core/item"
 import type { AiContextEnvelope, ImageContext } from "@/structured/types"
-import type {
-	WidgetCollection,
-	WidgetDefinition
-} from "@/widgets/collections/types"
-
-// Helper to convert a full AssessmentItemInput into a shell for prompt examples
-function createShellFromExample<const E extends readonly string[]>(
-	item: AssessmentItemInput<E>
-) {
-	// The shell now derives widget/interaction usage from refs in content.
-	// Do NOT include legacy 'widgets' or 'interactions' arrays.
-	const shell = {
-		identifier: item.identifier,
-		title: item.title,
-		responseDeclarations: item.responseDeclarations,
-		body: item.body ?? null
-	}
-	// Intentionally skip validation: examples are for guidance and must not block prompts
-	return shell
-}
+import type { WidgetCollection, WidgetDefinition } from "@/widgets/collections/types"
 
 export function createAssessmentShellPrompt<
 	C extends WidgetCollection<
@@ -473,7 +452,7 @@ Positive example — comprehensive, educationally valuable feedback:
 Transform basic source feedback into rich teaching moments:
 - If source says: "Correct! The answer is 12."
 - You create: Multi-paragraph explanation with visual representations, real-world connections, mathematical reasoning, and extension challenges
-- If source says: "Wrong. Try again."  
+- If source says: "Wrong. Try again."
 - You create: Empathetic acknowledgment, specific misconception identification, step-by-step remediation, visual aids, memory tricks, and encouraging next steps
 
 **Feedback Writing Guidelines**:
@@ -553,7 +532,7 @@ ${supportedInteractionTypes}
 - Example: left=["solar", "orbit", "immense"], right=["The rocket uses ___ power", "Moon's ___ around Earth"]
 
 **For gapMatchInteraction:**
-1) Create an interaction slot with type "gapMatchInteraction" 
+1) Create an interaction slot with type "gapMatchInteraction"
 2) Each gap in text gets a unique identifier (GAP_1, GAP_2, etc.)
 3) Each draggable item gets an identifier (WORD_SOLAR, TERM_1, etc.)
 4) Embed all sentence text and gaps INSIDE the gapMatchInteraction's "content" array. For each blank, insert an inline item { "type": "gap", "gapId": "GAP_*" }. Do not place gap placeholders in the top-level body.
@@ -587,7 +566,7 @@ ${supportedInteractionTypes}
           [{ "type": "inlineInteractionRef", "interactionId": "dropdown_2" }]
         ]
       ],
-      
+
     }
   ],
   "interactions": ["dropdown_1", "dropdown_2"],
@@ -754,7 +733,7 @@ ${supportedInteractionTypes}
       ]
     },
     {
-      "identifier": "INCORRECT", 
+      "identifier": "INCORRECT",
       "outcomeIdentifier": "FEEDBACK__RESPONSE_TEXT",
       "content": [
         {
@@ -820,19 +799,19 @@ ${supportedInteractionTypes}
   "feedbackBlocks": [
     {
       "identifier": "CORRECT",
-      "outcomeIdentifier": "FEEDBACK__RESPONSE_TEXT", 
+      "outcomeIdentifier": "FEEDBACK__RESPONSE_TEXT",
       "content": [
-        { 
-          "type": "paragraph", 
+        {
+          "type": "paragraph",
           "content": [
             { "type": "text", "content": "Excellent work! You successfully matched all the vocabulary words to their correct sentences, demonstrating strong understanding of context clues and word meanings." }
-          ] 
+          ]
         },
-        { 
-          "type": "paragraph", 
+        {
+          "type": "paragraph",
           "content": [
             { "type": "text", "content": "This vocabulary knowledge will help you understand more complex science and literature texts!" }
-          ] 
+          ]
         }
       ]
     },
@@ -840,11 +819,11 @@ ${supportedInteractionTypes}
       "identifier": "INCORRECT",
       "outcomeIdentifier": "FEEDBACK__RESPONSE_TEXT",
       "content": [
-        { 
-          "type": "paragraph", 
+        {
+          "type": "paragraph",
           "content": [
             { "type": "text", "content": "Let's review the correct answers and learn about these fascinating space vocabulary words together!" }
-          ] 
+          ]
         },
         {
           "type": "paragraph",
@@ -859,7 +838,7 @@ ${supportedInteractionTypes}
 	\`\`\`
 
 	**CRITICAL EXAMPLE - Mixed Number Representation with gapMatchInteraction:**
-	
+
 	**WRONG - Ambiguous presentation without clear labels:**
 	\`\`\`json
 	{
@@ -884,7 +863,7 @@ ${supportedInteractionTypes}
 	  }
 	}
 	\`\`\`
-	
+
 	**CORRECT - Clean presentation with clear separation:**
 	\`\`\`json
 	{
@@ -920,14 +899,14 @@ ${supportedInteractionTypes}
 	  }
 	}
 	\`\`\`
-	
+
 	**Why this is better than the ambiguous version:**
 	- The plus sign (+) clearly shows this is addition, not multiplication
 	- Clean visual separation between whole number and fraction
 	- The prompt text reinforces that there are "whole number and fraction parts"
 	- No distracting labels cluttering the interface
 	- The forward slash will render as a proper vertical fraction in the display
-	
+
 	**Remember:** gapMatchInteraction is excellent for structured input, but the presentation must be crystal clear about what each gap represents. Always provide explicit labels and visual cues to guide students.
 
 	Reference QTI outcome (result of compilation):
@@ -992,7 +971,7 @@ Example mapping for the provided sample:
 - Correct mapping: per row, the right choice matching the left formula's compound name
 
 ABSOLUTE REQUIREMENT: SLOT CONSISTENCY.
-This is the most critical rule. Any slot you include in the 'body' MUST have its slotId listed in either the 'widgets' array or the 'interactions' array. Additionally, any widget slot (blockSlot) used inside 'feedbackBlocks' MUST also have its slotId listed in the 'widgets' array (feedback never contains interactions). 
+This is the most critical rule. Any slot you include in the 'body' MUST have its slotId listed in either the 'widgets' array or the 'interactions' array. Additionally, any widget slot (blockSlot) used inside 'feedbackBlocks' MUST also have its slotId listed in the 'widgets' array (feedback never contains interactions).
 
 **EXCEPTION for Choice-Level Visuals:** Widget slots declared for use in interaction choices (following patterns like \`choice_a_visual\`, \`graph_choice_b\`, etc.) are declared in the \`widgets\` array but NOT placed in the body. This includes:
 - Widgets for multiple choice options when converting unsupported interactive widgets
@@ -1244,7 +1223,7 @@ CORRECT shell structure:
 \`\`\`json
 {
   "interactions": {
-    "equation_entry": { 
+    "equation_entry": {
       "type": "textEntryInteraction",  // ❌ WRONG - equations must be multiple choice
       "responseIdentifier": "equation_entry",
       "expectedLength": 16
@@ -1462,7 +1441,7 @@ This is a mandatory step for all questions involving a \`textEntryInteraction\`.
     },
     {
       "identifier": "INCORRECT",
-      "outcomeIdentifier": "FEEDBACK__RESPONSE_TEXT", 
+      "outcomeIdentifier": "FEEDBACK__RESPONSE_TEXT",
       "content": [
         {
           "type": "paragraph",
@@ -1523,7 +1502,7 @@ This is a mandatory step for all questions involving a \`textEntryInteraction\`.
       "outcomeIdentifier": "FEEDBACK__RESPONSE_TEXT",
       "content": [
         {
-          "type": "paragraph", 
+          "type": "paragraph",
           "content": [
             { "type": "text", "content": "Not quite. Please check your calculation." }
           ]
@@ -1569,9 +1548,6 @@ Currency symbols and amounts MUST NOT be represented as slots (widget or interac
 
 Any discrepancy will cause your output to be rejected. Review your work carefully to ensure the body's slots and the declaration arrays are perfectly synchronized.`
 
-	const validExamples = allExamples
-	const exampleShells = validExamples.map((ex) => createShellFromExample(ex))
-
 	const widgetSelectionSection =
 		createWidgetSelectionPromptSection(widgetCollection)
 
@@ -1580,14 +1556,6 @@ Any discrepancy will cause your output to be rejected. Review your work carefull
 ${formatUnifiedContextSections(envelope, imageContext)}
 
 ${widgetSelectionSection}
-
-## Target Shell Examples
-Below are examples of the exact 'shell' structure you must generate. Study them to understand the desired output format, especially how MathML is used and how widget/interaction slots are defined.
-
-\`\`\`json
-${JSON.stringify(exampleShells, null, 2)}
-\`\`\`
-
 
   ## CRITICAL Instructions:
 - **Strictly follow the MathML rules** in the system instructions.
@@ -1650,7 +1618,7 @@ ${JSON.stringify(exampleShells, null, 2)}
         "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Correct! Well done." }] }]
       },
       {
-        "identifier": "INCORRECT", 
+        "identifier": "INCORRECT",
         "outcomeIdentifier": "FEEDBACK__RESPONSE_TEXT",
         "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Not quite. Please review your answers." }] }]
       }
@@ -1681,7 +1649,7 @@ ${JSON.stringify(exampleShells, null, 2)}
         "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Correct! Well done." }] }]
       },
       {
-        "identifier": "INCORRECT", 
+        "identifier": "INCORRECT",
         "outcomeIdentifier": "FEEDBACK__RESPONSE_TEXT",
         "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Not quite. Please review your answers." }] }]
       }
@@ -1715,7 +1683,7 @@ ${JSON.stringify(exampleShells, null, 2)}
         "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Correct! Well done." }] }]
       },
       {
-        "identifier": "INCORRECT", 
+        "identifier": "INCORRECT",
         "outcomeIdentifier": "FEEDBACK__RESPONSE_TEXT",
         "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Not quite. Please review your answers." }] }]
       }
@@ -1749,7 +1717,7 @@ ${JSON.stringify(exampleShells, null, 2)}
         "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Correct! Well done." }] }]
       },
       {
-        "identifier": "INCORRECT", 
+        "identifier": "INCORRECT",
         "outcomeIdentifier": "FEEDBACK__RESPONSE_TEXT",
         "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Not quite. Please review your answers." }] }]
       }
@@ -1798,7 +1766,7 @@ ${JSON.stringify(exampleShells, null, 2)}
         "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Correct! Well done." }] }]
       },
       {
-        "identifier": "INCORRECT", 
+        "identifier": "INCORRECT",
         "outcomeIdentifier": "FEEDBACK__RESPONSE_TEXT",
         "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Not quite. Please review your answers." }] }]
       }
@@ -1832,7 +1800,7 @@ ${JSON.stringify(exampleShells, null, 2)}
         "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Correct! Well done." }] }]
       },
       {
-        "identifier": "INCORRECT", 
+        "identifier": "INCORRECT",
         "outcomeIdentifier": "FEEDBACK__RESPONSE_TEXT",
         "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Not quite. Please review your answers." }] }]
       }
@@ -1867,7 +1835,7 @@ ${JSON.stringify(exampleShells, null, 2)}
         "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Correct! Well done." }] }]
       },
       {
-        "identifier": "INCORRECT", 
+        "identifier": "INCORRECT",
         "outcomeIdentifier": "FEEDBACK__RESPONSE_TEXT",
         "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Not quite. Please review your answers." }] }]
       }
@@ -1902,7 +1870,7 @@ ${JSON.stringify(exampleShells, null, 2)}
         "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Correct! Well done." }] }]
       },
       {
-        "identifier": "INCORRECT", 
+        "identifier": "INCORRECT",
         "outcomeIdentifier": "FEEDBACK__RESPONSE_TEXT",
         "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Not quite. Please review your answers." }] }]
       }
@@ -2107,7 +2075,7 @@ ${JSON.stringify(exampleShells, null, 2)}
   }
   \`\`\`
   - **Numeric Answers Rule**: For text entry interactions, if the correct answer is a decimal that can be represented as a simple fraction (e.g., 0.5, 0.25), the 'correct' value in the response declaration should be a string representing that fraction (e.g., "1/2", "1/4"). This is to avoid forcing students to type decimals.
-  - **Cardinality Selection Rule**: 
+  - **Cardinality Selection Rule**:
    * Use "single" for most choice interactions (select one answer)
    * Use "multiple" for interactions allowing multiple selections
    * Use "ordered" ONLY when the sequence of choices matters (e.g., ranking, arranging steps)
@@ -2466,7 +2434,7 @@ When Perseus contains interactive widgets that require drawing, plotting, or man
   ],
   "responseDeclarations": [{
     "identifier": "RESPONSE",
-    "cardinality": "single", 
+    "cardinality": "single",
     "baseType": "identifier",
     "correct": "B"
   }]
@@ -2488,7 +2456,7 @@ When Perseus contains interactive widgets that require drawing, plotting, or man
 {
   "body": [
     { "type": "paragraph", "content": [{ "type": "text", "content": "A birdhouse hangs from a branch. The birdhouse is at rest." }] },
-    
+
     { "type": "paragraph", "content": [{ "type": "text", "content": "Which free-body diagram correctly labels the forces?" }] },
     { "type": "interactionRef", "interactionId": "fbd_choice" }
   ],
@@ -2592,7 +2560,7 @@ Perseus often calls interactive elements "widgets". You MUST correctly reclassif
 - **INTERACTIONS require USER INPUT** - ANY element that accepts user input MUST be an interaction
 - **EXCEPTION: TABLES ARE ALWAYS WIDGETS** - Even if a table contains input fields, the TABLE itself is ALWAYS a widget
 
-**ABSOLUTE RULE:** If a Perseus element requires ANY form of user input (typing, clicking, selecting, dragging, etc.), it MUST be placed in the \`interactions\` array, NOT the \`widgets\` array. 
+**ABSOLUTE RULE:** If a Perseus element requires ANY form of user input (typing, clicking, selecting, dragging, etc.), it MUST be placed in the \`interactions\` array, NOT the \`widgets\` array.
 
 **THE ONLY EXCEPTION: TABLES**
 - Tables are ALWAYS widgets, regardless of content
@@ -2667,7 +2635,7 @@ Perseus often calls interactive elements "widgets". You MUST correctly reclassif
   "body": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Choose the best answer." }] }, { "type": "interactionRef", "interactionId": "choice_interaction_1" }],
 }
 \`\`\`
-**FINAL RULE:** 
+**FINAL RULE:**
 - If a Perseus element requires ANY user input = **INTERACTION** (goes in \`interactions\` array)
 - If a Perseus element is purely visual/static = **WIDGET** (goes in \`widgets\` array)
 - **EXCEPTION: TABLES ARE ALWAYS WIDGETS** - Even tables with input fields
@@ -2740,7 +2708,7 @@ Perseus JSON may contain widget definitions that are NOT actually used in the co
 **Explanation:** The Perseus JSON contained both a dropdown widget (used in content) and a radio widget (not used). The wrong output created slots for BOTH widgets, adding an extra choice interaction that doesn't belong. The correct output ONLY includes the dropdown that's actually referenced via \`[[☃ dropdown 1]]\` in the content string.
 
 **GENERAL RULE:** Only create slots for widgets that appear as \`[[☃ widget_name]]\` in the Perseus content. Ignore all other widget definitions.
-**EXCEPTIONS:** 
+**EXCEPTIONS:**
 - Create 3 additional widget slots when converting unsupported interactive widgets to multiple choice
 - Create widget slots for visuals that appear inside interaction choice content
 
@@ -3446,13 +3414,13 @@ Widgets MUST NEVER display, label, or visually indicate the correct answer. This
       "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Incorrect. This equation does have a solution." }] }]
     },
     {
-      "identifier": "B", 
+      "identifier": "B",
       "outcomeIdentifier": "FEEDBACK__CHOICE_INTERACTION",
       "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Correct! Simplifying gives " }, { "type": "math", "mathml": "<mi>x</mi><mo>=</mo><mo>-</mo><mn>1</mn>" }, { "type": "text", "content": ", which is of the form " }, { "type": "math", "mathml": "<mi>x</mi><mo>=</mo><mi>a</mi>" }, { "type": "text", "content": " and therefore there is exactly one solution." }] }]
     },
     {
       "identifier": "C",
-      "outcomeIdentifier": "FEEDBACK__CHOICE_INTERACTION", 
+      "outcomeIdentifier": "FEEDBACK__CHOICE_INTERACTION",
       "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Incorrect. This equation has exactly one solution, not infinitely many." }] }]
     }
   ]
@@ -3486,7 +3454,7 @@ Widgets MUST NEVER display, label, or visually indicate the correct answer. This
     },
     {
       "identifier": "B",
-      "outcomeIdentifier": "FEEDBACK__CHOICE_INTERACTION", 
+      "outcomeIdentifier": "FEEDBACK__CHOICE_INTERACTION",
       "content": [{ "type": "paragraph", "content": [{ "type": "text", "content": "Correct! Simplifying gives " }, { "type": "math", "mathml": "<mi>x</mi><mo>=</mo><mo>-</mo><mn>1</mn>" }, { "type": "text", "content": ", which is of the form " }, { "type": "math", "mathml": "<mi>x</mi><mo>=</mo><mi>a</mi>" }, { "type": "text", "content": " and therefore there is exactly one solution." }] }]
     },
     {

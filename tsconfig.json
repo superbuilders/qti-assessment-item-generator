@@ -27,7 +27,6 @@
 			"@/widgets/*": ["src/widgets/*"],
 			"@/cartridge/*": ["src/cartridge/*"],
 			"@/stimulus/*": ["src/stimulus/*"],
-			"@/examples": ["src/examples.ts"],
 			"@/examples/*": ["src/examples/*"],
 			"@/testing/*": ["src/testing/*"],
 			"@/utils/*": ["src/utils/*"],
