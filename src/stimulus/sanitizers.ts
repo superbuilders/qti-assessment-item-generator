@@ -3,7 +3,7 @@ import {
 	DEFAULT_REMOVAL_SELECTORS,
 	TAG_ATTRIBUTE_WHITELIST
 } from "@/stimulus/constants"
-import { isCommentNode, isElementNode } from "@/stimulus/dom-utils"
+import { isCommentNode, isElementNode, isTextNode } from "@/stimulus/dom-utils"
 import type { StimulusIssue, StimulusOptions } from "@/stimulus/types"
 
 const BOOLEAN_ATTRIBUTES = new Set(["allowfullscreen"])
@@ -18,6 +18,7 @@ const DISALLOWED_ELEMENTS = new Set([
 
 const NODE_FILTER = {
 	SHOW_ELEMENT: 1,
+	SHOW_TEXT: 4,
 	SHOW_COMMENT: 128
 } as const
 
@@ -36,6 +37,7 @@ export function sanitizeDocument(
 	stripComments(document)
 	stripDisallowedElements(document, issues)
 	stripDisallowedAttributes(document, issues)
+	collapseWhitespace(document.body)
 }
 
 function stripDisallowedElements(document: Document, issues: StimulusIssue[]) {
@@ -52,6 +54,92 @@ function stripDisallowedElements(document: Document, issues: StimulusIssue[]) {
 			})
 		}
 	}
+}
+
+const PRESERVE_WHITESPACE_TAGS = new Set(["pre", "code"])
+
+function isWithinPreformatted(node: Node | null): boolean {
+	let current = node?.parentNode ?? null
+	while (current) {
+		if (isElementNode(current)) {
+			const tag = current.tagName.toLowerCase()
+			if (PRESERVE_WHITESPACE_TAGS.has(tag)) {
+				return true
+			}
+		}
+		current = current.parentNode
+	}
+	return false
+}
+
+function collapseWhitespace(root: Element | null) {
+	if (!root) return
+	const ownerDocument = root.ownerDocument
+	if (!ownerDocument) return
+	const walker = ownerDocument.createTreeWalker(root, NODE_FILTER.SHOW_TEXT)
+	const nodes: Text[] = []
+	let current = walker.nextNode()
+	while (current) {
+		if (isTextNode(current)) {
+			nodes.push(current)
+		}
+		current = walker.nextNode()
+	}
+	for (const node of nodes) {
+		if (isWithinPreformatted(node)) {
+			continue
+		}
+		const value = node.nodeValue ?? ""
+		const normalized = value.replace(/\u00a0/g, " ").replace(/\s+/g, " ")
+		if (normalized.trim().length === 0) {
+			node.nodeValue = ""
+			continue
+		}
+		let nextValue = normalized
+		if (nextValue.startsWith(" ") && !hasPreviousContent(node)) {
+			nextValue = nextValue.replace(/^ +/, "")
+		}
+		if (nextValue.endsWith(" ") && !hasNextContent(node)) {
+			nextValue = nextValue.replace(/ +$/, "")
+		}
+		node.nodeValue = nextValue
+	}
+}
+
+function hasPreviousContent(node: Node): boolean {
+	let sibling: Node | null = node.previousSibling
+	while (sibling) {
+		if (isTextNode(sibling)) {
+			const text = sibling.nodeValue ?? ""
+			if (text.trim().length > 0) {
+				return true
+			}
+		} else if (isElementNode(sibling)) {
+			if (sibling.textContent?.trim().length) {
+				return true
+			}
+		}
+		sibling = sibling.previousSibling
+	}
+	return false
+}
+
+function hasNextContent(node: Node): boolean {
+	let sibling: Node | null = node.nextSibling
+	while (sibling) {
+		if (isTextNode(sibling)) {
+			const text = sibling.nodeValue ?? ""
+			if (text.trim().length > 0) {
+				return true
+			}
+		} else if (isElementNode(sibling)) {
+			if (sibling.textContent?.trim().length) {
+				return true
+			}
+		}
+		sibling = sibling.nextSibling
+	}
+	return false
 }
 
 function stripComments(document: Document) {
