@@ -88,7 +88,7 @@ describe("Canvas stimulus HTML generation", () => {
 	})
 
 	for (const fixture of stimulusFixtures) {
-	test(`renders HTML for ${fixture.slugPath}`, async () => {
+		test(`renders HTML for ${fixture.slugPath}`, async () => {
 			const result = buildStimulusFromPageData(fixture.page)
 			expect(result).toBeDefined()
 			if (!result) return
@@ -108,6 +108,7 @@ describe("Canvas stimulus HTML generation", () => {
 			expect(articleOpenIndex).toBe(0)
 			const articleCloseIndex = result.html.lastIndexOf("</article>")
 			expect(articleCloseIndex).toBeGreaterThan(articleOpenIndex)
+			expect(result.html).toMatchSnapshot()
 
 			const htmlDocument = `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8" /><title>stimulus</title></head><body>${result.html}</body></html>`
 			const report = await htmlvalidate.validateString(
