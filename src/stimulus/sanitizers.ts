@@ -1,3 +1,5 @@
+import * as errors from "@superbuilders/errors"
+import * as logger from "@superbuilders/slog"
 import {
 	ALLOWED_GLOBAL_ATTRIBUTES,
 	DEFAULT_REMOVAL_SELECTORS,
@@ -27,7 +29,13 @@ export function sanitizeDocument(
 	issues: StimulusIssue[],
 	options: StimulusOptions | undefined
 ): void {
-	const selectors = options?.removeSelectors ?? DEFAULT_REMOVAL_SELECTORS
+	const selectors =
+		options && Array.isArray(options.removeSelectors)
+			? options.removeSelectors
+			: DEFAULT_REMOVAL_SELECTORS
+	if (!options || options.removeSelectors === undefined) {
+		logger.debug("sanitizeDocument using default removal selectors")
+	}
 	for (const selector of selectors) {
 		for (const node of Array.from(document.querySelectorAll(selector))) {
 			node.remove()
@@ -59,7 +67,7 @@ function stripDisallowedElements(document: Document, issues: StimulusIssue[]) {
 const PRESERVE_WHITESPACE_TAGS = new Set(["pre", "code"])
 
 function isWithinPreformatted(node: Node | null): boolean {
-	let current = node?.parentNode ?? null
+	let current: Node | null = node ? node.parentNode : null
 	while (current) {
 		if (isElementNode(current)) {
 			const tag = current.tagName.toLowerCase()
@@ -89,7 +97,11 @@ function collapseWhitespace(root: Element | null) {
 		if (isWithinPreformatted(node)) {
 			continue
 		}
-		const value = node.nodeValue ?? ""
+		const value = node.nodeValue
+		if (value === null) {
+			logger.error("text node missing value during whitespace collapse")
+			throw errors.new("text node missing value")
+		}
 		const normalized = value.replace(/\u00a0/g, " ").replace(/\s+/g, " ")
 		if (normalized.trim().length === 0) {
 			node.nodeValue = ""
@@ -110,7 +122,11 @@ function hasPreviousContent(node: Node): boolean {
 	let sibling: Node | null = node.previousSibling
 	while (sibling) {
 		if (isTextNode(sibling)) {
-			const text = sibling.nodeValue ?? ""
+			const text = sibling.nodeValue
+			if (text === null) {
+				logger.error("text sibling missing value during whitespace collapse")
+				throw errors.new("text sibling missing value")
+			}
 			if (text.trim().length > 0) {
 				return true
 			}
@@ -128,7 +144,11 @@ function hasNextContent(node: Node): boolean {
 	let sibling: Node | null = node.nextSibling
 	while (sibling) {
 		if (isTextNode(sibling)) {
-			const text = sibling.nodeValue ?? ""
+			const text = sibling.nodeValue
+			if (text === null) {
+				logger.error("text sibling missing value during whitespace collapse")
+				throw errors.new("text sibling missing value")
+			}
 			if (text.trim().length > 0) {
 				return true
 			}
@@ -170,7 +190,10 @@ function stripDisallowedAttributes(
 		}
 		const element = current
 		const tag = element.tagName.toLowerCase()
-		const allowed = TAG_ATTRIBUTE_WHITELIST[tag] ?? new Set<string>()
+		const allowed =
+			TAG_ATTRIBUTE_WHITELIST[tag] !== undefined
+				? TAG_ATTRIBUTE_WHITELIST[tag]
+				: new Set<string>()
 		for (const attr of Array.from(element.attributes)) {
 			const name = attr.name.toLowerCase()
 			const keep = allowed.has(name) || ALLOWED_GLOBAL_ATTRIBUTES.has(name)

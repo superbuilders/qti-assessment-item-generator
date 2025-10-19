@@ -201,9 +201,20 @@ function dedupePromptTextFromBody<E extends readonly string[]>(
 	}
 	const normalizeMath = (mathml: string): string => {
 		// prefer <mo> text; otherwise strip tags
-		const moMatches = Array.from(
+		const moMatchesRaw = Array.from(
 			mathml.matchAll(/<mo[^>]*>([\s\S]*?)<\/mo>/g)
-		).map((m) => m[1] ?? "")
+		)
+		const moMatches: string[] = []
+		for (const match of moMatchesRaw) {
+			const content = match[1]
+			if (typeof content !== "string") {
+				logger.error("normalizeMath missing <mo> content", {
+					mathmlPreview: mathml.slice(0, 200)
+				})
+				throw errors.new("normalizeMath missing <mo> content")
+			}
+			moMatches.push(content)
+		}
 		const raw =
 			moMatches.length > 0
 				? moMatches.join(" ")
@@ -300,7 +311,11 @@ function dedupePromptTextFromBody<E extends readonly string[]>(
 		for (let i = start; i < end; i++) {
 			if (body[i]?.type !== "paragraph") continue
 			// Strip selection guidance from body paragraph before comparison to align with prompt normalization
-			const rawPara = paragraphNorms[i] ?? ""
+			const rawPara = paragraphNorms[i]
+			if (rawPara === undefined) {
+				logger.error("paragraph normalization missing", { index: i })
+				throw errors.new("paragraph normalization missing")
+			}
 			const pStr = rawPara === "" ? "" : stripSelectionGuidance(rawPara)
 			if (pStr !== "" && pStr === prompt) {
 				toDelete.add(i)
@@ -316,11 +331,21 @@ function dedupePromptTextFromBody<E extends readonly string[]>(
 		for (let i = start; i < end; i++) {
 			if (body[i]?.type !== "paragraph") continue
 			if (toDelete.has(i)) continue
-			let acc = stripSelectionGuidance(paragraphNorms[i] ?? "")
+			const firstNorm = paragraphNorms[i]
+			if (firstNorm === undefined) {
+				logger.error("paragraph normalization missing", { index: i })
+				throw errors.new("paragraph normalization missing")
+			}
+			let acc = stripSelectionGuidance(firstNorm)
 			let accTokens = tokenizeForFuzzy(acc)
 			for (let j = i + 1; j < end; j++) {
 				if (body[j]?.type !== "paragraph") break
-				const nextSegment = stripSelectionGuidance(paragraphNorms[j] ?? "")
+				const nextNorm = paragraphNorms[j]
+				if (nextNorm === undefined) {
+					logger.error("paragraph normalization missing", { index: j })
+					throw errors.new("paragraph normalization missing")
+				}
+				const nextSegment = stripSelectionGuidance(nextNorm)
 				acc = collapseWhitespace(`${acc} ${nextSegment}`)
 				accTokens = tokenizeForFuzzy(acc)
 				if (acc === prompt) {

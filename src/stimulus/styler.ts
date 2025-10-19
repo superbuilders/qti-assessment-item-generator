@@ -41,11 +41,11 @@ function ensureCssValue(property: string, value: unknown): CssValue {
 
 function styleRulesToCssString(rules: StyleRules): string {
 	const declarations: string[] = []
-	for (const property in rules) {
+	for (const property of Object.keys(rules)) {
 		if (!Object.hasOwn(rules, property)) {
 			continue
 		}
-		const rawValue = rules[property]
+		const rawValue = Reflect.get(rules, property)
 		if (rawValue === undefined) {
 			logger.error("inline style value rejected: undefined", { property })
 			throw errors.new(`Inline style property "${property}" is undefined`)
