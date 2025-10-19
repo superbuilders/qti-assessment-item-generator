@@ -1,3 +1,5 @@
+import * as errors from "@superbuilders/errors"
+import * as logger from "@superbuilders/slog"
 import { isElementNode } from "@/stimulus/dom-utils"
 import type {
 	CssValue,
@@ -22,28 +24,39 @@ function isUnitlessProperty(property: string): boolean {
 }
 
 function ensureCssValue(property: string, value: unknown): CssValue {
-	if (typeof value === "string") return value
-	if (typeof value === "number") return value
-	throw new Error(
+	if (typeof value === "string") {
+		return value
+	}
+	if (typeof value === "number") {
+		return value
+	}
+	logger.error("inline style value rejected: unsupported type", {
+		property,
+		valueType: typeof value
+	})
+	throw errors.new(
 		`Invalid CSS value for "${property}": only string or number values are supported`
 	)
 }
 
 function styleRulesToCssString(rules: StyleRules): string {
 	const declarations: string[] = []
-	const keys = Object.keys(rules) as Array<keyof StyleRules>
-	for (const key of keys) {
-		const property = String(key)
-		const rawValue = rules[key]
+	for (const property in rules) {
+		if (!Object.hasOwn(rules, property)) {
+			continue
+		}
+		const rawValue = rules[property]
 		if (rawValue === undefined) {
-			throw new Error(`Inline style property "${property}" is undefined`)
+			logger.error("inline style value rejected: undefined", { property })
+			throw errors.new(`Inline style property "${property}" is undefined`)
 		}
 		const cssValue = ensureCssValue(property, rawValue)
 		const kebabProperty = camelToKebabCase(property)
 		let finalValue: string
 		if (typeof cssValue === "number") {
 			if (Number.isNaN(cssValue)) {
-				throw new Error(
+				logger.error("inline style value rejected: NaN", { property })
+				throw errors.new(
 					`Invalid CSS value for "${property}": NaN is not allowed`
 				)
 			}
