@@ -34,12 +34,12 @@ export function buildStimulusFromHtml(
 	const issues: StimulusIssue[] = []
 	const sourceDocument = createDocument(input.html)
 	sanitizeDocument(sourceDocument, issues, options)
-	const article = normalizeStructure(sourceDocument, issues)
+	const root = normalizeStructure(sourceDocument, issues)
 
-	applyInlineStyles(article, options)
-	const html = serializeArticle(article)
+	applyInlineStyles(root, options)
+	const html = serializeArticle(root)
 	const validationIssues = validateHtml(html)
-	const assets = collectAssets(article)
+	const assets = collectAssets(root)
 	return {
 		html,
 		issues: [...issues, ...validationIssues],

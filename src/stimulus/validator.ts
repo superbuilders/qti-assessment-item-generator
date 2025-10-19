@@ -3,7 +3,7 @@ import * as logger from "@superbuilders/slog"
 import { XMLParser } from "fast-xml-parser"
 import { VOID_ELEMENTS } from "@/stimulus/constants"
 import { createDocument } from "@/stimulus/dom"
-import { NODE_TYPE, isElementNode, isTextNode } from "@/stimulus/dom-utils"
+import { isElementNode, isTextNode, NODE_TYPE } from "@/stimulus/dom-utils"
 import type { StimulusIssue } from "@/stimulus/types"
 
 const ALLOWED_NAMED_ENTITIES = new Set(["amp", "lt", "gt", "quot", "apos"])
@@ -42,34 +42,29 @@ export function validateHtml(html: string): StimulusIssue[] {
 		]
 	}
 
-	const article = body.querySelector("article")
-	if (!article) {
+	const containerDoc = createDocument("<div></div>")
+	const container = containerDoc.querySelector("div")
+	if (!container) {
+		logger.error("validation container missing in generated document")
 		return [
 			{
 				severity: "error",
-				code: "html-missing-article",
-				message: "Stimulus output must contain a top-level <article> element."
+				code: "html-parse-error",
+				message: "Failed to create validation container."
 			}
 		]
 	}
-
-	if (article !== body.firstElementChild || body.childElementCount !== 1) {
-		return [
-			{
-				severity: "error",
-				code: "html-extra-content",
-				message:
-					"Stimulus output must contain exactly one <article> as the root element."
-			}
-		]
+	for (const child of Array.from(body.childNodes)) {
+		const imported = containerDoc.importNode(child, true)
+		container.appendChild(imported)
 	}
 
-	assertNoCdata(article, html.length)
+	assertNoCdata(container, html.length)
 
 	const issues: StimulusIssue[] = []
 	issues.push(...collectEntityIssues(html))
 
-	const xmlString = `<?xml version="1.0" encoding="UTF-8"?>${serializeElementToXml(article)}`
+	const xmlString = `<?xml version="1.0" encoding="UTF-8"?>${serializeElementToXml(container)}`
 	const xmlParseResult = errors.trySync(() => xmlParser.parse(xmlString))
 	if (xmlParseResult.error) {
 		const message = getErrorMessage(xmlParseResult.error)

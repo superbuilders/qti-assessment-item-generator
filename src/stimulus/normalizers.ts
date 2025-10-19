@@ -21,29 +21,32 @@ export function normalizeStructure(
 	normalizeTableHeaders(sourceRoot, issues)
 	normalizeIframes(sourceRoot)
 
-	const articleDoc = createDocument("<article></article>")
-	const article = resolveArticleContainer(articleDoc)
-	const articleDocument = article.ownerDocument
+	const containerDoc = createDocument("<div></div>")
+	const container = resolveContainerElement(containerDoc)
+	const containerDocument = container.ownerDocument
 
 	for (const child of Array.from(sourceRoot.childNodes)) {
 		if (isTextNode(child)) {
 			const text = readTextValue(child, "normalizeStructure:sourceRootChild")
 			if (text.trim().length === 0) continue
 		}
-		const imported = articleDocument.importNode(child, true)
-		article.appendChild(imported)
+		const imported = containerDocument.importNode(child, true)
+		container.appendChild(imported)
 	}
 
-	if (!article.hasChildNodes()) {
-		article.appendChild(articleDocument.createElement("p"))
+	removeEmptyDivPlaceholders(container)
+	trimBoundaryWhitespace(container)
+
+	if (!container.hasChildNodes()) {
+		container.appendChild(containerDocument.createElement("p"))
 		issues.push({
 			severity: "warning",
-			code: "empty-article",
-			message: "Article content was empty; inserted placeholder paragraph."
+			code: "empty-content",
+			message: "Stimulus content was empty; inserted placeholder paragraph."
 		})
 	}
 
-	return article
+	return container
 }
 
 const PRESERVE_IF_EMPTY = new Set([
@@ -79,9 +82,8 @@ function removeEmptyElements(root: Element) {
 				continue
 			}
 
-			const hasAttributes = current.attributes.length > 0
 			const isVoid = VOID_ELEMENTS.has(tag)
-			const isPreserved = hasAttributes || isVoid || PRESERVE_IF_EMPTY.has(tag)
+			const isPreserved = isVoid || PRESERVE_IF_EMPTY.has(tag)
 
 			if (isPreserved) {
 				current = walker.nextNode()
@@ -214,6 +216,41 @@ function normalizeIframes(root: Element) {
 	}
 }
 
+function removeEmptyDivPlaceholders(root: Element) {
+	for (const div of Array.from(root.querySelectorAll("div"))) {
+		if (div.childNodes.length === 0) {
+			div.remove()
+		}
+	}
+}
+
+function trimBoundaryWhitespace(container: Element) {
+	while (true) {
+		const first = container.firstChild
+		if (!first) break
+		if (isBoundaryWhitespaceNode(first)) {
+			first.remove()
+			continue
+		}
+		break
+	}
+	while (true) {
+		const last = container.lastChild
+		if (!last) break
+		if (isBoundaryWhitespaceNode(last)) {
+			last.remove()
+			continue
+		}
+		break
+	}
+}
+
+function isBoundaryWhitespaceNode(node: Node): boolean {
+	if (!isTextNode(node)) return false
+	const value = readTextValue(node, "trimBoundaryWhitespace")
+	return /^[\t\r\n ]*$/.test(value)
+}
+
 function resolveSourceRoot(document: Document): Element {
 	if (document.body) return document.body
 	if (document.documentElement) return document.documentElement
@@ -221,11 +258,11 @@ function resolveSourceRoot(document: Document): Element {
 	throw errors.new("normalizeStructure: document missing root element")
 }
 
-function resolveArticleContainer(document: Document): Element {
-	const article = document.querySelector("article")
-	if (article) return article
-	logger.error("article container missing in generated document")
-	throw errors.new("normalizeStructure: article container missing")
+function resolveContainerElement(document: Document): Element {
+	const container = document.querySelector("div")
+	if (container) return container
+	logger.error("stimulus container missing in generated document")
+	throw errors.new("normalizeStructure: container missing")
 }
 
 function readTextValue(node: Text, context: string): string {

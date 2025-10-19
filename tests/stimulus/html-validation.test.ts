@@ -103,11 +103,7 @@ describe("Canvas stimulus HTML generation", () => {
 			)
 			expect(warnings).toHaveLength(0)
 
-			expect(result.html.startsWith("<article")).toBeTrue()
-			const articleOpenIndex = result.html.indexOf("<article")
-			expect(articleOpenIndex).toBe(0)
-			const articleCloseIndex = result.html.lastIndexOf("</article>")
-			expect(articleCloseIndex).toBeGreaterThan(articleOpenIndex)
+			expect(result.html.trim().length).toBeGreaterThan(0)
 			expect(result.html).toMatchSnapshot()
 
 			const htmlDocument = `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8" /><title>stimulus</title></head><body>${result.html}</body></html>`

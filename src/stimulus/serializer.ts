@@ -3,12 +3,12 @@ import * as logger from "@superbuilders/slog"
 import { VOID_ELEMENTS } from "@/stimulus/constants"
 import { isElementNode, isTextNode, NODE_TYPE } from "@/stimulus/dom-utils"
 
-export function serializeArticle(article: Element): string {
-	const clone = article.cloneNode(true)
+export function serializeArticle(root: Element): string {
+	const clone = root.cloneNode(true)
 	if (!isElementNode(clone)) {
-		return serializeNode(article)
+		return serializeElementChildren(root)
 	}
-	return serializeNode(clone)
+	return serializeElementChildren(clone)
 }
 
 function serializeNode(node: Node): string {
@@ -45,6 +45,10 @@ function serializeElement(element: Element): string {
 	const children = Array.from(element.childNodes)
 	const childString = children.map(serializeNode).join("")
 	return `<${tag}${attrString}>${childString}</${tag}>`
+}
+
+function serializeElementChildren(element: Element): string {
+	return Array.from(element.childNodes).map(serializeNode).join("")
 }
 
 function readTextValue(node: Text, context: string): string {

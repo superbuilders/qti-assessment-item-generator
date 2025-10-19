@@ -5,7 +5,7 @@ import type { StyleObject } from "@/stimulus/types"
 describe("inline style injection", () => {
 	test("does not emit style attributes when inlineStyles option is absent", () => {
 		const result = buildStimulusFromHtml({ html: "<p>Plain text</p>" })
-		expect(result.html).toContain("<article>")
+		expect(result.html.trim()).toBe("<p>Plain text</p>")
 		expect(result.html).not.toContain('style="')
 	})
 
