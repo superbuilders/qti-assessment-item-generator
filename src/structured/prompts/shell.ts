@@ -9,7 +9,10 @@ import { createMathmlComplianceSection } from "@/structured/prompts/shared/mathm
 // Note: do not validate example shells here; examples are illustrative only
 // import { createAssessmentItemShellSchema } from "@core/item"
 import type { AiContextEnvelope, ImageContext } from "@/structured/types"
-import type { WidgetCollection, WidgetDefinition } from "@/widgets/collections/types"
+import type {
+	WidgetCollection,
+	WidgetDefinition
+} from "@/widgets/collections/types"
 
 export function createAssessmentShellPrompt<
 	C extends WidgetCollection<

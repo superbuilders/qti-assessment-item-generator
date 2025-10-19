@@ -3,6 +3,7 @@ import { createDocument } from "@/stimulus/dom"
 import { normalizeStructure } from "@/stimulus/normalizers"
 import { sanitizeDocument } from "@/stimulus/sanitizers"
 import { serializeArticle } from "@/stimulus/serializer"
+import { applyInlineStyles } from "@/stimulus/styler"
 import type {
 	StimulusBuildResult,
 	StimulusInput,
@@ -31,9 +32,11 @@ export function buildStimulusFromHtml(
 	options?: StimulusOptions
 ): StimulusBuildResult {
 	const issues: StimulusIssue[] = []
-	const document = createDocument(input.html)
-	sanitizeDocument(document, issues, options)
-	const article = normalizeStructure(document, issues)
+	const sourceDocument = createDocument(input.html)
+	sanitizeDocument(sourceDocument, issues, options)
+	const article = normalizeStructure(sourceDocument, issues)
+
+	applyInlineStyles(article, options)
 	const html = serializeArticle(article)
 	const validationIssues = validateHtml(html)
 	const assets = collectAssets(article)

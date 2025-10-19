@@ -5,6 +5,8 @@ import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
 import { buildStimulusFromPageData } from "@/stimulus/builder"
+import { defaultStimulusStyles } from "@/stimulus/default-styles"
+import type { StimulusOptions } from "@/stimulus/types"
 
 // Enable debug logging for this script
 logger.setDefaultLogLevel(logger.DEBUG)
@@ -14,13 +16,31 @@ logger.info("canvas stimulus generator started with debug logging enabled")
 const ROOT_DIR = "canvas-scrape/English 09, Part 1"
 const CONCURRENCY_LIMIT = 200
 
-const BASE_DIR_ARG = process.argv[2]
+const RAW_ARGS = process.argv.slice(2)
+if (RAW_ARGS.length !== 1) {
+	logger.error(
+		"expected exactly one positional argument for base data directory",
+		{
+			received: RAW_ARGS
+		}
+	)
+	throw errors.new(
+		"base data directory must be provided as the sole argument (e.g., 'data')"
+	)
+}
+
+const BASE_DIR_ARG = RAW_ARGS[0]
 if (!BASE_DIR_ARG) {
 	logger.error("base data directory not provided")
 	throw errors.new(
-		"base data directory must be provided as first argument (e.g., 'data')"
+		"base data directory must be provided as the sole argument (e.g., 'data')"
 	)
 }
+
+const configuredStimulusOptions: StimulusOptions = {
+	inlineStyles: defaultStimulusStyles
+}
+
 const OUTPUT_DIR = path.resolve(process.cwd(), BASE_DIR_ARG, "stimulus-out")
 const ROOT = path.resolve(process.cwd(), ROOT_DIR)
 // ---
@@ -133,7 +153,7 @@ async function buildAndWriteStimulus(
 	page: PageData,
 	outDir: string
 ): Promise<void> {
-	const buildResult = buildStimulusFromPageData(page)
+	const buildResult = buildStimulusFromPageData(page, configuredStimulusOptions)
 	if (!buildResult) {
 		logger.warn("page missing mainContent.html, skipping", { outDir })
 		return

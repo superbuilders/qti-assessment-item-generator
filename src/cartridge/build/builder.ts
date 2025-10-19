@@ -41,11 +41,9 @@ const UnitTestSchema = z
 	.strict()
 
 const NumericUnitId = z.string().regex(/^unit-\d+$/)
-const NonNumericUnitId = z
-	.string()
-	.refine((v) => !/^unit-\d+$/.test(v), {
-		message: "non-numeric unit id must not match unit-<n>"
-	})
+const NonNumericUnitId = z.string().refine((v) => !/^unit-\d+$/.test(v), {
+	message: "non-numeric unit id must not match unit-<n>"
+})
 
 const BuildUnitNumericSchema = z
 	.object({

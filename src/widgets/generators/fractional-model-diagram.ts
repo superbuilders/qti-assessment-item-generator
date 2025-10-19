@@ -35,9 +35,7 @@ function createPartitionedShapeSchema() {
 				.number()
 				.int()
 				.positive()
-				.describe(
-					"The total number of equal pieces the shape is divided into."
-				)
+				.describe("The total number of equal pieces the shape is divided into.")
 		})
 		.strict()
 }

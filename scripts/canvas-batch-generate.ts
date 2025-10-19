@@ -212,9 +212,7 @@ function extractUnitNumberFromDirName(dirName: string): string | undefined {
  * - For unit tests (e.g., "Unit 1 Test"), collects all lessons matching "1.X ...".
  * - For other quizzes (e.g., "MANDATORY QUIZ"), returns empty.
  */
-async function resolveLessonDirsForQuiz(
-	quizDir: string
-): Promise<{
+async function resolveLessonDirsForQuiz(quizDir: string): Promise<{
 	lessonDirs: string[]
 	unitDir?: string
 	quizRootDir: string

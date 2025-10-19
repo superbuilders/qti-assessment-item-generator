@@ -1,4 +1,11 @@
+import type { Properties } from "csstype"
+
 export type IssueSeverity = "info" | "warning" | "error"
+
+export type CssValue = string | number
+
+export type StyleRules = Properties<CssValue>
+export type StyleObject = Record<string, StyleRules>
 
 export interface StimulusIssue {
 	severity: IssueSeverity
@@ -16,6 +23,7 @@ export interface StimulusInput {
 export interface StimulusOptions {
 	removeSelectors?: string[]
 	strict?: boolean
+	inlineStyles?: StyleObject
 }
 
 export interface StimulusAsset {
