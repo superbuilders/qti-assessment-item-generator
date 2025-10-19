@@ -29,22 +29,11 @@ export interface StimulusOptions {
 
 ---
 
-### 2. Allow the `style` Attribute in the Sanitizer
+### 2. Keep Sanitization Strict
 
-This is a critical step. Your current sanitizer logic strips any attributes not explicitly whitelisted. We must permit the `style` attribute globally for this to work.
+We should continue stripping **all** inbound `style` attributes. Treat the styler as a pure post-processor: sanitize first, normalize the structure, then apply our trusted inline styles. This keeps untrusted Canvas CSS from slipping through while still letting us add our own rules later in the pipeline.
 
-**File:** `constants.ts`
-```typescript
-export const ALLOWED_GLOBAL_ATTRIBUTES = new Set([
-	"id",
-	"title",
-	"lang",
-	"xml:lang",
-	"style" // Add "style" to the whitelist
-])
-```
-
-Without this change, all the inline styles we inject would be immediately removed by `sanitizeDocument`.
+Because styles are re-applied after sanitization, no changes to the existing allowlists are needed.
 
 ---
 
@@ -55,7 +44,7 @@ This new module will contain the logic for converting the style object into inli
 **New File:** `styler.ts`
 ```typescript
 import type { StimulusOptions, StyleRules } from "@/stimulus/types"
-import { isElementNode } from "./dom-utils"
+import { isElementNode } from "@/stimulus/dom-utils"
 
 /**
  * Converts a camelCased CSS property name to its kebab-cased equivalent.
@@ -91,27 +80,26 @@ function isUnitlessProperty(prop: string): boolean {
 /**
  * Applies inline styles to elements in the document based on the provided style object.
  */
-export function applyInlineStyles(
-	document: Document,
-	options?: StimulusOptions
-): void {
+export function applyInlineStyles(root: Element, options?: StimulusOptions): void {
 	const styles = options?.inlineStyles
 	if (!styles) {
 		return
 	}
 
 	for (const [selector, rules] of Object.entries(styles)) {
-		const elements = document.querySelectorAll(selector)
+		const elements = root.querySelectorAll(selector)
 		if (elements.length === 0) continue
 
 		const cssString = styleRulesToCssString(rules)
 
 		for (const element of Array.from(elements)) {
 			if (isElementNode(element)) {
-				const existingStyle = element.getAttribute("style") || ""
-				// Prepend a semicolon if there's existing style, to not break it.
-				const separator = existingStyle.trim().length > 0 && !existingStyle.trim().endsWith(';') ? '; ' : ''
-				element.setAttribute("style", `${existingStyle}${separator}${cssString}`)
+				const existingStyle = element.getAttribute("style") ?? ""
+				const trimmed = existingStyle.trim()
+				const separator =
+					trimmed.length > 0 && !trimmed.endsWith(";") ? "; " : ""
+				const merged = `${trimmed}${separator}${cssString}`.trim()
+				element.setAttribute("style", merged)
 			}
 		}
 	}
@@ -123,7 +111,7 @@ This module does three things:
 2.  **`styleRulesToCssString`**: A helper that converts a React-style object (`{ fontSize: 16 }`) into a valid CSS string (`"font-size: 16px;"`).
 3.  **`camelToKebabCase`**: A utility to handle CSS property name conversion.
 
-This implementation intelligently merges new styles with any pre-existing `style` attributes on an element.
+Sanitization guarantees that elements arrive without inline styles, so this logic effectively just writes the curated rules, but it stays resilient if we ever seed defaults.
 
 ---
 
@@ -154,12 +142,12 @@ export function buildStimulusFromHtml(
 	options?: StimulusOptions
 ): StimulusBuildResult {
 	const issues: StimulusIssue[] = []
-	const document = createDocument(input.html)
-	sanitizeDocument(document, issues, options)
-	const article = normalizeStructure(document, issues)
+	const sourceDocument = createDocument(input.html)
+	sanitizeDocument(sourceDocument, issues, options)
+	const article = normalizeStructure(sourceDocument, issues)
 
 	// Apply styles after the DOM is clean and structured
-	applyInlineStyles(document, options)
+	applyInlineStyles(article, options)
 
 	const html = serializeArticle(article)
 	const validationIssues = validateHtml(html)
@@ -173,7 +161,7 @@ export function buildStimulusFromHtml(
 
 // ... (rest of the file remains the same)
 ```
-This integration is seamless. Since the styles are now part of the elements within the `<article>`, your existing `serializeArticle` function will work perfectly without modification, producing a pure, self-contained HTML snippet.
+This keeps styling as a final post-processing step: sanitized content stays clean, our curated rules land on the normalized `<article>`, and `serializeArticle` can emit a self-contained snippet without further changes.
 
 ---
 
