@@ -1,6 +1,6 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import { BLOCK_ELEMENTS, INLINE_ELEMENTS, VOID_ELEMENTS } from "@/stimulus/constants"
+import { BLOCK_ELEMENTS, VOID_ELEMENTS } from "@/stimulus/constants"
 import { createDocument } from "@/stimulus/dom"
 import { isElementNode, isTextNode } from "@/stimulus/dom-utils"
 import type { StimulusIssue } from "@/stimulus/types"
@@ -19,7 +19,6 @@ export function normalizeStructure(
 	fixParagraphChildren(sourceRoot, issues)
 	normalizeLists(sourceRoot, issues)
 	normalizeTableHeaders(sourceRoot, issues)
-	unwrapRedundantContainers(sourceRoot, issues)
 	normalizeIframes(sourceRoot)
 
 	const articleDoc = createDocument("<article></article>")
@@ -47,7 +46,14 @@ export function normalizeStructure(
 	return article
 }
 
-const PRESERVE_IF_EMPTY = new Set(["iframe", "svg", "math", "video", "audio", "canvas"])
+const PRESERVE_IF_EMPTY = new Set([
+	"iframe",
+	"svg",
+	"math",
+	"video",
+	"audio",
+	"canvas"
+])
 
 function removeEmptyElements(root: Element) {
 	const walker = root.ownerDocument.createTreeWalker(
@@ -196,26 +202,6 @@ function normalizeTableHeaders(root: Element, issues: StimulusIssue[]) {
 			code: "th-scope-added",
 			message: `Added scope="${scope}" to <th>.`
 		})
-	}
-}
-
-function unwrapRedundantContainers(root: Element, issues: StimulusIssue[]) {
-	for (const div of Array.from(root.querySelectorAll("div"))) {
-		if (div.childElementCount === 1 && div.textContent?.trim().length === 0) {
-			const child = div.firstElementChild
-			if (
-				child &&
-				(BLOCK_ELEMENTS.has(child.tagName.toLowerCase()) ||
-					INLINE_ELEMENTS.has(child.tagName.toLowerCase()))
-			) {
-				div.replaceWith(child)
-				issues.push({
-					severity: "info",
-					code: "div-unwrap",
-					message: "Unwrapped redundant <div> container."
-				})
-			}
-		}
 	}
 }
 
