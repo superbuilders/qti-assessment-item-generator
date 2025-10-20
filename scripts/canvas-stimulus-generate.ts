@@ -5,7 +5,6 @@ import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { z } from "zod"
 import { buildStimulusFromPageData } from "@/stimulus/builder"
-import { defaultStimulusStyles } from "@/stimulus/default-styles"
 import type { StimulusOptions } from "@/stimulus/types"
 
 // Enable debug logging for this script
@@ -37,9 +36,7 @@ if (!BASE_DIR_ARG) {
 	)
 }
 
-const configuredStimulusOptions: StimulusOptions = {
-	inlineStyles: defaultStimulusStyles
-}
+const configuredStimulusOptions: StimulusOptions = {}
 
 const OUTPUT_DIR = path.resolve(process.cwd(), BASE_DIR_ARG, "stimulus-out")
 const ROOT = path.resolve(process.cwd(), ROOT_DIR)
