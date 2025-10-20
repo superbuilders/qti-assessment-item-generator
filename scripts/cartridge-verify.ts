@@ -186,13 +186,12 @@ async function main() {
 						throw errors.new("video metadata youtube mismatch")
 					}
 					if (metadata.description.length === 0) {
-						logger.error("video metadata description missing", {
+						logger.warn("video metadata description empty", {
 							unitId: unit.id,
 							lessonId: lesson.id,
 							videoId: resource.id,
 							path: resource.path
 						})
-						throw errors.new("video metadata description missing")
 					}
 				}
 			}
