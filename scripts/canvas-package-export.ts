@@ -22,6 +22,8 @@ import {
 	type YoutubeMetadata
 } from "./lib/youtube-metadata"
 
+const YOUTUBE_REQUESTS_PER_SECOND = 5
+
 // Enable debug logging for this script
 logger.setDefaultLogLevel(logger.DEBUG)
 logger.info("canvas package export started with debug logging enabled")
@@ -901,20 +903,41 @@ async function main() {
 		return absolute
 	}
 
-	const videoMetadataCache = new Map<string, YoutubeMetadata>()
-
-	async function loadYoutubeMetadata(
-		youtubeId: string
-	): Promise<YoutubeMetadata> {
-		const cached = videoMetadataCache.get(youtubeId)
-		if (cached) {
-			return cached
+	async function fetchYoutubeMetadataBatch(
+		youtubeIds: string[],
+		perSecond: number
+	): Promise<Map<string, YoutubeMetadata>> {
+		const results = new Map<string, YoutubeMetadata>()
+		if (youtubeIds.length === 0) {
+			return results
 		}
-		logger.info("fetching youtube metadata", { youtubeId })
-		const metadata = await fetchYoutubeMetadata(youtubeId)
-		videoMetadataCache.set(youtubeId, metadata)
-		return metadata
+		for (let i = 0; i < youtubeIds.length; i += perSecond) {
+			const chunk = youtubeIds.slice(i, i + perSecond)
+			const fetched = await Promise.all(
+				chunk.map(async (youtubeId) => {
+					logger.info("fetching youtube metadata", { youtubeId })
+					const metadata = await fetchYoutubeMetadata(youtubeId)
+					return { youtubeId, metadata }
+				})
+			)
+			for (const { youtubeId, metadata } of fetched) {
+				results.set(youtubeId, metadata)
+			}
+			if (i + perSecond < youtubeIds.length) {
+				await new Promise((resolve) => setTimeout(resolve, 1000))
+			}
+		}
+		return results
 	}
+
+	const pendingVideoTasks: Array<{
+		lessonResources: Array<ArticleResource | QuizResource | ResourceVideo>
+		articleResource: ArticleResource
+		plan: VideoResourcePlan
+		lesson: LessonRecord
+		unit: UnitRecord
+	}> = []
+	const uniqueYoutubeIds = new Set<string>()
 
 	const buildUnits: BuildUnit[] = []
 	for (const unit of hierarchy) {
@@ -929,38 +952,14 @@ async function main() {
 					(a, b) => a.order - b.order
 				)
 				for (const videoPlan of sortedVideos) {
-					const metadata = await loadYoutubeMetadata(videoPlan.youtubeId)
-					const videoMetadata: VideoMetadata = {
-						id: videoPlan.id,
-						type: "video",
-						youtubeId: videoPlan.youtubeId,
-						path: videoPlan.metadataPath,
-						title: metadata.title,
-						description: metadata.description,
-						durationSeconds: metadata.durationSeconds,
-						lessonId: lesson.lessonId,
-						unitId: unit.unitId,
-						order: videoPlan.order
-					}
-					if (videoPlan.titleHint !== undefined) {
-						videoMetadata.titleHint = videoPlan.titleHint
-					}
-					if (videoPlan.contextHtml !== undefined) {
-						videoMetadata.contextHtml = videoPlan.contextHtml
-					}
-					const metadataAbsolutePath =
-						await writeVideoMetadataFile(videoMetadata)
-					fileMap[videoMetadata.path] = metadataAbsolutePath
-					const videoResource: ResourceVideo = {
-						id: videoPlan.id,
-						title: metadata.title,
-						type: "video",
-						path: videoPlan.metadataPath,
-						youtubeId: videoPlan.youtubeId,
-						durationSeconds: metadata.durationSeconds,
-						description: metadata.description
-					}
-					lessonResources.push(videoResource)
+					pendingVideoTasks.push({
+						lessonResources,
+						articleResource: articleEntry.resource,
+						plan: videoPlan,
+						lesson,
+						unit
+					})
+					uniqueYoutubeIds.add(videoPlan.youtubeId)
 				}
 			}
 			for (const quiz of lesson.quizzes) {
@@ -981,6 +980,63 @@ async function main() {
 			lessons: lessonBuilds,
 			unitTest: unit.unitTest
 		})
+	}
+
+	const metadataById = await fetchYoutubeMetadataBatch(
+		Array.from(uniqueYoutubeIds),
+		YOUTUBE_REQUESTS_PER_SECOND
+	)
+	const articleInsertionCounts = new Map<ArticleResource, number>()
+
+	for (const task of pendingVideoTasks) {
+		const metadata = metadataById.get(task.plan.youtubeId)
+		if (!metadata) {
+			logger.error("youtube metadata missing", {
+				youtubeId: task.plan.youtubeId
+			})
+			throw errors.new("youtube metadata missing")
+		}
+		const videoMetadata: VideoMetadata = {
+			id: task.plan.id,
+			type: "video",
+			youtubeId: task.plan.youtubeId,
+			path: task.plan.metadataPath,
+			title: metadata.title,
+			description: metadata.description,
+			durationSeconds: metadata.durationSeconds,
+			lessonId: task.lesson.lessonId,
+			unitId: task.unit.unitId,
+			order: task.plan.order
+		}
+		if (task.plan.titleHint !== undefined) {
+			videoMetadata.titleHint = task.plan.titleHint
+		}
+		if (task.plan.contextHtml !== undefined) {
+			videoMetadata.contextHtml = task.plan.contextHtml
+		}
+		const metadataAbsolutePath = await writeVideoMetadataFile(videoMetadata)
+		fileMap[videoMetadata.path] = metadataAbsolutePath
+		const videoResource: ResourceVideo = {
+			id: task.plan.id,
+			title: metadata.title,
+			type: "video",
+			path: task.plan.metadataPath,
+			youtubeId: task.plan.youtubeId,
+			durationSeconds: metadata.durationSeconds,
+			description: metadata.description
+		}
+		const articleIndex = task.lessonResources.indexOf(task.articleResource)
+		const alreadyInserted =
+			articleInsertionCounts.get(task.articleResource) ?? 0
+		const insertIndex =
+			articleIndex >= 0
+				? Math.min(
+						articleIndex + 1 + alreadyInserted,
+						task.lessonResources.length
+					)
+				: task.lessonResources.length
+		task.lessonResources.splice(insertIndex, 0, videoResource)
+		articleInsertionCounts.set(task.articleResource, alreadyInserted + 1)
 	}
 
 	logger.info(
