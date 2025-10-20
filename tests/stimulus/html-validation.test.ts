@@ -93,6 +93,8 @@ describe("Canvas stimulus HTML generation", () => {
 			expect(result).toBeDefined()
 			if (!result) return
 
+			expect(Array.isArray(result.videos)).toBeTrue()
+
 			const fatalIssues = result.issues.filter(
 				(issue) => issue.severity === "error"
 			)
@@ -105,6 +107,15 @@ describe("Canvas stimulus HTML generation", () => {
 
 			expect(result.html.trim().length).toBeGreaterThan(0)
 			expect(result.html).toMatchSnapshot()
+			expect(result.html.includes("<iframe")).toBeFalse()
+			expect(
+				result.html.toLowerCase().includes("watch the following videos")
+			).toBeFalse()
+
+			for (const video of result.videos) {
+				expect(video.order).toBeGreaterThan(0)
+				expect(video.youtubeId.length).toBe(11)
+			}
 
 			const htmlDocument = `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8" /><title>stimulus</title></head><body>${result.html}</body></html>`
 			const report = await htmlvalidate.validateString(

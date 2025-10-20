@@ -17,6 +17,19 @@ export const ResourceArticleSchema = z
 	})
 	.strict()
 
+export const ResourceVideoSchema = z
+	.object({
+		id: z.string(),
+		title: z.string(),
+		slug: z.string(),
+		type: z.literal("video"),
+		path: z.string(),
+		youtubeId: z.string(),
+		durationSeconds: z.number().int().positive(),
+		description: z.string()
+	})
+	.strict()
+
 export const ResourceQuizSchema = z
 	.object({
 		id: z.string(),
@@ -30,6 +43,7 @@ export const ResourceQuizSchema = z
 
 export const ResourceSchema = z.discriminatedUnion("type", [
 	ResourceArticleSchema,
+	ResourceVideoSchema,
 	ResourceQuizSchema
 ])
 

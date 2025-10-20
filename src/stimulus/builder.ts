@@ -11,6 +11,7 @@ import type {
 	StimulusOptions
 } from "@/stimulus/types"
 import { validateHtml } from "@/stimulus/validator"
+import { extractYouTubeVideos } from "@/stimulus/video-extractor"
 
 export type {
 	StimulusAsset,
@@ -37,13 +38,15 @@ export function buildStimulusFromHtml(
 	const root = normalizeStructure(sourceDocument, issues)
 
 	applyInlineStyles(root, options)
+	const videos = extractYouTubeVideos(root)
 	const html = serializeArticle(root)
 	const validationIssues = validateHtml(html)
 	const assets = collectAssets(root)
 	return {
 		html,
 		issues: [...issues, ...validationIssues],
-		assets
+		assets,
+		videos
 	}
 }
 

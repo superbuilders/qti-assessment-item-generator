@@ -20,6 +20,8 @@ Cartridge (tar.zst archive)
 ├── content/
 │   └── {group}/{slug}/
 │       └── stimulus.html   # Article content
+├── videos/
+│   └── {group}/{lessonSlug}/{videoId}.json  # Hydrated video metadata
 ├── quizzes/
 │   └── quiz-{unit}-{lesson}/
 │       ├── question-{nn}.xml
@@ -34,8 +36,8 @@ Cartridge (tar.zst archive)
 
 - **Index**: Root manifest listing all units and required course metadata
 - **Unit**: Contains lessons and optional unit test
-- **Lesson**: Contains resources (articles and/or quizzes)
-- **Resource**: Either an article (HTML stimulus) or a quiz (collection of questions)
+- **Lesson**: Contains resources (articles, videos, and/or quizzes)
+- **Resource**: Article (`stimulus.html`), video (metadata JSON with YouTube details), or quiz (collection of questions)
 
 ## Building a Cartridge (In-Memory)
 
@@ -60,6 +62,16 @@ const input: CartridgeBuildInput = {
           title: "1.1 Plot Structure",
           resources: [
             { id: "article-intro", type: "article", path: "content/unit-1--short-fiction---literary-elements/1-1-plot-structure/stimulus.html" },
+            {
+              id: "lesson-1-1-video-01",
+              type: "video",
+              slug: "lesson-1-1-video-01",
+              path: "videos/unit-1--short-fiction---literary-elements/1-1-plot-structure/lesson-1-1-video-01.json",
+              youtubeId: "AAAAAAAAAAA",
+              durationSeconds: 120,
+              description: "Sample description",
+              title: "Plot Structure Overview"
+            },
             {
               id: "quiz-1-1",
               type: "quiz",
@@ -118,6 +130,7 @@ import {
   iterUnitLessons,
   iterLessonResources,
   readArticleContent,
+  readVideoMetadata,
   readQuestionXml,
   readQuestionJson
 } from "@superbuilders/qti-assessment-item-generator/cartridge/client"
@@ -126,6 +139,10 @@ for await (const unit of iterUnits(reader)) {
   for await (const lesson of iterUnitLessons(reader, unit)) {
     for await (const resource of iterLessonResources(reader, lesson)) {
       // ...
+      if (resource.type === "video") {
+        const metadata = await readVideoMetadata(reader, resource)
+        // inspect metadata as needed
+      }
     }
   }
 }
@@ -250,4 +267,3 @@ These subpath exports are available from the published package for the cartridge
 
 - Removed directory reader and file-based helper APIs
 - Replaced packaging script to build directly from in-memory inputs
-

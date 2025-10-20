@@ -127,6 +127,7 @@ export async function buildCartridgeToBytes(
 		for (const l of u.lessons) {
 			for (const r of l.resources) {
 				if (r.type === "article") requiredPaths.add(r.path)
+				if (r.type === "video") requiredPaths.add(r.path)
 				if (r.type === "quiz") {
 					for (const q of r.questions) {
 						requiredPaths.add(q.xml)
@@ -629,8 +630,9 @@ export async function buildCartridgeFromFileMap(
 		)
 		const quizQuestionCount = u.lessons.reduce((sum, l) => {
 			let lessonQuizQuestions = 0
-			for (const r of l.resources)
+			for (const r of l.resources) {
 				if (r.type === "quiz") lessonQuizQuestions += r.questionCount
+			}
 			return sum + lessonQuizQuestions
 		}, 0)
 		const unitTestQuestionCount = u.unitTest ? u.unitTest.questionCount : 0

@@ -31,8 +31,16 @@ export interface StimulusAsset {
 	url: string
 }
 
+export type ExtractedVideo = {
+	order: number
+	youtubeId: string
+	titleHint?: string
+	contextHtml?: string
+}
+
 export interface StimulusBuildResult {
 	html: string
 	issues: StimulusIssue[]
 	assets: StimulusAsset[]
+	videos: ExtractedVideo[]
 }

@@ -10,6 +10,7 @@ import {
 	readIndex,
 	readQuestionJson,
 	readQuestionXml,
+	readVideoMetadata,
 	validateIntegrity
 } from "@/cartridge/client"
 import { openCartridgeTarZst } from "@/cartridge/readers/tarzst"
@@ -63,13 +64,19 @@ async function main() {
 	let totalUnits = 0
 	let totalLessons = 0
 	let totalArticles = 0
+	let totalVideos = 0
 	let totalQuizzes = 0
 	let totalQuestions = 0
+
+	function isRecord(value: unknown): value is Record<string, unknown> {
+		return typeof value === "object" && value !== null
+	}
 
 	for await (const unit of iterUnits(reader)) {
 		totalUnits++
 		let unitLessons = 0
 		let unitArticles = 0
+		let unitVideos = 0
 		let unitQuizzes = 0
 		let unitQuestions = 0
 
@@ -77,6 +84,7 @@ async function main() {
 			unitLessons++
 			totalLessons++
 			let lessonArticles = 0
+			let lessonVideos = 0
 			let lessonQuizzes = 0
 			let lessonQuestions = 0
 
@@ -93,6 +101,25 @@ async function main() {
 						path: resource.path,
 						byteLength: content.length
 					})
+					if (content.includes("<iframe")) {
+						logger.error("article contains iframe", {
+							unitId: unit.id,
+							lessonId: lesson.id,
+							articleId: resource.id,
+							path: resource.path
+						})
+						throw errors.new("article iframe detected")
+					}
+					const lowered = content.toLowerCase()
+					if (lowered.includes("watch the following videos")) {
+						logger.error("article contains instructional callout", {
+							unitId: unit.id,
+							lessonId: lesson.id,
+							articleId: resource.id,
+							path: resource.path
+						})
+						throw errors.new("article instructional callout detected")
+					}
 				} else if (resource.type === "quiz") {
 					lessonQuizzes++
 					unitQuizzes++
@@ -118,6 +145,62 @@ async function main() {
 							jsonKeys
 						})
 					}
+				} else if (resource.type === "video") {
+					lessonVideos++
+					unitVideos++
+					totalVideos++
+					const metadata = await readVideoMetadata(reader, resource)
+					logger.debug("video resource verified", {
+						unitId: unit.id,
+						lessonId: lesson.id,
+						videoId: resource.id,
+						path: resource.path,
+						youtubeId: resource.youtubeId,
+						durationSeconds: resource.durationSeconds
+					})
+					if (!isRecord(metadata)) {
+						logger.error("video metadata invalid", {
+							unitId: unit.id,
+							lessonId: lesson.id,
+							videoId: resource.id,
+							path: resource.path
+						})
+						throw errors.new("video metadata invalid")
+					}
+					const metaYoutubeId = metadata.youtubeId
+					if (typeof metaYoutubeId !== "string") {
+						logger.error("video metadata youtube missing", {
+							unitId: unit.id,
+							lessonId: lesson.id,
+							videoId: resource.id,
+							path: resource.path
+						})
+						throw errors.new("video metadata youtube missing")
+					}
+					if (metaYoutubeId !== resource.youtubeId) {
+						logger.error("video metadata youtube mismatch", {
+							unitId: unit.id,
+							lessonId: lesson.id,
+							videoId: resource.id,
+							path: resource.path,
+							metadataYoutubeId: metaYoutubeId,
+							expectedYoutubeId: resource.youtubeId
+						})
+						throw errors.new("video metadata youtube mismatch")
+					}
+					const metaDescription = metadata.description
+					if (
+						typeof metaDescription !== "string" ||
+						metaDescription.length === 0
+					) {
+						logger.error("video metadata description missing", {
+							unitId: unit.id,
+							lessonId: lesson.id,
+							videoId: resource.id,
+							path: resource.path
+						})
+						throw errors.new("video metadata description missing")
+					}
 				}
 			}
 
@@ -127,6 +210,7 @@ async function main() {
 				lessonNumber: lesson.lessonNumber,
 				title: lesson.title,
 				articleCount: lessonArticles,
+				videoCount: lessonVideos,
 				quizCount: lessonQuizzes,
 				questionCount: lessonQuestions
 			})
@@ -164,6 +248,7 @@ async function main() {
 			title: unit.title,
 			lessonCount: unitLessons,
 			articleCount: unitArticles,
+			videoCount: unitVideos,
 			quizCount: unitQuizzes,
 			questionCount: unitQuestions
 		})
@@ -175,6 +260,7 @@ async function main() {
 		totalUnits,
 		totalLessons,
 		totalArticles,
+		totalVideos,
 		totalQuizzes,
 		totalQuestions,
 		openMs: openMs.toFixed(2),

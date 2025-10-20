@@ -4,6 +4,16 @@ export type ResourceArticle = {
 	type: "article"
 	path: string
 }
+export type ResourceVideo = {
+	id: string
+	title: string
+	slug: string
+	type: "video"
+	path: string
+	youtubeId: string
+	durationSeconds: number
+	description: string
+}
 export type QuestionRef = { number: number; xml: string; json: string }
 export type ResourceQuiz = {
 	id: string
@@ -13,14 +23,14 @@ export type ResourceQuiz = {
 	questionCount: number
 	questions: QuestionRef[]
 }
-export type Resource = ResourceArticle | ResourceQuiz
+export type Resource = ResourceArticle | ResourceVideo | ResourceQuiz
 
 export type Lesson = {
 	id: string
 	unitId: string
 	lessonNumber: number
 	title: string
-	resources: Array<ResourceArticle | ResourceQuiz>
+	resources: Array<ResourceArticle | ResourceVideo | ResourceQuiz>
 }
 
 export type UnitTest = {

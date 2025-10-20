@@ -98,6 +98,13 @@ const PageDataSchema = z.object({
 
 type PageData = z.infer<typeof PageDataSchema>
 
+const DetectedVideoSchema = z.object({
+	order: z.number().int(),
+	youtubeId: z.string(),
+	titleHint: z.string().min(1).optional(),
+	contextHtml: z.string().min(1).optional()
+})
+
 // ----------------------
 // Core processing
 // ----------------------
@@ -190,6 +197,17 @@ async function buildAndWriteStimulus(
 	}
 
 	const finalizedResult = buildResult
+	const videosValidation = DetectedVideoSchema.array().safeParse(
+		finalizedResult.videos
+	)
+	if (!videosValidation.success) {
+		logger.error("video manifest schema mismatch", {
+			outDir,
+			error: videosValidation.error
+		})
+		throw errors.wrap(videosValidation.error, "video manifest validation")
+	}
+	const videosData = videosValidation.data
 
 	const outPath = path.join(outDir, "stimulus.html")
 	async function writeStimulusFile() {
@@ -205,6 +223,25 @@ async function buildAndWriteStimulus(
 	} else {
 		logger.info("wrote stimulus html", { file: outPath })
 	}
+
+	const videosPath = path.join(outDir, "videos.json")
+	async function writeVideosFile() {
+		await fs.mkdir(outDir, { recursive: true })
+		const serialized = `${JSON.stringify(videosData, null, 2)}\n`
+		await Bun.write(videosPath, serialized)
+	}
+	const videosWrite = await errors.try(writeVideosFile())
+	if (videosWrite.error) {
+		logger.error("failed to write video manifest", {
+			file: videosPath,
+			error: videosWrite.error
+		})
+		throw errors.wrap(videosWrite.error, "video manifest write")
+	}
+	logger.debug("wrote video manifest", {
+		file: videosPath,
+		count: videosData.length
+	})
 }
 
 // ----------------------

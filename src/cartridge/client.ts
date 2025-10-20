@@ -3,7 +3,13 @@ import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import type { CartridgeReader } from "@/cartridge/reader"
 import { IndexV1Schema, IntegritySchema } from "@/cartridge/schema"
-import type { IndexV1, Lesson, Resource, Unit } from "@/cartridge/types"
+import type {
+	IndexV1,
+	Lesson,
+	Resource,
+	ResourceVideo,
+	Unit
+} from "@/cartridge/types"
 
 // NOTE: After write-time validation and integrity check on open, reads trust shapes and avoid Zod.
 export async function readIndex(reader: CartridgeReader): Promise<IndexV1> {
@@ -69,6 +75,33 @@ export async function readArticleContent(
 		throw errors.wrap(res.error, "article read")
 	}
 	return res.data
+}
+
+export function isVideoResource(res: Resource): res is ResourceVideo {
+	return res.type === "video"
+}
+
+export async function readVideoMetadata(
+	reader: CartridgeReader,
+	resource: ResourceVideo
+): Promise<unknown> {
+	const res = await errors.try(reader.readText(resource.path))
+	if (res.error) {
+		logger.error("video metadata read", {
+			path: resource.path,
+			error: res.error
+		})
+		throw errors.wrap(res.error, "video metadata read")
+	}
+	const parseRes = errors.trySync(() => JSON.parse(res.data))
+	if (parseRes.error) {
+		logger.error("video metadata parse", {
+			path: resource.path,
+			error: parseRes.error
+		})
+		throw errors.wrap(parseRes.error, "video metadata parse")
+	}
+	return parseRes.data
 }
 
 export async function readQuestionXml(

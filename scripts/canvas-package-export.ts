@@ -1,5 +1,6 @@
 #!/usr/bin/env bun
 
+import "dotenv/config"
 import * as fs from "node:fs/promises"
 import * as path from "node:path"
 import * as errors from "@superbuilders/errors"
@@ -11,6 +12,10 @@ import {
 	type CartridgeFileMap,
 	type GeneratorInfo
 } from "@/cartridge/build/builder"
+import {
+	fetchYoutubeMetadata,
+	type YoutubeMetadata
+} from "./lib/youtube-metadata"
 
 // Enable debug logging for this script
 logger.setDefaultLogLevel(logger.DEBUG)
@@ -190,6 +195,17 @@ const IndexAssessmentSchema = z.object({
 	questions: z.array(IndexQuestionSchema)
 })
 
+const ExtractedVideoSchema = z
+	.object({
+		order: z.number().int(),
+		youtubeId: z.string(),
+		titleHint: z.string().optional(),
+		contextHtml: z.string().optional()
+	})
+	.strict()
+
+type ExtractedVideo = z.infer<typeof ExtractedVideoSchema>
+
 // ----------------------
 // Packaging Steps
 // ----------------------
@@ -197,7 +213,12 @@ const IndexAssessmentSchema = z.object({
 async function collectStimulus(): Promise<
 	Array<{
 		group: string
-		pages: Array<{ slug: string; path: string; diskPath: string }>
+		pages: Array<{
+			slug: string
+			path: string
+			diskPath: string
+			videos: ExtractedVideo[]
+		}>
 	}>
 > {
 	const stimulusRoot = path.join(DATA_DIR, "stimulus-out")
@@ -212,7 +233,12 @@ async function collectStimulus(): Promise<
 
 	const groups: Array<{
 		group: string
-		pages: Array<{ slug: string; path: string; diskPath: string }>
+		pages: Array<{
+			slug: string
+			path: string
+			diskPath: string
+			videos: ExtractedVideo[]
+		}>
 	}> = []
 	const groupDirentsResult = await errors.try(
 		fs.readdir(stimulusRoot, { withFileTypes: true })
@@ -231,7 +257,12 @@ async function collectStimulus(): Promise<
 	groupDirs.sort(sortTopGroups)
 
 	for (const groupDir of groupDirs) {
-		const pages: Array<{ slug: string; path: string; diskPath: string }> = []
+		const pages: Array<{
+			slug: string
+			path: string
+			diskPath: string
+			videos: ExtractedVideo[]
+		}> = []
 		const pageDirentsResult = await errors.try(
 			fs.readdir(groupDir, { withFileTypes: true })
 		)
@@ -253,6 +284,38 @@ async function collectStimulus(): Promise<
 				logger.debug("stimulus missing, skipping page", { dir: pageDir })
 				continue
 			}
+			const videosPath = path.join(pageDir, "videos.json")
+			const videosRead = await errors.try(fs.readFile(videosPath, "utf8"))
+			if (videosRead.error) {
+				logger.error("videos manifest read failed", {
+					file: videosPath,
+					error: videosRead.error
+				})
+				throw errors.wrap(videosRead.error, "video manifest read")
+			}
+			const videosParsed = errors.trySync<unknown>(() =>
+				JSON.parse(videosRead.data)
+			)
+			if (videosParsed.error) {
+				logger.error("videos manifest parse failed", {
+					file: videosPath,
+					error: videosParsed.error
+				})
+				throw errors.wrap(videosParsed.error, "video manifest parse")
+			}
+			const videosValidation = ExtractedVideoSchema.array().safeParse(
+				videosParsed.data
+			)
+			if (!videosValidation.success) {
+				logger.error("videos manifest schema invalid", {
+					file: videosPath,
+					error: videosValidation.error
+				})
+				throw errors.wrap(videosValidation.error, "video manifest validate")
+			}
+			const videosSorted = [...videosValidation.data].sort(
+				(a, b) => a.order - b.order
+			)
 			const relativePath = path.relative(stimulusRoot, htmlPath)
 			const cartridgePath = path
 				.join("content", relativePath)
@@ -261,7 +324,8 @@ async function collectStimulus(): Promise<
 			pages.push({
 				slug: path.basename(pageDir),
 				path: cartridgePath,
-				diskPath: htmlPath
+				diskPath: htmlPath,
+				videos: videosSorted
 			})
 		}
 		groups.push({ group: path.basename(groupDir), pages })
@@ -398,6 +462,26 @@ type ArticleResource = {
 	type: "article"
 	path: string
 }
+type VideoResourcePlan = {
+	id: string
+	slug: string
+	type: "video"
+	order: number
+	youtubeId: string
+	metadataPath: string
+	titleHint?: string
+	contextHtml?: string
+}
+type VideoResourceFinal = {
+	id: string
+	title: string
+	slug: string
+	type: "video"
+	path: string
+	youtubeId: string
+	durationSeconds: number
+	description: string
+}
 type QuizResource = {
 	id: string
 	title: string
@@ -411,7 +495,8 @@ type LessonRecord = {
 	lessonId: string
 	lessonNumber: number
 	title: string
-	resources: Array<ArticleResource | QuizResource>
+	articles: Array<{ resource: ArticleResource; videos: VideoResourcePlan[] }>
+	quizzes: QuizResource[]
 }
 type UnitTestRecord = {
 	id: string
@@ -465,7 +550,12 @@ function toLessonId(
 function buildHierarchy(
 	stimGroups: Array<{
 		group: string
-		pages: Array<{ slug: string; path: string; diskPath: string }>
+		pages: Array<{
+			slug: string
+			path: string
+			diskPath: string
+			videos: ExtractedVideo[]
+		}>
 	}>,
 	assessments: {
 		quizzes: Array<z.infer<typeof IndexAssessmentSchema>>
@@ -514,15 +604,49 @@ function buildHierarchy(
 					lessonId,
 					lessonNumber,
 					title: prettyLessonTitle,
-					resources: []
+					articles: [],
+					quizzes: []
 				}
 				unit.lessons.push(lesson)
 			}
-			lesson.resources.push({
-				id: `article-${g.group}-${p.slug}`.replace(/[^a-z0-9-]/g, "-"),
-				title: prettyLessonTitle,
-				type: "article",
-				path: p.path
+			const articleId = `article-${g.group}-${p.slug}`.replace(
+				/[^a-z0-9-]/g,
+				"-"
+			)
+			const existingVideoCount = lesson.articles.reduce((sum, entry) => {
+				return sum + entry.videos.length
+			}, 0)
+			const videosForArticle: VideoResourcePlan[] = []
+			for (let idx = 0; idx < p.videos.length; idx++) {
+				const video = p.videos[idx]
+				const ordinal = existingVideoCount + idx + 1
+				const paddedOrdinal = String(ordinal).padStart(2, "0")
+				const videoId = `${lessonId}-video-${paddedOrdinal}`
+				const metadataPath = path.posix.join(
+					"videos",
+					g.group,
+					p.slug,
+					`${videoId}.json`
+				)
+				videosForArticle.push({
+					id: videoId,
+					slug: videoId,
+					type: "video",
+					order: video.order,
+					youtubeId: video.youtubeId,
+					metadataPath,
+					titleHint: video.titleHint,
+					contextHtml: video.contextHtml
+				})
+			}
+			lesson.articles.push({
+				resource: {
+					id: articleId,
+					title: prettyLessonTitle,
+					type: "article",
+					path: p.path
+				},
+				videos: videosForArticle
 			})
 		}
 	}
@@ -576,7 +700,8 @@ function buildHierarchy(
 				lessonId: `lesson-${unitNum}-${lessonNum}`,
 				lessonNumber: lessonNum,
 				title: prettyLessonTitle,
-				resources: []
+				articles: [],
+				quizzes: []
 			}
 			unit.lessons.push(lesson)
 		}
@@ -589,7 +714,7 @@ function buildHierarchy(
 			})
 			throw errors.new("missing pretty quiz title")
 		}
-		lesson.resources.push({
+		lesson.quizzes.push({
 			id: q.id,
 			title: quizTitle,
 			type: "quiz",
@@ -646,10 +771,7 @@ function buildHierarchy(
 	for (const u of unitsMap.values()) {
 		u.lessons.sort((a, b) => a.lessonNumber - b.lessonNumber)
 		for (const l of u.lessons) {
-			l.resources.sort((r1, r2) => {
-				if (r1.type !== r2.type) return r1.type === "article" ? -1 : 1
-				return r1.id.localeCompare(r2.id)
-			})
+			l.quizzes.sort((q1, q2) => q1.id.localeCompare(q2.id))
 		}
 	}
 
@@ -691,21 +813,6 @@ async function main() {
 
 	// Build hierarchical Units → Lessons → Resources, and write split JSON files
 	const hierarchy = buildHierarchy(contentGroups, assessments, prettyMaps)
-
-	// Convert UnitRecord (staging view) to BuildUnit (builder schema) shape
-	const buildUnits: BuildUnit[] = hierarchy.map((u) => ({
-		id: u.unitId,
-		unitNumber: u.unitNumber,
-		title: u.title,
-		lessons: u.lessons.map((l) => ({
-			id: l.lessonId,
-			unitId: u.unitId,
-			lessonNumber: l.lessonNumber,
-			title: l.title,
-			resources: l.resources
-		})),
-		unitTest: u.unitTest
-	}))
 
 	// Read package.json for generator info
 	const pkgJsonPath = path.join(process.cwd(), "package.json")
@@ -759,6 +866,124 @@ async function main() {
 				path.basename(entry.json)
 			)
 		}
+	}
+
+	async function writeVideoMetadataFile(
+		metadataPath: string,
+		payload: Record<string, unknown>
+	): Promise<string> {
+		const absolute = path.join(DATA_DIR, ...metadataPath.split("/"))
+		const directory = path.dirname(absolute)
+		const mkdirResult = await errors.try(
+			fs.mkdir(directory, { recursive: true })
+		)
+		if (mkdirResult.error) {
+			logger.error("video metadata directory creation failed", {
+				directory,
+				error: mkdirResult.error
+			})
+			throw errors.wrap(mkdirResult.error, "video metadata directory")
+		}
+		const serialized = `${JSON.stringify(payload, null, 2)}\n`
+		const writeResult = await errors.try(
+			fs.writeFile(absolute, serialized, "utf8")
+		)
+		if (writeResult.error) {
+			logger.error("video metadata write failed", {
+				file: absolute,
+				error: writeResult.error
+			})
+			throw errors.wrap(writeResult.error, "video metadata write")
+		}
+		logger.debug("wrote video metadata", {
+			file: absolute,
+			bytes: Buffer.byteLength(serialized)
+		})
+		return absolute
+	}
+
+	const videoMetadataCache = new Map<string, YoutubeMetadata>()
+
+	async function loadYoutubeMetadata(
+		youtubeId: string
+	): Promise<YoutubeMetadata> {
+		const cached = videoMetadataCache.get(youtubeId)
+		if (cached) {
+			return cached
+		}
+		logger.info("fetching youtube metadata", { youtubeId })
+		const metadata = await fetchYoutubeMetadata(youtubeId)
+		videoMetadataCache.set(youtubeId, metadata)
+		return metadata
+	}
+
+	const buildUnits: BuildUnit[] = []
+	for (const unit of hierarchy) {
+		const lessonBuilds = []
+		for (const lesson of unit.lessons) {
+			const lessonResources: Array<
+				ArticleResource | QuizResource | VideoResourceFinal
+			> = []
+			for (const articleEntry of lesson.articles) {
+				lessonResources.push(articleEntry.resource)
+				const sortedVideos = [...articleEntry.videos].sort(
+					(a, b) => a.order - b.order
+				)
+				for (const videoPlan of sortedVideos) {
+					const metadata = await loadYoutubeMetadata(videoPlan.youtubeId)
+					const metadataPayload: Record<string, unknown> = {
+						id: videoPlan.id,
+						slug: videoPlan.slug,
+						youtubeId: videoPlan.youtubeId,
+						title: metadata.title,
+						description: metadata.description,
+						durationSeconds: metadata.durationSeconds,
+						lessonId: lesson.lessonId,
+						unitId: unit.unitId,
+						order: videoPlan.order
+					}
+					if (videoPlan.titleHint !== undefined) {
+						metadataPayload.titleHint = videoPlan.titleHint
+					}
+					if (videoPlan.contextHtml !== undefined) {
+						metadataPayload.contextHtml = videoPlan.contextHtml
+					}
+					const metadataAbsolutePath = await writeVideoMetadataFile(
+						videoPlan.metadataPath,
+						metadataPayload
+					)
+					fileMap[videoPlan.metadataPath] = metadataAbsolutePath
+					const videoResource: VideoResourceFinal = {
+						id: videoPlan.id,
+						title: metadata.title,
+						slug: videoPlan.slug,
+						type: "video",
+						path: videoPlan.metadataPath,
+						youtubeId: videoPlan.youtubeId,
+						durationSeconds: metadata.durationSeconds,
+						description: metadata.description
+					}
+					lessonResources.push(videoResource)
+				}
+			}
+			for (const quiz of lesson.quizzes) {
+				lessonResources.push(quiz)
+			}
+			lessonBuilds.push({
+				id: lesson.lessonId,
+				unitId: unit.unitId,
+				lessonNumber: lesson.lessonNumber,
+				title: lesson.title,
+				resources: lessonResources
+			})
+		}
+		buildUnits.push({
+			id: unit.unitId,
+			unitNumber: unit.unitNumber,
+			title: unit.title,
+			lessons: lessonBuilds,
+			unitTest: unit.unitTest
+		})
 	}
 
 	logger.info(
