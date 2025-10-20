@@ -1,0 +1,651 @@
+// Bun Snapshot v1, https://bun.sh/docs/test/snapshots
+
+exports[`Stimulus video extraction videos for course-completion--requesting-a-transcript/course-feedback 1`] = `[]`;
+
+exports[`Stimulus video extraction videos for course-completion--requesting-a-transcript/request-a-transcript 1`] = `[]`;
+
+exports[`Stimulus video extraction videos for final-exam/reattempt-up-to-2-unit-tests 1`] = `[]`;
+
+exports[`Stimulus video extraction videos for how-to-take-this-course/ask-the-teacher 1`] = `[]`;
+
+exports[`Stimulus video extraction videos for how-to-take-this-course/course-instructions 1`] = `[]`;
+
+exports[`Stimulus video extraction videos for how-to-take-this-course/how-this-course-works--suggested-timeline 1`] = `
+[
+  {
+    "contextHtml": "<p>Here is a brief overview of how our courses work:</p>",
+    "order": 1,
+    "youtubeId": "nRxBuxrgeAY",
+  },
+]
+`;
+
+exports[`Stimulus video extraction videos for how-to-take-this-course/learning-objectives--standards-met-by-this-course 1`] = `[]`;
+
+exports[`Stimulus video extraction videos for how-to-take-this-course/submitting-your-assignments 1`] = `[]`;
+
+exports[`Stimulus video extraction videos for unit-1--short-fiction---literary-elements/1-1-plot-structure 1`] = `
+[
+  {
+    "contextHtml": "<p>Unlike longer works, short fiction delivers a knockout punch. &#160;Short stories compress time by colliding all narrative elements at high speed: <strong>plot</strong> (narrative&#160;conflict), <strong>setting</strong> (time and place), <strong>characterization</strong> (protagonists against antagonists), <strong>point of view</strong> (narrator's perspective), and <strong>theme</strong> (author's message).</p>",
+    "order": 1,
+    "youtubeId": "Zr1xLtSMMLo",
+  },
+  {
+    "contextHtml": "<p>Unlike longer works, short fiction delivers a knockout punch. &#160;Short stories compress time by colliding all narrative elements at high speed: <strong>plot</strong> (narrative&#160;conflict), <strong>setting</strong> (time and place), <strong>characterization</strong> (protagonists against antagonists), <strong>point of view</strong> (narrator's perspective), and <strong>theme</strong> (author's message).</p>",
+    "order": 2,
+    "youtubeId": "0FH5lrBL0yA",
+  },
+  {
+    "contextHtml": "<p>Unlike longer works, short fiction delivers a knockout punch. &#160;Short stories compress time by colliding all narrative elements at high speed: <strong>plot</strong> (narrative&#160;conflict), <strong>setting</strong> (time and place), <strong>characterization</strong> (protagonists against antagonists), <strong>point of view</strong> (narrator's perspective), and <strong>theme</strong> (author's message).</p>",
+    "order": 3,
+    "youtubeId": "wNPSQPsf1bs",
+  },
+]
+`;
+
+exports[`Stimulus video extraction videos for unit-1--short-fiction---literary-elements/1-2-richard-connell----the-most-dangerous-game- 1`] = `
+[
+  {
+    "contextHtml": "<h4>Assignment:&#160; Read "<a href="https://www.classicshorts.com/stories/danger.html" target="_blank">The Most Dangerous Game</a>" by Richard Connell.</h4>",
+    "order": 1,
+    "titleHint": "Assignment: Read "The Most Dangerous Game" by Richard Connell.",
+    "youtubeId": "KjvtiU44Vs0",
+  },
+  {
+    "contextHtml": "<h4>Assignment:&#160; Read "<a href="https://www.classicshorts.com/stories/danger.html" target="_blank">The Most Dangerous Game</a>" by Richard Connell.</h4>",
+    "order": 2,
+    "titleHint": "Assignment: Read "The Most Dangerous Game" by Richard Connell.",
+    "youtubeId": "floCqxstrQQ",
+  },
+  {
+    "contextHtml": "<h4>Assignment:&#160; Read "<a href="https://www.classicshorts.com/stories/danger.html" target="_blank">The Most Dangerous Game</a>" by Richard Connell.</h4>",
+    "order": 3,
+    "titleHint": "Assignment: Read "The Most Dangerous Game" by Richard Connell.",
+    "youtubeId": "q5NqT78G3BI",
+  },
+]
+`;
+
+exports[`Stimulus video extraction videos for unit-1--short-fiction---literary-elements/1-3-edgar-allan-poe----the-cask-of-amontillado- 1`] = `
+[
+  {
+    "contextHtml": "<h4>Assignment:&#160; Read "<a href="https://www.owleyes.org/text/cask-amontillado/read/the-cask-of-amontillado#root-2" target="_blank">The Cask of Amontillado</a>" by Edgar Allan Poe.</h4>",
+    "order": 1,
+    "titleHint": "Assignment: Read "The Cask of Amontillado" by Edgar Allan Poe.",
+    "youtubeId": "_fhExYkBl4Y",
+  },
+  {
+    "contextHtml": "<h4>Assignment:&#160; Read "<a href="https://www.owleyes.org/text/cask-amontillado/read/the-cask-of-amontillado#root-2" target="_blank">The Cask of Amontillado</a>" by Edgar Allan Poe.</h4>",
+    "order": 2,
+    "titleHint": "Assignment: Read "The Cask of Amontillado" by Edgar Allan Poe.",
+    "youtubeId": "4Rn88c0oUU4",
+  },
+  {
+    "contextHtml": "<h4>Assignment:&#160; Read "<a href="https://www.owleyes.org/text/cask-amontillado/read/the-cask-of-amontillado#root-2" target="_blank">The Cask of Amontillado</a>" by Edgar Allan Poe.</h4>",
+    "order": 3,
+    "titleHint": "Assignment: Read "The Cask of Amontillado" by Edgar Allan Poe.",
+    "youtubeId": "zNJPZzAkGfs",
+  },
+]
+`;
+
+exports[`Stimulus video extraction videos for unit-1--short-fiction---literary-elements/1-4-characterization-and-setting 1`] = `
+[
+  {
+    "contextHtml": "<strong>Time</strong>",
+    "order": 1,
+    "youtubeId": "HCshdu8loDo",
+  },
+  {
+    "contextHtml": "<strong>Time</strong>",
+    "order": 2,
+    "youtubeId": "30CPmgVQNks",
+  },
+  {
+    "contextHtml": "<strong>Time</strong>",
+    "order": 3,
+    "youtubeId": "NRhteCMgYoU",
+  },
+]
+`;
+
+exports[`Stimulus video extraction videos for unit-1--short-fiction---literary-elements/1-5-alice-walker----everyday-use- 1`] = `
+[
+  {
+    "contextHtml": 
+"<h5>Assignment:&#160; Read "<strong><a href="https://harpers.org/archive/1973/04/everyday-use/">Everyday Use"</a></strong> by Alice Walker.
+</h5>"
+,
+    "order": 1,
+    "titleHint": "Assignment: Read "Everyday Use" by Alice Walker.",
+    "youtubeId": "Bt16zLid2-w",
+  },
+  {
+    "contextHtml": 
+"<h5>Assignment:&#160; Read "<strong><a href="https://harpers.org/archive/1973/04/everyday-use/">Everyday Use"</a></strong> by Alice Walker.
+</h5>"
+,
+    "order": 2,
+    "titleHint": "Assignment: Read "Everyday Use" by Alice Walker.",
+    "youtubeId": "4ZWQ4TB5XKI",
+  },
+]
+`;
+
+exports[`Stimulus video extraction videos for unit-1--short-fiction---literary-elements/1-6-theme-and-point-of-view 1`] = `
+[
+  {
+    "contextHtml": 
+"<ul>
+    <li><strong>first person</strong> ("I") in which the narrator is in the story--telling the story, in fact.</li>
+    <li><strong>third person omniscient</strong> ("he," "she," "they") in which there is no narrator, but the narration is "godlike" and can see into the heads (thoughts and motivations) of <strong>all the characters</strong>.</li>
+    <li><strong>third person limited</strong>&#160;/ <strong>close</strong> ("he," "she," "they")&#160;in which there is no narrator, but the narration can see into <strong>one character's</strong> head (thoughts and motivations).</li>
+    <li><strong>third person objective / distant</strong>&#160;("he," "she," "they")&#160;in which there is no narrator, and the narration can see into <span><strong>none of the&#160;<span>characters'</span></strong>
+</span>heads (thoughts and motivations).</li>
+</ul>"
+,
+    "order": 1,
+    "youtubeId": "MAu3e5GZo4k",
+  },
+  {
+    "contextHtml": 
+"<ul>
+    <li><strong>first person</strong> ("I") in which the narrator is in the story--telling the story, in fact.</li>
+    <li><strong>third person omniscient</strong> ("he," "she," "they") in which there is no narrator, but the narration is "godlike" and can see into the heads (thoughts and motivations) of <strong>all the characters</strong>.</li>
+    <li><strong>third person limited</strong>&#160;/ <strong>close</strong> ("he," "she," "they")&#160;in which there is no narrator, but the narration can see into <strong>one character's</strong> head (thoughts and motivations).</li>
+    <li><strong>third person objective / distant</strong>&#160;("he," "she," "they")&#160;in which there is no narrator, and the narration can see into <span><strong>none of the&#160;<span>characters'</span></strong>
+</span>heads (thoughts and motivations).</li>
+</ul>"
+,
+    "order": 2,
+    "youtubeId": "acURl_KBiRI",
+  },
+  {
+    "contextHtml": 
+"<ul>
+    <li><strong>first person</strong> ("I") in which the narrator is in the story--telling the story, in fact.</li>
+    <li><strong>third person omniscient</strong> ("he," "she," "they") in which there is no narrator, but the narration is "godlike" and can see into the heads (thoughts and motivations) of <strong>all the characters</strong>.</li>
+    <li><strong>third person limited</strong>&#160;/ <strong>close</strong> ("he," "she," "they")&#160;in which there is no narrator, but the narration can see into <strong>one character's</strong> head (thoughts and motivations).</li>
+    <li><strong>third person objective / distant</strong>&#160;("he," "she," "they")&#160;in which there is no narrator, and the narration can see into <span><strong>none of the&#160;<span>characters'</span></strong>
+</span>heads (thoughts and motivations).</li>
+</ul>"
+,
+    "order": 3,
+    "youtubeId": "B5vEfuLS2Qc",
+  },
+]
+`;
+
+exports[`Stimulus video extraction videos for unit-1--short-fiction---literary-elements/unit-1-study-guide 1`] = `[]`;
+
+exports[`Stimulus video extraction videos for unit-2--identity---the-graphic-novel/2-1-american-born-chinese 1`] = `
+[
+  {
+    "contextHtml": "<h4>Read "<strong><a href="https://anyflip.com/dnmpl/ziml/basic" target="_blank">American Born Chinese</a></strong>" by Gene Yang. &#160;Or, download the PDF version <a href="https://fb2bookfree.com/uploads/files/2020-10/1602210101_american-born-chinese.pdf" target="_blank">here</a>.</h4>",
+    "order": 1,
+    "titleHint": "Read "American Born Chinese" by Gene Yang. Or, download the PDF version here.",
+    "youtubeId": "Oz4JqAJbxj0",
+  },
+  {
+    "contextHtml": "<h4>Read "<strong><a href="https://anyflip.com/dnmpl/ziml/basic" target="_blank">American Born Chinese</a></strong>" by Gene Yang. &#160;Or, download the PDF version <a href="https://fb2bookfree.com/uploads/files/2020-10/1602210101_american-born-chinese.pdf" target="_blank">here</a>.</h4>",
+    "order": 2,
+    "titleHint": "Read "American Born Chinese" by Gene Yang. Or, download the PDF version here.",
+    "youtubeId": "GSrS9CsvHuo",
+  },
+]
+`;
+
+exports[`Stimulus video extraction videos for unit-2--identity---the-graphic-novel/2-2--show-and-tell----graphic-essay 1`] = `
+[
+  {
+    "contextHtml": "<h4>Read "<b><a href="https://bpb-us-e1.wpmucdn.com/blogs.uoregon.edu/dist/6/10008/files/2014/12/Scott-McCloud-Understanding-Comics-1a7nmnq.pdf" target="_blank" title="Show and Tell">Show and Tell</a></b>" by Scott McCloud.</h4>",
+    "order": 1,
+    "titleHint": "Read "Show and Tell" by Scott McCloud.",
+    "youtubeId": "fXYckRgsdjI",
+  },
+  {
+    "contextHtml": "<h4>Read "<b><a href="https://bpb-us-e1.wpmucdn.com/blogs.uoregon.edu/dist/6/10008/files/2014/12/Scott-McCloud-Understanding-Comics-1a7nmnq.pdf" target="_blank" title="Show and Tell">Show and Tell</a></b>" by Scott McCloud.</h4>",
+    "order": 2,
+    "titleHint": "Read "Show and Tell" by Scott McCloud.",
+    "youtubeId": "C8EQ5pGke4c",
+  },
+]
+`;
+
+exports[`Stimulus video extraction videos for unit-2--identity---the-graphic-novel/2-3-archetypes-in-literature 1`] = `
+[
+  {
+    "contextHtml": "<h4>Read <a href="https://boords.com/storytelling/character-archetypes" target="_blank" title="&quot;The 12 Character Archetypes&quot;">"The 12 Character Archetypes"</a>&#160;</h4>",
+    "order": 1,
+    "titleHint": "Read "The 12 Character Archetypes"",
+    "youtubeId": "dvYM4GIbYKg",
+  },
+  {
+    "contextHtml": "<h4>Read <a href="https://boords.com/storytelling/character-archetypes" target="_blank" title="&quot;The 12 Character Archetypes&quot;">"The 12 Character Archetypes"</a>&#160;</h4>",
+    "order": 2,
+    "titleHint": "Read "The 12 Character Archetypes"",
+    "youtubeId": "nGKberMyuEk",
+  },
+]
+`;
+
+exports[`Stimulus video extraction videos for unit-2--identity---the-graphic-novel/2-4-identity--who-am-i- 1`] = `
+[
+  {
+    "contextHtml": "<p>Let's learn more about how we construct ourselves and our identities, how we tell our own stories.</p>",
+    "order": 1,
+    "youtubeId": "FYCZqt5WSOM",
+  },
+  {
+    "contextHtml": "<p>Let's learn more about how we construct ourselves and our identities, how we tell our own stories.</p>",
+    "order": 2,
+    "youtubeId": "hoR2JxiM3gg",
+  },
+  {
+    "contextHtml": "<p>Let's learn more about how we construct ourselves and our identities, how we tell our own stories.</p>",
+    "order": 3,
+    "youtubeId": "2CLun4FpqR8",
+  },
+]
+`;
+
+exports[`Stimulus video extraction videos for unit-2--identity---the-graphic-novel/2-5-culture--who-are-we- 1`] = `
+[
+  {
+    "contextHtml": "<p>Needless to say, it's a complicated process!</p>",
+    "order": 1,
+    "youtubeId": "tLLCHbCgJbM",
+  },
+  {
+    "contextHtml": "<p>Needless to say, it's a complicated process!</p>",
+    "order": 2,
+    "youtubeId": "0HBfrgDTcec",
+  },
+  {
+    "contextHtml": "<p>Needless to say, it's a complicated process!</p>",
+    "order": 3,
+    "youtubeId": "mBDULN6Jtn0",
+  },
+]
+`;
+
+exports[`Stimulus video extraction videos for unit-2--identity---the-graphic-novel/2-6-literacy-narrative--how-does-language-define-us- 1`] = `
+[
+  {
+    "contextHtml": "<h4>Read "<strong><a href="https://www.umsl.edu/~alexanderjm/Mother%20Tongue%20by%20Tan.pdf" target="_blank">Mother Tongue</a></strong>" by Amy Tan.</h4>",
+    "order": 1,
+    "titleHint": "Read "Mother Tongue" by Amy Tan.",
+    "youtubeId": "xczCv40ZY1Y",
+  },
+  {
+    "contextHtml": "<h4>Read "<strong><a href="https://www.umsl.edu/~alexanderjm/Mother%20Tongue%20by%20Tan.pdf" target="_blank">Mother Tongue</a></strong>" by Amy Tan.</h4>",
+    "order": 2,
+    "titleHint": "Read "Mother Tongue" by Amy Tan.",
+    "youtubeId": "8vWO1Ub7Vqk",
+  },
+  {
+    "contextHtml": "<h4>Read "<strong><a href="https://www.umsl.edu/~alexanderjm/Mother%20Tongue%20by%20Tan.pdf" target="_blank">Mother Tongue</a></strong>" by Amy Tan.</h4>",
+    "order": 3,
+    "titleHint": "Read "Mother Tongue" by Amy Tan.",
+    "youtubeId": "0rAPrhh0zQU",
+  },
+]
+`;
+
+exports[`Stimulus video extraction videos for unit-2--identity---the-graphic-novel/unit-2-study-guide 1`] = `[]`;
+
+exports[`Stimulus video extraction videos for unit-3--writers-workshop/3-1-writing-claims 1`] = `
+[
+  {
+    "contextHtml": "<div><strong><br>Claims of Policy</strong>: a statement that a change in a policy or law should take place, according to reasons, and is supported by <u>both</u> claims of fact and claims of value. &#160;Claim of policy use the other two claims to call for action and change. &#160;<strong>Claim of policy</strong>: "The U.S. election voting system ought to change: Americans ought to be allowed to vote over multiple days, not one day only, in order to increase participation in government and balance work, family, and civic duty." Notice that a claim of policy uses a claim of fact ("to increase participation,") and claim of value ("civic duty") in order to call for change ("to vote over multiple days, not one day only").<br><br></div>",
+    "order": 1,
+    "youtubeId": "KJW1WQxddPQ",
+  },
+  {
+    "contextHtml": "<div><strong><br>Claims of Policy</strong>: a statement that a change in a policy or law should take place, according to reasons, and is supported by <u>both</u> claims of fact and claims of value. &#160;Claim of policy use the other two claims to call for action and change. &#160;<strong>Claim of policy</strong>: "The U.S. election voting system ought to change: Americans ought to be allowed to vote over multiple days, not one day only, in order to increase participation in government and balance work, family, and civic duty." Notice that a claim of policy uses a claim of fact ("to increase participation,") and claim of value ("civic duty") in order to call for change ("to vote over multiple days, not one day only").<br><br></div>",
+    "order": 2,
+    "youtubeId": "1BMnv2ojkLo",
+  },
+  {
+    "contextHtml": "<div><strong><br>Claims of Policy</strong>: a statement that a change in a policy or law should take place, according to reasons, and is supported by <u>both</u> claims of fact and claims of value. &#160;Claim of policy use the other two claims to call for action and change. &#160;<strong>Claim of policy</strong>: "The U.S. election voting system ought to change: Americans ought to be allowed to vote over multiple days, not one day only, in order to increase participation in government and balance work, family, and civic duty." Notice that a claim of policy uses a claim of fact ("to increase participation,") and claim of value ("civic duty") in order to call for change ("to vote over multiple days, not one day only").<br><br></div>",
+    "order": 3,
+    "youtubeId": "0O-5OrXJteg",
+  },
+]
+`;
+
+exports[`Stimulus video extraction videos for unit-3--writers-workshop/3-2-logical-reasoning 1`] = `
+[
+  {
+    "contextHtml": 
+"<div>
+    <div>"Most humans are right-handed. &#160;I am a human. &#160;Therefore, I am most-likely right-handed." </div>
+</div>"
+,
+    "order": 1,
+    "youtubeId": "MKRH03msgMg",
+  },
+  {
+    "contextHtml": 
+"<div>
+    <div>"Most humans are right-handed. &#160;I am a human. &#160;Therefore, I am most-likely right-handed." </div>
+</div>"
+,
+    "order": 2,
+    "youtubeId": "ImUT0-RLnsA",
+  },
+  {
+    "contextHtml": 
+"<div>
+    <div>"Most humans are right-handed. &#160;I am a human. &#160;Therefore, I am most-likely right-handed." </div>
+</div>"
+,
+    "order": 3,
+    "youtubeId": "EL_RpKGia1U",
+  },
+]
+`;
+
+exports[`Stimulus video extraction videos for unit-3--writers-workshop/3-3-choosing-types-of-evidence 1`] = `
+[
+  {
+    "contextHtml": "<p>A mix of all types of sources are needed in most research projects, depending on the topic, audience, and purpose.</p>",
+    "order": 1,
+    "youtubeId": "sp_asjG9MRg",
+  },
+  {
+    "contextHtml": "<p>A mix of all types of sources are needed in most research projects, depending on the topic, audience, and purpose.</p>",
+    "order": 2,
+    "youtubeId": "Dv3D8q4LZbM",
+  },
+]
+`;
+
+exports[`Stimulus video extraction videos for unit-3--writers-workshop/3-4-commentary--analyzing-evidence 1`] = `
+[
+  {
+    "contextHtml": "<p>Analysis is not summary. &#160;It is not general; rather, it is often more specific than the evidence itself. &#160;It is a "digging deeper" process that continues to polish the evidence until it is a golden nugget, a worthy find.</p>",
+    "order": 1,
+    "youtubeId": "t1UnV6J3xtQ",
+  },
+  {
+    "contextHtml": "<p>Analysis is not summary. &#160;It is not general; rather, it is often more specific than the evidence itself. &#160;It is a "digging deeper" process that continues to polish the evidence until it is a golden nugget, a worthy find.</p>",
+    "order": 2,
+    "youtubeId": "Tq_BoPJsv-4",
+  },
+  {
+    "contextHtml": "<p>Analysis is not summary. &#160;It is not general; rather, it is often more specific than the evidence itself. &#160;It is a "digging deeper" process that continues to polish the evidence until it is a golden nugget, a worthy find.</p>",
+    "order": 3,
+    "youtubeId": "ftjGEUzWmmQ",
+  },
+]
+`;
+
+exports[`Stimulus video extraction videos for unit-3--writers-workshop/3-5-synthesizing-information 1`] = `
+[
+  {
+    "contextHtml": 
+"<p>Academic research has much higher standards than simple "Google" searching. &#160;In academic writing and research, teachers want sources that have been "vetted," or screened, hand-picked as quality sources by librarians and researchers. &#160;A source
+    written by an expert, a doctor, or a specialist is much more valuable than that written by an unknown, a student, or a biased blogger. &#160;So, as a "synthesizer" yourself, you will be asked to filter information using managed databases like&#160; <a href="https://scholar.google.com">Google Scholar</a>!</p>"
+,
+    "order": 1,
+    "youtubeId": "QouxTTEjuvc",
+  },
+  {
+    "contextHtml": 
+"<p>Academic research has much higher standards than simple "Google" searching. &#160;In academic writing and research, teachers want sources that have been "vetted," or screened, hand-picked as quality sources by librarians and researchers. &#160;A source
+    written by an expert, a doctor, or a specialist is much more valuable than that written by an unknown, a student, or a biased blogger. &#160;So, as a "synthesizer" yourself, you will be asked to filter information using managed databases like&#160; <a href="https://scholar.google.com">Google Scholar</a>!</p>"
+,
+    "order": 2,
+    "youtubeId": "ObK6J7vGnw8",
+  },
+  {
+    "contextHtml": 
+"<p>Academic research has much higher standards than simple "Google" searching. &#160;In academic writing and research, teachers want sources that have been "vetted," or screened, hand-picked as quality sources by librarians and researchers. &#160;A source
+    written by an expert, a doctor, or a specialist is much more valuable than that written by an unknown, a student, or a biased blogger. &#160;So, as a "synthesizer" yourself, you will be asked to filter information using managed databases like&#160; <a href="https://scholar.google.com">Google Scholar</a>!</p>"
+,
+    "order": 3,
+    "youtubeId": "n1OKGamPJeo",
+  },
+]
+`;
+
+exports[`Stimulus video extraction videos for unit-3--writers-workshop/3-6-rebuttals-and-counterarguments 1`] = `
+[
+  {
+    "contextHtml": "<p>Let's clarify some terms: &#160;A <strong>counterargument</strong> is another point of view that contrasts with your argument. &#160;A <strong>concession</strong> is admitting that this counterargument has some good points. &#160;A <strong>rebuttal</strong> is positioning your argument against your counterargument to show how your argument is better. &#160;So, ultimately, we would like for you to write all three claims in this kind of order: 1) counterargument; 2) concession; 3) rebuttal. &#160;Like any claim, you will, of course, need to build in evidence to prove your rebuttal, but this paragraph is perhaps the most persuasive in urging your reader to agree with your viewpoint.</p>",
+    "order": 1,
+    "youtubeId": "zN4fF9jIoic",
+  },
+  {
+    "contextHtml": "<p>Let's clarify some terms: &#160;A <strong>counterargument</strong> is another point of view that contrasts with your argument. &#160;A <strong>concession</strong> is admitting that this counterargument has some good points. &#160;A <strong>rebuttal</strong> is positioning your argument against your counterargument to show how your argument is better. &#160;So, ultimately, we would like for you to write all three claims in this kind of order: 1) counterargument; 2) concession; 3) rebuttal. &#160;Like any claim, you will, of course, need to build in evidence to prove your rebuttal, but this paragraph is perhaps the most persuasive in urging your reader to agree with your viewpoint.</p>",
+    "order": 2,
+    "youtubeId": "g-C_ffXjDJE",
+  },
+  {
+    "contextHtml": "<p>Let's clarify some terms: &#160;A <strong>counterargument</strong> is another point of view that contrasts with your argument. &#160;A <strong>concession</strong> is admitting that this counterargument has some good points. &#160;A <strong>rebuttal</strong> is positioning your argument against your counterargument to show how your argument is better. &#160;So, ultimately, we would like for you to write all three claims in this kind of order: 1) counterargument; 2) concession; 3) rebuttal. &#160;Like any claim, you will, of course, need to build in evidence to prove your rebuttal, but this paragraph is perhaps the most persuasive in urging your reader to agree with your viewpoint.</p>",
+    "order": 3,
+    "youtubeId": "re0Qh40LiMc",
+  },
+]
+`;
+
+exports[`Stimulus video extraction videos for unit-3--writers-workshop/unit-3-study-guide 1`] = `[]`;
+
+exports[`Stimulus video extraction videos for unit-4--poetry/4-1-types-of-verse-and-sound-devices 1`] = `
+[
+  {
+    "contextHtml": 
+"<p>When reading a poem, look for repetition or patterns at the beginning and ends of lines. Look for transitions, or <em><strong>voltas</strong></em> (turns), that signal a change in tone. A sonnet, for example, usually has a <em>volta</em> (a
+    turn) in line 9 of 14 in order to move from problem to solution or from cause to effect.</p>"
+,
+    "order": 1,
+    "youtubeId": "JwhouCNq-Fc",
+  },
+  {
+    "contextHtml": 
+"<p>When reading a poem, look for repetition or patterns at the beginning and ends of lines. Look for transitions, or <em><strong>voltas</strong></em> (turns), that signal a change in tone. A sonnet, for example, usually has a <em>volta</em> (a
+    turn) in line 9 of 14 in order to move from problem to solution or from cause to effect.</p>"
+,
+    "order": 2,
+    "youtubeId": "URuMb15CWJs",
+  },
+  {
+    "contextHtml": 
+"<p>When reading a poem, look for repetition or patterns at the beginning and ends of lines. Look for transitions, or <em><strong>voltas</strong></em> (turns), that signal a change in tone. A sonnet, for example, usually has a <em>volta</em> (a
+    turn) in line 9 of 14 in order to move from problem to solution or from cause to effect.</p>"
+,
+    "order": 3,
+    "youtubeId": "upbtF41bxhI",
+  },
+]
+`;
+
+exports[`Stimulus video extraction videos for unit-4--poetry/4-2-poet-vs-speaker 1`] = `
+[
+  {
+    "contextHtml": 
+"<p>So, in your discussion of poems, speeches, stories, and essays, always differentiate the author from the speaker. &#160;Never assume that a voice in any of these works are synonymous with the author's. &#160;Authors and poets often use sarcasm, overstatement,
+    understatement, and verbal irony in order to mask their voice, poke fun at others, and to ridicule their targets. &#160;&#160;</p>"
+,
+    "order": 1,
+    "youtubeId": "zFNnbxCZPBU",
+  },
+  {
+    "contextHtml": 
+"<p>So, in your discussion of poems, speeches, stories, and essays, always differentiate the author from the speaker. &#160;Never assume that a voice in any of these works are synonymous with the author's. &#160;Authors and poets often use sarcasm, overstatement,
+    understatement, and verbal irony in order to mask their voice, poke fun at others, and to ridicule their targets. &#160;&#160;</p>"
+,
+    "order": 2,
+    "youtubeId": "6jCw8ydqkrg",
+  },
+  {
+    "contextHtml": 
+"<p>So, in your discussion of poems, speeches, stories, and essays, always differentiate the author from the speaker. &#160;Never assume that a voice in any of these works are synonymous with the author's. &#160;Authors and poets often use sarcasm, overstatement,
+    understatement, and verbal irony in order to mask their voice, poke fun at others, and to ridicule their targets. &#160;&#160;</p>"
+,
+    "order": 3,
+    "youtubeId": "_5vKV7HNXlo",
+  },
+]
+`;
+
+exports[`Stimulus video extraction videos for unit-4--poetry/4-3-types-of-imagery 1`] = `
+[
+  {
+    "contextHtml": "<ul><li><ul><li><span>Sight: called</span><strong> visual imagery </strong><span>(colors, shapes, symbols)</span></li><li><span>Hearing: called </span><strong>auditory imagery </strong><span>(sounds, music, noises)</span></li><li><span>Touch: called<strong> tactile imagery</strong> (skin, fabric, light/heavy objects)</span></li><li><span>Smell: called <strong>olfactory imagery</strong> (scents, food smells, natural aromas)</span></li><li><span>Taste: called <strong>gustatory imagery </strong>(sweet or bitter, salty or savory flavors)</span></li><li>Whole body movement: called <strong>kinesthetic imagery</strong> (actions of running, climbing, working)</li><li>Feelings of want: called <strong>organic imagery</strong> (hunger, thirst, tiredness, sickness)</li><li>Feelings of faintness: called <strong>equilibrioception imagery</strong> (dizziness, falling, fainting)</li><li>Mixed types: called <strong>composite imagery</strong> (contradictory senses, mixing any two senses together)</li></ul></li></ul>",
+    "order": 1,
+    "youtubeId": "eoNl1Ue5ZtQ",
+  },
+  {
+    "contextHtml": "<ul><li><ul><li><span>Sight: called</span><strong> visual imagery </strong><span>(colors, shapes, symbols)</span></li><li><span>Hearing: called </span><strong>auditory imagery </strong><span>(sounds, music, noises)</span></li><li><span>Touch: called<strong> tactile imagery</strong> (skin, fabric, light/heavy objects)</span></li><li><span>Smell: called <strong>olfactory imagery</strong> (scents, food smells, natural aromas)</span></li><li><span>Taste: called <strong>gustatory imagery </strong>(sweet or bitter, salty or savory flavors)</span></li><li>Whole body movement: called <strong>kinesthetic imagery</strong> (actions of running, climbing, working)</li><li>Feelings of want: called <strong>organic imagery</strong> (hunger, thirst, tiredness, sickness)</li><li>Feelings of faintness: called <strong>equilibrioception imagery</strong> (dizziness, falling, fainting)</li><li>Mixed types: called <strong>composite imagery</strong> (contradictory senses, mixing any two senses together)</li></ul></li></ul>",
+    "order": 2,
+    "youtubeId": "uX413tALG7Q",
+  },
+  {
+    "contextHtml": "<ul><li><ul><li><span>Sight: called</span><strong> visual imagery </strong><span>(colors, shapes, symbols)</span></li><li><span>Hearing: called </span><strong>auditory imagery </strong><span>(sounds, music, noises)</span></li><li><span>Touch: called<strong> tactile imagery</strong> (skin, fabric, light/heavy objects)</span></li><li><span>Smell: called <strong>olfactory imagery</strong> (scents, food smells, natural aromas)</span></li><li><span>Taste: called <strong>gustatory imagery </strong>(sweet or bitter, salty or savory flavors)</span></li><li>Whole body movement: called <strong>kinesthetic imagery</strong> (actions of running, climbing, working)</li><li>Feelings of want: called <strong>organic imagery</strong> (hunger, thirst, tiredness, sickness)</li><li>Feelings of faintness: called <strong>equilibrioception imagery</strong> (dizziness, falling, fainting)</li><li>Mixed types: called <strong>composite imagery</strong> (contradictory senses, mixing any two senses together)</li></ul></li></ul>",
+    "order": 3,
+    "youtubeId": "8yVYARYjl9o",
+  },
+]
+`;
+
+exports[`Stimulus video extraction videos for unit-4--poetry/4-4-the-sonnet 1`] = `
+[
+  {
+    "contextHtml": "<h4>Read "<strong><a href="https://www.nps.gov/stli/learn/historyculture/colossus.htm" target="_blank">The New Colossus</a></strong>" by Emma Lazarus.</h4>",
+    "order": 1,
+    "titleHint": "Read "The New Colossus" by Emma Lazarus.",
+    "youtubeId": "QmrKmL06J9g",
+  },
+  {
+    "contextHtml": "<h4>Read "<strong><a href="https://www.nps.gov/stli/learn/historyculture/colossus.htm" target="_blank">The New Colossus</a></strong>" by Emma Lazarus.</h4>",
+    "order": 2,
+    "titleHint": "Read "The New Colossus" by Emma Lazarus.",
+    "youtubeId": "NaKUuk78L1A",
+  },
+  {
+    "contextHtml": "<h4>Read "<strong><a href="https://www.nps.gov/stli/learn/historyculture/colossus.htm" target="_blank">The New Colossus</a></strong>" by Emma Lazarus.</h4>",
+    "order": 3,
+    "titleHint": "Read "The New Colossus" by Emma Lazarus.",
+    "youtubeId": "1hbk_Q9ZHe4",
+  },
+]
+`;
+
+exports[`Stimulus video extraction videos for unit-4--poetry/unit-4-study-guide 1`] = `[]`;
+
+exports[`Stimulus video extraction videos for unit-5--romeo-and-juliet/5-1-whos-who-in-verona--romeo-and-juliet 1`] = `
+[
+  {
+    "contextHtml": "<p><strong>Of Pentameter &amp; Bear Baiting - Romeo &amp; Juliet Part I</strong></p>",
+    "order": 1,
+    "youtubeId": "I4kz-C7GryY",
+  },
+  {
+    "contextHtml": "<p><strong>Love or Lust? Romeo and Juliet Part II</strong></p>",
+    "order": 2,
+    "youtubeId": "9J4hoAatGRQ",
+  },
+  {
+    "contextHtml": "<p><strong>Love or Lust? Romeo and Juliet Part II</strong></p>",
+    "order": 3,
+    "youtubeId": "9TVEOlPSeRg",
+  },
+]
+`;
+
+exports[`Stimulus video extraction videos for unit-5--romeo-and-juliet/5-2-the-role-of-language-in-shakespeare 1`] = `
+[
+  {
+    "contextHtml": "<h3>Assignment: Read Act II of <a href="https://www.litcharts.com/shakescleare/shakespeare-translations/romeo-and-juliet" target="_blank">Romeo &amp; Juliet</a>&#160;by William Shakespeare&#160;(original and modern text side by side)</h3>",
+    "order": 1,
+    "titleHint": "Assignment: Read Act II of Romeo & Juliet by William Shakespeare (original and modern text side by side)",
+    "youtubeId": "I5lsuyUNu_4",
+  },
+  {
+    "contextHtml": "<h3>Assignment: Read Act II of <a href="https://www.litcharts.com/shakescleare/shakespeare-translations/romeo-and-juliet" target="_blank">Romeo &amp; Juliet</a>&#160;by William Shakespeare&#160;(original and modern text side by side)</h3>",
+    "order": 2,
+    "titleHint": "Assignment: Read Act II of Romeo & Juliet by William Shakespeare (original and modern text side by side)",
+    "youtubeId": "OctEmnpm7rQ",
+  },
+  {
+    "contextHtml": "<h3>Assignment: Read Act II of <a href="https://www.litcharts.com/shakescleare/shakespeare-translations/romeo-and-juliet" target="_blank">Romeo &amp; Juliet</a>&#160;by William Shakespeare&#160;(original and modern text side by side)</h3>",
+    "order": 3,
+    "titleHint": "Assignment: Read Act II of Romeo & Juliet by William Shakespeare (original and modern text side by side)",
+    "youtubeId": "lKcmsK63yn4",
+  },
+]
+`;
+
+exports[`Stimulus video extraction videos for unit-5--romeo-and-juliet/5-3-figurative-language 1`] = `
+[
+  {
+    "contextHtml": "<h5>Assignment: Read Act III of <a href="https://www.litcharts.com/shakescleare/shakespeare-translations/romeo-and-juliet" target="_blank">Romeo &amp; Juliet</a>&#160;by William Shakespeare&#160;(original and modern text side by side)</h5>",
+    "order": 1,
+    "titleHint": "Assignment: Read Act III of Romeo & Juliet by William Shakespeare (original and modern text side by side)",
+    "youtubeId": "lzKj-bLvrYQ",
+  },
+  {
+    "contextHtml": "<h5>Assignment: Read Act III of <a href="https://www.litcharts.com/shakescleare/shakespeare-translations/romeo-and-juliet" target="_blank">Romeo &amp; Juliet</a>&#160;by William Shakespeare&#160;(original and modern text side by side)</h5>",
+    "order": 2,
+    "titleHint": "Assignment: Read Act III of Romeo & Juliet by William Shakespeare (original and modern text side by side)",
+    "youtubeId": "jeE1PtseG8g",
+  },
+  {
+    "contextHtml": "<h5>Assignment: Read Act III of <a href="https://www.litcharts.com/shakescleare/shakespeare-translations/romeo-and-juliet" target="_blank">Romeo &amp; Juliet</a>&#160;by William Shakespeare&#160;(original and modern text side by side)</h5>",
+    "order": 3,
+    "titleHint": "Assignment: Read Act III of Romeo & Juliet by William Shakespeare (original and modern text side by side)",
+    "youtubeId": "IRHODZaSVpY",
+  },
+]
+`;
+
+exports[`Stimulus video extraction videos for unit-5--romeo-and-juliet/5-4-dualities-juxaposition-and-foils 1`] = `
+[
+  {
+    "contextHtml": "<h3>Assignment: Read Act IV of <a href="https://www.litcharts.com/shakescleare/shakespeare-translations/romeo-and-juliet" target="_blank">Romeo &amp; Juliet</a>&#160;by William Shakespeare&#160;(original and modern text side by side)</h3>",
+    "order": 1,
+    "titleHint": "Assignment: Read Act IV of Romeo & Juliet by William Shakespeare (original and modern text side by side)",
+    "youtubeId": "Hgtn9lIBAn0",
+  },
+  {
+    "contextHtml": "<h3>Assignment: Read Act IV of <a href="https://www.litcharts.com/shakescleare/shakespeare-translations/romeo-and-juliet" target="_blank">Romeo &amp; Juliet</a>&#160;by William Shakespeare&#160;(original and modern text side by side)</h3>",
+    "order": 2,
+    "titleHint": "Assignment: Read Act IV of Romeo & Juliet by William Shakespeare (original and modern text side by side)",
+    "youtubeId": "teXTPqF4ecM",
+  },
+  {
+    "contextHtml": "<h3>Assignment: Read Act IV of <a href="https://www.litcharts.com/shakescleare/shakespeare-translations/romeo-and-juliet" target="_blank">Romeo &amp; Juliet</a>&#160;by William Shakespeare&#160;(original and modern text side by side)</h3>",
+    "order": 3,
+    "titleHint": "Assignment: Read Act IV of Romeo & Juliet by William Shakespeare (original and modern text side by side)",
+    "youtubeId": "BB2i4z-5h74",
+  },
+]
+`;
+
+exports[`Stimulus video extraction videos for unit-5--romeo-and-juliet/5-5-types-of-irony 1`] = `
+[
+  {
+    "contextHtml": "<h3>Assignment: Read Act V of <a href="https://www.litcharts.com/shakescleare/shakespeare-translations/romeo-and-juliet" target="_blank">Romeo &amp; Juliet</a>&#160;by William Shakespeare&#160;(original and modern text side by side)</h3>",
+    "order": 1,
+    "titleHint": "Assignment: Read Act V of Romeo & Juliet by William Shakespeare (original and modern text side by side)",
+    "youtubeId": "Ptwxw6FFmKo",
+  },
+  {
+    "contextHtml": "<h3>Assignment: Read Act V of <a href="https://www.litcharts.com/shakescleare/shakespeare-translations/romeo-and-juliet" target="_blank">Romeo &amp; Juliet</a>&#160;by William Shakespeare&#160;(original and modern text side by side)</h3>",
+    "order": 2,
+    "titleHint": "Assignment: Read Act V of Romeo & Juliet by William Shakespeare (original and modern text side by side)",
+    "youtubeId": "q6e0oNVx8Uk",
+  },
+  {
+    "contextHtml": "<h3>Assignment: Read Act V of <a href="https://www.litcharts.com/shakescleare/shakespeare-translations/romeo-and-juliet" target="_blank">Romeo &amp; Juliet</a>&#160;by William Shakespeare&#160;(original and modern text side by side)</h3>",
+    "order": 3,
+    "titleHint": "Assignment: Read Act V of Romeo & Juliet by William Shakespeare (original and modern text side by side)",
+    "youtubeId": "6Q6tOsnbUjI",
+  },
+]
+`;
+
+exports[`Stimulus video extraction videos for unit-5--romeo-and-juliet/unit-5-study-guide 1`] = `[]`;

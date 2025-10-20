@@ -21,7 +21,6 @@ export const ResourceVideoSchema = z
 	.object({
 		id: z.string(),
 		title: z.string(),
-		slug: z.string(),
 		type: z.literal("video"),
 		path: z.string(),
 		youtubeId: z.string(),

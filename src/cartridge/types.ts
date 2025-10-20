@@ -7,7 +7,6 @@ export type ResourceArticle = {
 export type ResourceVideo = {
 	id: string
 	title: string
-	slug: string
 	type: "video"
 	path: string
 	youtubeId: string

@@ -12,6 +12,11 @@ import {
 	type CartridgeFileMap,
 	type GeneratorInfo
 } from "@/cartridge/build/builder"
+import type { ResourceVideo } from "@/cartridge/types"
+import {
+	type VideoMetadata,
+	VideoMetadataSchema
+} from "@/stimulus/video-metadata"
 import {
 	fetchYoutubeMetadata,
 	type YoutubeMetadata
@@ -464,23 +469,11 @@ type ArticleResource = {
 }
 type VideoResourcePlan = {
 	id: string
-	slug: string
-	type: "video"
 	order: number
 	youtubeId: string
 	metadataPath: string
 	titleHint?: string
 	contextHtml?: string
-}
-type VideoResourceFinal = {
-	id: string
-	title: string
-	slug: string
-	type: "video"
-	path: string
-	youtubeId: string
-	durationSeconds: number
-	description: string
 }
 type QuizResource = {
 	id: string
@@ -630,9 +623,7 @@ function buildHierarchy(
 				)
 				videosForArticle.push({
 					id: videoId,
-					slug: videoId,
-					type: "video",
-					order: video.order,
+					order: ordinal,
 					youtubeId: video.youtubeId,
 					metadataPath,
 					titleHint: video.titleHint,
@@ -869,10 +860,18 @@ async function main() {
 	}
 
 	async function writeVideoMetadataFile(
-		metadataPath: string,
-		payload: Record<string, unknown>
+		metadata: VideoMetadata
 	): Promise<string> {
-		const absolute = path.join(DATA_DIR, ...metadataPath.split("/"))
+		const validated = VideoMetadataSchema.safeParse(metadata)
+		if (!validated.success) {
+			logger.error("video metadata schema invalid", {
+				path: metadata.path,
+				error: validated.error
+			})
+			throw errors.wrap(validated.error, "video metadata validation")
+		}
+		const normalized = validated.data
+		const absolute = path.join(DATA_DIR, ...normalized.path.split("/"))
 		const directory = path.dirname(absolute)
 		const mkdirResult = await errors.try(
 			fs.mkdir(directory, { recursive: true })
@@ -884,7 +883,7 @@ async function main() {
 			})
 			throw errors.wrap(mkdirResult.error, "video metadata directory")
 		}
-		const serialized = `${JSON.stringify(payload, null, 2)}\n`
+		const serialized = `${JSON.stringify(normalized, null, 2)}\n`
 		const writeResult = await errors.try(
 			fs.writeFile(absolute, serialized, "utf8")
 		)
@@ -896,7 +895,7 @@ async function main() {
 			throw errors.wrap(writeResult.error, "video metadata write")
 		}
 		logger.debug("wrote video metadata", {
-			file: absolute,
+			file: normalized.path,
 			bytes: Buffer.byteLength(serialized)
 		})
 		return absolute
@@ -922,7 +921,7 @@ async function main() {
 		const lessonBuilds = []
 		for (const lesson of unit.lessons) {
 			const lessonResources: Array<
-				ArticleResource | QuizResource | VideoResourceFinal
+				ArticleResource | QuizResource | ResourceVideo
 			> = []
 			for (const articleEntry of lesson.articles) {
 				lessonResources.push(articleEntry.resource)
@@ -931,10 +930,11 @@ async function main() {
 				)
 				for (const videoPlan of sortedVideos) {
 					const metadata = await loadYoutubeMetadata(videoPlan.youtubeId)
-					const metadataPayload: Record<string, unknown> = {
+					const videoMetadata: VideoMetadata = {
 						id: videoPlan.id,
-						slug: videoPlan.slug,
+						type: "video",
 						youtubeId: videoPlan.youtubeId,
+						path: videoPlan.metadataPath,
 						title: metadata.title,
 						description: metadata.description,
 						durationSeconds: metadata.durationSeconds,
@@ -943,20 +943,17 @@ async function main() {
 						order: videoPlan.order
 					}
 					if (videoPlan.titleHint !== undefined) {
-						metadataPayload.titleHint = videoPlan.titleHint
+						videoMetadata.titleHint = videoPlan.titleHint
 					}
 					if (videoPlan.contextHtml !== undefined) {
-						metadataPayload.contextHtml = videoPlan.contextHtml
+						videoMetadata.contextHtml = videoPlan.contextHtml
 					}
-					const metadataAbsolutePath = await writeVideoMetadataFile(
-						videoPlan.metadataPath,
-						metadataPayload
-					)
-					fileMap[videoPlan.metadataPath] = metadataAbsolutePath
-					const videoResource: VideoResourceFinal = {
+					const metadataAbsolutePath =
+						await writeVideoMetadataFile(videoMetadata)
+					fileMap[videoMetadata.path] = metadataAbsolutePath
+					const videoResource: ResourceVideo = {
 						id: videoPlan.id,
 						title: metadata.title,
-						slug: videoPlan.slug,
 						type: "video",
 						path: videoPlan.metadataPath,
 						youtubeId: videoPlan.youtubeId,

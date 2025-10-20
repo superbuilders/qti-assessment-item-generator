@@ -9,7 +9,7 @@ const YoutubeDetailsSchema = z
 		description: z.string(),
 		video_length: z.union([z.string(), z.number()])
 	})
-	.strict()
+	.passthrough()
 
 type YoutubeDetails = z.infer<typeof YoutubeDetailsSchema>
 

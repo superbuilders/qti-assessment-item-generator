@@ -10,6 +10,10 @@ import type {
 	ResourceVideo,
 	Unit
 } from "@/cartridge/types"
+import {
+	type VideoMetadata,
+	VideoMetadataSchema
+} from "@/stimulus/video-metadata"
 
 // NOTE: After write-time validation and integrity check on open, reads trust shapes and avoid Zod.
 export async function readIndex(reader: CartridgeReader): Promise<IndexV1> {
@@ -84,7 +88,7 @@ export function isVideoResource(res: Resource): res is ResourceVideo {
 export async function readVideoMetadata(
 	reader: CartridgeReader,
 	resource: ResourceVideo
-): Promise<unknown> {
+): Promise<VideoMetadata> {
 	const res = await errors.try(reader.readText(resource.path))
 	if (res.error) {
 		logger.error("video metadata read", {
@@ -101,7 +105,15 @@ export async function readVideoMetadata(
 		})
 		throw errors.wrap(parseRes.error, "video metadata parse")
 	}
-	return parseRes.data
+	const validation = VideoMetadataSchema.safeParse(parseRes.data)
+	if (!validation.success) {
+		logger.error("video metadata schema invalid", {
+			path: resource.path,
+			error: validation.error
+		})
+		throw errors.wrap(validation.error, "video metadata validation")
+	}
+	return validation.data
 }
 
 export async function readQuestionXml(

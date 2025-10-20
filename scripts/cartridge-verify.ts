@@ -68,10 +68,6 @@ async function main() {
 	let totalQuizzes = 0
 	let totalQuestions = 0
 
-	function isRecord(value: unknown): value is Record<string, unknown> {
-		return typeof value === "object" && value !== null
-	}
-
 	for await (const unit of iterUnits(reader)) {
 		totalUnits++
 		let unitLessons = 0
@@ -150,6 +146,26 @@ async function main() {
 					unitVideos++
 					totalVideos++
 					const metadata = await readVideoMetadata(reader, resource)
+					if (metadata.type !== "video") {
+						logger.error("video metadata type mismatch", {
+							unitId: unit.id,
+							lessonId: lesson.id,
+							videoId: resource.id,
+							path: resource.path,
+							metadataType: metadata.type
+						})
+						throw errors.new("video metadata type mismatch")
+					}
+					if (metadata.path !== resource.path) {
+						logger.error("video metadata path mismatch", {
+							unitId: unit.id,
+							lessonId: lesson.id,
+							videoId: resource.id,
+							resourcePath: resource.path,
+							metadataPath: metadata.path
+						})
+						throw errors.new("video metadata path mismatch")
+					}
 					logger.debug("video resource verified", {
 						unitId: unit.id,
 						lessonId: lesson.id,
@@ -158,41 +174,18 @@ async function main() {
 						youtubeId: resource.youtubeId,
 						durationSeconds: resource.durationSeconds
 					})
-					if (!isRecord(metadata)) {
-						logger.error("video metadata invalid", {
-							unitId: unit.id,
-							lessonId: lesson.id,
-							videoId: resource.id,
-							path: resource.path
-						})
-						throw errors.new("video metadata invalid")
-					}
-					const metaYoutubeId = metadata.youtubeId
-					if (typeof metaYoutubeId !== "string") {
-						logger.error("video metadata youtube missing", {
-							unitId: unit.id,
-							lessonId: lesson.id,
-							videoId: resource.id,
-							path: resource.path
-						})
-						throw errors.new("video metadata youtube missing")
-					}
-					if (metaYoutubeId !== resource.youtubeId) {
+					if (metadata.youtubeId !== resource.youtubeId) {
 						logger.error("video metadata youtube mismatch", {
 							unitId: unit.id,
 							lessonId: lesson.id,
 							videoId: resource.id,
 							path: resource.path,
-							metadataYoutubeId: metaYoutubeId,
+							metadataYoutubeId: metadata.youtubeId,
 							expectedYoutubeId: resource.youtubeId
 						})
 						throw errors.new("video metadata youtube mismatch")
 					}
-					const metaDescription = metadata.description
-					if (
-						typeof metaDescription !== "string" ||
-						metaDescription.length === 0
-					) {
+					if (metadata.description.length === 0) {
 						logger.error("video metadata description missing", {
 							unitId: unit.id,
 							lessonId: lesson.id,
