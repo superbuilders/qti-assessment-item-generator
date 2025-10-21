@@ -510,10 +510,10 @@ Remember: Feedback is your PRIMARY teaching tool. Every feedback block is an opp
 \`\`\`
 
 CRITICAL CLASSIFICATION RULE:
-- WIDGETS are COMPLETELY STATIC (images, graphs) - NO user input
+- WIDGETS are COMPLETELY STATIC (images, graphs, tables) - NO user input
 - INTERACTIONS require USER INPUT (typing, clicking, selecting) - ALL input elements MUST be interactions
-- TABLES ARE ALWAYS BLOCK CONTENT - Tables use the tableRich type and are never widgets
-- STEM-AND-LEAF PLOTS are a specialized widget type - Use stemLeafPlot ONLY when the source question explicitly mentions "stem and leaf plot" or "stem-and-leaf plot". For regular data tables, always use tableRich block content.
+- TABLES use the dataTable WIDGET - Create widget in widgets map, reference with widgetRef
+- STEM-AND-LEAF PLOTS are a specialized widget type - Use stemLeafPlot ONLY when the source question explicitly mentions "stem and leaf plot" or "stem-and-leaf plot". For regular data tables, always use the dataTable widget.
 Perseus misleadingly calls both types "widgets" - you MUST reclassify based on whether user input is required.
 
 ${supportedInteractionTypes}
@@ -525,7 +525,7 @@ ${supportedInteractionTypes}
 - \`matcher\` - matching items → convert to \`gapMatchInteraction\` when appropriate (see CRITICAL MATCHER RULES below)
 - \`number-line\` - when used for plotting points (not just display) → convert to \`choiceInteraction\` with static visuals
 
-**Remember:** Perseus misleadingly calls interactive elements "widgets" in its JSON. IGNORE THIS. Reclassify based on whether user input is required, EXCEPT for tables which are ALWAYS widgets.
+**Remember:** Perseus misleadingly calls interactive elements "widgets" in its JSON. IGNORE THIS. Reclassify based on whether user input is required.
 
 	### CRITICAL: Matcher Conversion Rules - Gap Match vs TableRich
 
@@ -543,44 +543,100 @@ ${supportedInteractionTypes}
 5) Response declaration uses baseType "directedPair" with source->target pairs
 
 **CRITICAL: TABLE GENERATION**
-- All tables MUST be generated as \`{ "type": "tableRich", ... }\` objects within the 'body'.
-- Tables are for presentation ONLY. They do not have a 'type' property in the widgets map.
-- For any interactive cell (e.g., a dropdown or text input), you MUST place an \`inlineInteractionRef\` inside the cell's content array.
-- The corresponding interaction (e.g., a dropdown) must be declared in the top-level 'interactions' array.
+- **ANY DATA ORGANIZED IN ROWS AND COLUMNS MUST USE THE dataTable WIDGET**, including:
+  * Tables in the main body
+  * Tables within choice content arrays
+  * Input/output tables, comparison tables, measurement data, etc.
+- **NEVER represent tabular data as plain text paragraphs** (e.g., "Input 1, Output 7" as separate paragraphs is WRONG)
+- All tables MUST be generated as:
+  1. Create a widget in the widgets map: \`"table_id": { "type": "dataTable", "caption": "...", "headers": [...], "rows": [...], "rowHeaders": false }\`
+  2. Reference it with a widgetRef: \`{ "type": "widgetRef", "widgetId": "table_id", "widgetType": "dataTable" }\`
+- Tables are static presentation elements - for interactive tables, place \`inlineInteractionRef\` within the table widget's cell content
+- Use tableRich block content ONLY for tables with inline interactions embedded in cells (rare)
 
-**Positive Example: Table with Inline Dropdowns**
+**Positive Example: Simple Data Table**
 \`\`\`json
 {
   "body": [
-    {
-      "type": "tableRich",
-      "header": [
-        [
-          [{ "type": "text", "content": "Substance" }],
-          [{ "type": "text", "content": "Result" }]
-        ]
-      ],
-      "rows": [
-        [
-          [{ "type": "text", "content": "Aluminum" }],
-          [{ "type": "inlineInteractionRef", "interactionId": "dropdown_1" }]
-        ],
-        [
-          [{ "type": "text", "content": "Cork" }],
-          [{ "type": "inlineInteractionRef", "interactionId": "dropdown_2" }]
-        ]
-      ],
-
-    }
+    { "type": "widgetRef", "widgetId": "temperature_table", "widgetType": "dataTable" }
   ],
-  "interactions": ["dropdown_1", "dropdown_2"],
-  "responseDeclarations": [
-    { "identifier": "RESPONSE_1", "baseType": "identifier", ... },
-    { "identifier": "RESPONSE_2", "baseType": "identifier", ... }
+  "widgets": {
+    "temperature_table": {
+      "type": "dataTable",
+      "caption": "Monthly Temperature Data",
+      "headers": ["Month", "Temperature (°F)", "Rainfall (inches)"],
+      "rows": [
+        ["January", "45", "3.2"],
+        ["February", "48", "2.8"],
+        ["March", "55", "3.5"]
+      ],
+      "rowHeaders": false
+    }
+  }
+}
+\`\`\`
+
+**Positive Example: Table Within Choice Content**
+\`\`\`json
+{
+  "body": [
+    { "type": "paragraph", "content": [{ "type": "text", "content": "Which table represents the rule +7?" }] },
+    { "type": "interactionRef", "interactionId": "choice_interaction" }
+  ],
+  "interactions": {
+    "choice_interaction": {
+      "type": "choiceInteraction",
+      "choices": [
+        {
+          "identifier": "A",
+          "content": [
+            { "type": "widgetRef", "widgetId": "table_choice_a", "widgetType": "dataTable" }
+          ]
+        },
+        {
+          "identifier": "B",
+          "content": [
+            { "type": "widgetRef", "widgetId": "table_choice_b", "widgetType": "dataTable" }
+          ]
+        }
+      ]
+    }
+  },
+  "widgets": {
+    "table_choice_a": {
+      "type": "dataTable",
+      "caption": null,
+      "headers": ["Input", "Output"],
+      "rows": [
+        ["1", "8"],
+        ["2", "9"],
+        ["3", "10"]
+      ],
+      "rowHeaders": false
+    },
+    "table_choice_b": {
+      "type": "dataTable",
+      "caption": null,
+      "headers": ["Input", "Output"],
+      "rows": [
+        ["1", "7"],
+        ["2", "14"],
+        ["3", "21"]
+      ],
+      "rowHeaders": false
+    }
+  }
+}
+\`\`\`
+**WRONG** - Representing table as paragraphs:
+\`\`\`json
+{
+  "content": [
+    { "type": "paragraph", "content": [{ "type": "text", "content": "Input 1, Output 8" }] },
+    { "type": "paragraph", "content": [{ "type": "text", "content": "Input 2, Output 9" }] }
   ]
 }
 \`\`\`
-3) The left column lists items, right column has dropdowns
 
 	#### Worked Example — Gap Match (Perseus → Shell → QTI)
 
@@ -2663,7 +2719,7 @@ Perseus often calls interactive elements "widgets". You MUST correctly reclassif
 - \`grapher\` - interactive function graphing
 - \`number-line\` - when used for plotting points (not just display)
 
-**Remember:** Perseus misleadingly calls interactive elements "widgets" in its JSON. IGNORE THIS. Reclassify based on whether user input is required, EXCEPT for tables which are ALWAYS widgets.
+**Remember:** Perseus misleadingly calls interactive elements "widgets" in its JSON. IGNORE THIS. Reclassify based on whether user input is required.
 
 **11. Unused Widgets in Perseus JSON - IGNORE THEM (WITH EXCEPTIONS):**
 Perseus JSON may contain widget definitions that are NOT actually used in the content. You MUST ONLY include widgets/interactions that are explicitly referenced in the Perseus content string via \`[[☃ widget_name]]\` placeholders.

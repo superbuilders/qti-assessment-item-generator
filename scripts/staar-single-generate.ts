@@ -91,7 +91,6 @@ async function processQuestionDir(dir: string, openai: OpenAI): Promise<void> {
 
 	const htmlPath = path.join(dir, htmlFilename)
 	const svgsDir = path.join(dir, "svgs")
-	const screenshotPath = path.join(dir, "screenshot.png")
 
 	// 1. Read Primary HTML Content
 	const htmlBytesResult = await errors.try(fs.readFile(htmlPath))
@@ -168,48 +167,12 @@ async function processQuestionDir(dir: string, openai: OpenAI): Promise<void> {
 		})
 	}
 
-	// 3. Load Screenshot Image for Vision
-	const multimodalImagePayloads: { data: ArrayBuffer; mimeType: "image/png" }[] = []
-	const screenshotFile = Bun.file(screenshotPath)
-	const screenshotExistsResult = await errors.try(screenshotFile.exists())
-	if (screenshotExistsResult.error) {
-		logger.debug("failed to check screenshot existence", {
-			questionDir: questionDirName,
-			screenshotPath,
-			error: screenshotExistsResult.error
-		})
-	} else if (screenshotExistsResult.data) {
-		const screenshotDataResult = await errors.try(screenshotFile.arrayBuffer())
-		if (screenshotDataResult.error) {
-			logger.warn("failed to read screenshot file", {
-				questionDir: questionDirName,
-				screenshotPath,
-				error: screenshotDataResult.error
-			})
-		} else {
-			multimodalImagePayloads.push({
-				data: screenshotDataResult.data,
-				mimeType: "image/png"
-			})
-			logger.info("loaded screenshot for vision", {
-				questionDir: questionDirName,
-				screenshotPath,
-				byteLength: screenshotDataResult.data.byteLength
-			})
-		}
-	} else {
-		logger.debug("no screenshot found, proceeding without vision", {
-			questionDir: questionDirName,
-			screenshotPath
-		})
-	}
-
-	// 4. Construct AI Context Envelope
+	// 3. Construct AI Context Envelope
 	const envelope: AiContextEnvelope = {
 		primaryContent: html,
 		supplementaryContent,
 		multimodalImageUrls: [],
-		multimodalImagePayloads,
+		multimodalImagePayloads: [],
 		pdfPayloads: []
 	}
 
@@ -220,7 +183,6 @@ async function processQuestionDir(dir: string, openai: OpenAI): Promise<void> {
 		questionDir: questionDirName,
 		primaryContentLength: html.length,
 		supplementaryContentCount: supplementaryContent.length,
-		imagePayloadCount: multimodalImagePayloads.length,
 		totalTextLength,
 		estimatedTokens: Math.round(totalTextLength / 4)
 	})
@@ -239,7 +201,7 @@ async function processQuestionDir(dir: string, openai: OpenAI): Promise<void> {
 		})
 	}
 
-	// 5. Generate Structured Item from Envelope
+	// 4. Generate Structured Item from Envelope
 	logger.info("calling openai to generate structured item", {
 		questionDir: questionDirName,
 		collection: WIDGET_COLLECTION.name
@@ -285,7 +247,7 @@ async function processQuestionDir(dir: string, openai: OpenAI): Promise<void> {
 		file: structuredJsonPath
 	})
 
-	// 6. Compile Structured Item to QTI XML
+	// 5. Compile Structured Item to QTI XML
 	logger.info("compiling structured item to qti xml", {
 		questionDir: questionDirName
 	})
