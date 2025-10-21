@@ -13,12 +13,12 @@ import { BoxPlotPropsSchema } from "@/widgets/generators/box-plot"
 import { CircleAngleDiagramPropsSchema } from "@/widgets/generators/circle-angle-diagram"
 import { CircleDiagramPropsSchema } from "@/widgets/generators/circle-diagram"
 import { ClockDiagramPropsSchema } from "@/widgets/generators/clock-diagram"
-import { DataTablePropsSchema } from "@/widgets/generators/data-table"
 import { CompositeShapeDiagramPropsSchema } from "@/widgets/generators/composite-shape-diagram"
 import { ConceptualGraphPropsSchema } from "@/widgets/generators/conceptual-graph"
 import { ConstraintGeometryDiagramPropsSchema } from "@/widgets/generators/constraint-geometry-diagram"
 import { CoordinatePlaneComprehensivePropsSchema } from "@/widgets/generators/coordinate-plane-comprehensive"
 import { CustomPolygonDiagramPropsSchema } from "@/widgets/generators/custom-polygon-diagram"
+import { DataTablePropsSchema } from "@/widgets/generators/data-table"
 import { DiscreteObjectRatioDiagramPropsSchema } from "@/widgets/generators/discrete-object-ratio-diagram"
 import { DivergentBarChartPropsSchema } from "@/widgets/generators/divergent-bar-chart"
 import { DivisionAreaDiagramPropsSchema } from "@/widgets/generators/division-area-diagram"
@@ -82,9 +82,9 @@ import { ShapeTransformationGraphPropsSchema } from "@/widgets/generators/shape-
 import { SimpleArrowPropsSchema } from "@/widgets/generators/simple-arrow"
 import { SinCosineWidgetPropsSchema } from "@/widgets/generators/sin-cosine-widget"
 import { StackedItemsDiagramPropsSchema } from "@/widgets/generators/stacked-items-diagram"
+import { StemLeafPlotPropsSchema } from "@/widgets/generators/stem-leaf-plot"
 import { StickPlotPropsSchema } from "@/widgets/generators/stick-plot"
 import { SubtractionWithRegroupingPropsSchema } from "@/widgets/generators/subtraction-with-regrouping"
-import { StemLeafPlotPropsSchema } from "@/widgets/generators/stem-leaf-plot"
 import { SymmetryDiagramPropsSchema } from "@/widgets/generators/symmetry-diagram"
 import { TapeDiagramPropsSchema } from "@/widgets/generators/tape-diagram"
 import { TransformationDiagramPropsSchema } from "@/widgets/generators/transformation-diagram"
@@ -516,6 +516,7 @@ const widgetSchemasWithoutSpecialUnions = [
 	typedSchemas.conceptualGraph,
 	typedSchemas.constraintGeometryDiagram,
 	typedSchemas.coordinatePlane,
+	typedSchemas.dataTable,
 	typedSchemas.divergentBarChart,
 	typedSchemas.functionPlotGraph,
 	typedSchemas.lineEquationGraph,
