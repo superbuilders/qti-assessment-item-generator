@@ -492,6 +492,69 @@ CORRECT (preserving all essential labels from Perseus):
 **GENERAL RULE: COPY WIDGET DATA FROM PERSEUS EXACTLY**
 When Perseus describes labels, values, or visual properties in the widget (via alt text, descriptions, or widget options), you MUST preserve ALL of them exactly. Missing labels or values makes questions unsolvable!
 
+**⚠️ CRITICAL: WIDGET DIMENSION CONSISTENCY ⚠️**
+
+When generating multiple widgets of the same type or purpose within a single question, maintain dimensional consistency unless the question explicitly requires different sizes:
+
+1. **GEOMETRIC PRIMITIVES IN DRAGGABLE/CHOICE CONTEXTS**:
+   - For line, ray, and segment widgets used as draggable choices: Use consistent dimensions (e.g., width: 300, height: 50 for horizontal orientation)
+   - For point widgets: Use square dimensions (e.g., width: 50, height: 50)
+   - Length parameter should be consistent across similar primitives (e.g., all use length: 225)
+
+2. **GROUPED VISUAL COMPARISONS**:
+   - When widgets appear together for comparison (e.g., multiple angles, shapes, or diagrams in choices), use identical width/height
+   - This ensures fair visual comparison and professional appearance
+
+3. **ORIENTATION-BASED SIZING**:
+   - Horizontal primitives (rotation near 0°): Consider "skinny" format (width >> height, e.g., 300x50)
+   - Vertical primitives (rotation near 90°): Consider tall format (height >> width, e.g., 50x300)
+   - Diagonal/varied orientations: Use square format (e.g., 300x300)
+
+**Example: Consistent dimensions for draggable geometric primitives**
+CORRECT (consistent sizing for similar widgets):
+\`{
+  "line_diagram": {
+    "type": "geometricPrimitiveDiagram",
+    "width": 300,
+    "height": 50,
+    "primitive": {
+      "type": "line",
+      "rotation": 0,
+      "length": 225
+    }
+  },
+  "ray_diagram": {
+    "type": "geometricPrimitiveDiagram",
+    "width": 300,  // ✅ Same width as line
+    "height": 50,   // ✅ Same height as line
+    "primitive": {
+      "type": "ray",
+      "rotation": 0,
+      "length": 225  // ✅ Same length as line
+    }
+  },
+  "point_diagram": {
+    "type": "geometricPrimitiveDiagram",
+    "width": 50,    // ✅ Square format for point
+    "height": 50,   // ✅ Square format for point
+    "primitive": {
+      "type": "point"
+    }
+  }
+}\`
+
+WRONG (inconsistent dimensions without justification):
+\`{
+  "line_diagram": {
+    "width": 400,   // ❌ Different from ray
+    "height": 100   // ❌ Different from ray
+  },
+  "ray_diagram": {
+    "width": 250,   // ❌ Inconsistent
+    "height": 75    // ❌ Inconsistent
+  }
+}\`
+
 **⚠️ CRITICAL: GEOMETRIC DIMENSION EXTRACTION FOR AREA/PERIMETER QUESTIONS ⚠️**
 
 When generating geometric widgets (nPolygon, triangleDiagram, rectangleDiagram, etc.) for questions about area, perimeter, or dimensions:

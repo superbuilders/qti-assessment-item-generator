@@ -60,7 +60,19 @@ const GapInlineSchema = z
 				CHOICE_IDENTIFIER_REGEX,
 				"invalid gap identifier: must be uppercase"
 			)
-			.describe("References a gap defined in a gapMatchInteraction")
+			.describe("References a gap defined in a gapMatchInteraction"),
+		minWidth: z
+			.number()
+			.positive()
+			.describe(
+				"Minimum width in pixels for this gap. Should be slightly larger than the widest draggable item that can fill it (e.g., 320 for 300px wide widgets)."
+			),
+		minHeight: z
+			.number()
+			.positive()
+			.describe(
+				"Minimum height in pixels for this gap. Should be slightly larger than the tallest draggable item that can fill it (e.g., 70 for 50px tall widgets, 320 for 300px tall widgets)."
+			)
 	})
 	.strict()
 	.describe(

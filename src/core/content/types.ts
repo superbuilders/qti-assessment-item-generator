@@ -3,7 +3,12 @@ export type InlineContentItem<E extends readonly string[] = readonly string[]> =
 	| { type: "math"; mathml: string }
 	| { type: "inlineWidgetRef"; widgetId: string; widgetType: E[number] }
 	| { type: "inlineInteractionRef"; interactionId: string }
-	| { type: "gap"; gapId: string }
+	| {
+			type: "gap"
+			gapId: string
+			minWidth: number
+			minHeight: number
+	  }
 
 export type InlineContent<E extends readonly string[] = readonly string[]> =
 	Array<InlineContentItem<E>>

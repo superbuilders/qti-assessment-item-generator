@@ -57,9 +57,9 @@ export function renderInlineContent<
 					}
 					return content
 				}
-				case "gap": {
-					return `<qti-gap identifier="${item.gapId}"/>`
-				}
+			case "gap": {
+				return `<qti-gap identifier="${item.gapId}" style="display: inline-block; min-width: ${item.minWidth}px; min-height: ${item.minHeight}px; border: 2px dashed #ccc; padding: 12px; vertical-align: middle;"/>`
+			}
 				default:
 					logger.error("unsupported inline content type", { item })
 					throw errors.new("unsupported inline content type")

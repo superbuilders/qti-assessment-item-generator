@@ -90,5 +90,54 @@ export const geometricPrimitiveDiagramExamples: GeometricPrimitiveDiagramProps[]
 				rotation: -125,
 				length: 120
 			}
+		},
+		// Skinny draggable widgets for gap match interactions (Question 6 style)
+		// These use a horizontal format (width >> height) for better visual consistency
+		// when displayed as draggable choices
+		{
+			type: "geometricPrimitiveDiagram",
+			width: 300,
+			height: 50,
+			primitive: {
+				type: "line",
+				pointOne: { label: null },
+				pointTwo: { label: null },
+				rotation: 0,
+				length: 225
+			}
+		},
+		{
+			type: "geometricPrimitiveDiagram",
+			width: 300,
+			height: 50,
+			primitive: {
+				type: "ray",
+				pointOne: { label: null },
+				pointTwo: { label: null },
+				rotation: 0,
+				length: 225
+			}
+		},
+		{
+			type: "geometricPrimitiveDiagram",
+			width: 300,
+			height: 50,
+			primitive: {
+				type: "segment",
+				pointOne: { label: null },
+				pointTwo: { label: null },
+				rotation: 0,
+				length: 225
+			}
+		},
+		// Compact point widget for draggable interactions
+		{
+			type: "geometricPrimitiveDiagram",
+			width: 50,
+			height: 50,
+			primitive: {
+				type: "point",
+				pointOne: { label: null }
+			}
 		}
 	]

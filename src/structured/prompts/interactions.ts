@@ -106,10 +106,14 @@ Positive examples — chemistry using MathML in dropdown choices:
 **GAP MATCH INTERACTION GENERATION**
 When the shell has classified a Perseus matcher as gapMatchInteraction:
 1. Extract draggable items from the Perseus left array - these become gapTexts.
+   - If draggable items are visual elements (images, geometric figures, diagrams), use { "type": "inlineWidgetRef", "widgetId": "...", "widgetType": "..." } in the gapText content array
+   - For text-only draggable items, use { "type": "text", "content": "..." }
 2. You MUST embed the gap-bearing sentence(s) inside the interaction's "content" array. Wherever a blank appears, insert { "type": "gap", "gapId": "GAP_*" } inline. The compiler renders <qti-gap> only from interaction.content.
 3. Generate the interaction object with gapTexts and gap definitions.
-4. Use semantic identifiers like WORD_SOLAR, TERM_ORBIT for gapTexts.
-5. Use GAP_1, GAP_2 for gap identifiers.
+4. Use semantic identifiers:
+   - For text gapTexts: WORD_SOLAR, TERM_ORBIT, etc.
+   - For visual gapTexts: LINE_DIAGRAM, RAY_DIAGRAM, SEGMENT_DIAGRAM, POINT_DIAGRAM, etc.
+5. Use GAP_1, GAP_2 or semantic gap identifiers like GAP_RAY, GAP_LINE for gap identifiers.
 
 ---
 ### Negative Examples (DO NOT GENERATE THESE PATTERNS)
@@ -178,8 +182,9 @@ This is incorrect for the same reason. The \`content\` array must contain the se
 }
 \`\`\`
 ---
-### Positive Example (CORRECT PATTERN)
+### Positive Examples (CORRECT PATTERNS)
 
+**Example 1: Text-based gap match**
 This is correct because the sentences and gap placeholders are located inside \`interaction.content\`.
 
 \`\`\`json
@@ -211,6 +216,59 @@ This is correct because the sentences and gap placeholders are located inside \`
   }
 }
 \`\`\`
+
+**Example 2: Visual gap match (with geometric figures as draggable items)**
+When draggable items are visual elements, use inlineWidgetRef in the gapText content.
+
+**CRITICAL: GAP SIZING** - You MUST specify minWidth and minHeight on EVERY gap to match the draggable items:
+- For horizontal geometric primitives (300x50): Use minWidth: 320, minHeight: 70
+- For square widgets (300x300): Use minWidth: 320, minHeight: 320
+- For text-based draggable items: Use minWidth: 320, minHeight: 120
+- Add ~20px to widget dimensions for padding and border
+- All gaps in the same interaction should typically use the same dimensions
+- These fields are REQUIRED - do not omit them
+
+\`\`\`json
+{
+  "gap_match_interaction": {
+    "type": "gapMatchInteraction",
+    "responseIdentifier": "RESPONSE",
+    "shuffle": true,
+    "content": [
+      { "type": "paragraph", "content": [
+        { "type": "text", "content": "Ray: " },
+        { "type": "gap", "gapId": "GAP_RAY", "minWidth": 320, "minHeight": 70 }
+      ]},
+      { "type": "paragraph", "content": [
+        { "type": "text", "content": "Line: " },
+        { "type": "gap", "gapId": "GAP_LINE", "minWidth": 320, "minHeight": 70 }
+      ]}
+    ],
+    "gapTexts": [
+      { 
+        "identifier": "CHOICE_LINE", 
+        "matchMax": 1, 
+        "content": [{ "type": "inlineWidgetRef", "widgetId": "line_diagram", "widgetType": "geometricPrimitiveDiagram" }] 
+      },
+      { 
+        "identifier": "CHOICE_RAY", 
+        "matchMax": 1, 
+        "content": [{ "type": "inlineWidgetRef", "widgetId": "ray_diagram", "widgetType": "geometricPrimitiveDiagram" }] 
+      },
+      { 
+        "identifier": "CHOICE_SEGMENT", 
+        "matchMax": 1, 
+        "content": [{ "type": "inlineWidgetRef", "widgetId": "segment_diagram", "widgetType": "geometricPrimitiveDiagram" }] 
+      }
+    ],
+    "gaps": [
+      { "identifier": "GAP_RAY", "required": true },
+      { "identifier": "GAP_LINE", "required": true }
+    ]
+  }
+}
+\`\`\`
+Note: Widget dimensions referenced above (e.g., line_diagram at 300x50) would be defined in the widgets section.
 
 **UNSUPPORTED INTERACTION HANDLING**
 Some Perseus widgets require complex, dynamic user input that we do not support. You MUST identify these and flag them.
