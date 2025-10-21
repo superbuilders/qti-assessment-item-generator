@@ -13,6 +13,7 @@ import { BoxPlotPropsSchema } from "@/widgets/generators/box-plot"
 import { CircleAngleDiagramPropsSchema } from "@/widgets/generators/circle-angle-diagram"
 import { CircleDiagramPropsSchema } from "@/widgets/generators/circle-diagram"
 import { ClockDiagramPropsSchema } from "@/widgets/generators/clock-diagram"
+import { DataTablePropsSchema } from "@/widgets/generators/data-table"
 import { CompositeShapeDiagramPropsSchema } from "@/widgets/generators/composite-shape-diagram"
 import { ConceptualGraphPropsSchema } from "@/widgets/generators/conceptual-graph"
 import { ConstraintGeometryDiagramPropsSchema } from "@/widgets/generators/constraint-geometry-diagram"
@@ -83,6 +84,7 @@ import { SinCosineWidgetPropsSchema } from "@/widgets/generators/sin-cosine-widg
 import { StackedItemsDiagramPropsSchema } from "@/widgets/generators/stacked-items-diagram"
 import { StickPlotPropsSchema } from "@/widgets/generators/stick-plot"
 import { SubtractionWithRegroupingPropsSchema } from "@/widgets/generators/subtraction-with-regrouping"
+import { StemLeafPlotPropsSchema } from "@/widgets/generators/stem-leaf-plot"
 import { SymmetryDiagramPropsSchema } from "@/widgets/generators/symmetry-diagram"
 import { TapeDiagramPropsSchema } from "@/widgets/generators/tape-diagram"
 import { TransformationDiagramPropsSchema } from "@/widgets/generators/transformation-diagram"
@@ -193,7 +195,9 @@ export const allWidgetSchemas = {
 	stickPlot: StickPlotPropsSchema,
 	video: VideoPropsSchema,
 	marbleDiagram: MarbleDiagramPropsSchema,
-	symmetryDiagram: SymmetryDiagramPropsSchema
+	symmetryDiagram: SymmetryDiagramPropsSchema,
+	stemLeafPlot: StemLeafPlotPropsSchema,
+	dataTable: DataTablePropsSchema
 } as const
 
 export const typedSchemas = allWidgetSchemas
@@ -294,7 +298,9 @@ export {
 	StickPlotPropsSchema,
 	VideoPropsSchema,
 	MarbleDiagramPropsSchema,
-	SymmetryDiagramPropsSchema
+	SymmetryDiagramPropsSchema,
+	StemLeafPlotPropsSchema,
+	DataTablePropsSchema
 }
 
 // NEW: Input types for each schema
@@ -488,6 +494,8 @@ export type PESSpectrumProps = z.input<typeof PESSpectrumPropsSchema>
 export type StickPlotProps = z.input<typeof StickPlotPropsSchema>
 export type VideoProps = z.input<typeof VideoPropsSchema>
 export type MarbleDiagramProps = z.input<typeof MarbleDiagramPropsSchema>
+export type StemLeafPlotProps = z.input<typeof StemLeafPlotPropsSchema>
+export type DataTableProps = z.input<typeof DataTablePropsSchema>
 
 const widgetSchemasWithoutSpecialUnions = [
 	typedSchemas.threeDIntersectionDiagram,
@@ -582,7 +590,8 @@ const widgetSchemasWithoutSpecialUnions = [
 	typedSchemas.stickPlot,
 	typedSchemas.video,
 	typedSchemas.marbleDiagram,
-	typedSchemas.symmetryDiagram
+	typedSchemas.symmetryDiagram,
+	typedSchemas.stemLeafPlot
 ] as const
 
 export const WidgetSchema = z.union([

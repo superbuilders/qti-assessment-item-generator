@@ -48,6 +48,13 @@ export const ProtractorAngleDiagramPropsSchema = z
 			)
 	})
 	.strict()
+	.refine(
+		(data) => data.startingReading + data.angleDegrees <= 180,
+		{
+			message:
+				"startingReading + angleDegrees must not exceed 180 degrees (end ray must stay within protractor range)"
+		}
+	)
 	.describe(
 		"creates a protractor diagram with two lines showing a specific angle measurement"
 	)

@@ -732,6 +732,26 @@ export async function generateFromEnvelope<
 		generatedInteractionKeys: Object.keys(generatedInteractions)
 	})
 
+	// Validate that all expected interaction IDs were generated
+	const generatedKeys = new Set(Object.keys(generatedInteractions))
+	const expectedKeys = new Set(interactionIds)
+	const missingKeys = interactionIds.filter((id) => !generatedKeys.has(id))
+	const extraKeys = Array.from(generatedKeys).filter(
+		(id) => !expectedKeys.has(id)
+	)
+
+	if (missingKeys.length > 0 || extraKeys.length > 0) {
+		logger.error("interaction key mismatch after shot 2", {
+			expected: interactionIds,
+			generated: Array.from(generatedKeys),
+			missing: missingKeys,
+			extra: extraKeys
+		})
+		throw errors.new(
+			"interaction key mismatch: body references interactions that don't exist or LLM generated interactions with wrong keys"
+		)
+	}
+
 	if (
 		!assessmentShell.responseDeclarations ||
 		assessmentShell.responseDeclarations.length === 0

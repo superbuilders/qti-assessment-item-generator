@@ -78,6 +78,8 @@ import { generateShapeTransformationGraph } from "@/widgets/generators/shape-tra
 import { generateSimpleArrow } from "@/widgets/generators/simple-arrow"
 import { generateSinCosineWidget } from "@/widgets/generators/sin-cosine-widget"
 import { generateStackedItemsDiagram } from "@/widgets/generators/stacked-items-diagram"
+import { generateStemLeafPlot } from "@/widgets/generators/stem-leaf-plot"
+import { generateDataTable } from "@/widgets/generators/data-table"
 import { generateStickPlot } from "@/widgets/generators/stick-plot"
 import { generateSubtractionWithRegrouping } from "@/widgets/generators/subtraction-with-regrouping"
 import { generateSymmetryDiagram } from "@/widgets/generators/symmetry-diagram"
@@ -455,6 +457,14 @@ export const allWidgetDefinitions = {
 	symmetryDiagram: {
 		schema: allWidgetSchemas.symmetryDiagram,
 		generator: generateSymmetryDiagram
+	},
+	stemLeafPlot: {
+		schema: allWidgetSchemas.stemLeafPlot,
+		generator: generateStemLeafPlot
+	},
+	dataTable: {
+		schema: allWidgetSchemas.dataTable,
+		generator: generateDataTable
 	}
 } as const
 

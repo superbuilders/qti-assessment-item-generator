@@ -485,8 +485,29 @@ export const generateTapeDiagram: WidgetGenerator<
 			stroke: theme.colors.black,
 			strokeWidth: theme.stroke.width.base
 		})
-		// Unit separators (black only for maximum clarity)
-		for (let i = 1; i < tape.unitsTotal; i++) {
+		
+
+		let gridInterval = 1
+		if (tape.unitsTotal > 20) {
+			const targetLines = 10 // Aim for roughly 10-15 grid lines total
+			const rawInterval = tape.unitsTotal / targetLines
+
+			if (rawInterval <= 5) {
+				gridInterval = 5
+			} else if (rawInterval <= 10) {
+				gridInterval = 10
+			} else if (rawInterval <= 20) {
+				gridInterval = 20
+			} else if (rawInterval <= 25) {
+				gridInterval = 25
+			} else if (rawInterval <= 50) {
+				gridInterval = 50
+			} else {
+				gridInterval = Math.ceil(rawInterval / 100) * 100
+			}
+		}
+		
+		for (let i = gridInterval; i < tape.unitsTotal; i += gridInterval) {
 			const x = geom.leftX + i * geom.cellWidth
 			canvas.drawLine(x, geom.y, x, geom.y + tapeHeight, {
 				stroke: theme.colors.black,

@@ -454,7 +454,7 @@ CORRECT (same stem, answer key, and widget slots—only the right angles rotate 
       "type": "protractorAngleDiagram",
       "width": 380,
       "height": 380,
-      "startingReading": 240,
+      "startingReading": 60,
       "angleDegrees": 90
     }
   }
@@ -491,6 +491,106 @@ CORRECT (preserving all essential labels from Perseus):
 
 **GENERAL RULE: COPY WIDGET DATA FROM PERSEUS EXACTLY**
 When Perseus describes labels, values, or visual properties in the widget (via alt text, descriptions, or widget options), you MUST preserve ALL of them exactly. Missing labels or values makes questions unsolvable!
+
+**⚠️ CRITICAL: GEOMETRIC DIMENSION EXTRACTION FOR AREA/PERIMETER QUESTIONS ⚠️**
+
+When generating geometric widgets (nPolygon, triangleDiagram, rectangleDiagram, etc.) for questions about area, perimeter, or dimensions:
+
+1. **ANALYZE THE SCREENSHOT CAREFULLY**: Use your vision to identify ALL dimension labels on shapes
+2. **EXTRACT DIMENSIONS FROM TEXT**: Look for dimension references in:
+   - The question prompt (e.g., "A floor is 12 feet by 8 feet")
+   - Alt text or image descriptions
+   - Text content near the image
+   - Answer choices (often reveal the scale of dimensions)
+3. **APPLY DIMENSIONS TO WIDGETS**: Use \`sideLabels\` arrays to mark dimensions on shapes
+
+**Example: Rectangle with missing dimensions**
+WRONG (area question with no dimensions shown):
+\`{
+  "floor_diagram": {
+    "type": "nPolygon",
+    "width": 400,
+    "height": 300,
+    "polygons": [{
+      "shape": "rectangle",
+      "fillColor": "#8ECAE6",
+      "sideLabels": null  // ❌ BANNED: Area questions need dimensions!
+    }]
+  }
+}\`
+*Question asks: "What is the area of the floor in square feet?"*
+*Without dimensions, this question is IMPOSSIBLE to answer!*
+
+CORRECT (dimensions extracted from screenshot or inferred from answer choices):
+\`{
+  "floor_diagram": {
+    "type": "nPolygon",
+    "width": 400,
+    "height": 300,
+    "polygons": [{
+      "shape": "rectangle",
+      "fillColor": "#8ECAE6",
+      "sideLabels": [
+        { "sideIndex": 0, "label": { "value": 20, "unit": "ft" } },  // top
+        { "sideIndex": 1, "label": { "value": 12, "unit": "ft" } },  // right
+        { "sideIndex": 2, "label": { "value": 20, "unit": "ft" } },  // bottom
+        { "sideIndex": 3, "label": { "value": 12, "unit": "ft" } }   // left
+      ]
+    }]
+  }
+}\`
+
+**Example: Multiple rectangles (composite floor plan)**
+WRONG (composite area question with missing dimensions):
+\`{
+  "floor_plan": {
+    "type": "nPolygon",
+    "polygons": [
+      { "shape": "rectangle", "fillColor": "#8ECAE6", "sideLabels": null },  // ❌ BANNED
+      { "shape": "rectangle", "fillColor": "#A3D9A5", "sideLabels": null }   // ❌ BANNED
+    ]
+  }
+}\`
+
+CORRECT (dimensions extracted and applied to both rectangles):
+\`{
+  "floor_plan": {
+    "type": "nPolygon",
+    "width": 500,
+    "height": 350,
+    "polygons": [
+      {
+        "shape": "rectangle",
+        "fillColor": "#8ECAE6",
+        "sideLabels": [
+          { "sideIndex": 0, "label": { "value": 20, "unit": "ft" } },
+          { "sideIndex": 1, "label": { "value": 12, "unit": "ft" } }
+          // Only label adjacent sides for clarity
+        ]
+      },
+      {
+        "shape": "rectangle",
+        "fillColor": "#A3D9A5",
+        "sideLabels": [
+          { "sideIndex": 0, "label": { "value": 14, "unit": "ft" } },
+          { "sideIndex": 1, "label": { "value": 11, "unit": "ft" } }
+        ]
+      }
+    ]
+  }
+}\`
+
+**DIMENSION INFERENCE STRATEGY:**
+When dimensions are not explicitly visible but the question requires them:
+1. Analyze answer choices - they reveal the scale (e.g., "240 sq ft", "312 sq ft" suggests dimensions in the 10-20 ft range)
+2. Look for ratios or relationships mentioned in the text
+3. Ensure your chosen dimensions produce ONE of the answer choices as correct
+4. Apply realistic measurements for the context (floors: feet; gardens: feet/meters; paper: inches/cm)
+
+**MANDATORY CHECK**: Before finalizing ANY geometric widget for an area/perimeter question, ask yourself:
+- "Can a student calculate the answer using the information shown in my widget?"
+- "Are all necessary dimensions visible on the diagram?"
+- If NO to either question, ADD THE MISSING DIMENSIONS using sideLabels!
 
 **Ensure all text content within widget properties is properly escaped and follows content rules.**
 

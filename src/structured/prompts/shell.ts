@@ -513,6 +513,7 @@ CRITICAL CLASSIFICATION RULE:
 - WIDGETS are COMPLETELY STATIC (images, graphs) - NO user input
 - INTERACTIONS require USER INPUT (typing, clicking, selecting) - ALL input elements MUST be interactions
 - TABLES ARE ALWAYS BLOCK CONTENT - Tables use the tableRich type and are never widgets
+- STEM-AND-LEAF PLOTS are a specialized widget type - Use stemLeafPlot ONLY when the source question explicitly mentions "stem and leaf plot" or "stem-and-leaf plot". For regular data tables, always use tableRich block content.
 Perseus misleadingly calls both types "widgets" - you MUST reclassify based on whether user input is required.
 
 ${supportedInteractionTypes}

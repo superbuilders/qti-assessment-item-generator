@@ -13,6 +13,8 @@ export const teksMath4Collection: WidgetCollection<
 		| "fractionModelDiagram"
 		| "quantityFractionalDiagram"
 		| "symmetryDiagram"
+		| "stemLeafPlot"
+		| "dataTable"
 	>,
 	readonly [
 		"protractorAngleDiagram",
@@ -23,7 +25,9 @@ export const teksMath4Collection: WidgetCollection<
 		"numberLineWithAction",
 		"fractionModelDiagram",
 		"quantityFractionalDiagram",
-		"symmetryDiagram"
+		"symmetryDiagram",
+		"stemLeafPlot",
+		"dataTable"
 	]
 > = {
 	name: "teks-math-4",
@@ -36,7 +40,9 @@ export const teksMath4Collection: WidgetCollection<
 		numberLineWithAction: allWidgetDefinitions.numberLineWithAction,
 		fractionModelDiagram: allWidgetDefinitions.fractionModelDiagram,
 		quantityFractionalDiagram: allWidgetDefinitions.quantityFractionalDiagram,
-		symmetryDiagram: allWidgetDefinitions.symmetryDiagram
+		symmetryDiagram: allWidgetDefinitions.symmetryDiagram,
+		stemLeafPlot: allWidgetDefinitions.stemLeafPlot,
+		dataTable: allWidgetDefinitions.dataTable
 	},
 	widgetTypeKeys: [
 		"protractorAngleDiagram",
@@ -47,6 +53,8 @@ export const teksMath4Collection: WidgetCollection<
 		"numberLineWithAction",
 		"fractionModelDiagram",
 		"quantityFractionalDiagram",
-		"symmetryDiagram"
+		"symmetryDiagram",
+		"stemLeafPlot",
+		"dataTable"
 	]
 } as const

@@ -1,9 +1,33 @@
+import * as errors from "@superbuilders/errors"
+import * as logger from "@superbuilders/slog"
 import { z } from "zod"
 import type { WidgetGenerator } from "@/widgets/types"
 import { CanvasImpl } from "@/widgets/utils/canvas-impl"
 import { PADDING } from "@/widgets/utils/constants"
 import { CSS_COLOR_PATTERN } from "@/widgets/utils/css-color"
 import { createHeightSchema, createWidthSchema } from "@/widgets/utils/schemas"
+import { theme } from "@/widgets/utils/theme"
+
+/**
+ * Factory to create label schema avoiding $ref generation.
+ */
+function createLabelSchema() {
+	return z
+		.object({
+			value: z
+				.union([z.number(), z.string()])
+				.describe(
+					"Numerical value or algebraic variable for the dimension label. Examples: 10, 7.5, 'x', '2y+3'. Use strings for variables or expressions."
+				),
+			unit: z
+				.string()
+				.nullable()
+				.describe(
+					"Measurement unit for the value. Common units: 'cm', 'in', 'm', 'ft', 'mm'. Set to null when no unit applies (pure numbers, ratios, or when unit is contextually understood)."
+				)
+		})
+		.strict()
+}
 
 export const NPolygonPropsSchema = z
 	.object({
@@ -38,7 +62,28 @@ export const NPolygonPropsSchema = z
 							CSS_COLOR_PATTERN,
 							"invalid css color; use hex (#RGB, #RRGGBB, #RRGGBBAA)"
 						)
-						.describe("The hex-only fill color for this polygon.")
+						.describe("The hex-only fill color for this polygon."),
+					sideLabels: z
+						.array(
+							z
+								.object({
+									sideIndex: z
+										.number()
+										.int()
+										.min(0)
+										.describe(
+											"Zero-based index of the side to label. For a triangle: 0=bottom, 1=right, 2=left. For a square/rectangle: 0=top, 1=right, 2=bottom, 3=left. Sides are numbered in the order vertices are generated (typically counterclockwise from top or top-left)."
+										),
+									label: createLabelSchema().describe(
+										"Dimension label for this side showing its length measurement or variable."
+									)
+								})
+								.strict()
+						)
+						.nullable()
+						.describe(
+							"Optional array of side labels. Each label specifies which side (by index) and what measurement to display. Labels are placed outside the polygon perpendicular to the midpoint of each side."
+						)
 				})
 			)
 			.min(1)
@@ -48,10 +93,22 @@ export const NPolygonPropsSchema = z
 	})
 	.strict()
 	.describe(
-		"Renders one or more filled polygons with a black border, placed side by side with sensible internal spacing. Supports regularTriangle, regularSquare, rectangle, regularPentagon, regularHexagon, regularHeptagon, regularOctagon. Also supports rightTrapezoid (one parallel pair, two right angles) and pentagonTwoConsecutiveRightAngles (house shape). Rectangle uses a 4:3 aspect inside its tile; other listed regulars are fitted in their tile."
+		"Renders one or more filled polygons with a black border, placed side by side with sensible internal spacing. Supports regularTriangle, regularSquare, rectangle, regularPentagon, regularHexagon, regularHeptagon, regularOctagon. Also supports rightTrapezoid (one parallel pair, two right angles) and pentagonTwoConsecutiveRightAngles (house shape). Rectangle uses a 4:3 aspect inside its tile; other listed regulars are fitted in their tile. Optionally displays dimension labels on polygon sides."
 	)
 
 export type NPolygonProps = z.infer<typeof NPolygonPropsSchema>
+
+type Label = z.infer<ReturnType<typeof createLabelSchema>>
+
+/**
+ * Format label object into display string.
+ */
+const formatLabel = (label: Label): string => {
+	if (label.unit) {
+		return `${label.value} ${label.unit}`
+	}
+	return String(label.value)
+}
 
 export const generateNPolygon: WidgetGenerator<
 	typeof NPolygonPropsSchema
@@ -77,7 +134,7 @@ export const generateNPolygon: WidgetGenerator<
 		tileH: number,
 		shape: (typeof polygons)[number]["shape"],
 		fillColor: string
-	): void {
+	): Array<{ x: number; y: number }> {
 		const cx = tileLeft + tileW / 2
 		const cy = tileTop + tileH / 2
 		const radius = Math.min(tileW, tileH) / 2 - PADDING
@@ -206,13 +263,21 @@ export const generateNPolygon: WidgetGenerator<
 			stroke: "#000000",
 			strokeWidth: 2
 		})
+
+		return points
 	}
+
+	// Draw all polygons and collect their points for label rendering
+	const polygonPoints: Array<{
+		points: Array<{ x: number; y: number }>
+		sideLabels: NonNullable<(typeof polygons)[number]["sideLabels"]>
+	}> = []
 
 	for (let index = 0; index < polygons.length; index++) {
 		const poly = polygons[index]
 		if (!poly) continue
 		const tileLeft = index * (tileWidth + INTERNAL_SPACING)
-		drawSinglePolygon(
+		const points = drawSinglePolygon(
 			tileLeft,
 			0,
 			tileWidth,
@@ -220,6 +285,82 @@ export const generateNPolygon: WidgetGenerator<
 			poly.shape,
 			poly.fillColor
 		)
+		polygonPoints.push({
+			points,
+			sideLabels: poly.sideLabels ?? []
+		})
+	}
+
+	// Render side labels
+	for (const polyData of polygonPoints) {
+		const { points, sideLabels } = polyData
+		if (!sideLabels || sideLabels.length === 0) continue
+		if (points.length < 2) {
+			logger.error("npolygon: insufficient points for labels", {
+				pointCount: points.length
+			})
+			throw errors.new("npolygon: insufficient points for labels")
+		}
+
+		for (const sideLabel of sideLabels) {
+			const { sideIndex, label } = sideLabel
+			if (sideIndex < 0 || sideIndex >= points.length) {
+				logger.error("npolygon: invalid side index", {
+					sideIndex,
+					maxIndex: points.length - 1
+				})
+				throw errors.new("npolygon: invalid side index")
+			}
+
+			const p1 = points[sideIndex]
+			const p2 = points[(sideIndex + 1) % points.length]
+			if (!p1 || !p2) {
+				logger.error("npolygon: side endpoints missing", { sideIndex })
+				throw errors.new("npolygon: side endpoints missing")
+			}
+
+			const labelText = formatLabel(label)
+			const midX = (p1.x + p2.x) / 2
+			const midY = (p1.y + p2.y) / 2
+
+			// Compute perpendicular direction pointing outward
+			const dx = p2.x - p1.x
+			const dy = p2.y - p1.y
+			const len = Math.hypot(dx, dy)
+			if (!(len > 0)) continue
+
+			let nx = -dy / len
+			let ny = dx / len
+
+			// Determine polygon center to ensure outward direction
+			const centerX = points.reduce((sum, p) => sum + p.x, 0) / points.length
+			const centerY = points.reduce((sum, p) => sum + p.y, 0) / points.length
+			const toCenterX = centerX - midX
+			const toCenterY = centerY - midY
+			const dot = nx * toCenterX + ny * toCenterY
+
+			// Flip if pointing inward
+			if (dot > 0) {
+				nx = -nx
+				ny = -ny
+			}
+
+			// Offset label outside the polygon
+			const offsetPx = 16
+			const labelX = midX + nx * offsetPx
+			const labelY = midY + ny * offsetPx
+
+			canvas.drawText({
+				x: labelX,
+				y: labelY,
+				text: labelText,
+				fill: theme.colors.text,
+				anchor: "middle",
+				dominantBaseline: "middle",
+				fontPx: theme.font.size.medium,
+				fontWeight: theme.font.weight.bold
+			})
+		}
 	}
 
 	const {

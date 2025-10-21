@@ -131,6 +131,23 @@ All assessments have \`shuffle: true\` enabled, meaning choice options are rando
 
 **Example of BANNED pattern:** "Choice D is correct because..." — this will show the wrong letter after shuffle.
 **Example of CORRECT pattern:** "The equation you selected is correct because..." — this works regardless of shuffle order.
+
+### ⚠️ CRITICAL RULE 6: BANNED CHARACTERS IN TEXT CONTENT
+**ABSOLUTE BAN**: The pipe character \`|\` and caret character \`^\` are FORBIDDEN in ALL text content. These characters are used to simulate tables or exponents, which must instead use proper structures.
+
+**For Stem-and-Leaf Plot Questions:**
+- **NEVER** use pipe notation like "7|1" or "stem|leaf" in text
+- **CORRECT**: Use prose like "stem of 7 with leaf of 1" or "a stem of 7 with a leaf of 1"
+- **CORRECT**: Use MathML if showing a value: "stem of " + \`<mn>7</mn>\` + " with leaf of " + \`<mn>1</mn>\` + " represents " + \`<mn>7.1</mn>\`
+- **WRONG**: "7|1 represents 7.1" ❌
+- **WRONG**: "The value 7|1" ❌
+
+**For Exponents:**
+- **NEVER** use caret notation like "2^3" in text
+- **CORRECT**: Use MathML: \`<msup><mn>2</mn><mn>3</mn></msup>\`
+- **WRONG**: "2^3 equals 8" ❌
+
+If you find yourself wanting to use \`|\` or \`^\`, stop and rewrite using words or proper MathML.
 </critical_rules>
 
 <style_and_tone_guide>
