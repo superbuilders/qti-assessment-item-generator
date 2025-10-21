@@ -1974,6 +1974,12 @@ ${widgetSelectionSection}
     - The \`correct\` value(s) MUST be the choice \`identifier\`(s) defined in the corresponding interaction (or table-cell dropdown), not labels, not numbers, not math content.
     - Never use \`"string"\`, \`"integer"\`, or \`"float"\` as \`baseType\` for these enumerated interactions.
     - Identifiers must be safe tokens (letters, digits, underscores), no spaces. Example patterns: \`A\`, \`B\`, \`C\`, \`one_half\`, \`POS_2_0_C\`.
+  - **⚠️ CRITICAL: ANSWER KEY CONSISTENCY FOR "SELECT ALL THAT APPLY" QUESTIONS**:
+    - When a choiceInteraction has \`cardinality: "multiple"\` and the prompt includes "Select all that apply" (or equivalent plural phrasing), the \`correct\` array MUST include EVERY choice identifier that satisfies the question criterion.
+    - **BANNED**: Creating a "select all that apply" question where only SOME of the qualifying choices are marked as correct. This creates an impossible question where a student who correctly identifies all valid answers will be marked wrong.
+    - **Example of BANNED pattern**: Question asks "Which angles do NOT measure 90°?" with 5 angles where 4 are non-90° but only 2 are marked correct. This is logically inconsistent.
+    - **REQUIRED**: Either (1) ensure ALL choices that meet the criterion are in the \`correct\` array, OR (2) modify the question to ask for a specific subset (e.g., "Select the TWO obtuse angles" instead of "Select all angles that are not 90°").
+    - **Widget consistency check**: If using widgets like protractorAngleDiagram with numeric properties (e.g., \`angleDegrees\`), verify that the \`correct\` array matches the mathematical criterion stated in the prompt. Do not arbitrarily exclude some qualifying choices.
 
   WRONG (dropdown uses string baseType and label-like "correct"):
   \`\`\`json
@@ -2060,6 +2066,120 @@ ${widgetSelectionSection}
     }
   }
   \`\`\`
+
+  WRONG (multiple cardinality with inconsistent answer key — only some qualifying choices marked correct):
+  \`\`\`json
+  {
+    "responseDeclarations": [
+      { "identifier": "RESPONSE", "cardinality": "multiple", "baseType": "identifier", "correct": ["A", "C"] }
+    ],
+    "interactions": {
+      "angles_choice": {
+        "type": "choiceInteraction",
+        "responseIdentifier": "RESPONSE",
+        "prompt": [
+          { "type": "text", "content": "Which angles do NOT measure 90°? Select all that apply." }
+        ],
+        "choices": [
+          { "identifier": "A", "content": [{ "type": "widgetRef", "widgetId": "angle_a" }] },
+          { "identifier": "B", "content": [{ "type": "widgetRef", "widgetId": "angle_b" }] },
+          { "identifier": "C", "content": [{ "type": "widgetRef", "widgetId": "angle_c" }] },
+          { "identifier": "D", "content": [{ "type": "widgetRef", "widgetId": "angle_d" }] },
+          { "identifier": "E", "content": [{ "type": "widgetRef", "widgetId": "angle_e" }] }
+        ],
+        "shuffle": true,
+        "minChoices": 0,
+        "maxChoices": 5
+      }
+    },
+    "widgets": {
+      "angle_a": { "type": "protractorAngleDiagram", "angleDegrees": 120 },
+      "angle_b": { "type": "protractorAngleDiagram", "angleDegrees": 90 },
+      "angle_c": { "type": "protractorAngleDiagram", "angleDegrees": 100 },
+      "angle_d": { "type": "protractorAngleDiagram", "angleDegrees": 70 },
+      "angle_e": { "type": "protractorAngleDiagram", "angleDegrees": 70 }
+    }
+  }
+  \`\`\`
+  // ❌ CRITICAL ERROR: The question asks "Select all that apply" for non-90° angles.
+  // Angles A (120°), C (100°), D (70°), and E (70°) all DO NOT measure 90°.
+  // But only A and C are marked correct! A student who correctly selects A, C, D, E would be marked wrong.
+  // This is LOGICALLY INCONSISTENT and creates an impossible question.
+
+  CORRECT (multiple cardinality with consistent answer key — all qualifying choices marked correct):
+  \`\`\`json
+  {
+    "responseDeclarations": [
+      { "identifier": "RESPONSE", "cardinality": "multiple", "baseType": "identifier", "correct": ["A", "C", "D", "E"] }
+    ],
+    "interactions": {
+      "angles_choice": {
+        "type": "choiceInteraction",
+        "responseIdentifier": "RESPONSE",
+        "prompt": [
+          { "type": "text", "content": "Which angles do NOT measure 90°? Select all that apply." }
+        ],
+        "choices": [
+          { "identifier": "A", "content": [{ "type": "widgetRef", "widgetId": "angle_a" }] },
+          { "identifier": "B", "content": [{ "type": "widgetRef", "widgetId": "angle_b" }] },
+          { "identifier": "C", "content": [{ "type": "widgetRef", "widgetId": "angle_c" }] },
+          { "identifier": "D", "content": [{ "type": "widgetRef", "widgetId": "angle_d" }] },
+          { "identifier": "E", "content": [{ "type": "widgetRef", "widgetId": "angle_e" }] }
+        ],
+        "shuffle": true,
+        "minChoices": 0,
+        "maxChoices": 5
+      }
+    },
+    "widgets": {
+      "angle_a": { "type": "protractorAngleDiagram", "angleDegrees": 120 },
+      "angle_b": { "type": "protractorAngleDiagram", "angleDegrees": 90 },
+      "angle_c": { "type": "protractorAngleDiagram", "angleDegrees": 100 },
+      "angle_d": { "type": "protractorAngleDiagram", "angleDegrees": 70 },
+      "angle_e": { "type": "protractorAngleDiagram", "angleDegrees": 70 }
+    }
+  }
+  \`\`\`
+  // ✅ CORRECT: All four non-90° angles (A, C, D, E) are marked correct.
+  // The answer key is logically consistent with the "select all that apply" criterion.
+
+  ALSO CORRECT (alternative — modify prompt to ask for specific subset):
+  \`\`\`json
+  {
+    "responseDeclarations": [
+      { "identifier": "RESPONSE", "cardinality": "multiple", "baseType": "identifier", "correct": ["A", "C"] }
+    ],
+    "interactions": {
+      "angles_choice": {
+        "type": "choiceInteraction",
+        "responseIdentifier": "RESPONSE",
+        "prompt": [
+          { "type": "text", "content": "Select the TWO obtuse angles (angles greater than 90°)." }
+        ],
+        "choices": [
+          { "identifier": "A", "content": [{ "type": "widgetRef", "widgetId": "angle_a" }] },
+          { "identifier": "B", "content": [{ "type": "widgetRef", "widgetId": "angle_b" }] },
+          { "identifier": "C", "content": [{ "type": "widgetRef", "widgetId": "angle_c" }] },
+          { "identifier": "D", "content": [{ "type": "widgetRef", "widgetId": "angle_d" }] },
+          { "identifier": "E", "content": [{ "type": "widgetRef", "widgetId": "angle_e" }] }
+        ],
+        "shuffle": true,
+        "minChoices": 2,
+        "maxChoices": 2
+      }
+    },
+    "widgets": {
+      "angle_a": { "type": "protractorAngleDiagram", "angleDegrees": 120 },
+      "angle_b": { "type": "protractorAngleDiagram", "angleDegrees": 90 },
+      "angle_c": { "type": "protractorAngleDiagram", "angleDegrees": 100 },
+      "angle_d": { "type": "protractorAngleDiagram", "angleDegrees": 70 },
+      "angle_e": { "type": "protractorAngleDiagram", "angleDegrees": 70 }
+    }
+  }
+  \`\`\`
+  // ✅ ALSO CORRECT: By specifying "the TWO obtuse angles" instead of "all angles not measuring 90°",
+  // the question now has a specific, unambiguous correct answer (only A=120° and C=100° are obtuse).
+  // The acute angles D and E are not obtuse, so they're correctly excluded from the answer key.
 
   WRONG (tableRich dropdown cells defined, but baseType is string and "correct" uses labels):
   \`\`\`json
