@@ -34,6 +34,7 @@ export const fourthGradeMathCollection: WidgetCollection<
 		| "transformationDiagram"
 		| "labeledRectangleDiagram"
 		| "customPolygonDiagram"
+		| "decoratedNumber"
 	>,
 	readonly [
 		"clockDiagram",
@@ -65,7 +66,8 @@ export const fourthGradeMathCollection: WidgetCollection<
 		"patternDiagram",
 		"transformationDiagram",
 		"labeledRectangleDiagram",
-		"customPolygonDiagram"
+		"customPolygonDiagram",
+		"decoratedNumber"
 	]
 > = {
 	name: "fourth-grade-math",
@@ -100,7 +102,8 @@ export const fourthGradeMathCollection: WidgetCollection<
 		patternDiagram: allWidgetDefinitions.patternDiagram,
 		transformationDiagram: allWidgetDefinitions.transformationDiagram,
 		labeledRectangleDiagram: allWidgetDefinitions.labeledRectangleDiagram,
-		customPolygonDiagram: allWidgetDefinitions.customPolygonDiagram
+		customPolygonDiagram: allWidgetDefinitions.customPolygonDiagram,
+		decoratedNumber: allWidgetDefinitions.decoratedNumber
 	},
 	widgetTypeKeys: [
 		"clockDiagram",
@@ -132,6 +135,7 @@ export const fourthGradeMathCollection: WidgetCollection<
 		"patternDiagram",
 		"transformationDiagram",
 		"labeledRectangleDiagram",
-		"customPolygonDiagram"
+		"customPolygonDiagram",
+		"decoratedNumber"
 	]
 } as const

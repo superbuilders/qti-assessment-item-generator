@@ -2839,6 +2839,7 @@ Perseus often calls interactive elements "widgets". You MUST correctly reclassif
 - \`interactive-graph\` - interactive graphing
 - \`grapher\` - interactive function graphing
 - \`number-line\` - when used for plotting points (not just display)
+- hotspot/image-click selection of numbers with circled/underlined digits → convert to \`choiceInteraction\` where each choice contains exactly one \`widgetRef\` of type \`decoratedNumber\`. Use the numeric value and which digits are circled/underlined; do not describe these decorations in plain text.
 
 **Remember:** Perseus misleadingly calls interactive elements "widgets" in its JSON. IGNORE THIS. Reclassify based on whether user input is required.
 

@@ -80,6 +80,7 @@ import { generateSinCosineWidget } from "@/widgets/generators/sin-cosine-widget"
 import { generateStackedItemsDiagram } from "@/widgets/generators/stacked-items-diagram"
 import { generateStemLeafPlot } from "@/widgets/generators/stem-leaf-plot"
 import { generateDataTable } from "@/widgets/generators/data-table"
+import { generateDecoratedNumber } from "@/widgets/generators/decorated-number"
 import { generateStickPlot } from "@/widgets/generators/stick-plot"
 import { generateSubtractionWithRegrouping } from "@/widgets/generators/subtraction-with-regrouping"
 import { generateSymmetryDiagram } from "@/widgets/generators/symmetry-diagram"
@@ -465,6 +466,10 @@ export const allWidgetDefinitions = {
 	dataTable: {
 		schema: allWidgetSchemas.dataTable,
 		generator: generateDataTable
+	},
+	decoratedNumber: {
+		schema: allWidgetSchemas.decoratedNumber,
+		generator: generateDecoratedNumber
 	}
 } as const
 

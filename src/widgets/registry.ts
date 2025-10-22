@@ -19,6 +19,7 @@ import { ConstraintGeometryDiagramPropsSchema } from "@/widgets/generators/const
 import { CoordinatePlaneComprehensivePropsSchema } from "@/widgets/generators/coordinate-plane-comprehensive"
 import { CustomPolygonDiagramPropsSchema } from "@/widgets/generators/custom-polygon-diagram"
 import { DataTablePropsSchema } from "@/widgets/generators/data-table"
+import { DecoratedNumberPropsSchema } from "@/widgets/generators/decorated-number"
 import { DiscreteObjectRatioDiagramPropsSchema } from "@/widgets/generators/discrete-object-ratio-diagram"
 import { DivergentBarChartPropsSchema } from "@/widgets/generators/divergent-bar-chart"
 import { DivisionAreaDiagramPropsSchema } from "@/widgets/generators/division-area-diagram"
@@ -197,7 +198,8 @@ export const allWidgetSchemas = {
 	marbleDiagram: MarbleDiagramPropsSchema,
 	symmetryDiagram: SymmetryDiagramPropsSchema,
 	stemLeafPlot: StemLeafPlotPropsSchema,
-	dataTable: DataTablePropsSchema
+	dataTable: DataTablePropsSchema,
+	decoratedNumber: DecoratedNumberPropsSchema
 } as const
 
 export const typedSchemas = allWidgetSchemas
@@ -300,7 +302,8 @@ export {
 	MarbleDiagramPropsSchema,
 	SymmetryDiagramPropsSchema,
 	StemLeafPlotPropsSchema,
-	DataTablePropsSchema
+	DataTablePropsSchema,
+	DecoratedNumberPropsSchema
 }
 
 // NEW: Input types for each schema
@@ -496,6 +499,7 @@ export type VideoProps = z.input<typeof VideoPropsSchema>
 export type MarbleDiagramProps = z.input<typeof MarbleDiagramPropsSchema>
 export type StemLeafPlotProps = z.input<typeof StemLeafPlotPropsSchema>
 export type DataTableProps = z.input<typeof DataTablePropsSchema>
+export type DecoratedNumberProps = z.input<typeof DecoratedNumberPropsSchema>
 
 const widgetSchemasWithoutSpecialUnions = [
 	typedSchemas.threeDIntersectionDiagram,
@@ -592,7 +596,8 @@ const widgetSchemasWithoutSpecialUnions = [
 	typedSchemas.video,
 	typedSchemas.marbleDiagram,
 	typedSchemas.symmetryDiagram,
-	typedSchemas.stemLeafPlot
+	typedSchemas.stemLeafPlot,
+	typedSchemas.decoratedNumber
 ] as const
 
 export const WidgetSchema = z.union([

@@ -431,6 +431,12 @@ ${JSON.stringify(assessmentShell, null, 2)}
     - Build each choice's \`content\` as structured block content that includes a \`widgetRef\` with the correct \`widgetId\` and \`widgetType\` for each visual in that choice, preserving any accompanying text.
     - Never embed \`<img>\` or \`<svg>\` directly. Always reference the widget slot(s).
     - Use choice identifiers A, B, C, ... consistently with the response declaration plan; ensure the slot names match exactly.
+    
+  - **CRITICAL: CONVERT HOTSPOT/IMAGE-CLICK INTERACTIONS TO CHOICE + DECORATED NUMBER VISUALS (WHEN APPLICABLE)**
+    - When the source shows an image of numbers where a specific digit is circled and another underlined, and students select regions (hotspotInteraction), DO NOT output an unsupportedInteraction.
+    - Instead, create a \`choiceInteraction\` with one visual per choice using the \`decoratedNumber\` widget.
+    - For each option, extract the numeric value and which digits are circled/underlined (from text or the SVG). The visual belongs in a \`widgetRef\` of type \`decoratedNumber\`; avoid describing decorations in plain text.
+    - Keep minChoices/maxChoices and prompt from the shell; only the choice visuals change.
 - Return ONLY a JSON object with interaction slot names as keys and interaction objects as values.
 
 Example output structure:
