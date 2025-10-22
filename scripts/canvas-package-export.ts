@@ -81,6 +81,14 @@ function slugifyName(name: string): string {
 	return withoutApostrophes.toLowerCase().replace(/[^a-z0-9-]+/g, "-")
 }
 
+function normalizeUnitTitle(name: string): string {
+	const trimmed = name.trim()
+	const match = trimmed.match(/^unit\s*\d+[\s:;\-\u2013\u2014]*/i)
+	if (!match) return trimmed
+	const remainder = trimmed.slice(match[0].length).trim()
+	return remainder.length > 0 ? remainder : trimmed
+}
+
 function hasOptionalTitle(value: unknown): value is { title?: unknown } {
 	return typeof value === "object" && value !== null && "title" in value
 }
@@ -107,7 +115,7 @@ async function collectPrettyMaps(courseTitle: string): Promise<{
 		if (!u.isDirectory()) continue
 		const unitPretty = u.name
 		const unitSlug = slugifyName(unitPretty)
-		unitTitleBySlug[unitSlug] = unitPretty
+		unitTitleBySlug[unitSlug] = normalizeUnitTitle(unitPretty)
 		const unitPath = path.join(root, unitPretty)
 		const pagesDirents = await errors.try(
 			fs.readdir(unitPath, { withFileTypes: true })
