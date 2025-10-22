@@ -9,7 +9,10 @@ export const protractorAngleDiagramExamples: ProtractorAngleDiagramProps[] = [
 		angleDegrees: 45,
 		startPointLabel: "A",
 		centerPointLabel: "B",
-		endPointLabel: "C"
+		endPointLabel: "C",
+		hideEndRay: false,
+		hideSector: false,
+		arcLabels: []
 	},
 	{
 		type: "protractorAngleDiagram",
@@ -19,7 +22,10 @@ export const protractorAngleDiagramExamples: ProtractorAngleDiagramProps[] = [
 		angleDegrees: 120,
 		startPointLabel: "D",
 		centerPointLabel: "E",
-		endPointLabel: "F"
+		endPointLabel: "F",
+		hideEndRay: false,
+		hideSector: false,
+		arcLabels: []
 	},
 	// Example showcasing a non-zero starting angle to match a rotated measurement
 	{
@@ -30,7 +36,10 @@ export const protractorAngleDiagramExamples: ProtractorAngleDiagramProps[] = [
 		angleDegrees: 35,
 		startPointLabel: "A",
 		centerPointLabel: "B",
-		endPointLabel: "C"
+		endPointLabel: "C",
+		hideEndRay: false,
+		hideSector: false,
+		arcLabels: []
 	},
 	{
 		type: "protractorAngleDiagram",
@@ -40,6 +49,9 @@ export const protractorAngleDiagramExamples: ProtractorAngleDiagramProps[] = [
 		angleDegrees: 90,
 		startPointLabel: "",
 		centerPointLabel: "",
-		endPointLabel: ""
+		endPointLabel: "",
+		hideEndRay: false,
+		hideSector: false,
+		arcLabels: []
 	}
 ]

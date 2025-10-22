@@ -177,7 +177,9 @@ describe("Compiler: gapMatchInteraction validation", () => {
 	test("should compile a valid gapMatchInteraction successfully", async () => {
 		const xml = await compile(baseValidItem, allWidgetsCollection)
 		expect(xml).toContain("<qti-gap-match-interaction")
-		expect(xml).toContain('<qti-gap identifier="GAP_1"/>')
+		expect(xml).toContain(
+			'<qti-gap identifier="GAP_1" style="display: inline-block; min-width: 320px; min-height: 120px; border: 2px dashed #ccc; padding: 12px; vertical-align: middle;"/>'
+		)
 		expect((xml.match(/<qti-gap identifier=/g) || []).length).toBe(1)
 		expect(xml).toMatchSnapshot()
 	})

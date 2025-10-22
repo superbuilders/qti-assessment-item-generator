@@ -9,22 +9,47 @@ export type Widget = z.infer<(typeof typedSchemas)[keyof typeof typedSchemas]>
 export type ResponseDeclaration =
 	| {
 			identifier: string
-			cardinality: "single" | "multiple" | "ordered"
-			baseType: "string" | "integer" | "float"
-			correct: string | number
+			cardinality: "single"
+			baseType: "string"
+			correct: string
 	  }
 	| {
 			identifier: string
-			cardinality: "single" | "multiple" | "ordered"
+			cardinality: "single"
+			baseType: "integer"
+			correct: number
+	  }
+	| {
+			identifier: string
+			cardinality: "single"
+			baseType: "float"
+			correct: number
+	  }
+	| {
+			identifier: string
+			cardinality: "single"
 			baseType: "identifier"
-			correct: string | string[]
+			correct: string
 	  }
 	| {
 			identifier: string
 			cardinality: "multiple" | "ordered"
+			baseType: "identifier"
+			correct: string[]
+	  }
+	| {
+			identifier: string
+			cardinality: "multiple"
 			baseType: "directedPair"
 			correct: Array<{ source: string; target: string }>
 			allowEmpty: boolean
+	  }
+	| {
+			identifier: string
+			cardinality: "ordered"
+			baseType: "directedPair"
+			correct: Array<{ source: string; target: string }>
+			allowEmpty: false
 	  }
 
 export type AssessmentItemShell<E extends readonly string[]> = {

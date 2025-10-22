@@ -6,8 +6,6 @@ export type InlineContentItem<E extends readonly string[] = readonly string[]> =
 	| {
 			type: "gap"
 			gapId: string
-			minWidth: number
-			minHeight: number
 	  }
 
 export type InlineContent<E extends readonly string[] = readonly string[]> =

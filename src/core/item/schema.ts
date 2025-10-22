@@ -15,8 +15,8 @@ import type {
 import { WidgetSchema } from "@/widgets/registry"
 
 // Response Declaration Schema (shared across all dynamic schemas)
-function createResponseDeclarationSchema(): z.ZodType<ResponseDeclaration> {
-	const BaseResponseDeclarationSchema = z.object({
+const BaseResponseDeclarationSchema = z
+	.object({
 		identifier: z
 			.string()
 			.regex(
@@ -32,76 +32,152 @@ function createResponseDeclarationSchema(): z.ZodType<ResponseDeclaration> {
 				"Defines response structure: single value, multiple values, or ordered sequence."
 			)
 	})
+	.strict()
 
-	const TextualResponseDeclarationSchema = BaseResponseDeclarationSchema.extend(
-		{
-			baseType: z.enum(["string", "integer", "float"]),
-			correct: z
-				.union([z.string(), z.number()])
-				.describe("The single correct answer for a text or numeric entry.")
-		}
-	).strict()
+const StringSingleResponseDeclaration = BaseResponseDeclarationSchema.extend({
+	baseType: z.literal("string"),
+	cardinality: z.literal("single"),
+	correct: z.string().describe("The single correct answer for a text entry.")
+}).strict()
 
-	const IdentifierResponseDeclarationSchema =
-		BaseResponseDeclarationSchema.extend({
-			baseType: z.literal("identifier"),
-			correct: z
-				.union([z.string(), z.array(z.string())])
-				.describe(
-					"The correct identifier(s). For multiple correct answers, provide an array of identifiers."
-				)
-		}).strict()
+const IntegerSingleResponseDeclaration = BaseResponseDeclarationSchema.extend({
+	baseType: z.literal("integer"),
+	cardinality: z.literal("single"),
+	correct: z
+		.number()
+		.int()
+		.describe("The single correct integer answer for a numeric entry.")
+}).strict()
 
-	const DirectedPairResponseDeclarationSchema =
+const FloatSingleResponseDeclaration = BaseResponseDeclarationSchema.extend({
+	baseType: z.literal("float"),
+	cardinality: z.literal("single"),
+	correct: z
+		.number()
+		.describe("The single correct decimal answer for a numeric entry.")
+}).strict()
+
+const IdentifierSingleResponseDeclaration =
+	BaseResponseDeclarationSchema.extend({
+		baseType: z.literal("identifier"),
+		cardinality: z.literal("single"),
+		correct: z
+			.string()
+			.describe("The single correct choice identifier for this response.")
+	}).strict()
+
+const IdentifierMultipleResponseDeclaration =
+	BaseResponseDeclarationSchema.extend({
+		baseType: z.literal("identifier"),
+		cardinality: z.literal("multiple"),
+		correct: z
+			.array(z.string())
+			.nonempty()
+			.describe("The set of correct choice identifiers for this response.")
+	}).strict()
+
+const IdentifierOrderedResponseDeclaration =
+	BaseResponseDeclarationSchema.extend({
+		baseType: z.literal("identifier"),
+		cardinality: z.literal("ordered"),
+		correct: z
+			.array(z.string())
+			.nonempty()
+			.describe(
+				"The ordered sequence of correct choice identifiers for this response."
+			)
+	}).strict()
+
+const GapMatchCorrectPairSchema = z
+	.object({
+		source: z
+			.string()
+			.regex(
+				CHOICE_IDENTIFIER_REGEX,
+				"invalid source identifier: must be uppercase"
+			)
+			.describe("The identifier of the gap-text (draggable item)."),
+		target: z
+			.string()
+			.regex(
+				CHOICE_IDENTIFIER_REGEX,
+				"invalid target identifier: must be uppercase"
+			)
+			.describe("The identifier of the gap where the item should be placed.")
+	})
+	.strict()
+	.describe("A source→target pair representing a correct match.")
+
+const DirectedPairMultipleResponseDeclaration = z
+	.discriminatedUnion("allowEmpty", [
 		BaseResponseDeclarationSchema.extend({
 			baseType: z.literal("directedPair"),
-			cardinality: z
-				.enum(["multiple", "ordered"])
-				.describe("Gap match always uses multiple or ordered cardinality."),
+			cardinality: z.literal("multiple"),
+			allowEmpty: z.literal(true),
 			correct: z
-				.array(
-					z.object({
-						source: z
-							.string()
-							.regex(
-								CHOICE_IDENTIFIER_REGEX,
-								"invalid source identifier: must be uppercase"
-							)
-							.describe("The identifier of the gap-text (draggable item)."),
-						target: z
-							.string()
-							.regex(
-								CHOICE_IDENTIFIER_REGEX,
-								"invalid target identifier: must be uppercase"
-							)
-							.describe(
-								"The identifier of the gap where the item should be placed."
-							)
-					})
-				)
-				.describe("Array of correct source->target pairs for gap match."),
-			allowEmpty: z
-				.boolean()
-				.describe(
-					"If true, an empty response (no items placed) can be correct."
-				)
+				.array(GapMatchCorrectPairSchema)
+				.describe("Array of correct source->target pairs for gap match.")
+		}).strict(),
+		BaseResponseDeclarationSchema.extend({
+			baseType: z.literal("directedPair"),
+			cardinality: z.literal("multiple"),
+			allowEmpty: z.literal(false),
+			correct: z
+				.array(GapMatchCorrectPairSchema)
+				.nonempty()
+				.describe("Array of correct source->target pairs for gap match.")
 		}).strict()
+	])
+	.describe(
+		"Gap match response declaration for multiple cardinality with explicit allowEmpty policy."
+	)
 
-	return z
-		.discriminatedUnion("baseType", [
-			TextualResponseDeclarationSchema,
-			IdentifierResponseDeclarationSchema,
-			DirectedPairResponseDeclarationSchema
-		])
-		.describe(
-			"Defines the correct answer for an interaction, with a structure that varies based on the response's baseType."
-		)
-}
+const DirectedPairOrderedResponseDeclaration =
+	BaseResponseDeclarationSchema.extend({
+		baseType: z.literal("directedPair"),
+		cardinality: z.literal("ordered"),
+		allowEmpty: z
+			.literal(false)
+			.describe(
+				"Ordered cardinality requires at least one correct pair; allowEmpty must be false."
+			),
+		correct: z
+			.array(GapMatchCorrectPairSchema)
+			.nonempty()
+			.describe("Ordered array of correct source->target pairs for gap match.")
+	}).strict()
+
+const ResponseDeclarationSchemaInternal = z
+	.union([
+		StringSingleResponseDeclaration,
+		IntegerSingleResponseDeclaration,
+		FloatSingleResponseDeclaration,
+		IdentifierSingleResponseDeclaration,
+		IdentifierMultipleResponseDeclaration,
+		IdentifierOrderedResponseDeclaration,
+		DirectedPairMultipleResponseDeclaration,
+		DirectedPairOrderedResponseDeclaration
+	])
+	.describe(
+		"Defines the correct answer for an interaction, with a structure that varies based on the response's baseType and cardinality."
+	)
+
+type _InferResponseDeclaration = z.infer<
+	typeof ResponseDeclarationSchemaInternal
+>
+type _EnsureSchemaMatchesType = [
+	ResponseDeclaration extends _InferResponseDeclaration ? true : never,
+	_InferResponseDeclaration extends ResponseDeclaration ? true : never
+]
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+declare const __ensureResponseDeclaration: _EnsureSchemaMatchesType
+
+export const ResponseDeclarationSchema: z.ZodType<ResponseDeclaration> =
+	ResponseDeclarationSchemaInternal
 
 export function createAssessmentItemShellSchema<
 	const E extends readonly string[]
 >(widgetTypeKeys: E): z.ZodType<AssessmentItemShell<E>> {
-	const ResponseDeclarationSchema = createResponseDeclarationSchema()
 	const BodySchema = createBodyContentSchema(widgetTypeKeys)
 
 	return z
@@ -166,7 +242,6 @@ export function createDynamicAssessmentItemSchema<
 		.describe("Map of widget slot IDs to their widget definitions")
 	const BodySchema = createBodyContentSchema(widgetTypeKeys)
 	const AnyInteractionSchema = createAnyInteractionSchema(widgetTypeKeys)
-	const ResponseDeclarationSchema = createResponseDeclarationSchema()
 
 	// Create feedback object schema tied to the feedbackPlan
 	const FeedbackObjectSchema = createFeedbackObjectSchema(
@@ -175,7 +250,7 @@ export function createDynamicAssessmentItemSchema<
 	)
 
 	// Compose the full AssessmentItem schema with direct object property composition
-	const AssessmentItemSchema = z
+	const AssessmentItemSchemaBase = z
 		.object({
 			identifier: z
 				.string()
@@ -207,152 +282,150 @@ export function createDynamicAssessmentItemSchema<
 			)
 		})
 		.strict()
-		.superRefine((data, ctx) => {
-			// Cross-field validation for gapMatchInteraction
-			if (!data.interactions) return
 
-			for (const [interactionKey, interaction] of Object.entries(
-				data.interactions
-			)) {
-				if (interaction.type !== "gapMatchInteraction") continue
+	type AssessmentItemShape = z.infer<typeof AssessmentItemSchemaBase>
 
-				const decl = data.responseDeclarations.find(
-					(d) => d.identifier === interaction.responseIdentifier
-				)
-				if (!decl) continue
-				if (decl.baseType !== "directedPair") continue
+	const validateGapMatchConstraints = (
+		data: AssessmentItemShape,
+		ctx: z.RefinementCtx
+	) => {
+		if (!data.interactions) return
 
-				const gapTextIds = new Set(
-					interaction.gapTexts.map((gt) => gt.identifier)
-				)
-				const declaredGapIds = new Set(
-					interaction.gaps.map((g) => g.identifier)
-				)
+		for (const [interactionKey, interaction] of Object.entries(
+			data.interactions
+		)) {
+			if (interaction.type !== "gapMatchInteraction") continue
 
-				// Validate correct response pairs
-				if (Array.isArray(decl.correct)) {
-					for (const pair of decl.correct) {
-						if (typeof pair === "object" && pair !== null) {
-							const sourceDesc = Object.getOwnPropertyDescriptor(pair, "source")
-							const targetDesc = Object.getOwnPropertyDescriptor(pair, "target")
-							if (!sourceDesc || !targetDesc) continue
-							const source = String(sourceDesc.value)
-							const target = String(targetDesc.value)
+			const declaration = data.responseDeclarations.find(
+				(d) => d.identifier === interaction.responseIdentifier
+			)
+			if (!declaration || declaration.baseType !== "directedPair") {
+				continue
+			}
 
-							if (!gapTextIds.has(source)) {
-								ctx.addIssue({
-									code: z.ZodIssueCode.custom,
-									message: `gap match validation: correct pair source '${source}' not in gapTexts`,
-									path: ["interactions", interactionKey, "gapTexts"]
-								})
-							}
-							if (!declaredGapIds.has(target)) {
-								ctx.addIssue({
-									code: z.ZodIssueCode.custom,
-									message: `gap match validation: correct pair target '${target}' not in gaps`,
-									path: ["interactions", interactionKey, "gaps"]
-								})
-							}
-						}
-					}
+			const gapTextIds = new Set(
+				interaction.gapTexts.map((gapText) => gapText.identifier)
+			)
+			const declaredGapIds = new Set(
+				interaction.gaps.map((gap) => gap.identifier)
+			)
 
-					// Validate matchMax multiplicity and duplicate pairs
-					const usageBySource = new Map<string, number>()
-					const seenPairs = new Set<string>()
+			for (const pair of declaration.correct) {
+				const { source, target } = pair
 
-					for (const pair of decl.correct) {
-						if (typeof pair === "object" && pair !== null) {
-							const sourceDesc = Object.getOwnPropertyDescriptor(pair, "source")
-							const targetDesc = Object.getOwnPropertyDescriptor(pair, "target")
-							if (!sourceDesc || !targetDesc) continue
-							const source = String(sourceDesc.value)
-							const target = String(targetDesc.value)
-
-							// Check for duplicate pairs
-							const pairKey = `${source}→${target}`
-							if (seenPairs.has(pairKey)) {
-								ctx.addIssue({
-									code: z.ZodIssueCode.custom,
-									message: `gap match validation: duplicate correct pair '${pairKey}'`,
-									path: ["responseDeclarations"]
-								})
-							}
-							seenPairs.add(pairKey)
-
-							// Count usage
-							usageBySource.set(source, (usageBySource.get(source) ?? 0) + 1)
-						}
-					}
-
-					// Validate matchMax constraints
-					for (const [source, count] of usageBySource) {
-						const gapText = interaction.gapTexts.find(
-							(gt) => gt.identifier === source
-						)
-						const matchMax = gapText?.matchMax ?? 1
-						if (matchMax !== 0 && count > matchMax) {
-							ctx.addIssue({
-								code: z.ZodIssueCode.custom,
-								message: `gap match validation: source '${source}' used ${count} times, exceeds matchMax ${matchMax}`,
-								path: ["responseDeclarations"]
-							})
-						}
-					}
+				if (!gapTextIds.has(source)) {
+					ctx.addIssue({
+						code: "custom",
+						message: `gap match validation: correct pair source '${source}' not in gapTexts`,
+						path: ["interactions", interactionKey, "gapTexts"]
+					})
 				}
 
-				// Validate cardinality policy for gap match
-				if (decl.cardinality !== "multiple") {
+				if (!declaredGapIds.has(target)) {
 					ctx.addIssue({
-						code: z.ZodIssueCode.custom,
-						message: `gap match validation: cardinality must be 'multiple', not '${decl.cardinality}'`,
+						code: "custom",
+						message: `gap match validation: correct pair target '${target}' not in gaps`,
+						path: ["interactions", interactionKey, "gaps"]
+					})
+				}
+			}
+
+			const usageBySource = new Map<string, number>()
+			const seenPairs = new Set<string>()
+
+			for (const pair of declaration.correct) {
+				const pairKey = `${pair.source}→${pair.target}`
+				if (seenPairs.has(pairKey)) {
+					ctx.addIssue({
+						code: "custom",
+						message: `gap match validation: duplicate correct pair '${pairKey}'`,
+						path: ["responseDeclarations"]
+					})
+				}
+				seenPairs.add(pairKey)
+				usageBySource.set(
+					pair.source,
+					(usageBySource.get(pair.source) ?? 0) + 1
+				)
+			}
+
+			for (const [source, usageCount] of usageBySource) {
+				const gapText = interaction.gapTexts.find(
+					(gapText) => gapText.identifier === source
+				)
+				const matchMax = gapText?.matchMax ?? 1
+				if (matchMax !== 0 && usageCount > matchMax) {
+					ctx.addIssue({
+						code: "custom",
+						message: `gap match validation: source '${source}' used ${usageCount} times, exceeds matchMax ${matchMax}`,
 						path: ["responseDeclarations"]
 					})
 				}
 			}
 
-			// Validate no gaps in body or feedback (placement ban)
-			// biome-ignore lint: any needed for recursive traversal
-			const checkForGaps = (nodes: any, contextPath: string[]): void => {
-				if (!nodes || !Array.isArray(nodes)) return
-				for (const node of nodes) {
-					if (!node) continue
-					if (node.type === "gap") {
-						ctx.addIssue({
-							code: z.ZodIssueCode.custom,
-							message:
-								"gap placeholders are only allowed inside gapMatchInteraction content",
-							path: contextPath
-						})
-					} else if (node.type === "paragraph") {
-						checkForGaps(node.content, contextPath)
-					} else if (
-						node.type === "unorderedList" ||
-						node.type === "orderedList"
-					) {
-						if (Array.isArray(node.items)) {
-							for (const item of node.items) checkForGaps(item, contextPath)
-						}
-					} else if (node.type === "tableRich") {
-						const scanRows = (rows: unknown) => {
-							if (!rows || !Array.isArray(rows)) return
-							for (const row of rows) {
-								if (!Array.isArray(row)) continue
-								for (const cell of row) checkForGaps(cell, contextPath)
-							}
-						}
-						scanRows(node.header)
-						scanRows(node.rows)
+			if (declaration.cardinality !== "multiple") {
+				ctx.addIssue({
+					code: "custom",
+					message: `gap match validation: cardinality must be 'multiple', not '${declaration.cardinality}'`,
+					path: ["responseDeclarations"]
+				})
+			}
+		}
+	}
+
+	const validateGapPlacement = (
+		data: AssessmentItemShape,
+		ctx: z.RefinementCtx
+	) => {
+		// biome-ignore lint: any needed for recursive traversal
+		const checkForGaps = (nodes: any, contextPath: string[]): void => {
+			if (!nodes || !Array.isArray(nodes)) return
+			for (const node of nodes) {
+				if (!node) continue
+				if (node.type === "gap") {
+					ctx.addIssue({
+						code: "custom",
+						message:
+							"gap placeholders are only allowed inside gapMatchInteraction content",
+						path: contextPath
+					})
+				} else if (node.type === "paragraph") {
+					checkForGaps(node.content, contextPath)
+				} else if (
+					node.type === "unorderedList" ||
+					node.type === "orderedList"
+				) {
+					if (Array.isArray(node.items)) {
+						for (const item of node.items) checkForGaps(item, contextPath)
 					}
+				} else if (node.type === "tableRich") {
+					const scanRows = (rows: unknown) => {
+						if (!rows || !Array.isArray(rows)) return
+						for (const row of rows) {
+							if (!Array.isArray(row)) continue
+							for (const cell of row) checkForGaps(cell, contextPath)
+						}
+					}
+					scanRows(node.header)
+					scanRows(node.rows)
 				}
 			}
+		}
 
-			if (data.body) {
-				checkForGaps(data.body, ["body"])
-			}
-		})
-		.describe(
-			"A complete QTI 3.0 assessment item with content, interactions, and scoring rules."
-		)
+		if (data.body) {
+			checkForGaps(data.body, ["body"])
+		}
+	}
+
+	const AssessmentItemSchema = AssessmentItemSchemaBase.transform(
+		(data, ctx): AssessmentItemShape => {
+			validateGapMatchConstraints(data, ctx)
+			validateGapPlacement(data, ctx)
+			return data
+		}
+	).describe(
+		"A complete QTI 3.0 assessment item with content, interactions, and scoring rules."
+	)
 
 	const AssessmentItemShellSchema =
 		createAssessmentItemShellSchema(widgetTypeKeys)

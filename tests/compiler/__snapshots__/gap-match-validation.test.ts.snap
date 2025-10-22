@@ -25,7 +25,7 @@ exports[`Compiler: gapMatchInteraction validation should compile a valid gapMatc
     <qti-item-body>
         <qti-gap-match-interaction response-identifier="RESPONSE" shuffle="true" max-associations="1">
             <qti-gap-text identifier="TOKEN_A" match-max="1">A</qti-gap-text>
-            <p>Fill blank: <qti-gap identifier="GAP_1"/></p>
+            <p>Fill blank: <qti-gap identifier="GAP_1" style="display: inline-block; min-width: 320px; min-height: 120px; border: 2px dashed #ccc; padding: 12px; vertical-align: middle;"/></p>
         
         </qti-gap-match-interaction>
         <qti-feedback-block outcome-identifier="FEEDBACK__OVERALL" identifier="FB__RESPONSE_CORRECT" show-hide="show">

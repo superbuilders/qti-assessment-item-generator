@@ -9,6 +9,9 @@ import type {
 	StepBlock
 } from "@/core/content"
 
+const GAP_PLACEHOLDER_STYLE =
+	"display: inline-block; min-width: 320px; min-height: 120px; border: 2px dashed #ccc; padding: 12px; vertical-align: middle;"
+
 /**
  * Escapes text content for safe inclusion in XML PCDATA.
  */
@@ -57,9 +60,9 @@ export function renderInlineContent<
 					}
 					return content
 				}
-			case "gap": {
-				return `<qti-gap identifier="${item.gapId}" style="display: inline-block; min-width: ${item.minWidth}px; min-height: ${item.minHeight}px; border: 2px dashed #ccc; padding: 12px; vertical-align: middle;"/>`
-			}
+				case "gap": {
+					return `<qti-gap identifier="${item.gapId}" style="${GAP_PLACEHOLDER_STYLE}"/>`
+				}
 				default:
 					logger.error("unsupported inline content type", { item })
 					throw errors.new("unsupported inline content type")

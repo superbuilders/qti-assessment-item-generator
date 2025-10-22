@@ -218,15 +218,7 @@ This is correct because the sentences and gap placeholders are located inside \`
 \`\`\`
 
 **Example 2: Visual gap match (with geometric figures as draggable items)**
-When draggable items are visual elements, use inlineWidgetRef in the gapText content.
-
-**CRITICAL: GAP SIZING** - You MUST specify minWidth and minHeight on EVERY gap to match the draggable items:
-- For horizontal geometric primitives (300x50): Use minWidth: 320, minHeight: 70
-- For square widgets (300x300): Use minWidth: 320, minHeight: 320
-- For text-based draggable items: Use minWidth: 320, minHeight: 120
-- Add ~20px to widget dimensions for padding and border
-- All gaps in the same interaction should typically use the same dimensions
-- These fields are REQUIRED - do not omit them
+When draggable items are visual elements, use inlineWidgetRef in the gapText content. The renderer will apply sensible default sizing for each gap, so you do not need to supply extra layout hints.
 
 \`\`\`json
 {
@@ -237,28 +229,28 @@ When draggable items are visual elements, use inlineWidgetRef in the gapText con
     "content": [
       { "type": "paragraph", "content": [
         { "type": "text", "content": "Ray: " },
-        { "type": "gap", "gapId": "GAP_RAY", "minWidth": 320, "minHeight": 70 }
+        { "type": "gap", "gapId": "GAP_RAY" }
       ]},
       { "type": "paragraph", "content": [
         { "type": "text", "content": "Line: " },
-        { "type": "gap", "gapId": "GAP_LINE", "minWidth": 320, "minHeight": 70 }
+        { "type": "gap", "gapId": "GAP_LINE" }
       ]}
     ],
     "gapTexts": [
-      { 
-        "identifier": "CHOICE_LINE", 
-        "matchMax": 1, 
-        "content": [{ "type": "inlineWidgetRef", "widgetId": "line_diagram", "widgetType": "geometricPrimitiveDiagram" }] 
+      {
+        "identifier": "CHOICE_LINE",
+        "matchMax": 1,
+        "content": [{ "type": "inlineWidgetRef", "widgetId": "line_diagram", "widgetType": "geometricPrimitiveDiagram" }]
       },
-      { 
-        "identifier": "CHOICE_RAY", 
-        "matchMax": 1, 
-        "content": [{ "type": "inlineWidgetRef", "widgetId": "ray_diagram", "widgetType": "geometricPrimitiveDiagram" }] 
+      {
+        "identifier": "CHOICE_RAY",
+        "matchMax": 1,
+        "content": [{ "type": "inlineWidgetRef", "widgetId": "ray_diagram", "widgetType": "geometricPrimitiveDiagram" }]
       },
-      { 
-        "identifier": "CHOICE_SEGMENT", 
-        "matchMax": 1, 
-        "content": [{ "type": "inlineWidgetRef", "widgetId": "segment_diagram", "widgetType": "geometricPrimitiveDiagram" }] 
+      {
+        "identifier": "CHOICE_SEGMENT",
+        "matchMax": 1,
+        "content": [{ "type": "inlineWidgetRef", "widgetId": "segment_diagram", "widgetType": "geometricPrimitiveDiagram" }]
       }
     ],
     "gaps": [
@@ -425,7 +417,7 @@ ${JSON.stringify(assessmentShell, null, 2)}
 - Extract all relevant data from the Perseus JSON to populate the interaction properties (prompt, choices, etc.).
 - Ensure all required properties for each interaction type are included.
 - **CRITICAL**: Preserve all MathML content exactly as it appears in the assessment shell body.
-  
+
   - **MANDATORY: USE WIDGET SLOTS ONLY FOR NON-MATH VISUALS**
     - If the original Perseus choice content includes non-math visuals (images, diagrams, graphie visuals), you MUST represent each visual by inserting a widgetRef to the predeclared widget slot using the naming scheme \`<responseIdentifier>__<choiceLetter>__v<index>\`.
     - Build each choice's \`content\` as structured block content that includes a \`widgetRef\` with the correct \`widgetId\` and \`widgetType\` for each visual in that choice, preserving any accompanying text.
@@ -710,7 +702,7 @@ CORRECT: \`content: [{ "type": "paragraph", "content": [{ "type": "text", "conte
     ]
   }
   \`\`\`
-  
+
   CORRECT (embed the predeclared widget slot for the choice's visual):
   \`\`\`json
   {
