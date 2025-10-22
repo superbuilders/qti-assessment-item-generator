@@ -461,6 +461,38 @@ CORRECT (same stem, answer key, and widget slots—only the right angles rotate 
 }
 \`\`\`
 
+**Construction-Mode Protractor (do NOT draw the solution angle):**
+If the source shows a protractor with only the baseline ray drawn (e.g., ray PQ) and labeled tick points (e.g., V, T, S, R), configure the widget so it does not reveal the completed angle. Use:
+- \`hideSector: true\` — no interior shading
+- \`hideEndRay: true\` — do not draw the second ray
+- Provide labels for the vertex/baseline endpoint, and tick labels with \`arcLabels\` at the degree marks from the baseline.
+
+Example (baseline PQ at 0°, target 85° labeled “S”):
+\`\`\`json
+{
+  "widgets": {
+    "protractor_diagram_1": {
+      "type": "protractorAngleDiagram",
+      "width": 490,
+      "height": 284,
+      "startingReading": 0,
+      "angleDegrees": 85,
+      "hideSector": true,
+      "hideEndRay": true,
+      "centerPointLabel": "P",
+      "startPointLabel": "Q",
+      "endPointLabel": "",
+      "arcLabels": [
+        { "label": "V", "degrees": 50 },
+        { "label": "T", "degrees": 75 },
+        { "label": "S", "degrees": 85 },
+        { "label": "R", "degrees": 105 }
+      ]
+    }
+  }
+}
+\`\`\`
+
 **CRITICAL: Missing Essential Widget Data BANNED:**
 WRONG (triangle with missing side labels that are needed for the question):
 \`{

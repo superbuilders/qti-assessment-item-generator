@@ -45,6 +45,26 @@ export const ProtractorAngleDiagramPropsSchema = z
 			.string()
 			.describe(
 				"label for the ending point (e.g., 'C'). use empty string for no label."
+			),
+		hideEndRay: z
+			.boolean()
+			.describe(
+				"when true, suppresses rendering of the second (end) ray and its arrow/label — useful for construction-style prompts"
+			),
+		hideSector: z
+			.boolean()
+			.describe(
+				"when true, suppresses the filled sector/arc between rays — useful for construction-style prompts"
+			),
+		arcLabels: z
+			.array(
+				z.object({
+					label: z.string(),
+					degrees: z.number().min(0).max(180)
+				})
+			)
+			.describe(
+				"optional labeled tick marks placed along the inner protractor scale at the given degree readings"
 			)
 	})
 	.strict()
@@ -76,7 +96,10 @@ export const generateProtractorAngleDiagram: WidgetGenerator<
 		angleDegrees,
 		startPointLabel,
 		centerPointLabel,
-		endPointLabel
+		endPointLabel,
+		hideEndRay = false,
+		hideSector = false,
+		arcLabels = []
 	} = props
 
 	const canvas = new CanvasImpl({
@@ -159,37 +182,39 @@ export const generateProtractorAngleDiagram: WidgetGenerator<
 
 	const arcColor = "#4A90E2"
 
-	// build filled sector with constant radius using linearized arc
-	const sectorPoints: Array<{ x: number; y: number }> = []
-	for (let i = 0; i <= arcSegments; i++) {
-		const a = startAngleRad + i * angleStep
-		const x = centerX + arcRadius * Math.cos(a)
-		const y = centerY - arcRadius * Math.sin(a)
-		sectorPoints.push({ x, y })
-	}
-	const fillPath = new Path2D()
-		.moveTo(centerX, centerY)
-		.lineTo(sectorPoints[0].x, sectorPoints[0].y)
-	for (let i = 1; i < sectorPoints.length; i++) {
-		fillPath.lineTo(sectorPoints[i].x, sectorPoints[i].y)
-	}
-	fillPath.closePath()
-	canvas.drawPath(fillPath, { fill: arcColor, stroke: "none" })
+	if (!hideSector) {
+		// build filled sector with constant radius using linearized arc
+		const sectorPoints: Array<{ x: number; y: number }> = []
+		for (let i = 0; i <= arcSegments; i++) {
+			const a = startAngleRad + i * angleStep
+			const x = centerX + arcRadius * Math.cos(a)
+			const y = centerY - arcRadius * Math.sin(a)
+			sectorPoints.push({ x, y })
+		}
+		const fillPath = new Path2D()
+			.moveTo(centerX, centerY)
+			.lineTo(sectorPoints[0].x, sectorPoints[0].y)
+		for (let i = 1; i < sectorPoints.length; i++) {
+			fillPath.lineTo(sectorPoints[i].x, sectorPoints[i].y)
+		}
+		fillPath.closePath()
+		canvas.drawPath(fillPath, { fill: arcColor, stroke: "none" })
 
-	// outline the arc for visual clarity
-	for (let i = 0; i < arcSegments; i++) {
-		const currentAngle = startAngleRad + i * angleStep
-		const nextAngle = startAngleRad + (i + 1) * angleStep
+		// outline the arc for visual clarity
+		for (let i = 0; i < arcSegments; i++) {
+			const currentAngle = startAngleRad + i * angleStep
+			const nextAngle = startAngleRad + (i + 1) * angleStep
 
-		const x1 = centerX + arcRadius * Math.cos(currentAngle)
-		const y1 = centerY - arcRadius * Math.sin(currentAngle)
-		const x2 = centerX + arcRadius * Math.cos(nextAngle)
-		const y2 = centerY - arcRadius * Math.sin(nextAngle)
+			const x1 = centerX + arcRadius * Math.cos(currentAngle)
+			const y1 = centerY - arcRadius * Math.sin(currentAngle)
+			const x2 = centerX + arcRadius * Math.cos(nextAngle)
+			const y2 = centerY - arcRadius * Math.sin(nextAngle)
 
-		canvas.drawLine(x1, y1, x2, y2, {
-			stroke: arcColor,
-			strokeWidth: theme.stroke.width.thick
-		})
+			canvas.drawLine(x1, y1, x2, y2, {
+				stroke: arcColor,
+				strokeWidth: theme.stroke.width.thick
+			})
+		}
 	}
 
 	// draw lines on top of the filled sector and arc outline
@@ -197,10 +222,12 @@ export const generateProtractorAngleDiagram: WidgetGenerator<
 		stroke: theme.colors.black,
 		strokeWidth: theme.stroke.width.thick
 	})
+if (!hideEndRay) {
 	canvas.drawLine(centerX, centerY, lineEndEndX, lineEndEndY, {
 		stroke: theme.colors.black,
 		strokeWidth: theme.stroke.width.thick
 	})
+}
 
 	// do not render a numeric angle label; sizing is derived from the readings only
 
@@ -253,6 +280,26 @@ export const generateProtractorAngleDiagram: WidgetGenerator<
 		})
 	}
 
+	// optional labeled ticks along the protractor rim (inner scale degrees)
+	if (Array.isArray(arcLabels) && arcLabels.length > 0) {
+		for (const tick of arcLabels) {
+			const tickAngleRad = degToRad(tick.degrees)
+			const labelRadius = protractorRadius + 35
+			const lx = centerX + labelRadius * Math.cos(tickAngleRad)
+			const ly = centerY - labelRadius * Math.sin(tickAngleRad)
+			canvas.drawText({
+				x: lx,
+				y: ly,
+				text: tick.label,
+				fill: theme.colors.text,
+				fontPx: theme.font.size.large,
+				fontWeight: theme.font.weight.bold,
+				anchor: "middle",
+				dominantBaseline: "middle"
+			})
+		}
+	}
+
 	// center point - keep as circle since it's the vertex
 	canvas.drawCircle(centerX, centerY, 4, { fill: theme.colors.black })
 	if (centerPointLabel !== "") {
@@ -269,7 +316,8 @@ export const generateProtractorAngleDiagram: WidgetGenerator<
 		})
 	}
 
-	// end point - arrow pointing in the direction of the end line
+// end point - arrow pointing in the direction of the end line (conditionally)
+if (!hideEndRay) {
 	const lineAngle = Math.atan2(endY - centerY, endX - centerX)
 	const endArrowTipX = endX
 	const endArrowTipY = endY
@@ -313,6 +361,7 @@ export const generateProtractorAngleDiagram: WidgetGenerator<
 			fontWeight: theme.font.weight.bold
 		})
 	}
+}
 
 	// get canvas content
 	const {
