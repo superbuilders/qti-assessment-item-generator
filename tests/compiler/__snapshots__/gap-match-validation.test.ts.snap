@@ -61,10 +61,7 @@ exports[`Compiler: gapMatchInteraction validation should compile a valid gapMatc
         
     <qti-response-condition>
         <qti-response-if>
-            <qti-match>
-                <qti-variable identifier="RESPONSE"/>
-                <qti-correct identifier="RESPONSE"/>
-            </qti-match>
+            <qti-match><qti-variable identifier="RESPONSE"/><qti-correct identifier="RESPONSE"/></qti-match>
             <qti-set-outcome-value identifier="FEEDBACK__OVERALL">
                 <qti-base-value base-type="identifier">FB__RESPONSE_CORRECT</qti-base-value>
             </qti-set-outcome-value>

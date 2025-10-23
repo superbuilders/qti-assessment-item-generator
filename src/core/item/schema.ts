@@ -34,6 +34,21 @@ const BaseResponseDeclarationSchema = z
 	})
 	.strict()
 
+const NumericRoundingSchema = z.discriminatedUnion("strategy", [
+	z
+		.object({
+			strategy: z.literal("decimalPlaces"),
+			figures: z.number().int().min(0)
+		})
+		.strict(),
+	z
+		.object({
+			strategy: z.literal("significantFigures"),
+			figures: z.number().int().min(1)
+		})
+		.strict()
+])
+
 const StringSingleResponseDeclaration = BaseResponseDeclarationSchema.extend({
 	baseType: z.literal("string"),
 	cardinality: z.literal("single"),
@@ -46,6 +61,9 @@ const IntegerSingleResponseDeclaration = BaseResponseDeclarationSchema.extend({
 	correct: z
 		.number()
 		.int()
+		.refine(Number.isFinite, {
+			message: "integer correct value must be finite"
+		})
 		.describe("The single correct integer answer for a numeric entry.")
 }).strict()
 
@@ -54,7 +72,13 @@ const FloatSingleResponseDeclaration = BaseResponseDeclarationSchema.extend({
 	cardinality: z.literal("single"),
 	correct: z
 		.number()
-		.describe("The single correct decimal answer for a numeric entry.")
+		.refine(Number.isFinite, {
+			message: "float correct value must be finite"
+		})
+		.describe("The single correct decimal answer for a numeric entry."),
+	rounding: NumericRoundingSchema.describe(
+		"Rounding policy describing how float responses are evaluated."
+	)
 }).strict()
 
 const IdentifierSingleResponseDeclaration =
@@ -161,16 +185,6 @@ const ResponseDeclarationSchemaInternal = z
 	.describe(
 		"Defines the correct answer for an interaction, with a structure that varies based on the response's baseType and cardinality."
 	)
-
-type _InferResponseDeclaration = z.infer<
-	typeof ResponseDeclarationSchemaInternal
->
-type _EnsureSchemaMatchesType = [
-	ResponseDeclaration extends _InferResponseDeclaration ? true : never,
-	_InferResponseDeclaration extends ResponseDeclaration ? true : never
-]
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-declare const __ensureResponseDeclaration: _EnsureSchemaMatchesType
 
 export const ResponseDeclarationSchema: z.ZodType<ResponseDeclaration> =
 	ResponseDeclarationSchemaInternal

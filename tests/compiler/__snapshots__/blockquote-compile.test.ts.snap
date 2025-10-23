@@ -58,10 +58,7 @@ exports[`Compiler: blockquote should render blockquote in body with escaped cont
         
     <qti-response-condition>
         <qti-response-if>
-            <qti-match>
-                <qti-variable identifier="RESPONSE_TE"/>
-                <qti-correct identifier="RESPONSE_TE"/>
-            </qti-match>
+            <qti-match><qti-variable identifier="RESPONSE_TE"/><qti-correct identifier="RESPONSE_TE"/></qti-match>
             <qti-set-outcome-value identifier="FEEDBACK__OVERALL">
                 <qti-base-value base-type="identifier">FB__RESPONSE_TE_CORRECT</qti-base-value>
             </qti-set-outcome-value>
@@ -141,10 +138,7 @@ exports[`Compiler: blockquote should render blockquote without attribution 1`] =
         
     <qti-response-condition>
         <qti-response-if>
-            <qti-match>
-                <qti-variable identifier="RESPONSE"/>
-                <qti-correct identifier="RESPONSE"/>
-            </qti-match>
+            <qti-match><qti-variable identifier="RESPONSE"/><qti-correct identifier="RESPONSE"/></qti-match>
             <qti-set-outcome-value identifier="FEEDBACK__OVERALL">
                 <qti-base-value base-type="identifier">FB__RESPONSE_CORRECT</qti-base-value>
             </qti-set-outcome-value>

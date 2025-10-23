@@ -13,11 +13,67 @@ type AssessmentItemWithFeedbackBlocks<E extends readonly string[]> = Omit<
 	feedbackBlocks: Record<string, FeedbackContent<E>>
 }
 
+function buildCorrectComparison<E extends readonly string[]>(
+	item: AssessmentItemWithFeedbackBlocks<E>,
+	responseIdentifier: string
+): string {
+	const escapedId = escapeXmlAttribute(responseIdentifier)
+	const decl = item.responseDeclarations.find(
+		(d) => d.identifier === responseIdentifier
+	)
+
+	if (!decl) {
+		logger.error("response declaration not found for comparison", {
+			responseIdentifier
+		})
+		return `<qti-match><qti-variable identifier="${escapedId}"/><qti-correct identifier="${escapedId}"/></qti-match>`
+	}
+
+	if (decl.cardinality === "single") {
+		if (decl.baseType === "float") {
+			const { rounding } = decl
+			const roundingMode = rounding.strategy === "decimalPlaces" ? "decimalPlaces" : "significantFigures"
+			const figures = String(rounding.figures)
+			return `<qti-equal-rounded rounding-mode="${escapeXmlAttribute(roundingMode)}" figures="${escapeXmlAttribute(figures)}">
+                <qti-variable identifier="${escapedId}"/>
+                <qti-correct identifier="${escapedId}"/>
+            </qti-equal-rounded>`
+		}
+
+		if (decl.baseType === "integer") {
+			return `<qti-equal>
+                <qti-variable identifier="${escapedId}"/>
+                <qti-correct identifier="${escapedId}"/>
+            </qti-equal>`
+		}
+	}
+
+	return `<qti-match><qti-variable identifier="${escapedId}"/><qti-correct identifier="${escapedId}"/></qti-match>`
+}
+
 export function compileResponseDeclarations<E extends readonly string[]>(
 	decls: AssessmentItem<E>["responseDeclarations"]
 ): string {
 	return decls
 		.map((decl): string => {
+			const formatCorrectValue = (value: unknown): string => {
+				if (decl.baseType === "integer" || decl.baseType === "float") {
+					if (typeof value !== "number") {
+						logger.error("numeric response has non-number correct value", {
+							identifier: decl.identifier,
+							baseType: decl.baseType,
+							value
+						})
+						throw errors.new(
+							`numeric response correct value must be a number for ${decl.identifier}`
+						)
+					}
+					return value.toString()
+				}
+
+				return String(value)
+			}
+
 			// Handle directedPair base type separately
 			if (decl.baseType === "directedPair") {
 				// Type narrowing: when baseType is "directedPair", correct is an array of {source, target} objects
@@ -101,7 +157,10 @@ export function compileResponseDeclarations<E extends readonly string[]>(
 			const correctXml = correctValues
 				.map(
 					(v: unknown): string =>
-						`<qti-value>${String(v).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</qti-value>`
+						`<qti-value>${formatCorrectValue(v)
+							.replace(/&/g, "&amp;")
+							.replace(/</g, "&lt;")
+							.replace(/>/g, "&gt;")}</qti-value>`
 				)
 				.join("\n            ")
 
@@ -122,7 +181,9 @@ export function compileResponseDeclarations<E extends readonly string[]>(
 				const mappingXml = correctValues
 					.map((v: unknown): string => {
 						const key =
-							typeof v === "string" || typeof v === "number" ? String(v) : ""
+							typeof v === "string" || typeof v === "number"
+								? formatCorrectValue(v)
+								: ""
 						return `\n            <qti-map-entry map-key="${escapeXmlAttribute(key)}" mapped-value="1"/>`
 					})
 					.join("")
@@ -211,14 +272,15 @@ function generateComboModeProcessing<E extends readonly string[]>(
 		]
 		const correctBranch = buildConditionTree(restDims, correctPath)
 		const incorrectBranch = buildConditionTree(restDims, incorrectPath)
+		const correctComparison = buildCorrectComparison(
+			item,
+			currentDim.responseIdentifier
+		)
 
 		return `
     <qti-response-condition>
         <qti-response-if>
-            <qti-match>
-                <qti-variable identifier="${responseId}"/>
-                <qti-correct identifier="${responseId}"/>
-            </qti-match>${correctBranch}
+            ${correctComparison}${correctBranch}
         </qti-response-if>
         <qti-response-else>${incorrectBranch}
         </qti-response-else>
@@ -240,7 +302,7 @@ function generateFallbackModeProcessing<E extends readonly string[]>(
 
 	const matchConditions = item.feedbackPlan.dimensions.map(
 		(dim: FeedbackDimension): string =>
-			`<qti-match><qti-variable identifier="${escapeXmlAttribute(dim.responseIdentifier)}"/><qti-correct identifier="${escapeXmlAttribute(dim.responseIdentifier)}"/></qti-match>`
+			buildCorrectComparison(item, dim.responseIdentifier)
 	)
 
 	const allCorrectCondition =
@@ -286,8 +348,7 @@ export function compileResponseProcessing<E extends readonly string[]>(
 
 	const scoreConditions = item.responseDeclarations
 		.map((decl): string => {
-			const responseId = escapeXmlAttribute(decl.identifier)
-			return `<qti-match><qti-variable identifier="${responseId}"/><qti-correct identifier="${responseId}"/></qti-match>`
+			return buildCorrectComparison(item, decl.identifier)
 		})
 		.join("\n                        ")
 

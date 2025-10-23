@@ -6,6 +6,18 @@ import type { typedSchemas } from "@/widgets/registry"
 
 export type Widget = z.infer<(typeof typedSchemas)[keyof typeof typedSchemas]>
 
+export type DecimalPlacesRounding = {
+	strategy: "decimalPlaces"
+	figures: number
+}
+
+export type SignificantFiguresRounding = {
+	strategy: "significantFigures"
+	figures: number
+}
+
+export type NumericRounding = DecimalPlacesRounding | SignificantFiguresRounding
+
 export type ResponseDeclaration =
 	| {
 			identifier: string
@@ -24,6 +36,7 @@ export type ResponseDeclaration =
 			cardinality: "single"
 			baseType: "float"
 			correct: number
+			rounding: NumericRounding
 	  }
 	| {
 			identifier: string
