@@ -6,6 +6,8 @@
 
 import type { FeedbackContent } from "@/core/content"
 import type { AssessmentItemInput } from "@/core/item"
+import * as logger from "@superbuilders/slog"
+import * as errors from "@superbuilders/errors"
 import { createSeededRandom } from "@/templates/seeds"
 import type { TemplateModule } from "@/templates/types"
 
@@ -57,7 +59,11 @@ export function generateFractionAdditionQuestion(
 
 	const simplifyFraction = (frac: Fraction): Fraction => {
 		if (frac.denominator === 0) {
-			throw new Error("Fraction denominator cannot be zero")
+			logger.error("fraction denominator zero detected", {
+				numerator: frac.numerator,
+				denominator: frac.denominator
+			})
+			throw errors.new("fraction denominator cannot be zero")
 		}
 		const denominatorSign = frac.denominator < 0 ? -1 : 1
 		const normalizedNumerator = frac.numerator * denominatorSign

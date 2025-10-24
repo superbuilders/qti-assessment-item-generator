@@ -179,10 +179,8 @@ async function processQuestionDir(dir: string, openai: OpenAI): Promise<void> {
 		})
 	} else {
 		const buf = screenshotBytesResult.data
-		const arrayBuffer = buf.buffer.slice(
-			buf.byteOffset,
-			buf.byteOffset + buf.byteLength
-		)
+		const arrayBuffer = new ArrayBuffer(buf.byteLength)
+		new Uint8Array(arrayBuffer).set(buf)
 		screenshotPayload = {
 			data: arrayBuffer,
 			mimeType: "image/png"
@@ -378,4 +376,3 @@ if (result.error) {
 	logger.error("script failed to complete", { error: result.error })
 	process.exit(1)
 }
-

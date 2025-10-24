@@ -1,3 +1,6 @@
+import * as errors from "@superbuilders/errors"
+import * as logger from "@superbuilders/slog"
+
 const UINT32_MAX = 0xffffffff
 const UINT32_MAX_PLUS_ONE = UINT32_MAX + 1
 
@@ -13,7 +16,8 @@ export type SeededRandom = {
  */
 export function createSeededRandom(seed: bigint): SeededRandom {
 	if (seed < 0n) {
-		throw new Error("Seed must be a nonnegative bigint")
+		logger.error("seed must be nonnegative", { seed: seed.toString() })
+		throw errors.new("seed must be nonnegative")
 	}
 
 	// Reduce big seed to 32-bit state while keeping determinism for large inputs.
@@ -26,13 +30,25 @@ export function createSeededRandom(seed: bigint): SeededRandom {
 
 	const nextInt = (min: number, maxInclusive: number): number => {
 		if (!Number.isFinite(min) || !Number.isFinite(maxInclusive)) {
-			throw new Error("nextInt bounds must be finite numbers")
+			logger.error("nextInt bounds must be finite numbers", {
+				min,
+				maxInclusive
+			})
+			throw errors.new("nextInt bounds must be finite numbers")
 		}
 		if (Math.floor(min) !== min || Math.floor(maxInclusive) !== maxInclusive) {
-			throw new Error("nextInt bounds must be integers")
+			logger.error("nextInt bounds must be integers", {
+				min,
+				maxInclusive
+			})
+			throw errors.new("nextInt bounds must be integers")
 		}
 		if (maxInclusive < min) {
-			throw new Error("nextInt maxInclusive must be >= min")
+			logger.error("nextInt maxInclusive must be >= min", {
+				min,
+				maxInclusive
+			})
+			throw errors.new("nextInt maxInclusive must be >= min")
 		}
 		const span = maxInclusive - min + 1
 		return min + Math.floor(next() * span)

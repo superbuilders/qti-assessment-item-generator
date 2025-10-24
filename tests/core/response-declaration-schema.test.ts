@@ -22,7 +22,6 @@ describe("ResponseDeclarationSchema", () => {
 		identifier: "RESPONSE_FLOAT",
 		cardinality: "single",
 		baseType: "float",
-		// @ts-expect-error testing schema guard
 		correct: "3.14",
 		rounding: {
 			strategy: "decimalPlaces",
@@ -75,12 +74,11 @@ describe("ResponseDeclarationSchema", () => {
 		identifier: "RESPONSE_TEXT",
 		cardinality: "single",
 		baseType: "string",
-		// @ts-expect-error testing schema guard
 		correct: 42
 	})
 
-	expect(result.success).toBe(false)
-})
+		expect(result.success).toBe(false)
+	})
 
 	test("rejects float declarations without rounding metadata", () => {
 		const result = ResponseDeclarationSchema.safeParse({
