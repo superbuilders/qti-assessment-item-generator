@@ -15,54 +15,59 @@ async function main() {
 		version: fractionAddition.version
 	})
 
-	// 1. Define the input data for the template.
-	// This data object conforms to FractionAdditionTemplateInput.
-	const questionProps = {
-		addend1: { type: "fraction", numerator: 1, denominator: 2, sign: "+" },
-		addend2: { type: "fraction", numerator: 1, denominator: 3, sign: "+" }
-	}
-	logger.debug("defined question props", { props: questionProps })
+	const exampleSeeds = [123n, 456n, 789n]
 
-	// 2. Validate input props against the template's schema.
+	for (const seed of exampleSeeds) {
+		logger.info("generating example from seed", { seed: seed.toString() })
+		const questionProps = { seed }
 
-	// 3. Validate input props against the template's schema.
-	const validationResult = fractionAddition.propsSchema.safeParse(questionProps)
-	if (!validationResult.success) {
-		logger.error("template input validation failed", {
-			error: validationResult.error
+		const validationResult =
+			fractionAddition.propsSchema.safeParse(questionProps)
+		if (!validationResult.success) {
+			logger.error("template input validation failed", {
+				seed: seed.toString(),
+				error: validationResult.error
+			})
+			throw errors.wrap(validationResult.error, "template input validation")
+		}
+
+		const itemInputResult = errors.trySync(() =>
+			fractionAddition.generate(validationResult.data)
+		)
+		if (itemInputResult.error) {
+			logger.error("template function failed", {
+				seed: seed.toString(),
+				error: itemInputResult.error
+			})
+			throw errors.wrap(itemInputResult.error, "template generation")
+		}
+		const assessmentItemInput = itemInputResult.data
+		logger.info("generated assessmentiteminput", {
+			seed: seed.toString(),
+			identifier: assessmentItemInput.identifier,
+			title: assessmentItemInput.title
 		})
-		throw errors.wrap(validationResult.error, "template input validation")
+
+		const compileResult = await errors.try(
+			compile(assessmentItemInput, templateCollection)
+		)
+		if (compileResult.error) {
+			logger.error("qti compilation failed", {
+				seed: seed.toString(),
+				error: compileResult.error
+			})
+			throw errors.wrap(compileResult.error, "compilation")
+		}
+		const qtiXml = compileResult.data
+		logger.info("successfully compiled qti xml", { seed: seed.toString() })
+		logger.info("generated qti xml", {
+			seed: seed.toString(),
+			xml: qtiXml,
+			separator: "========================================"
+		})
 	}
 
-	// 4. Call the template's generate() to produce AssessmentItemInput.
-	// This is a synchronous, deterministic call.
-	const itemInputResult = errors.trySync(() =>
-		fractionAddition.generate(validationResult.data)
-	)
-	if (itemInputResult.error) {
-		logger.error("template function failed", { error: itemInputResult.error })
-		throw errors.wrap(itemInputResult.error, "template generation")
-	}
-	const assessmentItemInput = itemInputResult.data
-	logger.info("successfully generated assessmentiteminput from template")
-
-	// 5. Pass the generated data structure to the compiler.
-	const compileResult = await errors.try(
-		compile(assessmentItemInput, templateCollection)
-	)
-	if (compileResult.error) {
-		logger.error("qti compilation failed", { error: compileResult.error })
-		throw errors.wrap(compileResult.error, "compilation")
-	}
-	const qtiXml = compileResult.data
-	logger.info("successfully compiled qti xml")
-
-	// 6. Log the final output.
-	logger.info("template poc succeeded")
-	logger.info("generated qti xml", {
-		xml: qtiXml,
-		separator: "========================================"
-	})
+	logger.info("template poc succeeded for all seeds")
 }
 
 // Execute the main function and handle potential errors at the top level.

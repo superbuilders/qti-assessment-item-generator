@@ -1,14 +1,13 @@
 // -----------------------------------------------------------------------------
 // 1. IMPORTS
-// The template only imports what is absolutely necessary: Zod for defining its
-// input shape, and the core types it needs to produce from your library.
+// The template only imports what is absolutely necessary: core item types,
+// shared seed utilities, and widget typing helpers.
 // -----------------------------------------------------------------------------
 
-import { z } from "zod"
 import type { FeedbackContent } from "@/core/content"
 import type { AssessmentItemInput } from "@/core/item"
-import { FractionSchema } from "@/templates/schemas"
-import type { TemplateModule } from "@/templates/types"
+import { createSeededRandom, SeedPropsSchema } from "@/templates/schemas"
+import type { SeedProps, TemplateModule } from "@/templates/types"
 
 // Define the exact widget tuple used by this template
 // The template includes a 'partitionedShape' widget in the widgets map below
@@ -17,26 +16,14 @@ export type TemplateWidgets = readonly ["partitionedShape"]
 // -----------------------------------------------------------------------------
 // 2. FUNDAMENTAL DATA TYPE & TEMPLATE PROPS SCHEMA
 // This section defines the public contract of the template. It is the only
-// part a user of the template needs to know. In a real-world scenario,
-// FractionSchema would likely live in a shared types file.
+// part a user of the template needs to know. Inputs are intentionally opaque
+// so the template owns all math-specific authoring decisions.
 // -----------------------------------------------------------------------------
 
 /**
  * Defines the structure for a simple fraction.
  */
 export type Fraction = { numerator: number; denominator: number }
-
-/**
- * Zod schema defining the inputs required by the Fraction Addition template.
- * It requires exactly two fractions.
- */
-// Strict props schema (fractions only)
-export const PropsSchema = z
-	.object({
-		addend1: FractionSchema.describe("The first addend (fraction only)."),
-		addend2: FractionSchema.describe("The second addend (fraction only).")
-	})
-	.strict()
 
 // -----------------------------------------------------------------------------
 // 3. THE TEMPLATE GENERATOR FUNCTION
@@ -47,24 +34,39 @@ export const PropsSchema = z
 /**
  * Generates the AssessmentItemInput data structure for a fraction addition question.
  *
- * @param props - An object containing the two fractions to be added.
+ * @param props - Opaque seed input used to generate the authored question.
  * @returns An AssessmentItemInput object ready for the QTI compiler.
  */
 export function generateFractionAdditionQuestion(
-	props: z.input<typeof PropsSchema>
+	props: SeedProps
 ): AssessmentItemInput<TemplateWidgets> {
-	const { addend1, addend2 } = props
+	const { seed } = props
 	// --- 3a. Self-Contained Mathematical Helpers ---
 	// To ensure the template is a pure, dependency-free module, all core
 	// mathematical logic is implemented directly within its scope.
 
-	const gcd = (a: number, b: number): number => (b === 0 ? a : gcd(b, a % b))
+	const gcd = (a: number, b: number): number => {
+		let x = Math.abs(a)
+		let y = Math.abs(b)
+		while (y !== 0) {
+			const temp = y
+			y = x % y
+			x = temp
+		}
+		return x === 0 ? 1 : x
+	}
 
 	const simplifyFraction = (frac: Fraction): Fraction => {
-		const commonDivisor = gcd(frac.numerator, frac.denominator)
+		if (frac.denominator === 0) {
+			throw new Error("Fraction denominator cannot be zero")
+		}
+		const denominatorSign = frac.denominator < 0 ? -1 : 1
+		const normalizedNumerator = frac.numerator * denominatorSign
+		const normalizedDenominator = frac.denominator * denominatorSign
+		const commonDivisor = gcd(normalizedNumerator, normalizedDenominator)
 		return {
-			numerator: frac.numerator / commonDivisor,
-			denominator: frac.denominator / commonDivisor
+			numerator: normalizedNumerator / commonDivisor,
+			denominator: normalizedDenominator / commonDivisor
 		}
 	}
 
@@ -82,22 +84,38 @@ export function generateFractionAdditionQuestion(
 		return `<mfrac><mn>${frac.numerator}</mn><mn>${frac.denominator}</mn></mfrac>`
 	}
 
-	// --- 3b. Core Logic: Calculate Answer and Pedagogically-Sound Distractors ---
-	// Convert input fraction schema to computation form
-	const toFraction = (v: {
-		type: "fraction"
-		numerator: number
-		denominator: number
-		sign?: "+" | "-"
-	}): Fraction => {
-		return {
-			numerator: v.numerator * ((v.sign ?? "+") === "-" ? -1 : 1),
-			denominator: v.denominator
-		}
+	// --- 3b. Core Logic: Determine Fractions From Seed and Build Distractors ---
+	const random = createSeededRandom(seed)
+
+	const createFractionFromSeed = (): Fraction => {
+		const denominator = random.nextInt(2, 12)
+		const maxNumerator = Math.max(1, Math.floor(denominator / 2))
+		const numerator = random.nextInt(1, maxNumerator)
+		return simplifyFraction({ numerator, denominator })
 	}
 
-	const f1 = toFraction(addend1)
-	const f2 = toFraction(addend2)
+	const fractionsEqual = (a: Fraction, b: Fraction) =>
+		a.numerator === b.numerator && a.denominator === b.denominator
+
+	const f1 = createFractionFromSeed()
+
+	let f2 = createFractionFromSeed()
+	if (fractionsEqual(f1, f2)) {
+		const alternativeDenominator = f2.denominator === 2 ? 3 : f2.denominator + 1
+		const alternativeMaxNumerator = Math.max(
+			1,
+			Math.floor(alternativeDenominator / 2)
+		)
+		const alternativeNumerator = Math.min(
+			alternativeMaxNumerator,
+			f2.numerator + 1
+		)
+		f2 = simplifyFraction({
+			numerator: alternativeNumerator,
+			denominator: alternativeDenominator
+		})
+	}
+
 	const correctAnswer = addFractions(f1, f2)
 
 	// Distractors are generated based on common student misconceptions.
@@ -188,7 +206,7 @@ export function generateFractionAdditionQuestion(
 	// --- 3d. Construct the Final AssessmentItemInput Object ---
 	// TODO: Update this template to use feedbackPlan + map structure
 	const assessmentItem: AssessmentItemInput<TemplateWidgets> = {
-		identifier: `fraction-addition-${f1.numerator}-${f1.denominator}-plus-${f2.numerator}-${f2.denominator}`,
+		identifier: `fraction-addition-seed-${seed.toString()}`,
 		title: `Fraction Addition: ${f1.numerator}/${f1.denominator} + ${f2.numerator}/${f2.denominator}`,
 
 		body: [
@@ -688,12 +706,11 @@ export function generateFractionAdditionQuestion(
 export const templateId = "math.fraction-addition"
 export const version = "1.0.0"
 
-const templateModule: TemplateModule<typeof PropsSchema, TemplateWidgets> = {
+const templateModule: TemplateModule<TemplateWidgets> = {
 	templateId,
 	version,
-	propsSchema: PropsSchema,
-	generate: (props: z.input<typeof PropsSchema>) =>
-		generateFractionAdditionQuestion(props)
+	propsSchema: SeedPropsSchema,
+	generate: generateFractionAdditionQuestion
 }
 
 export default templateModule

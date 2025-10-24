@@ -1,117 +1,57 @@
 import { z } from "zod"
 
-// -----------------------------------------------------------------------------
-// Canonical, constrained numeric value schemas for template inputs
-// Heavily inspired by number-line widget patterns, but simplified for template IO
-// -----------------------------------------------------------------------------
+/**
+ * Canonical schema for seed-only template inputs. Templates are expected to
+ * derive all authored data deterministically from this opaque value.
+ */
+export const SeedSchema = z.bigint().min(0n)
 
-// Whole integer (can be negative)
-export const IntegerSchema = z
+export const SeedPropsSchema = z
 	.object({
-		type: z.literal("integer"),
-		value: z.number().int()
+		seed: SeedSchema
 	})
 	.strict()
-	.describe("Whole integer value, may be negative or zero")
+	.describe("Opaque template seed used to deterministically generate content.")
 
-// Positive integer (> 0)
-export const PositiveIntegerSchema = z
-	.object({
-		type: z.literal("positiveInteger"),
-		value: z.number().int().positive()
-	})
-	.strict()
-	.describe("Positive integer value greater than zero")
+export type SeedProps = z.infer<typeof SeedPropsSchema>
 
-// Proper or improper fraction with optional sign encoded explicitly
-export const FractionSchema = z
-	.object({
-		type: z.literal("fraction"),
-		numerator: z.number().int().min(0),
-		denominator: z.number().int().positive(),
-		sign: z.enum(["+", "-"]).default("+")
-	})
-	.strict()
-	.describe("Fraction value with explicit sign and positive denominator")
+const UINT32_MAX = 0xffffffff
+const UINT32_MAX_PLUS_ONE = UINT32_MAX + 1
 
-// Mixed number with explicit sign
-export const MixedNumberSchema = z
-	.object({
-		type: z.literal("mixed"),
-		whole: z.number().int().min(0),
-		numerator: z.number().int().min(0),
-		denominator: z.number().int().positive(),
-		sign: z.enum(["+", "-"]).default("+")
-	})
-	.strict()
-	.describe("Mixed number with explicit sign and positive denominator")
+export type SeededRandom = {
+	next: () => number
+	nextInt: (min: number, maxInclusive: number) => number
+	nextBoolean: () => boolean
+}
 
-// Decimal number (finite), generic numeric
-export const DecimalNumberSchema = z
-	.object({
-		type: z.literal("decimal"),
-		value: z.number()
-	})
-	.strict()
-	.describe("Finite decimal number")
+/**
+ * Very small deterministic RNG (LCG) seeded from a bigint. Provides helpers for
+ * common integer and boolean draws without relying on global Math.random.
+ */
+export function createSeededRandom(seed: bigint): SeededRandom {
+	// Reduce big seed to 32-bit state while keeping determinism for large inputs.
+	let state = Number(seed & BigInt(UINT32_MAX)) >>> 0
 
-// Number of the form a + b*pi
-export const PiNumberSchema = z
-	.object({
-		type: z.literal("piNumber"),
-		a: z.number().describe("non-pi part"),
-		b: z.number().describe("coefficient of pi")
-	})
-	.strict()
-	.describe("Number of the form a + b*pi")
-
-// TODO (future): complex numbers { a, b, form }
-
-export const NumericValueSchema = z
-	.discriminatedUnion("type", [
-		IntegerSchema,
-		PositiveIntegerSchema,
-		FractionSchema,
-		MixedNumberSchema,
-		DecimalNumberSchema,
-		PiNumberSchema
-	])
-	.describe("Canonical numeric value union for template inputs")
-
-export type NumericValue = z.infer<typeof NumericValueSchema>
-
-// Subset limited to exact rationals (excludes decimal and pi forms)
-export const RationalValueSchema = z
-	.discriminatedUnion("type", [
-		IntegerSchema,
-		PositiveIntegerSchema,
-		FractionSchema,
-		MixedNumberSchema
-	])
-	.describe(
-		"Exact rational numeric value (integer, positiveInteger, fraction, mixed)"
-	)
-
-export type RationalValue = z.infer<typeof RationalValueSchema>
-
-// Utility converters
-export function numericValueToRational(
-	v: NumericValue
-): { numerator: number; denominator: number; sign: "+" | "-" } | null {
-	if (v.type === "integer") {
-		const sign: "+" | "-" = v.value < 0 ? "-" : "+"
-		return { numerator: Math.abs(v.value), denominator: 1, sign }
+	const next = () => {
+		state = (state * 1664525 + 1013904223) >>> 0
+		return state / UINT32_MAX_PLUS_ONE
 	}
-	if (v.type === "positiveInteger") {
-		return { numerator: v.value, denominator: 1, sign: "+" }
+
+	const nextInt = (min: number, maxInclusive: number): number => {
+		if (!Number.isFinite(min) || !Number.isFinite(maxInclusive)) {
+			throw new Error("nextInt bounds must be finite numbers")
+		}
+		if (Math.floor(min) !== min || Math.floor(maxInclusive) !== maxInclusive) {
+			throw new Error("nextInt bounds must be integers")
+		}
+		if (maxInclusive < min) {
+			throw new Error("nextInt maxInclusive must be >= min")
+		}
+		const span = maxInclusive - min + 1
+		return min + Math.floor(next() * span)
 	}
-	if (v.type === "fraction") {
-		return { numerator: v.numerator, denominator: v.denominator, sign: v.sign }
-	}
-	if (v.type === "mixed") {
-		const improper = v.whole * v.denominator + v.numerator
-		return { numerator: improper, denominator: v.denominator, sign: v.sign }
-	}
-	// For decimal and piNumber, return null to force template-specific handling
-	return null
+
+	const nextBoolean = () => next() < 0.5
+
+	return { next, nextInt, nextBoolean }
 }
