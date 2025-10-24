@@ -6,8 +6,8 @@
 
 import type { FeedbackContent } from "@/core/content"
 import type { AssessmentItemInput } from "@/core/item"
-import { createSeededRandom, SeedPropsSchema } from "@/templates/schemas"
-import type { SeedProps, TemplateModule } from "@/templates/types"
+import { createSeededRandom } from "@/templates/seeds"
+import type { TemplateModule } from "@/templates/types"
 
 // Define the exact widget tuple used by this template
 // The template includes a 'partitionedShape' widget in the widgets map below
@@ -34,13 +34,12 @@ export type Fraction = { numerator: number; denominator: number }
 /**
  * Generates the AssessmentItemInput data structure for a fraction addition question.
  *
- * @param props - Opaque seed input used to generate the authored question.
+ * @param seed - Opaque seed input used to generate the authored question.
  * @returns An AssessmentItemInput object ready for the QTI compiler.
  */
 export function generateFractionAdditionQuestion(
-	props: SeedProps
+	seed: bigint
 ): AssessmentItemInput<TemplateWidgets> {
-	const { seed } = props
 	// --- 3a. Self-Contained Mathematical Helpers ---
 	// To ensure the template is a pure, dependency-free module, all core
 	// mathematical logic is implemented directly within its scope.
@@ -709,7 +708,6 @@ export const version = "1.0.0"
 const templateModule: TemplateModule<TemplateWidgets> = {
 	templateId,
 	version,
-	propsSchema: SeedPropsSchema,
 	generate: generateFractionAdditionQuestion
 }
 

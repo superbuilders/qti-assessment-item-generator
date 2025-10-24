@@ -19,20 +19,9 @@ async function main() {
 
 	for (const seed of exampleSeeds) {
 		logger.info("generating example from seed", { seed: seed.toString() })
-		const questionProps = { seed }
-
-		const validationResult =
-			fractionAddition.propsSchema.safeParse(questionProps)
-		if (!validationResult.success) {
-			logger.error("template input validation failed", {
-				seed: seed.toString(),
-				error: validationResult.error
-			})
-			throw errors.wrap(validationResult.error, "template input validation")
-		}
 
 		const itemInputResult = errors.trySync(() =>
-			fractionAddition.generate(validationResult.data)
+			fractionAddition.generate(seed)
 		)
 		if (itemInputResult.error) {
 			logger.error("template function failed", {
