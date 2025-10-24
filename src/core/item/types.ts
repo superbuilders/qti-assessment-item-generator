@@ -72,17 +72,30 @@ export type AssessmentItemShell<E extends readonly string[]> = {
 	body: BlockContent<E> | null
 }
 
-export type AssessmentItem<E extends readonly string[]> = {
+export type AssessmentItem<
+	E extends readonly string[],
+	P extends FeedbackPlan = FeedbackPlan
+> = {
 	identifier: string
 	title: string
 	responseDeclarations: ResponseDeclaration[]
 	body: BlockContent<E> | null
 	widgets: Record<string, Widget> | null
 	interactions: Record<string, AnyInteraction<E>> | null
-	feedbackPlan: FeedbackPlan
+	feedbackPlan: P
 	feedback: {
-		FEEDBACK__OVERALL: AuthoringFeedbackOverall<FeedbackPlan, E>
+		FEEDBACK__OVERALL: AuthoringFeedbackOverall<P, E>
 	}
 }
 
-export type AssessmentItemInput<E extends readonly string[]> = AssessmentItem<E>
+export type AssessmentItemInput<
+	E extends readonly string[],
+	P extends FeedbackPlan = FeedbackPlan
+> = AssessmentItem<E, P>
+
+export function defineAssessmentItem<
+	const E extends readonly string[],
+	const P extends FeedbackPlan
+>(item: AssessmentItem<E, P>): AssessmentItem<E, P> {
+	return item
+}

@@ -4,10 +4,10 @@
 // shared seed utilities, and widget typing helpers.
 // -----------------------------------------------------------------------------
 
-import type { FeedbackContent } from "@/core/content"
-import type { AssessmentItemInput } from "@/core/item"
-import * as logger from "@superbuilders/slog"
 import * as errors from "@superbuilders/errors"
+import * as logger from "@superbuilders/slog"
+import type { FeedbackContent } from "@/core/content"
+import { type AssessmentItemInput, defineAssessmentItem } from "@/core/item"
 import { createSeededRandom } from "@/templates/seeds"
 import type { TemplateModule } from "@/templates/types"
 
@@ -210,7 +210,7 @@ export function generateFractionAdditionQuestion(
 
 	// --- 3d. Construct the Final AssessmentItemInput Object ---
 	// TODO: Update this template to use feedbackPlan + map structure
-	const assessmentItem: AssessmentItemInput<TemplateWidgets> = {
+	const assessmentItem = defineAssessmentItem({
 		identifier: `fraction-addition-seed-${seed.toString()}`,
 		title: `Fraction Addition: ${f1.numerator}/${f1.denominator} + ${f2.numerator}/${f2.denominator}`,
 
@@ -698,7 +698,7 @@ export function generateFractionAdditionQuestion(
 				)
 			}
 		}
-	}
+	})
 
 	return assessmentItem
 }

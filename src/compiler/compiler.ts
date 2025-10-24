@@ -47,10 +47,10 @@ export const ErrDuplicateChoiceIdentifier = errors.new(
 )
 
 // Internal type used during compilation after nested feedback is flattened
-type AssessmentItemWithFlatFeedback<E extends readonly string[]> = Omit<
-	AssessmentItem<E>,
-	"feedback"
-> & {
+type AssessmentItemWithFlatFeedback<
+	E extends readonly string[],
+	P extends FeedbackPlan = FeedbackPlan
+> = Omit<AssessmentItem<E, P>, "feedback"> & {
 	feedbackBlocks: Record<string, FeedbackContent<E>>
 }
 
