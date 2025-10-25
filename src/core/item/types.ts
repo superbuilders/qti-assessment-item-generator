@@ -92,10 +92,3 @@ export type AssessmentItemInput<
 	E extends readonly string[],
 	P extends FeedbackPlan = FeedbackPlan
 > = AssessmentItem<E, P>
-
-export function defineAssessmentItem<
-	const E extends readonly string[],
-	const P extends FeedbackPlan
->(item: AssessmentItem<E, P>): AssessmentItem<E, P> {
-	return item
-}

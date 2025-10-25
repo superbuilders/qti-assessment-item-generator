@@ -7,7 +7,8 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import type { FeedbackContent } from "@/core/content"
-import { type AssessmentItemInput, defineAssessmentItem } from "@/core/item"
+import type { FeedbackPlan } from "@/core/feedback"
+import type { AssessmentItemInput } from "@/core/item"
 import { createSeededRandom } from "@/templates/seeds"
 import type { TemplateModule } from "@/templates/types"
 
@@ -207,10 +208,30 @@ export function generateFractionAdditionQuestion(
 		)
 
 	const correctChoiceIndex = finalChoices.findIndex((c) => c.isCorrect)
+	const choiceIdentifiers = finalChoices.map((_, i) => `CHOICE_${i}`)
+	const correctChoiceIdentifier =
+		correctChoiceIndex >= 0
+			? choiceIdentifiers[correctChoiceIndex]
+			: choiceIdentifiers[0]
+
+	const feedbackPlan = {
+		mode: "combo" as const,
+		dimensions: [
+			{
+				responseIdentifier: "RESPONSE",
+				kind: "enumerated",
+				keys: choiceIdentifiers
+			}
+		],
+		combinations: choiceIdentifiers.map((choiceId) => ({
+			id: `FB__RESPONSE_${choiceId}`,
+			path: [{ responseIdentifier: "RESPONSE", key: choiceId }]
+		}))
+	} satisfies FeedbackPlan
 
 	// --- 3d. Construct the Final AssessmentItemInput Object ---
 	// TODO: Update this template to use feedbackPlan + map structure
-	const assessmentItem = defineAssessmentItem({
+	const assessmentItem = {
 		identifier: `fraction-addition-seed-${seed.toString()}`,
 		title: `Fraction Addition: ${f1.numerator}/${f1.denominator} + ${f2.numerator}/${f2.denominator}`,
 
@@ -273,8 +294,16 @@ export function generateFractionAdditionQuestion(
 				maxChoices: 1,
 				prompt: [{ type: "text", content: "Select the correct sum." }],
 				choices: finalChoices.map((choice, index) => {
+					const choiceId = choiceIdentifiers[index]
+					if (choiceId === undefined) {
+						logger.error("missing choice identifier during template assembly", {
+							index,
+							identifierCount: choiceIdentifiers.length
+						})
+						throw errors.new("missing choice identifier")
+					}
 					return {
-						identifier: `CHOICE_${index}`,
+						identifier: choiceId,
 						content: [
 							{
 								type: "paragraph" as const,
@@ -297,28 +326,23 @@ export function generateFractionAdditionQuestion(
 				identifier: "RESPONSE",
 				cardinality: "single",
 				baseType: "identifier",
-				correct: `CHOICE_${correctChoiceIndex}`
+				correct: correctChoiceIdentifier
 			}
 		],
 
-		feedbackPlan: {
-			mode: "combo",
-			dimensions: [
-				{
-					responseIdentifier: "RESPONSE",
-					kind: "enumerated",
-					keys: finalChoices.map((_, i) => `CHOICE_${i}`)
-				}
-			],
-			combinations: finalChoices.map((_, i) => ({
-				id: `FB__RESPONSE_CHOICE_${i}`,
-				path: [{ responseIdentifier: "RESPONSE", key: `CHOICE_${i}` }]
-			}))
-		},
+		feedbackPlan,
 		feedback: {
 			FEEDBACK__OVERALL: {
 				RESPONSE: Object.fromEntries(
 					finalChoices.map((choice, index) => {
+						const choiceId = choiceIdentifiers[index]
+						if (choiceId === undefined) {
+							logger.error(
+								"missing choice identifier during feedback construction",
+								{ index, identifierCount: choiceIdentifiers.length }
+							)
+							throw errors.new("missing choice identifier for feedback")
+						}
 						// Helper values for worked example
 						const commonDenom = f1.denominator * f2.denominator
 						const num1Expanded = Math.abs(f1.numerator) * f2.denominator
@@ -693,12 +717,12 @@ export function generateFractionAdditionQuestion(
 								}
 						}
 
-						return [`CHOICE_${index}`, { content: feedbackContent }] as const
+						return [choiceId, { content: feedbackContent }] as const
 					})
 				)
 			}
 		}
-	})
+	} satisfies AssessmentItemInput<TemplateWidgets, typeof feedbackPlan>
 
 	return assessmentItem
 }
