@@ -23,6 +23,7 @@
 			"@/templates/*": ["src/templates/*"],
 			"@/core/*": ["src/core/*"],
 			"@/structured/*": ["src/structured/*"],
+			"@/template-generator/*": ["src/template-generator/*"],
 			"@/compiler/*": ["src/compiler/*"],
 			"@/widgets/*": ["src/widgets/*"],
 			"@/cartridge/*": ["src/cartridge/*"],

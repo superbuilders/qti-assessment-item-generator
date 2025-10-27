@@ -1,7 +1,7 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { compile } from "@/compiler/compiler"
-import generateFractionAdditionQuestion from "@/templates/math/fraction-addition"
+import generateFractionAdditionQuestion from "@/templates/math/number-word-problem"
 import { allWidgetsCollection } from "@/widgets/collections/all"
 import { createSubsetCollection } from "@/widgets/collections/subset"
 

@@ -13,6 +13,7 @@
 		"typecheck": "tsc --noEmit",
 		"lint": "biome lint",
 		"format": "biome format --write",
+		"generate:template": "bun src/template-generator/cli.ts",
 		"prepublishOnly": "bun run build"
 	},
 	"keywords": [
@@ -36,7 +37,8 @@
 		"dotenv": "^17.2.3",
 		"html-validate": "^10.1.2",
 		"openai": "^6.3.0",
-		"tsc-alias": "^1.8.10"
+		"tsc-alias": "^1.8.10",
+		"typescript": "^5.9.3"
 	},
 	"peerDependencies": {
 		"typescript": "^5.9.3",

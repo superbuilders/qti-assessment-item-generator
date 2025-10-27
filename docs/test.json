@@ -1,0 +1,953 @@
+{
+  "identifier": "expanded-form-to-words-5",
+  "title": "Write the Number in Word Form from Expanded Form",
+  "responseDeclarations": [
+    {
+      "identifier": "RESPONSE",
+      "cardinality": "single",
+      "baseType": "identifier",
+      "correct": "A"
+    }
+  ],
+  "body": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "content": "The expanded form of a number is shown."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "math",
+          "mathml": "<mn>1,800</mn><mo>+</mo><mn>40</mn><mo>+</mo><mn>0.29</mn>"
+        }
+      ]
+    },
+    {
+      "type": "interactionRef",
+      "interactionId": "choice_interaction"
+    }
+  ],
+  "interactions": {
+    "choice_interaction": {
+      "type": "choiceInteraction",
+      "responseIdentifier": "RESPONSE",
+      "prompt": [
+        {
+          "type": "text",
+          "content": "What is the number in word form? "
+        },
+        {
+          "type": "text",
+          "content": "Select one answer."
+        }
+      ],
+      "choices": [
+        {
+          "identifier": "A",
+          "content": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "content": "One thousand eight hundred forty and twenty-nine hundredths"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "identifier": "B",
+          "content": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "content": "One thousand eight hundred four and twenty-nine hundredths"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "identifier": "C",
+          "content": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "content": "One thousand eighty-four and twenty-nine tenths"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "identifier": "D",
+          "content": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "content": "One thousand eight hundred forty and twenty-nine tenths"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "shuffle": true,
+      "minChoices": 1,
+      "maxChoices": 1
+    }
+  },
+  "widgets": {},
+  "feedbackPlan": {
+    "mode": "combo",
+    "dimensions": [
+      {
+        "responseIdentifier": "RESPONSE",
+        "kind": "enumerated",
+        "keys": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ]
+      }
+    ],
+    "combinations": [
+      {
+        "id": "FB__RESPONSE_A",
+        "path": [
+          {
+            "responseIdentifier": "RESPONSE",
+            "key": "A"
+          }
+        ]
+      },
+      {
+        "id": "FB__RESPONSE_B",
+        "path": [
+          {
+            "responseIdentifier": "RESPONSE",
+            "key": "B"
+          }
+        ]
+      },
+      {
+        "id": "FB__RESPONSE_C",
+        "path": [
+          {
+            "responseIdentifier": "RESPONSE",
+            "key": "C"
+          }
+        ]
+      },
+      {
+        "id": "FB__RESPONSE_D",
+        "path": [
+          {
+            "responseIdentifier": "RESPONSE",
+            "key": "D"
+          }
+        ]
+      }
+    ]
+  },
+  "feedback": {
+    "FEEDBACK__OVERALL": {
+      "RESPONSE": {
+        "A": {
+          "content": {
+            "preamble": {
+              "correctness": "correct",
+              "summary": [
+                {
+                  "type": "text",
+                  "content": "Your word form correctly reflects each part of the expanded number: "
+                },
+                {
+                  "type": "math",
+                  "mathml": "<mn>1,800</mn>"
+                },
+                {
+                  "type": "text",
+                  "content": " for the thousands and hundreds, "
+                },
+                {
+                  "type": "math",
+                  "mathml": "<mn>40</mn>"
+                },
+                {
+                  "type": "text",
+                  "content": " for the tens, and "
+                },
+                {
+                  "type": "math",
+                  "mathml": "<mn>0.29</mn>"
+                },
+                {
+                  "type": "text",
+                  "content": " as the decimal part."
+                }
+              ]
+            },
+            "steps": [
+              {
+                "type": "step",
+                "title": [
+                  {
+                    "type": "text",
+                    "content": "Match each term to its place value"
+                  }
+                ],
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "content": "The expanded form is "
+                      },
+                      {
+                        "type": "math",
+                        "mathml": "<mn>1,800</mn><mo>+</mo><mn>40</mn><mo>+</mo><mn>0.29</mn>"
+                      },
+                      {
+                        "type": "text",
+                        "content": "."
+                      }
+                    ]
+                  },
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "content": "These represent the whole-number parts (thousands and tens) and a decimal part in hundredths."
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "step",
+                "title": [
+                  {
+                    "type": "text",
+                    "content": "Read the decimal part as a fraction"
+                  }
+                ],
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "content": "For "
+                      },
+                      {
+                        "type": "math",
+                        "mathml": "<mn>0.29</mn>"
+                      },
+                      {
+                        "type": "text",
+                        "content": ", read the digits as “twenty-nine” and use “hundredths” because there are "
+                      },
+                      {
+                        "type": "math",
+                        "mathml": "<mn>2</mn>"
+                      },
+                      {
+                        "type": "text",
+                        "content": " digits after the decimal point."
+                      }
+                    ]
+                  },
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "content": "This is why wording with “tenths” would not match this decimal."
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "step",
+                "title": [
+                  {
+                    "type": "text",
+                    "content": "Combine the whole number and the decimal part"
+                  }
+                ],
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "content": "Say the whole-number part (one thousand eight hundred forty), then say “and,” then the fraction name for "
+                      },
+                      {
+                        "type": "math",
+                        "mathml": "<mn>0.29</mn>"
+                      },
+                      {
+                        "type": "text",
+                        "content": " (twenty-nine hundredths)."
+                      }
+                    ]
+                  },
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "content": "Self-check: Did you include “and” only before the decimal part and use “hundredths” for two decimal places?"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "B": {
+          "content": {
+            "preamble": {
+              "correctness": "incorrect",
+              "summary": [
+                {
+                  "type": "text",
+                  "content": "The expanded form includes a tens addend of "
+                },
+                {
+                  "type": "math",
+                  "mathml": "<mn>40</mn>"
+                },
+                {
+                  "type": "text",
+                  "content": " (forty), but your choice treated it like "
+                },
+                {
+                  "type": "math",
+                  "mathml": "<mn>4</mn>"
+                },
+                {
+                  "type": "text",
+                  "content": " (four). The decimal "
+                },
+                {
+                  "type": "math",
+                  "mathml": "<mn>0.29</mn>"
+                },
+                {
+                  "type": "text",
+                  "content": " correctly corresponds to twenty-nine hundredths."
+                }
+              ]
+            },
+            "steps": [
+              {
+                "type": "step",
+                "title": [
+                  {
+                    "type": "text",
+                    "content": "Match each expanded addend to words"
+                  }
+                ],
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "content": "Whole-number thousands and hundreds: "
+                      },
+                      {
+                        "type": "math",
+                        "mathml": "<mn>1,800</mn>"
+                      },
+                      {
+                        "type": "text",
+                        "content": " → “one thousand eight hundred.”"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "content": "Tens: "
+                      },
+                      {
+                        "type": "math",
+                        "mathml": "<mn>40</mn>"
+                      },
+                      {
+                        "type": "text",
+                        "content": " → “forty.”"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "content": "Decimal hundredths: "
+                      },
+                      {
+                        "type": "math",
+                        "mathml": "<mn>0.29</mn>"
+                      },
+                      {
+                        "type": "text",
+                        "content": " → “twenty-nine hundredths.”"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "step",
+                "title": [
+                  {
+                    "type": "text",
+                    "content": "Fix the tens place"
+                  }
+                ],
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "content": "Because the addend is "
+                      },
+                      {
+                        "type": "math",
+                        "mathml": "<mn>40</mn>"
+                      },
+                      {
+                        "type": "text",
+                        "content": ", the tens word must be “forty,” not “four.” There is no ones addend here (ones digit is "
+                      },
+                      {
+                        "type": "math",
+                        "mathml": "<mn>0</mn>"
+                      },
+                      {
+                        "type": "text",
+                        "content": ")."
+                      }
+                    ]
+                  },
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "content": "Writing “four” would match an addend of "
+                      },
+                      {
+                        "type": "math",
+                        "mathml": "<mn>4</mn>"
+                      },
+                      {
+                        "type": "text",
+                        "content": ", which is not present in the expanded form."
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "step",
+                "title": [
+                  {
+                    "type": "text",
+                    "content": "Assemble the word form"
+                  }
+                ],
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "content": "Write the whole-number part by saying “one thousand eight hundred” followed by the tens word “forty.”"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "content": "Then use “and” to indicate the decimal point, and say the decimal part as “twenty-nine hundredths” for "
+                      },
+                      {
+                        "type": "math",
+                        "mathml": "<mn>0.29</mn>"
+                      },
+                      {
+                        "type": "text",
+                        "content": "."
+                      }
+                    ]
+                  },
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "content": "Now, combine these parts into a single phrase to get the final word form."
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "step",
+                "title": [
+                  {
+                    "type": "text",
+                    "content": "Self-check before you submit"
+                  }
+                ],
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "content": "Did you say “forty” for the tens value (not “four”)?"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "content": "Does your decimal wording match “hundredths” for "
+                      },
+                      {
+                        "type": "math",
+                        "mathml": "<mn>0.29</mn>"
+                      },
+                      {
+                        "type": "text",
+                        "content": ", not “tenths”? "
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "C": {
+          "content": {
+            "preamble": {
+              "correctness": "incorrect",
+              "summary": [
+                {
+                  "type": "text",
+                  "content": "Your choice treats the whole-number part as eighty-four instead of eight hundred forty, and it names the decimal part as tenths rather than hundredths."
+                }
+              ]
+            },
+            "steps": [
+              {
+                "type": "step",
+                "title": [
+                  {
+                    "type": "text",
+                    "content": "Break the expanded form into whole and decimal parts"
+                  }
+                ],
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "content": "The whole-number part comes from "
+                      },
+                      {
+                        "type": "math",
+                        "mathml": "<mn>1,800</mn><mo>+</mo><mn>40</mn>"
+                      },
+                      {
+                        "type": "text",
+                        "content": ", which reads as “one thousand eight hundred forty,” not “one thousand eighty-four.”"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "content": "The decimal part is "
+                      },
+                      {
+                        "type": "math",
+                        "mathml": "<mn>0.29</mn>"
+                      },
+                      {
+                        "type": "text",
+                        "content": ", which you will name using place value."
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "step",
+                "title": [
+                  {
+                    "type": "text",
+                    "content": "Use place value to name the decimal correctly"
+                  }
+                ],
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "content": "In "
+                      },
+                      {
+                        "type": "math",
+                        "mathml": "<mn>0.29</mn>"
+                      },
+                      {
+                        "type": "text",
+                        "content": ", the 9 is in the hundredths place, so this is "
+                      },
+                      {
+                        "type": "math",
+                        "mathml": "<mfrac><mn>29</mn><mn>100</mn></mfrac>"
+                      },
+                      {
+                        "type": "text",
+                        "content": ", read as “twenty-nine hundredths,” not “twenty-nine tenths.”"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "step",
+                "title": [
+                  {
+                    "type": "text",
+                    "content": "Write and combine carefully"
+                  }
+                ],
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "content": "Write the whole-number words for "
+                      },
+                      {
+                        "type": "math",
+                        "mathml": "<mn>1,800</mn><mo>+</mo><mn>40</mn>"
+                      },
+                      {
+                        "type": "text",
+                        "content": " and the decimal words for "
+                      },
+                      {
+                        "type": "math",
+                        "mathml": "<mn>0.29</mn>"
+                      },
+                      {
+                        "type": "text",
+                        "content": ". Use the word “and” once to mark the decimal point, connecting the whole-number words to the decimal words."
+                      }
+                    ]
+                  },
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "content": "Now, combine your phrases to form the complete word form yourself."
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "step",
+                "title": [
+                  {
+                    "type": "text",
+                    "content": "Self-check before finalizing"
+                  }
+                ],
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "content": "• Does your whole-number wording reflect "
+                      },
+                      {
+                        "type": "math",
+                        "mathml": "<mn>1,800</mn><mo>+</mo><mn>40</mn>"
+                      },
+                      {
+                        "type": "text",
+                        "content": " (eight hundred forty), not eighty-four?"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "content": "• Did you name "
+                      },
+                      {
+                        "type": "math",
+                        "mathml": "<mn>0.29</mn>"
+                      },
+                      {
+                        "type": "text",
+                        "content": " as “twenty-nine hundredths,” and place the word “and” only once between the whole number and the decimal part?"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "D": {
+          "content": {
+            "preamble": {
+              "correctness": "incorrect",
+              "summary": [
+                {
+                  "type": "text",
+                  "content": "The option you chose uses \"twenty-nine tenths\" for the decimal part, but the expanded form shows a hundredths value."
+                },
+                {
+                  "type": "text",
+                  "content": " Recall that "
+                },
+                {
+                  "type": "math",
+                  "mathml": "<mn>0.29</mn><mo>=</mo><mfrac><mn>29</mn><mn>100</mn></mfrac>"
+                },
+                {
+                  "type": "text",
+                  "content": " which is read as \"twenty-nine hundredths.\""
+                }
+              ]
+            },
+            "steps": [
+              {
+                "type": "step",
+                "title": [
+                  {
+                    "type": "text",
+                    "content": "Match each expanded part to its place value"
+                  }
+                ],
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "content": "Identify the pieces in the expanded form: "
+                      },
+                      {
+                        "type": "math",
+                        "mathml": "<mn>1,800</mn><mo>+</mo><mn>40</mn><mo>+</mo><mn>0.29</mn>"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "content": "The whole-number part is "
+                      },
+                      {
+                        "type": "math",
+                        "mathml": "<mn>1,800</mn><mo>+</mo><mn>40</mn>"
+                      },
+                      {
+                        "type": "text",
+                        "content": " which is read \"one thousand eight hundred forty.\""
+                      }
+                    ]
+                  },
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "content": "The decimal part is "
+                      },
+                      {
+                        "type": "math",
+                        "mathml": "<mn>0.29</mn>"
+                      },
+                      {
+                        "type": "text",
+                        "content": " and equals "
+                      },
+                      {
+                        "type": "math",
+                        "mathml": "<mfrac><mn>29</mn><mn>100</mn></mfrac>"
+                      },
+                      {
+                        "type": "text",
+                        "content": ", so it is read \"twenty-nine hundredths.\""
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "step",
+                "title": [
+                  {
+                    "type": "text",
+                    "content": "Distinguish tenths vs. hundredths"
+                  }
+                ],
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "content": "Tenths have one digit after the decimal. For example, "
+                      },
+                      {
+                        "type": "math",
+                        "mathml": "<mn>0.2</mn>"
+                      },
+                      {
+                        "type": "text",
+                        "content": " is \"two tenths\" "
+                      },
+                      {
+                        "type": "text",
+                        "content": "("
+                      },
+                      {
+                        "type": "math",
+                        "mathml": "<mfrac><mn>2</mn><mn>10</mn></mfrac>"
+                      },
+                      {
+                        "type": "text",
+                        "content": ")."
+                      }
+                    ]
+                  },
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "content": "Hundredths have two digits after the decimal. "
+                      },
+                      {
+                        "type": "math",
+                        "mathml": "<mn>0.29</mn>"
+                      },
+                      {
+                        "type": "text",
+                        "content": " is \"twenty-nine hundredths\" "
+                      },
+                      {
+                        "type": "text",
+                        "content": "("
+                      },
+                      {
+                        "type": "math",
+                        "mathml": "<mfrac><mn>29</mn><mn>100</mn></mfrac>"
+                      },
+                      {
+                        "type": "text",
+                        "content": "). Saying \"twenty-nine tenths\" would mean "
+                      },
+                      {
+                        "type": "math",
+                        "mathml": "<mfrac><mn>29</mn><mn>10</mn></mfrac><mo>=</mo><mn>2.9</mn><mo>≠</mo><mn>0.29</mn>"
+                      },
+                      {
+                        "type": "text",
+                        "content": "."
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "step",
+                "title": [
+                  {
+                    "type": "text",
+                    "content": "Write the word form correctly"
+                  }
+                ],
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "content": "Combine the whole-number wording with the decimal wording, using \"and\" between them."
+                      }
+                    ]
+                  },
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "content": "Keep your whole-number part as \"one thousand eight hundred forty,\" and state the decimal part as \"twenty-nine hundredths.\" Now, rewrite your answer using these pieces and select the option that matches."
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}
