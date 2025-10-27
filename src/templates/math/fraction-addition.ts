@@ -40,9 +40,9 @@ export type Fraction = { numerator: number; denominator: number }
  * @param seed - Opaque seed input used to generate the authored question.
  * @returns An AssessmentItemInput object ready for the QTI compiler.
  */
-export function generateFractionAdditionQuestion(
-	seed: bigint
-): AssessmentItemInput<TemplateWidgets> {
+export const generateFractionAdditionQuestion: TemplateModule<
+	TemplateWidgets
+> = (seed) => {
 	// --- 3a. Self-Contained Mathematical Helpers ---
 	// To ensure the template is a pure, dependency-free module, all core
 	// mathematical logic is implemented directly within its scope.
@@ -728,17 +728,7 @@ export function generateFractionAdditionQuestion(
 }
 
 // -----------------------------------------------------------------------------
-// 4. CANONICAL TEMPLATE EXPORT
-// Provides a consistent interface for dynamic loading systems.
+// 4. EXPORT
 // -----------------------------------------------------------------------------
 
-export const templateId = "math.fraction-addition"
-export const version = "1.0.0"
-
-const templateModule: TemplateModule<TemplateWidgets> = {
-	templateId,
-	version,
-	generate: generateFractionAdditionQuestion
-}
-
-export default templateModule
+export default generateFractionAdditionQuestion

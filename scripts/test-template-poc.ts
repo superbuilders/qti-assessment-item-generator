@@ -1,7 +1,7 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { compile } from "@/compiler/compiler"
-import fractionAddition from "@/templates/math/fraction-addition"
+import generateFractionAdditionQuestion from "@/templates/math/fraction-addition"
 import { allWidgetsCollection } from "@/widgets/collections/all"
 import { createSubsetCollection } from "@/widgets/collections/subset"
 
@@ -10,10 +10,7 @@ async function main() {
 	const templateCollection = createSubsetCollection(allWidgetsCollection, [
 		"partitionedShape"
 	] as const)
-	logger.info("starting template poc test", {
-		templateId: fractionAddition.templateId,
-		version: fractionAddition.version
-	})
+	logger.info("starting template poc test")
 
 	const exampleSeeds = [123n, 456n, 789n]
 
@@ -21,7 +18,7 @@ async function main() {
 		logger.info("generating example from seed", { seed: seed.toString() })
 
 		const itemInputResult = errors.trySync(() =>
-			fractionAddition.generate(seed)
+			generateFractionAdditionQuestion(seed)
 		)
 		if (itemInputResult.error) {
 			logger.error("template function failed", {
