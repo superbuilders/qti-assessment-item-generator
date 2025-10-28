@@ -3,7 +3,6 @@ import { EventSchemas, Inngest, type Logger } from "inngest"
 import { z } from "zod"
 
 const helloWorldSchema = z.object({
-	requestId: z.uuid(),
 	message: z.string().min(1)
 })
 

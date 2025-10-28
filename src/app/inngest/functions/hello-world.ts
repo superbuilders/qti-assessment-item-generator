@@ -5,7 +5,6 @@ export const helloWorldFunction = inngest.createFunction(
 	{ event: "template/hello" },
 	async ({ event, logger }) => {
 		logger.info("Hello from Inngest!", {
-			requestId: event.data.requestId,
 			message: event.data.message
 		})
 
