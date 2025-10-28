@@ -29,8 +29,7 @@
 			"@/stimulus/*": ["src/lib/stimulus/*"],
 			"@/examples/*": ["src/lib/examples/*"],
 			"@/testing/*": ["src/lib/testing/*"],
-			"@/utils/*": ["src/lib/utils/*"],
-			"@/qti-validation/*": ["src/lib/qti-validation/*"]
+			"@/utils/*": ["src/lib/utils/*"]
 		}
 	},
 	"include": ["src/**/*", "tests/**/*", "scripts/**/*"],

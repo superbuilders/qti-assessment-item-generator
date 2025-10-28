@@ -18,7 +18,7 @@ import {
 	checkNoPerseusArtifacts,
 	sanitizeHtmlEntities,
 	sanitizeMathMLOperators
-} from "@/qti-validation/utils"
+} from "@/utils/qti-validation"
 
 // NEW: Recursive walker function for inline content
 function processInlineContent<E extends readonly string[]>(

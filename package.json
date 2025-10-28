@@ -1,6 +1,6 @@
 {
 	"name": "@superbuilders/qti-assessment-item-generator",
-	"version": "5.0.0",
+	"version": "6.0.0",
 	"description": "QTI 3.0 assessment item generator (compiler + AI pipeline)",
 	"type": "module",
 	"files": [
@@ -13,7 +13,7 @@
 		"build:lib": "tsc -p tsconfig.json && tsc-alias -p tsconfig.json",
 		"dev": "bun --watch src/app/index.ts",
 		"dev:inngest": "inngest-cli dev --queue-workers 4000 --poll-interval 2",
-		"typecheck": "tsc --noEmit",
+		"typecheck": "tsc --noEmit && tsc --noEmit -p src/app/tsconfig.json",
 		"lint": "biome lint",
 		"format": "biome format --write",
 		"generate:template": "bun src/lib/templates/cli.ts",
@@ -116,8 +116,8 @@
 			"import": "./dist/src/lib/examples.js"
 		},
 		"./qti-validation/utils": {
-			"types": "./dist/src/lib/qti-validation/utils.d.ts",
-			"import": "./dist/src/lib/qti-validation/utils.js"
+			"types": "./dist/src/lib/utils/qti-validation.d.ts",
+			"import": "./dist/src/lib/utils/qti-validation.js"
 		},
 		"./core": {
 			"types": "./dist/src/lib/core/index.d.ts",
