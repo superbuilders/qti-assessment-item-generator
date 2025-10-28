@@ -2,18 +2,18 @@ import * as fs from "node:fs/promises"
 import * as path from "node:path"
 import * as errors from "@superbuilders/errors"
 import type { Logger } from "@superbuilders/slog"
-import type { Ai } from "@/template-generator/ai"
-import { TEMPLATE_GENERATION_MODEL } from "@/template-generator/ai"
-import { runGenerationAttempt } from "@/template-generator/generation"
-import { composeInitialPrompt } from "@/template-generator/prompts/initial"
-import { composeRetryPrompt } from "@/template-generator/prompts/retry"
-import { typeCheckSource } from "@/template-generator/type-checker"
-import type { TypeScriptDiagnostic } from "@/template-generator/types"
+import type { Ai } from "@/templates/ai"
+import { TEMPLATE_GENERATION_MODEL } from "@/templates/ai"
+import { runGenerationAttempt } from "@/templates/generation"
+import { composeInitialPrompt } from "@/templates/prompts/initial"
+import { composeRetryPrompt } from "@/templates/prompts/retry"
+import { typeCheckSource } from "@/templates/type-checker"
+import type { TypeScriptDiagnostic } from "@/templates/types"
 import {
 	validateNoNonNullAssertions,
 	validateNoTypeAssertions,
 	validateTemplateWidgets
-} from "@/template-generator/widget-validation"
+} from "@/templates/widget-validation"
 
 const MAX_RETRIES = 10
 

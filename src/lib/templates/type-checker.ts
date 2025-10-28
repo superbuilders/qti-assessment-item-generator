@@ -2,7 +2,7 @@ import * as path from "node:path"
 import * as errors from "@superbuilders/errors"
 import type { Logger } from "@superbuilders/slog"
 import * as ts from "typescript"
-import type { TypeScriptDiagnostic } from "@/template-generator/types"
+import type { TypeScriptDiagnostic } from "@/templates/types"
 
 export async function typeCheckSource(
 	logger: Logger,
@@ -46,9 +46,8 @@ export async function typeCheckSource(
 	}
 
 	const relevantDirectories = [
-		normalizePath(path.resolve("src/templates")),
-		normalizePath(path.resolve("src/widgets")),
-		normalizePath(path.resolve("src/template-generator"))
+		normalizePath(path.resolve("src/lib/templates")),
+		normalizePath(path.resolve("src/lib/widgets"))
 	]
 
 	const templateRelatedFileNames = parsedConfig.fileNames.filter((fileName) => {

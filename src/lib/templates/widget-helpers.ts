@@ -3,7 +3,7 @@ import * as path from "node:path"
 import * as errors from "@superbuilders/errors"
 import type { Logger } from "@superbuilders/slog"
 
-const REGISTRY_PATH = path.resolve("src/widgets/registry.ts")
+const REGISTRY_PATH = path.resolve("src/lib/widgets/registry.ts")
 
 export const ErrWidgetGeneratorMissing = errors.new(
 	"widget generator source missing"

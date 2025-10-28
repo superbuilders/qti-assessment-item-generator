@@ -1,5 +1,5 @@
 import type { Logger } from "@superbuilders/slog"
-import { buildTemplateSkeleton } from "@/template-generator/skeleton"
+import { buildTemplateSkeleton } from "@/templates/skeleton"
 
 export function createTemplateContract(
 	logger: Logger,

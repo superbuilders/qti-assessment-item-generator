@@ -5,13 +5,13 @@ const POSITIVE_EXAMPLE_CACHE = new Map<string, string>()
 const NEGATIVE_EXAMPLE_CACHE = new Map<string, string>()
 
 const POSITIVE_ROOT = path.resolve(
-	"src/template-generator/prompts/examples/positive"
+	"src/lib/templates/prompts/examples/positive"
 )
 const POSITIVE_TEMPLATES_DIR = path.join(POSITIVE_ROOT, "templates")
 const POSITIVE_NOTES_DIR = path.join(POSITIVE_ROOT, "notes")
 
 const NEGATIVE_ROOT = path.resolve(
-	"src/template-generator/prompts/examples/negative"
+	"src/lib/templates/prompts/examples/negative"
 )
 const NEGATIVE_TEMPLATES_DIR = path.join(NEGATIVE_ROOT, "templates")
 const NEGATIVE_NOTES_DIR = path.join(NEGATIVE_ROOT, "notes")

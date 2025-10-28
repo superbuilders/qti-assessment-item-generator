@@ -2,25 +2,25 @@ import type { Logger } from "@superbuilders/slog"
 import {
 	createNegativeExampleSection,
 	createPositiveExampleSection
-} from "@/template-generator/prompts/sections/examples"
-import { FEEDBACK_GUIDANCE_SECTION } from "@/template-generator/prompts/sections/feedback-guidance"
-import { LITERAL_BANS_SECTION } from "@/template-generator/prompts/sections/literal-bans"
-import { createSourceContextSection } from "@/template-generator/prompts/sections/qti-source"
-import { createRetryDiagnosticsSection } from "@/template-generator/prompts/sections/retry-hints"
-import { SEED_GUIDANCE_SECTION } from "@/template-generator/prompts/sections/seed-guidance"
-import { createSeedHelpersSection } from "@/template-generator/prompts/sections/seed-helpers"
-import { SYSTEM_INSTRUCTIONS_SECTION } from "@/template-generator/prompts/sections/system-instructions"
-import { createTemplateContract } from "@/template-generator/prompts/sections/template-contract"
-import { TEMPLATE_PHILOSOPHY_SECTION } from "@/template-generator/prompts/sections/template-philosophy"
-import { createWidgetGuidance } from "@/template-generator/prompts/sections/widget-guidance"
-import { NON_NULL_BANS_SECTION } from "@/template-generator/prompts/sections/non-null-bans"
-import { TYPE_ASSERTION_BANS_SECTION } from "@/template-generator/prompts/sections/type-assertion-bans"
+} from "@/templates/prompts/sections/examples"
+import { FEEDBACK_GUIDANCE_SECTION } from "@/templates/prompts/sections/feedback-guidance"
+import { LITERAL_BANS_SECTION } from "@/templates/prompts/sections/literal-bans"
+import { createSourceContextSection } from "@/templates/prompts/sections/qti-source"
+import { createRetryDiagnosticsSection } from "@/templates/prompts/sections/retry-hints"
+import { SEED_GUIDANCE_SECTION } from "@/templates/prompts/sections/seed-guidance"
+import { createSeedHelpersSection } from "@/templates/prompts/sections/seed-helpers"
+import { SYSTEM_INSTRUCTIONS_SECTION } from "@/templates/prompts/sections/system-instructions"
+import { createTemplateContract } from "@/templates/prompts/sections/template-contract"
+import { TEMPLATE_PHILOSOPHY_SECTION } from "@/templates/prompts/sections/template-philosophy"
+import { createWidgetGuidance } from "@/templates/prompts/sections/widget-guidance"
+import { NON_NULL_BANS_SECTION } from "@/templates/prompts/sections/non-null-bans"
+import { TYPE_ASSERTION_BANS_SECTION } from "@/templates/prompts/sections/type-assertion-bans"
 import {
 	BASE_SYSTEM_PROMPT,
 	type PromptArtifacts
-} from "@/template-generator/prompts/shared"
-import type { TypeScriptDiagnostic } from "@/template-generator/types"
-import { createWidgetHelperSections } from "@/template-generator/widget-helpers"
+} from "@/templates/prompts/shared"
+import type { TypeScriptDiagnostic } from "@/templates/types"
+import { createWidgetHelperSections } from "@/templates/widget-helpers"
 
 export function composeRetryPrompt(
 	logger: Logger,

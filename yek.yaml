@@ -7,14 +7,13 @@ ignore_patterns:
   - "bun.lock"
   - "package.json"
   - "**/__snapshots__/**"
-  - "src/widgets/**"
-  - "src/examples/**"
-  - "examples/**"
+  - "src/lib/widgets/**"
+  - "src/lib/examples/**"
   - "teks-staar-scrape/**"
   - "canvas-scrape/**"
   - "docs/**"
   - "data/**"
-  - "src/testing/fixtures/**"
+  - "src/lib/testing/fixtures/**"
 priority_rules:
   - score: 99
     pattern: "^rules/"

@@ -1,5 +1,5 @@
 import * as ts from "typescript"
-import type { TypeScriptDiagnostic } from "@/template-generator/types"
+import type { TypeScriptDiagnostic } from "@/templates/types"
 
 function createDiagnostic(
 	sourceFile: ts.SourceFile,

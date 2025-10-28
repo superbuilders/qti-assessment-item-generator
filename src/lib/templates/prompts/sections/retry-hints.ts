@@ -1,4 +1,4 @@
-import type { TypeScriptDiagnostic } from "@/template-generator/types"
+import type { TypeScriptDiagnostic } from "@/templates/types"
 
 export function createRetryDiagnosticsSection(
 	diagnostics: TypeScriptDiagnostic[]

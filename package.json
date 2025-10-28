@@ -1,6 +1,6 @@
 {
 	"name": "@superbuilders/qti-assessment-item-generator",
-	"version": "4.5.0",
+	"version": "5.0.0",
 	"description": "QTI 3.0 assessment item generator (compiler + AI pipeline)",
 	"type": "module",
 	"files": [
@@ -13,7 +13,7 @@
 		"typecheck": "tsc --noEmit",
 		"lint": "biome lint",
 		"format": "biome format --write",
-		"generate:template": "bun src/template-generator/cli.ts",
+		"generate:template": "bun src/lib/templates/cli.ts",
 		"prepublishOnly": "bun run build"
 	},
 	"keywords": [
@@ -30,14 +30,14 @@
 		"url": "https://github.com/superbuilders/qti-assessment-item-generator"
 	},
 	"devDependencies": {
-		"@types/bun": "1.2.23",
-		"@types/node": "^24.7.2",
+		"@types/bun": "1.3.1",
+		"@types/node": "^24.9.2",
 		"@types/tar-stream": "^3.1.4",
 		"@types/unbzip2-stream": "^1.4.3",
 		"dotenv": "^17.2.3",
-		"html-validate": "^10.1.2",
-		"openai": "^6.3.0",
-		"tsc-alias": "^1.8.10",
+		"html-validate": "^10.2.1",
+		"openai": "^6.7.0",
+		"tsc-alias": "^1.8.16",
 		"typescript": "^5.9.3"
 	},
 	"peerDependencies": {
@@ -56,10 +56,10 @@
 		"@superbuilders/slog": "4.0.0",
 		"@types/he": "1.2.3",
 		"csstype": "^3.1.3",
-		"fast-xml-parser": "5.2.5",
+		"fast-xml-parser": "5.3.0",
 		"glob": "^11.0.3",
 		"he": "1.2.0",
-		"linkedom": "^0.18.4",
+		"linkedom": "^0.18.12",
 		"tar-stream": "^3.1.7",
 		"unbzip2-stream": "^1.4.3",
 		"z3-solver": "4.15.3",
@@ -68,108 +68,104 @@
 	"exports": {
 		"./package.json": "./package.json",
 		"./compiler": {
-			"types": "./dist/src/compiler/compiler.d.ts",
-			"import": "./dist/src/compiler/compiler.js"
+			"types": "./dist/src/lib/compiler/compiler.d.ts",
+			"import": "./dist/src/lib/compiler/compiler.js"
 		},
 		"./compiler/response-processor": {
-			"types": "./dist/src/compiler/response-processor.d.ts",
-			"import": "./dist/src/compiler/response-processor.js"
+			"types": "./dist/src/lib/compiler/response-processor.d.ts",
+			"import": "./dist/src/lib/compiler/response-processor.js"
 		},
 		"./compiler/qti-constants": {
-			"types": "./dist/src/compiler/qti-constants.d.ts",
-			"import": "./dist/src/compiler/qti-constants.js"
+			"types": "./dist/src/lib/compiler/qti-constants.d.ts",
+			"import": "./dist/src/lib/compiler/qti-constants.js"
 		},
 		"./structured": {
-			"types": "./dist/src/structured/client.d.ts",
-			"import": "./dist/src/structured/client.js"
+			"types": "./dist/src/lib/structured/client.d.ts",
+			"import": "./dist/src/lib/structured/client.js"
 		},
 		"./structured/ai-context-builder": {
-			"types": "./dist/src/structured/ai-context-builder.d.ts",
-			"import": "./dist/src/structured/ai-context-builder.js"
-		},
-		"./structured/differentiator": {
-			"types": "./dist/src/structured/differentiator.d.ts",
-			"import": "./dist/src/structured/differentiator.js"
+			"types": "./dist/src/lib/structured/ai-context-builder.d.ts",
+			"import": "./dist/src/lib/structured/ai-context-builder.js"
 		},
 		"./widgets/registry": {
-			"types": "./dist/src/widgets/registry.d.ts",
-			"import": "./dist/src/widgets/registry.js"
+			"types": "./dist/src/lib/widgets/registry.d.ts",
+			"import": "./dist/src/lib/widgets/registry.js"
 		},
 		"./widgets/collections": {
-			"types": "./dist/src/widgets/collections/index.d.ts",
-			"import": "./dist/src/widgets/collections/index.js"
+			"types": "./dist/src/lib/widgets/collections/index.d.ts",
+			"import": "./dist/src/lib/widgets/collections/index.js"
 		},
 		"./widgets/types": {
-			"types": "./dist/src/widgets/types.d.ts",
-			"import": "./dist/src/widgets/types.js"
+			"types": "./dist/src/lib/widgets/types.d.ts",
+			"import": "./dist/src/lib/widgets/types.js"
 		},
 		"./widgets/widget-generator": {
-			"types": "./dist/src/widgets/widget-generator.d.ts",
-			"import": "./dist/src/widgets/widget-generator.js"
+			"types": "./dist/src/lib/widgets/widget-generator.d.ts",
+			"import": "./dist/src/lib/widgets/widget-generator.js"
 		},
 		"./examples": {
-			"types": "./dist/src/examples.d.ts",
-			"import": "./dist/src/examples.js"
+			"types": "./dist/src/lib/examples.d.ts",
+			"import": "./dist/src/lib/examples.js"
 		},
 		"./qti-validation/utils": {
-			"types": "./dist/src/qti-validation/utils.d.ts",
-			"import": "./dist/src/qti-validation/utils.js"
+			"types": "./dist/src/lib/qti-validation/utils.d.ts",
+			"import": "./dist/src/lib/qti-validation/utils.js"
 		},
 		"./core": {
-			"types": "./dist/src/core/index.d.ts",
-			"import": "./dist/src/core/index.js"
+			"types": "./dist/src/lib/core/index.d.ts",
+			"import": "./dist/src/lib/core/index.js"
 		},
 		"./core/content": {
-			"types": "./dist/src/core/content/index.d.ts",
-			"import": "./dist/src/core/content/index.js"
+			"types": "./dist/src/lib/core/content/index.d.ts",
+			"import": "./dist/src/lib/core/content/index.js"
 		},
 		"./core/feedback": {
-			"types": "./dist/src/core/feedback/index.d.ts",
-			"import": "./dist/src/core/feedback/index.js"
+			"types": "./dist/src/lib/core/feedback/index.d.ts",
+			"import": "./dist/src/lib/core/feedback/index.js"
 		},
 		"./core/interactions": {
-			"types": "./dist/src/core/interactions/index.d.ts",
-			"import": "./dist/src/core/interactions/index.js"
+			"types": "./dist/src/lib/core/interactions/index.d.ts",
+			"import": "./dist/src/lib/core/interactions/index.js"
 		},
 		"./core/item": {
-			"types": "./dist/src/core/item/index.d.ts",
-			"import": "./dist/src/core/item/index.js"
+			"types": "./dist/src/lib/core/item/index.d.ts",
+			"import": "./dist/src/lib/core/item/index.js"
 		},
 		"./cartridge/readers/tarzst": {
-			"types": "./dist/src/cartridge/readers/tarzst.d.ts",
-			"import": "./dist/src/cartridge/readers/tarzst.js"
+			"types": "./dist/src/lib/cartridge/readers/tarzst.d.ts",
+			"import": "./dist/src/lib/cartridge/readers/tarzst.js"
 		},
 		"./cartridge/client": {
-			"types": "./dist/src/cartridge/client.d.ts",
-			"import": "./dist/src/cartridge/client.js"
+			"types": "./dist/src/lib/cartridge/client.d.ts",
+			"import": "./dist/src/lib/cartridge/client.js"
 		},
 		"./cartridge/types": {
-			"types": "./dist/src/cartridge/types.d.ts",
-			"import": "./dist/src/cartridge/types.js"
+			"types": "./dist/src/lib/cartridge/types.d.ts",
+			"import": "./dist/src/lib/cartridge/types.js"
 		},
 		"./cartridge/reader": {
-			"types": "./dist/src/cartridge/reader.d.ts",
-			"import": "./dist/src/cartridge/reader.js"
+			"types": "./dist/src/lib/cartridge/reader.d.ts",
+			"import": "./dist/src/lib/cartridge/reader.js"
 		},
 		"./cartridge/schema": {
-			"types": "./dist/src/cartridge/schema.d.ts",
-			"import": "./dist/src/cartridge/schema.js"
+			"types": "./dist/src/lib/cartridge/schema.d.ts",
+			"import": "./dist/src/lib/cartridge/schema.js"
 		},
 		"./cartridge/build/builder": {
-			"types": "./dist/src/cartridge/build/builder.d.ts",
-			"import": "./dist/src/cartridge/build/builder.js"
+			"types": "./dist/src/lib/cartridge/build/builder.d.ts",
+			"import": "./dist/src/lib/cartridge/build/builder.js"
 		},
 		"./stimulus/builder": {
-			"types": "./dist/src/stimulus/builder.d.ts",
-			"import": "./dist/src/stimulus/builder.js"
+			"types": "./dist/src/lib/stimulus/builder.d.ts",
+			"import": "./dist/src/lib/stimulus/builder.js"
 		},
 		"./stimulus/types": {
-			"types": "./dist/src/stimulus/types.d.ts",
-			"import": "./dist/src/stimulus/types.js"
+			"types": "./dist/src/lib/stimulus/types.d.ts",
+			"import": "./dist/src/lib/stimulus/types.js"
 		},
 		"./stimulus/validator": {
-			"types": "./dist/src/stimulus/validator.d.ts",
-			"import": "./dist/src/stimulus/validator.js"
+			"types": "./dist/src/lib/stimulus/validator.d.ts",
+			"import": "./dist/src/lib/stimulus/validator.js"
 		}
 	}
 }

@@ -67,29 +67,6 @@ const xml = await compile(structuredItem, WIDGETS);
 console.log(xml);
 ```
 
-### AI-Powered Item Differentiation
-
-Generate unique variations of an existing assessment item using a robust, two-shot pipeline that separates content planning from visual generation. This process is fully independent of the `AiContextEnvelope` used for initial item creation.
-
-```ts
-import OpenAI from "openai";
-import * as logger from "@superbuilders/slog";
-import { widgetCollections } from "@superbuilders/qti-assessment-item-generator/widgets/collections";
-import { differentiateAssessmentItem } from "@superbuilders/qti-assessment-item-generator/structured/differentiator";
-import type { AssessmentItemInput } from "@superbuilders/qti-assessment-item-generator/core/item";
-
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
-const WIDGETS = widgetCollections["fourth-grade-math"]; // choose a collection matching your item
-
-// Assume `sourceItem` is a valid AssessmentItemInput object you already have.
-const sourceItem: AssessmentItemInput = { /* ... */ };
-
-// To generate 3 new variations of the source item; Shot 2 will generate widgets via LLM using authoritative schemas:
-const items = await differentiateAssessmentItem(openai, logger, sourceItem, 3, WIDGETS);
-// `items` is now an array of up to 3 valid AssessmentItemInput objects.
-console.log(`Generated ${items.length} new items with regenerated widgets.`);
-```
-
 ### Standalone Widget Compilation
 
 Compile a widget configuration directly into an SVG or HTML string without using the AI pipeline. This is useful for rendering visual aids independently.
@@ -185,12 +162,6 @@ import type { IndexV1, Unit } from "@superbuilders/qti-assessment-item-generator
 -   `generateFromEnvelope(openai, logger, envelope, widgetCollection) => Promise<AssessmentItemInput>`
     -   Converts an `AiContextEnvelope` into an `AssessmentItemInput` using the provided widget collection.
     -   `widgetCollection` must be one of the exported collections from `widgets/collections`.
-
-### `structured/differentiator`
-
--   `differentiateAssessmentItem(openai, logger, item, n, widgetCollection) => Promise<AssessmentItemInput[]>`
-    -   Generates `n` new variations of a structured `AssessmentItemInput` via a two-shot process (plan + widgets) using the provided `widgetCollection`.
-    -   Independent of `AiContextEnvelope`.
 
 ### `compiler`
 

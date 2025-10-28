@@ -1,6 +1,6 @@
 import * as errors from "@superbuilders/errors"
 import type { Logger } from "@superbuilders/slog"
-import type { Ai, ChatCompletionParams } from "@/template-generator/ai"
+import type { Ai, ChatCompletionParams } from "@/templates/ai"
 
 type GenerationAttempt = {
 	logger: Logger

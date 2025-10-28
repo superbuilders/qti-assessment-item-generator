@@ -3,13 +3,13 @@ import * as logger from "@superbuilders/slog"
 import { compile } from "@/compiler/compiler"
 import generateQuestion, {
 	type TemplateWidgets
-} from "@/templates/math/number-word-problem"
+} from "@/templates/prompts/examples/positive/templates/fraction-addition"
 import { allWidgetsCollection } from "@/widgets/collections/all"
 import { createSubsetCollection } from "@/widgets/collections/subset"
 
 async function main() {
 	// Create a subset collection containing only the widgets used by this template
-	const templateWidgetTypes: TemplateWidgets = []
+	const templateWidgetTypes: TemplateWidgets = ["partitionedShape"]
 	const templateCollection = createSubsetCollection(
 		allWidgetsCollection,
 		templateWidgetTypes

@@ -3,9 +3,9 @@ import * as fs from "node:fs/promises"
 import * as path from "node:path"
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
-import { createAi } from "@/template-generator/ai"
-import { generateTemplate } from "@/template-generator/orchestrator"
-import { parseStructuredInput } from "@/template-generator/input"
+import { createAi } from "@/templates/ai"
+import { parseStructuredInput } from "@/templates/input"
+import { generateTemplate } from "@/templates/orchestrator"
 
 async function main() {
 	const rawArgs = Bun.argv.slice(2)
@@ -20,7 +20,7 @@ async function main() {
 	if (!qtiPath || !outputPath) {
 		logger.error("missing required arguments", {
 			usage:
-				"bun src/template-generator/cli.ts --qti <structured-item.json> --out <output.ts> [--debug-files]"
+				"bun src/lib/templates/cli.ts --qti <structured-item.json> --out <output.ts> [--debug-files]"
 		})
 		process.exit(1)
 	}
@@ -34,7 +34,9 @@ async function main() {
 		})
 		throw errors.wrap(rawInputResult.error, "cli: read structured item file")
 	}
-	logger.debug("loaded structured item json", { bytes: rawInputResult.data.length })
+	logger.debug("loaded structured item json", {
+		bytes: rawInputResult.data.length
+	})
 
 	const structuredInput = parseStructuredInput(logger, rawInputResult.data)
 	const { sourceContext, allowedWidgets } = structuredInput
