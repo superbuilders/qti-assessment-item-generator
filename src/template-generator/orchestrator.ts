@@ -9,6 +9,11 @@ import { composeInitialPrompt } from "@/template-generator/prompts/initial"
 import { composeRetryPrompt } from "@/template-generator/prompts/retry"
 import { typeCheckSource } from "@/template-generator/type-checker"
 import type { TypeScriptDiagnostic } from "@/template-generator/types"
+import {
+	validateNoNonNullAssertions,
+	validateNoTypeAssertions,
+	validateTemplateWidgets
+} from "@/template-generator/widget-validation"
 
 const MAX_RETRIES = 10
 
@@ -38,7 +43,8 @@ export async function generateTemplate(
 	ai: Ai,
 	options: GenerateTemplateOptions
 ): Promise<GenerationResult> {
-	const { sourceContext, allowedWidgets, outputFilePath, debugArtifacts } = options
+	const { sourceContext, allowedWidgets, outputFilePath, debugArtifacts } =
+		options
 	if (allowedWidgets.length > 1) {
 		logger.error("allowed widgets must contain at most one entry", {
 			allowedWidgets
@@ -71,7 +77,11 @@ export async function generateTemplate(
 		let systemPrompt: string
 		let userPrompt: string
 		if (lastDiagnostics.length === 0 && lastCode.length === 0) {
-			const initial = composeInitialPrompt(logger, allowedWidgets, sourceContext)
+			const initial = composeInitialPrompt(
+				logger,
+				allowedWidgets,
+				sourceContext
+			)
 			systemPrompt = initial.systemPrompt
 			userPrompt = initial.userPrompt
 		} else {
@@ -121,6 +131,32 @@ export async function generateTemplate(
 		lastDiagnostics = diagnostics
 
 		if (diagnostics.length === 0) {
+			const widgetDiagnostic = validateTemplateWidgets(code, allowedWidgets)
+			if (widgetDiagnostic) {
+				logger.warn("widget tuple validation failed", {
+					message: widgetDiagnostic.message
+				})
+				lastDiagnostics = [widgetDiagnostic]
+				continue
+			}
+
+			const nonNullDiagnostic = validateNoNonNullAssertions(code)
+			if (nonNullDiagnostic) {
+				logger.warn("non-null assertion detected", {
+					message: nonNullDiagnostic.message
+				})
+				lastDiagnostics = [nonNullDiagnostic]
+				continue
+			}
+
+			const typeAssertionDiagnostic = validateNoTypeAssertions(code)
+			if (typeAssertionDiagnostic) {
+				logger.warn("type assertion detected", {
+					message: typeAssertionDiagnostic.message
+				})
+				lastDiagnostics = [typeAssertionDiagnostic]
+				continue
+			}
 			logger.info("typecheck succeeded", { iteration })
 			await fs.writeFile(absoluteOutputPath, code)
 			logger.info("final template written", { file: absoluteOutputPath })

@@ -1,15 +1,19 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { compile } from "@/compiler/compiler"
-import generateFractionAdditionQuestion from "@/templates/math/number-word-problem"
+import generateFractionAdditionQuestion, {
+	type TemplateWidgets
+} from "@/templates/math/fraction-addition"
 import { allWidgetsCollection } from "@/widgets/collections/all"
 import { createSubsetCollection } from "@/widgets/collections/subset"
 
 async function main() {
 	// Create a subset collection containing only the widgets used by this template
-	const templateCollection = createSubsetCollection(allWidgetsCollection, [
-		"partitionedShape"
-	] as const)
+	const templateWidgetTypes: TemplateWidgets = ["partitionedShape"]
+	const templateCollection = createSubsetCollection(
+		allWidgetsCollection,
+		templateWidgetTypes
+	)
 	logger.info("starting template poc test")
 
 	const exampleSeeds = [123n, 456n, 789n]
