@@ -1,29 +1,37 @@
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
 import { compile } from "@/compiler/compiler"
-import generateFractionAdditionQuestion, {
+import generateQuestion, {
 	type TemplateWidgets
-} from "@/templates/math/fraction-addition"
+} from "@/templates/math/number-word-problem"
 import { allWidgetsCollection } from "@/widgets/collections/all"
 import { createSubsetCollection } from "@/widgets/collections/subset"
 
 async function main() {
 	// Create a subset collection containing only the widgets used by this template
-	const templateWidgetTypes: TemplateWidgets = ["partitionedShape"]
+	const templateWidgetTypes: TemplateWidgets = []
 	const templateCollection = createSubsetCollection(
 		allWidgetsCollection,
 		templateWidgetTypes
 	)
 	logger.info("starting template poc test")
 
-	const exampleSeeds = [123n, 456n, 789n]
+	const exampleSeeds = [
+		123n,
+		456n,
+		789n,
+		101112n,
+		131415n,
+		161718n,
+		192021n,
+		222324n,
+		252627n
+	]
 
 	for (const seed of exampleSeeds) {
 		logger.info("generating example from seed", { seed: seed.toString() })
 
-		const itemInputResult = errors.trySync(() =>
-			generateFractionAdditionQuestion(seed)
-		)
+		const itemInputResult = errors.trySync(() => generateQuestion(seed))
 		if (itemInputResult.error) {
 			logger.error("template function failed", {
 				seed: seed.toString(),

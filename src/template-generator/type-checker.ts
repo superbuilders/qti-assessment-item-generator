@@ -45,17 +45,30 @@ export async function typeCheckSource(
 		throw errors.new("errors parsing tsconfig.json")
 	}
 
+	const relevantDirectories = [
+		normalizePath(path.resolve("src/templates")),
+		normalizePath(path.resolve("src/widgets")),
+		normalizePath(path.resolve("src/template-generator"))
+	]
+
+	const templateRelatedFileNames = parsedConfig.fileNames.filter((fileName) => {
+		const normalizedFileName = normalizePath(fileName)
+		return relevantDirectories.some((directory) =>
+			isWithinDirectory(normalizedFileName, directory)
+		)
+	})
+
 	const host = createInMemoryHost(
 		parsedConfig.options,
 		normalizedVirtualPath,
 		source
 	)
 
-	const rootFiles = parsedConfig.fileNames.some(
+	const rootFiles = templateRelatedFileNames.some(
 		(name) => normalizePath(name) === normalizedVirtualPath
 	)
-		? [...parsedConfig.fileNames]
-		: [...parsedConfig.fileNames, normalizedVirtualPath]
+		? [...templateRelatedFileNames]
+		: [...templateRelatedFileNames, normalizedVirtualPath]
 
 	const program = ts.createProgram({
 		rootNames: rootFiles,
@@ -148,4 +161,13 @@ function createInMemoryHost(
 function normalizePath(filePath: string): string {
 	const resolved = path.resolve(filePath)
 	return ts.sys.useCaseSensitiveFileNames ? resolved : resolved.toLowerCase()
+}
+
+function isWithinDirectory(filePath: string, directoryPath: string): boolean {
+	const directoryWithSeparator = directoryPath.endsWith(path.sep)
+		? directoryPath
+		: `${directoryPath}${path.sep}`
+	return (
+		filePath === directoryPath || filePath.startsWith(directoryWithSeparator)
+	)
 }
