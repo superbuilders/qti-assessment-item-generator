@@ -1,17 +1,15 @@
 import type { MiddlewareHandler } from "hono"
+import { env } from "../env"
 
-export type AppBindings = {
-	DATABASE_URL?: string
-	OPENAI_API_KEY?: string
-	INNGEST_EVENT_KEY?: string
-}
+export type AppBindings = typeof env
 
 /**
  * Placeholder bindings middleware. Extend once we know which env vars must be
  * exposed to request handlers and Inngest steps.
  */
 export const bindings = (): MiddlewareHandler<{ Bindings: AppBindings }> => {
-	return async (_c, next) => {
+	return async (c, next) => {
+		c.env = env
 		await next()
 	}
 }

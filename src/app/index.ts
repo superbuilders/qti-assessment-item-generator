@@ -1,3 +1,4 @@
+import "./env"
 import { Hono } from "hono"
 import { serve } from "inngest/hono"
 import { inngest } from "./inngest/client"

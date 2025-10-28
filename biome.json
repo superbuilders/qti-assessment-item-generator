@@ -5,7 +5,6 @@
 		"./gritql/no-as-type-assertion.grit",
 		"./gritql/no-iife.grit",
 		"./gritql/no-new-error.grit",
-		"./gritql/no-relative-imports.grit",
 		"./gritql/no-try.grit",
 		"./gritql/require-logger-before-throw.grit"
 	],
