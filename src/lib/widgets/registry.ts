@@ -15,7 +15,6 @@ import { CircleDiagramPropsSchema } from "@/widgets/generators/circle-diagram"
 import { ClockDiagramPropsSchema } from "@/widgets/generators/clock-diagram"
 import { CompositeShapeDiagramPropsSchema } from "@/widgets/generators/composite-shape-diagram"
 import { ConceptualGraphPropsSchema } from "@/widgets/generators/conceptual-graph"
-import { ConstraintGeometryDiagramPropsSchema } from "@/widgets/generators/constraint-geometry-diagram"
 import { CoordinatePlaneComprehensivePropsSchema } from "@/widgets/generators/coordinate-plane-comprehensive"
 import { CustomPolygonDiagramPropsSchema } from "@/widgets/generators/custom-polygon-diagram"
 import { DataTablePropsSchema } from "@/widgets/generators/data-table"
@@ -118,7 +117,6 @@ export const allWidgetSchemas = {
 	fractionMultiplicationModel: FractionMultiplicationModelPropsSchema,
 	compositeShapeDiagram: CompositeShapeDiagramPropsSchema,
 	conceptualGraph: ConceptualGraphPropsSchema,
-	constraintGeometryDiagram: ConstraintGeometryDiagramPropsSchema,
 	coordinatePlane: CoordinatePlaneComprehensivePropsSchema,
 	divergentBarChart: DivergentBarChartPropsSchema,
 	functionPlotGraph: FunctionPlotGraphPropsSchema,
@@ -220,7 +218,6 @@ export {
 	CircleAngleDiagramPropsSchema,
 	CompositeShapeDiagramPropsSchema,
 	ConceptualGraphPropsSchema,
-	ConstraintGeometryDiagramPropsSchema,
 	CoordinatePlaneComprehensivePropsSchema,
 	DiscreteObjectRatioDiagramPropsSchema,
 	DivergentBarChartPropsSchema,
@@ -331,9 +328,6 @@ export type CompositeShapeDiagramProps = z.input<
 	typeof CompositeShapeDiagramPropsSchema
 >
 export type ConceptualGraphProps = z.input<typeof ConceptualGraphPropsSchema>
-export type ConstraintGeometryDiagramProps = z.input<
-	typeof ConstraintGeometryDiagramPropsSchema
->
 export type CoordinatePlaneComprehensiveProps = z.input<
 	typeof CoordinatePlaneComprehensivePropsSchema
 >
@@ -518,7 +512,6 @@ const widgetSchemasWithoutSpecialUnions = [
 	typedSchemas.fractionMultiplicationModel,
 	typedSchemas.compositeShapeDiagram,
 	typedSchemas.conceptualGraph,
-	typedSchemas.constraintGeometryDiagram,
 	typedSchemas.coordinatePlane,
 	typedSchemas.dataTable,
 	typedSchemas.divergentBarChart,

@@ -12,9 +12,10 @@ import { generateCircleDiagram } from "@/widgets/generators/circle-diagram"
 import { generateClockDiagram } from "@/widgets/generators/clock-diagram"
 import { generateCompositeShapeDiagram } from "@/widgets/generators/composite-shape-diagram"
 import { generateConceptualGraph } from "@/widgets/generators/conceptual-graph"
-import { generateConstraintGeometryDiagram } from "@/widgets/generators/constraint-geometry-diagram"
 import { generateCoordinatePlaneComprehensive } from "@/widgets/generators/coordinate-plane-comprehensive"
 import { generateCustomPolygonDiagram } from "@/widgets/generators/custom-polygon-diagram"
+import { generateDataTable } from "@/widgets/generators/data-table"
+import { generateDecoratedNumber } from "@/widgets/generators/decorated-number"
 import { generateDiscreteObjectRatioDiagram } from "@/widgets/generators/discrete-object-ratio-diagram"
 import { generateDivergentBarChart } from "@/widgets/generators/divergent-bar-chart"
 import { generateDivisionAreaDiagram } from "@/widgets/generators/division-area-diagram"
@@ -79,8 +80,6 @@ import { generateSimpleArrow } from "@/widgets/generators/simple-arrow"
 import { generateSinCosineWidget } from "@/widgets/generators/sin-cosine-widget"
 import { generateStackedItemsDiagram } from "@/widgets/generators/stacked-items-diagram"
 import { generateStemLeafPlot } from "@/widgets/generators/stem-leaf-plot"
-import { generateDataTable } from "@/widgets/generators/data-table"
-import { generateDecoratedNumber } from "@/widgets/generators/decorated-number"
 import { generateStickPlot } from "@/widgets/generators/stick-plot"
 import { generateSubtractionWithRegrouping } from "@/widgets/generators/subtraction-with-regrouping"
 import { generateSymmetryDiagram } from "@/widgets/generators/symmetry-diagram"
@@ -157,10 +156,6 @@ export const allWidgetDefinitions = {
 	conceptualGraph: {
 		schema: allWidgetSchemas.conceptualGraph,
 		generator: generateConceptualGraph
-	},
-	constraintGeometryDiagram: {
-		schema: allWidgetSchemas.constraintGeometryDiagram,
-		generator: generateConstraintGeometryDiagram
 	},
 	coordinatePlane: {
 		schema: allWidgetSchemas.coordinatePlane,
