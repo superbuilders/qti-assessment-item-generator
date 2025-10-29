@@ -1,6 +1,6 @@
 {
 	"name": "@superbuilders/qti-assessment-item-generator",
-	"version": "6.0.0",
+	"version": "7.0.0",
 	"description": "QTI 3.0 assessment item generator (compiler + AI pipeline)",
 	"type": "module",
 	"files": [
