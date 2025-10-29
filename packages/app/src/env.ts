@@ -6,8 +6,10 @@ export const env = createEnv({
 		DATABASE_URL: z.url(),
 		OPENAI_API_KEY: z.string().min(1),
 		INNGEST_EVENT_KEY: z.string().min(1),
-		INNGEST_SIGNING_KEY: z.string().min(1).optional()
+		INNGEST_SIGNING_KEY: z.string().min(1)
 	},
 	runtimeEnv: process.env,
+	clientPrefix: "",
+	client: {},
 	emptyStringAsUndefined: true
 })
