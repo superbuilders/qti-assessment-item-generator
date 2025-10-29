@@ -7,7 +7,7 @@ const rdsClient = new RDSDataClient({
 })
 
 export const db = drizzle(rdsClient, {
-	database: env.AWS_RDS_DATABASE,
+	database: "postgres",
 	resourceArn: env.AWS_RDS_RESOURCE_ARN,
 	secretArn: env.AWS_RDS_SECRET_ARN
 })
