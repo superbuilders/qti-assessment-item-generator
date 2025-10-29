@@ -3,7 +3,7 @@ import { drizzle } from "drizzle-orm/aws-data-api/pg"
 import { env } from "../env"
 
 const rdsClient = new RDSDataClient({
-	region: "us-east-2"
+	region: env.AWS_REGION
 })
 
 export const db = drizzle(rdsClient, {

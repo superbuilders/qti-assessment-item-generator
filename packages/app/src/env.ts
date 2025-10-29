@@ -6,6 +6,7 @@ dotenv.config({ path: ".env.local" })
 
 export const env = createEnv({
 	server: {
+		AWS_REGION: z.string().min(1),
 		AWS_RDS_RESOURCE_ARN: z.string().min(1),
 		AWS_RDS_SECRET_ARN: z.string().min(1),
 		OPENAI_API_KEY: z.string().min(1),
