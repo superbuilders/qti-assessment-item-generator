@@ -2,7 +2,7 @@ import { handle } from "hono/vercel"
 import app from "../index"
 
 export const config = {
-	runtime: "nodejs22.x"
+	runtime: "bun@1.x"
 }
 
 export default handle(app)

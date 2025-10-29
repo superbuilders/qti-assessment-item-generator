@@ -29,7 +29,7 @@
     },
     "packages/lib": {
       "name": "@superbuilders/qti-assessment-item-generator",
-      "version": "6.0.0",
+      "version": "7.0.0",
       "dependencies": {
         "@superbuilders/errors": "3.0.2",
         "@superbuilders/slog": "4.0.0",
