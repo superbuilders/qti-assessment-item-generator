@@ -1,18 +1,15 @@
 import { existsSync, readFileSync } from "node:fs"
 import * as path from "node:path"
+import { resolveLibPath } from "@/internal/paths"
 
 const POSITIVE_EXAMPLE_CACHE = new Map<string, string>()
 const NEGATIVE_EXAMPLE_CACHE = new Map<string, string>()
 
-const POSITIVE_ROOT = path.resolve(
-	"src/lib/templates/prompts/examples/positive"
-)
+const POSITIVE_ROOT = resolveLibPath("templates/prompts/examples/positive")
 const POSITIVE_TEMPLATES_DIR = path.join(POSITIVE_ROOT, "templates")
 const POSITIVE_NOTES_DIR = path.join(POSITIVE_ROOT, "notes")
 
-const NEGATIVE_ROOT = path.resolve(
-	"src/lib/templates/prompts/examples/negative"
-)
+const NEGATIVE_ROOT = resolveLibPath("templates/prompts/examples/negative")
 const NEGATIVE_TEMPLATES_DIR = path.join(NEGATIVE_ROOT, "templates")
 const NEGATIVE_NOTES_DIR = path.join(NEGATIVE_ROOT, "notes")
 

@@ -1,0 +1,26 @@
+{
+	"name": "@superbuilders/qti-assessment-item-generator-app",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"build": "rm -rf dist && tsc -p tsconfig.build.json",
+		"typecheck": "tsc --noEmit -p tsconfig.build.json",
+		"dev": "bun --watch src/index.ts",
+		"dev:inngest": "inngest-cli dev --queue-workers 4000 --poll-interval 2"
+	},
+	"dependencies": {
+		"@superbuilders/slog": "4.0.0",
+		"@t3-oss/env-core": "^0.13.8",
+		"drizzle-orm": "^0.44.7",
+		"hono": "^4.10.3",
+		"inngest": "^3.15.1",
+		"zod": "^4.1.12"
+	},
+	"devDependencies": {
+		"@types/node": "^24.9.2",
+		"dotenv": "^17.2.3",
+		"drizzle-kit": "^0.31.6",
+		"inngest-cli": "^1.12.1",
+		"typescript": "^5.9.3"
+	}
+}

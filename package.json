@@ -1,183 +1,25 @@
 {
-	"name": "@superbuilders/qti-assessment-item-generator",
-	"version": "6.0.0",
-	"description": "QTI 3.0 assessment item generator (compiler + AI pipeline)",
+	"name": "qti-assessment-item-generator-monorepo",
+	"private": true,
 	"type": "module",
-	"files": [
-		"dist",
-		"README.md",
-		"LICENSE"
+	"workspaces": [
+		"packages/*"
 	],
 	"scripts": {
-		"build": "rm -rf dist/app && tsc -p src/app/tsconfig.json",
-		"build:lib": "tsc -p tsconfig.json && tsc-alias -p tsconfig.json",
-		"dev": "bun --watch src/app/index.ts",
-		"dev:inngest": "inngest-cli dev --queue-workers 4000 --poll-interval 2",
-		"typecheck": "tsc --noEmit && tsc --noEmit -p src/app/tsconfig.json",
-		"lint": "biome lint",
-		"format": "biome format --write",
-		"generate:template": "bun src/lib/templates/cli.ts",
-		"prepublishOnly": "bun run build:lib"
-	},
-	"keywords": [
-		"logging",
-		"structured-logging",
-		"performance",
-		"slog",
-		"high-performance"
-	],
-	"author": "Bjorn Pagen",
-	"license": "0BSD",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/superbuilders/qti-assessment-item-generator"
+		"build": "bun run --cwd packages/lib build",
+		"build:lib": "bun run --cwd packages/lib build",
+		"build:app": "bun run --cwd packages/app build",
+		"typecheck": "bun run --cwd packages/lib typecheck && bun run --cwd packages/app typecheck",
+		"dev": "bun run --cwd packages/app dev",
+		"dev:inngest": "bun run --cwd packages/app dev:inngest",
+		"generate:template": "bun run --cwd packages/lib generate:template",
+		"lint": "bun run --cwd packages/lib lint",
+		"format": "bun run --cwd packages/lib format",
+		"test": "bun test"
 	},
 	"devDependencies": {
-		"@types/bun": "1.3.1",
-		"@types/node": "^24.9.2",
-		"@types/tar-stream": "^3.1.4",
-		"@types/unbzip2-stream": "^1.4.3",
-		"dotenv": "^17.2.3",
-		"html-validate": "^10.2.1",
-		"openai": "^6.7.0",
-		"tsc-alias": "^1.8.16",
-		"typescript": "^5.9.3"
-	},
-	"peerDependencies": {
-		"typescript": "^5.9.3",
-		"openai": ">=5 <6"
-	},
-	"engines": {
-		"node": ">=18"
-	},
-	"publishConfig": {
-		"access": "public"
-	},
-	"dependencies": {
 		"@biomejs/biome": "^2.0.0-beta.6",
-		"@superbuilders/errors": "3.0.2",
-		"@superbuilders/slog": "4.0.0",
-		"@t3-oss/env-core": "^0.13.8",
-		"@types/he": "1.2.3",
-		"csstype": "^3.1.3",
-		"drizzle-kit": "^0.31.6",
-		"drizzle-orm": "^0.44.7",
-		"fast-xml-parser": "5.3.0",
-		"glob": "^11.0.3",
-		"he": "1.2.0",
-		"hono": "^4.10.3",
-		"inngest": "^3.15.1",
-		"inngest-cli": "^1.12.1",
-		"linkedom": "^0.18.12",
-		"tar-stream": "^3.1.7",
-		"unbzip2-stream": "^1.4.3",
-		"zod": "^4.1.12"
-	},
-	"exports": {
-		"./package.json": "./package.json",
-		"./compiler": {
-			"types": "./dist/src/lib/compiler/compiler.d.ts",
-			"import": "./dist/src/lib/compiler/compiler.js"
-		},
-		"./compiler/response-processor": {
-			"types": "./dist/src/lib/compiler/response-processor.d.ts",
-			"import": "./dist/src/lib/compiler/response-processor.js"
-		},
-		"./compiler/qti-constants": {
-			"types": "./dist/src/lib/compiler/qti-constants.d.ts",
-			"import": "./dist/src/lib/compiler/qti-constants.js"
-		},
-		"./structured": {
-			"types": "./dist/src/lib/structured/client.d.ts",
-			"import": "./dist/src/lib/structured/client.js"
-		},
-		"./structured/ai-context-builder": {
-			"types": "./dist/src/lib/structured/ai-context-builder.d.ts",
-			"import": "./dist/src/lib/structured/ai-context-builder.js"
-		},
-		"./widgets/registry": {
-			"types": "./dist/src/lib/widgets/registry.d.ts",
-			"import": "./dist/src/lib/widgets/registry.js"
-		},
-		"./widgets/collections": {
-			"types": "./dist/src/lib/widgets/collections/index.d.ts",
-			"import": "./dist/src/lib/widgets/collections/index.js"
-		},
-		"./widgets/types": {
-			"types": "./dist/src/lib/widgets/types.d.ts",
-			"import": "./dist/src/lib/widgets/types.js"
-		},
-		"./widgets/widget-generator": {
-			"types": "./dist/src/lib/widgets/widget-generator.d.ts",
-			"import": "./dist/src/lib/widgets/widget-generator.js"
-		},
-		"./examples": {
-			"types": "./dist/src/lib/examples.d.ts",
-			"import": "./dist/src/lib/examples.js"
-		},
-		"./qti-validation/utils": {
-			"types": "./dist/src/lib/utils/qti-validation.d.ts",
-			"import": "./dist/src/lib/utils/qti-validation.js"
-		},
-		"./core": {
-			"types": "./dist/src/lib/core/index.d.ts",
-			"import": "./dist/src/lib/core/index.js"
-		},
-		"./core/content": {
-			"types": "./dist/src/lib/core/content/index.d.ts",
-			"import": "./dist/src/lib/core/content/index.js"
-		},
-		"./core/feedback": {
-			"types": "./dist/src/lib/core/feedback/index.d.ts",
-			"import": "./dist/src/lib/core/feedback/index.js"
-		},
-		"./core/interactions": {
-			"types": "./dist/src/lib/core/interactions/index.d.ts",
-			"import": "./dist/src/lib/core/interactions/index.js"
-		},
-		"./core/item": {
-			"types": "./dist/src/lib/core/item/index.d.ts",
-			"import": "./dist/src/lib/core/item/index.js"
-		},
-		"./cartridge/readers/tarzst": {
-			"types": "./dist/src/lib/cartridge/readers/tarzst.d.ts",
-			"import": "./dist/src/lib/cartridge/readers/tarzst.js"
-		},
-		"./cartridge/client": {
-			"types": "./dist/src/lib/cartridge/client.d.ts",
-			"import": "./dist/src/lib/cartridge/client.js"
-		},
-		"./cartridge/types": {
-			"types": "./dist/src/lib/cartridge/types.d.ts",
-			"import": "./dist/src/lib/cartridge/types.js"
-		},
-		"./cartridge/reader": {
-			"types": "./dist/src/lib/cartridge/reader.d.ts",
-			"import": "./dist/src/lib/cartridge/reader.js"
-		},
-		"./cartridge/schema": {
-			"types": "./dist/src/lib/cartridge/schema.d.ts",
-			"import": "./dist/src/lib/cartridge/schema.js"
-		},
-		"./cartridge/build/builder": {
-			"types": "./dist/src/lib/cartridge/build/builder.d.ts",
-			"import": "./dist/src/lib/cartridge/build/builder.js"
-		},
-		"./stimulus/builder": {
-			"types": "./dist/src/lib/stimulus/builder.d.ts",
-			"import": "./dist/src/lib/stimulus/builder.js"
-		},
-		"./stimulus/types": {
-			"types": "./dist/src/lib/stimulus/types.d.ts",
-			"import": "./dist/src/lib/stimulus/types.js"
-		},
-		"./stimulus/validator": {
-			"types": "./dist/src/lib/stimulus/validator.d.ts",
-			"import": "./dist/src/lib/stimulus/validator.js"
-		}
-	},
-	"trustedDependencies": [
-		"inngest-cli",
-		"protobufjs"
-	]
+		"@types/bun": "1.3.1",
+		"typescript": "^5.9.3"
+	}
 }

@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from "node:fs"
-import * as path from "node:path"
+import { resolveLibPath } from "@/internal/paths"
 
-const SEED_HELPERS_PATH = path.resolve("src/lib/templates/seeds.ts")
+const SEED_HELPERS_PATH = resolveLibPath("templates/seeds.ts")
 let cachedSeedHelpers: string | null = null
 
 export function createSeedHelpersSection(): string {

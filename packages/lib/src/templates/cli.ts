@@ -20,7 +20,7 @@ async function main() {
 	if (!qtiPath || !outputPath) {
 		logger.error("missing required arguments", {
 			usage:
-				"bun src/lib/templates/cli.ts --qti <structured-item.json> --out <output.ts> [--debug-files]"
+				"bun src/templates/cli.ts --qti <structured-item.json> --out <output.ts> [--debug-files]"
 		})
 		process.exit(1)
 	}

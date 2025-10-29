@@ -1,12 +1,12 @@
 # Event-Driven Template Generation Platform Proposal
 
 ## Why We Are Moving Beyond the Demo
-- **Current state**: `src/lib/templates` is a CLI-driven proof of concept that shells out to OpenAI, performs in-process type checking, and writes files locally. There is no persistent state, no API surface, and error handling is limited to log output.
+- **Current state**: `packages/lib/src/templates` is a CLI-driven proof of concept that shells out to OpenAI, performs in-process type checking, and writes files locally. There is no persistent state, no API surface, and error handling is limited to log output.
 - **Future requirements**: We want a hosted service capable of orchestrating deterministic template generation, replaying attempts, persisting artifacts, and exposing progress/program status to clients (internal UI, async job monitors, etc.).
 - **Solution direction**: Migrate from an ad-hoc CLI to an event-driven architecture backed by Inngest and a Hono-powered API, with Postgres providing persistence. Target deployment is Vercel, keeping us close to edge-friendly runtime constraints while still supporting serverless workloads.
 
 ## Target Architecture Overview
-- **Hono API (`src/app`)**  
+- **Hono API (`packages/app/src`)**  
   - Serves as the primary HTTP interface, deployed to Vercel’s Edge (or Node) runtime.  
   - Mounts `Inngest` via the official `inngest/hono` adapter to expose `/api/inngest` for function execution and event ingestion.  
   - Exposes additional REST endpoints (e.g., `POST /api/templates` to request a generation, `GET /api/templates/:id` to poll status, `GET /api/templates/:id/artifacts` to fetch outputs).
@@ -36,40 +36,42 @@
 
 ## Proposed Project Layout
 ```
-src/
+packages/
   app/
-    index.ts          # Hono entrypoint (exported from Vercel)
-    routes/
-      templates.ts    # REST endpoints (create request, fetch status, stream artifacts)
-    middleware/
-      bindings.ts     # Hono bindings middleware for env vars (optional)
-    inngest/
-      client.ts       # Shared Inngest client (id, schemas, middleware)
-      functions/
-        template-generate.ts
-        template-iteration.ts
-        record-artifact.ts
-        post-success.ts
-    db/
-      schema.sql      # Postgres schema (see below)
-      migrations/     # (Using drizzle-kit, kysely, prisma, or plain SQL)
+    src/
+      index.ts          # Hono entrypoint (exported from Vercel)
+      routes/
+        templates.ts    # REST endpoints (create request, fetch status, stream artifacts)
+      middleware/
+        bindings.ts     # Hono bindings middleware for env vars (optional)
+      inngest/
+        client.ts       # Shared Inngest client (id, schemas, middleware)
+        functions/
+          template-generate.ts
+          template-iteration.ts
+          record-artifact.ts
+          post-success.ts
+      db/
+        schema.sql      # Postgres schema (see below)
+        migrations/     # (Using drizzle-kit, kysely, prisma, or plain SQL)
   lib/
-    cartridge/
-    compiler/
-    core/
-    examples/
-    qti-validation/
-    stimulus/
-    structured/
-    templates/
-    testing/
-    utils/
-    widgets/
+    src/
+      cartridge/
+      compiler/
+      core/
+      examples/
+      qti-validation/
+      stimulus/
+      structured/
+      templates/
+      testing/
+      utils/
+      widgets/
 ```
 
-All existing modules under `src/` shift into `src/lib/…` to keep the application surface (`src/app`) distinct from reusable libraries.
+All existing modules under `src/` shift into `packages/lib/src/…` to keep the application surface (`packages/app/src`) distinct from reusable libraries.
 
-### Hono + Inngest bootstrap (`src/app/index.ts`)
+### Hono + Inngest bootstrap (`packages/app/src/index.ts`)
 ```ts
 import { Hono } from "hono";
 import { serve } from "inngest/hono";
@@ -85,7 +87,7 @@ export default app;
 - Additional routes attach via `app.route("/api/templates", templatesRouter)` or similar.  
 - Include bindings middleware to bridge Wrangler/Vercel runtime env variables into handlers so Inngest functions receive `ctx.env` (e.g., `DATABASE_URL`, `OPENAI_API_KEY`, `INNGEST_EVENT_KEY`).
 
-### Inngest Client (`src/app/inngest/client.ts`)
+### Inngest Client (`packages/app/src/inngest/client.ts`)
 ```ts
 import { EventSchemas, Inngest } from "inngest";
 import { z } from "zod";
@@ -137,7 +139,7 @@ export const inngest = new Inngest({
 });
 ```
 
-`functions` will export an array of `inngest.createFunction` outputs composed under `src/app/inngest/functions/index.ts`.
+`functions` will export an array of `inngest.createFunction` outputs composed under `packages/app/src/inngest/functions/index.ts`.
 
 
 ## Postgres Schema Sketch
@@ -185,7 +187,7 @@ ORM options: Drizzle ORM (fits serverless Postgres and TypeScript), Prisma Accel
 
 
 ## Deployment Strategy (Vercel)
-- **Hono**: Export default handler from `src/app/index.ts`. Configure `vercel.json` with `"framework": "hono"` or rely on auto-detection.  
+- **Hono**: Export default handler from `packages/app/src/index.ts`. Configure `vercel.json` with `"framework": "hono"` or rely on auto-detection.  
 - **Inngest**: Install the Vercel integration; configure `/api/inngest` route. Deploy functions with `inngest deploy`.  
 - **Database**: Use Vercel-managed Postgres or an external provider. Store `DATABASE_URL` in Vercel/Edge config.  
 - **Secrets**: Manage `OPENAI_API_KEY`, `INNGEST_EVENT_KEY`, `INNGEST_DEV`, etc. through Vercel + Inngest dashboard.  
@@ -201,7 +203,7 @@ ORM options: Drizzle ORM (fits serverless Postgres and TypeScript), Prisma Accel
 
 
 ## Migration & Refactor Considerations
-- Extract template generation logic into reusable modules under `src/lib/templates` so both CLI and Inngest pipelines can share code (e.g., rename CLI-specific functions, avoid direct `fs` writes).  
+- Extract template generation logic into reusable modules under `packages/lib/src/templates` so both CLI and Inngest pipelines can share code (e.g., rename CLI-specific functions, avoid direct `fs` writes).  
 - Wrap TypeScript checker to accept injectable file-system adapters (memory/durable) for serverless compatibility.  
 - Replace direct disk artifacts with Postgres or object storage writers (S3-compatible).  
 - Validation rules (non-null, widget tuple) stay as pure functions, allowing reuse without changes.
@@ -209,10 +211,10 @@ ORM options: Drizzle ORM (fits serverless Postgres and TypeScript), Prisma Accel
 
 ## Implementation Roadmap
 1. **Repository Reorg**  
-   - Move existing modules into `src/lib/*`, update import aliases/tsconfig paths accordingly.  
+   - Move existing modules into `packages/lib/src/*`, update import aliases/tsconfig paths accordingly.  
    - Introduce barrel exports where helpful to avoid long relative paths from the new app surface.  
 2. **Foundation**  
-   - Scaffold `src/app`, install `hono`, `inngest`, `drizzle-kit` (or preferred ORM).  
+   - Scaffold `packages/app/src`, install `hono`, `inngest`, `drizzle-kit` (or preferred ORM).  
    - Add minimal `GET /health` route and `/api/inngest` adapter.  
    - Configure local dev scripts (`"dev:api"`, `"dev:inngest"`).
 

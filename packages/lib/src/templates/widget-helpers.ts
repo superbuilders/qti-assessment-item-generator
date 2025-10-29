@@ -2,8 +2,9 @@ import { existsSync, readFileSync } from "node:fs"
 import * as path from "node:path"
 import * as errors from "@superbuilders/errors"
 import type { Logger } from "@superbuilders/slog"
+import { resolveLibPath } from "@/internal/paths"
 
-const REGISTRY_PATH = path.resolve("src/lib/widgets/registry.ts")
+const REGISTRY_PATH = resolveLibPath("widgets/registry.ts")
 
 export const ErrWidgetGeneratorMissing = errors.new(
 	"widget generator source missing"
@@ -101,7 +102,7 @@ function resolveModuleSpecifierToPath(moduleSpecifier: string): string {
 		const withExtension = moduleSpecifier.endsWith(".ts")
 			? relativePath
 			: `${relativePath}.ts`
-		return path.resolve("src", withExtension)
+		return resolveLibPath(withExtension)
 	}
 	// Already a relative path from registry location
 	if (moduleSpecifier.startsWith("./") || moduleSpecifier.startsWith("../")) {
@@ -114,7 +115,7 @@ function resolveModuleSpecifierToPath(moduleSpecifier: string): string {
 	const withExtension = moduleSpecifier.endsWith(".ts")
 		? moduleSpecifier
 		: `${moduleSpecifier}.ts`
-	return path.resolve(withExtension)
+	return resolveLibPath(withExtension)
 }
 
 function loadWidgetSource(widgetType: string, logger: Logger): string {

@@ -1,37 +1,13 @@
 {
+	"extends": "./tsconfig.base.json",
 	"compilerOptions": {
-		"target": "ESNext",
-		"module": "ESNext",
-		"moduleResolution": "bundler",
-		"strict": true,
-		"skipLibCheck": true,
-		"allowSyntheticDefaultImports": true,
-		"forceConsistentCasingInFileNames": true,
-		"declaration": true,
-		"declarationMap": true,
-		"outDir": "dist",
-		"rootDir": ".",
-		"esModuleInterop": true,
-		"experimentalDecorators": true,
-		"emitDecoratorMetadata": true,
-		"lib": ["ESNext", "DOM"],
-		"types": ["bun-types"],
-		"noUnusedLocals": true,
-		"noUnusedParameters": true,
-		"baseUrl": ".",
-		"paths": {
-			"@/templates/*": ["src/lib/templates/*"],
-			"@/core/*": ["src/lib/core/*"],
-			"@/structured/*": ["src/lib/structured/*"],
-			"@/compiler/*": ["src/lib/compiler/*"],
-			"@/widgets/*": ["src/lib/widgets/*"],
-			"@/cartridge/*": ["src/lib/cartridge/*"],
-			"@/stimulus/*": ["src/lib/stimulus/*"],
-			"@/examples/*": ["src/lib/examples/*"],
-			"@/testing/*": ["src/lib/testing/*"],
-			"@/utils/*": ["src/lib/utils/*"]
-		}
+		"noEmit": true
 	},
-	"include": ["src/**/*", "tests/**/*", "scripts/**/*"],
-	"exclude": ["node_modules", "dist", "src/app/**/*"]
+	"include": [
+		"packages/lib/src/**/*",
+		"packages/app/src/**/*",
+		"tests/**/*",
+		"scripts/**/*"
+	],
+	"exclude": ["node_modules", "packages/*/dist"]
 }
