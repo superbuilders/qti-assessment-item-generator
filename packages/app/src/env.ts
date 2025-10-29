@@ -9,6 +9,8 @@ export const env = createEnv({
 		AWS_REGION: z.string().min(1),
 		AWS_RDS_RESOURCE_ARN: z.string().min(1),
 		AWS_RDS_SECRET_ARN: z.string().min(1),
+		AWS_ACCESS_KEY_ID: z.string().min(1),
+		AWS_SECRET_ACCESS_KEY: z.string().min(1),
 		OPENAI_API_KEY: z.string().min(1),
 		INNGEST_EVENT_KEY: z.string().min(1).optional(),
 		INNGEST_SIGNING_KEY: z.string().min(1).optional()
