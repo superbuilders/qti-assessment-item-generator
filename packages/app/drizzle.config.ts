@@ -1,9 +1,9 @@
 import "dotenv/config"
 import type { Config } from "drizzle-kit"
-import { env } from "./env"
+import { env } from "./src/env"
 
 export default {
-	schema: "./db/schema/index.ts",
+	schema: "./src/db/schema/index.ts",
 	dialect: "postgresql",
 	driver: "aws-data-api",
 	dbCredentials: {

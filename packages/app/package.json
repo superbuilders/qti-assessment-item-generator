@@ -7,7 +7,11 @@
 		"typecheck": "tsc --noEmit -p tsconfig.build.json",
 		"dev": "bun --watch src/index.ts",
 		"dev:inngest": "inngest-cli dev --queue-workers 4000 --poll-interval 2",
-		"lint": "biome lint"
+		"lint": "biome lint",
+		"db:generate": "drizzle-kit generate",
+		"db:migrate": "drizzle-kit migrate",
+		"db:push": "drizzle-kit push",
+		"db:studio": "drizzle-kit studio"
 	},
 	"dependencies": {
 		"@superbuilders/slog": "4.0.0",
