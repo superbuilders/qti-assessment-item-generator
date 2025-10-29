@@ -11,6 +11,7 @@
 	},
 	"dependencies": {
 		"@superbuilders/slog": "4.0.0",
+		"@aws-sdk/client-rds-data": "^3.657.0",
 		"@t3-oss/env-core": "^0.13.8",
 		"drizzle-orm": "^0.44.7",
 		"hono": "^4.10.3",
