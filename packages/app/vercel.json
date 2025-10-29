@@ -3,5 +3,5 @@
 	"framework": "hono",
 	"bunVersion": "1.x",
 	"installCommand": "bun install",
-	"buildCommand": "bun run build:app"
+	"buildCommand": "bun run build"
 }

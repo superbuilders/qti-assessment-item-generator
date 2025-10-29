@@ -7,8 +7,7 @@
 		"packages/lib/src/**/*",
 		"packages/app/src/**/*",
 		"tests/**/*",
-		"scripts/**/*",
-		"index.ts"
+		"scripts/**/*"
 	],
 	"exclude": ["node_modules", "packages/*/dist"]
 }
