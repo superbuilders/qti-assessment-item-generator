@@ -26,15 +26,12 @@ const templateGenerationRequestedSchema = z.object({
 })
 
 const templateCandidateGenerationRequestedSchema = z.object({
-	candidateId: z.uuid(),
-	templateId: z.uuid(),
-	iteration: z.number().int().min(1)
+	templateId: z.uuid()
 })
 
 const templateCandidateValidationRequestedSchema = z.object({
 	candidateId: z.uuid(),
-	templateId: z.uuid(),
-	iteration: z.number().int().min(1)
+	templateId: z.uuid()
 })
 
 const templateGenerationCompletedSchema = z.object({

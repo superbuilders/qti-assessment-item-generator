@@ -1,6 +1,6 @@
 import * as errors from "@superbuilders/errors"
 import type { Logger as SlogLogger } from "@superbuilders/slog"
-import { eq } from "drizzle-orm"
+import { eq, sql } from "drizzle-orm"
 import type { Logger } from "inngest"
 import { typeCheckSource } from "@/templates/type-checker"
 import type { TypeScriptDiagnostic } from "@/templates/types"
@@ -19,6 +19,82 @@ import { inngest } from "../../client"
 
 const MAX_RETRIES = 10
 
+type CandidateEvaluation = TypeScriptDiagnostic[]
+
+async function performCandidateEvaluation({
+	logger,
+	candidateId,
+	templateId
+}: {
+	logger: Logger
+	candidateId: string
+	templateId: string
+}): Promise<CandidateEvaluation> {
+	const candidateRecord = await db
+		.select({
+			source: templateCandidates.source,
+			candidateTemplateId: templateCandidates.templateId,
+			allowedWidgets: templates.allowedWidgets
+		})
+		.from(templateCandidates)
+		.innerJoin(templates, eq(templates.id, templateCandidates.templateId))
+		.where(eq(templateCandidates.id, candidateId))
+		.limit(1)
+		.then((rows) => rows[0])
+
+	if (!candidateRecord) {
+		logger.error("candidate not found during validation", { candidateId })
+		throw errors.new(`template candidate not found: ${candidateId}`)
+	}
+
+	if (candidateRecord.candidateTemplateId !== templateId) {
+		logger.error("candidate template mismatch during validation", {
+			candidateId,
+			expectedTemplateId: templateId,
+			actualTemplateId: candidateRecord.candidateTemplateId
+		})
+		throw errors.new(
+			`candidate ${candidateId} belongs to template ${candidateRecord.candidateTemplateId}`
+		)
+	}
+
+	if (!candidateRecord.source || candidateRecord.source.length === 0) {
+		logger.error("candidate has no source to validate", { candidateId })
+		throw errors.new(`candidate ${candidateId} has empty source`)
+	}
+
+	return collectDiagnostics(
+		logger,
+		candidateRecord.source,
+		candidateRecord.allowedWidgets
+	)
+}
+
+async function collectDiagnostics(
+	logger: SlogLogger,
+	source: string,
+	allowedWidgets: readonly string[]
+): Promise<TypeScriptDiagnostic[]> {
+	const diagnostics = await typeCheckSource(logger, source)
+
+	const widgetDiagnostic = validateTemplateWidgets(source, allowedWidgets)
+	if (widgetDiagnostic) {
+		diagnostics.push(widgetDiagnostic)
+	}
+
+	const nonNullDiagnostic = validateNoNonNullAssertions(source)
+	if (nonNullDiagnostic) {
+		diagnostics.push(nonNullDiagnostic)
+	}
+
+	const typeAssertionDiagnostic = validateNoTypeAssertions(source)
+	if (typeAssertionDiagnostic) {
+		diagnostics.push(typeAssertionDiagnostic)
+	}
+
+	return diagnostics
+}
+
 export const validateTemplateCandidate = inngest.createFunction(
 	{
 		id: "template-candidate-validation",
@@ -28,14 +104,14 @@ export const validateTemplateCandidate = inngest.createFunction(
 	},
 	{ event: "template/candidate.validation.requested" },
 	async ({ event, step, logger }) => {
-		const { candidateId, templateId, iteration } = event.data
-		logger.info("validating template candidate", { candidateId, iteration })
+		const { candidateId, templateId } = event.data
+		logger.info("validating template candidate", { candidateId, templateId })
 
 		const evaluationResult = await errors.try(
 			performCandidateEvaluation({
+				logger,
 				candidateId,
-				templateId,
-				logger
+				templateId
 			})
 		)
 
@@ -44,7 +120,6 @@ export const validateTemplateCandidate = inngest.createFunction(
 			logger.error("template candidate validation failed", {
 				candidateId,
 				templateId,
-				iteration,
 				reason,
 				error: evaluationResult.error
 			})
@@ -73,7 +148,10 @@ export const validateTemplateCandidate = inngest.createFunction(
 		const diagnostics = evaluationResult.data
 
 		if (diagnostics.length === 0) {
-			logger.info("candidate validation succeeded", { candidateId })
+			logger.info("candidate validation succeeded", {
+				candidateId,
+				templateId
+			})
 
 			await step.sendEvent("notify-generation-complete", {
 				name: "template/template.generation.completed",
@@ -85,13 +163,13 @@ export const validateTemplateCandidate = inngest.createFunction(
 
 		logger.warn("candidate validation failed", {
 			candidateId,
+			templateId,
 			diagnosticsCount: diagnostics.length
 		})
 
 		await db.insert(candidateDiagnostics).values(
 			diagnostics.map((diagnostic) => ({
 				candidateId,
-				iteration,
 				message: diagnostic.message,
 				line: diagnostic.line,
 				column: diagnostic.column,
@@ -99,124 +177,42 @@ export const validateTemplateCandidate = inngest.createFunction(
 			}))
 		)
 
-		if (iteration >= MAX_RETRIES) {
+		const attemptResult = await db
+			.select({
+				total: sql<number>`count(*)`
+			})
+			.from(templateCandidates)
+			.where(eq(templateCandidates.templateId, templateId))
+		const attempts = Number(attemptResult[0]?.total ?? 0)
+
+		if (attempts >= MAX_RETRIES) {
 			logger.error("candidate reached maximum retries", {
 				candidateId,
-				iteration
+				templateId,
+				attempts
 			})
 
 			await step.sendEvent("notify-generation-failed", {
 				name: "template/template.generation.failed",
 				data: {
 					templateId,
-					reason: `Template generation failed after ${iteration} attempts. See candidate ${candidateId}.`
+					reason: `Template generation failed after ${attempts} attempts. See candidate ${candidateId}.`
 				}
 			})
 
 			return { status: "failed-max-retries" as const }
 		}
 
-		const nextIteration = iteration + 1
-		logger.info("retrying candidate generation", {
-			candidateId,
-			iteration: nextIteration
+		logger.info("retrying template generation", {
+			templateId,
+			nextAttempt: attempts + 1
 		})
 
-		await step.sendEvent("request-candidate-retry", {
-			name: "template/candidate.generation.requested",
-			data: {
-				candidateId,
-				templateId,
-				iteration: nextIteration
-			}
+		await step.sendEvent("request-template-generation-retry", {
+			name: "template/template.generation.requested",
+			data: { templateId }
 		})
 
-		return {
-			status: "retrying" as const,
-			nextIteration
-		}
+		return { status: "retrying" as const, nextAttempt: attempts + 1 }
 	}
 )
-
-async function performCandidateEvaluation({
-	candidateId,
-	templateId,
-	logger
-}: {
-	candidateId: string
-	templateId: string
-	logger: Logger
-}): Promise<TypeScriptDiagnostic[]> {
-	const candidateRecords = await db
-		.select({
-			source: templateCandidates.source,
-			candidateTemplateId: templateCandidates.templateId,
-			allowedWidgets: templates.allowedWidgets
-		})
-		.from(templateCandidates)
-		.innerJoin(templates, eq(templates.id, templateCandidates.templateId))
-		.where(eq(templateCandidates.id, candidateId))
-		.limit(1)
-
-	const candidateRecord = candidateRecords[0]
-	if (!candidateRecord) {
-		logger.error("candidate not found during validation", { candidateId })
-		throw errors.new(`template candidate not found: ${candidateId}`)
-	}
-
-	if (candidateRecord.candidateTemplateId !== templateId) {
-		logger.error("candidate template mismatch during validation", {
-			candidateId,
-			expectedTemplateId: templateId,
-			actualTemplateId: candidateRecord.candidateTemplateId
-		})
-		throw errors.new(
-			`candidate ${candidateId} belongs to template ${candidateRecord.candidateTemplateId}`
-		)
-	}
-
-	if (!candidateRecord.source || candidateRecord.source.length === 0) {
-		logger.error("candidate has no source to validate", { candidateId })
-		throw errors.new(`candidate ${candidateId} has empty source`)
-	}
-
-	return collectDiagnostics(
-		logger,
-		candidateId,
-		candidateRecord.source,
-		candidateRecord.allowedWidgets
-	)
-}
-
-async function collectDiagnostics(
-	logger: SlogLogger,
-	candidateId: string,
-	source: string,
-	allowedWidgets: readonly string[]
-): Promise<TypeScriptDiagnostic[]> {
-	const diagnostics = await typeCheckSource(
-		logger,
-		`/virtual/${candidateId}.ts`,
-		source
-	)
-	if (diagnostics.length > 0) {
-		return diagnostics
-	}
-
-	const widgetDiagnostic = validateTemplateWidgets(source, allowedWidgets)
-	if (widgetDiagnostic) {
-		return [widgetDiagnostic]
-	}
-
-	const nonNullDiagnostic = validateNoNonNullAssertions(source)
-	if (nonNullDiagnostic) {
-		return [nonNullDiagnostic]
-	}
-
-	const typeAssertionDiagnostic = validateNoTypeAssertions(source)
-	if (typeAssertionDiagnostic) {
-		return [typeAssertionDiagnostic]
-	}
-
-	return []
-}

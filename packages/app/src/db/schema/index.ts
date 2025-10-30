@@ -45,17 +45,12 @@ export const templateCandidates = generatorSchema.table(
 	{
 		id: uuid("id").primaryKey().defaultRandom(),
 		templateId: uuid("template_id").notNull(),
-		version: integer("version").notNull(),
 		source: text("source").notNull(),
 		createdAt: timestamp("created_at", { withTimezone: true })
 			.notNull()
 			.defaultNow()
 	},
 	(table) => [
-		uniqueIndex("template_candidates_template_version_idx").on(
-			table.templateId,
-			table.version
-		),
 		index("template_candidates_template_created_idx").on(
 			table.templateId,
 			table.createdAt
@@ -64,8 +59,7 @@ export const templateCandidates = generatorSchema.table(
 			name: "template_candidates_template_fk",
 			columns: [table.templateId],
 			foreignColumns: [templates.id]
-		}),
-		check("template_candidates_version_positive", sql`${table.version} >= 1`)
+		})
 	]
 )
 
@@ -105,7 +99,6 @@ export const candidateDiagnostics = generatorSchema.table(
 	{
 		id: uuid("id").primaryKey().defaultRandom(),
 		candidateId: uuid("candidate_id").notNull(),
-		iteration: integer("iteration").notNull(),
 		message: text("message").notNull(),
 		line: integer("line").notNull(),
 		column: integer("column").notNull(),
@@ -116,10 +109,6 @@ export const candidateDiagnostics = generatorSchema.table(
 	},
 	(table) => [
 		index("template_candidate_diagnostics_candidate_idx").on(table.candidateId),
-		index("template_candidate_diagnostics_candidate_iteration_idx").on(
-			table.candidateId,
-			table.iteration
-		),
 		foreignKey({
 			name: "template_candidate_diagnostics_candidate_fk",
 			columns: [table.candidateId],

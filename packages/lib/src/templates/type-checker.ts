@@ -5,12 +5,22 @@ import * as ts from "typescript"
 import { resolveLibPath } from "@/internal/paths"
 import type { TypeScriptDiagnostic } from "@/templates/types"
 
+let virtualFileCounter = 0
+function nextVirtualFilename(): string {
+	virtualFileCounter += 1
+	return path.join(
+		process.cwd(),
+		"__virtual_templates__",
+		`template-${virtualFileCounter}.ts`
+	)
+}
+
 export async function typeCheckSource(
 	logger: Logger,
-	virtualFilePath: string,
 	source: string
 ): Promise<TypeScriptDiagnostic[]> {
-	const normalizedVirtualPath = normalizePath(virtualFilePath)
+	const virtualPath = nextVirtualFilename()
+	const normalizedVirtualPath = normalizePath(virtualPath)
 	logger.info("running in-process typecheck", { file: normalizedVirtualPath })
 
 	const configPathResult = errors.trySync(() =>

@@ -1,91 +1,8 @@
 import * as errors from "@superbuilders/errors"
-import { desc, eq } from "drizzle-orm"
-import type { Logger } from "inngest"
+import { eq } from "drizzle-orm"
 import { db } from "../../../db/client"
-import { templateCandidates, templates } from "../../../db/schema"
+import { templates } from "../../../db/schema"
 import { inngest } from "../../client"
-
-type StartGenerationResult = { candidateId: string; version: number }
-
-async function performTemplateGenerationStart({
-	templateId,
-	logger
-}: {
-	templateId: string
-	logger: Logger
-}): Promise<StartGenerationResult> {
-	const templateResult = await db
-		.select({
-			id: templates.id
-		})
-		.from(templates)
-		.where(eq(templates.id, templateId))
-		.limit(1)
-	const template = templateResult[0]
-	if (!template) {
-		logger.error("template not found for generation workflow", {
-			templateId
-		})
-		throw errors.new(`template not found: ${templateId}`)
-	}
-
-	const latestCandidateResult = await db
-		.select({
-			id: templateCandidates.id,
-			version: templateCandidates.version,
-			source: templateCandidates.source
-		})
-		.from(templateCandidates)
-		.where(eq(templateCandidates.templateId, templateId))
-		.orderBy(desc(templateCandidates.version))
-		.limit(1)
-
-	const latestCandidate = latestCandidateResult[0]
-
-	if (latestCandidate && latestCandidate.source.trim().length === 0) {
-		logger.info("reusing pending template candidate", {
-			templateId,
-			candidateId: latestCandidate.id,
-			version: latestCandidate.version
-		})
-		return {
-			candidateId: latestCandidate.id,
-			version: latestCandidate.version
-		}
-	}
-
-	const nextVersion = (latestCandidate?.version ?? 0) + 1
-
-	const insertResult = await errors.try(
-		db
-			.insert(templateCandidates)
-			.values({
-				templateId,
-				version: nextVersion,
-				source: ""
-			})
-			.returning({ id: templateCandidates.id })
-	)
-	if (insertResult.error) {
-		logger.error("failed to create template candidate", {
-			templateId,
-			version: nextVersion,
-			error: insertResult.error
-		})
-		throw errors.wrap(insertResult.error, "create template candidate")
-	}
-
-	const inserted = insertResult.data[0]
-	if (!inserted) {
-		logger.error("inserted template candidate missing from result", {
-			templateId,
-			version: nextVersion
-		})
-		throw errors.new("failed to create template candidate")
-	}
-
-	return { candidateId: inserted.id, version: nextVersion }
-}
 
 export const startTemplateGeneration = inngest.createFunction(
 	{
@@ -99,20 +16,17 @@ export const startTemplateGeneration = inngest.createFunction(
 		const { templateId } = event.data
 		logger.info("starting template generation workflow", { templateId })
 
-		const setupResult = await errors.try<StartGenerationResult>(
-			performTemplateGenerationStart({
-				templateId,
-				logger
-			})
-		)
+		const templateResult = await db
+			.select({ id: templates.id })
+			.from(templates)
+			.where(eq(templates.id, templateId))
+			.limit(1)
 
-		if (setupResult.error) {
-			const reason = setupResult.error.toString()
-			logger.error("template generation start failed", {
-				templateId,
-				reason,
-				error: setupResult.error
+		if (!templateResult[0]) {
+			logger.error("template not found for generation workflow", {
+				templateId
 			})
+			const reason = `template not found: ${templateId}`
 
 			const failureEventResult = await errors.try(
 				step.sendEvent("template-generation-start-failed", {
@@ -135,27 +49,15 @@ export const startTemplateGeneration = inngest.createFunction(
 			return { status: "failed" as const, reason }
 		}
 
-		logger.info("template generation workflow started", {
-			templateId,
-			candidateId: setupResult.data.candidateId,
-			version: setupResult.data.version
-		})
-
 		const requestGenerationEventResult = await errors.try(
 			step.sendEvent("request-candidate-generation", {
 				name: "template/candidate.generation.requested",
-				data: {
-					candidateId: setupResult.data.candidateId,
-					templateId,
-					iteration: 1
-				}
+				data: { templateId }
 			})
 		)
 		if (requestGenerationEventResult.error) {
 			logger.error("template generation request event emission failed", {
 				templateId,
-				candidateId: setupResult.data.candidateId,
-				version: setupResult.data.version,
 				error: requestGenerationEventResult.error
 			})
 			throw errors.wrap(
@@ -164,10 +66,10 @@ export const startTemplateGeneration = inngest.createFunction(
 			)
 		}
 
+		logger.info("template generation workflow dispatched", { templateId })
+
 		return {
-			status: "workflow-started" as const,
-			candidateId: setupResult.data.candidateId,
-			version: setupResult.data.version
+			status: "dispatched" as const
 		}
 	}
 )

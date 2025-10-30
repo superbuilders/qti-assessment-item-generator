@@ -1,5 +1,5 @@
 import * as errors from "@superbuilders/errors"
-import { and, desc, eq } from "drizzle-orm"
+import { desc, eq, sql } from "drizzle-orm"
 import type { Logger } from "inngest"
 import { createAi, TEMPLATE_GENERATION_MODEL } from "@/templates/ai"
 import { runGenerationAttempt } from "@/templates/generation"
@@ -15,98 +15,102 @@ import {
 import { env } from "../../../env"
 import { inngest } from "../../client"
 
-type CandidateGenerationResult = { iteration: number }
+type GeneratedResult = {
+	status: "generated"
+	candidateId: string
+	attempt: number
+	diagnosticsUsed: number
+}
+
+type SkippedResult = {
+	status: "skipped"
+	reason: string
+	candidateId?: string
+}
+
+type CandidateGenerationResult = GeneratedResult | SkippedResult
 
 async function performCandidateGeneration({
-	candidateId,
-	templateId,
-	iteration,
-	logger
+	logger,
+	templateId
 }: {
-	candidateId: string
-	templateId: string
-	iteration: number
 	logger: Logger
+	templateId: string
 }): Promise<CandidateGenerationResult> {
-	const contextRecords = await db
+	const templateRecord = await db
 		.select({
-			candidateSource: templateCandidates.source,
-			candidateTemplateId: templateCandidates.templateId,
-			templateAllowedWidgets: templates.allowedWidgets,
-			templateExampleBody: templates.exampleAssessmentItemBody
+			allowedWidgets: templates.allowedWidgets,
+			exampleAssessmentItemBody: templates.exampleAssessmentItemBody
+		})
+		.from(templates)
+		.where(eq(templates.id, templateId))
+		.limit(1)
+		.then((rows) => rows[0])
+
+	if (!templateRecord) {
+		logger.error("template not found for candidate generation", { templateId })
+		throw errors.new(`template not found: ${templateId}`)
+	}
+
+	const latestCandidate = await db
+		.select({
+			id: templateCandidates.id,
+			source: templateCandidates.source,
+			createdAt: templateCandidates.createdAt
 		})
 		.from(templateCandidates)
-		.innerJoin(templates, eq(templates.id, templateCandidates.templateId))
-		.where(eq(templateCandidates.id, candidateId))
+		.where(eq(templateCandidates.templateId, templateId))
+		.orderBy(desc(templateCandidates.createdAt))
 		.limit(1)
+		.then((rows) => rows[0])
 
-	const contextRecord = contextRecords[0]
-	if (!contextRecord) {
-		logger.error("candidate record not found", { candidateId })
-		throw errors.new(`template candidate not found: ${candidateId}`)
+	const previousDiagnostics = latestCandidate
+		? await db
+				.select({
+					message: candidateDiagnostics.message,
+					line: candidateDiagnostics.line,
+					column: candidateDiagnostics.column,
+					tsCode: candidateDiagnostics.tsCode
+				})
+				.from(candidateDiagnostics)
+				.where(eq(candidateDiagnostics.candidateId, latestCandidate.id))
+				.orderBy(candidateDiagnostics.createdAt)
+		: []
+
+	if (latestCandidate && previousDiagnostics.length === 0) {
+		return {
+			status: "skipped",
+			reason: "latest candidate has no diagnostics; generation not required",
+			candidateId: latestCandidate.id
+		}
 	}
 
-	if (contextRecord.candidateTemplateId !== templateId) {
-		logger.error("candidate template mismatch", {
-			candidateId,
-			expectedTemplateId: templateId,
-			actualTemplateId: contextRecord.candidateTemplateId
+	const attemptResult = await db
+		.select({
+			total: sql<number>`count(*)`
 		})
-		throw errors.new(
-			`candidate ${candidateId} belongs to template ${contextRecord.candidateTemplateId}`
-		)
-	}
+		.from(templateCandidates)
+		.where(eq(templateCandidates.templateId, templateId))
+	const attempt = Number(attemptResult[0]?.total ?? 0) + 1
 
 	const structuredInput = parseStructuredInput(
 		logger,
-		JSON.stringify(contextRecord.templateExampleBody)
+		JSON.stringify(templateRecord.exampleAssessmentItemBody)
 	)
-
-	const latestDiagnosticIteration = await db
-		.select({ iteration: candidateDiagnostics.iteration })
-		.from(candidateDiagnostics)
-		.where(eq(candidateDiagnostics.candidateId, candidateId))
-		.orderBy(desc(candidateDiagnostics.iteration))
-		.limit(1)
-
-	const latestIteration = latestDiagnosticIteration[0]?.iteration ?? null
-
-	const diagnostics =
-		latestIteration === null
-			? []
-			: await db
-					.select({
-						message: candidateDiagnostics.message,
-						line: candidateDiagnostics.line,
-						column: candidateDiagnostics.column,
-						tsCode: candidateDiagnostics.tsCode
-					})
-					.from(candidateDiagnostics)
-					.where(
-						and(
-							eq(candidateDiagnostics.candidateId, candidateId),
-							eq(candidateDiagnostics.iteration, latestIteration)
-						)
-					)
-
+	const allowedWidgets = templateRecord.allowedWidgets
 	const sourceContext = structuredInput.sourceContext
-	const allowedWidgets = contextRecord.templateAllowedWidgets
-	const lastCode = contextRecord.candidateSource
-	const lastDiagnostics = diagnostics
 
 	const ai = createAi(logger, env.OPENAI_API_KEY)
-	const isRetry =
-		lastCode.length > 0 &&
-		Array.isArray(lastDiagnostics) &&
-		lastDiagnostics.length > 0
+	const isRetry = Boolean(latestCandidate && previousDiagnostics.length > 0)
+	const lastSource = latestCandidate?.source ?? ""
 
 	const prompt = isRetry
 		? composeRetryPrompt(
 				logger,
 				allowedWidgets,
 				sourceContext,
-				lastCode,
-				lastDiagnostics
+				lastSource,
+				previousDiagnostics
 			)
 		: composeInitialPrompt(logger, allowedWidgets, sourceContext)
 
@@ -118,23 +122,37 @@ async function performCandidateGeneration({
 		userPrompt: prompt.userPrompt
 	})
 
-	const updateResult = await errors.try(
+	const insertResult = await errors.try(
 		db
-			.update(templateCandidates)
-			.set({ source: generatedCode })
-			.where(eq(templateCandidates.id, candidateId))
+			.insert(templateCandidates)
+			.values({
+				templateId,
+				source: generatedCode
+			})
+			.returning({ id: templateCandidates.id })
 	)
-	if (updateResult.error) {
-		logger.error("failed to update candidate source", {
-			candidateId,
+	if (insertResult.error) {
+		logger.error("failed to insert template candidate", {
 			templateId,
-			iteration,
-			error: updateResult.error
+			error: insertResult.error
 		})
-		throw errors.wrap(updateResult.error, "update candidate source")
+		throw errors.wrap(insertResult.error, "insert template candidate")
 	}
 
-	return { iteration }
+	const inserted = insertResult.data[0]
+	if (!inserted) {
+		logger.error("inserted template candidate missing from result", {
+			templateId
+		})
+		throw errors.new("failed to insert template candidate")
+	}
+
+	return {
+		status: "generated",
+		candidateId: inserted.id,
+		attempt,
+		diagnosticsUsed: previousDiagnostics.length
+	}
 }
 
 export const generateTemplateCandidate = inngest.createFunction(
@@ -149,24 +167,17 @@ export const generateTemplateCandidate = inngest.createFunction(
 	},
 	{ event: "template/candidate.generation.requested" },
 	async ({ event, step, logger }) => {
-		const { candidateId, templateId, iteration } = event.data
-		logger.info("generating template candidate", { candidateId, iteration })
+		const { templateId } = event.data
+		logger.info("generating template candidate", { templateId })
 
-		const generationResult = await errors.try<CandidateGenerationResult>(
-			performCandidateGeneration({
-				candidateId,
-				templateId,
-				iteration,
-				logger
-			})
+		const generationResult = await errors.try(
+			performCandidateGeneration({ logger, templateId })
 		)
 
 		if (generationResult.error) {
 			const reason = generationResult.error.toString()
 			logger.error("template candidate generation failed", {
-				candidateId,
 				templateId,
-				iteration,
 				reason,
 				error: generationResult.error
 			})
@@ -192,17 +203,38 @@ export const generateTemplateCandidate = inngest.createFunction(
 			return { status: "failed" as const, reason }
 		}
 
-		logger.info("candidate generation completed", { candidateId, iteration })
+		if (generationResult.data.status === "skipped") {
+			logger.info("candidate generation skipped", {
+				templateId,
+				reason: generationResult.data.reason,
+				candidateId: generationResult.data.candidateId
+			})
+
+			return {
+				status: "skipped" as const,
+				reason: generationResult.data.reason
+			}
+		}
+
+		logger.info("candidate generation completed", {
+			candidateId: generationResult.data.candidateId,
+			templateId,
+			attempt: generationResult.data.attempt,
+			diagnosticsUsed: generationResult.data.diagnosticsUsed
+		})
 
 		await step.sendEvent("request-candidate-validation", {
 			name: "template/candidate.validation.requested",
-			data: { candidateId, templateId, iteration }
+			data: {
+				candidateId: generationResult.data.candidateId,
+				templateId
+			}
 		})
 
 		return {
 			status: "generation-complete" as const,
-			candidateId,
-			iteration: generationResult.data.iteration
+			candidateId: generationResult.data.candidateId,
+			attempt: generationResult.data.attempt
 		}
 	}
 )

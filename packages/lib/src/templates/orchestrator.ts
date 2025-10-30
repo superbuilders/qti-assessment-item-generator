@@ -126,7 +126,7 @@ export async function generateTemplate(
 			})
 		}
 
-		const diagnostics = await typeCheckSource(logger, absoluteOutputPath, code)
+		const diagnostics = await typeCheckSource(logger, code)
 		lastCode = code
 		lastDiagnostics = diagnostics
 

@@ -19,13 +19,13 @@ function normalizeAllowedWidgets(
 }
 
 function validateAllowedWidgets({
+	logger,
 	templateId,
-	allowedWidgets,
-	logger
+	allowedWidgets
 }: {
+	logger: Logger
 	templateId: string
 	allowedWidgets: readonly string[]
-	logger: Logger
 }): void {
 	const unknownWidgets = allowedWidgets.filter(
 		(widget) => !KNOWN_WIDGET_NAMES.has(widget)
@@ -43,13 +43,13 @@ function validateAllowedWidgets({
 }
 
 async function performTemplateScaffold({
+	logger,
 	templateId,
-	exampleAssessmentItemBody,
-	logger
+	exampleAssessmentItemBody
 }: {
+	logger: Logger
 	templateId: string
 	exampleAssessmentItemBody: unknown
-	logger: Logger
 }): Promise<ScaffoldResult> {
 	const existingTemplate = await db
 		.select({
@@ -78,9 +78,9 @@ async function performTemplateScaffold({
 	const normalizedWidgets = normalizeAllowedWidgets(parsed.allowedWidgets)
 
 	validateAllowedWidgets({
+		logger,
 		templateId,
-		allowedWidgets: normalizedWidgets,
-		logger
+		allowedWidgets: normalizedWidgets
 	})
 
 	const hash = createHash("sha256").update(stringifiedBody).digest("hex")
@@ -118,9 +118,9 @@ export const scaffoldTemplateFunction = inngest.createFunction(
 
 		const scaffoldResult = await errors.try(
 			performTemplateScaffold({
+				logger,
 				templateId,
-				exampleAssessmentItemBody,
-				logger
+				exampleAssessmentItemBody
 			})
 		)
 		if (scaffoldResult.error) {
