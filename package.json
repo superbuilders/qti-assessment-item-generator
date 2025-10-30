@@ -20,5 +20,8 @@
 		"@biomejs/biome": "^2.0.0-beta.6",
 		"@types/bun": "1.3.1",
 		"typescript": "^5.9.3"
+	},
+	"dependencies": {
+		"@superbuilders/errors": "^3.0.2"
 	}
 }

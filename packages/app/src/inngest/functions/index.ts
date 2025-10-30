@@ -1,3 +1,4 @@
+import { executeTemplateCandidate } from "./candidate/execution"
 import { generateTemplateCandidate } from "./candidate/generation"
 import { validateTemplateCandidate } from "./candidate/validation"
 import { helloWorldFunction } from "./hello-world"
@@ -9,5 +10,6 @@ export const functions = [
 	helloWorldFunction,
 	startTemplateGeneration,
 	generateTemplateCandidate,
+	executeTemplateCandidate,
 	validateTemplateCandidate
 ]

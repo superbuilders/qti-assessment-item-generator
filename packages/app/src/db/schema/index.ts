@@ -1,11 +1,11 @@
 import { sql } from "drizzle-orm"
 import {
 	check,
+	customType,
 	foreignKey,
 	index,
 	integer,
 	jsonb,
-	bigint as pgBigint,
 	pgSchema,
 	text,
 	timestamp,
@@ -64,33 +64,45 @@ export const templateCandidates = generatorSchema.table(
 	]
 )
 
-export const generatedAssessmentItems = generatorSchema.table(
-	"generated_assessment_items",
+const bigintText = customType<{ data: bigint; driverData: string }>({
+	dataType() {
+		return "text"
+	},
+	toDriver(value) {
+		return value.toString()
+	},
+	fromDriver(value) {
+		return BigInt(value)
+	}
+})
+
+export const templateCandidateExecutions = generatorSchema.table(
+	"template_candidate_executions",
 	{
 		id: uuid("id").primaryKey().defaultRandom(),
 		templateCandidateId: uuid("template_candidate_id").notNull(),
-		seed: pgBigint("seed", { mode: "bigint" }).notNull(),
+		seed: bigintText("seed").notNull(),
 		body: jsonb("body").notNull(),
 		createdAt: timestamp("created_at", { withTimezone: true })
 			.notNull()
 			.defaultNow()
 	},
 	(table) => [
-		index("generated_assessment_items_candidate_idx").on(
+		index("template_candidate_executions_candidate_idx").on(
 			table.templateCandidateId
 		),
-		uniqueIndex("generated_assessment_items_candidate_seed_idx").on(
+		uniqueIndex("template_candidate_executions_candidate_seed_idx").on(
 			table.templateCandidateId,
 			table.seed
 		),
 		foreignKey({
-			name: "generated_assessment_items_candidate_fk",
+			name: "template_candidate_executions_candidate_fk",
 			columns: [table.templateCandidateId],
 			foreignColumns: [templateCandidates.id]
 		}),
 		check(
-			"generated_assessment_items_seed_nonnegative",
-			sql`${table.seed} >= 0`
+			"template_candidate_executions_seed_digits",
+			sql`${table.seed} ~ '^[0-9]+$'`
 		)
 	]
 )
@@ -130,8 +142,8 @@ export const candidateDiagnostics = generatorSchema.table(
 	]
 )
 
-export type GeneratedAssessmentItemRecord =
-	typeof generatedAssessmentItems.$inferSelect
+export type TemplateCandidateExecutionRecord =
+	typeof templateCandidateExecutions.$inferSelect
 export type TemplateRecord = typeof templates.$inferSelect
 export type TemplateCandidateRecord = typeof templateCandidates.$inferSelect
 export type CandidateDiagnosticRecord = typeof candidateDiagnostics.$inferSelect

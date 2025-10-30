@@ -11,7 +11,7 @@
 		"experimentalDecorators": true,
 		"emitDecoratorMetadata": true,
 		"lib": ["ESNext", "DOM"],
-		"types": ["bun-types"],
+		"types": ["bun"],
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
 		"baseUrl": ".",
