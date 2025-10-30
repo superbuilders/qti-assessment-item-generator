@@ -148,6 +148,11 @@ export const validateTemplateCandidate = inngest.createFunction(
 		const diagnostics = evaluationResult.data
 
 		if (diagnostics.length === 0) {
+			await db
+				.update(templateCandidates)
+				.set({ validatedAt: new Date() })
+				.where(eq(templateCandidates.id, candidateId))
+
 			logger.info("candidate validation succeeded", {
 				candidateId,
 				templateId
@@ -166,6 +171,11 @@ export const validateTemplateCandidate = inngest.createFunction(
 			templateId,
 			diagnosticsCount: diagnostics.length
 		})
+
+		await db
+			.update(templateCandidates)
+			.set({ validatedAt: null })
+			.where(eq(templateCandidates.id, candidateId))
 
 		await db.insert(candidateDiagnostics).values(
 			diagnostics.map((diagnostic) => ({

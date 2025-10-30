@@ -56,7 +56,8 @@ async function performCandidateGeneration({
 		.select({
 			id: templateCandidates.id,
 			source: templateCandidates.source,
-			createdAt: templateCandidates.createdAt
+			createdAt: templateCandidates.createdAt,
+			validatedAt: templateCandidates.validatedAt
 		})
 		.from(templateCandidates)
 		.where(eq(templateCandidates.templateId, templateId))
@@ -77,10 +78,10 @@ async function performCandidateGeneration({
 				.orderBy(candidateDiagnostics.createdAt)
 		: []
 
-	if (latestCandidate && previousDiagnostics.length === 0) {
+	if (latestCandidate?.validatedAt) {
 		return {
 			status: "skipped",
-			reason: "latest candidate has no diagnostics; generation not required",
+			reason: "latest candidate already validated; generation not required",
 			candidateId: latestCandidate.id
 		}
 	}

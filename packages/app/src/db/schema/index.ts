@@ -46,6 +46,7 @@ export const templateCandidates = generatorSchema.table(
 		id: uuid("id").primaryKey().defaultRandom(),
 		templateId: uuid("template_id").notNull(),
 		source: text("source").notNull(),
+		validatedAt: timestamp("validated_at", { withTimezone: true }),
 		createdAt: timestamp("created_at", { withTimezone: true })
 			.notNull()
 			.defaultNow()
