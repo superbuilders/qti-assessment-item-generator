@@ -43,6 +43,24 @@ const templateGenerationFailedSchema = z.object({
 	reason: z.string().min(1)
 })
 
+const templateExecutionRequestedSchema = z.object({
+	templateId: z.uuid(),
+	seed: z.string().regex(/^\d+$/, "seed must be a non-negative integer string")
+})
+
+const templateExecutionCompletedSchema = z.object({
+	templateId: z.uuid(),
+	templateCandidateId: z.uuid(),
+	seed: z.string().regex(/^\d+$/, "seed must be a non-negative integer string"),
+	executionId: z.uuid()
+})
+
+const templateExecutionFailedSchema = z.object({
+	templateId: z.uuid(),
+	seed: z.string().regex(/^\d+$/, "seed must be a non-negative integer string"),
+	reason: z.string().min(1)
+})
+
 const templateCandidateExecutionRequestedSchema = z.object({
 	templateCandidateId: z.uuid(),
 	seed: z.string().regex(/^\d+$/, "seed must be a non-negative integer string")
@@ -85,6 +103,9 @@ const schema = {
 	"template/template.generation.requested": templateGenerationRequestedSchema,
 	"template/template.generation.completed": templateGenerationCompletedSchema,
 	"template/template.generation.failed": templateGenerationFailedSchema,
+	"template/template.execution.requested": templateExecutionRequestedSchema,
+	"template/template.execution.completed": templateExecutionCompletedSchema,
+	"template/template.execution.failed": templateExecutionFailedSchema,
 	"template/candidate.generation.requested":
 		templateCandidateGenerationRequestedSchema,
 	"template/candidate.validation.requested":
