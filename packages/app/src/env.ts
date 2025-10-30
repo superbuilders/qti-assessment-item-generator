@@ -1,8 +1,10 @@
+import * as logger from "@superbuilders/slog"
 import { createEnv } from "@t3-oss/env-core"
 import * as dotenv from "dotenv"
 import { z } from "zod"
 
 dotenv.config({ path: ".env.local" })
+logger.setDefaultLogLevel(logger.DEBUG)
 
 export const env = createEnv({
 	server: {

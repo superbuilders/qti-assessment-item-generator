@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto"
 import * as errors from "@superbuilders/errors"
 import { eq } from "drizzle-orm"
-import type { Logger } from "inngest"
+import { type Logger, NonRetriableError } from "inngest"
 import { parseStructuredInput } from "@/templates/input"
 import { allWidgetSchemas } from "@/widgets/registry"
 import { db } from "../../../db/client"
@@ -31,13 +31,14 @@ function validateAllowedWidgets({
 		(widget) => !KNOWN_WIDGET_NAMES.has(widget)
 	)
 	if (unknownWidgets.length > 0) {
+		const message = `template ${templateId} references unknown widgets: ${unknownWidgets.join(", ")}`
+		const nonRetriableError = new NonRetriableError(message)
 		logger.error("template scaffold rejected unknown widgets", {
 			templateId,
-			unknownWidgets
+			unknownWidgets,
+			error: nonRetriableError
 		})
-		throw errors.new(
-			`template ${templateId} references unknown widgets: ${unknownWidgets.join(", ")}`
-		)
+		throw nonRetriableError
 	}
 }
 
@@ -51,16 +52,25 @@ async function performTemplateScaffold({
 	logger: Logger
 }): Promise<ScaffoldResult> {
 	const existingTemplate = await db
-		.select({ id: templates.id })
+		.select({
+			id: templates.id,
+			hash: templates.exampleAssessmentItemHash,
+			allowedWidgets: templates.allowedWidgets
+		})
 		.from(templates)
 		.where(eq(templates.id, templateId))
 		.limit(1)
 
 	if (existingTemplate.length > 0) {
-		logger.error("template scaffold attempted to overwrite existing template", {
-			templateId
+		const template = existingTemplate[0]
+		logger.info("template scaffold reused existing template", {
+			templateId,
+			allowedWidgetsCount: template.allowedWidgets.length
 		})
-		throw errors.new(`template ${templateId} already exists`)
+		return {
+			hash: template.hash,
+			allowedWidgets: template.allowedWidgets
+		}
 	}
 
 	const stringifiedBody = JSON.stringify(exampleAssessmentItemBody)
@@ -128,25 +138,41 @@ export const scaffoldTemplateFunction = inngest.createFunction(
 				})
 			)
 			if (failureEventResult.error) {
-				logger.error("template scaffold failure event emission failed", {
-					templateId,
-					reason,
-					error: failureEventResult.error
-				})
-				throw errors.wrap(
+				const wrappedFailureEventError = errors.wrap(
 					failureEventResult.error,
 					`template scaffold failure event ${templateId}`
 				)
+				logger.error("template scaffold failure event emission failed", {
+					templateId,
+					reason,
+					error: wrappedFailureEventError
+				})
+				throw wrappedFailureEventError
 			}
 
-			logger.error("template scaffold aborting after failure event", {
-				templateId,
-				reason
-			})
-			throw errors.wrap(
+			const nonRetriable = errors.as(scaffoldResult.error, NonRetriableError)
+			if (nonRetriable) {
+				const wrappedNonRetriable = new NonRetriableError(
+					`scaffolding template ${templateId}: ${nonRetriable.message}`
+				)
+				logger.error("template scaffold aborting after failure event", {
+					templateId,
+					reason,
+					error: wrappedNonRetriable
+				})
+				throw wrappedNonRetriable
+			}
+
+			const wrappedError = errors.wrap(
 				scaffoldResult.error,
 				`scaffolding template ${templateId}`
 			)
+			logger.error("template scaffold aborting after failure event", {
+				templateId,
+				reason,
+				error: wrappedError
+			})
+			throw wrappedError
 		}
 
 		const completionEventResult = await errors.try(
