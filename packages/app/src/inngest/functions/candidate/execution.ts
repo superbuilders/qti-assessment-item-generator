@@ -1,4 +1,4 @@
-import { rmSync } from "node:fs"
+import { existsSync, rmSync } from "node:fs"
 import { mkdtemp, writeFile } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import * as path from "node:path"
@@ -37,6 +37,18 @@ type ModuleWithDefault = { default: unknown }
 type WidgetContainer = { widgets?: unknown }
 type FeedbackContainer = { feedbackPlan: unknown }
 
+const ALIAS_ROOT = path.resolve(process.cwd(), "../lib/src")
+const ALIAS_EXTENSIONS = [
+	"",
+	".ts",
+	".tsx",
+	".mts",
+	".cts",
+	".js",
+	".mjs",
+	".cjs"
+]
+
 function isPlainRecord(value: unknown): value is Record<string, unknown> {
 	return typeof value === "object" && value !== null && !Array.isArray(value)
 }
@@ -64,6 +76,42 @@ function hasTypeProperty(
 	value: Record<string, unknown>
 ): value is Record<string, unknown> & { type: unknown } {
 	return Object.hasOwn(value, "type")
+}
+
+function resolveAliasSpecifier(specifier: string): string {
+	const cleanSpecifier = specifier.replace(/^\//, "")
+	for (const ext of ALIAS_EXTENSIONS) {
+		const candidate = path.join(ALIAS_ROOT, `${cleanSpecifier}${ext}`)
+		if (existsSync(candidate)) {
+			return pathToFileURL(candidate).href
+		}
+	}
+	const indexCandidate = path.join(ALIAS_ROOT, cleanSpecifier, "index.ts")
+	if (existsSync(indexCandidate)) {
+		return pathToFileURL(indexCandidate).href
+	}
+	return pathToFileURL(path.join(ALIAS_ROOT, cleanSpecifier)).href
+}
+
+function rewriteAliasImports(source: string): string {
+	const replaceSpecifier = (match: string, specifier: string) => {
+		const resolved = resolveAliasSpecifier(specifier)
+		return match.replace(`@/${specifier}`, resolved)
+	}
+
+	return source
+		.replace(/from\s+["']@\/([^"']+)["']/g, (full, spec) =>
+			replaceSpecifier(full, spec)
+		)
+		.replace(/import\s+["']@\/([^"']+)["']/g, (full, spec) =>
+			replaceSpecifier(full, spec)
+		)
+		.replace(/import\(\s*["']@\/([^"']+)["']\s*\)/g, (full, spec) =>
+			replaceSpecifier(full, spec)
+		)
+		.replace(/export\s+\*\s+from\s+["']@\/([^"']+)["']/g, (full, spec) =>
+			replaceSpecifier(full, spec)
+		)
 }
 
 async function fetchCandidateRecord(
@@ -337,8 +385,9 @@ export const executeTemplateCandidate = inngest.createFunction(
 			}
 		})
 
+		const transformedSource = rewriteAliasImports(candidateRecord.source)
 		const writeResult = await errors.try(
-			writeFile(tempFilePath, candidateRecord.source, "utf8")
+			writeFile(tempFilePath, transformedSource, "utf8")
 		)
 		if (writeResult.error) {
 			return fail(writeResult.error.toString())
