@@ -14,7 +14,6 @@
 		"typecheck": "tsc --noEmit -p tsconfig.build.json",
 		"lint": "biome lint",
 		"format": "biome format --write",
-		"generate:template": "bun src/templates/cli.ts",
 		"prepublishOnly": "bun run build"
 	},
 	"keywords": [

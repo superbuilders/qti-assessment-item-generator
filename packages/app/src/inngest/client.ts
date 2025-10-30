@@ -3,17 +3,17 @@ import { EventSchemas, Inngest, type Logger } from "inngest"
 import { z } from "zod"
 import { env } from "../env"
 
-const authoredAssessmentItemUpsertRequestedSchema = z.object({
-	authoredItemId: z.uuid(),
-	structuredItem: z.json()
+const templateScaffoldRequestedSchema = z.object({
+	templateId: z.uuid(),
+	exampleAssessmentItemBody: z.json()
 })
 
-const authoredAssessmentItemUpsertCompletedSchema = z.object({
-	authoredItemId: z.uuid()
+const templateScaffoldCompletedSchema = z.object({
+	templateId: z.uuid()
 })
 
-const authoredAssessmentItemUpsertFailedSchema = z.object({
-	authoredItemId: z.uuid(),
+const templateScaffoldFailedSchema = z.object({
+	templateId: z.uuid(),
 	reason: z.string().min(1)
 })
 
@@ -22,8 +22,19 @@ const helloWorldSchema = z.object({
 })
 
 const templateGenerationRequestedSchema = z.object({
+	templateId: z.uuid()
+})
+
+const templateCandidateGenerationRequestedSchema = z.object({
+	candidateId: z.uuid(),
 	templateId: z.uuid(),
-	authoredItemId: z.uuid()
+	iteration: z.number().int().min(1)
+})
+
+const templateCandidateValidationRequestedSchema = z.object({
+	candidateId: z.uuid(),
+	templateId: z.uuid(),
+	iteration: z.number().int().min(1)
 })
 
 const templateGenerationCompletedSchema = z.object({
@@ -54,18 +65,16 @@ const questionBatchFailedSchema = z.object({
 })
 
 const schema = {
-	"template/authored.assessment.item.upsert.requested":
-		authoredAssessmentItemUpsertRequestedSchema,
-	"template/authored.assessment.item.upsert.completed":
-		authoredAssessmentItemUpsertCompletedSchema,
-	"template/authored.assessment.item.upsert.failed":
-		authoredAssessmentItemUpsertFailedSchema,
-	"template/template.generation.requested":
-		templateGenerationRequestedSchema,
-	"template/template.generation.completed":
-		templateGenerationCompletedSchema,
-	"template/template.generation.failed":
-		templateGenerationFailedSchema,
+	"template/template.scaffold.requested": templateScaffoldRequestedSchema,
+	"template/template.scaffold.completed": templateScaffoldCompletedSchema,
+	"template/template.scaffold.failed": templateScaffoldFailedSchema,
+	"template/template.generation.requested": templateGenerationRequestedSchema,
+	"template/template.generation.completed": templateGenerationCompletedSchema,
+	"template/template.generation.failed": templateGenerationFailedSchema,
+	"template/candidate.generation.requested":
+		templateCandidateGenerationRequestedSchema,
+	"template/candidate.validation.requested":
+		templateCandidateValidationRequestedSchema,
 	"template/question.batch.requested": questionBatchRequestedSchema,
 	"template/question.batch.completed": questionBatchCompletedSchema,
 	"template/question.batch.failed": questionBatchFailedSchema,

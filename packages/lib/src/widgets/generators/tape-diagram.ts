@@ -485,7 +485,6 @@ export const generateTapeDiagram: WidgetGenerator<
 			stroke: theme.colors.black,
 			strokeWidth: theme.stroke.width.base
 		})
-		
 
 		let gridInterval = 1
 		if (tape.unitsTotal > 20) {
@@ -506,7 +505,7 @@ export const generateTapeDiagram: WidgetGenerator<
 				gridInterval = Math.ceil(rawInterval / 100) * 100
 			}
 		}
-		
+
 		for (let i = gridInterval; i < tape.unitsTotal; i += gridInterval) {
 			const x = geom.leftX + i * geom.cellWidth
 			canvas.drawLine(x, geom.y, x, geom.y + tapeHeight, {

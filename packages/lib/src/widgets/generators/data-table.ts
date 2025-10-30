@@ -202,4 +202,3 @@ function escapeHtml(text: string): string {
 	}
 	return text.replace(/[&<>"']/g, (char) => map[char] ?? char)
 }
-

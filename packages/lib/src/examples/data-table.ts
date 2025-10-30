@@ -41,4 +41,3 @@ export const dataTableExamples: DataTableProps[] = [
 		rowHeaders: false
 	}
 ]
-

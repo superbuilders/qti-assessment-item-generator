@@ -12,7 +12,9 @@ import { teksMath4Collection } from "@/widgets/collections/teks-math-4"
 
 // Enable debug logging for this script
 logger.setDefaultLogLevel(logger.DEBUG)
-logger.info("staar single question generator started with debug logging enabled")
+logger.info(
+	"staar single question generator started with debug logging enabled"
+)
 
 // --- Configuration ---
 const ROOT_DIR = "teks-staar-scrape/staar_test_scrape"
@@ -23,7 +25,9 @@ const OUTPUT_DIR_ARG = process.argv[3]
 
 if (!QUESTION_DIR_ARG) {
 	logger.error("question directory not provided")
-	throw errors.new("Question directory name must be provided as first argument (e.g., question_01)")
+	throw errors.new(
+		"Question directory name must be provided as first argument (e.g., question_01)"
+	)
 }
 
 if (!OUTPUT_DIR_ARG) {
@@ -346,4 +350,3 @@ if (result.error) {
 	logger.error("script failed to complete", { error: result.error })
 	process.exit(1)
 }
-

@@ -68,13 +68,10 @@ export const ProtractorAngleDiagramPropsSchema = z
 			)
 	})
 	.strict()
-	.refine(
-		(data) => data.startingReading + data.angleDegrees <= 180,
-		{
-			message:
-				"startingReading + angleDegrees must not exceed 180 degrees (end ray must stay within protractor range)"
-		}
-	)
+	.refine((data) => data.startingReading + data.angleDegrees <= 180, {
+		message:
+			"startingReading + angleDegrees must not exceed 180 degrees (end ray must stay within protractor range)"
+	})
 	.describe(
 		"creates a protractor diagram with two lines showing a specific angle measurement"
 	)
@@ -222,12 +219,12 @@ export const generateProtractorAngleDiagram: WidgetGenerator<
 		stroke: theme.colors.black,
 		strokeWidth: theme.stroke.width.thick
 	})
-if (!hideEndRay) {
-	canvas.drawLine(centerX, centerY, lineEndEndX, lineEndEndY, {
-		stroke: theme.colors.black,
-		strokeWidth: theme.stroke.width.thick
-	})
-}
+	if (!hideEndRay) {
+		canvas.drawLine(centerX, centerY, lineEndEndX, lineEndEndY, {
+			stroke: theme.colors.black,
+			strokeWidth: theme.stroke.width.thick
+		})
+	}
 
 	// do not render a numeric angle label; sizing is derived from the readings only
 
@@ -316,52 +313,52 @@ if (!hideEndRay) {
 		})
 	}
 
-// end point - arrow pointing in the direction of the end line (conditionally)
-if (!hideEndRay) {
-	const lineAngle = Math.atan2(endY - centerY, endX - centerX)
-	const endArrowTipX = endX
-	const endArrowTipY = endY
-	const endArrowBase1X =
-		endX -
-		arrowSize * Math.cos(lineAngle) -
-		(arrowSize / 2) * Math.sin(lineAngle)
-	const endArrowBase1Y =
-		endY -
-		arrowSize * Math.sin(lineAngle) +
-		(arrowSize / 2) * Math.cos(lineAngle)
-	const endArrowBase2X =
-		endX -
-		arrowSize * Math.cos(lineAngle) +
-		(arrowSize / 2) * Math.sin(lineAngle)
-	const endArrowBase2Y =
-		endY -
-		arrowSize * Math.sin(lineAngle) -
-		(arrowSize / 2) * Math.cos(lineAngle)
+	// end point - arrow pointing in the direction of the end line (conditionally)
+	if (!hideEndRay) {
+		const lineAngle = Math.atan2(endY - centerY, endX - centerX)
+		const endArrowTipX = endX
+		const endArrowTipY = endY
+		const endArrowBase1X =
+			endX -
+			arrowSize * Math.cos(lineAngle) -
+			(arrowSize / 2) * Math.sin(lineAngle)
+		const endArrowBase1Y =
+			endY -
+			arrowSize * Math.sin(lineAngle) +
+			(arrowSize / 2) * Math.cos(lineAngle)
+		const endArrowBase2X =
+			endX -
+			arrowSize * Math.cos(lineAngle) +
+			(arrowSize / 2) * Math.sin(lineAngle)
+		const endArrowBase2Y =
+			endY -
+			arrowSize * Math.sin(lineAngle) -
+			(arrowSize / 2) * Math.cos(lineAngle)
 
-	canvas.drawPolygon(
-		[
-			{ x: endArrowTipX, y: endArrowTipY },
-			{ x: endArrowBase1X, y: endArrowBase1Y },
-			{ x: endArrowBase2X, y: endArrowBase2Y }
-		],
-		{ fill: theme.colors.black }
-	)
+		canvas.drawPolygon(
+			[
+				{ x: endArrowTipX, y: endArrowTipY },
+				{ x: endArrowBase1X, y: endArrowBase1Y },
+				{ x: endArrowBase2X, y: endArrowBase2Y }
+			],
+			{ fill: theme.colors.black }
+		)
 
-	if (endPointLabel !== "") {
-		const endLabelOffset = 12
-		const endLabelAngle = endAngleRad + Math.PI / 2
-		const endLabelX = endX + endLabelOffset * Math.cos(endLabelAngle)
-		const endLabelY = endY - endLabelOffset * Math.sin(endLabelAngle)
-		canvas.drawText({
-			x: endLabelX,
-			y: endLabelY,
-			text: endPointLabel,
-			fill: theme.colors.text,
-			fontPx: theme.font.size.large,
-			fontWeight: theme.font.weight.bold
-		})
+		if (endPointLabel !== "") {
+			const endLabelOffset = 12
+			const endLabelAngle = endAngleRad + Math.PI / 2
+			const endLabelX = endX + endLabelOffset * Math.cos(endLabelAngle)
+			const endLabelY = endY - endLabelOffset * Math.sin(endLabelAngle)
+			canvas.drawText({
+				x: endLabelX,
+				y: endLabelY,
+				text: endPointLabel,
+				fill: theme.colors.text,
+				fontPx: theme.font.size.large,
+				fontWeight: theme.font.weight.bold
+			})
+		}
 	}
-}
 
 	// get canvas content
 	const {

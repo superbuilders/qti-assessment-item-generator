@@ -19,4 +19,3 @@ describe("Widget: stem-leaf-plot", () => {
 		})
 	})
 })
-

@@ -12,7 +12,6 @@
 		"typecheck": "bun run --cwd packages/lib typecheck && bun run --cwd packages/app typecheck",
 		"dev": "bun run --cwd packages/app dev",
 		"dev:inngest": "bun run --cwd packages/app dev:inngest",
-		"generate:template": "bun run --cwd packages/lib generate:template",
 		"lint": "bun run --cwd packages/lib lint && bun run --cwd packages/app lint",
 		"format": "bun run --cwd packages/lib format",
 		"test": "bun test"

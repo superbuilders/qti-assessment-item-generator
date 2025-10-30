@@ -97,9 +97,7 @@ describe("compileResponseProcessing / numerics", () => {
 		)
 	})
 
-	test(
-		"keeps enumerated combo conditions using <qti-match> while scoring numerics with <qti-equal-rounded>",
-		() => {
+	test("keeps enumerated combo conditions using <qti-match> while scoring numerics with <qti-equal-rounded>", () => {
 		const item = createBaseItem({
 			responseDeclarations: [
 				{

@@ -107,7 +107,7 @@ export const generateStemLeafPlot: WidgetGenerator<
 
 	// Container div for the plot
 	parts.push(
-		'<div style="display: inline-block; font-family: \'Courier New\', monospace; border: 2px solid #374151; border-radius: 8px; padding: 16px; background-color: #F9FAFB; margin: 12px 0;">'
+		"<div style=\"display: inline-block; font-family: 'Courier New', monospace; border: 2px solid #374151; border-radius: 8px; padding: 16px; background-color: #F9FAFB; margin: 12px 0;\">"
 	)
 
 	// Header row with column labels
@@ -176,4 +176,3 @@ function escapeHtml(text: string): string {
 	}
 	return text.replace(/[&<>"']/g, (char) => map[char] ?? char)
 }
-

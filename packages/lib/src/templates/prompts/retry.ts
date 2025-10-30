@@ -5,6 +5,7 @@ import {
 } from "@/templates/prompts/sections/examples"
 import { FEEDBACK_GUIDANCE_SECTION } from "@/templates/prompts/sections/feedback-guidance"
 import { LITERAL_BANS_SECTION } from "@/templates/prompts/sections/literal-bans"
+import { NON_NULL_BANS_SECTION } from "@/templates/prompts/sections/non-null-bans"
 import { createSourceContextSection } from "@/templates/prompts/sections/qti-source"
 import { createRetryDiagnosticsSection } from "@/templates/prompts/sections/retry-hints"
 import { SEED_GUIDANCE_SECTION } from "@/templates/prompts/sections/seed-guidance"
@@ -12,9 +13,8 @@ import { createSeedHelpersSection } from "@/templates/prompts/sections/seed-help
 import { SYSTEM_INSTRUCTIONS_SECTION } from "@/templates/prompts/sections/system-instructions"
 import { createTemplateContract } from "@/templates/prompts/sections/template-contract"
 import { TEMPLATE_PHILOSOPHY_SECTION } from "@/templates/prompts/sections/template-philosophy"
-import { createWidgetGuidance } from "@/templates/prompts/sections/widget-guidance"
-import { NON_NULL_BANS_SECTION } from "@/templates/prompts/sections/non-null-bans"
 import { TYPE_ASSERTION_BANS_SECTION } from "@/templates/prompts/sections/type-assertion-bans"
+import { createWidgetGuidance } from "@/templates/prompts/sections/widget-guidance"
 import {
 	BASE_SYSTEM_PROMPT,
 	type PromptArtifacts

@@ -32,7 +32,10 @@ function buildCorrectComparison<E extends readonly string[]>(
 	if (decl.cardinality === "single") {
 		if (decl.baseType === "float") {
 			const { rounding } = decl
-			const roundingMode = rounding.strategy === "decimalPlaces" ? "decimalPlaces" : "significantFigures"
+			const roundingMode =
+				rounding.strategy === "decimalPlaces"
+					? "decimalPlaces"
+					: "significantFigures"
 			const figures = String(rounding.figures)
 			return `<qti-equal-rounded rounding-mode="${escapeXmlAttribute(roundingMode)}" figures="${escapeXmlAttribute(figures)}">
                 <qti-variable identifier="${escapedId}"/>

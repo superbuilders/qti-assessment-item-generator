@@ -22,39 +22,21 @@ import {
  */
 export const generatorSchema = pgSchema("template")
 
-export const authoredAssessmentItems = generatorSchema.table(
-	"authored_assessment_items",
-	{
-		id: uuid("id").primaryKey().defaultRandom(),
-		hash: text("hash").notNull(),
-		body: jsonb("body").notNull(),
-		createdAt: timestamp("created_at", { withTimezone: true })
-			.notNull()
-			.defaultNow()
-	},
-	(table) => [
-		uniqueIndex("authored_assessment_items_hash_idx").on(table.hash),
-		uniqueIndex("authored_assessment_items_body_idx").on(table.body)
-	]
-)
-
 export const templates = generatorSchema.table(
 	"templates",
 	{
 		id: uuid("id").primaryKey().defaultRandom(),
-		sourceItemId: uuid("source_item_id").notNull(),
 		allowedWidgets: text("allowed_widgets").array().notNull(),
+		exampleAssessmentItemHash: text("example_assessment_item_hash").notNull(),
+		exampleAssessmentItemBody: jsonb("example_assessment_item_body").notNull(),
 		createdAt: timestamp("created_at", { withTimezone: true })
 			.notNull()
 			.defaultNow()
 	},
 	(table) => [
-		uniqueIndex("templates_source_item_idx").on(table.sourceItemId),
-		foreignKey({
-			name: "templates_source_item_fk",
-			columns: [table.sourceItemId],
-			foreignColumns: [authoredAssessmentItems.id]
-		})
+		uniqueIndex("templates_example_assessment_item_hash_idx").on(
+			table.exampleAssessmentItemHash
+		)
 	]
 )
 
@@ -153,8 +135,6 @@ export const candidateDiagnostics = generatorSchema.table(
 	]
 )
 
-export type AuthoredAssessmentItemRecord =
-	typeof authoredAssessmentItems.$inferSelect
 export type GeneratedAssessmentItemRecord =
 	typeof generatedAssessmentItems.$inferSelect
 export type TemplateRecord = typeof templates.$inferSelect

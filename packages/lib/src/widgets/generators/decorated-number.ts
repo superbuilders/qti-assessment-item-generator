@@ -8,7 +8,14 @@ import { theme } from "@/widgets/utils/theme"
  */
 const DigitDecorationSchema = z.object({
 	placeValue: z
-		.enum(["ones", "tens", "hundreds", "thousands", "tenThousands", "hundredThousands"])
+		.enum([
+			"ones",
+			"tens",
+			"hundreds",
+			"thousands",
+			"tenThousands",
+			"hundredThousands"
+		])
 		.describe("The place value of the digit to decorate"),
 	decoration: z
 		.enum(["circle", "underline", "both"])
@@ -122,4 +129,3 @@ ${svgContent}
 
 	return svg
 }
-
