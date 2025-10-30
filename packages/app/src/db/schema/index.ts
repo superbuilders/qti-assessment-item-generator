@@ -105,6 +105,7 @@ export const candidateDiagnostics = generatorSchema.table(
 	{
 		id: uuid("id").primaryKey().defaultRandom(),
 		candidateId: uuid("candidate_id").notNull(),
+		iteration: integer("iteration").notNull(),
 		message: text("message").notNull(),
 		line: integer("line").notNull(),
 		column: integer("column").notNull(),
@@ -115,6 +116,10 @@ export const candidateDiagnostics = generatorSchema.table(
 	},
 	(table) => [
 		index("template_candidate_diagnostics_candidate_idx").on(table.candidateId),
+		index("template_candidate_diagnostics_candidate_iteration_idx").on(
+			table.candidateId,
+			table.iteration
+		),
 		foreignKey({
 			name: "template_candidate_diagnostics_candidate_fk",
 			columns: [table.candidateId],

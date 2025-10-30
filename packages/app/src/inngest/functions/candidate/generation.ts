@@ -1,5 +1,5 @@
 import * as errors from "@superbuilders/errors"
-import { eq } from "drizzle-orm"
+import { and, desc, eq } from "drizzle-orm"
 import type { Logger } from "inngest"
 import { createAi, TEMPLATE_GENERATION_MODEL } from "@/templates/ai"
 import { runGenerationAttempt } from "@/templates/generation"
@@ -62,15 +62,32 @@ async function performCandidateGeneration({
 		JSON.stringify(contextRecord.templateExampleBody)
 	)
 
-	const diagnostics = await db
-		.select({
-			message: candidateDiagnostics.message,
-			line: candidateDiagnostics.line,
-			column: candidateDiagnostics.column,
-			tsCode: candidateDiagnostics.tsCode
-		})
+	const latestDiagnosticIteration = await db
+		.select({ iteration: candidateDiagnostics.iteration })
 		.from(candidateDiagnostics)
 		.where(eq(candidateDiagnostics.candidateId, candidateId))
+		.orderBy(desc(candidateDiagnostics.iteration))
+		.limit(1)
+
+	const latestIteration = latestDiagnosticIteration[0]?.iteration ?? null
+
+	const diagnostics =
+		latestIteration === null
+			? []
+			: await db
+					.select({
+						message: candidateDiagnostics.message,
+						line: candidateDiagnostics.line,
+						column: candidateDiagnostics.column,
+						tsCode: candidateDiagnostics.tsCode
+					})
+					.from(candidateDiagnostics)
+					.where(
+						and(
+							eq(candidateDiagnostics.candidateId, candidateId),
+							eq(candidateDiagnostics.iteration, latestIteration)
+						)
+					)
 
 	const sourceContext = structuredInput.sourceContext
 	const allowedWidgets = contextRecord.templateAllowedWidgets

@@ -29,16 +29,32 @@ async function performTemplateGenerationStart({
 		throw errors.new(`template not found: ${templateId}`)
 	}
 
-	const latestCandidate = await db
+	const latestCandidateResult = await db
 		.select({
-			version: templateCandidates.version
+			id: templateCandidates.id,
+			version: templateCandidates.version,
+			source: templateCandidates.source
 		})
 		.from(templateCandidates)
 		.where(eq(templateCandidates.templateId, templateId))
 		.orderBy(desc(templateCandidates.version))
 		.limit(1)
 
-	const nextVersion = (latestCandidate[0]?.version ?? 0) + 1
+	const latestCandidate = latestCandidateResult[0]
+
+	if (latestCandidate && latestCandidate.source.trim().length === 0) {
+		logger.info("reusing pending template candidate", {
+			templateId,
+			candidateId: latestCandidate.id,
+			version: latestCandidate.version
+		})
+		return {
+			candidateId: latestCandidate.id,
+			version: latestCandidate.version
+		}
+	}
+
+	const nextVersion = (latestCandidate?.version ?? 0) + 1
 
 	const insertResult = await errors.try(
 		db
@@ -125,14 +141,28 @@ export const startTemplateGeneration = inngest.createFunction(
 			version: setupResult.data.version
 		})
 
-		await step.sendEvent("request-candidate-generation", {
-			name: "template/candidate.generation.requested",
-			data: {
-				candidateId: setupResult.data.candidateId,
+		const requestGenerationEventResult = await errors.try(
+			step.sendEvent("request-candidate-generation", {
+				name: "template/candidate.generation.requested",
+				data: {
+					candidateId: setupResult.data.candidateId,
+					templateId,
+					iteration: 1
+				}
+			})
+		)
+		if (requestGenerationEventResult.error) {
+			logger.error("template generation request event emission failed", {
 				templateId,
-				iteration: 1
-			}
-		})
+				candidateId: setupResult.data.candidateId,
+				version: setupResult.data.version,
+				error: requestGenerationEventResult.error
+			})
+			throw errors.wrap(
+				requestGenerationEventResult.error,
+				`template generation request event ${templateId}`
+			)
+		}
 
 		return {
 			status: "workflow-started" as const,
