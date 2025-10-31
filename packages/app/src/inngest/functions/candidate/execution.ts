@@ -1,4 +1,4 @@
-import { rmSync } from "node:fs"
+import { existsSync, rmSync } from "node:fs"
 import { mkdtemp, writeFile } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import * as path from "node:path"
@@ -21,6 +21,28 @@ type CandidateRecord = {
 }
 
 type ModuleWithDefault = { default: unknown }
+
+const ALIAS_EXTENSIONS = [
+	"",
+	".ts",
+	".tsx",
+	".mts",
+	".cts",
+	".js",
+	".mjs",
+	".cjs",
+	".json"
+]
+const ALIAS_IMPORT_REGEX = /(['"`])@\/([^'"`]+)\1/g
+const RAW_ALIAS_TARGETS = [
+	path.resolve(process.cwd(), "../lib/src"),
+	path.resolve(process.cwd(), "packages/lib/src"),
+	path.resolve(process.cwd(), "../../packages/lib/src")
+]
+const SLASH_ALIAS_TARGETS = RAW_ALIAS_TARGETS.filter(
+	(candidate, index, array) =>
+		existsSync(candidate) && array.indexOf(candidate) === index
+)
 
 function hasDefaultExport(value: unknown): value is ModuleWithDefault {
 	return typeof value === "object" && value !== null && "default" in value
@@ -248,8 +270,23 @@ export const executeTemplateCandidate = inngest.createFunction(
 			}
 		})
 
+		const transformedSourceResult = errors.trySync(() =>
+			rewriteAliasImports(logger, templateCandidateId, candidateRecord.source)
+		)
+		if (transformedSourceResult.error) {
+			logger.error("candidate alias rewrite failed", {
+				templateCandidateId,
+				error: transformedSourceResult.error,
+				stack:
+					transformedSourceResult.error instanceof Error
+						? transformedSourceResult.error.stack
+						: null
+			})
+			return fail(transformedSourceResult.error.toString())
+		}
+
 		const writeResult = await errors.try(
-			writeFile(tempFilePath, candidateRecord.source, "utf8")
+			writeFile(tempFilePath, transformedSourceResult.data, "utf8")
 		)
 		if (writeResult.error) {
 			return fail(writeResult.error.toString())
@@ -375,3 +412,80 @@ export const executeTemplateCandidate = inngest.createFunction(
 		return { status: "execution-succeeded" as const, executionId }
 	}
 )
+
+function resolveAliasSpecifier(
+	logger: Logger,
+	templateCandidateId: string,
+	specifier: string
+): string {
+	if (SLASH_ALIAS_TARGETS.length === 0) {
+		logger.error("no alias targets available for '@/'' resolution", {
+			templateCandidateId,
+			specifier
+		})
+		throw errors.new("path alias '@/…' is not configured")
+	}
+
+	const cleanSpecifier = specifier.replace(/^\//, "")
+	const attempts: string[] = []
+
+	for (const baseDir of SLASH_ALIAS_TARGETS) {
+		const baseCandidate = path.join(baseDir, cleanSpecifier)
+		for (const extension of ALIAS_EXTENSIONS) {
+			const candidatePath =
+				extension.length > 0 ? `${baseCandidate}${extension}` : baseCandidate
+			attempts.push(candidatePath)
+			if (existsSync(candidatePath)) {
+				return pathToFileURL(candidatePath).href
+			}
+		}
+
+		for (const extension of ALIAS_EXTENSIONS) {
+			const indexCandidate = path.join(
+				baseDir,
+				cleanSpecifier,
+				`index${extension}`
+			)
+			attempts.push(indexCandidate)
+			if (existsSync(indexCandidate)) {
+				return pathToFileURL(indexCandidate).href
+			}
+		}
+	}
+
+	logger.error("failed to resolve alias import", {
+		templateCandidateId,
+		specifier,
+		attempts
+	})
+	throw errors.new(`unable to resolve alias import @/${cleanSpecifier}`)
+}
+
+function rewriteAliasImports(
+	logger: Logger,
+	templateCandidateId: string,
+	source: string
+): string {
+	let rewriteCount = 0
+	const transformed = source.replace(
+		ALIAS_IMPORT_REGEX,
+		(_match, quote: string, specifier: string) => {
+			rewriteCount += 1
+			const resolved = resolveAliasSpecifier(
+				logger,
+				templateCandidateId,
+				specifier
+			)
+			return `${quote}${resolved}${quote}`
+		}
+	)
+
+	if (rewriteCount > 0) {
+		logger.debug("candidate alias imports rewritten", {
+			templateCandidateId,
+			rewriteCount
+		})
+	}
+
+	return transformed
+}
