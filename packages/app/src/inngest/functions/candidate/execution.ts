@@ -1,4 +1,4 @@
-import { existsSync, rmSync } from "node:fs"
+import { rmSync } from "node:fs"
 import { mkdtemp, writeFile } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import * as path from "node:path"
@@ -22,93 +22,8 @@ type CandidateRecord = {
 
 type ModuleWithDefault = { default: unknown }
 
-const ALIAS_ROOT = path.resolve(process.cwd(), "../lib/src")
-const ALIAS_EXTENSIONS = [
-	"",
-	".ts",
-	".tsx",
-	".mts",
-	".cts",
-	".js",
-	".mjs",
-	".cjs"
-]
-
 function hasDefaultExport(value: unknown): value is ModuleWithDefault {
 	return typeof value === "object" && value !== null && "default" in value
-}
-
-function resolveAliasSpecifier(
-	logger: Logger,
-	templateCandidateId: string,
-	specifier: string
-): string {
-	const cleanSpecifier = specifier.replace(/^\//, "")
-	const attempts: string[] = []
-	const pushAttempt = (candidate: string) => {
-		attempts.push(candidate)
-		return candidate
-	}
-
-	for (const ext of ALIAS_EXTENSIONS) {
-		const candidate = pushAttempt(
-			path.join(ALIAS_ROOT, `${cleanSpecifier}${ext}`)
-		)
-		if (existsSync(candidate)) {
-			logger.debug("resolved alias import", {
-				templateCandidateId,
-				specifier,
-				resolvedPath: candidate
-			})
-			return pathToFileURL(candidate).href
-		}
-	}
-	const indexCandidate = pushAttempt(
-		path.join(ALIAS_ROOT, cleanSpecifier, "index.ts")
-	)
-	if (existsSync(indexCandidate)) {
-		logger.debug("resolved alias import (index.ts)", {
-			templateCandidateId,
-			specifier,
-			resolvedPath: indexCandidate
-		})
-		return pathToFileURL(indexCandidate).href
-	}
-	logger.warn("alias import could not be resolved; falling back", {
-		templateCandidateId,
-		specifier,
-		attempts
-	})
-	return pathToFileURL(path.join(ALIAS_ROOT, cleanSpecifier)).href
-}
-
-function rewriteAliasImports(
-	logger: Logger,
-	templateCandidateId: string,
-	source: string
-): string {
-	const replaceSpecifier = (match: string, specifier: string) => {
-		const resolved = resolveAliasSpecifier(
-			logger,
-			templateCandidateId,
-			specifier
-		)
-		return match.replace(`@/${specifier}`, resolved)
-	}
-
-	return source
-		.replace(/from\s+["']@\/([^"']+)["']/g, (full, spec) =>
-			replaceSpecifier(full, spec)
-		)
-		.replace(/import\s+["']@\/([^"']+)["']/g, (full, spec) =>
-			replaceSpecifier(full, spec)
-		)
-		.replace(/import\(\s*["']@\/([^"']+)["']\s*\)/g, (full, spec) =>
-			replaceSpecifier(full, spec)
-		)
-		.replace(/export\s+\*\s+from\s+["']@\/([^"']+)["']/g, (full, spec) =>
-			replaceSpecifier(full, spec)
-		)
 }
 
 async function fetchCandidateRecord(
@@ -333,22 +248,8 @@ export const executeTemplateCandidate = inngest.createFunction(
 			}
 		})
 
-		const transformedSource = rewriteAliasImports(
-			logger,
-			templateCandidateId,
-			candidateRecord.source
-		)
-		const aliasOccurrences = (candidateRecord.source.match(/@\/\S+/g) ?? [])
-			.length
-		const aliasRemaining = (transformedSource.match(/@\/\S+/g) ?? []).length
-		logger.debug("candidate source alias rewrite summary", {
-			templateCandidateId,
-			aliasOccurrences,
-			aliasRemaining,
-			transformedLength: transformedSource.length
-		})
 		const writeResult = await errors.try(
-			writeFile(tempFilePath, transformedSource, "utf8")
+			writeFile(tempFilePath, candidateRecord.source, "utf8")
 		)
 		if (writeResult.error) {
 			return fail(writeResult.error.toString())
