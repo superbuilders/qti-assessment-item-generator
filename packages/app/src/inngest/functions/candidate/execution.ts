@@ -338,7 +338,7 @@ export const executeTemplateCandidate = inngest.createFunction(
 		}
 		const parsedSeed = parsedSeedResult.data
 		const normalizedSeed = parsedSeedResult.data
-		if (normalizedSeed < 0n) {
+		if (normalizedSeed < BigInt(0)) {
 			return fail("seed must be non-negative")
 		}
 
