@@ -16,7 +16,7 @@
 		"noUnusedParameters": true,
 		"baseUrl": ".",
 		"paths": {
-			"@/*": ["packages/lib/src/*"]
+			"@/*": ["src/*"]
 		},
 		"resolvePackageJsonImports": true,
 		"resolvePackageJsonExports": true,
@@ -25,5 +25,5 @@
 		"noEmit": true
 	},
 	"include": ["src", "scripts", "drizzle.config.ts", "vercel.json"],
-	"exclude": ["node_modules", "packages/lib/dist"]
+	"exclude": ["node_modules"]
 }

@@ -34,11 +34,7 @@ const ALIAS_EXTENSIONS = [
 	".json"
 ]
 const ALIAS_IMPORT_REGEX = /(['"`])@\/([^'"`]+)\1/g
-const RAW_ALIAS_TARGETS = [
-	path.resolve(process.cwd(), "../lib/src"),
-	path.resolve(process.cwd(), "packages/lib/src"),
-	path.resolve(process.cwd(), "../../packages/lib/src")
-]
+const RAW_ALIAS_TARGETS = [path.resolve(process.cwd(), "src")]
 const SLASH_ALIAS_TARGETS = RAW_ALIAS_TARGETS.filter(
 	(candidate, index, array) =>
 		existsSync(candidate) && array.indexOf(candidate) === index
