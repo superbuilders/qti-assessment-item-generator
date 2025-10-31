@@ -78,24 +78,61 @@ function hasTypeProperty(
 	return Object.hasOwn(value, "type")
 }
 
-function resolveAliasSpecifier(specifier: string): string {
+function resolveAliasSpecifier(
+	logger: Logger,
+	templateCandidateId: string,
+	specifier: string
+): string {
 	const cleanSpecifier = specifier.replace(/^\//, "")
+	const attempts: string[] = []
+	const pushAttempt = (candidate: string) => {
+		attempts.push(candidate)
+		return candidate
+	}
+
 	for (const ext of ALIAS_EXTENSIONS) {
-		const candidate = path.join(ALIAS_ROOT, `${cleanSpecifier}${ext}`)
+		const candidate = pushAttempt(
+			path.join(ALIAS_ROOT, `${cleanSpecifier}${ext}`)
+		)
 		if (existsSync(candidate)) {
+			logger.debug("resolved alias import", {
+				templateCandidateId,
+				specifier,
+				resolvedPath: candidate
+			})
 			return pathToFileURL(candidate).href
 		}
 	}
-	const indexCandidate = path.join(ALIAS_ROOT, cleanSpecifier, "index.ts")
+	const indexCandidate = pushAttempt(
+		path.join(ALIAS_ROOT, cleanSpecifier, "index.ts")
+	)
 	if (existsSync(indexCandidate)) {
+		logger.debug("resolved alias import (index.ts)", {
+			templateCandidateId,
+			specifier,
+			resolvedPath: indexCandidate
+		})
 		return pathToFileURL(indexCandidate).href
 	}
+	logger.warn("alias import could not be resolved; falling back", {
+		templateCandidateId,
+		specifier,
+		attempts
+	})
 	return pathToFileURL(path.join(ALIAS_ROOT, cleanSpecifier)).href
 }
 
-function rewriteAliasImports(source: string): string {
+function rewriteAliasImports(
+	logger: Logger,
+	templateCandidateId: string,
+	source: string
+): string {
 	const replaceSpecifier = (match: string, specifier: string) => {
-		const resolved = resolveAliasSpecifier(specifier)
+		const resolved = resolveAliasSpecifier(
+			logger,
+			templateCandidateId,
+			specifier
+		)
 		return match.replace(`@/${specifier}`, resolved)
 	}
 
@@ -310,6 +347,14 @@ export const executeTemplateCandidate = inngest.createFunction(
 			return fail("template candidate not found")
 		}
 
+		logger.debug("fetched template candidate record", {
+			templateCandidateId,
+			templateId: candidateRecord.templateId,
+			allowedWidgetCount: candidateRecord.allowedWidgets.length,
+			sourceLength: candidateRecord.source.length,
+			validatedAt: candidateRecord.validatedAt?.toISOString() ?? null
+		})
+
 		if (!candidateRecord.validatedAt) {
 			return fail("template candidate has not been validated")
 		}
@@ -368,6 +413,11 @@ export const executeTemplateCandidate = inngest.createFunction(
 
 		const tempDir = tempDirResult.data
 		const tempFilePath = path.join(tempDir, "candidate.ts")
+		logger.debug("created candidate execution temp dir", {
+			templateCandidateId,
+			tempDir,
+			tempFilePath
+		})
 		cleanupStack.defer(() => {
 			const removalResult = errors.trySync(() =>
 				rmSync(tempDir, { recursive: true, force: true })
@@ -385,7 +435,20 @@ export const executeTemplateCandidate = inngest.createFunction(
 			}
 		})
 
-		const transformedSource = rewriteAliasImports(candidateRecord.source)
+		const transformedSource = rewriteAliasImports(
+			logger,
+			templateCandidateId,
+			candidateRecord.source
+		)
+		const aliasOccurrences = (candidateRecord.source.match(/@\/\S+/g) ?? [])
+			.length
+		const aliasRemaining = (transformedSource.match(/@\/\S+/g) ?? []).length
+		logger.debug("candidate source alias rewrite summary", {
+			templateCandidateId,
+			aliasOccurrences,
+			aliasRemaining,
+			transformedLength: transformedSource.length
+		})
 		const writeResult = await errors.try(
 			writeFile(tempFilePath, transformedSource, "utf8")
 		)
@@ -397,10 +460,24 @@ export const executeTemplateCandidate = inngest.createFunction(
 			import(pathToFileURL(tempFilePath).href)
 		)
 		if (importResult.error) {
+			logger.error("candidate module import failed", {
+				templateCandidateId,
+				tempFilePath,
+				error: importResult.error,
+				stack:
+					importResult.error instanceof Error ? importResult.error.stack : null
+			})
 			return fail(importResult.error.toString())
 		}
 
 		const moduleExports = importResult.data
+		logger.debug("candidate module imported", {
+			templateCandidateId,
+			exportKeys:
+				moduleExports && typeof moduleExports === "object"
+					? Object.keys(moduleExports)
+					: typeof moduleExports
+		})
 		let generatorCandidate: unknown = moduleExports
 		if (
 			typeof generatorCandidate !== "function" &&
@@ -417,6 +494,14 @@ export const executeTemplateCandidate = inngest.createFunction(
 			Promise.resolve().then(() => generator(parsedSeed))
 		)
 		if (generationResult.error) {
+			logger.error("candidate generator threw error", {
+				templateCandidateId,
+				error: generationResult.error,
+				stack:
+					generationResult.error instanceof Error
+						? generationResult.error.stack
+						: null
+			})
 			return fail(generationResult.error.toString())
 		}
 
@@ -457,6 +542,11 @@ export const executeTemplateCandidate = inngest.createFunction(
 		}
 
 		const { widgetSchemas, widgetMapping } = widgetResourcesResult.data
+		logger.debug("derived widget resources", {
+			templateCandidateId,
+			widgetSchemaCount: Object.keys(widgetSchemas).length,
+			widgetMappingCount: Object.keys(widgetMapping).length
+		})
 		const feedbackPlanResult = FeedbackPlanSchema.safeParse(
 			rawItem.feedbackPlan
 		)
@@ -494,6 +584,13 @@ export const executeTemplateCandidate = inngest.createFunction(
 		if (sanitizedResult.error) {
 			return fail(sanitizedResult.error.toString())
 		}
+		logger.debug("sanitized item", {
+			templateCandidateId,
+			bodyPresent: Boolean(sanitizedResult.data.body),
+			interactionCount: sanitizedResult.data.interactions
+				? Object.keys(sanitizedResult.data.interactions).length
+				: 0
+		})
 
 		const persistResult = await errors.try(
 			persistExecution(
