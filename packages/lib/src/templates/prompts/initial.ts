@@ -17,6 +17,9 @@ import { TYPE_ASSERTION_BANS_SECTION } from "@/templates/prompts/sections/type-a
 import {
 	createAssessmentItemTypesSection,
 	createContentTypesSection,
+	createFeedbackAuthoringTypesSection,
+	createFeedbackPlanSchemaSection,
+	createFeedbackPlanTypesSection,
 	createInteractionTypesSection
 } from "@/templates/prompts/sections/type-definitions"
 import { createWidgetGuidance } from "@/templates/prompts/sections/widget-guidance"
@@ -43,6 +46,9 @@ export function composeInitialPrompt(
 		createAssessmentItemTypesSection(),
 		createContentTypesSection(),
 		createInteractionTypesSection(),
+		createFeedbackPlanTypesSection(),
+		createFeedbackPlanSchemaSection(),
+		createFeedbackAuthoringTypesSection(),
 		IDENTIFIER_GUIDANCE_SECTION,
 		FEEDBACK_GUIDANCE_SECTION,
 		LITERAL_BANS_SECTION,
