@@ -420,6 +420,14 @@ export const executeTemplateCandidate = inngest.createFunction(
 			return fail(generationResult.error.toString())
 		}
 
+		if (typeof generationResult.data !== "string") {
+			logger.error("candidate generator returned non-string payload", {
+				templateCandidateId,
+				resultType: typeof generationResult.data
+			})
+			return fail("template candidate execution must resolve to a string")
+		}
+
 		const persistResult = await errors.try(
 			persistExecution(
 				templateCandidateId,
