@@ -1,13 +1,11 @@
 {
 	"name": "@superbuilders/qti-assessment-item-generator-app",
-	"private": true,
 	"type": "module",
 	"scripts": {
-		"build": "bun scripts/validate-env.ts && rm -rf dist && tsc -p tsconfig.build.json",
 		"typecheck": "tsc --noEmit -p tsconfig.build.json",
+		"lint": "biome lint",
 		"dev": "bun --watch src/index.ts",
 		"dev:inngest": "inngest-cli dev --queue-workers 4000 --poll-interval 2",
-		"lint": "biome lint",
 		"db:generate": "drizzle-kit generate",
 		"db:migrate": "drizzle-kit migrate",
 		"db:push": "drizzle-kit push",
@@ -24,7 +22,7 @@
 		"zod": "^4.1.12"
 	},
 	"devDependencies": {
-		"@types/node": "^24.9.2",
+		"@types/bun": "^1.3.1",
 		"dotenv": "^17.2.3",
 		"drizzle-kit": "^0.31.6",
 		"inngest-cli": "^1.12.1",
