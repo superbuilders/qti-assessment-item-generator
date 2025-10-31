@@ -6,16 +6,10 @@ import { pathToFileURL } from "node:url"
 import * as errors from "@superbuilders/errors"
 import { and, eq } from "drizzle-orm"
 import type { Logger } from "inngest"
-import type { ZodType } from "zod"
-import { FeedbackPlanSchema } from "@/core/feedback"
-import { createDynamicAssessmentItemSchema } from "@/core/item/schema"
-import { validateAndSanitizeHtmlFields } from "@/structured/validator"
-import { typedSchemas } from "@/widgets/registry"
 import { db } from "../../../db/client"
 import {
 	templateCandidateExecutions,
-	templateCandidates,
-	templates
+	templateCandidates
 } from "../../../db/schema"
 import { inngest } from "../../client"
 
@@ -24,18 +18,9 @@ type CandidateRecord = {
 	templateId: string
 	source: string
 	validatedAt: Date | null
-	allowedWidgets: readonly string[]
 }
 
-type WidgetResources = {
-	widgetSchemas: Record<string, ZodType>
-	widgetMapping: Record<string, string>
-}
-
-type WidgetRegistry = typeof typedSchemas
 type ModuleWithDefault = { default: unknown }
-type WidgetContainer = { widgets?: unknown }
-type FeedbackContainer = { feedbackPlan: unknown }
 
 const ALIAS_ROOT = path.resolve(process.cwd(), "../lib/src")
 const ALIAS_EXTENSIONS = [
@@ -49,33 +34,8 @@ const ALIAS_EXTENSIONS = [
 	".cjs"
 ]
 
-function isPlainRecord(value: unknown): value is Record<string, unknown> {
-	return typeof value === "object" && value !== null && !Array.isArray(value)
-}
-
-function hasWidgetSchema(
-	registry: WidgetRegistry,
-	widgetType: string
-): widgetType is keyof WidgetRegistry {
-	return Object.hasOwn(registry, widgetType)
-}
-
 function hasDefaultExport(value: unknown): value is ModuleWithDefault {
 	return typeof value === "object" && value !== null && "default" in value
-}
-
-function hasWidgets(value: unknown): value is WidgetContainer {
-	return typeof value === "object" && value !== null && "widgets" in value
-}
-
-function hasFeedbackPlan(value: unknown): value is FeedbackContainer {
-	return typeof value === "object" && value !== null && "feedbackPlan" in value
-}
-
-function hasTypeProperty(
-	value: Record<string, unknown>
-): value is Record<string, unknown> & { type: unknown } {
-	return Object.hasOwn(value, "type")
 }
 
 function resolveAliasSpecifier(
@@ -159,74 +119,13 @@ async function fetchCandidateRecord(
 			id: templateCandidates.id,
 			templateId: templateCandidates.templateId,
 			source: templateCandidates.source,
-			validatedAt: templateCandidates.validatedAt,
-			allowedWidgets: templates.allowedWidgets
+			validatedAt: templateCandidates.validatedAt
 		})
 		.from(templateCandidates)
-		.innerJoin(templates, eq(templates.id, templateCandidates.templateId))
 		.where(eq(templateCandidates.id, templateCandidateId))
 		.limit(1)
 
 	return rows[0] ?? null
-}
-
-function deriveWidgetResources(
-	logger: Logger,
-	allowedWidgets: readonly string[],
-	itemWidgets: Record<string, unknown> | null
-): WidgetResources {
-	const widgetSchemas: Record<string, ZodType> = {}
-	const widgetMapping: Record<string, string> = {}
-
-	for (const widgetType of allowedWidgets) {
-		if (!hasWidgetSchema(typedSchemas, widgetType)) {
-			logger.error("widget schema missing for allowed widget", { widgetType })
-			throw errors.new(`no widget schema available for ${widgetType}`)
-		}
-		const schema = typedSchemas[widgetType]
-		widgetSchemas[widgetType] = schema
-	}
-
-	if (!itemWidgets) {
-		return { widgetSchemas, widgetMapping }
-	}
-
-	const allowedSet = new Set(allowedWidgets)
-
-	for (const [widgetId, widgetCandidate] of Object.entries(itemWidgets)) {
-		if (!isPlainRecord(widgetCandidate)) {
-			logger.error("widget missing type during execution validation", {
-				widgetId
-			})
-			throw errors.new(`widget ${widgetId} missing type`)
-		}
-		if (!hasTypeProperty(widgetCandidate)) {
-			logger.error("widget missing type during execution validation", {
-				widgetId
-			})
-			throw errors.new(`widget ${widgetId} missing type`)
-		}
-		const widgetTypeValue = widgetCandidate.type
-		if (typeof widgetTypeValue !== "string") {
-			logger.error("widget missing type during execution validation", {
-				widgetId
-			})
-			throw errors.new(`widget ${widgetId} missing type`)
-		}
-		if (!allowedSet.has(widgetTypeValue)) {
-			logger.error("widget type not permitted for template", {
-				widgetId,
-				widgetType: widgetTypeValue,
-				allowedWidgets
-			})
-			throw errors.new(
-				`widget ${widgetId} uses type ${widgetTypeValue}, which is not allowed`
-			)
-		}
-		widgetMapping[widgetId] = widgetTypeValue
-	}
-
-	return { widgetSchemas, widgetMapping }
 }
 
 async function persistExecution(
@@ -350,7 +249,6 @@ export const executeTemplateCandidate = inngest.createFunction(
 		logger.debug("fetched template candidate record", {
 			templateCandidateId,
 			templateId: candidateRecord.templateId,
-			allowedWidgetCount: candidateRecord.allowedWidgets.length,
 			sourceLength: candidateRecord.source.length,
 			validatedAt: candidateRecord.validatedAt?.toISOString() ?? null
 		})
@@ -490,9 +388,26 @@ export const executeTemplateCandidate = inngest.createFunction(
 		}
 		const generator = generatorCandidate
 
-		const generationResult = await errors.try(
-			Promise.resolve().then(() => generator(parsedSeed))
-		)
+		const asyncResult = errors.trySync(() => generator(parsedSeed))
+		if (asyncResult.error) {
+			logger.error("candidate generator threw error", {
+				templateCandidateId,
+				error: asyncResult.error,
+				stack:
+					asyncResult.error instanceof Error ? asyncResult.error.stack : null
+			})
+			return fail(asyncResult.error.toString())
+		}
+
+		if (!(asyncResult.data instanceof Promise)) {
+			logger.error("candidate generator returned non-promise result", {
+				templateCandidateId,
+				resultType: typeof asyncResult.data
+			})
+			return fail("template candidate execution must return a Promise")
+		}
+
+		const generationResult = await errors.try(asyncResult.data)
 		if (generationResult.error) {
 			logger.error("candidate generator threw error", {
 				templateCandidateId,
@@ -505,98 +420,11 @@ export const executeTemplateCandidate = inngest.createFunction(
 			return fail(generationResult.error.toString())
 		}
 
-		const rawItem = generationResult.data
-		if (!isPlainRecord(rawItem)) {
-			return fail("template candidate execution returned invalid result")
-		}
-
-		if (!hasFeedbackPlan(rawItem)) {
-			return fail(
-				"template candidate execution result missing feedbackPlan property"
-			)
-		}
-
-		let widgetSource: Record<string, unknown> | null = null
-		if (hasWidgets(rawItem)) {
-			const candidateWidgets = rawItem.widgets
-			if (candidateWidgets === null || candidateWidgets === undefined) {
-				widgetSource = null
-			} else if (isPlainRecord(candidateWidgets)) {
-				widgetSource = candidateWidgets
-			} else {
-				return fail(
-					"template candidate execution widgets must be an object map"
-				)
-			}
-		}
-
-		const widgetResourcesResult = errors.trySync(() =>
-			deriveWidgetResources(
-				logger,
-				candidateRecord.allowedWidgets,
-				widgetSource
-			)
-		)
-		if (widgetResourcesResult.error) {
-			return fail(widgetResourcesResult.error.toString())
-		}
-
-		const { widgetSchemas, widgetMapping } = widgetResourcesResult.data
-		logger.debug("derived widget resources", {
-			templateCandidateId,
-			widgetSchemaCount: Object.keys(widgetSchemas).length,
-			widgetMappingCount: Object.keys(widgetMapping).length
-		})
-		const feedbackPlanResult = FeedbackPlanSchema.safeParse(
-			rawItem.feedbackPlan
-		)
-		if (!feedbackPlanResult.success) {
-			return fail(
-				"template candidate execution result has invalid feedbackPlan",
-				{ validationErrors: feedbackPlanResult.error.issues }
-			)
-		}
-		const feedbackPlan = feedbackPlanResult.data
-
-		const itemSchemaResult = errors.trySync(() =>
-			createDynamicAssessmentItemSchema(
-				widgetMapping,
-				candidateRecord.allowedWidgets,
-				widgetSchemas,
-				feedbackPlan
-			)
-		)
-		if (itemSchemaResult.error) {
-			return fail(itemSchemaResult.error.toString())
-		}
-
-		const itemSchema = itemSchemaResult.data.AssessmentItemSchema
-		const validation = itemSchema.safeParse(rawItem)
-		if (!validation.success) {
-			return fail(validation.error.toString(), {
-				validationErrors: validation.error.issues
-			})
-		}
-
-		const sanitizedResult = errors.trySync(() =>
-			validateAndSanitizeHtmlFields(validation.data, logger)
-		)
-		if (sanitizedResult.error) {
-			return fail(sanitizedResult.error.toString())
-		}
-		logger.debug("sanitized item", {
-			templateCandidateId,
-			bodyPresent: Boolean(sanitizedResult.data.body),
-			interactionCount: sanitizedResult.data.interactions
-				? Object.keys(sanitizedResult.data.interactions).length
-				: 0
-		})
-
 		const persistResult = await errors.try(
 			persistExecution(
 				templateCandidateId,
 				normalizedSeed,
-				sanitizedResult.data
+				generationResult.data
 			)
 		)
 		if (persistResult.error) {
