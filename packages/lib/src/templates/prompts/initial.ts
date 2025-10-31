@@ -45,7 +45,8 @@ export function composeInitialPrompt(
 		createNegativeExampleSection([
 			"shuffled_twice",
 			"prompt_spacing",
-			"readonly_choice_ids"
+			"readonly_choice_ids",
+			"interaction_replacement"
 		])
 	].filter((section): section is string => Boolean(section))
 
