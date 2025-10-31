@@ -1,7 +1,6 @@
 {
 	"$schema": "https://openapi.vercel.sh/vercel.json",
 	"framework": "hono",
-	"buildCommand": "echo done",
 	"bunVersion": "1.x",
 	"regions": ["cle1"]
 }

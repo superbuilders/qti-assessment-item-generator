@@ -6,6 +6,7 @@ import * as path from "node:path"
 // stream import no longer required after switching to direct piping
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
+import { spawn } from "bun"
 import tar from "tar-stream"
 import { z } from "zod"
 import {
@@ -292,7 +293,7 @@ export async function buildCartridgeToBytes(
 	// Finalize tar then stream into multi-threaded zstd
 	pack.finalize()
 
-	const proc = Bun.spawn({
+	const proc = spawn({
 		cmd: ["zstd", "--fast=3", "-T0", "-q", "-c"],
 		stdin: "pipe",
 		stdout: "pipe",
@@ -496,7 +497,7 @@ export async function buildCartridgeToFile(
 	}
 
 	// Stream to zstd directly to file
-	const proc = Bun.spawn({
+	const proc = spawn({
 		cmd: ["zstd", "--fast=3", "-T0", "-q", "-o", outFile],
 		stdin: "pipe",
 		stdout: "pipe",
@@ -703,12 +704,12 @@ export async function buildCartridgeFromFileMap(
 	await writeJson("integrity.json", integ.data)
 
 	// tar | zstd
-	const procTar = Bun.spawn({
+	const procTar = spawn({
 		cmd: ["tar", "-C", stageRoot, "-cf", "-", "."],
 		stdout: "pipe",
 		stderr: "pipe"
 	})
-	const procZstd = Bun.spawn({
+	const procZstd = spawn({
 		cmd: ["zstd", "--fast=3", "-T0", "-q", "-o", outFile],
 		stdin: "pipe",
 		stdout: "pipe",

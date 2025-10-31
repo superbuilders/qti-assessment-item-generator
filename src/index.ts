@@ -1,9 +1,9 @@
 import "./env"
 import { Hono } from "hono"
 import { serve } from "inngest/hono"
-import { executionRoutes } from "./routes/executions"
 import { inngest } from "./inngest/client"
 import { functions } from "./inngest/functions"
+import { executionRoutes } from "./routes/executions"
 
 const app = new Hono()
 

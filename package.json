@@ -1,27 +1,44 @@
 {
-	"name": "qti-assessment-item-generator-monorepo",
+	"name": "@superbuilders/qti-assessment-item-generator-app",
 	"private": true,
 	"type": "module",
 	"workspaces": [
 		"packages/*"
 	],
 	"scripts": {
-		"build": "bun run --cwd packages/lib build",
+		"build": "bun run build:lib",
 		"build:lib": "bun run --cwd packages/lib build",
-		"build:app": "bun run --cwd packages/app build",
-		"typecheck": "bun run --cwd packages/lib typecheck && bun run --cwd packages/app typecheck",
-		"dev": "bun run --cwd packages/app dev",
-		"dev:inngest": "bun run --cwd packages/app dev:inngest",
-		"lint": "bun run --cwd packages/lib lint && bun run --cwd packages/app lint",
-		"format": "bun run --cwd packages/lib format",
+		"typecheck": "bun run typecheck:app && bun run typecheck:lib",
+		"typecheck:app": "tsc --noEmit -p tsconfig.json",
+		"typecheck:lib": "bun run --cwd packages/lib typecheck",
+		"dev": "bun --watch src/index.ts",
+		"dev:inngest": "inngest-cli dev --queue-workers 4000 --poll-interval 2",
+		"lint": "biome lint && bun run --cwd packages/lib lint",
+		"format": "biome format --write",
+		"db:generate": "drizzle-kit generate",
+		"db:migrate": "drizzle-kit migrate",
+		"db:push": "drizzle-kit push",
+		"db:studio": "drizzle-kit studio",
+		"db:drop": "bun run src/db/scripts/drop.ts",
 		"test": "bun test"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.0.0-beta.6",
 		"@types/bun": "^1.3.1",
+		"dotenv": "^17.2.3",
+		"drizzle-kit": "^0.31.6",
+		"inngest-cli": "^1.13.1",
 		"typescript": "^5.9.3"
 	},
 	"dependencies": {
-		"@superbuilders/errors": "^3.0.2"
+		"@aws-sdk/client-rds-data": "^3.922.0",
+		"@superbuilders/errors": "^3.0.2",
+		"@superbuilders/slog": "4.0.0",
+		"@t3-oss/env-core": "^0.13.8",
+		"drizzle-orm": "^0.44.7",
+		"hono": "^4.10.4",
+		"inngest": "^3.44.4",
+		"openai": "^6.7.0",
+		"zod": "^4.1.12"
 	}
 }

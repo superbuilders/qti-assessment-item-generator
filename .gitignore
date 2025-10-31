@@ -37,3 +37,5 @@ prd.md
 teks-staar-scrape
 canvas-scrape
 data
+.vercel
+.env*.local

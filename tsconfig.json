@@ -3,11 +3,12 @@
 		"target": "ESNext",
 		"module": "ESNext",
 		"moduleResolution": "bundler",
+		"types": ["bun"],
 		"strict": true,
 		"skipLibCheck": true,
 		"allowSyntheticDefaultImports": true,
-		"forceConsistentCasingInFileNames": true,
 		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
 		"experimentalDecorators": true,
 		"emitDecoratorMetadata": true,
 		"lib": ["ESNext", "DOM"],
@@ -16,6 +17,13 @@
 		"baseUrl": ".",
 		"paths": {
 			"@/*": ["packages/lib/src/*"]
-		}
-	}
+		},
+		"resolvePackageJsonImports": true,
+		"resolvePackageJsonExports": true,
+		"resolveJsonModule": true,
+		"useDefineForClassFields": true,
+		"noEmit": true
+	},
+	"include": ["src", "scripts", "drizzle.config.ts", "vercel.json"],
+	"exclude": ["node_modules", "packages/lib/dist"]
 }

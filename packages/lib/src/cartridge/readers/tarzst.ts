@@ -1,6 +1,8 @@
 // zstd reader uses Bun.spawn to decompress; no fs imports needed
+
 import * as errors from "@superbuilders/errors"
 import * as logger from "@superbuilders/slog"
+import { spawn } from "bun"
 import tar from "tar-stream"
 import { validateIntegrity } from "@/cartridge/client"
 import type { CartridgeReader } from "@/cartridge/reader"
@@ -11,7 +13,7 @@ export async function createTarZstReader(
 	const fileIndex = new Map<string, Buffer>()
 
 	const extract = tar.extract()
-	const zstdProc = Bun.spawn({
+	const zstdProc = spawn({
 		cmd: ["zstd", "-d", "-c", filePath],
 		stdout: "pipe",
 		stderr: "pipe"
