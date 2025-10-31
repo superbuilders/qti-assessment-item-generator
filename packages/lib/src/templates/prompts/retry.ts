@@ -15,6 +15,11 @@ import { SYSTEM_INSTRUCTIONS_SECTION } from "@/templates/prompts/sections/system
 import { createTemplateContract } from "@/templates/prompts/sections/template-contract"
 import { TEMPLATE_PHILOSOPHY_SECTION } from "@/templates/prompts/sections/template-philosophy"
 import { TYPE_ASSERTION_BANS_SECTION } from "@/templates/prompts/sections/type-assertion-bans"
+import {
+	createAssessmentItemTypesSection,
+	createContentTypesSection,
+	createInteractionTypesSection
+} from "@/templates/prompts/sections/type-definitions"
 import { createWidgetGuidance } from "@/templates/prompts/sections/widget-guidance"
 import {
 	BASE_SYSTEM_PROMPT,
@@ -42,6 +47,9 @@ export function composeRetryPrompt(
 		createSeedHelpersSection(),
 		createWidgetGuidance(allowedWidgets),
 		createTemplateContract(logger, allowedWidgets),
+		createAssessmentItemTypesSection(),
+		createContentTypesSection(),
+		createInteractionTypesSection(),
 		IDENTIFIER_GUIDANCE_SECTION,
 		FEEDBACK_GUIDANCE_SECTION,
 		LITERAL_BANS_SECTION,
