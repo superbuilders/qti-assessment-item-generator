@@ -2,6 +2,5 @@
 	"$schema": "https://openapi.vercel.sh/vercel.json",
 	"framework": "hono",
 	"bunVersion": "1.x",
-	"buildCommand": "echo skip-tsc",
 	"regions": ["cle1"]
 }
