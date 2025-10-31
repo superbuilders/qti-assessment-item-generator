@@ -326,51 +326,24 @@ export const executeTemplateCandidate = inngest.createFunction(
 		}
 		const generator = generatorCandidate
 
-		const asyncResult = errors.trySync(() => generator(parsedSeed))
-		if (asyncResult.error) {
+		const executionResult = errors.trySync(() => generator(parsedSeed))
+		if (executionResult.error) {
 			logger.error("candidate generator threw error", {
 				templateCandidateId,
-				error: asyncResult.error,
+				error: executionResult.error,
 				stack:
-					asyncResult.error instanceof Error ? asyncResult.error.stack : null
-			})
-			return fail(asyncResult.error.toString())
-		}
-
-		if (!(asyncResult.data instanceof Promise)) {
-			logger.error("candidate generator returned non-promise result", {
-				templateCandidateId,
-				resultType: typeof asyncResult.data
-			})
-			return fail("template candidate execution must return a Promise")
-		}
-
-		const generationResult = await errors.try(asyncResult.data)
-		if (generationResult.error) {
-			logger.error("candidate generator threw error", {
-				templateCandidateId,
-				error: generationResult.error,
-				stack:
-					generationResult.error instanceof Error
-						? generationResult.error.stack
+					executionResult.error instanceof Error
+						? executionResult.error.stack
 						: null
 			})
-			return fail(generationResult.error.toString())
-		}
-
-		if (typeof generationResult.data !== "string") {
-			logger.error("candidate generator returned non-string payload", {
-				templateCandidateId,
-				resultType: typeof generationResult.data
-			})
-			return fail("template candidate execution must resolve to a string")
+			return fail(executionResult.error.toString())
 		}
 
 		const persistResult = await errors.try(
 			persistExecution(
 				templateCandidateId,
 				normalizedSeed,
-				generationResult.data
+				executionResult.data
 			)
 		)
 		if (persistResult.error) {
