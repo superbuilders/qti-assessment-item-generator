@@ -6,8 +6,6 @@
 		"packages/*"
 	],
 	"scripts": {
-		"build": "bun run build:lib",
-		"build:lib": "bun run --cwd packages/lib build",
 		"typecheck": "bun run typecheck:app && bun run typecheck:lib",
 		"typecheck:app": "tsc --noEmit -p tsconfig.json",
 		"typecheck:lib": "bun run --cwd packages/lib typecheck",
